@@ -53,5 +53,3 @@ example collection. It displays an interactive virtual globe in an HTML canvas.
     </script>
     </body>
     </html>
-
-$Revision: 3320 $ $Date: 2015-07-15 13:53:05 -0700 (Wed, 15 Jul 2015) $
