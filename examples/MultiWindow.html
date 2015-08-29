@@ -1,0 +1,28 @@
+<!--@version $Id: MultiWindow.html 3103 2015-05-20 00:27:44Z tgaskins $-->
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <!--NOTE: Most Web World Wind examples use jquery, Bootstrap and requirejs but those technologies are NOT-->
+    <!--required by Web World Wind. See SimplestExample.html for an example of using Web World Wind without them.-->
+    <meta charset="UTF-8">
+    <title>World Wind Multi-window Example</title>
+    <script data-main="MultiWindow" src="../thirdparty/require.js"></script>
+</head>
+<body>
+<div id="page">
+    <div id="div1" style="position:absolute; top:20px; left:20px;">
+        <canvas id="canvasOne" width="300" height="300" style="border: 10px solid mediumblue;">
+            Your browser does not support HTML5 Canvas.
+        </canvas>
+    </div>
+    <div id="div2" style="position:absolute; top:20px; left:350px;" >
+        <canvas id="canvasTwo" width="300" height="300" style="border: 10px solid #ff0000;">
+        </canvas>
+    </div>
+    <div id="div3" style="position:absolute; top:20px; left:680px;" >
+        <canvas id="canvasThree" width="300" height="300" style="border: 10px solid #00ff00;">
+        </canvas>
+    </div>
+</div>
+</body>
+</html>

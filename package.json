@@ -1,0 +1,19 @@
+{
+  "name": "web-world-wind",
+  "version": "0.0.1",
+  "description": "Web World Wind",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "NASA",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-compress": "^0.13.0",
+    "grunt-contrib-requirejs": "^0.4.4",
+    "grunt-jsdoc": "^0.6.3"
+  }
+}

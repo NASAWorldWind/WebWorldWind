@@ -1,0 +1,42 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww14720\viewh15360\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 2/3/15 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\fs28 \cf0 Picking is the operation of informing the application of the shapes and terrain position at or near a specified screen location. The location is typically the cursor position or, in the case of touch screen devices, a tap position.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+\cf0 \
+World Wind provides three types of picking:\
+\
+1) Identify the top-most shape at a specified screen-coordinate location, as well as the terrain position at that location. This is termed top-most picking.\
+\
+2) Identify all shapes at a specified screen-coordinate location, as well as the terrain position at that location. Indicate the top-most object among all those collected. This is termed deep picking.\
+\
+3) Identify all shapes within a screen-coordinate rectangle. Indicate among those the shapes that are visible \'97 have an un-occluded representation on the screen. This is termed region picking. It does not include terrain.\
+\
+The WorldWindow class provides a pick method to execute the first two operations. A different method on WorldWindow, pickShapesInRegion, executes the third case.\
+\
+Picking utilizes the GPU to determine which objects are at the pick point. During picking, shapes are drawn to an off-screen frame buffer \'97 termed the pick buffer \'97 in unique colors. Their presence at the pick point is determined by reading the frame buffer at the pick point and determining whether the color there matches the shape\'92s unique pick color. Picking is limited to those shapes that intersect a very small frustum computed around the pick point. Shapes outside this frustum are not drawn.\
+\
+In the case of top-most picking, all shapes intersecting the pick frustum are collected during off-screen rendering. When they have all been rendered, the frame buffer is read and the color there matched against the collected shapes. The shape matching the color is returned as the picked shape.\
+\
+Terrain intersecting the pick frustum is also drawn in a unique pick color per terrain triangle, after determining the terrain tile that must be sampled. The triangle at the pick point is determined by matching the color read from the frame buffer. Further calculation determines the geographic position in that triangle corresponding to the pick point.\
+\
+In top-most picking, the picked terrain position is returned along with the picked shape, unless the terrain occludes all shapes at the pick point, in which case only the picked terrain position is returned. In deep picking, the terrain position is returned along with all shapes at the pick position, and marked as the top-most object if it occludes all shapes. In region picking no terrain position is returned.\
+\
+In the case of deep picking, each shape is rendered in a unique color and the frame buffer is read immediately to determine if the shape affected the screen at the pick point. If so, it is added to the list of picked shapes. Once all shapes so determined are collected, a final read of the frame buffer produces a color that is matched to the picked shapes to determine which of them is top-most. Terrain is picked as described for the previous case, and it, too, is considered in this final top-most determination. The terrain may be top-most.\
+\
+In region picking, all shapes intersecting a frustum corresponding to the specified region are collected and each rendered to the pick buffer in a unique color. The frame buffer for the region is read and the unique colors there are determined. Each collected shape with a pick color whose color is in the frame buffer is deemed to be visible on the screen and are marked as such.\
+\
+During pick rendering, shapes with texture do not render textured but instead specify their unique pick color to the current shader. The shader has a flag set by the shape indicating whether to apply texture-sampled color or the specified pick color.\
+\
+When picking text, the text\'92s bounding rectangle is rendered, not the text itself. This makes it possible to pick between the characters and still identify that the text was picked.\
+\
+Picking performance depends mostly on the number of shapes within the pick frustum. Top-most picking performs faster than deep picking. Performance of region picking depends on the size of the pick rectangle. In WWJ, typical performance of deep picking on even scenes with a very large number of objects is on the order of a few milliseconds.\
+\
+This method of picking assures that the objects picked are actually unoccluded and visible, and requires no special logic in the shapes themselves other than determining whether they\'92re in the pick frustum and rendering themselves in a unique color. Detection code unique to each shape is not required.}

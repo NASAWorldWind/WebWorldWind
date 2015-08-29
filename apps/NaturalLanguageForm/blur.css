@@ -1,0 +1,115 @@
+
+.background-image {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 1;
+
+  display: block;
+  
+  background-image:  
+  					linear-gradient(
+      					rgba(232, 232, 232, 0.55),
+     					rgba(255, 255, 255, 0.55)
+    				),
+    				/* bottom, image */
+
+   						 url(https://humanlink.files.wordpress.com/2008/10/picture-141.png);
+  
+  width: 100%;
+  height: 100%;
+
+  -webkit-filter: blur(6px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  
+  filter: blur(5px);
+}
+
+.content {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.tcon {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 40px;
+  transition: 0.3s;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  width: 40px;
+  background: transparent;
+  outline: none; }
+  .tcon > * {
+    display: block; }
+  .tcon:hover, .tcon:focus {
+    outline: none; }
+  .tcon::-moz-focus-inner {
+    border: 0; }
+
+.tcon-plus {
+  height: 40px;
+  position: relative;
+  -webkit-transform: scale(.75);
+  transform: scale(.75);
+  width: 40px; }
+  .tcon-plus::before, .tcon-plus::after {
+    content: "";
+    border-radius: 2px;
+    display: block;
+    width: 85%;
+    height: 25%;
+    position: absolute;
+    top: 37%;
+    left: 8%;
+    transition: 0.3s;
+    background: #333; }
+  .tcon-plus:after {
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg); }
+
+.tcon-plus--minus.tcon-transform::before {
+  -webkit-transform: rotate(180deg) translate(0, 0);
+  transform: rotate(180deg) translate(0, 0);
+  width: 62%; }
+.tcon-plus--minus.tcon-transform::after {
+  -webkit-transform: rotate(-180deg) translate(-37.5%, 0);
+  transform: rotate(-180deg) translate(-37.5%, 0);
+  width: 62%; }
+
+.tcon-visuallyhidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px; }
+  .tcon-visuallyhidden:active, .tcon-visuallyhidden:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto; }
+
+ 

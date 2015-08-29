@@ -1,0 +1,6 @@
+/* @version $Id: Explorer.css 3296 2015-06-30 20:19:26Z tgaskins $ */
+.wrap-panel-heading {
+    white-space: normal;
+    -ms-word-wrap: break-word;
+    word-wrap: break-word;
+}

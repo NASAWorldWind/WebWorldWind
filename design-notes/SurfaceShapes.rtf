@@ -1,0 +1,65 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1344\cocoasubrtf720
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww21540\viewh21500\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs28 \cf0 2/4/15\
+\
+
+\fs36 Overview
+\fs28 \
+\
+Surface shapes provide World Wind applications with the capability to display primitive shapes overlaid on the World Wind terrain. They solve the problem of displaying geometry that appears to follow the surface of the terrain exactly, and with a clear edge at the end boundaries. Said another way, surface shapes are infinitely thin primitives draped over the terrain. World Wind provides the following surface shapes: SurfacePolygon, SurfacePolyline, SurfaceEllipse, SurfaceCircle, SurfaceQuad, SurfaceSquare and SurfaceSector.\
+\
+Surface shapes may be attached to any layer in a World Window, and are configured by the application. SurfacePolygon and SurfacePolyline are configured with a list of locations and a path type. SurfacePolygon may contain multiple lists of locations, in which case regions of non-zero winding order identify the interior regions. A shape\'92s locations must be re-specified by the application in order for a shape to update its display; a change in a location\'92s value is not automatically reflected in a shape\'92s display. The path type indicates the method of interpolating between locations: great circle, rhumb or linear. SurfacePolygon and SurfacePolyline tessellate between the application-specified locations in order to give the appearance of following a great circle arc or a rhumb line.\
+\
+SurfaceEllipse, SurfaceCircle, SurfaceQuad and SurfaceSquare are configured with a center location and one or more dimensions in meters. These shapes implicitly compute their boundaries based on the center location and the given dimensions. Each dimension indicates the length in meters of a great arc between the center location and the edge indicated by the dimension. For example, an ellipse\'92s major radius indicates the length in meters of the great arc between the center location and the location at the end of the major axis. A shape\'92s center location or dimensions must be re-specified in order for a shape to update its display; a change in the center location is not automatically reflected in a shape\'92s display. Though the meaning of path type is less clear for these shapes, they tessellate between their implicitly generated locations in order to give the appearance of following a great circle arc or a rhumb line.\
+\
+SurfaceSector is configured with an axis-aligned rectangle in geographic coordinates. A SurfaceSector\'92s rectangle must be re-specified in order for a shape to update its display; a change in the rectangle is not automatically reflected in the shape\'92s display. Though the meaning of path type is less clear SurfaceSector, this shape tessellates between it\'92s implicitly generated locations in order to give the appearance of following a great circle arc or a rhumb line. \
+\
+Though the location data for surface shapes is expressed in the equirectangular projection, shapes cross the anti-meridian or contains a poles are displayed correctly\
+\
+
+\fs36 Implementation in World Wind Java
+\fs28 \
+\
+Surface shapes are drawn into a per-WorldWindow collection of off-screen texture tiles in the equirectangular projection. These tiles are selected as a function of the viewer\'92s position and orientation and are independent of the shapes themselves. Only those tiles intersecting a shape are displayed each frame.\
+\
+Surface Shapes in World Wind Java use OpenGL to rasterize themselves into the off-screen textures. This enables surface shapes to use the same GL rendering code as their 3D counterparts, and ensures that all shapes line stippling attributes behave similarly. Additionally, offscreen rendering using AWT did not scale as well as GL. The off-screen texture tiles typically have the same dimension, but vary in the geographic region they represent. Texture tiles of progressively finer resolution are selected as the viewer gets close to the terrain, thereby enabling surface shapes to maintain an approximately constant ratio of texels to screen pixels.  \
+\
+World Wind Java limits its use of OpenGL to version 1.4 in order to support older hardware, and therefore cannot assume the availability of framebuffer objects for offscreen rendering. Surface shapes are therefore drawn into a region of the World Window\'92s framebuffer then copied into a texture tile. GL framebuffer objects are used on platforms supporting that extension, but the assumption that the framebuffer may be modified does not change. World Wind Java defines three rendering phases: preRender, pick, and render. Surface shape offscreen rendering occurs during the preRender phase, during which a renderable is given full control of the framebuffer.\
+\
+The WorldWindow\'92s SceneController, DrawContext and SurfaceObjectTileBuilder work together each frame to create a single set of texture tiles that contain a visual representation of all surface shapes. The following six steps outline that process:\
+\
+1) The SceneController calls preRender on all layers. Any surface shapes in the layers enqueue themselves in the SceneController\'92s list of surface shapes using a method on the DrawContext.\
+2) The SceneController enables its ordered rendering flag, then passes its list of surface shapes to a SurfaceObjectTileBuilder.\
+3) SurfaceObjectTileBuilder assembles its texture tiles based on the current eye point and frustum, then determines which shapes intersect each tile.\
+4) SurfaceObjectTileBuilder updates each tile as necessary. Tiles are updated when one of the following conditions is true: (a) the tile\'92s texture is not in the GPU resource cache, (b) the list of intersecting shapes has changed since the last update, or (c) any shape\'92s state has changed since the last update.\
+5) For all tiles that must be updated, SurfaceObjectTileBuilder clears the texture, then draws all intersecting surface shapes into the texture by calling render on each shape. Surface shapes use the ordered rendering flag as an indicator to draw, rather than enqueue. The tile\'92s dimensions and geographic bounds are available during shape rendering via a property of the DrawContext.  \
+6) After calling render on all layers, the SceneController draws the SurfaceObjectTileBuilder\'92s texture tiles on the current terrain tiles. \
+\
+During picking, the fragments of each shape must be displayed in a unique color. The texture tiles containing the visual representation of all surface shapes are not suitable of this purpose, since it\'92s unclear which shape contributed to each texel. Surface shapes display their pick representation by working with SurfaceObjectTileBuilder to maintain a set of texture tiles containing white texels where the shape has geometry, and transparent black texels everywhere else. During picking, these texture tiles are modulated with a unique pick color and drawn on the terrain. The following four steps outline that process:\
+\
+1) The SceneController calls preRender on all layers. Each surface shape intersecting the pick frustum enables picking and ordered rendering (temporarily), then passes itself to an internal SurfaceObjectTileBuilder.\
+2) SurfaceObjectTileBuilder assembles its texture tiles based on the current eye point and frustum, then determines which tiles the shape intersects.\
+3) For all tiles that must be updated, SurfaceObjectTileBuilder clears the texture, then draws the shape into the texture by calling render. The shape uses the ordered rendering flag and the pick flag as an indicator to draw its pick representation, rather than enqueue. The texture tile\'92s dimensions and geographic bounds are available during shape rendering via a property of the DrawContext.  \
+4) During layer picking, each surface shape draws its pick tiles on the terrain, modulating the texture fragments with the current pick color.\
+\
+A surface shape\'92s locations may define a complex polygon, whether specified explicitly or computed implicitly. Two examples are a polygon with holes, and an ellipse which has concave geometry once projected into the equirectangular projection. Surface shapes use the GLU tessellator to triangulate their geometry. The output of this step is a list of triangle indices that display the shape\'92s interior, and a list of line segment indices that display the shape\'92s outline.\
+\
+
+\fs36 Porting from World Wind Java to Web World Wind
+\fs28 \
+\
+The port of surface shapes from World Wind Java to Web World Wind will be a direct port of the current design and implementation, with the following exceptions:\
+\
+1) Store shape vertices and indices in GL buffers instead of submitting them using immediate mode GL calls (e.g. glBegin/glVertex/glEnd). \
+\
+2) Replace GL 1.x style state changes with uniform properties of GL 2.x shaders.\
+\
+3) Use the following JavaScript GLU tessellator:\
+{\field{\*\fldinst{HYPERLINK "https://github.com/brendankenny/libtess.js"}}{\fldrslt https://github.com/brendankenny/libtess.js}}\
+\
+In World Wind Java, surface shapes use the GLU tessellator to triangulate their geometry every time they render, and submit vertices during the triangulation using immediate mode GL calls. The assumption guiding this choice was that the texture tiles cache a shape\'92s representation, so the results of GLU tessellation need not be kept around and immediate mode GL calls would be fast enough. This has proven to be a false assumption; updates to surface shape texture tiles can be unnecessarily expensive as the complexity of shape geometry increases. Since the port requires replacing immediate mode GL calls, take the opportunity to keep the tessellated indices around, rather than recomputing them.\
+}

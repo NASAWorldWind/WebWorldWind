@@ -1,0 +1,95 @@
+I just spent way too much time meandering about that blighted wasteland known as JavaScript Unit Testing.
+I want to share what I learned about what works. There may be some other ways to make unit testing work in WebStorm,
+but there are a LOT of ways that don't.
+
+The primary issue is getting WebStorm's most documented framework jsTestDriver, working correctly with requirejs,
+which we use for module management. If it weren't for our using requirejs, this might have been easier. But we are
+using requirejs.
+
+1) create a "test" path within the project
+2) in the toolbar, click on the Wrench icon (Preferences)
+3) select "Project: WebWorldWind" and open the subsection
+4) select Directories
+5) select the "test" subdirectory created in step 1 and mark as "Tests" (the "test" directory icon will turn green)
+6) in the project root (this might be relocatable elsewhere, but YMMV), create a file called "jsTestDriver.conf"
+7) for testing Vec3.js, I put the following stuff into it:
+
+    load:
+      - thirdparty/require.js
+
+    test:
+      - test/Vec3.test.js
+
+    serve:
+      - src/util/Logger.js
+      - src/error/ArgumentError.js
+      - src/geom/Vec3.js
+
+    WebStorm understands the format of this .conf file and will check and help fill in valid file paths and names.
+8) go to the top menu and select "Run | Edit Configurations..."
+9) click on the "+" icon (Create New Configuration)
+10) in the drop-down, select "JsTestDriver"; a new pane will appear
+11) give the test a name (I called it "Vec3" but it should be more general than that for our purposes)
+12) in the Configuration tab, select "Configuration file" from the "Test:" drop-down
+13) click on the "..." icon to select the jsTestDriver.conf you created in step 6
+14) in your "test" subdirectory, create a test runner; I called mine "Vec3.test.js"
+    (apparently, the convention is to put "test" in the name right before the extension; whether this is critical
+    for proper operation of jsTestDriver is TBD; I got the impression it was, but again, YMMV)
+15) in your test runner (Vec3.test.js for this example), add the following:
+
+    require({
+        baseUrl: '/test/'
+    }, [
+        'src/geom/Vec3'
+    ], function(
+        Vec3
+    ) {
+        TestCase("Vec3Test", {
+            testTest: function () {
+                var vec3 = new Vec3(1, 2, 3);
+
+                assertEquals(2, vec3[1]);
+            }
+        });
+    });
+
+    I will add commentary about what is in this file a little later; some of it is CRITICAL for unit testing to work.
+16) go to the Run top level menu entry and select "Run <Name_Of_Test>" (where <Name_Of_Test> is "Vec3" for what I
+    created above)
+17) open your browser of choice (whatever you configured WebStorm to run the unit tests)
+18) the first time this runs, the Run tab at the bottom of the screen displays:
+    "To capture a browser open http://127.0.0.1:9876/capture"
+    click on the URL
+19) a new browser tab opens and the unit test is run; little pop-ups also appear showing the status of your unit tests
+
+Now a few comments about what I said in step 15, where I filled in the test runner itself. It is important to get this
+right because if you don't, either jsTestDriver won't see any unit tests or the unit tests will get "undefined"
+for the module handle passed to them.
+
+First of all, you need to specify requirejs' baseUrl property here. I had no success putting it in a separate file.
+But I might not have been invoking the proper incantation.
+
+Second, the baseUrl needs to start with "/test/" for jsTestDriver to work correctly.
+
+Third, the actual path for the modules to load can be split between baseUrl and the string array that is the
+second parameter of require(). So if you have a couple of modules that all share a common base path (e.g.,
+in our case src/geom/Vec3 and src/geom/Angle) you could put the common part at the end of the baseUrl
+(for this example, "/test/src/geom") and then put the unique parts in the string array passed to require().
+
+Fourth, the structure of the test runner is an instance of the class "TestCase" and each method defines
+a different test. "assertEquals" is just one of several unit test assertion functions that can be called.
+I also believe that you can do common stuff both before and after all tests have been called (e.g.,
+outputting a report). I refer you to the documentation for jsTestDriver (located at:
+https://code.google.com/p/js-test-driver/wiki/GettingStarted), such as it is.
+
+Fifth, I had to put the modules AND THEIR DEPENDENCIES onto the "serve:" line in the jsTestDriver.conf file.
+I think that is needed, but I might be wrong.
+
+Sixth, looking at the Google docs for jsTestDriver (Google wrote this originally and JetBrains picked
+it up for WebStorm), the preferred configuration is that this conf file be placed in the project root and
+that it has the name "jsTestDriver.conf". I suspect it can be put elsewhere and have a different name,
+but that was Google's recommendation.
+
+Seventh, you can explicitly specify a port that the unit test framework should access, but the default (9876) was fine
+with me.
+

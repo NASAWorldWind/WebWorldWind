@@ -1,0 +1,253 @@
+/*
+ * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
+ */
+/**
+ * @exports GpuResourceCache
+ * @version $Id: GpuResourceCache.js 3023 2015-04-15 20:24:17Z tgaskins $
+ */
+define([
+        '../util/AbsentResourceList',
+        '../error/ArgumentError',
+        '../util/ImageSource',
+        '../util/Logger',
+        '../cache/MemoryCache',
+        '../render/Texture'
+    ],
+    function (AbsentResourceList,
+              ArgumentError,
+              ImageSource,
+              Logger,
+              MemoryCache,
+              Texture) {
+        "use strict";
+
+        /**
+         * Constructs a GPU resource cache for a specified size and low-water value.
+         * @alias GpuResourceCache
+         * @constructor
+         * @classdesc Maintains a cache of GPU resources such as textures and GLSL programs.
+         * Applications typically do not interact with this class unless they create their own shapes.
+         * @param {Number} capacity The cache capacity, in bytes.
+         * @param {Number} lowWater The number of bytes to clear the cache to when it exceeds its capacity.
+         * @throws {ArgumentError} If the specified capacity is undefined, 0 or negative or the low-water value is
+         * undefined, negative or not less than the capacity.
+         */
+        var GpuResourceCache = function (capacity, lowWater) {
+            if (!capacity || capacity < 1) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GpuResourceCache", "constructor",
+                        "Specified cache capacity is undefined, 0 or negative."));
+            }
+
+            if (!lowWater || lowWater < 0 || lowWater >= capacity) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GpuResourceCache", "constructor",
+                        "Specified cache low-water value is undefined, negative or not less than the capacity."));
+            }
+
+            // Private. Holds the actual cache entries.
+            this.entries = new MemoryCache(capacity, lowWater);
+
+            // Private. Counter for generating cache keys.
+            this.cacheKeyPool = 0;
+
+            // Private. List of retrievals currently in progress.
+            this.currentRetrievals = {};
+
+            // Private. Identifies requested resources that whose retrieval failed.
+            this.absentResourceList = new AbsentResourceList(3, 60e3);
+        };
+
+        Object.defineProperties(GpuResourceCache.prototype, {
+            /**
+             * Indicates the capacity of this cache in bytes.
+             * @type {Number}
+             * @readonly
+             * @memberof GpuResourceCache.prototype
+             */
+            capacity: {
+                get: function () {
+                    return this.entries.capacity;
+                }
+            },
+
+            /**
+             * Indicates the low-water value for this cache in bytes, the size this cache is cleared to when it
+             * exceeds its capacity.
+             * @type {Number}
+             * @readonly
+             * @memberof GpuResourceCache.prototype
+             */
+            lowWater: {
+                get: function () {
+                    return this.entries.lowWater;
+                }
+            },
+
+            /**
+             * Indicates the number of bytes currently used by this cache.
+             * @type {Number}
+             * @readonly
+             * @memberof GpuResourceCache.prototype
+             */
+            usedCapacity: {
+                get: function () {
+                    return this.entries.usedCapacity;
+                }
+            },
+
+            /**
+             * Indicates the number of free bytes in this cache.
+             * @type {Number}
+             * @readonly
+             * @memberof GpuResourceCache.prototype
+             */
+            freeCapacity: {
+                get: function () {
+                    return this.entries.freeCapacity;
+                }
+            }
+        });
+
+        /**
+         * Creates a cache key unique to this cache, typically for a resource about to be added to this cache.
+         * @returns {String} The generated cache key.
+         */
+        GpuResourceCache.prototype.generateCacheKey = function () {
+            return "GpuResourceCache " + ++this.cacheKeyPool;
+        };
+
+        /**
+         * Adds a specified resource to this cache. Replaces the existing resource for the specified key if the
+         * cache currently contains a resource for that key.
+         * @param {String|ImageSource} key The key or image source of the resource to add.
+         * @param {Object} resource The resource to add to the cache.
+         * @param {Number} size The resource's size in bytes. Must be greater than 0.
+         * @throws {ArgumentError} If either the key or resource arguments is null or undefined
+         * or if the specified size is less than 1.
+         */
+        GpuResourceCache.prototype.putResource = function (key, resource, size) {
+            if (!key) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GpuResourceCache", "putResource", "missingKey."));
+            }
+
+            if (!resource) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GpuResourceCache", "putResource", "missingResource."));
+            }
+
+            if (!size || size < 1) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GpuResourceCache", "putResource",
+                        "The specified resource size is undefined or less than 1."));
+            }
+
+            var entry = {
+                resource: resource
+            };
+
+            this.entries.putEntry(key instanceof ImageSource ? key.key : key, entry, size);
+        };
+
+        /**
+         * Returns the resource associated with a specified key.
+         * @param {String|ImageSource} key The key or image source of the resource to find.
+         * @returns {Object} The resource associated with the specified key, or null if the resource is not in
+         * this cache or the specified key is null or undefined.
+         */
+        GpuResourceCache.prototype.resourceForKey = function (key) {
+            var entry = (key instanceof ImageSource)
+                ? this.entries.entryForKey(key.key) : this.entries.entryForKey(key);
+
+            return entry ? entry.resource : null;
+        };
+
+        /**
+         * Indicates whether a specified resource is in this cache.
+         * @param {String|ImageSource} key The key or image source of the resource to find.
+         * @returns {Boolean} true If the resource is in this cache, false if the resource
+         * is not in this cache or the specified key is null or undefined.
+         */
+        GpuResourceCache.prototype.containsResource = function (key) {
+            return this.entries.containsKey(key instanceof ImageSource ? key.key : key);
+        };
+
+        /**
+         * Removes the specified resource from this cache. The cache is not modified if the specified key is null or
+         * undefined or does not correspond to an entry in the cache.
+         * @param {String|ImageSource} key The key or image source of the resource to remove.
+         */
+        GpuResourceCache.prototype.removeResource = function (key) {
+            this.entries.removeEntry(key instanceof ImageSource ? key.key : key);
+        };
+
+        /**
+         * Removes all resources from this cache.
+         */
+        GpuResourceCache.prototype.clear = function () {
+            this.entries.clear(false);
+        };
+
+        /**
+         * Retrieves an image and adds it to this cache when it arrives. If the specified image source is a URL, a
+         * retrieval request for the image is made and this method returns immediately with a value of null. A redraw
+         * event is generated when the image subsequently arrives and is added to this cache. If the image source is an
+         * {@link ImageSource}, the image is used immediately and this method returns the {@link Texture} created and
+         * cached for the image. No redraw event is generated in this case.
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @param {String|ImageSource} imageSource The image source, either a {@link ImageSource} or a String
+         * giving the URL of the image.
+         * @returns {Texture} The {@link Texture} created for the image if the specified image source is an
+         * {@link ImageSource}, otherwise null.
+         */
+        GpuResourceCache.prototype.retrieveTexture = function (gl, imageSource) {
+            if (!imageSource) {
+                return null;
+            }
+
+            if (imageSource instanceof ImageSource) {
+                var t = new Texture(gl, imageSource.image);
+                this.putResource(imageSource.key, t, t.size);
+                return t;
+            }
+
+            if (this.currentRetrievals[imageSource] || this.absentResourceList.isResourceAbsent(imageSource)) {
+                return null;
+            }
+
+            var cache = this,
+                image = new Image();
+
+            image.onload = function () {
+                Logger.log(Logger.LEVEL_INFO, "Image retrieval succeeded: " + imageSource);
+
+                var texture = new Texture(gl, image);
+
+                cache.putResource(imageSource, texture, texture.size);
+
+                delete cache.currentRetrievals[imageSource];
+                cache.absentResourceList.unmarkResourceAbsent(imageSource);
+
+                // Send an event to request a redraw.
+                var e = document.createEvent('Event');
+                e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                window.dispatchEvent(e);
+            };
+
+            image.onerror = function () {
+                delete cache.currentRetrievals[imageSource];
+                cache.absentResourceList.markResourceAbsent(imageSource);
+                Logger.log(Logger.LEVEL_WARNING, "Image retrieval failed: " + imageSource);
+            };
+
+            this.currentRetrievals[imageSource] = imageSource;
+            image.crossOrigin = 'anonymous';
+            image.src = imageSource;
+
+            return null;
+        };
+
+        return GpuResourceCache;
+    });

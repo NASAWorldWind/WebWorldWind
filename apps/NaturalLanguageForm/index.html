@@ -1,0 +1,168 @@
+<!--
+    Author: Ritesh Mishra, ritesh.mishra@nasa.gov
+    Modified by Matt Evers, mre8338@truman.edu
+    Editor: Jenipher D. González Aponte, jenipher.gonzalez-aponte@nasa.gov
+    NASA Ames Research Center, Moffett Field, California
+-->
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>NASA World Wind</title>
+
+	<meta name="author" content="Codrops" />
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="css/component.css" />
+	<link rel="stylesheet" type="text/css" href="css/default.css" />
+	<link rel="stylesheet" href="css/normalize.css">
+
+	<link rel="stylesheet" type="text/css" href="blur.css">
+	<link rel="stylesheet" type="text/css" href="css/searchBox.css">
+	<link href="dataPoint/css/style.css" rel="stylesheet" type="text/css">
+	<link href="dataPoint/css/reset.css" rel="stylesheet" type="text/css">
+
+	<style type="text/css">
+		#draggable { width: 150px; height: 150px; padding: 0.5em; }
+		/* dataPoint animation div */
+		#apDiv2
+		{
+			position: fixed;
+			width: 50px;
+			height: 60px;
+			z-index: 10;
+			right: 90px;
+			bottom: 75px;
+		}
+		/* dataPoint Icon div */
+        #apDiv3
+		{
+			position: fixed;
+			width: 50px;
+			height: 60px;
+			z-index: 1;
+			right: 78px;
+			bottom: 22px;
+		}
+		/*
+		    Wind Gear Icon
+		    Ritesh Mishra
+		*/
+        #apDiv4
+		{
+			position: fixed;
+			width: 200px;
+			height: 50px;
+			left: 70px;
+			bottom: 30px;
+		}
+        /*
+        World Wind Tag CSS
+						   Jenipher D. González Aponte
+						   */
+		#apDiv5
+		{
+			position:fixed;
+			right: 0px;
+			top: 0px;
+		}
+		/* information pop-up */
+		#layDiv1
+		{
+			position: fixed;
+			width: 100px;
+			height: 140px;
+			z-index: 1;
+			right: 78px;
+			bottom: 22px;
+		}
+	</style>
+	<script src="js/modernizr.custom.js"></script>
+	<script src="js/prefixfree.min.js"></script>
+	<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script data-main="js/main.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.19/require.js"></script>
+</head>
+<body class="nl-blurred">
+	<div id="landingScreen">
+		<!-- Sliding animation effect -->
+		<div class="container demo-1">
+			<!-- Top Navigation -->
+			<div class="tinted-image"></div>
+			<div class="background-image"></div>
+			<!-- NASA Logo -->
+			<div class="content">
+				<p> <img src="img/NASA.png" width="136" height="110" alt="NasaTranLogo" longdesc="img/NASA.png"></p>
+				<div id="apDiv3"><img src="img/pin.png" width="44" height="46" alt="Pin" longdesc="img/pin.png"></div>
+				<div id="apDiv5">
+					<a href="https://www.webworldwind.org" target="_blank">
+						<img src="img/Tag.png" border="false" longdesc="img/Tag.png" width="130" height="130">
+					</a>
+				</div>
+				<!--<div id="apDiv4"><img src="img/windGear.svg" alt="windGear" width="64" height="42" longdesc="img/windGear.svg"></div>-->
+				<div class="main-clearfix" style="padding-top: 10px; padding-left: 20%;">
+					<!-- NLS Form -->
+					<!--<form id="nl-form" class="nl-form">-->
+						<!--I'm looking for-->
+						<!--<select>-->
+						<!--<option value="1" selected>amenity</option>-->
+						<!--<option value="2">cafe</option>-->
+						<!--<option value="3">restaurant</option>-->
+						<!--</select>-->
+						<!--<input id="amenityField" type="text" value="" placeholder="amenity" data-subline="For example: <em>cafe</em>">-->
+						<!--near-->
+						<!--<input id="addressField" type="text" value="" placeholder="address" data-subline="For example: <em>Los Angeles</em> or <em>New York</em>"/>-->
+						<!--&lt;!&ndash;at&ndash;&gt;-->
+						<!--<input type="text" value="" placeholder="time" data-subline="For example: <em>1994</em>"/>-->
+					<!--</form>-->
+				</div>
+				<div class="nl-overlay"></div>
+			</div>
+		</div>
+		<!-- /container -->
+		<!--<script src="js/nlform.js"></script>-->
+		<!-- dataPoint Stuff -->
+		<div id="apDiv2">
+			<div id="hamburger" class="hamburglar is-open">
+				<div class="burger-icon">
+					<div class="burger-container">
+						<span class="burger-bun-top"></span>
+						<span class="burger-filling"></span>
+						<span class="burger-bun-bot"></span>
+					</div>
+				</div>
+
+				<!-- svg ring containter -->
+				<div class="burger-ring">
+
+					<svg class="svg-ring">
+						<path class="path" fill="none" stroke="#333" stroke-miterlimit="10" stroke-width="4" d="M 34 2 C 16.3 2 2 16.3 2 34 s 14.3 32 32 32 s 32 -14.3 32 -32 S 51.7 2 34 2" />
+					</svg>
+				</div>
+				<!-- the masked path that animates the fill to the ring -->
+
+				<svg width="0" height="0">
+					<mask id="mask">
+						<path xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#FD3E22" stroke-miterlimit="10" stroke-width="4" d="M 34 2 c 11.6 0 21.8 6.2 27.4 15.5 c 2.9 4.8 5 16.5 -9.4 16.5 h -4" />
+					</mask>
+				</svg>
+				<div class="path-burger">
+					<div class="animate-path">
+						<div class="path-rotation"></div>
+						<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+						<!--<script src="dataPoint/js/index.js"></script>-->
+						<!-- /dataPoint -->
+					</div>
+				</div>
+				<!--<script>-->
+					<!--var nlform = new NLForm(document.getElementById( 'nl-form' ));-->
+				<!--</script>-->
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
+
