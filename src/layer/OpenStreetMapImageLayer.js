@@ -46,8 +46,6 @@ define([
             this.destCanvas = document.createElement("canvas");
             this.destContext = this.destCanvas.getContext("2d");
 
-            this.mapAncestorToTile = false;
-
             this.urlBuilder = {
                 urlForTile: function (tile, imageFormat) {
                     //var url = "http://a.tile.openstreetmap.org/" +
