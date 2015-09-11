@@ -24,7 +24,7 @@ define([
          * @constructor
          * @classdesc Represents an image applied to a portion of a globe's terrain. Applications typically do not
          * interact with this class.
-         * @augments Tile
+         * @augments TextureTile
          * @param {Sector} sector The sector this tile covers.
          * @param {Level} level The level this tile is associated with.
          * @param {Number} row This tile's row in the associated level.
