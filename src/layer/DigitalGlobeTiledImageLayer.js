@@ -81,8 +81,6 @@ define([
             this.destCanvas = document.createElement("canvas");
             this.destContext = this.destCanvas.getContext("2d");
 
-            this.mapAncestorToTile = false;
-
             this.requestMetadata();
 
             var self = this;
