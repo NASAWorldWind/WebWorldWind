@@ -79,7 +79,7 @@ define([
             /**
              * The bounding boxes associated with this layer. The returned array contains objects with the following
              * properties: TODO
-             * @type {{}[]}
+             * @type {Object[]}
              * @readonly
              */
             this.boundingBox;
@@ -125,7 +125,7 @@ define([
 
             /**
              * The tile matris sets associated with this layer.
-             * @type {{}[]}
+             * @type {Object[]}
              * @readonly
              */
             this.tileMatrixSetLink;
