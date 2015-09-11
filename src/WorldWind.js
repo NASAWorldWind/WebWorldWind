@@ -83,6 +83,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Polygon',
         './geom/Position',
         './projections/ProjectionEquirectangular',
+        './projections/ProjectionGnomonic',
         './projections/ProjectionMercator',
         './projections/ProjectionPolarEquidistant',
         './projections/ProjectionUPS',
@@ -134,6 +135,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/WmsLayerCapabilities',
         './layer/WmsTimeDimensionedLayer',
         './util/WmsUrlBuilder',
+        './ogc/WmtsCapabilities',
+        './layer/WmtsLayer',
         './WorldWindow',
         './util/WWMath',
         './util/WWMessage',
@@ -216,6 +219,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Polygon,
               Position,
               ProjectionEquirectangular,
+              ProjectionGnomonic,
               ProjectionMercator,
               ProjectionPolarEquidistant,
               ProjectionUPS,
@@ -267,6 +271,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmsLayerCapabilities,
               WmsTimeDimensionedLayer,
               WmsUrlBuilder,
+              WmtsCapabilities,
+              WmtsLayer,
               WorldWindow,
               WWMath,
               WWMessage,
@@ -558,6 +564,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Polygon'] = Polygon;
         WorldWind['Position'] = Position;
         WorldWind['ProjectionEquirectangular'] = ProjectionEquirectangular;
+        WorldWind['ProjectionGnomonic'] = ProjectionGnomonic;
         WorldWind['ProjectionMercator'] = ProjectionMercator;
         WorldWind['ProjectionPolarEquidistant'] = ProjectionPolarEquidistant;
         WorldWind['ProjectionUPS'] = ProjectionUPS;
@@ -609,6 +616,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
         WorldWind['WmsTimeDimensionedLayer'] = WmsTimeDimensionedLayer;
         WorldWind['WmsUrlBuilder'] = WmsUrlBuilder;
+        WorldWind['WmtsCapabilities'] = WmtsCapabilities;
+        WorldWind['WmtsLayer'] = WmtsLayer;
         WorldWind['WWMath'] = WWMath;
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
