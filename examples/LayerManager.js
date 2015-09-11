@@ -81,6 +81,10 @@ define(function () {
                 this.flatGlobe.projection = new WorldWind.ProjectionUPS("North");
             } else if (projectionName === "South UPS") {
                 this.flatGlobe.projection = new WorldWind.ProjectionUPS("South");
+            } else if (projectionName === "North Gnomonic") {
+                this.flatGlobe.projection = new WorldWind.ProjectionUPS("North");
+            } else if (projectionName === "South Gnomonic") {
+                this.flatGlobe.projection = new WorldWind.ProjectionUPS("South");
             }
 
             if (this.wwd.globe !== this.flatGlobe) {
@@ -165,7 +169,9 @@ define(function () {
             "North Polar",
             "South Polar",
             "North UPS",
-            "South UPS"
+            "South UPS",
+            "North Gnomonic",
+            "South Gnomonic"
         ];
         var projectionDropdown = $("#projectionDropdown");
 
