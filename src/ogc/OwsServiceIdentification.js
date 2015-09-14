@@ -20,7 +20,7 @@ define([
          * @classdesc Represents an OWS Service Identification section of an OGC capabilities document.
          * This object holds as properties all the fields specified in the OWS Service Identification.
          * Fields can be accessed as properties named according to their document names converted to camel case.
-         * For example, "serviceType" and "titles".
+         * For example, "serviceType" and "title".
          * Note that fields with multiple possible values are returned as arrays, such as "titles" and "abstracts".
          * @param {Element} element An XML DOM element representing the OWS Service Identification section.
          * @throws {ArgumentError} If the specified XML DOM element is null or undefined.
@@ -31,10 +31,31 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "OwsServiceIdentification", "constructor", "missingDomElement"));
             }
 
-            this.assembleDocument(element);
-        };
+            var children = element.children;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
 
-        OwsServiceIdentification.prototype.assembleDocument = function (element) {
+                if (child.localName === "ServiceType") {
+                    this.serviceType = child.textContent;
+                } else if (child.localName === "ServiceTypeVersion") {
+                    this.serviceTypeVersion = child.textContent;
+                } else if (child.localName === "Profile") {
+                    this.profile = this.profiles || [];
+                    this.profile.push(child.textContent);
+                } else if (child.localName === "Title") {
+                    this.title = this.title|| [];
+                    this.title.push(child.textContent);
+                } else if (child.localName === "Abstract") {
+                    this.abstract = this.title|| [];
+                    this.abstract.push(child.textContent);
+                } else if (child.localName === "Fees") {
+                    this.fees = child.textContent;
+                } else if (child.localName === "AccessConstraints") {
+                    this.accessConstraints = this.accessConstraints || [];
+                    this.accessConstraints.push(child.textContent);
+                }
+                // TODO: Keywords
+            }
         };
 
         return OwsServiceIdentification;

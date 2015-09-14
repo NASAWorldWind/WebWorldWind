@@ -34,7 +34,6 @@ define([
         // TODO: Test Mercator layers.
         // TODO: Support tile matrix limits.
         // TODO: Extensibility for other projections.
-        // TODO: Determine where to get the layer's bounding box from if WGS84 bounding box not specified.
         // TODO: Finish parsing capabilities document (ServiceIdentification and ServiceProvider).
         // TODO: Time dimensions.
 
@@ -173,19 +172,26 @@ define([
                         "No supported Tile Matrix Set could be found."));
             }
 
-            // Determine the layer's sector.
-            // TODO: The WGS84 bounding box is optional. Determine how to determine the sector if it is not specified.
+            // Determine the layer's sector if possible. Mandatory for EPSG:4326 tile matrix sets. (Others compute
+            // it from tile Matrix Set metadata.)
             if (layerCaps.wgs84BoundingBox) {
                 this.sector = new Sector(
                     layerCaps.wgs84BoundingBox.lowerCorner[1],
                     layerCaps.wgs84BoundingBox.upperCorner[1],
                     layerCaps.wgs84BoundingBox.lowerCorner[0],
                     layerCaps.wgs84BoundingBox.upperCorner[0]);
-            } else {
-                // For now, throw an exception if there is no WGS84 bounding box.
+            } else if (this.tileMatrixSet.boundingBox &&
+                WmtsLayerCapabilities.isEpsg4326Crs(this.tileMatrixSet.boundingBox.crs)) {
+                this.sector = new Sector(
+                    this.tileMatrixSet.boundingBox.lowerCorner[1],
+                    this.tileMatrixSet.boundingBox.upperCorner[1],
+                    this.tileMatrixSet.boundingBox.lowerCorner[0],
+                    this.tileMatrixSet.boundingBox.upperCorner[0]);
+            } else if (WmtsLayerCapabilities.isEpsg4326Crs(this.tileMatrixSet.supportedCRS)) {
+                // Throw an exception if there is no 4326 bounding box.
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
-                        "No WGS84 bounding box was specified in the layer capabilities."));
+                        "No EPSG:4326 bounding box was specified in the layer or tile matrix set capabilities."));
             }
 
             // Form a unique string to identify cache entries.
@@ -470,27 +476,46 @@ define([
         };
 
         WmtsLayer.prototype.createTile3857 = function (tileMatrix, row, column) {
-            var mapWidth = tileMatrix.tileWidth * tileMatrix.matrixWidth,
-                mapHeight = tileMatrix.tileHeight * tileMatrix.matrixHeight,
-                swX = WWMath.clamp(column * tileMatrix.tileWidth - 0.5, 0, mapWidth),
-                neY = WWMath.clamp(row * tileMatrix.tileHeight - 0.5, 0, mapHeight),
-                neX = WWMath.clamp(swX + (tileMatrix.tileWidth) + 0.5, 0, mapWidth),
-                swY = WWMath.clamp(neY + (tileMatrix.tileHeight) + 0.5, 0, mapHeight),
+            if (!tileMatrix.mapWidth) {
+                this.computeTileMatrixValues3857(tileMatrix);
+            }
+
+            var swX = WWMath.clamp(column * tileMatrix.tileWidth - 0.5, 0, tileMatrix.mapWidth),
+                neY = WWMath.clamp(row * tileMatrix.tileHeight - 0.5, 0, tileMatrix.mapHeight),
+                neX = WWMath.clamp(swX + (tileMatrix.tileWidth) + 0.5, 0, tileMatrix.mapWidth),
+                swY = WWMath.clamp(neY + (tileMatrix.tileHeight) + 0.5, 0, tileMatrix.mapHeight),
                 x, y, swLat, swLon, neLat, neLon;
 
-            x = (swX / mapWidth) - 0.5;
-            y = 0.5 - (swY / mapHeight);
-            swLat = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI; // TODO: Use top-left corner metadata
-            swLon = 360 * x;
+            x = swX / tileMatrix.mapWidth;
+            y = swY / tileMatrix.mapHeight;
+            swLon = tileMatrix.topLeftCorner[0] + x * tileMatrix.tileMatrixDeltaX;
+            swLat = tileMatrix.topLeftCorner[1] - y * tileMatrix.tileMatrixDeltaY;
+            var swDegrees = WWMath.epsg3857ToEpsg4326(swLon, swLat);
 
-            x = (neX / mapWidth) - 0.5;
-            y = 0.5 - (neY / mapHeight);
-            neLat = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI; // TODO: Use top-left corner metadata
-            neLon = 360 * x;
+            x = neX / tileMatrix.mapWidth;
+            y = neY / tileMatrix.mapHeight;
+            neLon = tileMatrix.topLeftCorner[0] + x * tileMatrix.tileMatrixDeltaX;
+            neLat = tileMatrix.topLeftCorner[1] - y * tileMatrix.tileMatrixDeltaY;
+            var neDegrees = WWMath.epsg3857ToEpsg4326(neLon, neLat);
 
-            var sector = new Sector(swLat, neLat, swLon, neLon);
+            var sector = new Sector(swDegrees[0], neDegrees[0], swDegrees[1], neDegrees[1]);
 
             return this.makeTile(sector, tileMatrix, row, column);
+        };
+
+        WmtsLayer.prototype.computeTileMatrixValues3857 = function (tileMatrix) {
+            var pixelSpan = tileMatrix.scaleDenominator * 0.28e-3,
+                tileSpanX = tileMatrix.tileWidth * pixelSpan,
+                tileSpanY = tileMatrix.tileHeight * pixelSpan,
+                tileMatrixMaxX = tileMatrix.topLeftCorner[0] + tileSpanX * tileMatrix.matrixWidth,
+                tileMatrixMinY = tileMatrix.topLeftCorner[1] - tileSpanY * tileMatrix.matrixHeight,
+                bottomRightCorner = [tileMatrixMaxX, tileMatrixMinY],
+                topLeftCorner = tileMatrix.topLeftCorner;
+
+            tileMatrix.tileMatrixDeltaX = bottomRightCorner[0] - topLeftCorner[0];
+            tileMatrix.tileMatrixDeltaY = topLeftCorner[1] - bottomRightCorner[1];
+            tileMatrix.mapWidth = tileMatrix.tileWidth * tileMatrix.matrixWidth;
+            tileMatrix.mapHeight = tileMatrix.tileHeight * tileMatrix.matrixHeight;
         };
 
         WmtsLayer.prototype.makeTile = function (sector, tileMatrix, row, column) {
