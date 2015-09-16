@@ -89,7 +89,7 @@ define(function () {
                 if (wmsCapsDoc.version) { // if no version, then the URL doesn't point to a caps doc.
                     thisExplorer.addServerPanel(serverAddress, wmsCapsDoc);
                 } else {
-                    alert(wmsServer +
+                    alert(serverAddress +
                         " WMS capabilities document invalid. The server is probably not a WMS server.");
                 }
             } else if (request.readyState === 4) {
