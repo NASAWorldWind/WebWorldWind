@@ -502,12 +502,16 @@ define([
                     this.abstract = childElement.textContent;
 
                 } else if (childElement.localName === "KeywordList") {
-                    this.keywordList = [];
-                    elements = childElement.getElementsByTagName("Keyword");
-                    for (e = 0; e < elements.length; e++) {
-                        this.keywordList.push(elements[e].textContent);
-                    }
+                    this.keywordList = this.keywordList || [];
 
+                    var children2 = childElement.children || childElement.childNodes;
+                    for (var c2 = 0; c2 < children2.length; c2++) {
+                        var child2 = children2[c2];
+
+                        if (child2.localName === "Keyword") {
+                            this.keywordList.push(child2.textContent);
+                        }
+                    }
                 } else if (childElement.localName === "Style") {
                     if (!this._styles) {
                         this._styles = [];

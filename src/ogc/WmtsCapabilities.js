@@ -46,14 +46,7 @@ define([
         };
 
         WmtsCapabilities.prototype.assembleDocument = function (dom) {
-            var e,
-                elements = dom.getElementsByTagName("Capabilities");
-
-            if (elements.length == 0) {
-                return;
-            }
-
-            var root = elements[0];
+            var root = dom.documentElement;
 
             this.version = root.getAttribute("version");
             this.updateSequence = root.getAttribute("updateSequence");
