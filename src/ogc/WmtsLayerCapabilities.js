@@ -142,7 +142,7 @@ define([
         };
 
         WmtsLayerCapabilities.prototype.assembleLayer = function (element) {
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -191,7 +191,7 @@ define([
 
             result.isDefault = element.getAttribute("isDefault");
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -221,7 +221,7 @@ define([
                 result.crs = crs;
             }
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -240,7 +240,7 @@ define([
         WmtsLayerCapabilities.assembleDimension = function (element) {
             var result = {};
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -304,7 +304,7 @@ define([
         WmtsLayerCapabilities.assembleTileMatrixSetLink = function (element) {
             var result = {};
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -321,7 +321,7 @@ define([
         WmtsLayerCapabilities.assembleTileMatrixSetLimits = function (element) {
             var result = {};
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -337,7 +337,7 @@ define([
         WmtsLayerCapabilities.assembleTileMatrixLimits = function (element) {
             var result = {};
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 

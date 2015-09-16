@@ -51,7 +51,7 @@ define([
             this.version = root.getAttribute("version");
             this.updateSequence = root.getAttribute("updateSequence");
 
-            var children = root.children;
+            var children = root.children || root.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -73,7 +73,7 @@ define([
         WmtsCapabilities.prototype.assembleContents = function (element) {
             var contents = {};
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -103,7 +103,7 @@ define([
         WmtsCapabilities.assembleTileMatrixSet = function (element) {
             var tileMatrixSet = {};
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -138,7 +138,7 @@ define([
         WmtsCapabilities.assembleTileMatrix = function (element) {
             var tileMatrix = {};
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
