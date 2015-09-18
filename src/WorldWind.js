@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @version $Id: WorldWind.js 3418 2015-08-22 00:17:05Z tgaskins $
+ * @version $Id: WorldWind.js 3351 2015-07-28 22:03:20Z dcollins $
  */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
         './error/AbstractError',
@@ -26,7 +26,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Compass',
         './layer/CompassLayer',
         './layer/CoordinatesDisplayLayer',
-        './layer/DigitalGlobeTiledImageLayer',
         './gesture/DragRecognizer',
         './render/DrawContext',
         './globe/EarthElevationModel',
@@ -52,6 +51,31 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/HighlightController',
         './util/ImageSource',
         './render/ImageTile',
+        './formats/kml/KmlAbstractView',
+        './formats/kml/KmlBalloonStyle',
+        './formats/kml/KmlColorStyle',
+        './formats/kml/KmlElements',
+        './formats/kml/KmlFeature',
+        './formats/kml/KmlFile',
+        './formats/kml/KmlGeometry',
+        './formats/kml/KmlIcon',
+        './formats/kml/KmlIconStyle',
+        './formats/kml/KmlLabelStyle',
+        './formats/kml/KmlLinearRing',
+        './formats/kml/KmlLineString',
+        './formats/kml/KmlLineStyle',
+        './formats/kml/KmlMultiGeometry',
+        './formats/kml/KmlObject',
+        './formats/kml/KmlPlacemark',
+        './formats/kml/KmlPoint',
+        './formats/kml/KmlPolygon',
+        './formats/kml/KmlPolyStyle',
+        './formats/kml/KmlStyle',
+        './formats/kml/KmlStyleSelector',
+        './formats/kml/KmlSubStyle',
+        './formats/kml/KmlTimePrimitive',
+        './formats/kml/KmlTimeSpan',
+        './formats/kml/KmlTimeStamp',
         './layer/LandsatRestLayer',
         './layer/Layer',
         './util/Level',
@@ -73,7 +97,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/OpenStreetMapImageLayer',
         './gesture/PanRecognizer',
         './shapes/Path',
-        './util/PeriodicTimeSequence',
         './pick/PickedObject',
         './pick/PickedObjectList',
         './gesture/PinchRecognizer',
@@ -132,12 +155,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',
-        './layer/WmsTimeDimensionedLayer',
         './util/WmsUrlBuilder',
         './WorldWindow',
         './util/WWMath',
-        './util/WWMessage',
         './util/WWUtil',
+        './util/XmlDocument',
         './globe/ZeroElevationModel'],
     function (AbstractError,
               Angle,
@@ -159,7 +181,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Compass,
               CompassLayer,
               CoordinatesDisplayLayer,
-              DigitalGlobeTiledImageLayer,
               DragRecognizer,
               DrawContext,
               EarthElevationModel,
@@ -185,6 +206,31 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               HighlightController,
               ImageSource,
               ImageTile,
+              KmlAbstractView,
+              KmlBalloonStyle,
+              KmlColorStyle,
+              KmlElements,
+              KmlFeature,
+              KmlFile,
+              KmlGeometry,
+              KmlIcon,
+              KmlIconStyle,
+              KmlLabelStyle,
+              KmlLinearRing,
+              KmlLineString,
+              KmlLineStyle,
+              KmlMultiGeometry,
+              KmlObject,
+              KmlPlacemark,
+              KmlPoint,
+              KmlPolygon,
+              KmlPolyStyle,
+              KmlStyle,
+              KmlStyleSelector,
+              KmlSubStyle,
+              KmlTimePrimitive,
+              KmlTimeSpan,
+              KmlTimeStamp,
               LandsatRestLayer,
               Layer,
               Level,
@@ -206,7 +252,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               OpenStreetMapImageLayer,
               PanRecognizer,
               Path,
-              PeriodicTimeSequence,
               PickedObject,
               PickedObjectList,
               PinchRecognizer,
@@ -265,12 +310,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
-              WmsTimeDimensionedLayer,
               WmsUrlBuilder,
               WorldWindow,
               WWMath,
-              WWMessage,
               WWUtil,
+              XmlDocument,
               ZeroElevationModel) {
         "use strict";
         /**
@@ -501,7 +545,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
         WorldWind['CoordinatesDisplayLayer'] = CoordinatesDisplayLayer;
-        WorldWind['DigitalGlobeTiledImageLayer'] = DigitalGlobeTiledImageLayer;
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
         WorldWind['EarthElevationModel'] = EarthElevationModel;
@@ -527,6 +570,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
+        WorldWind['KmlFile'] = KmlFile;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
         WorldWind['Level'] = Level;
@@ -548,7 +592,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['OpenStreetMapImageLayer'] = OpenStreetMapImageLayer;
         WorldWind['PanRecognizer'] = PanRecognizer;
         WorldWind['Path'] = Path;
-        WorldWind['PeriodicTimeSequence'] = PeriodicTimeSequence;
         WorldWind['PickedObject'] = PickedObject;
         WorldWind['PickedObjectList'] = PickedObjectList;
         WorldWind['PinchRecognizer'] = PinchRecognizer;
@@ -607,10 +650,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
-        WorldWind['WmsTimeDimensionedLayer'] = WmsTimeDimensionedLayer;
         WorldWind['WmsUrlBuilder'] = WmsUrlBuilder;
         WorldWind['WWMath'] = WWMath;
-        WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;

@@ -4,13 +4,12 @@
  */
 /**
  * @exports WmsLayer
- * @version $Id: WmsLayer.js 3362 2015-07-31 19:29:12Z tgaskins $
+ * @version $Id: WmsLayer.js 3054 2015-04-29 19:29:02Z tgaskins $
  */
 define([
         '../error/ArgumentError',
         '../geom/Location',
         '../util/Logger',
-        '../util/PeriodicTimeSequence',
         '../geom/Sector',
         '../layer/TiledImageLayer',
         '../util/WmsUrlBuilder'
@@ -18,7 +17,6 @@ define([
     function (ArgumentError,
               Location,
               Logger,
-              PeriodicTimeSequence,
               Sector,
               TiledImageLayer,
               WmsUrlBuilder) {
@@ -45,20 +43,15 @@ define([
          * </ul>
          * The function [WmsLayer.formLayerConfiguration]{@link WmsLayer#formLayerConfiguration} will create an
          * appropriate configuration object given a {@link WmsLayerCapabilities} object.
-         * @param {String} timeString The time parameter passed to the WMS server when imagery is requested. May be
-         * null, in which case no time parameter is passed to the server.
          * @throws {ArgumentError} If the specified configuration is null or undefined.
          */
-        var WmsLayer = function (config, timeString) {
+        var WmsLayer = function (config) {
             if (!config) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmsLayer", "constructor", "No configuration specified."));
             }
 
             var cachePath = config.service + config.layerNames + config.styleNames;
-            if (timeString) {
-                cachePath = cachePath + timeString;
-            }
 
             TiledImageLayer.call(this, config.sector, config.levelZeroDelta, config.numLevels, config.format,
                 cachePath, config.size, config.size);
@@ -66,18 +59,10 @@ define([
             this.displayName = config.title;
             this.pickEnabled = false;
 
-            this.urlBuilder = new WmsUrlBuilder(config.service, config.layerNames, config.styleNames, config.version,
-                timeString);
+            this.urlBuilder = new WmsUrlBuilder(config.service, config.layerNames, config.styleNames, config.version);
             if (config.coordinateSystem) {
                 this.urlBuilder.crs = config.coordinateSystem;
             }
-
-            /**
-             * The time string passed to this layer's constructor.
-             * @type {String}
-             * @readonly
-             */
-            this.timeString = timeString;
         };
 
         WmsLayer.prototype = Object.create(TiledImageLayer.prototype);
@@ -85,10 +70,6 @@ define([
         /**
          * Forms a configuration object for a specified {@link WmsLayerCapabilities} layer description. The
          * configuration object created and returned is suitable for passing to the WmsLayer constructor.
-         * <p>
-         *     This method also parses any time dimensions associated with the layer and returns them in the
-         *     configuration object's "timeSequences" property. This property is a mixed array of Date objects
-         *     and {@link PeriodicTimeSequence} objects describing the dimensions found.
          * @param wmsLayerCapabilities {WmsLayerCapabilities} The WMS layer capabilities to create a configuration for.
          * @returns {{}} A configuration object.
          * @throws {ArgumentError} If the specified WMS layer capabilities is null or undefined.
@@ -152,42 +133,7 @@ define([
                 }
             }
 
-            var dimensions = WmsLayer.parseTimeDimensions(wmsLayerCapabilities);
-            if (dimensions && dimensions.length > 0) {
-                config.timeSequences = dimensions;
-            }
-
             return config;
-        };
-
-        WmsLayer.parseTimeDimensions = function (wmsLayerCapabilities) {
-            var dimensions = wmsLayerCapabilities.dimensions || wmsLayerCapabilities.extents,
-                parsedDimensions = null;
-
-            if (dimensions) {
-                parsedDimensions = [];
-
-                for (var i = 0; i < dimensions.length; i++) {
-                    var dimension = dimensions[i];
-
-                    if (dimension.name.toLowerCase() === "time" && dimension.units.toLowerCase() === "iso8601") {
-                        var individualDimensions = dimension.content.split(",");
-
-                        for (var j = 0; j < individualDimensions.length; j++) {
-                            var individualDimension = individualDimensions[j],
-                                splitDimension = individualDimension.split("/");
-
-                            if (splitDimension.length === 1) {
-                                parsedDimensions.push(new Date(individualDimension));
-                            } else if (splitDimension.length === 3) {
-                                parsedDimensions.push(new PeriodicTimeSequence(individualDimension));
-                            }
-                        }
-                    }
-                }
-            }
-
-            return parsedDimensions;
         };
 
         return WmsLayer;

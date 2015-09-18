@@ -647,7 +647,7 @@ define([
                 }
             }
 
-            // If you get hear, the shapefile is out of records.
+            // If you get here, the shapefile is out of records.
             return null;
         };
 

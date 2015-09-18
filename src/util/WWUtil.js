@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @version $Id: WWUtil.js 3402 2015-08-14 17:28:09Z tgaskins $
+ * @version $Id: WWUtil.js 3133 2015-06-02 16:48:25Z tgaskins $
  */
 define([
         '../error/ArgumentError',
@@ -39,9 +39,6 @@ define([
                     return "jpg";
 
                 if (mimeType === "application/bil16")
-                    return "bil";
-
-                if (mimeType === "application/bil32")
                     return "bil";
 
                 return null;
@@ -204,6 +201,20 @@ define([
 
                 // Add the script element to the document, causing the browser to invoke it.
                 head.appendChild(script);
+            },
+
+            arrayEquals: function(array1, array2) {
+                return (array1.length == array2.length) && array1.every(function(element, index) {
+                    return element === array2[index] || element.equals && element.equals(array2[index]);
+                });
+            },
+
+            transformToBoolean: function(item) {
+                if(item == 0 || item == "0" || item == "false") {
+                    return false;
+                } else {
+                    return Boolean(item);
+                }
             }
         };
 

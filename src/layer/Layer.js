@@ -4,7 +4,7 @@
  */
 /**
  * @exports Layer
- * @version $Id: Layer.js 3414 2015-08-20 19:09:19Z tgaskins $
+ * @version $Id: Layer.js 3106 2015-05-26 18:20:34Z tgaskins $
  */
 define([
         '../util/Logger'
@@ -70,14 +70,6 @@ define([
              * @readonly
              */
             this.inCurrentFrame = false;
-        };
-
-        /**
-         * Refreshes the data associated with this layer. The behavior of this function varies with the layer
-         * type. For image layers, it causes the images to be re-retrieved from their origin.
-         */
-        Layer.prototype.refresh = function () {
-            // Default implementation does nothing.
         };
 
         /**
