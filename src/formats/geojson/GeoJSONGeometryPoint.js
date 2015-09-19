@@ -5,17 +5,15 @@
 /**
  * @exports GeoJSONGeometryPoint
  */
-define([
-        '../../error/ArgumentError',
+define(['../../error/ArgumentError',
         './GeoJSONCRS',
         './GeoJSONGeometry',
         '../../util/Logger'
     ],
-    function (
-        ArgumentError,
-        GeoJSONCRS,
-        GeoJSONGeometry,
-        Logger) {
+    function (ArgumentError,
+              GeoJSONCRS,
+              GeoJSONGeometry,
+              Logger) {
         "use strict";
 
         /**

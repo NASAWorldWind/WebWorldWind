@@ -5,113 +5,111 @@
 /**
  * @exports GeoJSONFeature
  */
-define([
-    '../../error/ArgumentError',
-    './GeoJSONConstants',
-    './GeoJSONCRS',
-    '../../util/Logger'
-], function(
-    ArgumentError,
-    GeoJSONConstants,
-    GeoJSONCRS,
-    Logger
-){
-    "use strict";
+define(['../../error/ArgumentError',
+        './GeoJSONConstants',
+        './GeoJSONCRS',
+        '../../util/Logger'
+    ],
+    function (ArgumentError,
+              GeoJSONConstants,
+              GeoJSONCRS,
+              Logger) {
+        "use strict";
 
-    /**
-     * Constructs a GeoJSON Feature object. Applications typically do not call this constructor. It is called by
-     * {@link GeoJSON} as GeoJSON is read.
-     * @alias GeoJSONFeature
-     * @constructor
-     * @classdesc Contains the data associated with a GeoJSON Feature Object. A feature object must have a member with the name "geometry".
-     * The value of the geometry member is a geometry object or a JSON null value.A feature object must have a member with the name "properties".
-     * The value of the properties member is an object (any JSON object or a JSON null value).
-     * If a feature has a commonly used identifier, that identifier should be included as a member of the feature object with the name "id".
-     * @param {Object} geometry An object containing the value of GeoJSON geometry member.
-     * @param {Object} properties An object containing the value of GeoJSON properties member.
-     * @param {Object} crs An object containing the value of GeoJSON FeatureCollection or Feature crs member.
-     * @param {Object} id An object containing the value of GeoJSON Feature id member.
-     * @throws {ArgumentError} If the specified mandatory geometries or properties are null or undefined.
-     */
-    var GeoJSONFeature = function (geometry, properties, crs, id) {
-
-        if (!geometry) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeature", "constructor",
-                    "missingGeometry"));
-        }
-
-        if (!geometry[GeoJSONConstants.FIELD_TYPE]) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeature", "constructor",
-                    "missingFeatureGeometryType"));
-        }
-
-        if (!properties) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeature", "constructor",
-                    "missingProperties"));
-        }
-
-        // Documented in defineProperties below.
-        this._geometry = geometry;
-
-        // Documented in defineProperties below.
-        this._properties =  properties;
-
-        // Documented in defineProperties below.
-        this._crs = crs ? new GeoJSONCRS(crs[GeoJSONConstants.FIELD_TYPE], crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
-
-        // Documented in defineProperties below.
-        this._id = id;
-    };
-
-    Object.defineProperties(GeoJSONFeature.prototype, {
         /**
-         * The GeoJSON Feature geometry as specified to this GeoJSONFeature's constructor.
-         * @memberof GeoJSONFeature.prototype
-         * @type {Object}
-         * @readonly
+         * Constructs a GeoJSON Feature object. Applications typically do not call this constructor. It is called by
+         * {@link GeoJSON} as GeoJSON is read.
+         * @alias GeoJSONFeature
+         * @constructor
+         * @classdesc Contains the data associated with a GeoJSON Feature Object. A feature object must have a member with the name "geometry".
+         * The value of the geometry member is a geometry object or a JSON null value.A feature object must have a member with the name "properties".
+         * The value of the properties member is an object (any JSON object or a JSON null value).
+         * If a feature has a commonly used identifier, that identifier should be included as a member of the feature object with the name "id".
+         * @param {Object} geometry An object containing the value of GeoJSON geometry member.
+         * @param {Object} properties An object containing the value of GeoJSON properties member.
+         * @param {Object} crs An object containing the value of GeoJSON FeatureCollection or Feature crs member.
+         * @param {Object} id An object containing the value of GeoJSON Feature id member.
+         * @throws {ArgumentError} If the specified mandatory geometries or properties are null or undefined.
          */
-        geometry: {
-            get: function () {
-                return this._geometry;
-            }
-        },
-        /**
-         * The GeoJSON Feature properties as specified to this GeoJSONFeature's constructor.
-         * @memberof GeoJSONFeature.prototype
-         * @type {Object}
-         * @readonly
-         */
-        properties: {
-            get: function () {
-                return this._properties;
-            }
-        },
-        /**
-         * The GeoJSON FeatureCollection or Feature crs object.
-         * @memberof GeoJSONFeature.prototype
-         * @type {GeoJSONCRS}
-         * @readonly
-         */
-        crs: {
-            get: function () {
-                return this._crs;
-            }
-        },
-        /**
-         * The GeoJSON Feature id as specified to this GeoJSONFeature's constructor.
-         * @memberof GeoJSONFeature.prototype
-         * @type {Object}
-         * @readonly
-         */
-        id: {
-            get: function () {
-                return this._id;
-            }
-        }
-    });
+        var GeoJSONFeature = function (geometry, properties, crs, id) {
 
-    return GeoJSONFeature;
+            if (!geometry) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeature", "constructor",
+                        "missingGeometry"));
+            }
+
+            if (!geometry[GeoJSONConstants.FIELD_TYPE]) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeature", "constructor",
+                        "missingFeatureGeometryType"));
+            }
+
+            if (!properties) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeature", "constructor",
+                        "missingProperties"));
+            }
+
+            // Documented in defineProperties below.
+            this._geometry = geometry;
+
+            // Documented in defineProperties below.
+            this._properties =  properties;
+
+            // Documented in defineProperties below.
+            this._crs = crs ? new GeoJSONCRS(crs[GeoJSONConstants.FIELD_TYPE], crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
+
+            // Documented in defineProperties below.
+            this._id = id;
+        };
+
+        Object.defineProperties(GeoJSONFeature.prototype, {
+            /**
+             * The GeoJSON Feature geometry as specified to this GeoJSONFeature's constructor.
+             * @memberof GeoJSONFeature.prototype
+             * @type {Object}
+             * @readonly
+             */
+            geometry: {
+                get: function () {
+                    return this._geometry;
+                }
+            },
+            /**
+             * The GeoJSON Feature properties as specified to this GeoJSONFeature's constructor.
+             * @memberof GeoJSONFeature.prototype
+             * @type {Object}
+             * @readonly
+             */
+            properties: {
+                get: function () {
+                    return this._properties;
+                }
+            },
+            /**
+             * The GeoJSON FeatureCollection or Feature crs object.
+             * @memberof GeoJSONFeature.prototype
+             * @type {GeoJSONCRS}
+             * @readonly
+             */
+            crs: {
+                get: function () {
+                    return this._crs;
+                }
+            },
+            /**
+             * The GeoJSON Feature id as specified to this GeoJSONFeature's constructor.
+             * @memberof GeoJSONFeature.prototype
+             * @type {Object}
+             * @readonly
+             */
+            id: {
+                get: function () {
+                    return this._id;
+                }
+            }
+        });
+
+        return GeoJSONFeature;
 });

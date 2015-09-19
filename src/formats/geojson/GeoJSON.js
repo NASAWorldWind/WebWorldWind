@@ -5,8 +5,7 @@
 /**
  * @exports GeoJSON
  */
-define([
-        '../../error/ArgumentError',
+define(['../../error/ArgumentError',
         '../../util/Color',
         './GeoJSONConstants',
         './GeoJSONFeature',
@@ -570,7 +569,7 @@ define([
                 for (var pointsIndex = 0, points = geometry.coordinates; pointsIndex < points.length; pointsIndex++) {
                     var longitude = points[pointsIndex][0],
                         latitude = points[pointsIndex][1],
-                        //altitude = points[pointsIndex][2] ?  points[pointsIndex][2] : 0,
+                    //altitude = points[pointsIndex][2] ?  points[pointsIndex][2] : 0,
                         position;
                     position = new Location(latitude, longitude);
                     positions.push(position);
@@ -620,7 +619,7 @@ define([
                     for (var positionIndex = 0, points = lines[linesIndex]; positionIndex < points.length; positionIndex++) {
                         var longitude = points[positionIndex][0],
                             latitude = points[positionIndex][1],
-                            //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
+                        //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
                             position;
                         position = new Location(latitude, longitude);
                         positions.push(position);
@@ -671,7 +670,7 @@ define([
                     for (var positionIndex = 0, points = boundaries[boundariesIndex]; positionIndex < points.length; positionIndex++) {
                         var longitude = points[positionIndex][0],
                             latitude = points[positionIndex][1],
-                            //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
+                        //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
                             position;
                         position = new Location(latitude, longitude);
                         positions.push(position);
@@ -724,8 +723,8 @@ define([
                         for (var positionIndex = 0, points = polygons[polygonsIndex][boundariesIndex]; positionIndex < points.length; positionIndex++) {
                             var longitude = points[positionIndex][0],
                                 latitude = points[positionIndex][1],
-                                //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,;
-                            position = new Location(latitude, longitude);
+                            //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,;
+                                position = new Location(latitude, longitude);
                             positions.push(position);
                         }
                         boundaries.push(positions);
