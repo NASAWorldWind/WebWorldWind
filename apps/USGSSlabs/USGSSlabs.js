@@ -90,8 +90,7 @@ define(['../../src/WorldWind',
         };
 
         USGSSlabs.prototype.parse = function (name, width, color, responseText) {
-            var lines = responseText.split("\n"),
-                positions = [];
+            var lines = responseText.split("\n");
 
             var meshLayer = new WorldWind.RenderableLayer();
             meshLayer.displayName = name;
@@ -101,54 +100,100 @@ define(['../../src/WorldWind',
             meshAttributes.drawOutline = false;
             meshAttributes.outlineColor = WorldWind.Color.BLUE;
             meshAttributes.interiorColor = color;
-            meshAttributes.applyLighting = true;
+            meshAttributes.applyLighting = false;
 
             var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
             highlightAttributes.outlineColor = WorldWind.Color.WHITE;
 
-            for (var i = 0; i < lines.length; i++) {
-                if (lines[i].trim().length === 0) {
-                    continue;
-                }
+            var positions = this.makePositionList(lines);
+            var gridIndices = this.makeGridIndices(width, positions.numOriginalPositions / width);
+            var indices = this.findTriangles(gridIndices, positions.indexMap);
+            var splitShapes = WorldWind.TriangleMesh.split(positions.positions, indices, null, null);
 
-                if (i % width === 0) {
-                    // Limit the number of rows per mesh to avoid exceeding the max mesh size of 65536 positions.
-                    if (i != 0 && positions.length === 10) {
-                        // Create a new mesh for the positions we have.
-                        var mesh = new WorldWind.GeographicMesh(positions, meshAttributes);
-                        mesh.altitudeScale = 100;
-                        mesh.highlightAttributes = highlightAttributes;
-                        meshLayer.addRenderable(mesh);
-
-                        // Start a new positions array for the next mesh. Copy the last row of the just-created
-                        // mesh to the first row of the next mesh.
-                        positions = [positions[positions.length - 1]];
-                    }
-
-                    positions[positions.length] = [];
-                }
-
-                var rawPosition = lines[i].split("\t"),
-                    longitude = parseFloat(rawPosition[0]),
-                    latitude = parseFloat(rawPosition[1]),
-                    altitude = rawPosition[2] === "NaN" ? 0 : parseFloat(rawPosition[2]);
-
-                if (longitude > 180) {
-                    longitude -= 360;
-                }
-
-                var position = new WorldWind.Position(latitude, longitude, altitude);
-
-                positions[positions.length - 1].push(position);
+            for (var i = 0; i < splitShapes.length; i++) {
+                var mesh = new WorldWind.TriangleMesh(splitShapes[i].positions, splitShapes[i].indices, meshAttributes);
+                mesh.altitudeScale = 100;
+                mesh.highlightAttributes = highlightAttributes;
+                meshLayer.addRenderable(mesh);
+                break;
             }
-
-            mesh = new WorldWind.GeographicMesh(positions, meshAttributes);
-            mesh.altitudeScale = 100;
-            mesh.highlightAttributes = highlightAttributes;
-            meshLayer.addRenderable(mesh);
 
             this.layersPanel.synchronizeLayerList();
             this.wwd.redraw();
+        };
+
+        USGSSlabs.prototype.makeGridIndices = function (width, height) {
+            var indices = [], i = 0;
+
+            for (var r = 0; r < height - 1; r++) {
+                for (var c = 0; c < width - 1; c++) {
+                    var k = r * width + c;
+
+                    indices[i++] = k;
+                    indices[i++] = k + 1;
+                    indices[i++] = k + width;
+                    indices[i++] = k + 1;
+                    indices[i++] = k + 1 + width;
+                    indices[i++] = k + width;
+                }
+            }
+
+            return indices;
+        };
+
+        USGSSlabs.prototype.makePositionList = function (lines) {
+            var positions = [],
+                indices = [],
+                originalIndex = 0,
+                latitude, longitude, altitude;
+
+            for (var i = 0; i < lines.length; i++) {
+                var rawPosition = lines[i].trim().split("\t");
+                if (rawPosition.length != 3) {
+                    continue;
+                }
+
+                if (rawPosition[2] != "NaN") {
+                    indices[originalIndex] = positions.length;
+
+                    longitude = parseFloat(rawPosition[0]);
+                    latitude = parseFloat(rawPosition[1]);
+                    altitude = parseFloat(rawPosition[2]);
+
+                    if (longitude > 180) {
+                        longitude -= 360;
+                    }
+
+                    positions.push(new WorldWind.Position(latitude, longitude, altitude));
+                }
+
+                ++originalIndex;
+            }
+
+            return {positions: positions, indexMap: indices, numOriginalPositions: originalIndex};
+        };
+
+        USGSSlabs.prototype.findTriangles = function (gridIndices, indexMap) {
+            var mappedIndices = [],
+                ia, ib, ic, iaMapped, ibMapped, icMapped;
+
+            for (var i = 0; i < gridIndices.length; i += 3) {
+                ia = gridIndices[i];
+                ib = gridIndices[i + 1];
+                ic = gridIndices[i + 2];
+
+                iaMapped = indexMap[ia];
+                ibMapped = indexMap[ib];
+                icMapped = indexMap[ic];
+
+                if (iaMapped && ibMapped && icMapped) {
+                    mappedIndices.push(iaMapped);
+                    mappedIndices.push(ibMapped);
+                    mappedIndices.push(icMapped);
+                }
+            }
+
+            return mappedIndices;
         };
 
         return USGSSlabs;
