@@ -227,6 +227,7 @@ define(function () {
                 subLayers = null,
                 node = {
                     title: layer.title,
+                    tooltip: layer.title,
                     layerCaps: layer
                 };
 

@@ -36,9 +36,9 @@ define(function () {
         /**
          * The time in milliseconds to display each frame of the time sequence.
          * @type {Number}
-         * @default 400 milliseconds
+         * @default 1000 milliseconds
          */
-        this.frameTime = 400;
+        this.frameTime = 1000;
 
         /**
          * The time sequence this player controls.
@@ -123,16 +123,16 @@ define(function () {
         sliderDiv.slider({orientation: "vertical"});
 
         topButtonGroup.append(forwardButton);
-        //topButtonGroup.append(playButton);
+        topButtonGroup.append(playButton);
         topButtonGroup.append(backwardButton);
 
-        //bottomButtonGroup.append(repeatButton);
+        bottomButtonGroup.append(repeatButton);
 
         var playerDiv = $("#timeSeriesPlayer");
         playerDiv.append(topButtonGroup);
         playerDiv.append(sliderDiv);
         playerDiv.append(displaySpan);
-        //playerDiv.append(bottomButtonGroup);
+        playerDiv.append(bottomButtonGroup);
 
         this.playButton = playButton;
         this.repeatButton = repeatButton;
