@@ -318,7 +318,7 @@ define([
          * position in the associated positions array.
          * @param {Vec2[]} textureCoords The mesh's texture coordinates.
          * @param {Number[]} outlineIndices The mesh's outline indices.
-         * @returns {{}[]} An array of objects, each of which defines one subdivision of the full mesh. Each object
+         * @returns {Object[]} An array of objects, each of which defines one subdivision of the full mesh. Each object
          * in the array has the properties of the same name as the input arguments.
          */
         TriangleMesh.split = function (positions, indices, textureCoords, outlineIndices) {
