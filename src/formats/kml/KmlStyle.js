@@ -33,10 +33,6 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      */
     var KmlStyle = function(styleNode) {
-        // TODO Understand why this is undefined.
-        if(!this) {
-            return new KmlStyle(styleNode);
-        }
         KmlStyleSelector.call(this, styleNode);
     };
 

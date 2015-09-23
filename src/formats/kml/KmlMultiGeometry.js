@@ -22,9 +22,6 @@ define([
      * @alias KmlMultiGeometry
      */
     var KmlMultiGeometry = function(multiGeometryNode) {
-        if(!this) {
-            return new KmlMultiGeometry(multiGeometryNode);
-        }
         KmlGeometry.call(this, multiGeometryNode)
     };
 

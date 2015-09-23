@@ -33,9 +33,6 @@ define([
      * @throws {ArgumentError} If the node is null.
      */
     var KmlPlacemark = function (placemarkNode) {
-        if(!this) {
-            return new KmlPlacemark(placemarkNode);
-        }
         KmlFeature.call(this, placemarkNode);
     };
 

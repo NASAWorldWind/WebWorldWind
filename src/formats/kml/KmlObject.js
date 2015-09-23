@@ -168,7 +168,8 @@ define([
      */
     KmlObject.prototype.createChildElement = function(options) {
         var node = this.retrieveNode(options);
-        return new this.retrieveElementForNode(node.nodeName)(node);
+        var constructor = this.retrieveElementForNode(node.nodeName);
+        return new constructor(node);
     };
 
     /**

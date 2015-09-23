@@ -33,9 +33,6 @@ define([
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      */
     var KmlPoint = function(pointNode) {
-        if(!this) {
-            return new KmlPoint(pointNode);
-        }
         KmlGeometry.call(this, pointNode);
 
         this._shape = null;

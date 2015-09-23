@@ -7,10 +7,12 @@ require({
 },[
     'test/CatchTest',
     'src/formats/kml/KmlObject',
+    'src/formats/kml/KmlPoint',
     'src/util/XmlDocument'
 ], function(
     CatchTest,
     KmlObject,
+    KmlPoint,
     XmlDocument
 ){
     TestCase("KmlObjectTestCase", {
@@ -111,6 +113,20 @@ require({
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
             var retrievedValue = new KmlObject(kmlNode,{}).retrieve({name: 'extrude', transformer: Boolean});
             assertEquals(null, retrievedValue);
+        }),
+
+        testRetrievingChildNode: CatchTest(function(){
+            var validKmlWithValidInformation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
+                "<Point id=\"1\">" +
+                "   <Point id=\"2\"></Point>" +
+                "</Point>" +
+                "</kml>";
+
+            var kmlDocument = new XmlDocument(validKmlWithValidInformation).dom();
+            var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
+            var retrievedValue = new KmlObject(kmlNode).createChildElement({name: 'Point'});
+            assertTrue(retrievedValue instanceof KmlPoint);
         })
     });
 });

@@ -23,9 +23,6 @@ define([
      * @throws {ArgumentError} If the node is null or undefined
      */
     var KmlIconStyle = function(iconStyleNode){
-        if(!this) {
-            return new KmlIconStyle(iconStyleNode);
-        }
         KmlColorStyle.call(this, iconStyleNode);
     };
 

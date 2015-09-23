@@ -20,9 +20,6 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      */
     var KmlIcon = function(iconNode) {
-        if(!this) {
-            return new KmlIcon(iconNode);
-        }
         KmlObject.call(this, iconNode);
     };
 

@@ -23,9 +23,6 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      */
     var KmlPolyStyle = function(polyStyleNode){
-        if(!this) {
-            return new KmlPolyStyle(polyStyleNode);
-        }
         KmlColorStyle.call(this, polyStyleNode);
     };
 

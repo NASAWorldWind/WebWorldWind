@@ -34,10 +34,6 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      */
     var KmlPolygon = function(polygonNode) {
-        // TODO Understand why this is undefined.
-        if(!this) {
-            return new KmlPolygon(polygonNode);
-        }
         KmlGeometry.call(this, polygonNode);
     };
 
