@@ -39,22 +39,5 @@ define([
             }
         };
 
-        /**
-         * Use this method, when you need to find whether tag with given tagName is present as a first level descendant
-         * of given node
-         * @param node Node, which descendants should be tested.
-         * @param tagName Tag name to test for.
-         * @returns {boolean} True if at least one is present.
-         */
-        XmlDocument.prototype.isPresent = function(node, tagName) {
-            [].forEach.call(node.childNodes, function(child) {
-                if(child.nodeName == tagName) {
-                    return true;
-                }
-            });
-
-            return false;
-        };
-
         return XmlDocument;
 });
