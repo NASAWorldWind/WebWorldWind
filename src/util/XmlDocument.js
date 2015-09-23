@@ -4,10 +4,12 @@
  */
 // It simply adds XmlParser, which encapsulates the fact that, there are different implementations
 define([
-
+        '../error/ArgumentError',
+        '../util/Logger'
     ],
     function(
-
+        ArgumentError,
+        Logger
     ){
         /**
          * Constructor function responsible for abstracting away the complexities in parsing XmlDocuments.
@@ -29,7 +31,14 @@ define([
         XmlDocument.prototype.dom = function() {
             if(DOMParser) {
                 var parser = new DOMParser();
-                return parser.parseFromString(this._document, "text/xml");
+                var parsedDocument = parser.parseFromString(this._document, "text/xml");
+                if(parsedDocument.getElementsByTagName("parsererror").length) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "XmlDocument", "dom", "Invalid XML document. " +
+                            parsedDocument.getElementsByTagName("parsererror")[0].innerHTML)
+                    );
+                }
+                return parsedDocument;
             } else {
                 // Support for IE6
                 var xmlDoc=new ActiveXObject("Microsoft.XMLDOM");

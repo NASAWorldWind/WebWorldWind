@@ -25,7 +25,8 @@ require({
                 "   <LineString id=\"9\">" +
                 "       <coordinates>10,20,0 20,20,0</coordinates>" +
                 "   </LineString>" +
-                "</MultiGeometry>";
+                "</MultiGeometry>" +
+                "</kml>";
 
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var multiGeometry = new KmlMultiGeometry(kmlRepresentation.getElementsByTagName("MultiGeometry")[0]);

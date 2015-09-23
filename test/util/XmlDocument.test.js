@@ -5,24 +5,37 @@
 require({
     baseUrl: '/test/'
 }, [
+        'test/CatchTest',
         'src/util/XmlDocument'
     ], function(
+        CatchTest,
         XmlDocument
     ){
-    var xmlDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-        "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
-        "<Placemark>" +
-        "   <Point>" +
-        "       <coordinates>-122.0822035425683,37.42228990140251,0</coordinates>" +
-        "   </Point>" +
-        "</Placemark>" +
-        "</kml>";
+    TestCase("XmlDocument", {
+        "testGettingDomOfValidXml": CatchTest(function(){
+            var xmlDocument = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
+                "<Placemark>" +
+                "   <Point>" +
+                "       <coordinates>-122.0822035425683,37.42228990140251,0</coordinates>" +
+                "   </Point>" +
+                "</Placemark>" +
+                "</kml>";
+            var document = new XmlDocument(xmlDocument);
+            var resultingDom = document.dom();
 
-    var XmlDocumentTestCase = TestCase("XmlDocument");
-    XmlDocumentTestCase.prototype.testGettingDomOfValidXml = function(){
-        var document = new XmlDocument(xmlDocument);
-        var resultingDom = document.dom();
+            assertEquals(resultingDom.childNodes.length, 1);
+        }),
 
-        assertEquals(resultingDom.childNodes.length, 1);
-    }
+        "testGettingDomOfInvalidXml": CatchTest(function(){
+            var invalidDocument = "RandomData";
+            var document = new XmlDocument(invalidDocument);
+            try {
+                var resultingDom = document.dom();
+                fail("Exception should have been thrown.");
+            } catch(e) {
+                assertEquals("ArgumentError", e.name);
+            }
+        })
+    });
 });
