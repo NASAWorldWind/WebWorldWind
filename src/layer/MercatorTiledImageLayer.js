@@ -46,7 +46,6 @@ define([
                 sector, levelZeroDelta, numLevels, imageFormat, cachePath, tileWidth, tileHeight);
 
             this.detectBlankImages = false;
-            this.mapAncestorToTile = false;
 
             // These pixels are tested in retrieved images to determine whether the image is blank.
             this.testPixels = [
