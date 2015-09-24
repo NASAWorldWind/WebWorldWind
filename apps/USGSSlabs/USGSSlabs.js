@@ -54,6 +54,7 @@ define(['../../src/WorldWind',
 
             this.layersPanel.synchronizeLayerList();
 
+            this.loadSlabData("CAS", "cascadia_slab1.0_clip.xyz", 401, WorldWind.Color.YELLOW);
             this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
             this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
             //this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.WHITE);
