@@ -138,6 +138,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WmsUrlBuilder',
         './ogc/WmtsCapabilities',
         './layer/WmtsLayer',
+        './ogc/WmtsLayerCapabilities',
         './WorldWindow',
         './util/WWMath',
         './util/WWMessage',
@@ -275,6 +276,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmsUrlBuilder,
               WmtsCapabilities,
               WmtsLayer,
+              WmtsLayerCapabilities,
               WorldWindow,
               WWMath,
               WWMessage,
@@ -621,6 +623,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WmsUrlBuilder'] = WmsUrlBuilder;
         WorldWind['WmtsCapabilities'] = WmtsCapabilities;
         WorldWind['WmtsLayer'] = WmtsLayer;
+        WorldWind['WmtsLayerCapabilities'] = WmtsLayerCapabilities;
         WorldWind['WWMath'] = WWMath;
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;

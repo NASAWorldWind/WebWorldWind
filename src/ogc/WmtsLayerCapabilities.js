@@ -199,7 +199,7 @@ define([
                     result.identifier = child.textContent;
                 } else if (child.localName === "Title") {
                     result.title = result.title || [];
-                    result.push(new OwsLanguageString(child));
+                    result.title.push(new OwsLanguageString(child));
                 } else if (child.localName === "Abstract") {
                     result.abstract = result.abstract || [];
                     result.abstract.push(new OwsLanguageString(child));
@@ -257,13 +257,13 @@ define([
                         name: child.getAttribute("name"),
                         reference: child.getAttribute("reference")
                     }
-                } else if (child.localName == UnitSymbol) {
+                } else if (child.localName == "UnitSymbol") {
                     result.unitSymbol = child.textContent;
                 } else if (child.localName === "Default") {
                     result.default = child.textContent;
                 } else if (child.localName === "Current") {
                     result.current = (child.textContent === "true");
-                } else if (child.localName === Value) {
+                } else if (child.localName === "Value") {
                     result.value = result.value || [];
                     result.value.push(child.textContent);
                 }
