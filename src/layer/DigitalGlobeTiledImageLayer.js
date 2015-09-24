@@ -25,8 +25,7 @@ define([
         "use strict";
 
         /**
-         * Constructs Digital Globe tiled image layer for a specified dataset.
-         * distributed by Digital Globe.
+         * Constructs Digital Globe tiled image layer for a specified dataset distributed by Digital Globe.
          * @alias DigitalGlobeTiledImageLayer
          * @constructor
          * @augments MercatorTiledImageLayer
