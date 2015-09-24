@@ -161,7 +161,7 @@ define([
         };
 
         WmsLayer.parseTimeDimensions = function (wmsLayerCapabilities) {
-            var dimensions = wmsLayerCapabilities.dimensions || wmsLayerCapabilities.extents,
+            var dimensions = wmsLayerCapabilities.extents || wmsLayerCapabilities.dimensions,
                 parsedDimensions = null;
 
             if (dimensions) {
@@ -170,7 +170,8 @@ define([
                 for (var i = 0; i < dimensions.length; i++) {
                     var dimension = dimensions[i];
 
-                    if (dimension.name.toLowerCase() === "time" && dimension.units.toLowerCase() === "iso8601") {
+                    if (dimension.name.toLowerCase() === "time" &&
+                        (!dimension.units || dimension.units.toLowerCase() === "iso8601")) {
                         var individualDimensions = dimension.content.split(",");
 
                         for (var j = 0; j < individualDimensions.length; j++) {

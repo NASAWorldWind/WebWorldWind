@@ -220,7 +220,7 @@ define(function () {
     TimeSeriesPlayer.prototype.updateTimeDisplay = function (timeString) {
         timeString = timeString.replace("00:00:00 GMT", "GMT");
         this.timeDisplay.text(timeString);
-        this.timeDisplay.css('top', this.sliderThumb.offset().top - this.slider.offset().top + this.slider.height() - 30);
+        this.timeDisplay.css('top', this.sliderThumb.offset().top - this.slider.offset().top + this.slider.height());
         this.timeDisplay.css('left', this.sliderThumb.offset().left - this.slider.offset().left + 40);
     };
 
