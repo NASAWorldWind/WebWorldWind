@@ -15,8 +15,8 @@ define(['../../error/ArgumentError',
         "use strict";
 
         /**
-         * Constructs a GeoJSON geometry for a MultiLineString. Applications typically do not call this constructor. It is called by
-         * {@link GeoJSON} as GeoJSON geometries are read.
+         * Constructs a GeoJSON geometry for a MultiLineString. Applications typically do not call this constructor.
+         * It is called by {@link GeoJSON} as GeoJSON geometries are read.
          * @alias GeoJSONGeometryMultiLineString
          * @constructor
          * @classdesc Contains the data associated with a GeoJSON MultiLineString geometry.
@@ -24,9 +24,11 @@ define(['../../error/ArgumentError',
          * @param {Array} coordinates The array containing MultiLineString coordinates.
          * @param {String} type A string containing type of geometry.
          * @param {Object} crs An object containing GeoJSON CRS information.
-         * @throws {ArgumentError} If the specified coordinates or type are null or undefined or if the coordinates parameter is not an array of LineString coordinates array.
+         * @param {Object} bbox An object containing GeoJSON bbox information.
+         * @throws {ArgumentError} If the specified coordinates or type are null or undefined or if the coordinates
+         * parameter is not an array of LineString coordinates array.
          */
-        var GeoJSONGeometryMultiLineString = function (coordinates, type, crs) {
+        var GeoJSONGeometryMultiLineString = function (coordinates, type, crs, bbox) {
 
             if (!coordinates) {
                 throw new ArgumentError(
@@ -53,7 +55,7 @@ define(['../../error/ArgumentError',
                         "missingType"));
             }
 
-            GeoJSONGeometry.call(this, coordinates, type, crs);
+            GeoJSONGeometry.call(this, coordinates, type, crs, bbox);
         };
 
         GeoJSONGeometryMultiLineString.prototype = Object.create(GeoJSONGeometry.prototype);

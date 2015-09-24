@@ -59,13 +59,15 @@ define(['../../error/ArgumentError',
          * GeoJSON and create shapes for it.
          * @alias GeoJSON
          * @constructor
-         * @classdesc Parses a GeoJSON and creates shapes representing its contents. Points and MultiPoints in the GeoJSON are
-         * represented by [Placemarks]{@link Placemark}, Lines and MultiLines are represented by [SurfacePolylines]{@link SurfacePolyline},
-         * and Polygons and MultiPolygons are represented by [SurfacePolygons]{@link SurfacePolygon}.
+         * @classdesc Parses a GeoJSON and creates shapes representing its contents. Points and MultiPoints in
+         * the GeoJSON are represented by [Placemarks]{@link Placemark}, Lines and MultiLines are represented by
+         * [SurfacePolylines]{@link SurfacePolyline}, and Polygons and MultiPolygons are represented
+         * by [SurfacePolygons]{@link SurfacePolygon}.
          * <p>
          * An attribute callback may also be specified to examine each geometry and configure the shape created for it.
          * This function enables the application to assign independent attributes to each
-         * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON feature.
+         * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
+         * feature.
          * @param {String} url The location of the GeoJSON.
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
@@ -221,10 +223,10 @@ define(['../../error/ArgumentError',
          * For {@link Placemark} shapes it is also specified as the placemark label.
          * It is specified as the displayName for all other shapes.
          *
-         * @param {{GeoJSONGeometry}} geometry An object containing the geometry associated with this GeoJSON.
+         * @param {GeoJSONGeometry} geometry An object containing the geometry associated with this GeoJSON.
          * @param {Object} properties An object containing the attribute-value pairs found in GeoJSON feature properties
          * member.
-         * @returns {{}} An object with properties as described above.
+         * @returns {Object} An object with properties as described above.
          */
         GeoJSON.prototype.defaultShapeConfigurationCallback = function (geometry, properties) {
             var configuration = {};
@@ -245,7 +247,7 @@ define(['../../error/ArgumentError',
             return configuration;
         };
 
-        // Internal use only. Intentionally not documented.
+        // Get GeoJSON string using XMLHttpRequest. Internal use only.
         GeoJSON.prototype.requestUrl = function (url) {
             var xhr = new XMLHttpRequest();
 
@@ -278,7 +280,7 @@ define(['../../error/ArgumentError',
             xhr.send(null);
         };
 
-        // Internal use only. Intentionally not documented.
+        // Parse GeoJSON string using built in method JSON.parse(). Internal use only.
         GeoJSON.prototype.parse = function (geoJSONString) {
             try {
                 this._geoJSONObject = JSON.parse(geoJSONString);
@@ -329,7 +331,9 @@ define(['../../error/ArgumentError',
                         this.geoJSONObject[GeoJSONConstants.FIELD_GEOMETRY],
                         this.geoJSONObject[GeoJSONConstants.FIELD_PROPERTIES],
                         this.geoJSONObject[GeoJSONConstants.FIELD_CRS],
-                        this.geoJSONObject[GeoJSONConstants.FIELD_ID]);
+                        this.geoJSONObject[GeoJSONConstants.FIELD_ID],
+                        this.geoJSONObject[GeoJSONConstants.FIELD_BBOX]
+                    );
                     this.addRenderablesForFeature(
                         layer,
                         feature,
@@ -338,7 +342,8 @@ define(['../../error/ArgumentError',
                 case GeoJSONConstants.TYPE_FEATURE_COLLECTION:
                     var featureCollection = new GeoJSONFeatureCollection(
                         this.geoJSONObject[GeoJSONConstants.FIELD_FEATURES],
-                        this.geoJSONObject[GeoJSONConstants.FIELD_CRS]
+                        this.geoJSONObject[GeoJSONConstants.FIELD_CRS],
+                        this.geoJSONObject[GeoJSONConstants.FIELD_BBOX]
                     );
                     this.addRenderablesForFeatureCollection(
                         layer,
@@ -347,8 +352,8 @@ define(['../../error/ArgumentError',
                 case GeoJSONConstants.TYPE_GEOMETRY_COLLECTION:
                     var geometryCollection = new GeoJSONGeometryCollection(
                         this.geoJSONObject[GeoJSONConstants.FIELD_GEOMETRIES],
-                        this.geoJSONObject[GeoJSONConstants.FIELD_TYPE],
-                        this.geoJSONObject[GeoJSONConstants.FIELD_CRS]);
+                        this.geoJSONObject[GeoJSONConstants.FIELD_CRS],
+                        this.geoJSONObject[GeoJSONConstants.FIELD_BBOX]);
                     this.addRenderablesForGeometryCollection(
                         layer,
                         geometryCollection,
@@ -400,43 +405,68 @@ define(['../../error/ArgumentError',
                     var pointGeometry = new GeoJSONGeometryPoint(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs);
-                    this.addRenderablesForPoint(layer, pointGeometry, properties ? properties : null);
+                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        geometry[GeoJSONConstants.FIELD_BBOX]);
+                    this.addRenderablesForPoint(
+                        layer,
+                        pointGeometry,
+                        properties ? properties : null);
                     break;
                 case GeoJSONConstants.TYPE_MULTI_POINT:
                     var multiPointGeometry = new GeoJSONGeometryMultiPoint(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs);
-                    this.addRenderablesForMultiPoint(layer, multiPointGeometry, properties ? properties : null);
+                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        geometry[GeoJSONConstants.FIELD_BBOX]);
+                    this.addRenderablesForMultiPoint(
+                        layer,
+                        multiPointGeometry,
+                        properties ? properties : null);
                     break;
                 case GeoJSONConstants.TYPE_LINE_STRING:
                     var lineStringGeometry = new GeoJSONGeometryLineString(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs);
-                    this.addRenderablesForLineString(layer, lineStringGeometry, properties ? properties : null);
+                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        geometry[GeoJSONConstants.FIELD_BBOX]);
+                    this.addRenderablesForLineString(
+                        layer,
+                        lineStringGeometry,
+                        properties ? properties : null);
                     break;
                 case GeoJSONConstants.TYPE_MULTI_LINE_STRING:
                     var multiLineStringGeometry = new GeoJSONGeometryMultiLineString(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs);
-                    this.addRenderablesForMultiLineString(layer, multiLineStringGeometry, properties ? properties : null);
+                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        geometry[GeoJSONConstants.FIELD_BBOX]);
+                    this.addRenderablesForMultiLineString(
+                        layer,
+                        multiLineStringGeometry,
+                        properties ? properties : null);
                     break;
                 case GeoJSONConstants.TYPE_POLYGON:
                     var polygonGeometry = new GeoJSONGeometryPolygon(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs);
-                    this.addRenderablesForPolygon(layer, polygonGeometry, properties ? properties : null);
+                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        geometry[GeoJSONConstants.FIELD_BBOX]
+                    );
+                    this.addRenderablesForPolygon(
+                        layer,
+                        polygonGeometry,
+                        properties ? properties : null);
                     break;
                 case GeoJSONConstants.TYPE_MULTI_POLYGON:
                     var multiPolygonGeometry = new GeoJSONGeometryMultiPolygon(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs);
-                    this.addRenderablesForMultiPolygon(layer, multiPolygonGeometry, properties ? properties : null);
+                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        geometry[GeoJSONConstants.FIELD_BBOX]);
+                    this.addRenderablesForMultiPolygon(
+                        layer,
+                        multiPolygonGeometry,
+                        properties ? properties : null);
                     break;
                 default:
                     break;
@@ -476,7 +506,10 @@ define(['../../error/ArgumentError',
                     latitude = geometry.coordinates[1],
                     altitude = geometry.coordinates[2] ?  geometry.coordinates[2] : 0,
                     position = new Position(latitude, longitude, altitude),
-                    placemark = new Placemark(position, false, configuration && configuration.attributes ? configuration.attributes : null);
+                    placemark = new Placemark(
+                        position,
+                        false,
+                        configuration && configuration.attributes ? configuration.attributes : null);
 
                 placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
                 if (configuration && configuration.name){
@@ -505,12 +538,14 @@ define(['../../error/ArgumentError',
         GeoJSON.prototype.addRenderablesForMultiPoint = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPoint", "missingLayer"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPoint",
+                        "missingLayer"));
             }
 
             if (!geometry) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPoint", "missingGeometry"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPoint",
+                        "missingGeometry"));
             }
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
@@ -523,7 +558,10 @@ define(['../../error/ArgumentError',
                         latitude = geometry.coordinates[pointIndex][1],
                         altitude = geometry.coordinates[pointIndex][2] ?  geometry.coordinates[pointIndex][2] : 0,
                         position = new Position(latitude, longitude, altitude),
-                        placemark = new Placemark(position, false, configuration && configuration.attributes ? configuration.attributes : null);
+                        placemark = new Placemark(
+                            position,
+                            false,
+                            configuration && configuration.attributes ? configuration.attributes : null);
                     placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
                     if (configuration && configuration.name){
                         placemark.label = configuration.name;
@@ -552,12 +590,14 @@ define(['../../error/ArgumentError',
         GeoJSON.prototype.addRenderablesForLineString = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForLineString", "missingLayer"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForLineString",
+                        "missingLayer"));
             }
 
             if (!geometry) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForLineString", "missingGeometry"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForLineString",
+                        "missingGeometry"));
             }
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
@@ -576,7 +616,9 @@ define(['../../error/ArgumentError',
                 }
 
                 var shape;
-                shape = new SurfacePolyline(positions, configuration && configuration.attributes ? configuration.attributes : null);
+                shape = new SurfacePolyline(
+                    positions,
+                    configuration && configuration.attributes ? configuration.attributes : null);
                 layer.addRenderable(shape);
             }
             else {
@@ -600,12 +642,14 @@ define(['../../error/ArgumentError',
         GeoJSON.prototype.addRenderablesForMultiLineString = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiLineString", "missingLayer"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiLineString",
+                        "missingLayer"));
             }
 
             if (!geometry) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiLineString", "missingGeometry"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiLineString",
+                        "missingGeometry"));
             }
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
@@ -616,7 +660,8 @@ define(['../../error/ArgumentError',
                 for (var linesIndex = 0, lines = geometry.coordinates; linesIndex < lines.length; linesIndex++) {
                     var positions = [];
 
-                    for (var positionIndex = 0, points = lines[linesIndex]; positionIndex < points.length; positionIndex++) {
+                    for (var positionIndex = 0, points = lines[linesIndex]; positionIndex < points.length;
+                         positionIndex++) {
                         var longitude = points[positionIndex][0],
                             latitude = points[positionIndex][1],
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
@@ -626,7 +671,9 @@ define(['../../error/ArgumentError',
                     }
 
                     var shape;
-                    shape = new SurfacePolyline(positions, configuration && configuration.attributes ? configuration.attributes : null);
+                    shape = new SurfacePolyline(
+                        positions,
+                        configuration && configuration.attributes ? configuration.attributes : null);
                     layer.addRenderable(shape);
                 }
             }
@@ -664,10 +711,12 @@ define(['../../error/ArgumentError',
             if (geometry.crs === null ||
                 (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
                 geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
-                for (var boundariesIndex = 0, boundaries = geometry.coordinates; boundariesIndex < boundaries.length; boundariesIndex++) {
+                for (var boundariesIndex = 0, boundaries = geometry.coordinates;
+                     boundariesIndex < boundaries.length; boundariesIndex++) {
                     var positions = [];
 
-                    for (var positionIndex = 0, points = boundaries[boundariesIndex]; positionIndex < points.length; positionIndex++) {
+                    for (var positionIndex = 0, points = boundaries[boundariesIndex];
+                         positionIndex < points.length; positionIndex++) {
                         var longitude = points[positionIndex][0],
                             latitude = points[positionIndex][1],
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
@@ -677,7 +726,9 @@ define(['../../error/ArgumentError',
                     }
 
                     var shape;
-                    shape = new SurfacePolygon(positions, configuration && configuration.attributes ? configuration.attributes : null);
+                    shape = new SurfacePolygon(
+                        positions,
+                        configuration && configuration.attributes ? configuration.attributes : null);
                     layer.addRenderable(shape);
                 }
             }
@@ -702,12 +753,14 @@ define(['../../error/ArgumentError',
         GeoJSON.prototype.addRenderablesForMultiPolygon = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPolygon", "missingLayer"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPolygon",
+                        "missingLayer"));
             }
 
             if (!geometry) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPolygon", "missingGeometry"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPolygon",
+                        "missingGeometry"));
             }
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
@@ -715,12 +768,14 @@ define(['../../error/ArgumentError',
             if (geometry.crs === null ||
                 (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
                 geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
-                for (var polygonsIndex = 0, polygons = geometry.coordinates; polygonsIndex < polygons.length; polygonsIndex++) {
+                for (var polygonsIndex = 0, polygons = geometry.coordinates;
+                     polygonsIndex < polygons.length; polygonsIndex++) {
                     var boundaries = [],
                         position;
                     for (var boundariesIndex = 0; boundariesIndex < polygons[polygonsIndex].length; boundariesIndex++) {
                         var positions = [];
-                        for (var positionIndex = 0, points = polygons[polygonsIndex][boundariesIndex]; positionIndex < points.length; positionIndex++) {
+                        for (var positionIndex = 0, points = polygons[polygonsIndex][boundariesIndex];
+                             positionIndex < points.length; positionIndex++) {
                             var longitude = points[positionIndex][0],
                                 latitude = points[positionIndex][1],
                             //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,;
@@ -730,7 +785,9 @@ define(['../../error/ArgumentError',
                         boundaries.push(positions);
                     }
                     var shape;
-                    shape = new SurfacePolygon(boundaries, configuration && configuration.attributes ? configuration.attributes : null);
+                    shape = new SurfacePolygon(
+                        boundaries,
+                        configuration && configuration.attributes ? configuration.attributes : null);
                     layer.addRenderable(shape);
                 }
             }
@@ -752,16 +809,19 @@ define(['../../error/ArgumentError',
         GeoJSON.prototype.addRenderablesForGeometryCollection = function (layer, geometryCollection, properties) {
             if (!layer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometryCollection", "missingLayer"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometryCollection",
+                        "missingLayer"));
             }
 
             if (!geometryCollection) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometryCollection", "missingGeometryCollection"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometryCollection",
+                        "missingGeometryCollection"));
             }
 
 
-            for (var geometryIndex = 0, geometries = geometryCollection.geometries; geometryIndex < geometries.length; geometryIndex++) {
+            for (var geometryIndex = 0, geometries = geometryCollection.geometries;
+                 geometryIndex < geometries.length; geometryIndex++) {
                 if(geometries[geometryIndex].hasOwnProperty(GeoJSONConstants.FIELD_TYPE)){
                     this.addRenderablesForGeometry(layer, geometries[geometryIndex], null, properties);
                 }
@@ -825,12 +885,14 @@ define(['../../error/ArgumentError',
         GeoJSON.prototype.addRenderablesForFeatureCollection = function (layer, featureCollection) {
             if (!layer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForFeatureCollection", "missingLayer"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForFeatureCollection",
+                        "missingLayer"));
             }
 
             if (!featureCollection) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForFeatureCollection", "missingFeatureCollection"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForFeatureCollection",
+                        "missingFeatureCollection"));
             }
 
             if (featureCollection.features.length > 0) {
@@ -840,13 +902,14 @@ define(['../../error/ArgumentError',
                         featureCollection.features[featureIndex][GeoJSONConstants.FIELD_GEOMETRY],
                         featureCollection.features[featureIndex][GeoJSONConstants.FIELD_PROPERTIES],
                         featureCollection.features[featureIndex][GeoJSONConstants.FIELD_CRS],
-                        featureCollection.features[featureIndex][GeoJSONConstants.FIELD_ID]);
+                        featureCollection.features[featureIndex][GeoJSONConstants.FIELD_ID],
+                        featureCollection.features[featureIndex][GeoJSONConstants.FIELD_BBOX]);
                     this.addRenderablesForFeature(layer, feature, featureCollection.crs);
                 }
             }
         };
 
-        // Intentionally not documented.
+        // Set type of GeoJSON object. Internal use ony.
         GeoJSON.prototype.setGeoJSONType = function (geoJSONObject) {
             switch (geoJSONObject[GeoJSONConstants.FIELD_TYPE]) {
                 case GeoJSONConstants.TYPE_POINT:

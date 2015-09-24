@@ -19,14 +19,16 @@ define(['./GeoJSONConstants',
          * @constructor
          * @classdesc A geometry is a GeoJSON object where the type member's value is one of the following strings:
          * "Point", "MultiPoint", "LineString", "MultiLineString", "Polygon", "MultiPolygon", or "GeometryCollection".
-         * A GeoJSON geometry object of any type other than "GeometryCollection" must have a member with the name "coordinates".
-         * The value of the coordinates member is always an array. The structure for the elements in this array is determined by the type of geometry.
-         * @param {Array} coordinates he array containing geometry coordinates.
+         * A GeoJSON geometry object of any type other than "GeometryCollection" must have a member with the name
+         * "coordinates". The value of the coordinates member is always an array.
+         * The structure for the elements in this array is determined by the type of geometry.
+         * @param {Array} coordinates An array containing geometry coordinates.
          * @param {String} type A string containing type of geometry.
          * @param {Object} crs An object containing the value of GeoJSON crs member.
+         * @param {Object} bbox An array containing information on the coordinate range for geometries.
          * @throws {ArgumentError} If the specified mandatory coordinates or type are null or undefined.
          */
-        var GeoJSONGeometry = function (coordinates, type, crs) {
+        var GeoJSONGeometry = function (coordinates, type, crs, bbox) {
 
             if (!coordinates) {
                 throw new ArgumentError(
@@ -48,6 +50,9 @@ define(['./GeoJSONConstants',
 
             // Documented in defineProperties below.
             this._crs = crs ? new GeoJSONCRS(crs[GeoJSONConstants.FIELD_TYPE], crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
+
+            // Documented in defineProperties below.
+            this._bbox = bbox ? bbox : null;
         };
 
         Object.defineProperties(GeoJSONGeometry.prototype, {
@@ -63,7 +68,18 @@ define(['./GeoJSONConstants',
                 }
             },
             /**
-             * The GeoJSON crs object.
+             * The GeoJSON geometry type as specified to this GeoJSONGeometry's constructor.
+             * @memberof GeoJSONGeometry.prototype
+             * @type {String}
+             * @readonly
+             */
+            type: {
+                get: function () {
+                    return this._type;
+                }
+            },
+            /**
+             * The GeoJSON crs object as specified to this GeoJSONGeometry's constructor.
              * @memberof GeoJSONGeometry.prototype
              * @type {Object}
              * @readonly
@@ -74,14 +90,14 @@ define(['./GeoJSONConstants',
                 }
             },
             /**
-             * The GeoJSON geometry type as specified to this GeoJSONGeometry's constructor.
+             * The GeoJSON bbox object as specified to this GeoJSONGeometry's constructor.
              * @memberof GeoJSONGeometry.prototype
-             * @type {String}
+             * @type {Object}
              * @readonly
              */
-            type: {
+            bbox: {
                 get: function () {
-                    return this._type;
+                    return this._bbox;
                 }
             }
         });

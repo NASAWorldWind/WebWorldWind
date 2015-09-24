@@ -17,18 +17,22 @@ define(['../../error/ArgumentError',
         "use strict";
 
         /**
-         * Constructs a GeoJSON FeatureCollection object. Applications typically do not call this constructor. It is called by
-         * {@link GeoJSON} as GeoJSON is read.
+         * Constructs a GeoJSON FeatureCollection object. Applications typically do not call this constructor.
+         * It is called by {@link GeoJSON} as GeoJSON is read.
          * @alias GeoJSONFeatureCollection
          * @constructor
          * @classdesc Contains the data associated with a GeoJSON Feature Collection Object.
          * An object of type "FeatureCollection" must have a member with the name "features".
-         * The value corresponding to "features" is an array. Each element in the array is a feature object as defined in {@link GeoJSONFeature}.
+         * The value corresponding to "features" is an array. Each element in the array is a feature object as
+         * defined in {@link GeoJSONFeature}.
+         * To include information on the coordinate range for feature collections, a GeoJSON object may have a member
+         * named "bbox".
          * @param {Array} features An array containing the data associated with the GeoJSON FeatureCollection features.
          * @param {Object} crs An object containing the value of GeoJSON FeatureCollection crs member.
+         * @param {Object} bbox An object containing the value of GeoJSON FeatureCollection bbox member.
          * @throws {ArgumentError} If the specified mandatory features parameter is null or undefined.
          */
-        var GeoJSONFeatureCollection = function (features, crs) {
+        var GeoJSONFeatureCollection = function (features, crs, bbox) {
 
             if (!features) {
                 throw new ArgumentError(
@@ -45,7 +49,12 @@ define(['../../error/ArgumentError',
             this._features = features;
 
             // Documented in defineProperties below.
-            this._crs = crs ? new GeoJSONCRS(crs[GeoJSONConstants.FIELD_TYPE], crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
+            this._crs = crs ? new GeoJSONCRS(
+                crs[GeoJSONConstants.FIELD_TYPE],
+                crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
+
+            // Documented in defineProperties below.
+            this._bbox = bbox;
         };
 
         Object.defineProperties(GeoJSONFeatureCollection.prototype, {
@@ -69,6 +78,17 @@ define(['../../error/ArgumentError',
             crs: {
                 get: function () {
                     return this._crs;
+                }
+            },
+            /**
+             * The GeoJSON Collection bbox member as specified to this GeoJSONFeatureCollection's constructor.
+             * @memberof GeoJSONFeatureCollection.prototype
+             * @type {Object}
+             * @readonly
+             */
+            bbox: {
+                get: function () {
+                    return this._bbox;
                 }
             }
         });

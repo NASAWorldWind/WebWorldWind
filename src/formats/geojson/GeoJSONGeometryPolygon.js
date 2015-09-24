@@ -15,8 +15,8 @@ define(['../../error/ArgumentError',
         "use strict";
 
         /**
-         * Constructs a GeoJSON geometry for a Polygon. Applications typically do not call this constructor. It is called by
-         * {@link GeoJSON} as GeoJSON geometries are read.
+         * Constructs a GeoJSON geometry for a Polygon. Applications typically do not call this constructor.
+         * It is called by {@link GeoJSON} as GeoJSON geometries are read.
          * @alias GeoJSONGeometryPolygon
          * @constructor
          * @classdesc Contains the data associated with a GeoJSON Polygon geometry.
@@ -24,9 +24,11 @@ define(['../../error/ArgumentError',
          * @param {Array} coordinates The array containing Polygon coordinates.
          * @param {String} type A string containing type of geometry.
          * @param {Object} crs An object containing GeoJSON CRS information.
-         * @throws {ArgumentError} If the specified coordinates or type are null or undefined or if the coordinates parameter is not an array of LinearRing coordinate arrays.
+         * @param {Object} bbox An object containing GeoJSON bbox information.
+         * @throws {ArgumentError} If the specified coordinates or type are null or undefined or if the
+         * coordinates parameter is not an array of LinearRing coordinate arrays.
          */
-        var GeoJSONGeometryPolygon = function (coordinates, type, crs) {
+        var GeoJSONGeometryPolygon = function (coordinates, type, crs, bbox) {
 
             if (!coordinates) {
                 throw new ArgumentError(
@@ -44,12 +46,14 @@ define(['../../error/ArgumentError',
                 Object.prototype.toString.call(coordinates[0][0]) !== '[object Array]' ||
                 Object.prototype.toString.call(coordinates[0][0][0]) !== '[object Number]') {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryPolygon", "constructor", "invalidCoordinatesType"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryPolygon", "constructor",
+                        "invalidCoordinatesType"));
             }
 
             if (coordinates[0][0] !== coordinates[0][coordinates.length - 1]) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryPolygon", "constructor", "invalidLinearRing"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryPolygon", "constructor",
+                        "invalidLinearRing"));
             }
 
             if (!type) {
@@ -58,7 +62,7 @@ define(['../../error/ArgumentError',
                         "missingType"));
             }
 
-            GeoJSONGeometry.call(this, coordinates, type, crs);
+            GeoJSONGeometry.call(this, coordinates, type, crs, bbox);
         };
 
         GeoJSONGeometryPolygon.prototype = Object.create(GeoJSONGeometry.prototype);
