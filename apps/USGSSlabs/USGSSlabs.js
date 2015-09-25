@@ -57,7 +57,7 @@ define(['../../src/WorldWind',
             this.loadSlabData("CAS", "cascadia_slab1.0_clip.xyz", 401, WorldWind.Color.YELLOW);
             this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
             this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
-            //this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.WHITE);
+            this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.MAGENTA);
         };
 
         USGSSlabs.prototype.loadSlabData = function (name, dataFile, width, color) {
@@ -101,7 +101,7 @@ define(['../../src/WorldWind',
             meshAttributes.drawOutline = false;
             meshAttributes.outlineColor = WorldWind.Color.BLUE;
             meshAttributes.interiorColor = color;
-            meshAttributes.applyLighting = false;
+            meshAttributes.applyLighting = true;
 
             var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
             highlightAttributes.outlineColor = WorldWind.Color.WHITE;
@@ -116,7 +116,6 @@ define(['../../src/WorldWind',
                 mesh.altitudeScale = 100;
                 mesh.highlightAttributes = highlightAttributes;
                 meshLayer.addRenderable(mesh);
-                break;
             }
 
             this.layersPanel.synchronizeLayerList();
