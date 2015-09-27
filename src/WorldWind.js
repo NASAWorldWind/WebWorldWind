@@ -8,6 +8,8 @@
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
         './error/AbstractError',
         './geom/Angle',
+		'./shapes/Annotation',
+		'./shapes/AnnotationAttributes',
         './error/ArgumentError',
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
@@ -141,6 +143,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './globe/ZeroElevationModel'],
     function (AbstractError,
               Angle,
+			  Annotation,
+			  AnnotationAttributes,
               ArgumentError,
               BasicProgram,
               BasicTextureProgram,
