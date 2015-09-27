@@ -487,6 +487,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
 
         WorldWind['AbstractError'] = AbstractError;
         WorldWind['Angle'] = Angle;
+        WorldWind['Annotation'] = Annotation;
         WorldWind['ArgumentError'] = ArgumentError;
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;

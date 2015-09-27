@@ -137,5 +137,4 @@ define([
         });
 
         return AnnotationAttributes;
-    })
-;
+    });

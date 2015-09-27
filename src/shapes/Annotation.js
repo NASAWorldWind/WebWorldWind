@@ -35,6 +35,7 @@ define([
         "use strict";
 
         var Annotation = function (position, attributes) {
+
             if (!position) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Annotation", "constructor", "missingPosition"));
@@ -82,7 +83,6 @@ define([
         Annotation.prototype = Object.create(Renderable.prototype);
 
         Object.defineProperties(Annotation.prototype, {
-
             text: {
                 get: function () {
                     return this.label;
