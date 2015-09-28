@@ -112,6 +112,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/SurfaceTileRenderer',
         './shaders/SurfaceTileRendererProgram',
         './gesture/TapRecognizer',
+        './layer/TectonicPlatesLayer',
         './globe/Terrain',
         './globe/TerrainTile',
         './globe/TerrainTileList',
@@ -250,6 +251,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               SurfaceTileRenderer,
               SurfaceTileRendererProgram,
               TapRecognizer,
+              TectonicPlatesLayer,
               Terrain,
               TerrainTile,
               TerrainTileList,
@@ -597,6 +599,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['SurfaceTileRenderer'] = SurfaceTileRenderer;
         WorldWind['SurfaceTileRendererProgram'] = SurfaceTileRendererProgram;
         WorldWind['TapRecognizer'] = TapRecognizer;
+        WorldWind['TectonicPlatesLayer'] = TectonicPlatesLayer;
         WorldWind['Terrain'] = Terrain;
         WorldWind['TerrainTile'] = TerrainTile;
         WorldWind['TerrainTileList'] = TerrainTileList;

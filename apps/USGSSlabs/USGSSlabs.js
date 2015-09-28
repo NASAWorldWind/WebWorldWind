@@ -29,6 +29,7 @@ define(['../../src/WorldWind',
             var layers = [
                 {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
                 {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
+                {layer: new WorldWind.TectonicPlatesLayer(null), enabled: true},
                 {layer: new WorldWind.CompassLayer(), enabled: true, hide: true},
                 {layer: new WorldWind.CoordinatesDisplayLayer(this.wwd), enabled: true, hide: true},
                 {layer: new WorldWind.ViewControlsLayer(this.wwd), enabled: true, hide: true}
