@@ -78,37 +78,37 @@ define([
              * @readonly
              */
             this.framebufferId = gl.createFramebuffer();
-            gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, this.framebufferId);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebufferId);
 
             // Internal. Intentionally not documented. Configure this framebuffer's color buffer.
             this.texture = gl.createTexture();
-            gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, this.texture);
-            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MIN_FILTER,
-                WebGLRenderingContext.LINEAR);
-            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_MAG_FILTER,
-                WebGLRenderingContext.LINEAR);
-            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_WRAP_S,
-                WebGLRenderingContext.CLAMP_TO_EDGE);
-            gl.texParameteri(WebGLRenderingContext.TEXTURE_2D, WebGLRenderingContext.TEXTURE_WRAP_T,
-                WebGLRenderingContext.CLAMP_TO_EDGE);
-            gl.texImage2D(WebGLRenderingContext.TEXTURE_2D, 0, WebGLRenderingContext.RGBA, width, height, 0,
-                WebGLRenderingContext.RGBA, WebGLRenderingContext.UNSIGNED_BYTE, null);
-            gl.framebufferTexture2D(WebGLRenderingContext.FRAMEBUFFER, WebGLRenderingContext.COLOR_ATTACHMENT0,
-                WebGLRenderingContext.TEXTURE_2D, this.texture, 0);
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
+                gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER,
+                gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,
+                gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,
+                gl.CLAMP_TO_EDGE);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0,
+                gl.RGBA, gl.UNSIGNED_BYTE, null);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0,
+                gl.TEXTURE_2D, this.texture, 0);
 
             // Internal. Intentionally not documented. Configure this framebuffer's optional depth buffer.
             this.depthBuffer = null;
             if (depth) {
                 this.depthBuffer = gl.createRenderbuffer();
-                gl.bindRenderbuffer(WebGLRenderingContext.RENDERBUFFER, this.depthBuffer);
-                gl.renderbufferStorage(WebGLRenderingContext.RENDERBUFFER, WebGLRenderingContext.DEPTH_COMPONENT16,
+                gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
+                gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16,
                     width, height);
-                gl.framebufferRenderbuffer(WebGLRenderingContext.FRAMEBUFFER, WebGLRenderingContext.DEPTH_ATTACHMENT,
-                    WebGLRenderingContext.RENDERBUFFER, this.depthBuffer);
+                gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT,
+                    gl.RENDERBUFFER, this.depthBuffer);
             }
 
-            var e = gl.checkFramebufferStatus(WebGLRenderingContext.FRAMEBUFFER);
-            if (e != WebGLRenderingContext.FRAMEBUFFER_COMPLETE) {
+            var e = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+            if (e != gl.FRAMEBUFFER_COMPLETE) {
                 Logger.logMessage(Logger.LEVEL_WARNING, "FramebufferTexture", "constructor",
                     "Error creating framebuffer: " + e);
                 this.framebufferId = null;
@@ -116,9 +116,9 @@ define([
                 this.depthBuffer = null;
             }
 
-            gl.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER, null);
-            gl.bindRenderbuffer(WebGLRenderingContext.RENDERBUFFER, null);
-            gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, null);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+            gl.bindTexture(gl.TEXTURE_2D, null);
         };
 
         /**
@@ -131,7 +131,7 @@ define([
          */
         FramebufferTexture.prototype.bind = function (dc) {
             if (this.texture) {
-                dc.currentGlContext.bindTexture(WebGLRenderingContext.TEXTURE_2D, this.texture);
+                dc.currentGlContext.bindTexture(gl.TEXTURE_2D, this.texture);
             }
 
             return !!this.texture;

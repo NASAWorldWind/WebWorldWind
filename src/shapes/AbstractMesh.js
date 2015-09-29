@@ -299,15 +299,15 @@ define([
                 currentData.refreshVertexBuffer = true;
             }
 
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
+            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
             if (currentData.refreshVertexBuffer) {
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, currentData.meshPoints,
-                    WebGLRenderingContext.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, currentData.meshPoints,
+                    gl.STATIC_DRAW);
                 dc.frameStatistics.incrementVboLoadCount(1);
                 currentData.refreshVertexBuffer = false;
             }
 
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
 
             program.loadTextureEnabled(gl, false);
 
@@ -329,10 +329,10 @@ define([
                     currentData.refreshMeshIndices = true;
                 }
 
-                gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, vboId);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
                 if (currentData.refreshMeshIndices) {
-                    gl.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, this.meshIndices,
-                        WebGLRenderingContext.STATIC_DRAW);
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.meshIndices,
+                        gl.STATIC_DRAW);
                     dc.frameStatistics.incrementVboLoadCount(1);
                     currentData.refreshMeshIndices = false;
                 }
@@ -366,19 +366,19 @@ define([
                             currentData.refreshTexCoordBuffer = true;
                         }
 
-                        gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                         if (currentData.refreshTexCoordBuffer) {
-                            gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, this.texCoords,
-                                WebGLRenderingContext.STATIC_DRAW);
+                            gl.bufferData(gl.ARRAY_BUFFER, this.texCoords,
+                                gl.STATIC_DRAW);
                             dc.frameStatistics.incrementVboLoadCount(1);
                             currentData.refreshTexCoordBuffer = false;
                         }
 
                         program.loadTextureEnabled(gl, true);
                         gl.enableVertexAttribArray(program.vertexTexCoordLocation);
-                        gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, WebGLRenderingContext.FLOAT,
+                        gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT,
                             false, 0, 0);
-                        program.loadTextureUnit(gl, WebGLRenderingContext.TEXTURE0);
+                        program.loadTextureUnit(gl, gl.TEXTURE0);
                         program.loadModulateColor(gl, dc.pickingMode);
                     }
                 }
@@ -399,20 +399,20 @@ define([
                         currentData.refreshNormalsBuffer = true;
                     }
 
-                    gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                     if (currentData.refreshNormalsBuffer) {
-                        gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, currentData.normals,
-                            WebGLRenderingContext.STATIC_DRAW);
+                        gl.bufferData(gl.ARRAY_BUFFER, currentData.normals,
+                            gl.STATIC_DRAW);
                         dc.frameStatistics.incrementVboLoadCount(1);
                         currentData.refreshNormalsBuffer = false;
                     }
 
                     gl.enableVertexAttribArray(program.normalVectorLocation);
-                    gl.vertexAttribPointer(program.normalVectorLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+                    gl.vertexAttribPointer(program.normalVectorLocation, 3, gl.FLOAT, false, 0, 0);
                 }
 
-                gl.drawElements(WebGLRenderingContext.TRIANGLES, this.meshIndices.length,
-                    WebGLRenderingContext.UNSIGNED_SHORT, 0);
+                gl.drawElements(gl.TRIANGLES, this.meshIndices.length,
+                    gl.UNSIGNED_SHORT, 0);
 
                 if (hasTexture) {
                     gl.disableVertexAttribArray(program.vertexTexCoordLocation);
@@ -455,16 +455,16 @@ define([
                     currentData.refreshOutlineIndices = true;
                 }
 
-                gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, vboId);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
                 if (currentData.refreshOutlineIndices) {
-                    gl.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, this.meshOutlineIndices,
-                        WebGLRenderingContext.STATIC_DRAW);
+                    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.meshOutlineIndices,
+                        gl.STATIC_DRAW);
                     dc.frameStatistics.incrementVboLoadCount(1);
                     currentData.refreshOutlineIndices = false;
                 }
 
-                gl.drawElements(WebGLRenderingContext.LINE_STRIP, this.meshOutlineIndices.length,
-                    WebGLRenderingContext.UNSIGNED_SHORT, 0);
+                gl.drawElements(gl.LINE_STRIP, this.meshOutlineIndices.length,
+                    gl.UNSIGNED_SHORT, 0);
             }
 
             if (dc.pickingMode) {
@@ -479,7 +479,7 @@ define([
             var gl = dc.currentGlContext;
 
             if (this.activeAttributes.drawInterior) {
-                gl.disable(WebGLRenderingContext.CULL_FACE);
+                gl.disable(gl.CULL_FACE);
 
                 dc.findAndBindProgram(BasicTextureProgram);
 
@@ -499,7 +499,7 @@ define([
             gl.disableVertexAttribArray(dc.currentProgram.vertexPointLocation);
             gl.depthMask(true);
             gl.lineWidth(1);
-            gl.enable(WebGLRenderingContext.CULL_FACE);
+            gl.enable(gl.CULL_FACE);
         };
 
         return AbstractMesh;
