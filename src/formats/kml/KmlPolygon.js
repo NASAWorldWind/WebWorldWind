@@ -138,14 +138,9 @@ define([
      * @param pStyle Style applied on the polygon.
      */
     KmlPolygon.prototype.render = function(layer, pStyle) {
-        var style = pStyle && pStyle.PolyStyle || {};
-        var shapeOptions = {};
-        shapeOptions._drawInterior = style.fill || true;
-        shapeOptions._drawOutline = style.outline || false;
-        shapeOptions._outlineColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
-        shapeOptions._interiorColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
-        shapeOptions._colorMode = style.colorMode || 'normal'; // TODO Not yet supported.
-        shapeOptions._outlineWidth = 10.0;
+        var shapeOptions = KmlPolyStyle.render(pStyle && pStyle.PolyStyle);
+        KmlLineStyle.render(pStyle && pStyle.LineStyle, shapeOptions);
+
         shapeOptions._drawVerticals = this.extrude || false;
         shapeOptions._applyLighting = false;
         shapeOptions._depthTest = true;

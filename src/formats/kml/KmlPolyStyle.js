@@ -66,6 +66,18 @@ define([
         }
     });
 
+    KmlPolyStyle.render = function(style, options) {
+        style = style || {};
+        var shapeOptions = options || {};
+        shapeOptions._drawInterior = style.fill || true;
+        shapeOptions._drawOutline = style.outline || false;
+        shapeOptions._outlineColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
+        shapeOptions._interiorColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
+        shapeOptions._colorMode = style.colorMode || 'normal'; // TODO Not yet supported.
+
+        return shapeOptions;
+    };
+
     KmlElements.addKey(KmlPolyStyle.prototype.tagName[0], KmlPolyStyle);
 
     return KmlPolyStyle;

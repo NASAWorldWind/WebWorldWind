@@ -48,5 +48,15 @@ define([
             }
         };
 
+        XmlDocument.isValid = function(document) {
+            // TODO refactor.
+            try {
+                new XmlDocument(document).dom();
+                return true;
+            } catch(e) {
+                return false;
+            }
+        };
+
         return XmlDocument;
 });

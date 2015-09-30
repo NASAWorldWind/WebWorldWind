@@ -30,6 +30,13 @@ define([
     KmlFeature.prototype = Object.create(KmlObject.prototype);
 
     Object.defineProperties(KmlFeature.prototype, {
+        tagName: {
+            get: function() {
+                return ['NetworkLink', 'Placemark', 'PhotoOverlay', 'ScreenOverlay', 'GroundOverlay', 'Folder',
+                    'Document'];
+            }
+        },
+
         /**
          * Name of this feature. Every feature should have name.
          * @memberof KmlFeature.prototype

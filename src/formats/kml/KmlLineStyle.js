@@ -101,6 +101,16 @@ define([
         }
     });
 
+    KmlLineStyle.render = function(style, options) {
+        var shapeOptions = options || {};
+        style = style || {};
+
+        shapeOptions._outlineColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
+        shapeOptions._outlineWidth = style.width || 10.0;
+
+        return shapeOptions;
+    };
+
     KmlElements.addKey(KmlLineStyle.prototype.tagName[0], KmlLineStyle);
 
     return KmlLineStyle;

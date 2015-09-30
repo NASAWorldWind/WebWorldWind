@@ -143,7 +143,8 @@ define([
             var ShapeClass = self.retrieveElementForNode(shape.nodeName);
             if(ShapeClass == null) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "KmlObject", "parse", "Element, which doesn't have internal representation. Node name: " + shape.nodeName)
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "KmlObject", "parse", "Element, which doesn't have internal " +
+                        "representation. Node name: " + shape.nodeName)
                 );
             }
             shapes.push(new ShapeClass(shape));

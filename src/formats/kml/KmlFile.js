@@ -8,14 +8,20 @@
  */
 define([
         '../../error/ArgumentError',
+        '../../util/jszip',
+        '../../util/jszip-utils',
         '../../util/Logger',
+        '../../util/Remote',
         '../../util/XmlDocument',
         './KmlElements',
         './KmlObject'
     ],
     function(
         ArgumentError,
+        JsZip,
+        JSZipUtils,
         Logger,
+        Remote,
         XmlDocument,
         KmlElements,
         KmlObject
@@ -28,17 +34,48 @@ define([
          * rendered in one Layer.
          * @constructor
          * @param {String} document Either url location of the KmlFile or String representation of valid Kml file.
+         * @param {Object} options callback to use when loaded over the http.
          * @alias KmlFile
          * @classdesc Support for Kml File parsing and display.
          */
-        var KmlFile = function(document) {
-            if(!document) {
+        var KmlFile = function(options) {
+            var self = this;
+            if(!options || (!options.document && !options.url)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "constructor", "invalidDocumentPassed")
                 );
             }
 
-            this._document = new XmlDocument(document).dom();
+            // Default values.
+            options.callback = options.callback || function(document){};
+            options.local = options.local || false;
+
+            if(options.local) {
+                this._document = new XmlDocument(options.document).dom();
+                options.callback(document);
+            } else {
+                // Load the document
+                var success = function(loadedDocument) {
+                    var rootDocument = null;
+
+                    if(options.url.indexOf('.kmz') == -1) {
+                        rootDocument = loadedDocument;
+                    } else {
+                        var kmzFile = new JsZip();
+                        kmzFile.load(loadedDocument);
+                        kmzFile.files.forEach(function (file) {
+                            if (file.endsWith(".kml") && rootDocument == null) {
+                                rootDocument = file.asText();
+                            }
+                        });
+                    }
+                    self._document = new XmlDocument(rootDocument).dom();
+                    // TODO what if the file doesn't exist at all.
+                    options.callback(rootDocument);
+
+                };
+                this.requestUrl(options.url, {success: success});
+            }
         };
 
         Object.defineProperties(KmlFile.prototype, {
@@ -98,5 +135,16 @@ define([
             });
         };
 
-        return KmlFile;
+        KmlFile.prototype.requestUrl = function(url, options) {
+            options.url = url;
+            if(url.endsWith(".kmz")) {
+                options.zip = true;
+            } else {
+                options.ajax = true;
+            }
+
+            new Remote(options);
+        };
+
+         return KmlFile;
 });

@@ -70,9 +70,12 @@ define([
      * It renders placemark with associated geometry.
      * @param layer Layer into which the placemark may be rendered.
      */
-    KmlPlacemark.prototype.render = function(layer) {
+    KmlPlacemark.prototype.render = function(layer, style) {
         // Work correctly with styles.
         var placemarkAttributes = new PlacemarkAttributes(null);
+        KmlIconStyle.render(style && style.IconStyle, placemarkAttributes);
+        KmlLabelStyle.render(style && style.LabelStyle, placemarkAttributes);
+
         placemarkAttributes.imageScale = 1;
         placemarkAttributes.imageOffset = new Offset(
             WorldWind.OFFSET_FRACTION, 0.3,
