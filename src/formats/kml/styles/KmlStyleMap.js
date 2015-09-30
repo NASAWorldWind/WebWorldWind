@@ -4,10 +4,12 @@
  */
 define([
     '../KmlElements',
-    './KmlSubStyle'
+    './KmlSubStyle',
+    '../util/Pair'
 ], function (
     KmlElements,
-    KmlSubStyle
+    KmlSubStyle,
+    Pair
 ) {
     "use strict";
     var KmlStyleMap = function(node) {
@@ -20,6 +22,14 @@ define([
         tagName: {
             get: function() {
                 return ['StyleMap'];
+            }
+        },
+
+        Pair: {
+            get: function() {
+                return this.createChildElement({
+                    name: Pair.prototype.tagName
+                });
             }
         }
     });

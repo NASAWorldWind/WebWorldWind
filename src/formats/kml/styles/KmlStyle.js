@@ -9,6 +9,7 @@ define([
     './KmlIconStyle',
     './KmlLabelStyle',
     './KmlLineStyle',
+    './KmlListStyle',
     './KmlBalloonStyle'
 ], function (
     KmlStyleSelector,
@@ -17,6 +18,7 @@ define([
     KmlIconStyle,
     KmlLabelStyle,
     KmlLineStyle,
+    KmlListStyle,
     KmlBalloonStyle
 ) {
     "use strict";
@@ -105,6 +107,14 @@ define([
             get: function() {
                 return this.createChildElement({
                     name: KmlBalloonStyle.prototype.tagName
+                });
+            }
+        },
+
+        ListStyle: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlListStyle.prototype.tagName
                 });
             }
         },

@@ -4,10 +4,12 @@
  */
 define([
     './../KmlElements',
-    './KmlFeature'
+    './KmlFeature',
+    '../KmlLink'
 ], function (
     KmlElements,
-    KmlFeature
+    KmlFeature,
+    KmlLink
 ) {
     "use strict";
 
@@ -22,12 +24,28 @@ define([
             get: function() {
                 return ['NetworkLink'];
             }
+        },
+
+        refreshVisibility: {
+            get: function() {
+                return this.retrieve({name: 'refreshVisibility'});
+            }
+        },
+
+        flyToView: {
+            get: function() {
+                return this.retrieve({name: 'flyToView'});
+            }
+        },
+
+        Link: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlLink.prototype.tagName
+                });
+            }
         }
     });
-
-    KmlNetworkLink.prototype.render = function(){
-        // TODO render network link.
-    };
 
     return KmlNetworkLink;
 });

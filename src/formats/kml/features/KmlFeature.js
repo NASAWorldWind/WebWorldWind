@@ -4,13 +4,15 @@
  */
 define([
     './../KmlObject',
-    './KmlAbstractView',
-    './styles/KmlStyle',
-    './KmlTimePrimitive'
+    '../KmlAbstractView',
+    '../styles/KmlStyle',
+    '../KmlRegion',
+    '../KmlTimePrimitive'
 ], function(
     KmlObject,
     KmlAbstractView,
     KmlStyle,
+    KmlRegion,
     KmlTimePrimitive
 ){
     "use strict";
@@ -110,6 +112,18 @@ define([
             }
         },
 
+        styleUrl: {
+            get: function() {
+                return this.retrieve({name: 'styleUrl'});
+            }
+        },
+
+        Snippet: {
+            get: function() {
+                return this.retrieve({name: 'Snippet'});
+            }
+        },
+
         /**
          * It represents one of the AbstractViews associated with current Feature. Specific implementation of
          * AbstractView will be returned.
@@ -117,7 +131,7 @@ define([
          * @type {KmlAbstractView}
          * @readonly
          */
-        abstractView: {
+        AbstractView: {
             get: function() {
                 return this.createChildElement({
                     name: KmlAbstractView.prototype.tagName
@@ -132,7 +146,7 @@ define([
          * @type {KmlTimePrimitive}
          * @readonly
          */
-        timePrimitive: {
+        TimePrimitive: {
             get: function() {
                 return this.createChildElement({
                     name: KmlTimePrimitive.prototype.tagName
@@ -143,10 +157,18 @@ define([
         /**
          * One style element per Feature, with possible children of different substyles.
          */
-        style: {
+        StyleSelector: {
             get: function() {
                 return this.createChildElement({
                     name: KmlStyle.prototype.tagName
+                });
+            }
+        },
+
+        Region: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlRegion.prototype.tagName
                 });
             }
         }

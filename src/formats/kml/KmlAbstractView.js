@@ -4,10 +4,12 @@
  */
 define([
     './KmlObject',
-    './KmlElements'
+    './KmlElements',
+    './KmlTimePrimitive'
 ], function(
     KmlObject,
-    KmlElements
+    KmlElements,
+    KmlTimePrimitive
 ){
     // TODO Fix to use current implementations.
     "use strict";
@@ -23,9 +25,11 @@ define([
     KmlAbstractView.prototype = Object.create(KmlObject.prototype);
 
     Object.defineProperties(KmlAbstractView.prototype, {
-        timePrimitive: {
+        TimePrimitive: {
             get: function() {
-                return '';
+                return this.createChildElement({
+                    name: KmlTimePrimitive.prototype.tagName
+                });
             }
         },
 

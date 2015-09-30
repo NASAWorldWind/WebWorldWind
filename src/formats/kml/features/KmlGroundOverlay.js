@@ -5,10 +5,12 @@
 define([
     './../KmlElements',
     '../KmlLatLonBox',
+    '../KmlLatLonQuad',
     './KmlOverlay'
 ], function (
     KmlElements,
     KmlLatLonBox,
+    KmlLatLonQuad,
     KmlOverlay
 ) {
     "use strict";
@@ -42,6 +44,14 @@ define([
             get: function() {
                 return this.createChildElement({
                     name: KmlLatLonBox.prototype.tagName
+                });
+            }
+        },
+
+        LatLonQuad: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlLatLonQuad.prototype.tagName
                 });
             }
         }

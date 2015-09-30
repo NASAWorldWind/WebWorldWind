@@ -1,0 +1,39 @@
+/*
+ * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
+ */
+require({
+    baseUrl: '/test/'
+}, [
+    'test/CatchTest',
+    'src/formats/kml/util/Pair',
+    'src/formats/kml/styles/KmlStyleSelector',
+    'src/util/XmlDocument'
+], function (
+    CatchTest,
+    Pair,
+    KmlStyleSelector,
+    XmlDocument
+) {
+    "use strict";
+    TestCase("KmlPairTest", {
+        testValidKml: CatchTest(function () {
+            var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
+                "<Pair>" +
+                "   <key>normal</key>" +
+                "   <styleUrl>validUrl</styleUrl>" +
+                "   <Style></Style>" +
+                "</Pair>" +
+                "</kml>";
+            var kmlRepresentation = new XmlDocument(validKml).dom();
+            var scale = new Pair(
+                kmlRepresentation.getElementsByTagName("Pair")[0]);
+
+            assertEquals('normal', scale.key);
+            assertEquals('styleUrl', scale.styleUrl);
+
+            assertTrue(scale.Style instanceof KmlStyleSelector);
+        })
+    })
+});
