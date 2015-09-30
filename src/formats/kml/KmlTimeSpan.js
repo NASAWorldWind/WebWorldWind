@@ -29,6 +29,12 @@ define([
     KmlTimeSpan.prototype = Object.create(KmlTimePrimitive.prototype);
 
     Object.defineProperties(KmlTimeSpan.prototype, {
+        tagName: {
+            get: function() {
+                return ['TimeSpan'];
+            }
+        },
+
         /**
          * Time from which is the event valid.
          * @memberof KmlTimeSpan.prototype
@@ -54,7 +60,7 @@ define([
         }
     });
 
-    KmlElements.addKey("TimeSpan", KmlTimeSpan);
+    KmlElements.addKey(KmlTimeSpan.prototype.tagName[0], KmlTimeSpan);
 
     return KmlTimeSpan;
 });

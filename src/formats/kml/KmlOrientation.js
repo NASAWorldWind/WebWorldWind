@@ -22,6 +22,24 @@ define([
             get: function() {
                 return ['Orientation'];
             }
+        },
+
+        heading: {
+            get: function() {
+                return this.retrieve({name: 'heading'})
+            }
+        },
+
+        tilt: {
+            get: function() {
+                return this.retrieve({name: 'tilt'})
+            }
+        },
+
+        roll: {
+            get: function() {
+                return this.retrieve({name: 'roll'})
+            }
         }
     });
 

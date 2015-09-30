@@ -9,7 +9,6 @@
 define([
         '../../error/ArgumentError',
         '../../util/jszip',
-        '../../util/jszip-utils',
         '../../util/Logger',
         '../../util/Remote',
         '../../util/XmlDocument',
@@ -19,7 +18,6 @@ define([
     function(
         ArgumentError,
         JsZip,
-        JSZipUtils,
         Logger,
         Remote,
         XmlDocument,

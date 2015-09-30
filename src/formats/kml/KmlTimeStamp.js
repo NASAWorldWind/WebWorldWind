@@ -30,6 +30,12 @@ define([
     KmlTimeStamp.prototype = Object.create(KmlTimePrimitive.prototype);
 
     Object.defineProperties(KmlTimeStamp.prototype, {
+        tagName: {
+            get: function() {
+                return ['TimeStamp'];
+            }
+        },
+
         /**
          * This property specifies when exactly the event happen.
          * @memberof KmlTimeStamp.prototype
@@ -43,7 +49,7 @@ define([
         }
     });
 
-    KmlElements.addKey("TimeStamp", KmlTimeStamp);
+    KmlElements.addKey(KmlTimeStamp.prototype.tagName[0], KmlTimeStamp);
 
     return KmlTimeStamp;
 });

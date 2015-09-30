@@ -7,7 +7,7 @@ require({
 },[
     'test/CatchTest',
     'src/formats/kml/KmlObject',
-    'src/formats/kml/KmlPoint',
+    'src/formats/kml/geom/KmlPoint',
     'src/util/XmlDocument'
 ], function(
     CatchTest,

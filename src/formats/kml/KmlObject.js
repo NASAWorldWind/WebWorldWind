@@ -8,13 +8,11 @@
 define([
     '../../error/ArgumentError',
     './KmlElements',
-    '../../util/Logger',
-    '../../error/UnsupportedOperationError'
+    '../../util/Logger'
 ], function(
     ArgumentError,
     KmlElements,
-    Logger,
-    UnsupportedOperationError
+    Logger
 ){
     "use strict";
     /**
@@ -178,9 +176,8 @@ define([
      * It renders all objects that are part of the element, which are renderable.
      */
     KmlObject.prototype.render = function() {
-        throw new UnsupportedOperationError(
-            Logger.logMessage(Logger.LEVEL_SEVERE, "KmlObject", "draw", "Trying to call function on the Object instead of subclasses.")
-        );
+        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "render", this.tagName[0] + " doesn't yet support " +
+            "rendering.");
     };
 
     return KmlObject;

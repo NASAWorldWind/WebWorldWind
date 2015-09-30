@@ -20,7 +20,55 @@ define([
     Object.defineProperties(KmlLink.prototype, {
         tagName: {
             get: function() {
-                return ['Link', 'Icon']
+                return ['Link']
+            }
+        },
+
+        href: {
+            get: function() {
+                return this.retrieve({name: 'href'});
+            }
+        },
+
+        refreshMode: {
+            get: function() {
+                return this.retrieve({name: 'refreshMode'});
+            }
+        },
+
+        refreshInterval: {
+            get: function() {
+                return this.retrieve({name: 'refreshInterval'});
+            }
+        },
+
+        viewRefreshMode: {
+            get: function() {
+                return this.retrieve({name: 'viewRefreshMode'});
+            }
+        },
+
+        viewRefreshTime: {
+            get: function() {
+                return this.retrieve({name: 'viewRefreshTime'});
+            }
+        },
+
+        viewBoundScale: {
+            get: function() {
+                return this.retrieve({name: 'viewBoundScale'});
+            }
+        },
+
+        viewFormat: {
+            get: function() {
+                return this.retrieve({name: 'viewFormat'});
+            }
+        },
+
+        httpQuery: {
+            get: function() {
+                return this.retrieve({name: 'httpQuery'});
             }
         }
     });

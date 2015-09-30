@@ -22,6 +22,36 @@ define([
             get: function() {
                 return ['LatLonBox'];
             }
+        },
+
+        north: {
+            get: function() {
+                return this.retrieve({name: 'north'});
+            }
+        },
+
+        south: {
+            get: function() {
+                return this.retrieve({name: 'south'});
+            }
+        },
+
+        east: {
+            get: function() {
+                return this.retrieve({name: 'east'});
+            }
+        },
+
+        west: {
+            get: function() {
+                return this.retrieve({name: 'west'});
+            }
+        },
+
+        rotation: {
+            get: function() {
+                return this.retrieve({name: 'rotation'});
+            }
         }
     });
 

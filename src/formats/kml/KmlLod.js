@@ -22,6 +22,30 @@ define([
             get: function() {
                 return ['Lod'];
             }
+        },
+
+        minLodPixels: {
+            get: function() {
+                return this.retrieve({name: 'minLodPixels'});
+            }
+        },
+
+        maxLodPixels: {
+            get: function() {
+                return this.retrieve({name: 'maxLodPixels'});
+            }
+        },
+
+        minFadeExtent: {
+            get: function() {
+                return this.retrieve({name: 'minFadeExtent'});
+            }
+        },
+
+        maxFadeExtent: {
+            get: function() {
+                return this.retrieve({name: 'maxFadeExtent'});
+            }
         }
     });
 

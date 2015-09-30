@@ -4,9 +4,13 @@
  */
 define([
     './KmlElements',
+    './KmlLatLonAltBox',
+    './KmlLod',
     './KmlObject'
 ], function (
     KmlElements,
+    KmlLatLonAltBox,
+    KmlLod,
     KmlObject
 ) {
     "use strict";
@@ -21,6 +25,22 @@ define([
         tagName: {
             get: function() {
                 return ['Region'];
+            }
+        },
+
+        LatLonAltBox: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlLatLonAltBox.prototype.tagName
+                });
+            }
+        },
+
+        Lod: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlLod.prototype.tagName
+                });
             }
         }
     });

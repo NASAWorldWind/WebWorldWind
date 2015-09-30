@@ -3,10 +3,10 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    './KmlObject',
+    './KmlLink',
     './KmlElements'
 ], function (
-    KmlObject,
+    KmlLink,
     KmlElements
 ) {
     "use strict";
@@ -20,10 +20,10 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      */
     var KmlIcon = function(iconNode) {
-        KmlObject.call(this, iconNode);
+        KmlLink.call(this, iconNode);
     };
 
-    KmlIcon.prototype = Object.create(KmlObject.prototype);
+    KmlIcon.prototype = Object.create(KmlLink.prototype);
 
     Object.defineProperties(KmlIcon.prototype, {
         /**
@@ -95,51 +95,6 @@ define([
         h: {
             get: function() {
                 return this.retrieve({name: 'gx:h'});
-            }
-        },
-
-        /**
-         *
-         */
-        refreshMode: {
-            get: function(){
-                return this.retrieve({name: 'refreshMode'});
-            }
-        },
-
-        refreshInterval: {
-            get: function() {
-                return this.retrieve({name: 'refreshInterval'});
-            }
-        },
-
-        viewRefreshMode: {
-            get: function() {
-                return this.retrieve({name: 'viewRefreshMode'});
-            }
-        },
-
-        viewRefreshTime: {
-            get: function() {
-                return this.retrieve({name: 'viewRefreshTime'});
-            }
-        },
-
-        viewBoundScale: {
-            get: function() {
-                return this.retrieve({name: 'viewBoundScale'});
-            }
-        },
-
-        viewFormat: {
-            get: function() {
-                return this.retrieve({name: 'viewFormat'});
-            }
-        },
-
-        httpQuery: {
-            get: function() {
-                return this.retrieve({name: 'httpQuery'});
             }
         }
     });

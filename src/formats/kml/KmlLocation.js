@@ -22,6 +22,24 @@ define([
             get: function() {
                 return ['Location'];
             }
+        },
+
+        longitude: {
+            get: function() {
+                return this.retrieve({name: 'longitude'});
+            }
+        },
+
+        latitude: {
+            get: function() {
+                return this.retrieve({name: 'latitude'});
+            }
+        },
+
+        altitude: {
+            get: function() {
+                return this.retrieve({name: 'altitude'});
+            }
         }
     });
 
