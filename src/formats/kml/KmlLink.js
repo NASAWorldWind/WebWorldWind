@@ -11,7 +11,7 @@ define([
 ) {
     "use strict";
 
-    var KmlLink = function() {
+    var KmlLink = function(node) {
         KmlObject.call(this, node);
     };
 

@@ -35,12 +35,10 @@ define([
 
         tagName: {
             get: function(){
-                return ['Camera, LookAt'];
+                return ['Camera', 'LookAt'];
             }
         }
     });
-
-    KmlElements.addKey("AbstractView", KmlAbstractView);
 
     return KmlAbstractView;
 });

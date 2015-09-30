@@ -7,13 +7,15 @@ define([
     '../KmlAbstractView',
     '../styles/KmlStyle',
     '../KmlRegion',
-    '../KmlTimePrimitive'
+    '../KmlTimePrimitive',
+    '../../../util/WWUtil'
 ], function(
     KmlObject,
     KmlAbstractView,
     KmlStyle,
     KmlRegion,
-    KmlTimePrimitive
+    KmlTimePrimitive,
+    WWUtil
 ){
     "use strict";
     /**
@@ -59,7 +61,7 @@ define([
          */
         visibility: {
             get: function(){
-                return this.retrieve({name: 'visibility', transformer: Boolean});
+                return this.retrieve({name: 'visibility', transformer: WWUtil.transformToBoolean});
             }
         },
 
@@ -72,7 +74,7 @@ define([
          */
         open: {
             get: function() {
-                return this.retrieve({name: 'open', transformer: Boolean});
+                return this.retrieve({name: 'open', transformer: WWUtil.transformToBoolean});
             }
         },
 

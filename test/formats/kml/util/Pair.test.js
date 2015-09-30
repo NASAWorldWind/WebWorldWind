@@ -31,7 +31,7 @@ require({
                 kmlRepresentation.getElementsByTagName("Pair")[0]);
 
             assertEquals('normal', scale.key);
-            assertEquals('styleUrl', scale.styleUrl);
+            assertEquals('validUrl', scale.styleUrl);
 
             assertTrue(scale.Style instanceof KmlStyleSelector);
         })

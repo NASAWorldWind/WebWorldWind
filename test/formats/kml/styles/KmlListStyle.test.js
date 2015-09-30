@@ -8,7 +8,7 @@ require({
     'test/CatchTest',
     'src/util/XmlDocument',
     'src/formats/kml/styles/KmlListStyle',
-    'src/formats/kml/utils/ItemIcon'
+    'src/formats/kml/util/ItemIcon'
 ], function (
     CatchTest,
     XmlDocument,
