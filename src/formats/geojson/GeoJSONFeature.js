@@ -28,7 +28,8 @@ define(['../../error/ArgumentError',
          * The value of the properties member is an object (any JSON object or a JSON null value).
          * If a feature has a commonly used identifier, that identifier should be included as a member of the
          * feature object with the name "id".
-         * To include information on the coordinate range for features, a GeoJSON object may have a member named "bbox".
+         * To include information on the coordinate range for features, a GeoJSON object may have a member
+         * named "bbox".
          * @param {Object} geometry An object containing the value of GeoJSON geometry member.
          * @param {Object} properties An object containing the value of GeoJSON properties member.
          * @param {Object} crs An object containing the value of GeoJSON FeatureCollection or Feature crs member.

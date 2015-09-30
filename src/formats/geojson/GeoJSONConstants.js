@@ -38,7 +38,14 @@ define([],
         GeoJSONConstants.TYPE_FEATURE = "Feature";
         GeoJSONConstants.TYPE_FEATURE_COLLECTION = "FeatureCollection";
 
+        GeoJSONConstants.FIELD_CRS_NAME = "name";
+        GeoJSONConstants.FIELD_CRS_LINK = "link";
+
+        // Default Named CRS string
+        // OGC CRS URNs such as "urn:ogc:def:crs:OGC:1.3:CRS84" shall be preferred over legacy identifiers
+        // such as "EPSG:4326"
         GeoJSONConstants.WGS84_CRS = "urn:ogc:def:crs:OGC:1.3:CRS84";
+        GeoJSONConstants.EPSG4326_CRS = "EPSG:4326";
 
         return GeoJSONConstants;
     }

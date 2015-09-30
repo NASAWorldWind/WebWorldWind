@@ -27,7 +27,7 @@ define(['../../error/ArgumentError',
          * defined in {@link GeoJSONFeature}.
          * To include information on the coordinate range for feature collections, a GeoJSON object may have a member
          * named "bbox".
-         * @param {Array} features An array containing the data associated with the GeoJSON FeatureCollection features.
+         * @param {Object} features An object containing the data associated with the GeoJSON FeatureCollection features.
          * @param {Object} crs An object containing the value of GeoJSON FeatureCollection crs member.
          * @param {Object} bbox An object containing the value of GeoJSON FeatureCollection bbox member.
          * @throws {ArgumentError} If the specified mandatory features parameter is null or undefined.
@@ -42,7 +42,8 @@ define(['../../error/ArgumentError',
 
             if (Object.prototype.toString.call(features) !== '[object Array]') {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeatureCollection", "constructor", "invalidFeatures"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeatureCollection", "constructor",
+                        "invalidFeatures"));
             }
 
             // Documented in defineProperties below.
@@ -61,7 +62,7 @@ define(['../../error/ArgumentError',
             /**
              * The GeoJSON Feature Collection features as specified to this GeoJSONFeatureCollection's constructor.
              * @memberof GeoJSONFeatureCollection.prototype
-             * @type {Array}
+             * @type {Object}
              * @readonly
              */
             features: {

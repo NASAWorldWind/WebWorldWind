@@ -24,6 +24,7 @@ define(['../../error/ArgumentError',
         '../../shapes/PlacemarkAttributes',
         '../../shapes/Polygon',
         '../../geom/Position',
+        '../../util/proj4-src',
         '../../layer/RenderableLayer',
         '../../shapes/ShapeAttributes',
         '../../shapes/SurfacePolygon',
@@ -48,6 +49,7 @@ define(['../../error/ArgumentError',
               PlacemarkAttributes,
               Polygon,
               Position,
+              Proj4,
               RenderableLayer,
               ShapeAttributes,
               SurfacePolygon,
@@ -95,6 +97,8 @@ define(['../../error/ArgumentError',
             this.defaultPlacemarkAttributes = new PlacemarkAttributes(null);
 
             this.defaultShapeAttributes = new ShapeAttributes(null);
+
+            this.setProj4jsAliases();
         };
 
         Object.defineProperties(GeoJSON.prototype, {
@@ -224,8 +228,8 @@ define(['../../error/ArgumentError',
          * It is specified as the displayName for all other shapes.
          *
          * @param {GeoJSONGeometry} geometry An object containing the geometry associated with this GeoJSON.
-         * @param {Object} properties An object containing the attribute-value pairs found in GeoJSON feature properties
-         * member.
+         * @param {Object} properties An object containing the attribute-value pairs found in GeoJSON feature
+         * properties member.
          * @returns {Object} An object with properties as described above.
          */
         GeoJSON.prototype.defaultShapeConfigurationCallback = function (geometry, properties) {
@@ -292,7 +296,8 @@ define(['../../error/ArgumentError',
                 if (this.geoJSONObject){
                     if (Object.prototype.toString.call(this.geoJSONObject) === '[object Array]') {
                         throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse", "invalidGeoJSONObjectLength"));
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
+                                "invalidGeoJSONObjectLength"));
                     }
 
                     if (this.geoJSONObject.hasOwnProperty(GeoJSONConstants.FIELD_TYPE)) {
@@ -300,7 +305,8 @@ define(['../../error/ArgumentError',
                     }
                     else{
                         throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse", "missingGeoJSONType"));
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
+                                "missingGeoJSONType"));
                     }
                 }
             }
@@ -384,8 +390,8 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
          * @param {GeoJSONGeometry} geometry An object containing the current geometry.
          * @param {GeoJSONCRS} crs An object containing the CRS information.
-         * @param {Object} properties An object containing the attribute-value pairs found in GeoJSON feature properties
-         * member.
+         * @param {Object} properties An object containing the attribute-value pairs found in GeoJSON feature
+         * properties member.
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the geometry is null or undefined.
          */
@@ -400,12 +406,14 @@ define(['../../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometry", "missingGeometry"));
             }
 
+            var crsObject = geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs;
+
             switch(geometry[GeoJSONConstants.FIELD_TYPE]){
                 case GeoJSONConstants.TYPE_POINT:
                     var pointGeometry = new GeoJSONGeometryPoint(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        crsObject,
                         geometry[GeoJSONConstants.FIELD_BBOX]);
                     this.addRenderablesForPoint(
                         layer,
@@ -416,7 +424,7 @@ define(['../../error/ArgumentError',
                     var multiPointGeometry = new GeoJSONGeometryMultiPoint(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        crsObject,
                         geometry[GeoJSONConstants.FIELD_BBOX]);
                     this.addRenderablesForMultiPoint(
                         layer,
@@ -427,7 +435,7 @@ define(['../../error/ArgumentError',
                     var lineStringGeometry = new GeoJSONGeometryLineString(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        crsObject,
                         geometry[GeoJSONConstants.FIELD_BBOX]);
                     this.addRenderablesForLineString(
                         layer,
@@ -438,7 +446,7 @@ define(['../../error/ArgumentError',
                     var multiLineStringGeometry = new GeoJSONGeometryMultiLineString(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        crsObject,
                         geometry[GeoJSONConstants.FIELD_BBOX]);
                     this.addRenderablesForMultiLineString(
                         layer,
@@ -449,7 +457,7 @@ define(['../../error/ArgumentError',
                     var polygonGeometry = new GeoJSONGeometryPolygon(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        crsObject,
                         geometry[GeoJSONConstants.FIELD_BBOX]
                     );
                     this.addRenderablesForPolygon(
@@ -461,14 +469,12 @@ define(['../../error/ArgumentError',
                     var multiPolygonGeometry = new GeoJSONGeometryMultiPolygon(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
                         geometry[GeoJSONConstants.FIELD_TYPE],
-                        geometry[GeoJSONConstants.FIELD_CRS] ? geometry[GeoJSONConstants.FIELD_CRS] : crs,
+                        crsObject,
                         geometry[GeoJSONConstants.FIELD_BBOX]);
                     this.addRenderablesForMultiPolygon(
                         layer,
                         multiPolygonGeometry,
                         properties ? properties : null);
-                    break;
-                default:
                     break;
             }
         }
@@ -499,26 +505,26 @@ define(['../../error/ArgumentError',
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
-            if (geometry.crs === null ||
-                (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
-                geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
+            if (!geometry.crs || geometry.crs.isCRSSupported()) {
                 var longitude = geometry.coordinates[0],
                     latitude = geometry.coordinates[1],
-                    altitude = geometry.coordinates[2] ?  geometry.coordinates[2] : 0,
-                    position = new Position(latitude, longitude, altitude),
-                    placemark = new Placemark(
-                        position,
-                        false,
-                        configuration && configuration.attributes ? configuration.attributes : null);
+                    altitude = geometry.coordinates[2] ?  geometry.coordinates[2] : 0;
+
+                var reprojectedCoordinate = this.getReprojectedIfRequired(
+                    latitude,
+                    longitude,
+                    geometry.crs);
+                var position = new Position(reprojectedCoordinate[1], reprojectedCoordinate[0], altitude);
+                var placemark = new Placemark(
+                    position,
+                    false,
+                    configuration && configuration.attributes ? configuration.attributes : null);
 
                 placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
                 if (configuration && configuration.name){
                     placemark.label = configuration.name;
                 }
                 layer.addRenderable(placemark);
-            }
-            else {
-                //TODO other CRS
             }
         };
 
@@ -550,26 +556,26 @@ define(['../../error/ArgumentError',
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
-            for (var pointIndex = 0, points = geometry.coordinates.length; pointIndex < points; pointIndex += 1){
-                if (geometry.crs === null ||
-                    (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
-                    geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
+            if (!geometry.crs || geometry.crs.isCRSSupported()) {
+                for (var pointIndex = 0, points = geometry.coordinates.length; pointIndex < points; pointIndex += 1){
                     var longitude = geometry.coordinates[pointIndex][0],
                         latitude = geometry.coordinates[pointIndex][1],
-                        altitude = geometry.coordinates[pointIndex][2] ?  geometry.coordinates[pointIndex][2] : 0,
-                        position = new Position(latitude, longitude, altitude),
-                        placemark = new Placemark(
-                            position,
-                            false,
-                            configuration && configuration.attributes ? configuration.attributes : null);
+                        altitude = geometry.coordinates[pointIndex][2] ?  geometry.coordinates[pointIndex][2] : 0;
+
+                    var reprojectedCoordinate = this.getReprojectedIfRequired(
+                        latitude,
+                        longitude,
+                        geometry.crs);
+                    var position = new Position(reprojectedCoordinate[1], reprojectedCoordinate[0], altitude);
+                    var placemark = new Placemark(
+                        position,
+                        false,
+                        configuration && configuration.attributes ? configuration.attributes : null);
                     placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
                     if (configuration && configuration.name){
                         placemark.label = configuration.name;
                     }
                     layer.addRenderable(placemark);
-                }
-                else {
-                    //TODO other CRS
                 }
             }
         };
@@ -602,16 +608,17 @@ define(['../../error/ArgumentError',
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
-            if (geometry.crs === null ||
-                (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
-                geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
+            if (!geometry.crs || geometry.crs.isCRSSupported()) {
                 var positions = [];
                 for (var pointsIndex = 0, points = geometry.coordinates; pointsIndex < points.length; pointsIndex++) {
                     var longitude = points[pointsIndex][0],
-                        latitude = points[pointsIndex][1],
+                        latitude = points[pointsIndex][1];
                     //altitude = points[pointsIndex][2] ?  points[pointsIndex][2] : 0,
-                        position;
-                    position = new Location(latitude, longitude);
+                    var reprojectedCoordinate = this.getReprojectedIfRequired(
+                        latitude,
+                        longitude,
+                        geometry.crs);
+                    var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
                     positions.push(position);
                 }
 
@@ -620,9 +627,6 @@ define(['../../error/ArgumentError',
                     positions,
                     configuration && configuration.attributes ? configuration.attributes : null);
                 layer.addRenderable(shape);
-            }
-            else {
-                //TODO other CRS
             }
         };
 
@@ -654,19 +658,20 @@ define(['../../error/ArgumentError',
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
-            if (geometry.crs === null ||
-                (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
-                geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
+            if (!geometry.crs || geometry.crs.isCRSSupported()) {
                 for (var linesIndex = 0, lines = geometry.coordinates; linesIndex < lines.length; linesIndex++) {
                     var positions = [];
 
                     for (var positionIndex = 0, points = lines[linesIndex]; positionIndex < points.length;
                          positionIndex++) {
                         var longitude = points[positionIndex][0],
-                            latitude = points[positionIndex][1],
+                            latitude = points[positionIndex][1];
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
-                            position;
-                        position = new Location(latitude, longitude);
+                        var reprojectedCoordinate = this.getReprojectedIfRequired(
+                            latitude,
+                            longitude,
+                            geometry.crs);
+                        var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
                         positions.push(position);
                     }
 
@@ -676,9 +681,6 @@ define(['../../error/ArgumentError',
                         configuration && configuration.attributes ? configuration.attributes : null);
                     layer.addRenderable(shape);
                 }
-            }
-            else {
-                //TODO other CRS
             }
         };
 
@@ -708,9 +710,7 @@ define(['../../error/ArgumentError',
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
-            if (geometry.crs === null ||
-                (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
-                geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
+            if (!geometry.crs || geometry.crs.isCRSSupported()) {
                 for (var boundariesIndex = 0, boundaries = geometry.coordinates;
                      boundariesIndex < boundaries.length; boundariesIndex++) {
                     var positions = [];
@@ -718,10 +718,13 @@ define(['../../error/ArgumentError',
                     for (var positionIndex = 0, points = boundaries[boundariesIndex];
                          positionIndex < points.length; positionIndex++) {
                         var longitude = points[positionIndex][0],
-                            latitude = points[positionIndex][1],
+                            latitude = points[positionIndex][1];
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
-                            position;
-                        position = new Location(latitude, longitude);
+                        var reprojectedCoordinate = this.getReprojectedIfRequired(
+                            latitude,
+                            longitude,
+                            geometry.crs);
+                        var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
                         positions.push(position);
                     }
 
@@ -731,9 +734,6 @@ define(['../../error/ArgumentError',
                         configuration && configuration.attributes ? configuration.attributes : null);
                     layer.addRenderable(shape);
                 }
-            }
-            else {
-                //TODO other CRS
             }
         };
 
@@ -765,21 +765,22 @@ define(['../../error/ArgumentError',
 
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
-            if (geometry.crs === null ||
-                (geometry.crs.properties.hasOwnProperty(GeoJSONConstants.FIELD_NAME) &&
-                geometry.crs.properties[GeoJSONConstants.FIELD_NAME] === GeoJSONConstants.WGS84_CRS)) {
+            if (!geometry.crs || geometry.crs.isCRSSupported()) {
                 for (var polygonsIndex = 0, polygons = geometry.coordinates;
                      polygonsIndex < polygons.length; polygonsIndex++) {
-                    var boundaries = [],
-                        position;
+                    var boundaries = [];
                     for (var boundariesIndex = 0; boundariesIndex < polygons[polygonsIndex].length; boundariesIndex++) {
                         var positions = [];
                         for (var positionIndex = 0, points = polygons[polygonsIndex][boundariesIndex];
                              positionIndex < points.length; positionIndex++) {
                             var longitude = points[positionIndex][0],
-                                latitude = points[positionIndex][1],
+                                latitude = points[positionIndex][1];
                             //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,;
-                                position = new Location(latitude, longitude);
+                            var reprojectedCoordinate = this.getReprojectedIfRequired(
+                                latitude,
+                                longitude,
+                                geometry.crs);
+                            var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
                             positions.push(position);
                         }
                         boundaries.push(positions);
@@ -790,9 +791,6 @@ define(['../../error/ArgumentError',
                         configuration && configuration.attributes ? configuration.attributes : null);
                     layer.addRenderable(shape);
                 }
-            }
-            else {
-                //TODO other CRS
             }
         };
 
@@ -855,21 +853,19 @@ define(['../../error/ArgumentError',
             //If an object has no crs member, then its parent or grandparent object's crs member may be acquired.
             var crs = feature.crs ? feature.crs : inheritedCrs;
 
-            switch (feature.geometry.type) {
-                case GeoJSON.TYPE_GEOMETRY_COLLECTION:
-                    this.addRenderablesForGeometryCollection(
-                        layer,
-                        feature.geometry,
-                        feature.properties);
-                    break;
-                default:
-                    this.addRenderablesForGeometry(
-                        layer,
-                        feature.geometry,
-                        crs,
-                        feature.properties
-                    );
-                    break;
+            if (feature.geometry.type === GeoJSON.TYPE_GEOMETRY_COLLECTION) {
+                this.addRenderablesForGeometryCollection(
+                    layer,
+                    feature.geometry,
+                    feature.properties);
+            }
+            else {
+                this.addRenderablesForGeometry(
+                    layer,
+                    feature.geometry,
+                    crs,
+                    feature.properties
+                );
             }
         };
 
@@ -911,6 +907,12 @@ define(['../../error/ArgumentError',
 
         // Set type of GeoJSON object. Internal use ony.
         GeoJSON.prototype.setGeoJSONType = function (geoJSONObject) {
+            if (!geoJSONObject) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "setGeoJSONType",
+                        "missingGeoJSONObject"));
+            }
+
             switch (geoJSONObject[GeoJSONConstants.FIELD_TYPE]) {
                 case GeoJSONConstants.TYPE_POINT:
                     this._geoJSONType = GeoJSONConstants.TYPE_POINT;
@@ -942,8 +944,66 @@ define(['../../error/ArgumentError',
                 default:
                     throw new ArgumentError(
                         Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "setGeoJSONType", "invalidGeoJSONType"));
-                    break;
             }
+        };
+
+        /**
+         * Reprojects GeoJSON geometry coordinates if required using proj4js.
+         *
+         * @param {Number} latitude The latitude coordinate of the geometry.
+         * @param {Number} longitude The longitude coordinate of the geometry.
+         * @param {GeoJSONCRS} crsObject The GeoJSON CRS object.
+         * @returns {Number[]} An array containing reprojected coordinates.
+         * @throws {ArgumentError} If the specified latitude is null or undefined.
+         * @throws {ArgumentError} If the specified longitude is null or undefined.
+         * @throws {ArgumentError} If the specified crsObject is null or undefined.
+         */
+        GeoJSON.prototype.getReprojectedIfRequired = function (latitude, longitude, crsObject) {
+            if (!latitude) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "getReprojectedIfRequired",
+                        "missingLatitude"));
+            }
+
+            if (!longitude) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "getReprojectedIfRequired",
+                        "missingLongitude"));
+            }
+
+            if (!crsObject) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "getReprojectedIfRequired",
+                        "missingCrsObject"));
+            }
+
+            if (!crsObject || crsObject.isDefault()){
+                return [longitude, latitude];
+            }
+            else{
+                if (crsObject.isNamed()){
+                    return Proj4(crsObject.properties.name, GeoJSONConstants.EPSG4326_CRS, [longitude, latitude]);
+                }
+                else{
+                    //TODO Linked CRS
+                }
+            }
+        };
+
+        // Use this function to add aliases for some projection strings that proj4js doesn't recognize. Internal
+        // use only.
+        GeoJSON.prototype.setProj4jsAliases = function () {
+            Proj4.defs([
+                [
+                    'urn:ogc:def:crs:OGC:1.3:CRS84',
+                    Proj4.defs('EPSG:4326')
+                ],
+                [
+                    'urn:ogc:def:crs:EPSG::3857',
+                    Proj4.defs('EPSG:3857')
+
+                ]
+            ]);
         };
 
         return GeoJSON;

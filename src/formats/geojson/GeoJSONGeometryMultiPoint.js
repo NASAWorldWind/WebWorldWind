@@ -21,7 +21,7 @@ define(['../../error/ArgumentError',
          * @constructor
          * @classdesc Contains the data associated with a GeoJSON MultiPoint geometry.
          * @augments GeoJSONGeometry
-         * @param {Array} coordinates The array containing MultiPoint coordinates.
+         * @param {Number[]} coordinates The array containing MultiPoint coordinates.
          * @param {String} type A string containing type of geometry.
          * @param {Object} crs An object containing GeoJSON CRS information.
          * @param {Object} bbox An object containing GeoJSON bbox information.
@@ -45,7 +45,8 @@ define(['../../error/ArgumentError',
             if (Object.prototype.toString.call(coordinates[0]) !== '[object Array]' ||
                 Object.prototype.toString.call(coordinates[0][0]) !== '[object Number]') {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryMultiPoint", "constructor", "invalidCoordinatesType"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryMultiPoint", "constructor",
+                        "invalidCoordinatesType"));
             }
 
             if (!type) {

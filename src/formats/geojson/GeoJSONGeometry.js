@@ -22,7 +22,7 @@ define(['./GeoJSONConstants',
          * A GeoJSON geometry object of any type other than "GeometryCollection" must have a member with the name
          * "coordinates". The value of the coordinates member is always an array.
          * The structure for the elements in this array is determined by the type of geometry.
-         * @param {Array} coordinates An array containing geometry coordinates.
+         * @param {Number[]} coordinates An array containing geometry coordinates.
          * @param {String} type A string containing type of geometry.
          * @param {Object} crs An object containing the value of GeoJSON crs member.
          * @param {Object} bbox An array containing information on the coordinate range for geometries.
@@ -49,7 +49,9 @@ define(['./GeoJSONConstants',
             this._type =  type;
 
             // Documented in defineProperties below.
-            this._crs = crs ? new GeoJSONCRS(crs[GeoJSONConstants.FIELD_TYPE], crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
+            this._crs = crs ? new GeoJSONCRS(
+                crs[GeoJSONConstants.FIELD_TYPE],
+                crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
 
             // Documented in defineProperties below.
             this._bbox = bbox ? bbox : null;
@@ -59,7 +61,7 @@ define(['./GeoJSONConstants',
             /**
              * The GeoJSON geometry coordinates as specified to this GeoJSONGeometry's constructor.
              * @memberof GeoJSONGeometry.prototype
-             * @type {Array}
+             * @type {Number[]}
              * @readonly
              */
             coordinates: {

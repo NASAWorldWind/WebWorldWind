@@ -21,7 +21,7 @@ define(['../../error/ArgumentError',
          * @constructor
          * @classdesc Contains the data associated with a GeoJSON Polygon geometry.
          * @augments GeoJSONGeometry
-         * @param {Array} coordinates The array containing Polygon coordinates.
+         * @param {Number[]} coordinates The array containing Polygon coordinates.
          * @param {String} type A string containing type of geometry.
          * @param {Object} crs An object containing GeoJSON CRS information.
          * @param {Object} bbox An object containing GeoJSON bbox information.

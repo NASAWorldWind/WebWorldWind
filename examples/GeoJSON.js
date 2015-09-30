@@ -149,6 +149,20 @@ requirejs(['../src/WorldWind',
         worldRiversGeoJSON.load(shapeConfigurationCallback, worldRiversLayer);
         wwd.addLayer(worldRiversLayer);
 
+        //CRS Reprojection test
+
+        //USA EPSG:3857
+        var usa3857Layer = new WorldWind.RenderableLayer("USA-3857");
+        var usa3857GeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/usa_epsg3857.geojson");
+        usa3857GeoJSON.load(shapeConfigurationCallback, usa3857Layer);
+        wwd.addLayer(usa3857Layer);
+
+        //USA EPSG:4326
+        var usa4326Layer = new WorldWind.RenderableLayer("USA-4326");
+        var usa4326GeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/usa_epsg4326.geojson");
+        usa4326GeoJSON.load(shapeConfigurationCallback, usa4326Layer);
+        wwd.addLayer(usa4326Layer);
+
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);

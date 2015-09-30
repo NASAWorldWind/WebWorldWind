@@ -23,7 +23,7 @@ define(['../../error/ArgumentError',
          * @constructor
          * @classdesc Contains the data associated with a GeoJSON Point geometry.
          * @augments GeoJSONGeometry
-         * @param {Array} coordinates The array containing Point coordinates.
+         * @param {Number[]} coordinates The array containing Point coordinates.
          * @param {String} type A string containing type of geometry.
          * @param {Object} crs An object containing GeoJSON CRS information.
          * @param {Object} bbox An object containing GeoJSON bbox information.
@@ -47,7 +47,8 @@ define(['../../error/ArgumentError',
             if (Object.prototype.toString.call(coordinates) !== '[object Array]' ||
                 Object.prototype.toString.call(coordinates[0]) !== '[object Number]') {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryPoint", "constructor", "invalidCoordinatesType"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryPoint", "constructor",
+                        "invalidCoordinatesType"));
             }
 
             if (!type) {

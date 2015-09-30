@@ -7,11 +7,13 @@
  */
 define(['../../error/ArgumentError',
         './GeoJSONConstants',
-        '../../util/Logger'
+        '../../util/Logger',
+        '../../util/proj4-src'
     ],
     function (ArgumentError,
               GeoJSONConstants,
-              Logger){
+              Logger,
+              Proj4){
         "use strict";
 
         /**
@@ -39,7 +41,7 @@ define(['../../error/ArgumentError',
          * OGC CRS URNs such as "urn:ogc:def:crs:OGC:1.3:CRS84" shall be preferred over legacy identifiers
          * such as "EPSG:4326".
          * <p>
-         * At the moment is implemented only "urn:ogc:def:crs:OGC:1.3:CRS84".
+         * For reprojecton is used Proj4js JavaScript library.
          * @param {String} type A string, indicating the type of CRS object.
          * @param {Object} properties An object containing the properties of CRS object.
          * @throws {ArgumentError} If the specified type or properties are null or undefined.
@@ -88,6 +90,98 @@ define(['../../error/ArgumentError',
                 }
             }
         });
+
+        /**
+         * Indicates whether this CRS is the default GeoJSON one, respectively a geographic coordinate
+         * reference system, using the WGS84 datum, and with longitude and latitude units of decimal degrees.
+         *
+         * @return {Boolean} True if the CRS is the default GeoJSON CRS
+         */
+        GeoJSONCRS.prototype.isDefault = function () {
+            if (this.isNamed()){
+                if (this._properties.name && (this._properties.name === GeoJSONConstants.EPSG4326_CRS ||
+                    this._properties.name === GeoJSONConstants.WGS84_CRS))
+                {
+                    return true;
+                }
+            }
+            //else if (this.isLinked()){
+            //    //TODO Linked CRS
+            //}
+            return false;
+        };
+
+        /**
+         * Indicates whether the type of this CRS object is named CRS.
+         *
+         * @return {Boolean} True if the type of CRS object is named CRS
+         */
+        GeoJSONCRS.prototype.isNamed = function () {
+            return (this._type === GeoJSONConstants.FIELD_CRS_NAME);
+        };
+
+        /**
+         * Indicates whether the type of this CRS object is linked CRS.
+         *
+         * @return {Boolean} True if the type of CRS object is linked CRS
+         */
+        GeoJSONCRS.prototype.isLinked = function () {
+            return (this._type === GeoJSONConstants.FIELD_CRS_LINK);
+        };
+
+        /**
+         * Indicates whether the CRS is supported by proj4js.
+         *
+         * @return {Boolean} True if the CRS is supported by proj4js
+         */
+        GeoJSONCRS.prototype.isCRSSupported = function () {
+            var crsString;
+            if (this.isNamed()){
+                crsString = this._properties.name;
+            }
+            else if (this.isLinked()){
+                //TODO Linked CRS
+            }
+
+            try{
+                Proj4(crsString, GeoJSONConstants.EPSG4326_CRS);
+            }
+            catch(e){
+                Logger.log(Logger.LEVEL_WARNING,
+                    "Unknown GeoJSON coordinate reference system (" + e + "): " + this._properties.name);
+                return false;
+            }
+            return true;
+        };
+
+        // Get GeoJSON Linked CRS string using XMLHttpRequest. Internal use only.
+        GeoJSONCRS.prototype.getLinkedCRSString = function (url) {
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("GET", url, true);
+            xhr.responseType = 'text';
+            xhr.onreadystatechange = (function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        console.log(xhr.response);
+                    }
+                    else {
+                        Logger.log(Logger.LEVEL_WARNING,
+                            "GeoJSON Linked CRS retrieval failed (" + xhr.statusText + "): " + url);
+                    }
+                }
+            }).bind(this);
+
+            xhr.onerror = function () {
+                Logger.log(Logger.LEVEL_WARNING, "GeoJSON Linked CRS retrieval failed: " + url);
+            };
+
+            xhr.ontimeout = function () {
+                Logger.log(Logger.LEVEL_WARNING, "GeoJSON Linked CRS retrieval timed out: " + url);
+            };
+
+            xhr.send(null);
+        };
 
         return GeoJSONCRS;
     }
