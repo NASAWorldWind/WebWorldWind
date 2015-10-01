@@ -23,6 +23,7 @@ define([
      * @param objectNode Node representing Kml Object
      * @constructor
      * @throws {ArgumentError} If either node is null or id isn't present on the object.
+     * @see https://developers.google.com/kml/documentation/kmlreference#object
      */
     var KmlObject = function(objectNode) {
         if(!objectNode) {
@@ -77,6 +78,10 @@ define([
         } else {
             return nodes[0];
         }
+    };
+
+    KmlObject.prototype.retrieveAttribute = function(options) {
+
     };
 
     /**

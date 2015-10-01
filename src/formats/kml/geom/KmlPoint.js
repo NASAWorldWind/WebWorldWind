@@ -31,6 +31,7 @@ define([
      * @classdesc Contains the data associated with Kml point
      * @param pointNode Node representing the Kml point.
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
+     * @see https://developers.google.com/kml/documentation/kmlreference#point
      */
     var KmlPoint = function(pointNode) {
         KmlGeometry.call(this, pointNode);

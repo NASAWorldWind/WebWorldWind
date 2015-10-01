@@ -17,6 +17,7 @@ define([
      * @classdesc Contains the data associated with Kml sub style
      * @param subStyleNode Node representing the Kml sub style.
      * @throws {ArgumentError} If either the node is null or undefined.
+     * @see https://developers.google.com/kml/documentation/kmlreference#substyle
      */
     var KmlSubStyle = function(subStyleNode) {
         KmlObject.call(this, subStyleNode);

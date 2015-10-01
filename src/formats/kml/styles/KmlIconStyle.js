@@ -21,6 +21,7 @@ define([
      * @returns {KmlIconStyle}
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined
+     * @see https://developers.google.com/kml/documentation/kmlreference#iconstyle
      */
     var KmlIconStyle = function(iconStyleNode){
         KmlColorStyle.call(this, iconStyleNode);

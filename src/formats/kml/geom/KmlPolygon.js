@@ -32,6 +32,7 @@ define([
      * @classdesc Contains the data associated with Kml polygon
      * @param polygonNode Node representing the Kml polygon.
      * @throws {ArgumentError} If either the node is null or undefined.
+     * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
     var KmlPolygon = function(polygonNode) {
         KmlGeometry.call(this, polygonNode);

@@ -26,6 +26,7 @@ define([
      * @param featureNode Node representing Kml Feature
      * @constructor
      * @throws {ArgumentError} If the node is null.
+     * @see https://developers.google.com/kml/documentation/kmlreference#feature
      */
     var KmlFeature = function(featureNode) {
         KmlObject.call(this, featureNode);
@@ -114,12 +115,27 @@ define([
             }
         },
 
+        /**
+         * URL of a <Style> or <StyleMap> defined in a Document. If the style is in the same file, use a # reference.
+         * If the style is defined in an external file, use a full URL along with # referencing.
+         * If it references remote URL, this server must support CORS for us to be able to download it.
+         * @memberof KmlFeature.prototype
+         * @type {String}
+         * @readonly
+         */
         styleUrl: {
             get: function() {
                 return this.retrieve({name: 'styleUrl'});
             }
         },
 
+        /**
+         * A short description of the feature. In Google Earth, this description is displayed in the Places panel under
+         * the name of the feature. If a Snippet is not supplied, the first two lines of the <description> are used. In Google Earth, if a Placemark contains both a description and a Snippet, the <Snippet> appears beneath the Placemark in the Places panel, and the <description> appears in the Placemark's description balloon. This tag does not support HTML markup. <Snippet> has a maxLines attribute, an integer that specifies the maximum number of lines to display.
+         * @memberof KmlFeature.prototype
+         * @type {String}
+         * @readonly
+         */
         Snippet: {
             get: function() {
                 return this.retrieve({name: 'Snippet'});
@@ -158,6 +174,9 @@ define([
 
         /**
          * One style element per Feature, with possible children of different substyles.
+         * @memberof KmlFeature.prototype
+         * @type {KmlTimePrimitive}
+         * @readonly
          */
         StyleSelector: {
             get: function() {
@@ -167,6 +186,12 @@ define([
             }
         },
 
+        /**
+         * Features and geometry associated with a Region are drawn only when the Region is active. See <Region>.
+         * @memberof KmlFeature.prototype
+         * @type {KmlRegion}
+         * @readonly
+         */
         Region: {
             get: function() {
                 return this.createChildElement({

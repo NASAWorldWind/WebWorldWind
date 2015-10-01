@@ -11,6 +11,16 @@ define([
 ) {
     "use strict";
 
+    /**
+     * Constructs an KmlMultiTrack. Applications usually don't call this constructor. It is called by {@link KmlFile} as
+     * objects from Kml file are read. This object is already concrete implementation.
+     * @alias KmlMultiTrack
+     * @classdesc Contains the data associated with MultiTrack node.
+     * @param node Node representing multi track in the document.
+     * @constructor
+     * @throws {ArgumentError} If the node is null or undefined.
+     * @see https://developers.google.com/kml/documentation/kmlreference#gxmultitrack
+     */
     var KmlMultiTrack = function(node) {
         KmlGeometry.call(this, node);
     };
@@ -18,6 +28,12 @@ define([
     KmlMultiTrack.prototype = Object.create(KmlGeometry.prototype);
 
     Object.defineProperties(KmlMultiTrack.prototype, {
+        /**
+         * Array of the tag names representing Kml multi track.
+         * @memberof KmlMultiTrack.prototype
+         * @readonly
+         * @type {Array}
+         */
         tagName: {
             get: function() {
                 return ['gx:MultiTrack'];

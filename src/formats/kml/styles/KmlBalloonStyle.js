@@ -18,6 +18,7 @@ define([
      * @param balloonStyleNode Node representing BallonStyle in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined
+     * @see https://developers.google.com/kml/documentation/kmlreference#balloonstyle
      */
     var KmlBalloonStyle = function(balloonStyleNode){
         KmlSubStyle.call(this, balloonStyleNode);

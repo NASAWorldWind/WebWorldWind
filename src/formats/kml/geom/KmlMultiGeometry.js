@@ -20,6 +20,7 @@ define([
      * @constructor
      * @classdesc Class representing MultiGeometry Element of Kml Document.
      * @alias KmlMultiGeometry
+     * @see https://developers.google.com/kml/documentation/kmlreference#multigeometry
      */
     var KmlMultiGeometry = function(multiGeometryNode) {
         KmlGeometry.call(this, multiGeometryNode)

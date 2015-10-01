@@ -30,6 +30,7 @@ define([
          * @constructor
          * @alias KmlLineString
          * @classdesc Class representing LineString element of KmlFile
+         * @see https://developers.google.com/kml/documentation/kmlreference#linestring
          */
         var KmlLineString = function (lineStringNode) {
             KmlGeometry.call(this, lineStringNode);

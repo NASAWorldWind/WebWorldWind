@@ -18,6 +18,7 @@ define([
      * @classdesc It is ancestor for all TimePrimitives - TimeSpan and TimeStamp
      * @param timePrimitiveNode Node representing Kml TimePrimitive.
      * @constructor
+     * @see https://developers.google.com/kml/documentation/kmlreference#timeprimitive
      */
     var KmlTimePrimitive = function(timePrimitiveNode) {
         KmlObject.call(this,timePrimitiveNode);

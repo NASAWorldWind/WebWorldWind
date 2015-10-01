@@ -16,6 +16,7 @@ define([
      * @classdesc Contains the data associated with Kml style selector
      * @param styleSelectorNode Node representing the Kml style selector.
      * @throws {ArgumentError} If either the node is null or undefined.
+     * @see https://developers.google.com/kml/documentation/kmlreference#styleselector
      */
     var KmlStyleSelector = function(styleSelectorNode){
         KmlObject.call(this, styleSelectorNode);

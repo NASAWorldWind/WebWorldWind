@@ -18,6 +18,7 @@ define([
      * @param labelStyleNode Node representing the LabelStyle in the document.
      * @constructor
      * @throws {ArgumentError} If node is null or undefined.
+     * @see https://developers.google.com/kml/documentation/kmlreference#labelstyle
      */
     var KmlLabelStyle = function(labelStyleNode) {
         KmlColorStyle.call(this, labelStyleNode);

@@ -21,6 +21,7 @@ define([
      * @classdesc Contains the data associated with Kml poly style
      * @param polyStyleNode Node representing the Kml poly style.
      * @throws {ArgumentError} If either the node is null or undefined.
+     * @see https://developers.google.com/kml/documentation/kmlreference#polystyle
      */
     var KmlPolyStyle = function(polyStyleNode){
         KmlColorStyle.call(this, polyStyleNode);

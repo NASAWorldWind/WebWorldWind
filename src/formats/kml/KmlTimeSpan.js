@@ -21,6 +21,7 @@ define([
      * @param timeSpanNode Node representing the Kml TimeSpan
      * @constructor
      * @throws {ArgumentError} If the content of the node contains invalid elements.
+     * @see https://developers.google.com/kml/documentation/kmlreference#timespan
      */
     var KmlTimeSpan = function(timeSpanNode) {
         KmlTimePrimitive.call(this, timeSpanNode);
@@ -29,6 +30,12 @@ define([
     KmlTimeSpan.prototype = Object.create(KmlTimePrimitive.prototype);
 
     Object.defineProperties(KmlTimeSpan.prototype, {
+        /**
+         * Array of the tag names representing Kml timeSpan.
+         * @memberof KmlTimeSpan.prototype
+         * @readonly
+         * @type {Array}
+         */
         tagName: {
             get: function() {
                 return ['TimeSpan'];

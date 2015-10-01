@@ -31,6 +31,7 @@ define([
      * @param placemarkNode Node representing Kml Placemark
      * @constructor
      * @throws {ArgumentError} If the node is null.
+     * @see https://developers.google.com/kml/documentation/kmlreference#placemark
      */
     var KmlPlacemark = function (placemarkNode) {
         KmlFeature.call(this, placemarkNode);

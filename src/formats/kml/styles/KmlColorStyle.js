@@ -16,6 +16,7 @@ define([
      * @param colorStyleNode Node representing ColorStyle from Kml document
      * @constructor
      * @throws {ArgumentError} If the node is null.
+     * @see https://developers.google.com/kml/documentation/kmlreference#colorstyle
      */
     var KmlColorStyle = function(colorStyleNode) {
         KmlSubStyle.call(this, colorStyleNode);

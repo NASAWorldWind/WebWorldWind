@@ -33,6 +33,7 @@ define([
      * @classdesc Contains the data associated with Kml style
      * @param styleNode Node representing the Kml style.
      * @throws {ArgumentError} If either the node is null or undefined.
+     * @see https://developers.google.com/kml/documentation/kmlreference#style
      */
     var KmlStyle = function(styleNode) {
         KmlStyleSelector.call(this, styleNode);
@@ -111,6 +112,12 @@ define([
             }
         },
 
+        /**
+         * Style used for lists in current node and all children nodes.
+         * @memberof KmlStyle.prototype
+         * @readonly
+         * @type {KmlBalloonStyle|null}
+         */
         ListStyle: {
             get: function() {
                 return this.createChildElement({

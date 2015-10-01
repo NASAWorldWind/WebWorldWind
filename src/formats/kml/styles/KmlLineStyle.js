@@ -18,6 +18,7 @@ define([
      * @constructor
      * @alias KmlLineStyle
      * @classdesc Class representing LineStyle element of KmlFile
+     * @see https://developers.google.com/kml/documentation/kmlreference#linestyle
      */
     var KmlLineStyle = function(lineStyleNode) {
         KmlColorStyle.call(this, lineStyleNode);

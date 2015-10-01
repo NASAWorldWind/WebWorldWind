@@ -22,6 +22,7 @@ define([
      * @param timeStampNode Node representing the Kml TimeStamp
      * @constructor
      * @throws {ArgumentError} If the content of the node contains invalid elements.
+     * @see https://developers.google.com/kml/documentation/kmlreference#timestamp
      */
     var KmlTimeStamp = function(timeStampNode) {
         KmlTimePrimitive.call(this, timeStampNode);
@@ -30,6 +31,12 @@ define([
     KmlTimeStamp.prototype = Object.create(KmlTimePrimitive.prototype);
 
     Object.defineProperties(KmlTimeStamp.prototype, {
+        /**
+         * Array of the tag names representing Kml timeStamp.
+         * @memberof KmlTimeStamp.prototype
+         * @readonly
+         * @type {Array}
+         */
         tagName: {
             get: function() {
                 return ['TimeStamp'];
