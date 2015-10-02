@@ -23,12 +23,11 @@ define(['../../error/ArgumentError',
          * @augments GeoJSONGeometry
          * @param {Number[]} coordinates The array containing MultiLineString coordinates.
          * @param {String} type A string containing type of geometry.
-         * @param {Object} crs An object containing GeoJSON CRS information.
          * @param {Object} bbox An object containing GeoJSON bbox information.
          * @throws {ArgumentError} If the specified coordinates or type are null or undefined or if the coordinates
          * parameter is not an array of LineString coordinates array.
          */
-        var GeoJSONGeometryMultiLineString = function (coordinates, type, crs, bbox) {
+        var GeoJSONGeometryMultiLineString = function (coordinates, type, bbox) {
 
             if (!coordinates) {
                 throw new ArgumentError(
@@ -56,7 +55,7 @@ define(['../../error/ArgumentError',
                         "missingType"));
             }
 
-            GeoJSONGeometry.call(this, coordinates, type, crs, bbox);
+            GeoJSONGeometry.call(this, coordinates, type, bbox);
         };
 
         GeoJSONGeometryMultiLineString.prototype = Object.create(GeoJSONGeometry.prototype);

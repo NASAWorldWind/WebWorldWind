@@ -64,6 +64,9 @@ define(['../../error/ArgumentError',
 
             // Documented in defineProperties below.
             this._properties = properties;
+
+            //
+            this._projectionString = null;
         };
 
         Object.defineProperties(GeoJSONCRS.prototype, {
@@ -88,6 +91,12 @@ define(['../../error/ArgumentError',
                 get: function () {
                     return this._properties;
                 }
+            },
+
+            projectionString: {
+                get: function () {
+                    return this._projectionString;
+                }
             }
         });
 
@@ -99,15 +108,12 @@ define(['../../error/ArgumentError',
          */
         GeoJSONCRS.prototype.isDefault = function () {
             if (this.isNamed()){
-                if (this._properties.name && (this._properties.name === GeoJSONConstants.EPSG4326_CRS ||
-                    this._properties.name === GeoJSONConstants.WGS84_CRS))
+                if (this._projectionString === GeoJSONConstants.EPSG4326_CRS ||
+                    this._projectionString === GeoJSONConstants.WGS84_CRS)
                 {
                     return true;
                 }
             }
-            //else if (this.isLinked()){
-            //    //TODO Linked CRS
-            //}
             return false;
         };
 
@@ -135,16 +141,8 @@ define(['../../error/ArgumentError',
          * @return {Boolean} True if the CRS is supported by proj4js
          */
         GeoJSONCRS.prototype.isCRSSupported = function () {
-            var crsString;
-            if (this.isNamed()){
-                crsString = this._properties.name;
-            }
-            else if (this.isLinked()){
-                //TODO Linked CRS
-            }
-
             try{
-                Proj4(crsString, GeoJSONConstants.EPSG4326_CRS);
+                Proj4(this._projectionString, GeoJSONConstants.EPSG4326_CRS);
             }
             catch(e){
                 Logger.log(Logger.LEVEL_WARNING,
@@ -155,15 +153,15 @@ define(['../../error/ArgumentError',
         };
 
         // Get GeoJSON Linked CRS string using XMLHttpRequest. Internal use only.
-        GeoJSONCRS.prototype.getLinkedCRSString = function (url) {
+        GeoJSONCRS.prototype.getLinkedCRSString = function (url, crsCallback) {
             var xhr = new XMLHttpRequest();
-
             xhr.open("GET", url, true);
             xhr.responseType = 'text';
             xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        console.log(xhr.response);
+                        this._projectionString = xhr.response;
+                        crsCallback();
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -181,6 +179,17 @@ define(['../../error/ArgumentError',
             };
 
             xhr.send(null);
+        };
+
+        // Set CRS string. Internal use only
+        GeoJSONCRS.prototype.setCRSString = function (crsCallback) {
+            if (this.isNamed()){
+                this._projectionString = this._properties.name;
+                crsCallback();
+            }
+            else if (this.isLinked()){
+                this.getLinkedCRSString(this._properties.href, crsCallback);
+            }
         };
 
         return GeoJSONCRS;

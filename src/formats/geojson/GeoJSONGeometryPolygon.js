@@ -23,12 +23,11 @@ define(['../../error/ArgumentError',
          * @augments GeoJSONGeometry
          * @param {Number[]} coordinates The array containing Polygon coordinates.
          * @param {String} type A string containing type of geometry.
-         * @param {Object} crs An object containing GeoJSON CRS information.
          * @param {Object} bbox An object containing GeoJSON bbox information.
          * @throws {ArgumentError} If the specified coordinates or type are null or undefined or if the
          * coordinates parameter is not an array of LinearRing coordinate arrays.
          */
-        var GeoJSONGeometryPolygon = function (coordinates, type, crs, bbox) {
+        var GeoJSONGeometryPolygon = function (coordinates, type, bbox) {
 
             if (!coordinates) {
                 throw new ArgumentError(
@@ -62,7 +61,7 @@ define(['../../error/ArgumentError',
                         "missingType"));
             }
 
-            GeoJSONGeometry.call(this, coordinates, type, crs, bbox);
+            GeoJSONGeometry.call(this, coordinates, type, bbox);
         };
 
         GeoJSONGeometryPolygon.prototype = Object.create(GeoJSONGeometry.prototype);

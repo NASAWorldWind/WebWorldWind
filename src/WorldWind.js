@@ -42,7 +42,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
-		'./formats/geojson/GeoJSON',
+		'./formats/geojson/GeoJSONParser',
         './gesture/GestureRecognizer',
         './globe/Globe',
         './globe/Globe2D',
@@ -176,7 +176,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
-			  GeoJSON,
+			  GeoJSONParser,
               GestureRecognizer,
               Globe,
               Globe2D,
@@ -519,7 +519,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
-		WorldWind['GeoJSON'] = GeoJSON;
+		WorldWind['GeoJSONParser'] = GeoJSONParser;
         WorldWind['GestureRecognizer'] = GestureRecognizer;
         WorldWind['Globe'] = Globe;
         WorldWind['Globe2D'] = Globe2D;

@@ -5,11 +5,9 @@
 /**
  * @exports GeoJSONGeometry
  */
-define(['./GeoJSONConstants',
-        './GeoJSONCRS'
+define(['./GeoJSONConstants'
     ],
-    function (GeoJSONConstants,
-              GeoJSONCRS) {
+    function (GeoJSONConstants) {
         "use strict";
 
         /**
@@ -24,11 +22,10 @@ define(['./GeoJSONConstants',
          * The structure for the elements in this array is determined by the type of geometry.
          * @param {Number[]} coordinates An array containing geometry coordinates.
          * @param {String} type A string containing type of geometry.
-         * @param {Object} crs An object containing the value of GeoJSON crs member.
          * @param {Object} bbox An array containing information on the coordinate range for geometries.
          * @throws {ArgumentError} If the specified mandatory coordinates or type are null or undefined.
          */
-        var GeoJSONGeometry = function (coordinates, type, crs, bbox) {
+        var GeoJSONGeometry = function (coordinates, type, bbox) {
 
             if (!coordinates) {
                 throw new ArgumentError(
@@ -47,11 +44,6 @@ define(['./GeoJSONConstants',
 
             // Documented in defineProperties below.
             this._type =  type;
-
-            // Documented in defineProperties below.
-            this._crs = crs ? new GeoJSONCRS(
-                crs[GeoJSONConstants.FIELD_TYPE],
-                crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
 
             // Documented in defineProperties below.
             this._bbox = bbox ? bbox : null;
@@ -78,17 +70,6 @@ define(['./GeoJSONConstants',
             type: {
                 get: function () {
                     return this._type;
-                }
-            },
-            /**
-             * The GeoJSON crs object as specified to this GeoJSONGeometry's constructor.
-             * @memberof GeoJSONGeometry.prototype
-             * @type {Object}
-             * @readonly
-             */
-            crs: {
-                get: function () {
-                    return this._crs;
                 }
             },
             /**

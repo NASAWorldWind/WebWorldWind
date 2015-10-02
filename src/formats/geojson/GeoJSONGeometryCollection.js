@@ -7,12 +7,10 @@
  */
 define(['../../error/ArgumentError',
         './GeoJSONConstants',
-        './GeoJSONCRS',
         '../../util/Logger'
     ],
     function (ArgumentError,
               GeoJSONConstants,
-              GeoJSONCRS,
               Logger) {
         "use strict";
 
@@ -27,12 +25,11 @@ define(['../../error/ArgumentError',
          * geometry object. To include information on the coordinate range for features, a GeoJSON object may have a
          * member named "bbox".
          * @param {Object} geometries An array containing GeoJSONGeometry objects.
-         * @param {Object} crs An object containing GeoJSON CRS information.
          * @param {Object} bbox An object containing the value of GeoJSON GeometryCollection bbox member.
          * @throws {ArgumentError} If the specified mandatory geometries is null or undefined or if the geometries
          * parameter is not an array of GeoJSONGeometry.
          */
-        var GeoJSONGeometryCollection = function (geometries, crs, bbox) {
+        var GeoJSONGeometryCollection = function (geometries, bbox) {
             if (!geometries) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryCollection", "constructor",
@@ -47,11 +44,6 @@ define(['../../error/ArgumentError',
 
             // Documented in defineProperties below.
             this._geometries = geometries;
-
-            // Documented in defineProperties below.
-            this._crs = crs ? new GeoJSONCRS(
-                crs[GeoJSONConstants.FIELD_TYPE],
-                crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
 
             // Documented in defineProperties below.
             this._bbox = bbox;
@@ -69,17 +61,7 @@ define(['../../error/ArgumentError',
                     return this._geometries;
                 }
             },
-            /**
-             * The GeoJSON GeometryCollection CRS as specified to this GeoJSON GeometryCollection's constructor.
-             * @memberof GeoJSONGeometryCollection.prototype
-             * @type {Object}
-             * @readonly
-             */
-            crs: {
-                get: function () {
-                    return this._crs;
-                }
-            },
+
             /**
              * The GeoJSON GeometryCollection bbox member as specified to this GeoJSONGeometryCollection's constructor.
              * @memberof GeoJSONGeometryCollection.prototype

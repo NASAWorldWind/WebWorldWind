@@ -7,12 +7,10 @@
  */
 define(['../../error/ArgumentError',
         './GeoJSONConstants',
-        './GeoJSONCRS',
         '../../util/Logger'
     ],
     function (ArgumentError,
               GeoJSONConstants,
-              GeoJSONCRS,
               Logger) {
         "use strict";
 
@@ -27,12 +25,12 @@ define(['../../error/ArgumentError',
          * defined in {@link GeoJSONFeature}.
          * To include information on the coordinate range for feature collections, a GeoJSON object may have a member
          * named "bbox".
-         * @param {Object} features An object containing the data associated with the GeoJSON FeatureCollection features.
-         * @param {Object} crs An object containing the value of GeoJSON FeatureCollection crs member.
+         * @param {Object} features An object containing the data associated with the GeoJSON FeatureCollection
+         * features.
          * @param {Object} bbox An object containing the value of GeoJSON FeatureCollection bbox member.
          * @throws {ArgumentError} If the specified mandatory features parameter is null or undefined.
          */
-        var GeoJSONFeatureCollection = function (features, crs, bbox) {
+        var GeoJSONFeatureCollection = function (features,  bbox) {
 
             if (!features) {
                 throw new ArgumentError(
@@ -50,11 +48,6 @@ define(['../../error/ArgumentError',
             this._features = features;
 
             // Documented in defineProperties below.
-            this._crs = crs ? new GeoJSONCRS(
-                crs[GeoJSONConstants.FIELD_TYPE],
-                crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
-
-            // Documented in defineProperties below.
             this._bbox = bbox;
         };
 
@@ -68,17 +61,6 @@ define(['../../error/ArgumentError',
             features: {
                 get: function () {
                     return this._features;
-                }
-            },
-            /**
-             * The GeoJSON Feature Collection crs object.
-             * @memberof GeoJSONFeatureCollection.prototype
-             * @type {GeoJSONCRS}
-             * @readonly
-             */
-            crs: {
-                get: function () {
-                    return this._crs;
                 }
             },
             /**

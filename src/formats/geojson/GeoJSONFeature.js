@@ -7,12 +7,10 @@
  */
 define(['../../error/ArgumentError',
         './GeoJSONConstants',
-        './GeoJSONCRS',
         '../../util/Logger'
     ],
     function (ArgumentError,
               GeoJSONConstants,
-              GeoJSONCRS,
               Logger) {
         "use strict";
 
@@ -32,12 +30,11 @@ define(['../../error/ArgumentError',
          * named "bbox".
          * @param {Object} geometry An object containing the value of GeoJSON geometry member.
          * @param {Object} properties An object containing the value of GeoJSON properties member.
-         * @param {Object} crs An object containing the value of GeoJSON FeatureCollection or Feature crs member.
          * @param {Object} id An object containing the value of GeoJSON Feature id member.
          * @param {Object} bbox An object containing the value of GeoJSON Feature bbox member.
          * @throws {ArgumentError} If the specified mandatory geometries or properties are null or undefined.
          */
-        var GeoJSONFeature = function (geometry, properties, crs, id, bbox) {
+        var GeoJSONFeature = function (geometry, properties, id, bbox) {
 
             if (!geometry) {
                 throw new ArgumentError(
@@ -62,11 +59,6 @@ define(['../../error/ArgumentError',
 
             // Documented in defineProperties below.
             this._properties =  properties;
-
-            // Documented in defineProperties below.
-            this._crs = crs ? new GeoJSONCRS(
-                crs[GeoJSONConstants.FIELD_TYPE],
-                crs[GeoJSONConstants.FIELD_PROPERTIES]) : null;
 
             // Documented in defineProperties below.
             this._id = id;
@@ -96,17 +88,6 @@ define(['../../error/ArgumentError',
             properties: {
                 get: function () {
                     return this._properties;
-                }
-            },
-            /**
-             * The GeoJSON FeatureCollection or Feature crs object.
-             * @memberof GeoJSONFeature.prototype
-             * @type {GeoJSONCRS}
-             * @readonly
-             */
-            crs: {
-                get: function () {
-                    return this._crs;
                 }
             },
             /**
