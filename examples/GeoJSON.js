@@ -83,49 +83,49 @@ requirejs(['../src/WorldWind',
 
         // Polygon test
         var polygonLayer = new WorldWind.RenderableLayer("Polygon");
-        var polygonGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/PolygonTest.geojson");
+        var polygonGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/PolygonTest.geojson");
         polygonGeoJSON.load(shapeConfigurationCallback, polygonLayer);
         wwd.addLayer(polygonLayer);
 
         // MultiPolygon test
         var multiPolygonLayer = new WorldWind.RenderableLayer("MultiPolygon");
-        var multiPolygonGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/MultiPolygonTest.geojson");
+        var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/MultiPolygonTest.geojson");
         multiPolygonGeoJSON.load(shapeConfigurationCallback, multiPolygonLayer);
         wwd.addLayer(multiPolygonLayer);
 
         //Point test
         var pointLayer = new WorldWind.RenderableLayer("Point");
-        var pointGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/PointTest.geojson");
+        var pointGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/PointTest.geojson");
         pointGeoJSON.load(shapeConfigurationCallback, pointLayer);
         wwd.addLayer(pointLayer);
 
         //MultiPoint test
         var multiPointLayer = new WorldWind.RenderableLayer("MultiPoint");
-        var multiPointGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/MultiPointTest.geojson");
+        var multiPointGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/MultiPointTest.geojson");
         multiPointGeoJSON.load(shapeConfigurationCallback, multiPointLayer);
         wwd.addLayer(multiPointLayer);
 
         //LineString test
         var lineStringLayer = new WorldWind.RenderableLayer("LineString");
-        var lineStringGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/LineStringTest.geojson");
+        var lineStringGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/LineStringTest.geojson");
         lineStringGeoJSON.load(shapeConfigurationCallback, lineStringLayer);
         wwd.addLayer(lineStringLayer);
 
         //MultiLineString test
         var multiLineStringLayer = new WorldWind.RenderableLayer("MultiLineString");
-        var multiLineStringGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/MultiLineStringTest.geojson");
+        var multiLineStringGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/MultiLineStringTest.geojson");
         multiLineStringGeoJSON.load(shapeConfigurationCallback, multiLineStringLayer);
         wwd.addLayer(multiLineStringLayer);
 
         // GeometryCollection test
         var geometryCollectionLayer = new WorldWind.RenderableLayer("GeometryCollection");
-        var geometryCollectionGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/GeometryCollectionTest.geojson");
+        var geometryCollectionGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/GeometryCollectionFeatureTest.geojson");
         geometryCollectionGeoJSON.load(shapeConfigurationCallback, geometryCollectionLayer);
         wwd.addLayer(geometryCollectionLayer);
 
         // Feature test
         var featureLayer = new WorldWind.RenderableLayer("Feature - USA");
-        var featureGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/FeatureTest.geojson");
+        var featureGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/FeatureTest.geojson");
         featureGeoJSON.load(shapeConfigurationCallback, featureLayer);
         wwd.addLayer(featureLayer);
 
@@ -133,33 +133,39 @@ requirejs(['../src/WorldWind',
 
         //World Borders
         var worldBordersLayer = new WorldWind.RenderableLayer("World Borders");
-        var worldBordersGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/world_borders.geojson");
+        var worldBordersGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/world_borders.geojson");
         worldBordersGeoJSON.load(shapeConfigurationCallback, worldBordersLayer);
         wwd.addLayer(worldBordersLayer);
 
         //World Main Cities
         var worldMainCitiesLayer = new WorldWind.RenderableLayer("World Main Cities");
-        var worldMainCitiesGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/world_main_cities.geojson");
+        var worldMainCitiesGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/world_main_cities.geojson");
         worldMainCitiesGeoJSON.load(shapeConfigurationCallback, worldMainCitiesLayer);
         wwd.addLayer(worldMainCitiesLayer);
 
         //World Rivers
         var worldRiversLayer = new WorldWind.RenderableLayer("World Rivers");
-        var worldRiversGeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/world_rivers.geojson");
+        var worldRiversGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/world_rivers.geojson");
         worldRiversGeoJSON.load(shapeConfigurationCallback, worldRiversLayer);
         wwd.addLayer(worldRiversLayer);
 
         //CRS Reprojection test
 
-        //USA EPSG:3857
-        var usa3857Layer = new WorldWind.RenderableLayer("USA-3857");
-        var usa3857GeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/usa_epsg3857.geojson");
+        //USA EPSG:3857 named
+        var usa3857Layer = new WorldWind.RenderableLayer("USA 3857-named");
+        var usa3857GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/usa_epsg3857_named.geojson");
+        usa3857GeoJSON.load(shapeConfigurationCallback, usa3857Layer);
+        wwd.addLayer(usa3857Layer);
+
+        //USA EPSG:3857 linked
+        var usa3857Layer = new WorldWind.RenderableLayer("USA 3857-linked");
+        var usa3857GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/usa_epsg3857_linked.geojson");
         usa3857GeoJSON.load(shapeConfigurationCallback, usa3857Layer);
         wwd.addLayer(usa3857Layer);
 
         //USA EPSG:4326
         var usa4326Layer = new WorldWind.RenderableLayer("USA-4326");
-        var usa4326GeoJSON = new WorldWind.GeoJSON(resourcesUrl + "/usa_epsg4326.geojson");
+        var usa4326GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "/usa_epsg4326.geojson");
         usa4326GeoJSON.load(shapeConfigurationCallback, usa4326Layer);
         wwd.addLayer(usa4326Layer);
 
