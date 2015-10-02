@@ -129,7 +129,6 @@ define([
             this.tileCache = new MemoryCache(500000, 400000);
             this.currentRetrievals = [];
             this.absentResourceList = new AbsentResourceList(3, 50e3);
-            this.mapAncestorToTile = true;
 
             this.pickEnabled = false;
         };
@@ -137,7 +136,7 @@ define([
         TiledImageLayer.prototype = Object.create(Layer.prototype);
 
         // Inherited from Layer.
-        TiledImageLayer.prototype.refresh = function (){
+        TiledImageLayer.prototype.refresh = function () {
             this.expiration = new Date();
             this.currentTilesInvalid = true;
         };
@@ -259,16 +258,9 @@ define([
 
             if (this.currentAncestorTile) {
                 if (this.isTileTextureInMemory(dc, this.currentAncestorTile)) {
-                    if (this.mapAncestorToTile) {
-                        // Set up to map the ancestor tile into the current one.
-                        tile.fallbackTile = this.currentAncestorTile;
-                        this.currentTiles.push(tile);
-                    } else {
-                        // Just enque the ancestor tile and don't enque the current one. This is necessary when the
-                        // texture coordinate mapping from the current tile to its ancestor is not straightforward,
-                        // as is the case for Mercator tiles.
-                        this.currentTiles.push(this.currentAncestorTile);
-                    }
+                    // Set up to map the ancestor tile into the current one.
+                    tile.fallbackTile = this.currentAncestorTile;
+                    this.currentTiles.push(tile);
                 }
             }
         };
@@ -358,7 +350,7 @@ define([
 
         // Intentionally not documented.
         TiledImageLayer.prototype.createTexture = function (dc, tile, image) {
-            return  new Texture(dc.currentGlContext, image);
+            return new Texture(dc.currentGlContext, image);
         };
 
         // Intentionally not documented.

@@ -514,10 +514,10 @@ define([
                     refreshBuffers = true;
                 }
 
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                 if (refreshBuffers) {
-                    gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, currentData.capTriangles,
-                        WebGLRenderingContext.STATIC_DRAW);
+                    gl.bufferData(gl.ARRAY_BUFFER, currentData.capTriangles,
+                        gl.STATIC_DRAW);
                     dc.frameStatistics.incrementVboLoadCount(1);
                 }
 
@@ -541,15 +541,15 @@ define([
                     if (textureBound) {
                         program.loadTextureEnabled(gl, true);
                         gl.enableVertexAttribArray(program.vertexTexCoordLocation);
-                        gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, WebGLRenderingContext.FLOAT,
+                        gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT,
                             false, stride, 12);
-                        program.loadTextureUnit(gl, WebGLRenderingContext.TEXTURE0);
+                        program.loadTextureUnit(gl, gl.TEXTURE0);
                         program.loadModulateColor(gl, dc.pickingMode);
                     }
                 }
 
-                gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, stride, 0);
-                gl.drawArrays(WebGLRenderingContext.TRIANGLES, 0, 4 * (currentData.capTriangles.length / stride));
+                gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, stride, 0);
+                gl.drawArrays(gl.TRIANGLES, 0, 4 * (currentData.capTriangles.length / stride));
             }
 
             // Draw the un-textured extruded boundaries and/or the outline.
@@ -581,10 +581,10 @@ define([
                     // Bind and if necessary fill the VBO. We fill the VBO here rather than in doMakeOrderedRenderable
                     // so that there's no possibility of the VBO being ejected from the cache between the time it's
                     // filled and the time it's used.
-                    gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                     if (refreshBuffers) {
-                        gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, currentData.boundaryPoints[b],
-                            WebGLRenderingContext.STATIC_DRAW);
+                        gl.bufferData(gl.ARRAY_BUFFER, currentData.boundaryPoints[b],
+                            gl.STATIC_DRAW);
                         dc.frameStatistics.incrementVboLoadCount(1);
                     }
 
@@ -601,8 +601,8 @@ define([
                         program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
 
                         // Draw the extruded boundary as one tri-strip.
-                        gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
-                        gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, numBoundaryPoints);
+                        gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+                        gl.drawArrays(gl.TRIANGLE_STRIP, 0, numBoundaryPoints);
                     }
 
                     // Draw the outline for this boundary.
@@ -629,14 +629,14 @@ define([
                             nPts = numBoundaryPoints;
                         }
 
-                        gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false,
+                        gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false,
                             stride, 0);
-                        gl.drawArrays(WebGLRenderingContext.LINE_STRIP, 0, nPts);
+                        gl.drawArrays(gl.LINE_STRIP, 0, nPts);
 
                         if (this.mustDrawVerticals(dc)) {
-                            gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false,
+                            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false,
                                 0, 0);
-                            gl.drawArrays(WebGLRenderingContext.LINES, 0, numBoundaryPoints - 2);
+                            gl.drawArrays(gl.LINES, 0, numBoundaryPoints - 2);
                         }
                     }
                 }
@@ -655,7 +655,7 @@ define([
                     program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
 
                     // Create and bind a temporary VBO to hold the boundary vertices and texture coordinates.
-                    gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, gl.createBuffer());
+                    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
                     var boundaryVertices = new Float32Array(4 * 5); // 4 vertices of x, y, z, s, t
 
                     for (b = 0; b < currentData.boundaryPoints.length; b++) { // for each boundary
@@ -674,7 +674,7 @@ define([
                             textureBound = sideTexture && sideTexture.bind(dc);
                             if (textureBound) {
                                 program.loadTextureEnabled(gl, true);
-                                program.loadTextureUnit(gl, WebGLRenderingContext.TEXTURE0);
+                                program.loadTextureUnit(gl, gl.TEXTURE0);
                                 gl.enableVertexAttribArray(program.vertexTexCoordLocation);
                             } else {
                                 program.loadTextureEnabled(gl, false);
@@ -707,15 +707,15 @@ define([
                             boundaryVertices[18] = 1; // lower right texture coordinates
                             boundaryVertices[19] = 0;
 
-                            gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, boundaryVertices,
-                                WebGLRenderingContext.STATIC_DRAW);
+                            gl.bufferData(gl.ARRAY_BUFFER, boundaryVertices,
+                                gl.STATIC_DRAW);
                             dc.frameStatistics.incrementVboLoadCount(1);
 
-                            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, WebGLRenderingContext.FLOAT,
+                            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT,
                                 false, 20, 12);
-                            gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT,
+                            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT,
                                 false, 20, 0);
-                            gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4);
+                            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
                         }
                     }
                 }
@@ -733,7 +733,7 @@ define([
             var gl = dc.currentGlContext;
 
             if (this.activeAttributes.drawInterior) {
-                gl.disable(WebGLRenderingContext.CULL_FACE);
+                gl.disable(gl.CULL_FACE);
             }
 
             dc.findAndBindProgram(BasicTextureProgram);
@@ -747,7 +747,7 @@ define([
             gl.disableVertexAttribArray(dc.currentProgram.vertexPointLocation);
             gl.depthMask(true);
             gl.lineWidth(1);
-            gl.enable(WebGLRenderingContext.CULL_FACE);
+            gl.enable(gl.CULL_FACE);
         };
 
         return Polygon;

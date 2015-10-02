@@ -25,8 +25,7 @@ define([
         "use strict";
 
         /**
-         * Constructs Digital Globe tiled image layer for a specified dataset.
-         * distributed by Digital Globe.
+         * Constructs Digital Globe tiled image layer for a specified dataset distributed by Digital Globe.
          * @alias DigitalGlobeTiledImageLayer
          * @constructor
          * @augments MercatorTiledImageLayer
@@ -80,8 +79,6 @@ define([
             // Create a canvas we can use when unprojecting retrieved images.
             this.destCanvas = document.createElement("canvas");
             this.destContext = this.destCanvas.getContext("2d");
-
-            this.mapAncestorToTile = false;
 
             this.requestMetadata();
 

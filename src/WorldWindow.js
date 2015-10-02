@@ -98,7 +98,7 @@ define([
              * @type {number}
              * @readonly
              */
-            this.depthBits = gl.getParameter(WebGLRenderingContext.DEPTH_BITS);
+            this.depthBits = gl.getParameter(gl.DEPTH_BITS);
 
             /**
              * The current viewport of this World Window.
@@ -671,11 +671,11 @@ define([
         // Internal function. Intentionally not documented.
         WorldWindow.prototype.beginFrame = function () {
             var gl = this.drawContext.currentGlContext;
-            gl.enable(WebGLRenderingContext.BLEND);
-            gl.enable(WebGLRenderingContext.CULL_FACE);
-            gl.enable(WebGLRenderingContext.DEPTH_TEST);
-            gl.blendFunc(WebGLRenderingContext.ONE, WebGLRenderingContext.ONE_MINUS_SRC_ALPHA);
-            gl.depthFunc(WebGLRenderingContext.LEQUAL);
+            gl.enable(gl.BLEND);
+            gl.enable(gl.CULL_FACE);
+            gl.enable(gl.DEPTH_TEST);
+            gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+            gl.depthFunc(gl.LEQUAL);
 
             if (this.drawContext.pickingMode) {
                 this.drawContext.makePickFramebuffer();
@@ -686,11 +686,11 @@ define([
         // Internal function. Intentionally not documented.
         WorldWindow.prototype.endFrame = function () {
             var gl = this.drawContext.currentGlContext;
-            gl.disable(WebGLRenderingContext.BLEND);
-            gl.disable(WebGLRenderingContext.CULL_FACE);
-            gl.disable(WebGLRenderingContext.DEPTH_TEST);
-            gl.blendFunc(WebGLRenderingContext.ONE, WebGLRenderingContext.ZERO);
-            gl.depthFunc(WebGLRenderingContext.LESS);
+            gl.disable(gl.BLEND);
+            gl.disable(gl.CULL_FACE);
+            gl.disable(gl.DEPTH_TEST);
+            gl.blendFunc(gl.ONE, gl.ZERO);
+            gl.depthFunc(gl.LESS);
             gl.clearColor(0, 0, 0, 1);
 
             this.drawContext.bindFramebuffer(null);
@@ -703,7 +703,7 @@ define([
                 gl = dc.currentGlContext;
 
             gl.clearColor(dc.clearColor.red, dc.clearColor.green, dc.clearColor.blue, dc.clearColor.alpha);
-            gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT | WebGLRenderingContext.DEPTH_BUFFER_BIT);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         };
 
         // Internal function. Intentionally not documented.
@@ -712,7 +712,7 @@ define([
 
             if (this.subsurfaceMode && this.hasStencilBuffer) {
                 // Draw the surface and collect the ordered renderables.
-                this.drawContext.currentGlContext.disable(WebGLRenderingContext.STENCIL_TEST);
+                this.drawContext.currentGlContext.disable(this.drawContext.currentGlContext.STENCIL_TEST);
                 this.drawContext.surfaceShapeTileBuilder.clear();
                 this.drawLayers(true);
                 this.drawSurfaceRenderables();
@@ -725,11 +725,11 @@ define([
                     // drawn again, and the stencil buffer will ensure that they are drawn only where they overlap
                     // the fragments drawn by the ordered renderables.
                     this.drawContext.currentGlContext.clear(
-                        WebGLRenderingContext.DEPTH_BUFFER_BIT | WebGLRenderingContext.STENCIL_BUFFER_BIT);
-                    this.drawContext.currentGlContext.enable(WebGLRenderingContext.STENCIL_TEST);
-                    this.drawContext.currentGlContext.stencilFunc(WebGLRenderingContext.ALWAYS, 1, 1);
+                        this.drawContext.currentGlContext.DEPTH_BUFFER_BIT | this.drawContext.currentGlContext.STENCIL_BUFFER_BIT);
+                    this.drawContext.currentGlContext.enable(this.drawContext.currentGlContext.STENCIL_TEST);
+                    this.drawContext.currentGlContext.stencilFunc(this.drawContext.currentGlContext.ALWAYS, 1, 1);
                     this.drawContext.currentGlContext.stencilOp(
-                        WebGLRenderingContext.REPLACE, WebGLRenderingContext.REPLACE, WebGLRenderingContext.REPLACE);
+                        this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE);
                     this.drawOrderedRenderables();
 
                     this.drawContext.screenCreditController.drawCredits(this.drawContext);
@@ -751,9 +751,9 @@ define([
         WorldWindow.prototype.redrawSurface = function () {
             // Draw the terrain and surface shapes but only where the current stencil buffer is non-zero.
             // The non-zero fragments are from drawing the ordered renderables previously.
-            this.drawContext.currentGlContext.stencilFunc(WebGLRenderingContext.EQUAL, 1, 1);
+            this.drawContext.currentGlContext.stencilFunc(this.drawContext.currentGlContext.EQUAL, 1, 1);
             this.drawContext.currentGlContext.stencilOp(
-                WebGLRenderingContext.KEEP, WebGLRenderingContext.KEEP, WebGLRenderingContext.KEEP);
+                this.drawContext.currentGlContext.KEEP, this.drawContext.currentGlContext.KEEP, this.drawContext.currentGlContext.KEEP);
             this.drawContext.surfaceShapeTileBuilder.clear();
             this.drawLayers(false);
             this.drawSurfaceRenderables();

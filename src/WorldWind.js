@@ -42,6 +42,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
+		'./formats/geojson/GeoJSONParser',
         './gesture/GestureRecognizer',
         './globe/Globe',
         './globe/Globe2D',
@@ -83,6 +84,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Polygon',
         './geom/Position',
         './projections/ProjectionEquirectangular',
+        './projections/ProjectionGnomonic',
         './projections/ProjectionMercator',
         './projections/ProjectionPolarEquidistant',
         './projections/ProjectionUPS',
@@ -111,6 +113,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/SurfaceTileRenderer',
         './shaders/SurfaceTileRendererProgram',
         './gesture/TapRecognizer',
+        './layer/TectonicPlatesLayer',
         './globe/Terrain',
         './globe/TerrainTile',
         './globe/TerrainTileList',
@@ -125,6 +128,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/TileFactory',
         './gesture/TiltRecognizer',
         './gesture/Touch',
+        './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
         './geom/Vec2',
         './geom/Vec3',
@@ -134,6 +138,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/WmsLayerCapabilities',
         './layer/WmsTimeDimensionedLayer',
         './util/WmsUrlBuilder',
+        './ogc/WmtsCapabilities',
+        './layer/WmtsLayer',
+        './ogc/WmtsLayerCapabilities',
         './WorldWindow',
         './util/WWMath',
         './util/WWMessage',
@@ -175,6 +182,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
+			  GeoJSONParser,
               GestureRecognizer,
               Globe,
               Globe2D,
@@ -216,6 +224,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Polygon,
               Position,
               ProjectionEquirectangular,
+              ProjectionGnomonic,
               ProjectionMercator,
               ProjectionPolarEquidistant,
               ProjectionUPS,
@@ -244,6 +253,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               SurfaceTileRenderer,
               SurfaceTileRendererProgram,
               TapRecognizer,
+              TectonicPlatesLayer,
               Terrain,
               TerrainTile,
               TerrainTileList,
@@ -258,6 +268,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               TileFactory,
               TiltRecognizer,
               Touch,
+              TriangleMesh,
               UnsupportedOperationError,
               Vec2,
               Vec3,
@@ -267,6 +278,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmsLayerCapabilities,
               WmsTimeDimensionedLayer,
               WmsUrlBuilder,
+              WmtsCapabilities,
+              WmtsLayer,
+              WmtsLayerCapabilities,
               WorldWindow,
               WWMath,
               WWMessage,
@@ -517,6 +531,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
+		WorldWind['GeoJSONParser'] = GeoJSONParser;
         WorldWind['GestureRecognizer'] = GestureRecognizer;
         WorldWind['Globe'] = Globe;
         WorldWind['Globe2D'] = Globe2D;
@@ -558,6 +573,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Polygon'] = Polygon;
         WorldWind['Position'] = Position;
         WorldWind['ProjectionEquirectangular'] = ProjectionEquirectangular;
+        WorldWind['ProjectionGnomonic'] = ProjectionGnomonic;
         WorldWind['ProjectionMercator'] = ProjectionMercator;
         WorldWind['ProjectionPolarEquidistant'] = ProjectionPolarEquidistant;
         WorldWind['ProjectionUPS'] = ProjectionUPS;
@@ -586,6 +602,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['SurfaceTileRenderer'] = SurfaceTileRenderer;
         WorldWind['SurfaceTileRendererProgram'] = SurfaceTileRendererProgram;
         WorldWind['TapRecognizer'] = TapRecognizer;
+        WorldWind['TectonicPlatesLayer'] = TectonicPlatesLayer;
         WorldWind['Terrain'] = Terrain;
         WorldWind['TerrainTile'] = TerrainTile;
         WorldWind['TerrainTileList'] = TerrainTileList;
@@ -600,6 +617,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['TileFactory'] = TileFactory;
         WorldWind['TiltRecognizer'] = TiltRecognizer;
         WorldWind['Touch'] = Touch;
+        WorldWind['TriangleMesh'] = TriangleMesh;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
@@ -609,6 +627,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
         WorldWind['WmsTimeDimensionedLayer'] = WmsTimeDimensionedLayer;
         WorldWind['WmsUrlBuilder'] = WmsUrlBuilder;
+        WorldWind['WmtsCapabilities'] = WmtsCapabilities;
+        WorldWind['WmtsLayer'] = WmtsLayer;
+        WorldWind['WmtsLayerCapabilities'] = WmtsLayerCapabilities;
         WorldWind['WWMath'] = WWMath;
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;

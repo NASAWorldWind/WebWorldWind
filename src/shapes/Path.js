@@ -521,10 +521,10 @@ define([
             // Bind and if necessary fill the VBO. We fill the VBO here rather than in doMakeOrderedRenderable so that
             // there's no possibility of the VBO being ejected from the cache between the time it's filled and
             // the time it's used.
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
+            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
             if (currentData.fillVbo) {
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, currentData.tessellatedPoints,
-                    WebGLRenderingContext.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, currentData.tessellatedPoints,
+                    gl.STATIC_DRAW);
                 dc.frameStatistics.incrementVboLoadCount(1);
             }
 
@@ -544,8 +544,8 @@ define([
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
                 program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
 
-                gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
-                gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, numPoints);
+                gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, numPoints);
             }
 
             if (this.activeAttributes.drawOutline) {
@@ -574,8 +574,8 @@ define([
                     nPts = numPoints;
                 }
 
-                gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, stride, 0);
-                gl.drawArrays(WebGLRenderingContext.LINE_STRIP, 0, nPts);
+                gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, stride, 0);
+                gl.drawArrays(gl.LINE_STRIP, 0, nPts);
 
                 if (this.mustDrawVerticals(dc)) {
                     if (!currentData.verticalIndicesVboCacheKey) {
@@ -590,16 +590,16 @@ define([
                         currentData.fillVbo = true;
                     }
 
-                    gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, vboId);
+                    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
                     if (currentData.fillVbo) {
-                        gl.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, currentData.verticalIndices,
-                            WebGLRenderingContext.STATIC_DRAW);
+                        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, currentData.verticalIndices,
+                            gl.STATIC_DRAW);
                         dc.frameStatistics.incrementVboLoadCount(1);
                     }
 
-                    gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
-                    gl.drawElements(WebGLRenderingContext.LINES, currentData.verticalIndices.length,
-                        WebGLRenderingContext.UNSIGNED_SHORT, 0);
+                    gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+                    gl.drawElements(gl.LINES, currentData.verticalIndices.length,
+                        gl.UNSIGNED_SHORT, 0);
                 }
             }
             currentData.fillVbo = false;
@@ -616,7 +616,7 @@ define([
             var gl = dc.currentGlContext;
 
             if (this.mustDrawInterior(dc)) {
-                gl.disable(WebGLRenderingContext.CULL_FACE);
+                gl.disable(gl.CULL_FACE);
             }
 
             dc.findAndBindProgram(BasicTextureProgram);
@@ -630,7 +630,7 @@ define([
             gl.disableVertexAttribArray(dc.currentProgram.vertexPointLocation);
             gl.depthMask(true);
             gl.lineWidth(1);
-            gl.enable(WebGLRenderingContext.CULL_FACE);
+            gl.enable(gl.CULL_FACE);
         };
 
         return Path;

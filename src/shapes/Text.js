@@ -406,15 +406,15 @@ define([
             // that they be in separate buffers, so the code below uses the 3D buffer for vertex coords and the 2D
             // buffer for texture coords.
             program = dc.currentProgram;
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, dc.unitQuadBuffer3());
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, dc.unitQuadBuffer());
-            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, WebGLRenderingContext.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer3());
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer());
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(program.vertexPointLocation);
             gl.enableVertexAttribArray(program.vertexTexCoordLocation);
 
             // Tell the program which texture unit to use.
-            program.loadTextureUnit(gl, WebGLRenderingContext.TEXTURE0);
+            program.loadTextureUnit(gl, gl.TEXTURE0);
 
             // Turn off texturing in picking mode.
             if (dc.pickingMode) {
@@ -441,8 +441,8 @@ define([
             gl.disableVertexAttribArray(program.vertexTexCoordLocation);
 
             // Clear GL bindings.
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, null);
-            gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, null);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindTexture(gl.TEXTURE_2D, null);
 
             gl.depthMask(true);
 
@@ -505,12 +505,12 @@ define([
 
                 // Turn off depth testing for the label unless it's been requested.
                 if (!this.activeAttributes.depthTest) {
-                    gl.disable(WebGLRenderingContext.DEPTH_TEST, false);
+                    gl.disable(gl.DEPTH_TEST, false);
                 }
-                gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
                 if (!this.activeAttributes.depthTest) {
                     // Turn depth testing back on.
-                    gl.disable(WebGLRenderingContext.DEPTH_TEST, true);
+                    gl.disable(gl.DEPTH_TEST, true);
                 }
             }
 
@@ -557,12 +557,12 @@ define([
 
                 // Turn off depth testing unless it's been requested.
                 if (!this.activeAttributes.depthTest) {
-                    gl.disable(WebGLRenderingContext.DEPTH_TEST, false);
+                    gl.disable(gl.DEPTH_TEST, false);
                 }
-                gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
                 if (!this.activeAttributes.depthTest) {
                     // Turn depth testing back on.
-                    gl.disable(WebGLRenderingContext.DEPTH_TEST, true);
+                    gl.disable(gl.DEPTH_TEST, true);
                 }
             }
         };

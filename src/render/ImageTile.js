@@ -24,7 +24,7 @@ define([
          * @constructor
          * @classdesc Represents an image applied to a portion of a globe's terrain. Applications typically do not
          * interact with this class.
-         * @augments Tile
+         * @augments TextureTile
          * @param {Sector} sector The sector this tile covers.
          * @param {Level} level The level this tile is associated with.
          * @param {Number} row This tile's row in the associated level.
@@ -106,10 +106,12 @@ define([
             if (deltaLevel <= 0)
                 return;
 
-            var twoN = 2 << (deltaLevel - 1),
-                sxy = 1 / twoN,
-                tx = sxy * (this.column % twoN),
-                ty = sxy * (this.row % twoN);
+            var fbTileDeltaLat = this.fallbackTile.sector.deltaLatitude(),
+                fbTileDeltaLon = this.fallbackTile.sector.deltaLongitude(),
+                sx = this.sector.deltaLongitude() / fbTileDeltaLon,
+                sy = this.sector.deltaLatitude() / fbTileDeltaLat,
+                tx = (this.sector.minLongitude - this.fallbackTile.sector.minLongitude) / fbTileDeltaLon,
+                ty = (this.sector.minLatitude - this.fallbackTile.sector.minLatitude) / fbTileDeltaLat;
 
             // Apply a transform to the matrix that maps texture coordinates for this tile to texture coordinates for the
             // fallback tile. Rather than perform the full set of matrix operations, a single multiply is performed with the
@@ -121,8 +123,8 @@ define([
             // matrix.multiply(scale);
 
             matrix.multiply(
-                sxy, 0, 0, tx,
-                0, sxy, 0, ty,
+                sx, 0, 0, tx,
+                0, sy, 0, ty,
                 0, 0, 1, 0,
                 0, 0, 0, 1);
         };
