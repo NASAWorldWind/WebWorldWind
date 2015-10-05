@@ -6,11 +6,9 @@ define([
     './KmlColorStyle',
     './../KmlElements',
     '../KmlIcon'
-], function (
-    KmlColorStyle,
-    KmlElements,
-    KmlIcon
-) {
+], function (KmlColorStyle,
+             KmlElements,
+             KmlIcon) {
     "use strict";
     /**
      * Constructs an KmlIconStyle. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -23,7 +21,7 @@ define([
      * @throws {ArgumentError} If the node is null or undefined
      * @see https://developers.google.com/kml/documentation/kmlreference#iconstyle
      */
-    var KmlIconStyle = function(iconStyleNode){
+    var KmlIconStyle = function (iconStyleNode) {
         KmlColorStyle.call(this, iconStyleNode);
     };
 
@@ -37,7 +35,7 @@ define([
          * @type {Array}
          */
         tagName: {
-            get: function() {
+            get: function () {
                 return ['IconStyle'];
             }
         },
@@ -49,7 +47,7 @@ define([
          * @type {Number}
          */
         scale: {
-            get: function() {
+            get: function () {
                 return this.retrieve({name: 'scale', transformer: Number});
             }
         },
@@ -61,7 +59,7 @@ define([
          * @type {Number}
          */
         heading: {
-            get: function() {
+            get: function () {
                 return this.retrieve({name: 'heading'});
             }
         },
@@ -73,16 +71,64 @@ define([
          * @type {KmlIcon}
          */
         Icon: {
-            get: function(){
+            get: function () {
                 return this.createChildElement({
                     name: KmlIcon.prototype.tagName
                 })
             }
         },
 
-        hotSpot: {
-            get: function() {
-                // TODO find support for hotSpot
+        /**
+         * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the x component
+         * of a point on the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {KmlIcon}
+         */
+        hotSpotX: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'x'});
+            }
+        },
+
+        /**
+         * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the y component
+         * of a point on the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {KmlIcon}
+         */
+        hotSpotY: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'y'});
+            }
+        },
+
+        /**
+         * Units in which the x value is specified. A value of fraction indicates the x value is a fraction of the
+         * icon. A value of pixels indicates the x value in pixels. A value of insetPixels indicates the indent from
+         * the right edge of the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {KmlIcon}
+         */
+        hotSpotXXUnits: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'xunits'});
+            }
+        },
+
+        /**
+         * Units in which the y value is specified. A value of fraction indicates the y value is a fraction of the
+         * icon. A value of pixels indicates the y value in pixels. A value of insetPixels indicates the indent from
+         * the top edge of the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {KmlIcon}
+         */
+        hotSpotYYUnits: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'yunits'});
             }
         }
     });
