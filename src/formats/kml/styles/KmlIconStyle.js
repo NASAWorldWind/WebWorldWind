@@ -112,7 +112,7 @@ define([
          * @readonly
          * @type {KmlIcon}
          */
-        hotSpotXXUnits: {
+        hotSpotXUnits: {
             get: function () {
                 return this.retrieveAttribute({name: 'hotSpot', attributeName: 'xunits'});
             }
@@ -126,7 +126,7 @@ define([
          * @readonly
          * @type {KmlIcon}
          */
-        hotSpotYYUnits: {
+        hotSpotYUnits: {
             get: function () {
                 return this.retrieveAttribute({name: 'hotSpot', attributeName: 'yunits'});
             }
