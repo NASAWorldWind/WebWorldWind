@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @version $Id: WorldWind.js 3418 2015-08-22 00:17:05Z tgaskins $
+ * @version $Id: WorldWind.js 3351 2015-07-28 22:03:20Z dcollins $
  */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
         './error/AbstractError',
@@ -26,7 +26,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Compass',
         './layer/CompassLayer',
         './layer/CoordinatesDisplayLayer',
-        './layer/DigitalGlobeTiledImageLayer',
         './gesture/DragRecognizer',
         './render/DrawContext',
         './globe/EarthElevationModel',
@@ -51,8 +50,57 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/GpuResourceCache',
         './shaders/GpuShader',
         './util/HighlightController',
+        './formats/kml/util/ImagePyramid',
         './util/ImageSource',
         './render/ImageTile',
+        './formats/kml/util/ItemIcon',
+        './formats/kml/KmlAbstractView',
+        './formats/kml/styles/KmlBalloonStyle',
+        './formats/kml/KmlCamera',
+        './formats/kml/styles/KmlColorStyle',
+        './formats/kml/features/KmlContainer',
+        './formats/kml/features/KmlDocument',
+        './formats/kml/KmlElements',
+        './formats/kml/features/KmlFeature',
+        './formats/kml/KmlFile',
+        './formats/kml/features/KmlFolder',
+        './formats/kml/geom/KmlGeometry',
+        './formats/kml/features/KmlGroundOverlay',
+        './formats/kml/KmlIcon',
+        './formats/kml/styles/KmlIconStyle',
+        './formats/kml/styles/KmlLabelStyle',
+        './formats/kml/KmlLatLonAltBox',
+        './formats/kml/KmlLatLonBox',
+        './formats/kml/KmlLatLonQuad',
+        './formats/kml/geom/KmlLinearRing',
+        './formats/kml/geom/KmlLineString',
+        './formats/kml/styles/KmlLineStyle',
+        './formats/kml/KmlLink',
+        './formats/kml/styles/KmlListStyle',
+        './formats/kml/KmlLocation',
+        './formats/kml/KmlLod',
+        './formats/kml/KmlLookAt',
+        './formats/kml/geom/KmlMultiGeometry',
+        './formats/kml/features/KmlNetworkLink',
+        './formats/kml/KmlObject',
+        './formats/kml/KmlOrientation',
+        './formats/kml/features/KmlOverlay',
+        './formats/kml/features/KmlPhotoOverlay',
+        './formats/kml/features/KmlPlacemark',
+        './formats/kml/geom/KmlPoint',
+        './formats/kml/geom/KmlPolygon',
+        './formats/kml/styles/KmlPolyStyle',
+        './formats/kml/KmlRegion',
+        './formats/kml/features/KmlScreenOverlay',
+        './formats/kml/styles/KmlStyle',
+        './formats/kml/styles/KmlStyleMap',
+        './formats/kml/styles/KmlStyleSelector',
+        './formats/kml/styles/KmlSubStyle',
+        './formats/kml/KmlTimePrimitive',
+        './formats/kml/KmlTimeSpan',
+        './formats/kml/KmlTimeStamp',
+        './formats/kml/features/KmlTour',
+        './formats/kml/geom/KmlTrack',
         './layer/LandsatRestLayer',
         './layer/Layer',
         './util/Level',
@@ -72,9 +120,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './error/NotYetImplementedError',
         './util/Offset',
         './layer/OpenStreetMapImageLayer',
+        './formats/kml/util/Pair',
         './gesture/PanRecognizer',
         './shapes/Path',
-        './util/PeriodicTimeSequence',
         './pick/PickedObject',
         './pick/PickedObjectList',
         './gesture/PinchRecognizer',
@@ -92,6 +140,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/Renderable',
         './layer/RenderableLayer',
         './gesture/RotationRecognizer',
+        './formats/kml/util/Scale',
+        './formats/kml/util/Schema',
         './shapes/ScreenImage',
         './shapes/ScreenText',
         './geom/Sector',
@@ -133,18 +183,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec2',
         './geom/Vec3',
         './layer/ViewControlsLayer',
+        './formats/kml/util/ViewVolume',
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',
-        './layer/WmsTimeDimensionedLayer',
         './util/WmsUrlBuilder',
         './ogc/WmtsCapabilities',
         './layer/WmtsLayer',
         './ogc/WmtsLayerCapabilities',
         './WorldWindow',
         './util/WWMath',
-        './util/WWMessage',
         './util/WWUtil',
+        './util/XmlDocument',
         './globe/ZeroElevationModel'],
     function (AbstractError,
               Angle,
@@ -166,7 +216,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Compass,
               CompassLayer,
               CoordinatesDisplayLayer,
-              DigitalGlobeTiledImageLayer,
               DragRecognizer,
               DrawContext,
               EarthElevationModel,
@@ -191,8 +240,57 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuResourceCache,
               GpuShader,
               HighlightController,
+              ImagePyramid,
               ImageSource,
               ImageTile,
+              ItemIcon,
+              KmlAbstractView,
+              KmlBalloonStyle,
+              KmlColorStyle,
+              KmlContainer,
+              KmlCamera,
+              KmlDocument,
+              KmlElements,
+              KmlFeature,
+              KmlFile,
+              KmlFolder,
+              KmlGeometry,
+              KmlGroundOverlay,
+              KmlIcon,
+              KmlIconStyle,
+              KmlLabelStyle,
+              KmlLatLonAltBox,
+              KmlLatLonBox,
+              KmlLatLonQuad,
+              KmlLinearRing,
+              KmlLineString,
+              KmlLineStyle,
+              KmlLink,
+              KmlListStyle,
+              KmlLocation,
+              KmlLod,
+              KmlLookAt,
+              KmlMultiGeometry,
+              KmlNetworkLink,
+              KmlObject,
+              KmlOrientation,
+              KmlOverlay,
+              KmlPhotoOverlay,
+              KmlPlacemark,
+              KmlPoint,
+              KmlPolygon,
+              KmlPolyStyle,
+              KmlRegion,
+              KmlScreenOverlay,
+              KmlStyle,
+              KmlStyleMap,
+              KmlStyleSelector,
+              KmlSubStyle,
+              KmlTimePrimitive,
+              KmlTimeSpan,
+              KmlTimeStamp,
+              KmlTour,
+              KmlTrack,
               LandsatRestLayer,
               Layer,
               Level,
@@ -212,9 +310,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               NotYetImplementedError,
               Offset,
               OpenStreetMapImageLayer,
+              Pair,
               PanRecognizer,
               Path,
-              PeriodicTimeSequence,
               PickedObject,
               PickedObjectList,
               PinchRecognizer,
@@ -232,6 +330,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Renderable,
               RenderableLayer,
               RotationRecognizer,
+              Scale,
+              Schema,
               ScreenImage,
               ScreenText,
               Sector,
@@ -273,18 +373,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec2,
               Vec3,
               ViewControlsLayer,
+              ViewVolume,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
-              WmsTimeDimensionedLayer,
               WmsUrlBuilder,
               WmtsCapabilities,
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
               WWMath,
-              WWMessage,
               WWUtil,
+              XmlDocument,
               ZeroElevationModel) {
         "use strict";
         /**
@@ -515,7 +615,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
         WorldWind['CoordinatesDisplayLayer'] = CoordinatesDisplayLayer;
-        WorldWind['DigitalGlobeTiledImageLayer'] = DigitalGlobeTiledImageLayer;
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
         WorldWind['EarthElevationModel'] = EarthElevationModel;
@@ -542,6 +641,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
+        WorldWind['KmlFile'] = KmlFile;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
         WorldWind['Level'] = Level;
@@ -563,7 +663,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['OpenStreetMapImageLayer'] = OpenStreetMapImageLayer;
         WorldWind['PanRecognizer'] = PanRecognizer;
         WorldWind['Path'] = Path;
-        WorldWind['PeriodicTimeSequence'] = PeriodicTimeSequence;
         WorldWind['PickedObject'] = PickedObject;
         WorldWind['PickedObjectList'] = PickedObjectList;
         WorldWind['PinchRecognizer'] = PinchRecognizer;
@@ -625,13 +724,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
-        WorldWind['WmsTimeDimensionedLayer'] = WmsTimeDimensionedLayer;
         WorldWind['WmsUrlBuilder'] = WmsUrlBuilder;
         WorldWind['WmtsCapabilities'] = WmtsCapabilities;
         WorldWind['WmtsLayer'] = WmtsLayer;
         WorldWind['WmtsLayerCapabilities'] = WmtsLayerCapabilities;
         WorldWind['WWMath'] = WWMath;
-        WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;

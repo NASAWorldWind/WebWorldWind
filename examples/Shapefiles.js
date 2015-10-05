@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @version $Id: Shapefiles.js 3361 2015-07-31 19:28:04Z tgaskins $
+ * @version $Id: Shapefiles.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
 requirejs(['../src/WorldWind',
@@ -18,7 +18,6 @@ requirejs(['../src/WorldWind',
 
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -85,12 +84,6 @@ requirejs(['../src/WorldWind',
         var cityShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_50m_populated_places_simple/ne_50m_populated_places_simple.shp");
         cityShapefile.load(null, shapeConfigurationCallback, cityLayer);
         wwd.addLayer(cityLayer);
-
-        var fortStory = "http://worldwindserver.net/webworldwind/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
-        var fortStoryLayer = new WorldWind.RenderableLayer("Fort Story");
-        var fortStoryShapefile = new WorldWind.Shapefile(fortStory);
-        fortStoryShapefile.load(null, null, fortStoryLayer);
-        wwd.addLayer(fortStoryLayer);
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);

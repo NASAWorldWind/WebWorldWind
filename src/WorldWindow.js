@@ -4,7 +4,7 @@
  */
 /**
  * @exports WorldWindow
- * @version $Id: WorldWindow.js 3402 2015-08-14 17:28:09Z tgaskins $
+ * @version $Id: WorldWindow.js 3351 2015-07-28 22:03:20Z dcollins $
  */
 define([
         './error/ArgumentError',
@@ -51,12 +51,10 @@ define([
          * @constructor
          * @classdesc Represents a World Wind window for an HTML canvas.
          * @param {String} canvasName The name assigned to the HTML canvas in the document.
-         * @param {ElevationModel} An optional argument indicating the elevation model to use for the World
-         * Window. If missing or null, a default elevation model is used.
          * @throws {ArgumentError} If there is no HTML element with the specified name in the document, or if the
          * HTML canvas does not support WebGL.
          */
-        var WorldWindow = function (canvasName, elevationModel) {
+        var WorldWindow = function (canvasName) {
             if (!(window.WebGLRenderingContext)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor",
@@ -111,7 +109,7 @@ define([
              * The globe displayed.
              * @type {Globe}
              */
-            this.globe = new Globe(elevationModel || new EarthElevationModel());
+            this.globe = new Globe(new EarthElevationModel());
 
             /**
              * The layers to display in this world window.
