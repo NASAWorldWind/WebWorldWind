@@ -122,7 +122,7 @@ define([
         SurfaceTileRenderer.prototype.beginRendering = function (dc, opacity) {
             var gl = dc.currentGlContext,
                 program = dc.findAndBindProgram(SurfaceTileRendererProgram);
-            program.loadTexSampler(gl, WebGLRenderingContext.TEXTURE0);
+            program.loadTexSampler(gl, gl.TEXTURE0);
 
             if (dc.pickingMode && !this.isSurfaceShapeTileRendering) {
                 program.loadModulateColor(gl, true);
@@ -137,7 +137,7 @@ define([
         // Intentionally not documented.
         SurfaceTileRenderer.prototype.endRendering = function (dc) {
             var gl = dc.currentGlContext;
-            gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, null);
+            gl.bindTexture(gl.TEXTURE_2D, null);
         };
 
         // Intentionally not documented.

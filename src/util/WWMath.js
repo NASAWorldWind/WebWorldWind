@@ -706,6 +706,17 @@ define([
              */
             gudermannianInverse: function (latitude) {
                 return Math.log(Math.tan(Math.PI / 4 + (latitude * Angle.DEGREES_TO_RADIANS) / 2)) / Math.PI;
+            },
+
+            epsg3857ToEpsg4326: function (easting, northing) {
+                var r = 6.3781e6,
+                    latRadians = (Math.PI / 2) - 2 * Math.atan(Math.exp(-northing / r)),
+                    lonRadians = easting / r;
+
+                return [
+                    WWMath.clamp(latRadians * Angle.RADIANS_TO_DEGREES, -90, 90),
+                    WWMath.clamp(lonRadians * Angle.RADIANS_TO_DEGREES, -180, 180)
+                ];
             }
         };
 

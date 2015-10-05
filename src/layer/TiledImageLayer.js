@@ -4,7 +4,7 @@
  */
 /**
  * @exports TiledImageLayer
- * @version $Id: TiledImageLayer.js 3132 2015-06-01 22:42:45Z dcollins $
+ * @version $Id: TiledImageLayer.js 3414 2015-08-20 19:09:19Z tgaskins $
  */
 define([
         '../util/AbsentResourceList',
@@ -106,19 +106,40 @@ define([
 
             this.levels = new LevelSet(sector, levelZeroDelta, numLevels, tileWidth, tileHeight);
 
+            this.detailHintOrigin = 2.4;
+
+            /**
+             * Affects the degree of detail shown by this layer. Values greater than zero increase detail, but at the
+             * expense of performance. Values less than zero decrease detail. To increase detail, try values greater
+             * than but near 0, such as 0.1 and 0.2, until the desired detail is achieved.
+             * @type {Number}
+             * @default 0
+             */
+            this.detailHint = 0;
+
+            /* Intentionally not documented.
+             * Indicates the time at which this layer's imagery expire. Expired images are re-retrieved
+             * when the current time exceeds the specified expiry time. If null, images do not expire.
+             * @type {Date}
+             */
+            this.expiration = null;
+
             this.currentTiles = [];
             this.currentTilesInvalid = true;
             this.tileCache = new MemoryCache(500000, 400000);
-            this.detailHintOrigin = 2.4;
-            this.detailHint = 0;
             this.currentRetrievals = [];
             this.absentResourceList = new AbsentResourceList(3, 50e3);
-            this.mapAncestorToTile = true;
 
             this.pickEnabled = false;
         };
 
         TiledImageLayer.prototype = Object.create(Layer.prototype);
+
+        // Inherited from Layer.
+        TiledImageLayer.prototype.refresh = function () {
+            this.expiration = new Date();
+            this.currentTilesInvalid = true;
+        };
 
         // Intentionally not documented.
         TiledImageLayer.prototype.createTile = function (sector, level, row, column) {
@@ -132,9 +153,6 @@ define([
         TiledImageLayer.prototype.doRender = function (dc) {
             if (!dc.terrain)
                 return;
-
-            if (this.expiration && (new Date().getTime() > this.expiration.getTime()))
-                this.currentTilesInvalid = true;
 
             if (this.currentTilesInvalid
                 || !this.lasTtMVP || !dc.navigatorState.modelviewProjection.equals(this.lasTtMVP)
@@ -240,16 +258,9 @@ define([
 
             if (this.currentAncestorTile) {
                 if (this.isTileTextureInMemory(dc, this.currentAncestorTile)) {
-                    if (this.mapAncestorToTile) {
-                        // Set up to map the ancestor tile into the current one.
-                        tile.fallbackTile = this.currentAncestorTile;
-                        this.currentTiles.push(tile);
-                    } else {
-                        // Just enque the ancestor tile and don't enque the current one. This is necessary when the
-                        // texture coordinate mapping from the current tile to its ancestor is not straightforward,
-                        // as is the case for Mercator tiles.
-                        this.currentTiles.push(this.currentAncestorTile);
-                    }
+                    // Set up to map the ancestor tile into the current one.
+                    tile.fallbackTile = this.currentAncestorTile;
+                    this.currentTiles.push(tile);
                 }
             }
         };
@@ -279,7 +290,7 @@ define([
 
         // Intentionally not documented.
         TiledImageLayer.prototype.isTextureExpired = function (texture) {
-            return this.expiration && this.expiration < new Date().getTime;
+            return this.expiration && (texture.creationTime.getTime() <= this.expiration.getTime());
         };
 
         /**
@@ -339,7 +350,7 @@ define([
 
         // Intentionally not documented.
         TiledImageLayer.prototype.createTexture = function (dc, tile, image) {
-            return  new Texture(dc.currentGlContext, image);
+            return new Texture(dc.currentGlContext, image);
         };
 
         // Intentionally not documented.

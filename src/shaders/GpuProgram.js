@@ -53,8 +53,8 @@ define([
             var program, vShader, fShader;
 
             try {
-                vShader = new GpuShader(gl, WebGLRenderingContext.VERTEX_SHADER, vertexShaderSource);
-                fShader = new GpuShader(gl, WebGLRenderingContext.FRAGMENT_SHADER, fragmentShaderSource);
+                vShader = new GpuShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+                fShader = new GpuShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
             } catch (e) {
                 if (vShader)
                     vShader.dispose(gl);
@@ -210,7 +210,7 @@ define([
         GpuProgram.prototype.link = function (gl, program) {
             gl.linkProgram(program);
 
-            return gl.getProgramParameter(program, WebGLRenderingContext.LINK_STATUS);
+            return gl.getProgramParameter(program, gl.LINK_STATUS);
         };
 
         /**

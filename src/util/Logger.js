@@ -100,6 +100,7 @@ define(function () {
             missingBuffer: "The specified buffer descriptor is null or undefined.",
             missingColor: "The specified color is null or undefined.",
             missingDc: "The specified draw context is null or undefined.",
+            missingDomElement: "The specified DOM element is null or undefined.",
             missingEntry: "The specified entry is null or undefined.",
             missingFont: "The specified font is null or undefined.",
             missingFrustum: "The specified frustum is null or undefined.",

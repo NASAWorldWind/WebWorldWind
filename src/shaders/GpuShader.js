@@ -31,8 +31,8 @@ define([
          * compilation fails. If the compilation fails the error thrown contains any compilation messages.
          */
         var GpuShader = function (gl, shaderType, shaderSource) {
-            if (!(shaderType === WebGLRenderingContext.VERTEX_SHADER
-                || shaderType === WebGLRenderingContext.FRAGMENT_SHADER)) {
+            if (!(shaderType === gl.VERTEX_SHADER
+                || shaderType === gl.FRAGMENT_SHADER)) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "GpuShader", "constructor",
                     "The specified shader type is unrecognized."));
             }
@@ -46,7 +46,7 @@ define([
             if (!shader) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "GpuShader", "constructor",
                     "Unable to create shader of type " +
-                    (shaderType == WebGLRenderingContext.VERTEX_SHADER ? "VERTEX_SHADER." : "FRAGMENT_SHADER.")));
+                    (shaderType == gl.VERTEX_SHADER ? "VERTEX_SHADER." : "FRAGMENT_SHADER.")));
             }
 
             if (!this.compile(gl, shader, shaderType, shaderSource)) {
@@ -75,7 +75,7 @@ define([
             gl.shaderSource(shaderId, shaderSource);
             gl.compileShader(shaderId);
 
-            return gl.getShaderParameter(shaderId, WebGLRenderingContext.COMPILE_STATUS);
+            return gl.getShaderParameter(shaderId, gl.COMPILE_STATUS);
         };
 
         /**
