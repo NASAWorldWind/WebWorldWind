@@ -296,7 +296,7 @@ define([
             buffer[idx++] = height - cornerRadius;
             buffer[idx++] = 0;
             buffer[idx++] = cornerRadius;
-            idx = this.drawCorner(cornerRadius, cornerRadius, cornerRadius, Math.PI, Math.PI * 2, cornerSteps, buffer, idx);
+            idx = this.drawCorner(cornerRadius, cornerRadius, cornerRadius, Math.PI, Math.PI * 1.5, cornerSteps, buffer, idx);
 
             //Bottom left
             buffer[idx++] = cornerRadius;
@@ -309,7 +309,7 @@ define([
             buffer[idx++] = leaderOffsetY;
 
             buffer[idx++] = width / 2 + leaderGapWidth / 2;
-            buffer[idx++] = 0;
+            buffer[idx] = 0;
 
             return buffer;
         };
