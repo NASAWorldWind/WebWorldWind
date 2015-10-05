@@ -197,6 +197,7 @@ requirejs(['../src/WorldWind',
                 wwd.redraw();
             }
         });
+
         var spinnerRight = $("#spinnerRight").spinner({
             min: 0,
             max: 100,
@@ -205,6 +206,7 @@ requirejs(['../src/WorldWind',
                 wwd.redraw();
             }
         });
+
         var spinnerTop = $("#spinnerTop").spinner({
             min: 0,
             max: 100,
@@ -213,6 +215,7 @@ requirejs(['../src/WorldWind',
                 wwd.redraw();
             }
         });
+
         var spinnerBottom = $("#spinnerBottom").spinner({
             min: 0,
             max: 100,
@@ -231,7 +234,11 @@ requirejs(['../src/WorldWind',
 
             $("#annotationText").val(annotation.text);
 
+            $("#opacity").html(annotation.attributes.opacity);
+
             $("#opacitySlider").slider('value', annotation.attributes.opacity);
+
+            $("#scaleSlider").slider('value', annotation.attributes.scale);
 
             var bgRed = annotation.attributes.backgroundColor.red * 255,
                 bgGreen = annotation.attributes.backgroundColor.green * 255,
