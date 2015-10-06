@@ -66,6 +66,7 @@ requirejs(['../src/WorldWind',
         polygonAttributes.outlineColor = WorldWind.Color.BLUE;
         polygonAttributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
         polygonAttributes.drawVerticals = polygon.extrude;
+        polygonAttributes.applyLighting = true;
         polygon.attributes = polygonAttributes;
 
         // Create and assign the polygon's highlight attributes.
@@ -106,6 +107,7 @@ requirejs(['../src/WorldWind',
         polygonAttributes.outlineColor = WorldWind.Color.BLUE;
         polygonAttributes.interiorColor = WorldWind.Color.WHITE;
         polygonAttributes.drawVerticals = polygon.extrude;
+        polygonAttributes.applyLighting = true;
         polygon.attributes = polygonAttributes;
         highlightAttributes = new WorldWind.ShapeAttributes(polygonAttributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
@@ -142,6 +144,7 @@ requirejs(['../src/WorldWind',
         polygonAttributes.outlineColor = WorldWind.Color.BLUE;
         polygonAttributes.interiorColor = WorldWind.Color.WHITE;
         polygonAttributes.drawVerticals = polygon.extrude;
+        polygonAttributes.applyLighting = true;
         polygon.attributes = polygonAttributes;
         highlightAttributes = new WorldWind.ShapeAttributes(polygonAttributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
@@ -200,6 +203,7 @@ requirejs(['../src/WorldWind',
         polygonAttributes.outlineColor = WorldWind.Color.BLUE;
         polygonAttributes.interiorColor = WorldWind.Color.WHITE;
         polygonAttributes.drawVerticals = polygon.extrude;
+        polygonAttributes.applyLighting = true;
         polygon.attributes = polygonAttributes;
         highlightAttributes = new WorldWind.ShapeAttributes(polygonAttributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
