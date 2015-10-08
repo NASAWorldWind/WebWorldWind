@@ -5,133 +5,245 @@
 define([
         '../util/Color',
         '../util/Font',
-        '../geom/Vec2'
+        '../util/Insets'
     ],
     function (Color,
               Font,
-              Vec2) {
+              Insets) {
         "use strict";
 
+        /**
+         * Constructs an annotation attributes bundle.
+         * @alias AnnotationAttributes
+         * @constructor
+         * @classdesc Holds attributes applied to {@link Annotation} shapes.
+         * @param {AnnotationAttributes} attributes Attributes to initialize this attributes instance to. May be null,
+         * in which case the new instance contains default attributes.
+         */
         var AnnotationAttributes = function (attributes) {
-                this._offset = attributes ? attributes._offset
-                    : new Vec2(1, 1);
-                this._cornerRadius = attributes ? attributes._cornerRadius : 0;
 
-            this._insetLeft = attributes ? attributes._insetLeft : 2;
-            this._insetRight = attributes ? attributes._insetRight : 2;
-            this._insetTop = attributes ? attributes._insetTop : 2;
-            this._insetBottom = attributes ? attributes._insetBottom : 2;
-
+            // These are all documented with their property accessors below.
+            this._cornerRadius = attributes ? attributes._cornerRadius : 0;
+            this._insets = attributes ? attributes._insets : new Insets(0, 0, 0, 0);
             this._backgroundColor = attributes ? attributes._backgroundColor : Color.WHITE;
             this._leaderGapWidth = attributes ? attributes._leaderGapWidth : 40;
             this._opacity = attributes ? attributes._opacity : 1;
             this._scale = attributes ? attributes._scale : 1;
             this._textColor = attributes ? attributes._textColor : new Color(1, 1, 1, 1);
+            this._drawLeader = attributes ? attributes._drawLeader : true;
+            this._width = attributes ? attributes._width : 200;
+            this._height = attributes ? attributes._height : 100;
+
+            /**
+             * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
+             * attributes change. The state key will be automatically computed the next time it's requested. This flag
+             * will be set to false when that occurs.
+             * @type {Boolean}
+             * @protected
+             */
+            this.stateKeyInvalid = true;
         };
 
-        AnnotationAttributes.prototype.setInsets = function(left, right, top, bottom){
-            this._insetLeft = left;
-            this._insetRight = right;
-            this._insetTop = top;
-            this._insetBottom = bottom;
+        /**
+         * Computes the state key for this attributes object. Subclasses that define additional attributes must
+         * override this method, call it from that method, and append the state of their attributes to its
+         * return value.
+         * @returns {String} The state key for this object.
+         * @protected
+         */
+        AnnotationAttributes.prototype.computeStateKey = function () {
+            return "wi " + this._width
+                + " he " + this._height
+                + " cr " + this._cornerRadius
+                + " in " + this._insets.toString()
+                + " bg " + this.backgroundColor.toHexString(true)
+                + " tc " + this.textColor.toHexString(true)
+                + " dl " + this.drawLeader
+                + " lgw " + this.leaderGapWidth
+                + " op " + this.opacity
+                + " sc " + this.scale;
         };
 
         Object.defineProperties(AnnotationAttributes.prototype, {
 
-            offset: {
+            /**
+             * Indicates the width of the callout.
+             * @type {Number}
+             * @default 200
+             * @memberof AnnotationAttributes.prototype
+             */
+            width: {
                 get: function () {
-                    return this._offset;
+                    return this._width;
                 },
                 set: function (value) {
-                    this._offset = value;
+                    this._width = value;
+                    this.stateKeyInvalid = true;
                 }
             },
+
+            /**
+             * Indicates height of the callout.
+             * @type {Number}
+             * @default 100
+             * @memberof AnnotationAttributes.prototype
+             */
+            height: {
+                get: function () {
+                    return this._height;
+                },
+                set: function (value) {
+                    this._height = value;
+                    this.stateKeyInvalid = true;
+                }
+            },
+
+            /**
+             * Indicates the radius for the corners.
+             * @type {Number}
+             * @default 0
+             * @memberof AnnotationAttributes.prototype
+             */
             cornerRadius: {
                 get: function () {
                     return this._cornerRadius;
                 },
                 set: function (value) {
                     this._cornerRadius = value;
+                    this.stateKeyInvalid = true;
                 }
             },
-            insetLeft: {
+
+            /**
+             * Indicates the insets instance of this object.
+             * Insets adjusts top, bottom, left, right padding for the text.
+             * @type {Insets}
+             * @default 0, 0, 0, 0
+             * @memberof AnnotationAttributes.prototype
+             */
+            insets: {
                 get: function () {
-                    return this._insetLeft;
+                    return this._insets;
                 },
                 set: function (value) {
-                    this._insetLeft = value;
+                    this._insets = value;
+                    this.stateKeyInvalid = true;
                 }
             },
-            insetRight: {
-                get: function () {
-                    return this._insetRight;
-                },
-                set: function (value) {
-                    this._insetRight = value;
-                }
-            },
-            insetTop: {
-                get: function () {
-                    return this._insetTop;
-                },
-                set: function (value) {
-                    this._insetTop = value;
-                }
-            },
-            insetBottom: {
-                get: function () {
-                    return this._insetBottom;
-                },
-                set: function (value) {
-                    this._insetBottom = value;
-                }
-            },
+
+            /**
+             * Indicates the background color of the callout.
+             * @type {Color}
+             * @default White
+             * @memberof AnnotationAttributes.prototype
+             */
             backgroundColor: {
                 get: function () {
                     return this._backgroundColor;
                 },
                 set: function (value) {
                     this._backgroundColor = value;
+                    this.stateKeyInvalid = true;
                 }
             },
+
+             /**
+             * Indicates the text color.
+             * @type {Color}
+             * @default 1, 1, 1, 1
+             * @memberof AnnotationAttributes.prototype
+             */
             textColor: {
                 get: function () {
                     return this._textColor;
                 },
                 set: function (value) {
                     this._textColor = value;
+                    this.stateKeyInvalid = true;
                 }
             },
+
+            /**
+             * Indicates whether to draw a leader pointing to the annotation's geographic position.
+             * @type {Boolean}
+             * @default true
+             * @memberof AnnotationAttributes.prototype
+             */
             drawLeader: {
                 get: function () {
                     return this._drawLeader;
                 },
                 set: function (value) {
                     this._drawLeader = value;
+                    this.stateKeyInvalid = true;
                 }
             },
+
+            /**
+             * Indicates the gap width of the leader in pixels.
+             * @type {Number}
+             * @default 40
+             * @memberof AnnotationAttributes.prototype
+             */
             leaderGapWidth: {
                 get: function () {
                     return this._leaderGapWidth;
                 },
                 set: function (value) {
                     this._leaderGapWidth = value;
+                    this.stateKeyInvalid = true;
                 }
             },
+
+            /**
+             * Indicates the opacity of the annotation.
+             * The value ranges from 0 to 1.
+             * Opacity affects both callout and text.
+             * @type {Number}
+             * @default 1
+             * @memberof AnnotationAttributes.prototype
+             */
             opacity: {
                 get: function () {
                     return this._opacity;
                 },
                 set: function (value) {
                     this._opacity = value;
+                    this.stateKeyInvalid = true;
                 }
             },
+
+            /**
+             * Indicates the scale multiplier.
+             * @type {Number}
+             * @default 1
+             * @memberof AnnotationAttributes.prototype
+             */
             scale: {
                 get: function () {
                     return this._scale;
                 },
                 set: function (value) {
                     this._scale = value;
+                    this.stateKeyInvalid = true;
+                }
+            },
+
+            /**
+             * A string identifying the state of this attributes object. The string encodes the current values of all
+             * this object's properties. It's typically used to validate cached representations of shapes associated
+             * with this attributes object.
+             * @type {String}
+             * @readonly
+             * @memberof AnnotationAttributes.prototype
+             */
+            stateKey: {
+                get: function () {
+                    if (this.stateKeyInvalid) {
+                        this._stateKey = this.computeStateKey();
+                        this.stateKeyInvalid = false;
+                    }
+                    return this._stateKey;
                 }
             }
         });
