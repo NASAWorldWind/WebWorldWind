@@ -8,32 +8,45 @@ define([
         '../shaders/BasicTextureProgram',
         '../util/Color',
         '../util/Font',
+        '../util/Insets',
         '../util/Logger',
         '../geom/Matrix',
         '../util/Offset',
         '../pick/PickedObject',
         '../render/Renderable',
+        '../shapes/TextAttributes',
         '../geom/Vec2',
         '../geom/Vec3',
-        '../util/WWMath',
-        '../shapes/TextAttributes'
+        '../util/WWMath'
     ],
     function (AnnotationAttributes,
               ArgumentError,
               BasicTextureProgram,
               Color,
               Font,
+              Insets,
               Logger,
               Matrix,
               Offset,
               PickedObject,
               Renderable,
+              TextAttributes,
               Vec2,
               Vec3,
-              WWMath,
-              TextAttributes) {
+              WWMath) {
         "use strict";
 
+        /**
+         * Constructs an annotation.
+         * @alias Annotation
+         * @constructor
+         * @augments Renderable
+         * @classdesc Represents an Annotation shape. An annotation displays a callout, a text and a leader pointing
+         * the annotation's geographic position to the ground.
+         * @param {Position} position The annotations's geographic position.
+         * @param {AnnotationAttributes} attributes The attributes to associate with this annotation.
+         * @throws {ArgumentError} If the specified position is null or undefined.
+         */
         var Annotation = function (position, attributes) {
 
             if (!position) {
@@ -43,36 +56,68 @@ define([
 
             Renderable.call(this);
 
+            /**
+             * This annotation's geographic position.
+             * @type {Position}
+             */
             this.position = position;
 
+            /**
+             * The annotation's attributes.
+             * @type {AnnotationAttributes}
+             * @default see [AnnotationAttributes]{@link AnnotationAttributes}
+             */
             this.attributes = attributes ? attributes : new AnnotationAttributes(null);
 
+            /**
+             * This annotation's altitude mode. May be one of
+             * <ul>
+             *  <li>[WorldWind.ABSOLUTE]{@link WorldWind#ABSOLUTE}</li>
+             *  <li>[WorldWind.RELATIVE_TO_GROUND]{@link WorldWind#RELATIVE_TO_GROUND}</li>
+             *  <li>[WorldWind.CLAMP_TO_GROUND]{@link WorldWind#CLAMP_TO_GROUND}</li>
+             * </ul>
+             * @default WorldWind.ABSOLUTE
+             */
+            this.altitudeMode = WorldWind.ABSOLUTE;
+
+            // Internal use only. Intentionally not documented.
             this.layer = null;
 
+            // Internal use only. Intentionally not documented.
+            this.lastStateKey = null;
+
+            // Internal use only. Intentionally not documented.
             this.calloutTransform = Matrix.fromIdentity();
 
+            // Internal use only. Intentionally not documented.
             this.calloutOffset = new WorldWind.Offset(
                 WorldWind.OFFSET_FRACTION, 0.5,
                 WorldWind.OFFSET_FRACTION, 0);
 
+            // Internal use only. Intentionally not documented.
             this.label = "";
 
+            // Internal use only. Intentionally not documented.
             this.labelTexture = null;
 
+            // Internal use only. Intentionally not documented.
             this.labelTransform = Matrix.fromIdentity();
 
+            // Internal use only. Intentionally not documented.
             this.labelAttributes = new TextAttributes(null);
 
+            // Internal use only. Intentionally not documented.
             this.labelAttributes.offset = new WorldWind.Offset(
                 WorldWind.OFFSET_FRACTION, 0.5,
                 WorldWind.OFFSET_FRACTION, 1.0);
 
-            this.altitudeMode = WorldWind.ABSOLUTE;
-
+            // Internal use only. Intentionally not documented.
             this.placePoint = new Vec3(0, 0, 0);
 
+            // Internal use only. Intentionally not documented.
             this.depthOffset = -2.05;
 
+            // Internal use only. Intentionally not documented.
             this.calloutPoints = null;
         };
 
@@ -83,14 +128,27 @@ define([
         Annotation.prototype = Object.create(Renderable.prototype);
 
         Object.defineProperties(Annotation.prototype, {
+
+            /**
+             * The text for this annotation.
+             * @type {String}
+             * @memberof Annotation.prototype
+             */
             text: {
                 get: function () {
                     return this.label;
                 },
                 set: function (value) {
                     this.label = value;
+                    this.lastStateKey = null;
                 }
             },
+
+            /**
+             * The text color for this annotation.
+             * @type {Color}
+             * @memberof Annotation.prototype
+             */
             textColor: {
                 get: function () {
                     return this.attributes.textColor;
@@ -136,8 +194,9 @@ define([
 
             var orderedAnnotation = this.makeOrderedRenderable(dc);
 
-            if (!orderedAnnotation)
+            if (!orderedAnnotation) {
                 return;
+            }
 
             orderedAnnotation.layer = dc.currentLayer;
 
@@ -164,15 +223,23 @@ define([
          */
         Annotation.prototype.makeOrderedRenderable = function (dc) {
 
-            //TODO: add min width and min height to attributes
-            this.label = dc.textSupport.wrap(this.label, 200, 100, this.labelAttributes.font);
-
             var w, h, s, iLeft, iRight, iTop, iBottom,
                 offset;
 
+            // Wraps the text based and the width and height that were set for the
+            // annotation
+            this.label = dc.textSupport.wrap(
+                this.label,
+                this.attributes.width,this.attributes.height,
+                this.labelAttributes.font);
+
+            // Compute the annotation's model point.
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
+            // Compute the annotation's screen point in the OpenGL coordinate system of the WorldWindow
+            // by projecting its model coordinate point onto the viewport. Apply a depth offset in order
+            // to cause the annotation to appear above nearby terrain.
             if (!dc.navigatorState.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
                 return null;
             }
@@ -187,17 +254,13 @@ define([
                 dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
             }
 
-            this.labelTransform.setScale(w * s, h * s, 1);
-
-            this.labelBounds = WWMath.boundingRectForUnitQuad(this.labelTransform);
-
             w = this.labelTexture.imageWidth;
             h = this.labelTexture.imageHeight;
             s = this.attributes.scale;
-            iLeft = this.attributes.insetLeft;
-            iRight = this.attributes.insetRight;
-            iTop = this.attributes.insetTop;
-            iBottom = this.attributes.insetBottom;
+            iLeft = this.attributes.insets.left;
+            iRight = this.attributes.insets.right;
+            iTop = this.attributes.insets.top;
+            iBottom = this.attributes.insets.bottom;
 
             offset = this.calloutOffset.offsetForSize((w + iLeft + iRight) * s, (h + iTop + iBottom) * s);
 
@@ -207,9 +270,31 @@ define([
                 Annotation.screenPoint[2]);
 
             this.labelTransform.setTranslation(
-                Annotation.screenPoint[0] - offset[0] + this.attributes.insetLeft * this.attributes.scale,
-                Annotation.screenPoint[1] + 30 + this.attributes.insetBottom * this.attributes.scale,
+                Annotation.screenPoint[0] - offset[0] + this.attributes.insets.left * this.attributes.scale,
+                Annotation.screenPoint[1] + 30 + this.attributes.insets.bottom * this.attributes.scale,
                 Annotation.screenPoint[2]);
+
+            this.labelTransform.setScale(w * s, h * s, 1);
+
+            this.labelBounds = WWMath.boundingRectForUnitQuad(this.labelTransform);
+
+            // Compute dimensions of the callout taking in consideration the insets
+            var width = (w + iLeft + iRight) * s;
+            var height = (h + iTop + iBottom) * s;
+
+            var leaderOffsetX = (width / 2);
+
+            var leaderOffsetY = -30;
+
+            if (!this.attributes.drawLeader) {
+                leaderOffsetY = 0;
+            }
+
+            if (this.attributes.stateKey != this.lastStateKey)
+                this.calloutPoints = this.createCallout(
+                    width, height,
+                    leaderOffsetX, leaderOffsetY,
+                    this.attributes.leaderGapWidth, this.attributes.cornerRadius);
 
             return this;
         };
@@ -244,8 +329,9 @@ define([
 
         // Internal. Intentionally not documented.
         Annotation.prototype.drawCorner = function (x0, y0, cornerRadius, start, end, steps, buffer, startIdx) {
-            if (cornerRadius < 1)
+            if (cornerRadius < 1) {
                 return startIdx;
+            }
 
             var step = (end - start) / (steps - 1);
             for (var i = 1; i < steps - 1; i++) {
@@ -260,7 +346,8 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        Annotation.prototype.createCallout = function (width, height, leaderOffsetX, leaderOffsetY, leaderGapWidth, cornerRadius) {
+        Annotation.prototype.createCallout = function (width, height, leaderOffsetX, leaderOffsetY, leaderGapWidth,
+                                                       cornerRadius) {
 
             var cornerSteps = 16;
 
@@ -275,28 +362,32 @@ define([
             buffer[idx++] = 0;
             buffer[idx++] = width - cornerRadius;
             buffer[idx++] = 0;
-            idx = this.drawCorner(width - cornerRadius, cornerRadius, cornerRadius, -Math.PI / 2, 0, cornerSteps, buffer, idx);
+            idx = this.drawCorner(width - cornerRadius, cornerRadius, cornerRadius, -Math.PI / 2, 0,
+                cornerSteps, buffer, idx);
 
             //Right
             buffer[idx++] = width;
             buffer[idx++] = cornerRadius;
             buffer[idx++] = width;
             buffer[idx++] = height - cornerRadius;
-            idx = this.drawCorner(width - cornerRadius, height - cornerRadius, cornerRadius, 0, Math.PI / 2, cornerSteps, buffer, idx);
+            idx = this.drawCorner(width - cornerRadius, height - cornerRadius, cornerRadius, 0, Math.PI / 2,
+                cornerSteps, buffer, idx);
 
             //Top
             buffer[idx++] = width - cornerRadius;
             buffer[idx++] = height;
             buffer[idx++] = cornerRadius;
             buffer[idx++] = height;
-            idx = this.drawCorner(cornerRadius, height - cornerRadius, cornerRadius, Math.PI / 2, Math.PI, cornerSteps, buffer, idx);
+            idx = this.drawCorner(cornerRadius, height - cornerRadius, cornerRadius, Math.PI / 2, Math.PI,
+                cornerSteps, buffer, idx);
 
             //Left
             buffer[idx++] = 0;
             buffer[idx++] = height - cornerRadius;
             buffer[idx++] = 0;
             buffer[idx++] = cornerRadius;
-            idx = this.drawCorner(cornerRadius, cornerRadius, cornerRadius, Math.PI, Math.PI * 1.5, cornerSteps, buffer, idx);
+            idx = this.drawCorner(cornerRadius, cornerRadius, cornerRadius, Math.PI, Math.PI * 1.5,
+                cornerSteps, buffer, idx);
 
             //Bottom left
             buffer[idx++] = cornerRadius;
@@ -327,33 +418,18 @@ define([
                 this.pickColor = dc.uniquePickColor();
             }
 
-            //Draw callout
             program.loadOpacity(gl, this.attributes.opacity);
-            var w = this.labelTexture.imageWidth;
-            var h = this.labelTexture.imageHeight;
-            var s = this.attributes.scale;
 
-            this.labelTransform.setScale(w * s, h * s, 1);
+            // Attributes have changed. We need to track this because the callout vbo data may
+            // have changed if scaled or text wrapping changes callout dimensions
+            var calloutAttributesChanged = (this.attributes.stateKey != this.lastStateKey);
 
-            var width = (this.labelTexture.imageWidth + this.attributes.insetLeft + this.attributes.insetRight ) * s;
-            var height = (this.labelTexture.imageHeight + this.attributes.insetTop + this.attributes.insetBottom) * s;
-
-            var leaderOffsetX = (width / 2);
-
-            //TODO: add leaderoffsety to attributes
-            var leaderOffsetY = -30;
-
-            if (!this.attributes.drawLeader) {
-                leaderOffsetY = 0;
-            }
-
-            this.calloutPoints = this.createCallout(width, height, leaderOffsetX, leaderOffsetY, this.attributes.leaderGapWidth, this.attributes.cornerRadius);
-
-            if (!this.calloutCacheKey) {
+            // Create new cache key if callout drawing points have changed
+            if (!this.calloutCacheKey || calloutAttributesChanged) {
                 this.calloutCacheKey = dc.gpuResourceCache.generateCacheKey();
             }
 
-            var calloutVboId = null;
+            var calloutVboId = dc.gpuResourceCache.resourceForKey(this.calloutCacheKey);
 
             if (!calloutVboId) {
                 calloutVboId = gl.createBuffer();
@@ -363,15 +439,26 @@ define([
                 refreshBuffers = true;
             }
 
+            // Remove the last generated vbo data if attributes changed
+            if (calloutAttributesChanged && this.calloutCacheKey){
+                dc.gpuResourceCache.removeResource(this.calloutCacheKey);
+            }
+
+            // Store current statekey because we are no longer using it
+            // in this iteration
+            this.lastStateKey = this.attributes.stateKey;
+
             // Compute and specify the MVP matrix.
             Annotation.matrix.copy(dc.screenProjection);
             Annotation.matrix.multiplyMatrix(this.calloutTransform);
             program.loadModelviewProjection(gl, Annotation.matrix);
 
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, calloutVboId);//dc.unitQuadBuffer3());
+            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, calloutVboId);
 
             if (refreshBuffers) {
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, this.calloutPoints, WebGLRenderingContext.STATIC_DRAW);
+                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
+                    this.calloutPoints, WebGLRenderingContext.STATIC_DRAW);
+
                 dc.frameStatistics.incrementVboLoadCount(1);
             }
 
@@ -383,7 +470,7 @@ define([
 
             gl.drawArrays(WebGLRenderingContext.TRIANGLE_FAN, 0, this.calloutPoints.length / 2);
 
-            //Draw text
+            // Draw text
             Annotation.matrix.copy(dc.screenProjection);
             Annotation.matrix.multiplyMatrix(this.labelTransform);
             program.loadModelviewProjection(gl, Annotation.matrix);
