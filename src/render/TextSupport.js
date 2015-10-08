@@ -181,8 +181,9 @@ define([
                     {
                         wrappedText += subLines[j];
                         currentHeight += maxLineHeight + this.lineSpacing;
-                        if (j < subLines.length - 1)
+                        if (j < subLines.length - 1) {
                             wrappedText += '\n';
+                        }
                     }
                     else
                     {
@@ -190,14 +191,16 @@ define([
                     }
                 }
 
-                if (i < lines.length - 1 && !heightExceeded)
+                if (i < lines.length - 1 && !heightExceeded) {
                     wrappedText += '\n';
+                }
             }
             // Add continuation string if text truncated
             if (heightExceeded)
             {
-                if (wrappedText.length() > 0)
+                if (wrappedText.length() > 0) {
                     wrappedText = wrappedText.substring(0, length - 1);
+                }
 
                 wrappedText += "...";
             }
@@ -227,8 +230,10 @@ define([
                 var end = source.indexOf(' ', start + 1);
                 while (start < source.length)
                 {
-                    if (end == -1)
+                    if (end == -1) {
                         end = source.length;   // last word
+                    }
+
                     // Extract a 'word' which is in fact a space and a word
                     var word = source.substring(start, end);
                     var linePlusWord = line + word;
