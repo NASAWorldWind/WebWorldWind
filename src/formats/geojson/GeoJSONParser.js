@@ -496,6 +496,8 @@ define(['../../error/ArgumentError',
                         multiPolygonGeometry,
                         properties ? properties : null);
                     break;
+                default:
+                    break;
             }
         }
 
