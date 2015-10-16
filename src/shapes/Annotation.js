@@ -185,6 +185,35 @@ define([
         };
 
         /**
+         * Creates a new annotation that is a copy of this annotation.
+         * @returns {Annotation} The new annotation.
+         */
+        Annotation.prototype.clone = function () {
+            var clone = new Annotation(this.position);
+
+            clone.copy(this);
+            clone.pickDelegate = this.pickDelegate ? this.pickDelegate : this;
+
+            return clone;
+        };
+
+        /**
+         * Copies the contents of a specified annotation to this annotation.
+         * @param {Annotation} that The Annotation to copy.
+         */
+        Annotation.prototype.copy = function (that) {
+            this.position = that.position;
+            this.enabled = that.enabled;
+            this.attributes = that.attributes;
+            this.label = that.label;
+            this.altitudeMode = that.altitudeMode;
+            this.pickDelegate = that.pickDelegate;
+            this.depthOffset = that.depthOffset;
+
+            return this;
+        };
+
+        /**
          * Renders this annotation. This method is typically not called by applications but is called by
          * {@link RenderableLayer} during rendering. For this shape this method creates and
          * enques an ordered renderable with the draw context and does not actually draw the annotation.
@@ -192,7 +221,26 @@ define([
          */
         Annotation.prototype.render = function (dc) {
 
-            var orderedAnnotation = this.makeOrderedRenderable(dc);
+            if (!this.enabled) {
+                return;
+            }
+
+            if (!dc.accumulateOrderedRenderables) {
+                return;
+            }
+
+            if (dc.globe.projectionLimits
+                && !dc.globe.projectionLimits.containsLocation(this.position.latitude, this.position.longitude)) {
+                return;
+            }
+
+            var orderedAnnotation;
+            if (this.lastFrameTime !== dc.timestamp) {
+                orderedAnnotation = this.makeOrderedRenderable(dc);
+            } else {
+                var annotationCopy = this.clone();
+                orderedAnnotation = annotationCopy.makeOrderedRenderable(dc);
+            }
 
             if (!orderedAnnotation) {
                 return;
@@ -200,6 +248,7 @@ define([
 
             orderedAnnotation.layer = dc.currentLayer;
 
+            this.lastFrameTime = dc.timestamp;
             dc.addOrderedRenderable(orderedAnnotation);
         };
 
@@ -214,7 +263,7 @@ define([
             }
         };
 
-        /* INTENTIONALLY NOT DOCUMENTED
+        /* Intentionally not documented
          * Creates an ordered renderable for this shape.
          * @protected
          * @param {DrawContext} dc The current draw context.
