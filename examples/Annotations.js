@@ -35,6 +35,8 @@ requirejs(['../src/WorldWind',
 
         var annotationController = new AnnotationController(wwd);
 
+        var layerManger = new LayerManager(wwd);
+
         var locations = [
             new WorldWind.Position(45.759506, 21.227948, 1e2),
             new WorldWind.Position(39.238384, 58.331522, 1e2),
