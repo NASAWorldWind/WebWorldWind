@@ -27,6 +27,7 @@ define([
             this._insets = attributes ? attributes._insets : new Insets(0, 0, 0, 0);
             this._backgroundColor = attributes ? attributes._backgroundColor : Color.WHITE;
             this._leaderGapWidth = attributes ? attributes._leaderGapWidth : 40;
+            this._leaderGapHeight = attributes ? attributes._leaderGapHeight : 30;
             this._opacity = attributes ? attributes._opacity : 1;
             this._scale = attributes ? attributes._scale : 1;
             this._textColor = attributes ? attributes._textColor : new Color(1, 1, 1, 1);
@@ -191,6 +192,22 @@ define([
                 },
                 set: function (value) {
                     this._leaderGapWidth = value;
+                    this.stateKeyInvalid = true;
+                }
+            },
+
+            /**
+             * Indicates the gap height of the leader in pixels.
+             * @type {Number}
+             * @default 30
+             * @memberof AnnotationAttributes.prototype
+             */
+            leaderGapHeight: {
+                get: function () {
+                    return this._leaderGapHeight;
+                },
+                set: function (value) {
+                    this._leaderGapHeight = value;
                     this.stateKeyInvalid = true;
                 }
             },

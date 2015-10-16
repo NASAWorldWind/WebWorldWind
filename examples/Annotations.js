@@ -72,6 +72,7 @@ requirejs(['../src/WorldWind',
             annotationAttributes.textColor = new WorldWind.Color(1, 1, 1, 1);
             annotationAttributes.drawLeader = true;
             annotationAttributes.leaderGapWidth = 40;
+            annotationAttributes.leaderGapHeight = 30;
             annotationAttributes.opacity = 1;
             annotationAttributes.scale = 1;
             annotationAttributes.width = 200;

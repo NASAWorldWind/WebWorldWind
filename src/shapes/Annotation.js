@@ -224,7 +224,7 @@ define([
         Annotation.prototype.makeOrderedRenderable = function (dc) {
 
             var w, h, s, iLeft, iRight, iTop, iBottom,
-                offset;
+                offset, leaderGapHeight;
 
             // Wraps the text based and the width and height that were set for the
             // annotation
@@ -261,17 +261,18 @@ define([
             iRight = this.attributes.insets.right;
             iTop = this.attributes.insets.top;
             iBottom = this.attributes.insets.bottom;
+            leaderGapHeight = this.attributes.leaderGapHeight;
 
             offset = this.calloutOffset.offsetForSize((w + iLeft + iRight) * s, (h + iTop + iBottom) * s);
 
             this.calloutTransform.setTranslation(
                 Annotation.screenPoint[0] - offset[0],
-                Annotation.screenPoint[1] + 30,
+                Annotation.screenPoint[1] + leaderGapHeight,
                 Annotation.screenPoint[2]);
 
             this.labelTransform.setTranslation(
-                Annotation.screenPoint[0] - offset[0] + this.attributes.insets.left * this.attributes.scale,
-                Annotation.screenPoint[1] + 30 + this.attributes.insets.bottom * this.attributes.scale,
+                Annotation.screenPoint[0] - offset[0] + iLeft * s,
+                Annotation.screenPoint[1] + leaderGapHeight + iBottom * s,
                 Annotation.screenPoint[2]);
 
             this.labelTransform.setScale(w * s, h * s, 1);
@@ -284,17 +285,18 @@ define([
 
             var leaderOffsetX = (width / 2);
 
-            var leaderOffsetY = -30;
+            var leaderOffsetY = -leaderGapHeight;
 
             if (!this.attributes.drawLeader) {
                 leaderOffsetY = 0;
             }
 
-            if (this.attributes.stateKey != this.lastStateKey)
+            if (this.attributes.stateKey != this.lastStateKey){
                 this.calloutPoints = this.createCallout(
                     width, height,
                     leaderOffsetX, leaderOffsetY,
                     this.attributes.leaderGapWidth, this.attributes.cornerRadius);
+            }
 
             return this;
         };
