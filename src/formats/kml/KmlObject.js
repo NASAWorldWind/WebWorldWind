@@ -196,6 +196,9 @@ define([
      */
     KmlObject.prototype.createChildElement = function (options) {
         var node = this.retrieveNode(options);
+        if(node == null) {
+            return null;
+        }
         var constructor = this.retrieveElementForNode(node.nodeName);
         return new constructor(node);
     };

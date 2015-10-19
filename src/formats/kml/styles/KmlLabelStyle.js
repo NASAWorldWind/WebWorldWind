@@ -52,6 +52,10 @@ define([
         }
     });
 
+    KmlLabelStyle.render = function() {
+
+    };
+
     KmlElements.addKey(KmlLabelStyle.prototype.tagName[0], KmlLabelStyle);
 
     return KmlLabelStyle;

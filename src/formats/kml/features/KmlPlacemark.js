@@ -9,6 +9,8 @@ define([
     './../KmlElements',
     './KmlFeature',
     '../geom/KmlGeometry',
+    '../styles/KmlIconStyle',
+    '../styles/KmlLabelStyle',
     '../../../shapes/PlacemarkAttributes',
     '../../../shapes/Placemark',
     '../../../util/Color',
@@ -17,6 +19,8 @@ define([
     KmlElements,
     KmlFeature,
     KmlGeometry,
+    KmlIconStyle,
+    KmlLabelStyle,
     PlacemarkAttributes,
     Placemark,
     Color,
@@ -95,7 +99,7 @@ define([
 
         layer.addRenderable(placemark);
 
-        this.geometry.render(layer, this.style);
+        this.geometry.render(layer, this.StyleSelector);
     };
 
     KmlElements.addKey(KmlPlacemark.prototype.tagName[0], KmlPlacemark);

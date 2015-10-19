@@ -133,6 +133,10 @@ define([
         }
     });
 
+    KmlIconStyle.render = function() {
+
+    };
+
     KmlElements.addKey(KmlIconStyle.prototype.tagName[0], KmlIconStyle);
 
     return KmlIconStyle;

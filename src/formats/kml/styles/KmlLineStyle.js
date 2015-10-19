@@ -3,9 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/Color',
     './KmlColorStyle',
     './../KmlElements'
 ], function (
+    Color,
     KmlColorStyle,
     KmlElements
 ) {
