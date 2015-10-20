@@ -122,7 +122,7 @@ requirejs([
             xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        var dataArray = xhr.response.split('\r\n');
+                        var dataArray = xhr.response.split('\n');
 
                         if (analyticalSurfaceObjectArray.filter(
                                 function(e) {
