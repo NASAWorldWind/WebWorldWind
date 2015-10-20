@@ -104,7 +104,7 @@ define([
         }
     });
 
-    KmlLineStyle.render = function(style, options) {
+    KmlLineStyle.update = function(style, options) {
         var shapeOptions = options || {};
         style = style || {};
 

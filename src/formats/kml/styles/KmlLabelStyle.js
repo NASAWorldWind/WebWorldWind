@@ -52,7 +52,7 @@ define([
         }
     });
 
-    KmlLabelStyle.render = function() {
+    KmlLabelStyle.update = function() {
 
     };
 

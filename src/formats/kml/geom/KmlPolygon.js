@@ -12,6 +12,7 @@ define([
     '../../../geom/Location',
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
+    '../../../WorldWind',
     '../../../util/WWUtil'
 ], function (
     Color,
@@ -23,26 +24,39 @@ define([
     Location,
     Polygon,
     ShapeAttributes,
+    WorldWind,
     WWUtil
 ) {
     "use strict";
     /**
      * Constructs an KmlPolygon. Application usually don't call this constructor. It is called by {@link KmlFile} as
      * Objects from KmlFile are read. It is concrete implementation.
+     * It is Polygon and KmlGeometry.
      * @alias KmlPolygon
      * @constructor
      * @classdesc Contains the data associated with Kml polygon
      * @param polygonNode Node representing the Kml polygon.
+     * @param pStyle Style to be applied to current node.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
-    var KmlPolygon = function(polygonNode) {
+    var KmlPolygon = function(polygonNode, pStyle) {
         KmlGeometry.call(this, polygonNode);
+        var self = this;
+        // Default locations and attributes. Invisible unless called otherwise.
+        pStyle.then(function(pStyle){
+            // Once style is delivered create corresponding polygon.
+            Polygon.call(this, self.prepareLocations(), self.prepareAttributes(pStyle));
+            self.moveValidProperties();
+        });
+        this._style = pStyle;
+        this._layer = null;
     };
 
-    KmlPolygon.prototype = Object.create(KmlGeometry.prototype);
+    KmlPolygon.prototype = Object.create(Polygon.prototype);
+    KmlPolygon.prototype.kml = Object.create(KmlGeometry.prototype);
 
-    Object.defineProperties(KmlPolygon.prototype, {
+    Object.defineProperties(KmlPolygon.prototype.kml, {
         /**
          * In case that the polygon is above ground, this property decides whether there is going to be a line to the
          * ground.
@@ -120,8 +134,10 @@ define([
             get: function() {
                 return this.outerBoundary.center;
             }
-        },
+        }
+    });
 
+    Object.defineProperties(KmlPolygon.prototype, {
         /**
          * Array of the tag names representing Kml polygon.
          * @memberof KmlPolygon.prototype
@@ -137,36 +153,56 @@ define([
 
     /**
      * Renders polygon as polygon applying valid styles.
-     * @param layer layer into which the polygon should be rendered.
-     * @param pStyle Style applied on the polygon.
+     * options.style
      */
-    KmlPolygon.prototype.render = function(layer, pStyle) {
-        var shapeOptions = KmlPolyStyle.render(pStyle && pStyle.PolyStyle);
-        KmlLineStyle.render(pStyle && pStyle.LineStyle, shapeOptions);
+    KmlPolygon.prototype.update = function(layer) {
+        this._style.then(function(pStyle) {
+            var shapeOptions = this.prepareAttributes(pStyle);
+            this.attributes = shapeOptions;
+            this.highlightAttributes = shapeOptions;
 
-        shapeOptions._drawVerticals = this.extrude || false;
+            this.locations = this.prepareLocations();
+            this.moveValidProperties();
+
+            if(this._layer != null ) {
+                // Remove renderable from this layer.
+                this._layer.removeRenderable(this);
+            }
+            layer.addRenderable(this);
+            this._layer = layer;
+        });
+    };
+
+    // Well anything that contains NetworkLink must also work using promises.
+
+    KmlPolygon.prototype.moveValidProperties = function() {
+        this.extrude = this.kml.extrude || false;
+        this.altitudeMode = this.kml.altitudeMode || WorldWind.ABSOLUTE;
+    };
+
+    KmlPolygon.prototype.prepareAttributes = function(pStyle) {
+        var shapeOptions = KmlPolyStyle.update(pStyle && pStyle.PolyStyle);
+        KmlLineStyle.update(pStyle && pStyle.LineStyle, shapeOptions);
+
+        shapeOptions._drawVerticals = this.kml.extrude || false;
         shapeOptions._applyLighting = false;
         shapeOptions._depthTest = true;
         shapeOptions._outlineStippleFactor = 0;
         shapeOptions._outlineStipplePattern = 61680;
         shapeOptions._enableLighting = false;
 
-        var attributes = new ShapeAttributes(shapeOptions);
+        return new ShapeAttributes(shapeOptions);
+    };
 
+    KmlPolygon.prototype.prepareLocations = function() {
         var locations = [];
-        if(this.innerBoundary != null) {
-            locations[0] = this.innerBoundary.positions;
-            locations[1] = this.outerBoundary.positions;
+        if(this.kml.innerBoundary != null) {
+            locations[0] = this.kml.innerBoundary.positions;
+            locations[1] = this.kml.outerBoundary.positions;
         } else {
-            locations = this.outerBoundary.positions;
+            locations = this.kml.outerBoundary.positions;
         }
-
-        this._shape = new Polygon(locations, attributes);
-        this._shape.highlightAttributes = shapeOptions;
-        this._shape.extrude = this.extrude || false;
-        this._shape.altitudeMode = this.altitudeMode || WorldWind.ABSOLUTE;
-
-        layer.addRenderable(this._shape);
+        return locations;
     };
 
     KmlElements.addKey(KmlPolygon.prototype.tagName[0], KmlPolygon);

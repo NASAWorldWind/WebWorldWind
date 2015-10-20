@@ -121,15 +121,15 @@ define([
          * It renders all shapes, which are associated with current file.
          * @param layer
          */
-        KmlFile.prototype.render = function(layer) {
+        KmlFile.prototype.update = function(layer) {
             if(!layer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "render", "Layer must be defined in order to render document.")
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "update", "Layer must be defined in order to update document.")
                 );
             }
 
             this.shapes.forEach(function(shape){
-                shape.render(layer);
+                shape.update(layer);
             });
         };
 

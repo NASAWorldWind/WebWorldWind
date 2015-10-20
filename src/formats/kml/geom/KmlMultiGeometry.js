@@ -17,18 +17,20 @@ define([
      * Constructs an KmlMultiGeometry object. KmlMultiGeometry is object, which contains other geometry objects. This
      * class isn't intended to be used outside of the KmlObject hierarchy. It is already concrete implementation.
      * @param multiGeometryNode {Node} Node representing this MultiGeometry
+     * @param pStyle {StyleSelector}
      * @constructor
      * @classdesc Class representing MultiGeometry Element of Kml Document.
      * @alias KmlMultiGeometry
      * @see https://developers.google.com/kml/documentation/kmlreference#multigeometry
      */
-    var KmlMultiGeometry = function(multiGeometryNode) {
-        KmlGeometry.call(this, multiGeometryNode)
+    var KmlMultiGeometry = function(multiGeometryNode, pStyle) {
+        KmlGeometry.call(this, multiGeometryNode);
+        this._style = pStyle;
     };
 
-    KmlMultiGeometry.prototype = Object.create(KmlGeometry.prototype);
+    KmlMultiGeometry.prototype.kml = Object.create(KmlGeometry.prototype);
 
-    Object.defineProperties(KmlMultiGeometry.prototype, {
+    Object.defineProperties(KmlMultiGeometry.prototype.kml, {
         /**
          * It returns all shapes currently present in this node.
          * @memberof KmlMultiGeometry.prototype
@@ -50,7 +52,7 @@ define([
         center: {
             get: function() {
                 var positions = this.shapes.map(function(shape){
-                    return shape.center;
+                    return shape.kml.center;
                 });
                 var midLatitude = 0;
                 var midLongitude = 0;
@@ -66,8 +68,10 @@ define([
                     midAltitude / positions.length
                 );
             }
-        },
+        }
+    });
 
+    Object.defineProperties(KmlMultiGeometry.prototype, {
         /**
          * Array of the tag names representing Kml multi geometry.
          * @memberof KmlMultiGeometry.prototype
@@ -84,10 +88,14 @@ define([
     /**
      * It renders all associated shapes. It honors style associated with the MultiGeometry.
      */
-    KmlMultiGeometry.prototype.render = function(layer, style) {
+    KmlMultiGeometry.prototype.update = function(layer, style) {
         this.shapes.forEach(function(shape) {
-            shape.render(layer, style);
+            shape.update(layer, style);
         });
+    };
+
+    KmlMultiGeometry.prototype.getStyle = function() {
+        return this._style;
     };
 
     KmlElements.addKey(KmlMultiGeometry.prototype.tagName[0], KmlMultiGeometry);

@@ -110,7 +110,7 @@ define([
      * It renders KmlPoint as Polygon.
      * @param layer Layer into which the point should be added.
      */
-    KmlPoint.prototype.render = function(layer) {
+    KmlPoint.prototype.update = function(layer) {
         var attributes = new ShapeAttributes(null);
         attributes.outlineColor = Color.WHITE;
         attributes.interiorColor = Color.WHITE;

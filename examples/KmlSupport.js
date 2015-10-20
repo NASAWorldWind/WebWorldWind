@@ -19,7 +19,7 @@ requirejs(['../src/WorldWind',
 
                     var kmlFileRepresentation = new KmlFile({document: text, local: true});
                     kmlFileRepresentation.parseDocument();
-                    kmlFileRepresentation.render(renderableLayer);
+                    kmlFileRepresentation.update(renderableLayer);
                 }
             }
         }).bind(this);

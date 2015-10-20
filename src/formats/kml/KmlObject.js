@@ -8,10 +8,13 @@
 define([
     '../../error/ArgumentError',
     './KmlElements',
-    '../../util/Logger'
+    '../../util/Logger',
+    '../../util/Promise'
 ], function (ArgumentError,
              KmlElements,
-             Logger) {
+             Logger,
+             Promise
+) {
     "use strict";
     /**
      * Constructs an Kml object. Every node in the Kml document is either basic type or Kml object. Applications usually
@@ -162,18 +165,26 @@ define([
         var self = this;
         var node = options && options.node || self.node;
         var shapes = [];
-        [].forEach.call(node.childNodes, function (shape) {
-            if (shape.nodeType != 1) {
+        [].forEach.call(node.childNodes, function (node) {
+            if (node.nodeType != 1) {
                 return;
             }
 
-            var ShapeClass = self.retrieveElementForNode(shape.nodeName);
-            if (ShapeClass == null) {
+            var constructor = self.retrieveElementForNode(node.nodeName);
+            if (constructor == null) {
                 Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "parse", "Element, which doesn't have internal " +
-                        "representation. Node name: " + shape.nodeName);
+                        "representation. Node name: " + node.nodeName);
                 return;
             }
-            shapes.push(new ShapeClass(shape));
+            var style = new Promise(function(resolve, reject){
+                if(self.getStyle) {
+                    resolve(self.getStyle());
+                } else {
+                    // Maybe reject. We will see later.
+                    resolve({});
+                }
+            });
+            shapes.push(new constructor(node, style));
         });
 
         return shapes;
@@ -199,16 +210,22 @@ define([
             return null;
         }
         var constructor = this.retrieveElementForNode(node.nodeName);
-        return new constructor(node);
+        return new constructor(node, this.getStyle());
     };
 
     /**
      * To be overridden in subclasses.
-     * It renders all objects that are part of the element, which are renderable.
+     * It is prepared to update the current state of renderables in the KML tree.
      */
-    KmlObject.prototype.render = function () {
-        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "render", this.tagName[0] + " doesn't yet support " +
+    KmlObject.prototype.update = function () {
+        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "update", this.tagName[0] + " doesn't yet support " +
             "rendering.");
+    };
+
+    // To be overriden in descendants.
+    KmlObject.prototype.getStyle = function() {
+        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.tagName[0] + " doesn't override  " +
+            "getStyle.");
     };
 
     return KmlObject;

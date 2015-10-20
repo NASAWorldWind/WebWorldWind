@@ -8,6 +8,7 @@ define([
     '../styles/KmlStyle',
     '../KmlRegion',
     '../KmlTimePrimitive',
+    '../../../util/Promise',
     '../../../util/WWUtil'
 ], function(
     KmlObject,
@@ -15,6 +16,7 @@ define([
     KmlStyle,
     KmlRegion,
     KmlTimePrimitive,
+    Promise,
     WWUtil
 ){
     "use strict";
@@ -24,12 +26,14 @@ define([
      * @alias KmlFeature
      * @classdesc Contains the data associated with KmlFeature.
      * @param featureNode Node representing Kml Feature
+     * @param pStyle Promise of the future style.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#feature
      */
-    var KmlFeature = function(featureNode) {
+    var KmlFeature = function(featureNode, pStyle) {
         KmlObject.call(this, featureNode);
+        this._style = pStyle;
     };
 
     KmlFeature.prototype = Object.create(KmlObject.prototype);
@@ -180,6 +184,7 @@ define([
          */
         StyleSelector: {
             get: function() {
+                // Uses create child element, which uses getStyle. Therefor do it differently.
                 return this.createChildElement({
                     name: KmlStyle.prototype.tagName
                 });
@@ -201,8 +206,23 @@ define([
         }
     });
 
-    KmlFeature.prototype.resolveStyle = function() {
-
+    // Is it possible that I created some type of loop?
+    // It definitely looks like that.
+    KmlFeature.prototype.getStyle = function() {
+        var self = this;
+        if(this._pStyle) {
+            return this._pStyle;
+        }
+        this._pStyle = new Promise(function(resolve, reject) {
+            // Resolve this promise right now.
+            // Take into account this._style if present.
+            // Move this resolve to the end of the stack to prevent recursion.
+            window.setTimeout(function(){
+                resolve(self.StyleSelector);
+            }, 0);
+        });
+        // Use also styleUrl if valid and StyleSelector.
+        return this._pStyle;
     };
 
     return KmlFeature;

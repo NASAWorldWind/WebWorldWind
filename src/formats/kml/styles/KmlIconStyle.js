@@ -133,7 +133,7 @@ define([
         }
     });
 
-    KmlIconStyle.render = function() {
+    KmlIconStyle.update = function() {
 
     };
 

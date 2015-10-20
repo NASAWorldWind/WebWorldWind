@@ -69,7 +69,7 @@ define([
         }
     });
 
-    KmlPolyStyle.render = function(style, options) {
+    KmlPolyStyle.update = function(style, options) {
         style = style || {};
         var shapeOptions = options || {};
         shapeOptions._drawInterior = style.fill || true;

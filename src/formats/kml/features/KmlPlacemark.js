@@ -75,11 +75,11 @@ define([
      * It renders placemark with associated geometry.
      * @param layer Layer into which the placemark may be rendered.
      */
-    KmlPlacemark.prototype.render = function(layer, style) {
+    KmlPlacemark.prototype.update = function(layer, style) {
         // Work correctly with styles.
         var placemarkAttributes = new PlacemarkAttributes(null);
-        KmlIconStyle.render(style && style.IconStyle, placemarkAttributes);
-        KmlLabelStyle.render(style && style.LabelStyle, placemarkAttributes);
+        KmlIconStyle.update(style && style.IconStyle, placemarkAttributes);
+        KmlLabelStyle.update(style && style.LabelStyle, placemarkAttributes);
 
         placemarkAttributes.imageScale = 1;
         placemarkAttributes.imageOffset = new Offset(
@@ -93,13 +93,13 @@ define([
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes.outlineColor = Color.RED;
 
-        var placemark = new Placemark(this.geometry.center, true, placemarkAttributes);
+        var placemark = new Placemark(this.geometry.kml.center, true, placemarkAttributes);
         placemark.label = this.description;
         placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
 
         layer.addRenderable(placemark);
 
-        this.geometry.render(layer, this.StyleSelector);
+        this.geometry.update(layer, this.StyleSelector);
     };
 
     KmlElements.addKey(KmlPlacemark.prototype.tagName[0], KmlPlacemark);

@@ -78,9 +78,9 @@ define([
         }
     });
 
-    KmlDocument.prototype.render = function(layer, style) {
+    KmlDocument.prototype.update = function(layer, style) {
         this.shapes.forEach(function(shape) {
-            shape.render(layer, style);
+            shape.update(layer, style);
         });
     };
 

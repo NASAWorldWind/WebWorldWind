@@ -137,8 +137,8 @@ define([
          * Renders LineString as Path.
          * @param layer Layer into which will be the shape rendered.
          */
-        KmlLineString.prototype.render = function(layer) {
-            // TODO modify to render using path.
+        KmlLineString.prototype.update = function(layer) {
+            // TODO modify to update using path.
             var attributes = new ShapeAttributes(null);
             attributes.outlineColor = Color.WHITE;
             attributes.interiorColor = Color.WHITE;

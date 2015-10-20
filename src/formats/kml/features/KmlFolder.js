@@ -53,9 +53,9 @@ define([
         }
     });
 
-    KmlFolder.prototype.render = function(layer, style) {
+    KmlFolder.prototype.update = function(layer, style) {
         this.shapes.forEach(function(shape) {
-            shape.render(layer, style);
+            shape.update(layer, style);
         });
     };
 
