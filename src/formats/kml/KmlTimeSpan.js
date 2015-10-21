@@ -25,49 +25,39 @@ define([
      */
     var KmlTimeSpan = function(timeSpanNode) {
         KmlTimePrimitive.call(this, timeSpanNode);
+
+        Object.defineProperties(this, {
+            /**
+             * Time from which is the event valid.
+             * @memberof KmlTimeSpan.prototype
+             * @type {DateTime}
+             * @readonly
+             */
+            begin: {
+                get: function() {
+                    return this.retrieve({name: 'begin'});
+                }
+            },
+
+            /**
+             * Time to which is the event valid.
+             * @memberof KmlTimeSpan.prototype
+             * @type {DateTime}
+             * @readonly
+             */
+            end: {
+                get: function() {
+                    return this.retrieve({name: 'end'});
+                }
+            }
+        });
     };
 
-    KmlTimeSpan.prototype = Object.create(KmlTimePrimitive.prototype);
+    KmlTimeSpan.prototype.getTagNames = function() {
+        return ['TimeSpan'];
+    };
 
-    Object.defineProperties(KmlTimeSpan.prototype, {
-        /**
-         * Array of the tag names representing Kml timeSpan.
-         * @memberof KmlTimeSpan.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['TimeSpan'];
-            }
-        },
-
-        /**
-         * Time from which is the event valid.
-         * @memberof KmlTimeSpan.prototype
-         * @type {DateTime}
-         * @readonly
-         */
-        begin: {
-            get: function() {
-                return this.retrieve({name: 'begin'});
-            }
-        },
-
-        /**
-         * Time to which is the event valid.
-         * @memberof KmlTimeSpan.prototype
-         * @type {DateTime}
-         * @readonly
-         */
-        end: {
-            get: function() {
-                return this.retrieve({name: 'end'});
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlTimeSpan.prototype.tagName[0], KmlTimeSpan);
+    KmlElements.addKey(KmlTimeSpan.prototype.getTagNames()[0], KmlTimeSpan);
 
     return KmlTimeSpan;
 });

@@ -37,109 +37,99 @@ define([
      */
     var KmlStyle = function(styleNode) {
         KmlStyleSelector.call(this, styleNode);
+
+        Object.defineProperties(this, {
+            /**
+             * Style used for icons in current node and all children nodes.
+             * @memberof KmlStyle.prototype
+             * @readonly
+             * @type {KmlIconStyle|null}
+             */
+            IconStyle: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlIconStyle.prototype.getTagNames()
+                    });
+                }
+            },
+
+            /**
+             * Style used for labels in current node and all children nodes.
+             * @memberof KmlStyle.prototype
+             * @readonly
+             * @type {KmlLabelStyle|null}
+             */
+            LabelStyle: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlLabelStyle.prototype.getTagNames()
+                    });
+                }
+            },
+
+            /**
+             * Style used for line in current node and all children nodes.
+             * @memberof KmlStyle.prototype
+             * @readonly
+             * @type {KmlLineStyle|null}
+             */
+            LineStyle: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlLineStyle.prototype.getTagNames()
+                    });
+                }
+            },
+
+            /**
+             * Style used for polygon in current node and all children nodes.
+             * @memberof KmlStyle.prototype
+             * @readonly
+             * @type {KmlPolyStyle|null}
+             */
+            PolyStyle: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlPolyStyle.prototype.getTagNames()
+                    });
+                }
+            },
+
+            /**
+             * Style used for balloons in current node and all children nodes.
+             * @memberof KmlStyle.prototype
+             * @readonly
+             * @type {KmlBalloonStyle|null}
+             */
+            BalloonStyle: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlBalloonStyle.prototype.getTagNames()
+                    });
+                }
+            },
+
+            /**
+             * Style used for lists in current node and all children nodes.
+             * @memberof KmlStyle.prototype
+             * @readonly
+             * @type {KmlBalloonStyle|null}
+             */
+            ListStyle: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlListStyle.prototype.getTagNames()
+                    });
+                }
+            }
+        });
     };
 
-    KmlStyle.prototype = Object.create(KmlStyleSelector.prototype);
+    KmlStyle.prototype.getTagNames = function() {
+        return ['Style'];
+    };
 
-    Object.defineProperties(KmlStyle.prototype, {
-        /**
-         * Style used for icons in current node and all children nodes.
-         * @memberof KmlStyle.prototype
-         * @readonly
-         * @type {KmlIconStyle|null}
-         */
-        IconStyle: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlIconStyle.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Style used for labels in current node and all children nodes.
-         * @memberof KmlStyle.prototype
-         * @readonly
-         * @type {KmlLabelStyle|null}
-         */
-        LabelStyle: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlLabelStyle.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Style used for line in current node and all children nodes.
-         * @memberof KmlStyle.prototype
-         * @readonly
-         * @type {KmlLineStyle|null}
-         */
-        LineStyle: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlLineStyle.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Style used for polygon in current node and all children nodes.
-         * @memberof KmlStyle.prototype
-         * @readonly
-         * @type {KmlPolyStyle|null}
-         */
-        PolyStyle: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlPolyStyle.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Style used for balloons in current node and all children nodes.
-         * @memberof KmlStyle.prototype
-         * @readonly
-         * @type {KmlBalloonStyle|null}
-         */
-        BalloonStyle: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlBalloonStyle.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Style used for lists in current node and all children nodes.
-         * @memberof KmlStyle.prototype
-         * @readonly
-         * @type {KmlBalloonStyle|null}
-         */
-        ListStyle: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlListStyle.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Array of the tag names representing Kml poly style.
-         * @memberof KmlStyle.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Style'];
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlStyle.prototype.tagName[0], KmlStyle);
+    KmlElements.addKey(KmlStyle.prototype.getTagNames()[0], KmlStyle);
 
     return KmlStyle;
 });

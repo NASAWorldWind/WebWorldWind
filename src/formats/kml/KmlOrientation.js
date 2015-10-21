@@ -21,64 +21,54 @@ define([
      */
     var KmlOrientation = function (node) {
         KmlObject.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Rotation about the z axis (normal to the Earth's surface). A value of 0 (the default) equals North. A
+             * positive rotation is clockwise around the z axis and specified in degrees from 0 to 360.
+             * @memberof KmlOrientation.prototype
+             * @readonly
+             * @type {Number}
+             */
+            heading: {
+                get: function () {
+                    return this.retrieve({name: 'heading', transformer: Number})
+                }
+            },
+
+            /**
+             * Rotation about the x axis. A positive rotation is clockwise around the x axis and specified in degrees from
+             * 0 to 180.
+             * @memberof KmlOrientation.prototype
+             * @readonly
+             * @type {Number}
+             */
+            tilt: {
+                get: function () {
+                    return this.retrieve({name: 'tilt', transformer: Number})
+                }
+            },
+
+            /**
+             * Rotation about the y axis. A positive rotation is clockwise around the y axis and specified in degrees from
+             * 0 to 180.
+             * @memberof KmlOrientation.prototype
+             * @readonly
+             * @type {Number}
+             */
+            roll: {
+                get: function () {
+                    return this.retrieve({name: 'roll', transformer: Number})
+                }
+            }
+        });
     };
 
-    KmlOrientation.prototype = Object.create(KmlObject.prototype);
+    KmlOrientation.prototype.getTagNames = function() {
+        return ['Orientation'];
+    };
 
-    Object.defineProperties(KmlOrientation.prototype, {
-        /**
-         * Array of the tag names representing Kml orientation.
-         * @memberof KmlOrientation.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function () {
-                return ['Orientation'];
-            }
-        },
-
-        /**
-         * Rotation about the z axis (normal to the Earth's surface). A value of 0 (the default) equals North. A
-         * positive rotation is clockwise around the z axis and specified in degrees from 0 to 360.
-         * @memberof KmlOrientation.prototype
-         * @readonly
-         * @type {Number}
-         */
-        heading: {
-            get: function () {
-                return this.retrieve({name: 'heading', transformer: Number})
-            }
-        },
-
-        /**
-         * Rotation about the x axis. A positive rotation is clockwise around the x axis and specified in degrees from
-         * 0 to 180.
-         * @memberof KmlOrientation.prototype
-         * @readonly
-         * @type {Number}
-         */
-        tilt: {
-            get: function () {
-                return this.retrieve({name: 'tilt', transformer: Number})
-            }
-        },
-
-        /**
-         * Rotation about the y axis. A positive rotation is clockwise around the y axis and specified in degrees from
-         * 0 to 180.
-         * @memberof KmlOrientation.prototype
-         * @readonly
-         * @type {Number}
-         */
-        roll: {
-            get: function () {
-                return this.retrieve({name: 'roll', transformer: Number})
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlOrientation.prototype.tagName[0], KmlOrientation);
+    KmlElements.addKey(KmlOrientation.prototype.getTagNames()[0], KmlOrientation);
 
     return KmlOrientation;
 });

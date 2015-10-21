@@ -21,120 +21,110 @@ define([
      */
     var KmlLookAt = function (node) {
         KmlAbstractView.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Longitude of the point the camera is looking at. Angular distance in degrees, relative to the Prime
+             * Meridian. Values west of the Meridian range from ?180 to 0 degrees. Values east of the Meridian range from 0
+             * to 180 degrees.
+             * @memberof KmlLookAt.prototype
+             * @readonly
+             * @type {Number}
+             */
+            longitude: {
+                get: function () {
+                    return this.retrieve({name: 'longitude', transformer: Number});
+                }
+            },
+
+            /**
+             * Latitude of the point the camera is looking at. Degrees north or south of the Equator (0 degrees). Values
+             * range from ?90 degrees to 90 degrees.
+             * @memberof KmlLookAt.prototype
+             * @readonly
+             * @type {Number}
+             */
+            latitude: {
+                get: function () {
+                    return this.retrieve({name: 'latitude', transformer: Number});
+                }
+            },
+
+            /**
+             * Distance from the earth's surface, in meters. Interpreted according to the LookAt's altitude mode.
+             * @memberof KmlLookAt.prototype
+             * @readonly
+             * @type {Number}
+             */
+            altitude: {
+                get: function () {
+                    return this.retrieve({name: 'altitude', transformer: Number});
+                }
+            },
+
+            /**
+             * Direction (that is, North, South, East, West), in degrees. Default=0 (North). (See diagram below.) Values
+             * range from 0 to 360 degrees.
+             * @memberof KmlLookAt.prototype
+             * @readonly
+             * @type {Number}
+             */
+            heading: {
+                get: function () {
+                    return this.retrieve({name: 'heading', transformer: Number});
+                }
+            },
+
+            /**
+             * Angle between the direction of the LookAt position and the normal to the surface of the earth. (See diagram
+             * below.) Values range from 0 to 90 degrees. Values for <tilt> cannot be negative. A <tilt> value of 0 degrees
+             * indicates viewing from directly above. A <tilt> value of 90 degrees indicates viewing along the horizon.
+             * @memberof KmlLookAt.prototype
+             * @readonly
+             * @type {Number}
+             */
+            tilt: {
+                get: function () {
+                    return this.retrieve({name: 'tilt', transformer: Number});
+                }
+            },
+
+            /**
+             * Distance in meters from the point specified by <longitude>, <latitude>, and <altitude> to the LookAt
+             * position. (See diagram below.)
+             * @memberof KmlLookAt.prototype
+             * @readonly
+             * @type {Number}
+             */
+            range: {
+                get: function () {
+                    return this.retrieve({name: 'range', transformer: Number});
+                }
+            },
+
+            /**
+             * Specifies how the <altitude> specified for the LookAt point is interpreted. Possible values are as follows:
+             * clampToGround - (default) Indicates to ignore the <altitude> specification and place the LookAt position
+             *  on the ground.
+             * relativeToGround - Interprets the <altitude> as a value in meters above the ground.
+             * absolute - Interprets the <altitude> as a value in meters above sea level.
+             * @memberof KmlLookAt.prototype
+             * @readonly
+             * @type {String}
+             */
+            altitudeMode: {
+                get: function () {
+                    return this.retrieve({name: 'altitudeMode'});
+                }
+            }
+        });
     };
 
-    KmlLookAt.prototype = Object.create(KmlAbstractView.prototype);
+    KmlLookAt.prototype.getTagNames = function() {
+        return ['LookAt'];
+    };
 
-    Object.defineProperties(KmlLookAt.prototype, {
-        /**
-         * Array of the tag names representing Kml look at.
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function () {
-                return ['LookAt'];
-            }
-        },
-
-        /**
-         * Longitude of the point the camera is looking at. Angular distance in degrees, relative to the Prime
-         * Meridian. Values west of the Meridian range from ?180 to 0 degrees. Values east of the Meridian range from 0
-         * to 180 degrees.
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {Number}
-         */
-        longitude: {
-            get: function () {
-                return this.retrieve({name: 'longitude', transformer: Number});
-            }
-        },
-
-        /**
-         * Latitude of the point the camera is looking at. Degrees north or south of the Equator (0 degrees). Values
-         * range from ?90 degrees to 90 degrees.
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {Number}
-         */
-        latitude: {
-            get: function () {
-                return this.retrieve({name: 'latitude', transformer: Number});
-            }
-        },
-
-        /**
-         * Distance from the earth's surface, in meters. Interpreted according to the LookAt's altitude mode.
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {Number}
-         */
-        altitude: {
-            get: function () {
-                return this.retrieve({name: 'altitude', transformer: Number});
-            }
-        },
-
-        /**
-         * Direction (that is, North, South, East, West), in degrees. Default=0 (North). (See diagram below.) Values
-         * range from 0 to 360 degrees.
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {Number}
-         */
-        heading: {
-            get: function () {
-                return this.retrieve({name: 'heading', transformer: Number});
-            }
-        },
-
-        /**
-         * Angle between the direction of the LookAt position and the normal to the surface of the earth. (See diagram
-         * below.) Values range from 0 to 90 degrees. Values for <tilt> cannot be negative. A <tilt> value of 0 degrees
-         * indicates viewing from directly above. A <tilt> value of 90 degrees indicates viewing along the horizon.
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {Number}
-         */
-        tilt: {
-            get: function () {
-                return this.retrieve({name: 'tilt', transformer: Number});
-            }
-        },
-
-        /**
-         * Distance in meters from the point specified by <longitude>, <latitude>, and <altitude> to the LookAt
-         * position. (See diagram below.)
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {Number}
-         */
-        range: {
-            get: function () {
-                return this.retrieve({name: 'range', transformer: Number});
-            }
-        },
-
-        /**
-         * Specifies how the <altitude> specified for the LookAt point is interpreted. Possible values are as follows:
-         * clampToGround - (default) Indicates to ignore the <altitude> specification and place the LookAt position
-         *  on the ground.
-         * relativeToGround - Interprets the <altitude> as a value in meters above the ground.
-         * absolute - Interprets the <altitude> as a value in meters above sea level.
-         * @memberof KmlLookAt.prototype
-         * @readonly
-         * @type {String}
-         */
-        altitudeMode: {
-            get: function () {
-                return this.retrieve({name: 'altitudeMode'});
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlLookAt.prototype.tagName[0], KmlLookAt);
+    KmlElements.addKey(KmlLookAt.prototype.getTagNames()[0], KmlLookAt);
 
     return KmlLookAt;
 });

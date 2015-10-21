@@ -25,57 +25,47 @@ define([
      */
     var KmlRegion = function (node) {
         KmlObject.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * A bounding box that describes an area of interest defined by geographic coordinates and altitudes. Default
+             * values and required fields are as follows:
+             * @memberof KmlRegion.prototype
+             * @readonly
+             * @type {Array}
+             */
+            LatLonAltBox: {
+                get: function () {
+                    return this.createChildElement({
+                        name: KmlLatLonAltBox.prototype.getTagNames()
+                    });
+                }
+            },
+
+            /**
+             * Lod is an abbreviation for Level of Detail. <Lod> describes the size of the projected region on the screen
+             * that is required in order for the region to be considered "active." Also specifies the size of the pixel
+             * ramp used for fading in (from transparent to opaque) and fading out (from opaque to transparent). See
+             * diagram below for a visual representation of these parameters.
+             * @memberof KmlRegion.prototype
+             * @readonly
+             * @type {Array}
+             */
+            Lod: {
+                get: function () {
+                    return this.createChildElement({
+                        name: KmlLod.prototype.getTagNames()
+                    });
+                }
+            }
+        });
     };
 
-    KmlRegion.prototype = Object.create(KmlObject.prototype);
+    KmlRegion.prototype.getTagNames = function() {
+        return ['Region'];
+    };
 
-    Object.defineProperties(KmlRegion.prototype, {
-        /**
-         * Array of the tag names representing Kml region.
-         * @memberof KmlRegion.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function () {
-                return ['Region'];
-            }
-        },
-
-        /**
-         * A bounding box that describes an area of interest defined by geographic coordinates and altitudes. Default
-         * values and required fields are as follows:
-         * @memberof KmlRegion.prototype
-         * @readonly
-         * @type {Array}
-         */
-        LatLonAltBox: {
-            get: function () {
-                return this.createChildElement({
-                    name: KmlLatLonAltBox.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Lod is an abbreviation for Level of Detail. <Lod> describes the size of the projected region on the screen
-         * that is required in order for the region to be considered "active." Also specifies the size of the pixel
-         * ramp used for fading in (from transparent to opaque) and fading out (from opaque to transparent). See
-         * diagram below for a visual representation of these parameters.
-         * @memberof KmlRegion.prototype
-         * @readonly
-         * @type {Array}
-         */
-        Lod: {
-            get: function () {
-                return this.createChildElement({
-                    name: KmlLod.prototype.tagName
-                });
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlRegion.prototype.tagName[0], KmlRegion);
+    KmlElements.addKey(KmlRegion.prototype.getTagNames()[0], KmlRegion);
 
     return KmlRegion;
 });

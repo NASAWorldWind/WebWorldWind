@@ -22,21 +22,9 @@ define([
         KmlFeature.call(this, node);
     };
 
-    KmlContainer.prototype = Object.create(KmlFeature.prototype);
-
-    Object.defineProperties(KmlContainer.prototype, {
-        /**
-         * Array of tag names representing Kml container types.
-         * @memberof KmlContainer.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Folder', 'Document'];
-            }
-        }
-    });
+    KmlContainer.prototype.getTagNames = function() {
+        return ['Folder', 'Document'];
+    };
 
     return KmlContainer;
 });

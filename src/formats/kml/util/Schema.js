@@ -25,23 +25,11 @@ define([
         KmlObject.call(this, node);
     };
 
-    Schema.prototype = Object.create(KmlObject.prototype);
+    Schema.prototype.getTagNames = function() {
+        return ['Schema'];
+    };
 
-    Object.defineProperties(Schema.prototype, {
-        /**
-         * Array of the tag names representing Schema.
-         * @memberof Schema.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Schema']
-            }
-        }
-    });
-
-    KmlElements.addKey("Schema", Schema);
+    KmlElements.addKey(Schema.prototype.getTagNames()[0], Schema);
 
     return Schema;
 });

@@ -39,37 +39,30 @@ define([
      */
     var KmlPlacemark = function (placemarkNode) {
         KmlFeature.call(this, placemarkNode);
-    };
 
-    KmlPlacemark.prototype = Object.create(KmlFeature.prototype);
-
-    Object.defineProperties(KmlPlacemark.prototype, {
-        /**
-         * It contains geometry associated with this placemark. The geometry is cached.
-         * @memberof KmlPlacemark.prototype
-         * @type {KmlGeometry}
-         * @readonly
-         */
-        geometry: {
-            get: function(){
-                return this.createChildElement({
-                    name: KmlGeometry.prototype.tagName
-                });
+        Object.defineProperties(this, {
+            /**
+             * It contains geometry associated with this placemark. The geometry is cached.
+             * @memberof KmlPlacemark.prototype
+             * @type {KmlGeometry}
+             * @readonly
+             */
+            geometry: {
+                get: function(){
+                    return this.createChildElement({
+                        name: KmlGeometry.prototype.getTagNames()
+                    });
+                }
             }
-        },
+        });
 
-        /**
-         * Array of the tag names representing Kml placemark.
-         * @memberof KmlPlacemark.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Placemark'];
+        // TODO use extend instead.
+        for (var key in KmlPlacemark.prototype) {
+            if (KmlPlacemark.prototype.hasOwnProperty(key)) {
+                this[key] = KmlPlacemark.prototype[key];
             }
         }
-    });
+    };
 
     /**
      * It renders placemark with associated geometry.
@@ -93,7 +86,7 @@ define([
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes.outlineColor = Color.RED;
 
-        var placemark = new Placemark(this.geometry.kml.center, true, placemarkAttributes);
+        var placemark = new Placemark(this.geometry.kmlCenter, true, placemarkAttributes);
         placemark.label = this.description;
         placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
 
@@ -102,7 +95,11 @@ define([
         this.geometry.update(layer, this.StyleSelector);
     };
 
-    KmlElements.addKey(KmlPlacemark.prototype.tagName[0], KmlPlacemark);
+    KmlPlacemark.prototype.getTagNames = function() {
+        return ['Placemark'];
+    };
+
+    KmlElements.addKey(KmlPlacemark.prototype.getTagNames()[0], KmlPlacemark);
 
     return KmlPlacemark;
 });

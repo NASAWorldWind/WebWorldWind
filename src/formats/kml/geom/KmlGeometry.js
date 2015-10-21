@@ -6,11 +6,9 @@
  * @exports KmlGeometry
  */
 define([
-    './../KmlObject',
-    '../KmlElements'
+    './../KmlObject'
 ], function(
-    KmlObject,
-    KmlElements
+    KmlObject
 ){
     "use strict";
     /**
@@ -27,23 +25,9 @@ define([
         KmlObject.call(this, geometryNode);
     };
 
-    KmlGeometry.prototype = Object.create(KmlObject.prototype);
-
-    Object.defineProperties(KmlGeometry.prototype, {
-        /**
-         * Array of tag names representing Kml geometry types.
-         * @memberof KmlGeometry.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Point', 'LinearRing', 'LineString', 'MultiGeometry', 'Polygon'];
-            }
-        }
-    });
-
-    KmlElements.addKey("Geometry", KmlGeometry);
+    KmlGeometry.prototype.getTagNames = function() {
+        return ['Point', 'LinearRing', 'LineString', 'MultiGeometry', 'Polygon'];
+    };
 
     return KmlGeometry;
 });

@@ -24,85 +24,71 @@ define([
      */
     var KmlLineStyle = function(lineStyleNode) {
         KmlColorStyle.call(this, lineStyleNode);
+
+        Object.defineProperties(this, {
+            /**
+             * Width of the line in pixels.
+             * @memberof KmlLineStyle.prototype
+             * @readonly
+             * @type {Number}
+             */
+            width: {
+                get: function() {
+                    return this.retrieve({name: 'width', transformer: Number});
+                }
+            },
+
+            /**
+             * Color applied to outer width. Ignored by Polygon and LinearRing.
+             * @memberof KmlLineStyle.prototype
+             * @readonly
+             * @type {String}
+             */
+            outerColor: {
+                get: function() {
+                    return this.retrieve({name: 'gx:outerColor'});
+                }
+            },
+
+            /**
+             * Value between 0.0 and 1.0 specifies the proportion of the line used by outerColor. Only applies to line
+             * setting width with physical width.
+             * @memberof KmlLineStyle.prototype
+             * @readonly
+             * @type {Number}
+             */
+            outerWidth: {
+                get: function() {
+                    return this.retrieve({name: 'gx:outerWidth'});
+                }
+            },
+
+            /**
+             * Physical width of the line in meters.
+             * @memberof KmlLineStyle.prototype
+             * @readonly
+             * @type {Number}
+             */
+            physicalWidth: {
+                get: function() {
+                    return this.retrieve({name: 'gx:physicalWidth'});
+                }
+            },
+
+            /**
+             * A boolean defining whether or not to display a text label on a LineString. A LineString's label is contained
+             * in the <name> element that is a sibling of <LineString> (i.e. contained within the same <Placemark> element).
+             * @memberof KmlLineStyle.prototype
+             * @readonly
+             * @type {Boolean}
+             */
+            labelVisibility: {
+                get: function() {
+                    return this.retrieve({name: 'gx:labelVisibility'});
+                }
+            }
+        });
     };
-
-    KmlLineStyle.prototype = Object.create(KmlColorStyle.prototype);
-
-    Object.defineProperties(KmlLineStyle.prototype, {
-        /**
-         * Array of the tag names representing Kml line style.
-         * @memberof KmlLineStyle.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['LineStyle'];
-            }
-        },
-
-        /**
-         * Width of the line in pixels.
-         * @memberof KmlLineStyle.prototype
-         * @readonly
-         * @type {Number}
-         */
-        width: {
-            get: function() {
-                return this.retrieve({name: 'width', transformer: Number});
-            }
-        },
-
-        /**
-         * Color applied to outer width. Ignored by Polygon and LinearRing.
-         * @memberof KmlLineStyle.prototype
-         * @readonly
-         * @type {String}
-         */
-        outerColor: {
-            get: function() {
-                return this.retrieve({name: 'gx:outerColor'});
-            }
-        },
-
-        /**
-         * Value between 0.0 and 1.0 specifies the proportion of the line used by outerColor. Only applies to line
-         * setting width with physical width.
-         * @memberof KmlLineStyle.prototype
-         * @readonly
-         * @type {Number}
-         */
-        outerWidth: {
-            get: function() {
-                return this.retrieve({name: 'gx:outerWidth'});
-            }
-        },
-
-        /**
-         * Physical width of the line in meters.
-         * @memberof KmlLineStyle.prototype
-         * @readonly
-         * @type {Number}
-         */
-        physicalWidth: {
-            get: function() {
-                return this.retrieve({name: 'gx:physicalWidth'});
-            }
-        },
-
-        /**
-         * A boolean defining whether or not to display a text label on a LineString. A LineString's label is contained
-         * in the <name> element that is a sibling of <LineString> (i.e. contained within the same <Placemark> element).
-         * @memberof KmlLineStyle.prototype
-         * @readonly
-         * @type {Boolean}
-         */
-        labelVisibility: {
-            get: function() {
-                return this.retrieve({name: 'gx:labelVisibility'});
-            }
-        }
-    });
 
     KmlLineStyle.update = function(style, options) {
         var shapeOptions = options || {};
@@ -114,7 +100,11 @@ define([
         return shapeOptions;
     };
 
-    KmlElements.addKey(KmlLineStyle.prototype.tagName[0], KmlLineStyle);
+    KmlLineStyle.prototype.getTagNames = function() {
+        return ['LineStyle'];
+    };
+
+    KmlElements.addKey(KmlLineStyle.prototype.getTagNames()[0], KmlLineStyle);
 
     return KmlLineStyle;
 });

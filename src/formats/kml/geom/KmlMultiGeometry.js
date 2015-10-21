@@ -26,70 +26,58 @@ define([
     var KmlMultiGeometry = function(multiGeometryNode, pStyle) {
         KmlGeometry.call(this, multiGeometryNode);
         this._style = pStyle;
+
+        Object.defineProperties(this, {
+            /**
+             * It returns all shapes currently present in this node.
+             * @memberof KmlMultiGeometry.prototype
+             * @type {Array}
+             * @readonly
+             */
+            kmlShapes: {
+                get: function(){
+                    return this.parse();
+                }
+            },
+
+            /**
+             * Center of all the geometries implemented as average of centers of all shapes.
+             * @memberof KmlMultiGeometry.prototype
+             * @type {Position}
+             * @readonly
+             */
+            kmlCenter: {
+                get: function() {
+                    var positions = this.kmlShapes.map(function(shape){
+                        return shape.kmlCenter;
+                    });
+                    var midLatitude = 0;
+                    var midLongitude = 0;
+                    var midAltitude = 0;
+                    positions.forEach(function(position){
+                        midLatitude += position.latitude;
+                        midLongitude += position.longitude;
+                        midAltitude += position.altitude;
+                    });
+                    return new Position(
+                        midLatitude / positions.length,
+                        midLongitude / positions.length,
+                        midAltitude / positions.length
+                    );
+                }
+            }
+        });
     };
 
-    KmlMultiGeometry.prototype.kml = Object.create(KmlGeometry.prototype);
-
-    Object.defineProperties(KmlMultiGeometry.prototype.kml, {
-        /**
-         * It returns all shapes currently present in this node.
-         * @memberof KmlMultiGeometry.prototype
-         * @type {Array}
-         * @readonly
-         */
-        shapes: {
-            get: function(){
-                return this.parse();
-            }
-        },
-
-        /**
-         * Center of all the geometries implemented as average of centers of all shapes.
-         * @memberof KmlMultiGeometry.prototype
-         * @type {Position}
-         * @readonly
-         */
-        center: {
-            get: function() {
-                var positions = this.shapes.map(function(shape){
-                    return shape.kml.center;
-                });
-                var midLatitude = 0;
-                var midLongitude = 0;
-                var midAltitude = 0;
-                positions.forEach(function(position){
-                    midLatitude += position.latitude;
-                    midLongitude += position.longitude;
-                    midAltitude += position.altitude;
-                });
-                return new Position(
-                    midLatitude / positions.length,
-                    midLongitude / positions.length,
-                    midAltitude / positions.length
-                );
-            }
-        }
-    });
-
-    Object.defineProperties(KmlMultiGeometry.prototype, {
-        /**
-         * Array of the tag names representing Kml multi geometry.
-         * @memberof KmlMultiGeometry.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ["MultiGeometry"]
-            }
-        }
-    });
+    KmlMultiGeometry.prototype.getTagNames = function() {
+        return ["MultiGeometry"];
+    };
 
     /**
      * It renders all associated shapes. It honors style associated with the MultiGeometry.
      */
     KmlMultiGeometry.prototype.update = function(layer, style) {
-        this.shapes.forEach(function(shape) {
+        this.kmlShapes.forEach(function(shape) {
             shape.update(layer, style);
         });
     };
@@ -98,7 +86,7 @@ define([
         return this._style;
     };
 
-    KmlElements.addKey(KmlMultiGeometry.prototype.tagName[0], KmlMultiGeometry);
+    KmlElements.addKey(KmlMultiGeometry.prototype.getTagNames()[0], KmlMultiGeometry);
 
     return KmlMultiGeometry;
 });

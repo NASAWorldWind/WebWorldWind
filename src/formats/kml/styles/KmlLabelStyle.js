@@ -22,41 +22,31 @@ define([
      */
     var KmlLabelStyle = function(labelStyleNode) {
         KmlColorStyle.call(this, labelStyleNode);
+
+        Object.defineProperties(this, {
+            /**
+             * Scale in which to resize the icon.
+             * @memberof KmlLabelStyle.prototype
+             * @readonly
+             * @type {Number}
+             */
+            scale: {
+                get: function() {
+                    return this.retrieve({name: 'scale', transformer: Number});
+                }
+            }
+        });
     };
-
-    KmlLabelStyle.prototype = Object.create(KmlColorStyle.prototype);
-
-    Object.defineProperties(KmlLabelStyle.prototype, {
-        /**
-         * Array of the tag names representing Kml icon style.
-         * @memberof KmlLabelStyle.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function(){
-                return ['LabelStyle'];
-            }
-        },
-
-        /**
-         * Scale in which to resize the icon.
-         * @memberof KmlLabelStyle.prototype
-         * @readonly
-         * @type {Number}
-         */
-        scale: {
-            get: function() {
-                return this.retrieve({name: 'scale', transformer: Number});
-            }
-        }
-    });
 
     KmlLabelStyle.update = function() {
 
     };
 
-    KmlElements.addKey(KmlLabelStyle.prototype.tagName[0], KmlLabelStyle);
+    KmlLabelStyle.prototype.getTagNames = function() {
+        return ['LabelStyle'];
+    };
+
+    KmlElements.addKey(KmlLabelStyle.prototype.getTagNames()[0], KmlLabelStyle);
 
     return KmlLabelStyle;
 });

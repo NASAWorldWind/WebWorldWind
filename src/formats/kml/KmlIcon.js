@@ -22,85 +22,75 @@ define([
      */
     var KmlIcon = function(iconNode) {
         KmlLink.call(this, iconNode);
+
+        Object.defineProperties(this, {
+            /**
+             * Http address or a local file specification used to load the icon.
+             * @memberof KmlIcon.prototype
+             * @readonly
+             * @type {String}
+             */
+            href: {
+                get: function(){
+                    return this.retrieve({name: 'href'});
+                }
+            },
+
+            /**
+             * The href can contain a pallet of icons. In this case this is offset from left border.
+             * @memberof KmlIcon.prototype
+             * @readonly
+             * @type {Number}
+             */
+            x: {
+                get: function(){
+                    return this.retrieve({name: 'gx:x', transformer: Number});
+                }
+            },
+
+            /**
+             * The href can contain a pallet of icons. In this case this is offset from top border.
+             * @memberof KmlIcon.prototype
+             * @readonly
+             * @type {Number}
+             */
+            y: {
+                get: function() {
+                    return this.retrieve({name: 'gx:y', transformer: Number});
+                }
+            },
+
+            /**
+             * The href can contain a pallet of icons. In this case this is width of the icon on the pallete.
+             * @memberof KmlIcon.prototype
+             * @readonly
+             * @type {Number}
+             */
+            w: {
+                get: function() {
+                    return this.retrieve({name: 'gx:w'});
+                }
+            },
+
+            /**
+             * The href can contain a pallet of icons. In this case this is height of the icon on the pallete.
+             * @memberof KmlIcon.prototype
+             * @readonly
+             * @type {Number}
+             */
+            h: {
+                get: function() {
+                    return this.retrieve({name: 'gx:h'});
+                }
+            }
+        });
     };
 
-    KmlIcon.prototype = Object.create(KmlLink.prototype);
+    KmlIcon.prototype.getTagNames = function() {
+        return ['Icon'];
+    };
 
-    Object.defineProperties(KmlIcon.prototype, {
-        /**
-         * Array containing the tag name of Icon.
-         * @memberof KmlIcon.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function(){
-                return ['Icon'];
-            }
-        },
-
-        /**
-         * Http address or a local file specification used to load the icon.
-         * @memberof KmlIcon.prototype
-         * @readonly
-         * @type {String}
-         */
-        href: {
-            get: function(){
-                return this.retrieve({name: 'href'});
-            }
-        },
-
-        /**
-         * The href can contain a pallet of icons. In this case this is offset from left border.
-         * @memberof KmlIcon.prototype
-         * @readonly
-         * @type {Number}
-         */
-        x: {
-            get: function(){
-                return this.retrieve({name: 'gx:x', transformer: Number});
-            }
-        },
-
-        /**
-         * The href can contain a pallet of icons. In this case this is offset from top border.
-         * @memberof KmlIcon.prototype
-         * @readonly
-         * @type {Number}
-         */
-        y: {
-            get: function() {
-                return this.retrieve({name: 'gx:y', transformer: Number});
-            }
-        },
-
-        /**
-         * The href can contain a pallet of icons. In this case this is width of the icon on the pallete.
-         * @memberof KmlIcon.prototype
-         * @readonly
-         * @type {Number}
-         */
-        w: {
-            get: function() {
-                return this.retrieve({name: 'gx:w'});
-            }
-        },
-
-        /**
-         * The href can contain a pallet of icons. In this case this is height of the icon on the pallete.
-         * @memberof KmlIcon.prototype
-         * @readonly
-         * @type {Number}
-         */
-        h: {
-            get: function() {
-                return this.retrieve({name: 'gx:h'});
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlIcon.prototype.tagName[0], KmlIcon);
+    KmlElements.addKey(KmlIcon.prototype.getTagNames()[0], KmlIcon);
 
     return KmlIcon;
 });

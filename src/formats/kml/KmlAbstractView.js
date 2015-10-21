@@ -25,37 +25,27 @@ define([
      */
     var KmlAbstractView = function(node){
         KmlObject.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Time associated with current view. It shouldn't be displayed outside of this time frame.
+             * @memberof KmlAbstractView.prototype
+             * @readonly
+             * @type {Array}
+             */
+            TimePrimitive: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlTimePrimitive.prototype.getTagNames()
+                    });
+                }
+            }
+        });
     };
 
-    KmlAbstractView.prototype = Object.create(KmlObject.prototype);
-
-    Object.defineProperties(KmlAbstractView.prototype, {
-        /**
-         * Time associated with current view. It shouldn't be displayed outside of this time frame.
-         * @memberof KmlAbstractView.prototype
-         * @readonly
-         * @type {Array}
-         */
-        TimePrimitive: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlTimePrimitive.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Tag names for descendant of the AbstractView.
-         * @memberof KmlAbstractView.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function(){
-                return ['Camera', 'LookAt'];
-            }
-        }
-    });
+    KmlAbstractView.prototype.getTagNames = function() {
+        return ['Camera', 'LookAt'];
+    };
 
     return KmlAbstractView;
 });

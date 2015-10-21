@@ -24,21 +24,9 @@ define([
         KmlObject.call(this,timePrimitiveNode);
     };
 
-    KmlTimePrimitive.prototype = Object.create(KmlObject.prototype);
-
-    Object.defineProperties(KmlTimePrimitive.prototype, {
-        /**
-         * Tag names for descendant of the TimePrimitive.
-         * @memberof KmlTimePrimitive.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['TimeSpan','TimeStamp'];
-            }
-        }
-    });
+    KmlTimePrimitive.prototype.getTagNames = function() {
+        return ['TimeSpan','TimeStamp'];
+    };
 
     return KmlTimePrimitive;
 });

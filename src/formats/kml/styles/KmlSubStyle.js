@@ -23,21 +23,9 @@ define([
         KmlObject.call(this, subStyleNode);
     };
 
-    KmlSubStyle.prototype = Object.create(KmlObject.prototype);
-
-    Object.defineProperties(KmlSubStyle.prototype, {
-        /**
-         * Tag names for descendant of the SubStyle.
-         * @memberof KmlSubStyle.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['LineStyle','PolyStyle','IconStyle','LabelStyle', 'BalloonStyle', 'ListStyle'];
-            }
-        }
-    });
+    KmlSubStyle.prototype.getTagNames = function(){
+        return ['LineStyle','PolyStyle','IconStyle','LabelStyle', 'BalloonStyle', 'ListStyle'];
+    };
 
     return KmlSubStyle;
 });

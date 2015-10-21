@@ -23,61 +23,51 @@ define([
      */
     var Scale = function(node) {
         KmlObject.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Scales model along x axis
+             * @memberof Scale.prototype
+             * @readonly
+             * @type {Array}
+             */
+            x: {
+                get: function() {
+                    return this.retrieve({name: 'x'});
+                }
+            },
+
+            /**
+             * Scales model along y axis
+             * @memberof Scale.prototype
+             * @readonly
+             * @type {Array}
+             */
+            y: {
+                get: function() {
+                    return this.retrieve({name: 'y'});
+                }
+            },
+
+            /**
+             * Scales model along z axis
+             * @memberof Scale.prototype
+             * @readonly
+             * @type {Array}
+             */
+            z: {
+                get: function() {
+                    return this.retrieve({name: 'z'});
+                }
+            }
+        });
     };
 
-    Scale.prototype = Object.create(KmlObject.prototype);
+    Scale.prototype.getTagNames = function() {
+        return ['Scale'];
+    };
 
-    Object.defineProperties(Scale.prototype, {
-        /**
-         * Array of the tag names representing Scale
-         * @memberof Scale.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Scale'];
-            }
-        },
-
-        /**
-         * Scales model along x axis
-         * @memberof Scale.prototype
-         * @readonly
-         * @type {Array}
-         */
-        x: {
-            get: function() {
-                return this.retrieve({name: 'x'});
-            }
-        },
-
-        /**
-         * Scales model along y axis
-         * @memberof Scale.prototype
-         * @readonly
-         * @type {Array}
-         */
-        y: {
-            get: function() {
-                return this.retrieve({name: 'y'});
-            }
-        },
-
-        /**
-         * Scales model along z axis
-         * @memberof Scale.prototype
-         * @readonly
-         * @type {Array}
-         */
-        z: {
-            get: function() {
-                return this.retrieve({name: 'z'});
-            }
-        }
-    });
-
-    KmlElements.addKey(Scale.prototype.tagName[0], Scale);
+    KmlElements.addKey(Scale.prototype.getTagNames()[0], Scale);
 
     return Scale;
 });

@@ -22,44 +22,34 @@ define([
      */
     var KmlStyleMap = function (node) {
         KmlSubStyle.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Defines a key/value pair that maps a mode (normal or highlight) to the predefined <styleUrl>. <Pair>
+             * contains two elements (both are required):
+             * <key>, which identifies the key
+             * <styleUrl> or <Style>, which references the style. In <styleUrl>, for referenced style elements that are
+             *  local to the KML document, a simple # referencing is used. For styles that are contained in external files,
+             * use a full URL along with # referencing.
+             * @memberof KmlStyleMap.prototype
+             * @readonly
+             * @type {Pair}
+             */
+            Pair: {
+                get: function () {
+                    return this.createChildElement({
+                        name: Pair.prototype.getTagNames()
+                    });
+                }
+            }
+        });
     };
 
-    KmlStyleMap.prototype = Object.create(KmlSubStyle.prototype);
+    KmlStyleMap.prototype.getTagNames = function() {
+        return ['StyleMap'];
+    };
 
-    Object.defineProperties(KmlStyleMap.prototype, {
-        /**
-         * Array of the tag names representing Kml style map.
-         * @memberof KmlStyleMap.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function () {
-                return ['StyleMap'];
-            }
-        },
-
-        /**
-         * Defines a key/value pair that maps a mode (normal or highlight) to the predefined <styleUrl>. <Pair>
-         * contains two elements (both are required):
-         * <key>, which identifies the key
-         * <styleUrl> or <Style>, which references the style. In <styleUrl>, for referenced style elements that are
-         *  local to the KML document, a simple # referencing is used. For styles that are contained in external files,
-         * use a full URL along with # referencing.
-         * @memberof KmlStyleMap.prototype
-         * @readonly
-         * @type {Pair}
-         */
-        Pair: {
-            get: function () {
-                return this.createChildElement({
-                    name: Pair.prototype.tagName
-                });
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlStyleMap.prototype.tagName[0], KmlStyleMap);
+    KmlElements.addKey(KmlStyleMap.prototype.getTagNames()[0], KmlStyleMap);
 
     return KmlStyleMap;
 });

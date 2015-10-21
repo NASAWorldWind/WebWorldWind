@@ -22,36 +22,22 @@ define([
      */
     var KmlFolder = function(node) {
         KmlContainer.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Specifies any amount of features, which are part of this document.
+             * @memberof KmlFolder.prototype
+             * @readonly
+             * @type {Array}
+             * @see {KmlFeature}
+             */
+            shapes: {
+                get: function(){
+                    return this.parse();
+                }
+            }
+        });
     };
-
-    KmlFolder.prototype = Object.create(KmlContainer.prototype);
-
-    Object.defineProperties(KmlFolder.prototype, {
-        /**
-         * Array of the tag names representing Kml folder.
-         * @memberof KmlFolder.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Folder'];
-            }
-        },
-
-        /**
-         * Specifies any amount of features, which are part of this document.
-         * @memberof KmlFolder.prototype
-         * @readonly
-         * @type {Array}
-         * @see {KmlFeature}
-         */
-        shapes: {
-            get: function(){
-                return this.parse();
-            }
-        }
-    });
 
     KmlFolder.prototype.update = function(layer, style) {
         this.shapes.forEach(function(shape) {
@@ -59,7 +45,11 @@ define([
         });
     };
 
-    KmlElements.addKey(KmlFolder.prototype.tagName[0], KmlFolder);
+    KmlFolder.prototype.getTagNames = function() {
+        return ['Folder'];
+    };
+
+    KmlElements.addKey(KmlFolder.prototype.getTagNames()[0], KmlFolder);
 
     return KmlFolder;
 });

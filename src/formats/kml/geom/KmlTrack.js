@@ -25,23 +25,11 @@ define([
         KmlGeometry.call(this, node);
     };
 
-    KmlTrack.prototype = Object.create(KmlGeometry.prototype);
+    KmlTrack.prototype.getTagNames = function() {
+        return ['gx:Track'];
+    };
 
-    Object.defineProperties(KmlTrack.prototype, {
-        /**
-         * Array of the tag names representing Kml track.
-         * @memberof KmlTrack.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['gx:Track'];
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlTrack.prototype.tagName[0], KmlTrack);
+    KmlElements.addKey(KmlTrack.prototype.getTagNames()[0], KmlTrack);
 
     return KmlTrack;
 });

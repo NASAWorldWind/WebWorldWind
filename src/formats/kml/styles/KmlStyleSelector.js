@@ -22,21 +22,9 @@ define([
         KmlObject.call(this, styleSelectorNode);
     };
 
-    KmlStyleSelector.prototype = Object.create(KmlObject.prototype);
-
-    Object.defineProperties(KmlStyleSelector.prototype, {
-        /**
-         * Tag names for descendant of the StyleSelector.
-         * @memberof KmlStyleSelector.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Style','StyleMap'];
-            }
-        }
-    });
+    KmlStyleSelector.prototype.getTagNames = function() {
+        return ['Style','StyleMap'];
+    };
 
     return KmlStyleSelector;
 });

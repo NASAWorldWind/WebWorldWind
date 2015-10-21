@@ -21,97 +21,87 @@ define([
      */
     var KmlLatLonAltBox = function (node) {
         KmlObject.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to ï¿½90.
+             * @memberof KmlLatLonAltBox.prototype
+             * @readonly
+             * @type {Number}
+             */
+            north: {
+                get: function () {
+                    return this.retrieve({name: 'north', transformer: Number});
+                }
+            },
+
+            /**
+             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to ï¿½90.
+             * @memberof KmlLatLonAltBox.prototype
+             * @readonly
+             * @type {Number}
+             */
+            south: {
+                get: function () {
+                    return this.retrieve({name: 'south', transformer: Number});
+                }
+            },
+
+            /**
+             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to ï¿½180.
+             * @memberof KmlLatLonAltBox.prototype
+             * @readonly
+             * @type {Number}
+             */
+            east: {
+                get: function () {
+                    return this.retrieve({name: 'east', transformer: Number});
+                }
+            },
+
+            /**
+             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to ï¿½180.
+             * @memberof KmlLatLonAltBox.prototype
+             * @readonly
+             * @type {Number}
+             */
+            west: {
+                get: function () {
+                    return this.retrieve({name: 'west', transformer: Number});
+                }
+            },
+
+            /**
+             * Specified in meters (and is affected by the altitude mode specification).
+             * @memberof KmlLatLonAltBox.prototype
+             * @readonly
+             * @type {Number}
+             */
+            minAltitude: {
+                get: function () {
+                    return this.retrieve({name: 'minAltitude'});
+                }
+            },
+
+            /**
+             * Specified in meters (and is affected by the altitude mode specification).
+             * @memberof KmlLatLonAltBox.prototype
+             * @readonly
+             * @type {Number}
+             */
+            maxAltitude: {
+                get: function () {
+                    return this.retrieve({name: 'maxAltitude'});
+                }
+            }
+        });
     };
 
-    KmlLatLonAltBox.prototype = Object.create(KmlObject.prototype);
+    KmlLatLonAltBox.prototype.getTagNames = function() {
+        return ['LatLonAltBox'];
+    };
 
-    Object.defineProperties(KmlLatLonAltBox.prototype, {
-        /**
-         * Array of the tag names representing Kml alternative lat lon box.
-         * @memberof KmlLatLonAltBox.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function () {
-                return ['LatLonAltBox'];
-            }
-        },
-
-        /**
-         * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to ±90.
-         * @memberof KmlLatLonAltBox.prototype
-         * @readonly
-         * @type {Number}
-         */
-        north: {
-            get: function () {
-                return this.retrieve({name: 'north', transformer: Number});
-            }
-        },
-
-        /**
-         * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to ±90.
-         * @memberof KmlLatLonAltBox.prototype
-         * @readonly
-         * @type {Number}
-         */
-        south: {
-            get: function () {
-                return this.retrieve({name: 'south', transformer: Number});
-            }
-        },
-
-        /**
-         * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to ±180.
-         * @memberof KmlLatLonAltBox.prototype
-         * @readonly
-         * @type {Number}
-         */
-        east: {
-            get: function () {
-                return this.retrieve({name: 'east', transformer: Number});
-            }
-        },
-
-        /**
-         * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to ±180.
-         * @memberof KmlLatLonAltBox.prototype
-         * @readonly
-         * @type {Number}
-         */
-        west: {
-            get: function () {
-                return this.retrieve({name: 'west', transformer: Number});
-            }
-        },
-
-        /**
-         * Specified in meters (and is affected by the altitude mode specification).
-         * @memberof KmlLatLonAltBox.prototype
-         * @readonly
-         * @type {Number}
-         */
-        minAltitude: {
-            get: function () {
-                return this.retrieve({name: 'minAltitude'});
-            }
-        },
-
-        /**
-         * Specified in meters (and is affected by the altitude mode specification).
-         * @memberof KmlLatLonAltBox.prototype
-         * @readonly
-         * @type {Number}
-         */
-        maxAltitude: {
-            get: function () {
-                return this.retrieve({name: 'maxAltitude'});
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlLatLonAltBox.prototype.tagName[0], KmlLatLonAltBox);
+    KmlElements.addKey(KmlLatLonAltBox.prototype.getTagNames()[0], KmlLatLonAltBox);
 
     return KmlLatLonAltBox;
 });

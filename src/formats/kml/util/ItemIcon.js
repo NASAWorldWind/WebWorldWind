@@ -21,51 +21,41 @@ define([
      */
     var ItemIcon = function (node) {
         KmlObject.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Specifies the current state of the NetworkLink or Folder. Possible values are open, closed, error,
+             * fetching0, fetching1, and fetching2. These values can be combined by inserting a space between two values
+             * (no comma).
+             * @memberof ItemIcon.prototype
+             * @readonly
+             * @type {String}
+             */
+            state: {
+                get: function () {
+                    return this.retrieve({name: 'state'});
+                }
+            },
+
+            /**
+             * Specifies the URI of the image used in the List View for the Feature.
+             * @memberof ItemIcon.prototype
+             * @readonly
+             * @type {String}
+             */
+            href: {
+                get: function () {
+                    return this.retrieve({name: 'href'});
+                }
+            }
+        });
     };
 
-    ItemIcon.prototype = Object.create(KmlObject.prototype);
+    ItemIcon.prototype.getTagNames = function() {
+        return ['ItemIcon'];
+    };
 
-    Object.defineProperties(ItemIcon.prototype, {
-        /**
-         * Array of the tag names representing Item Icon.
-         * @memberof ItemIcon.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function () {
-                return ['ItemIcon'];
-            }
-        },
-
-        /**
-         * Specifies the current state of the NetworkLink or Folder. Possible values are open, closed, error,
-         * fetching0, fetching1, and fetching2. These values can be combined by inserting a space between two values
-         * (no comma).
-         * @memberof ItemIcon.prototype
-         * @readonly
-         * @type {String}
-         */
-        state: {
-            get: function () {
-                return this.retrieve({name: 'state'});
-            }
-        },
-
-        /**
-         * Specifies the URI of the image used in the List View for the Feature.
-         * @memberof ItemIcon.prototype
-         * @readonly
-         * @type {String}
-         */
-        href: {
-            get: function () {
-                return this.retrieve({name: 'href'});
-            }
-        }
-    });
-
-    KmlElements.addKey(ItemIcon.prototype.tagName[0], ItemIcon);
+    KmlElements.addKey(ItemIcon.prototype.getTagNames()[0], ItemIcon);
 
     return ItemIcon;
 });

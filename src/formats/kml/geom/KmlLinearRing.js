@@ -23,23 +23,11 @@ define([
         KmlLineString.call(this, linearRingNode);
     };
 
-    KmlLinearRing.prototype = Object.create(KmlLineString.prototype);
+    KmlLinearRing.prototype.getTagNames = function() {
+        return ['LinearRing'];
+    };
 
-    Object.defineProperties(KmlLinearRing.prototype, {
-        /**
-         * Array of the tag names representing Kml linear ring.
-         * @memberof KmlLinearRing.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['LinearRing'];
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlLinearRing.prototype.tagName[0], KmlLinearRing);
+    KmlElements.addKey(KmlLinearRing.prototype.getTagNames()[0], KmlLinearRing);
 
     return KmlLinearRing;
 });

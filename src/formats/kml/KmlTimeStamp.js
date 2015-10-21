@@ -26,37 +26,27 @@ define([
      */
     var KmlTimeStamp = function(timeStampNode) {
         KmlTimePrimitive.call(this, timeStampNode);
+
+        Object.defineProperties(this, {
+            /**
+             * This property specifies when exactly the event happen.
+             * @memberof KmlTimeStamp.prototype
+             * @type {DateTime}
+             * @readonly
+             */
+            when: {
+                get: function () {
+                    return this.retrieve({name: 'when'});
+                }
+            }
+        });
     };
 
-    KmlTimeStamp.prototype = Object.create(KmlTimePrimitive.prototype);
+    KmlTimeStamp.prototype.getTagNames = function() {
+        return ['TimeStamp'];
+    };
 
-    Object.defineProperties(KmlTimeStamp.prototype, {
-        /**
-         * Array of the tag names representing Kml timeStamp.
-         * @memberof KmlTimeStamp.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['TimeStamp'];
-            }
-        },
-
-        /**
-         * This property specifies when exactly the event happen.
-         * @memberof KmlTimeStamp.prototype
-         * @type {DateTime}
-         * @readonly
-         */
-        when: {
-            get: function () {
-                return this.retrieve({name: 'when'});
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlTimeStamp.prototype.tagName[0], KmlTimeStamp);
+    KmlElements.addKey(KmlTimeStamp.prototype.getTagNames()[0], KmlTimeStamp);
 
     return KmlTimeStamp;
 });

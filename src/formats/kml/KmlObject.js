@@ -19,6 +19,7 @@ define([
     /**
      * Constructs an Kml object. Every node in the Kml document is either basic type or Kml object. Applications usually
      * don't call this constructor. It is usually called only by its descendants.
+     * It should be treated as mixin.
      * @alias KmlObject
      * @classdesc Contains the data associated with every Kml object.
      * @param objectNode Node representing Kml Object
@@ -34,37 +35,45 @@ define([
         }
         this._node = objectNode;
         this._shape = null;
-    };
 
-    Object.defineProperties(KmlObject.prototype, {
-        /**
-         * Every object, which is part of the KML document has its identity. We will use it for changes in the document
-         * for binding.
-         * @memberof KmlObject.prototype
-         * @type {Number}
-         * @readonly
-         */
-        id: {
-            get: function () {
-                return this.retrieve({
-                    name: 'id',
-                    isAttribute: true
-                });
+        Object.defineProperties(this, {
+            /**
+             * Every object, which is part of the KML document has its identity. We will use it for changes in the document
+             * for binding.
+             * @memberof KmlObject.prototype
+             * @type {Number}
+             * @readonly
+             */
+            id: {
+                get: function () {
+                    return this.retrieve({
+                        name: 'id',
+                        isAttribute: true
+                    });
+                }
+            },
+
+            /**
+             * Node of this object. It may be overridden by other users of some functions like parse.
+             * @memberof KmlObject.prototype
+             * @type {Node}
+             * @readonly
+             */
+            node: {
+                get: function () {
+                    return this._node;
+                }
             }
-        },
+        });
 
-        /**
-         * Node of this object. It may be overridden by other users of some functions like parse.
-         * @memberof KmlObject.prototype
-         * @type {Node}
-         * @readonly
-         */
-        node: {
-            get: function () {
-                return this._node;
+        for (var key in KmlObject.prototype) {
+            if (KmlObject.prototype.hasOwnProperty(key)) {
+                this[key] = KmlObject.prototype[key];
             }
         }
-    });
+    };
+
+
 
     /**
      * It returns last node found with given name. It accepts array of possible node names
@@ -218,13 +227,13 @@ define([
      * It is prepared to update the current state of renderables in the KML tree.
      */
     KmlObject.prototype.update = function () {
-        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "update", this.tagName[0] + " doesn't yet support " +
+        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "update", this.getTagNames()[0] + " doesn't yet support " +
             "rendering.");
     };
 
     // To be overriden in descendants.
     KmlObject.prototype.getStyle = function() {
-        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.tagName[0] + " doesn't override  " +
+        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.getTagNames()[0] + " doesn't override  " +
             "getStyle.");
     };
 

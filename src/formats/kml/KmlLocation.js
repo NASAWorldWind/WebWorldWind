@@ -23,61 +23,51 @@ define([
      */
     var KmlLocation = function(node) {
         KmlObject.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Longitude of the location.
+             * @memberof KmlLocation.prototype
+             * @readonly
+             * @type {Array}
+             */
+            longitude: {
+                get: function() {
+                    return this.retrieve({name: 'longitude'});
+                }
+            },
+
+            /**
+             * Latitude of the location.
+             * @memberof KmlLocation.prototype
+             * @readonly
+             * @type {Array}
+             */
+            latitude: {
+                get: function() {
+                    return this.retrieve({name: 'latitude'});
+                }
+            },
+
+            /**
+             * Altitude of the location.
+             * @memberof KmlLocation.prototype
+             * @readonly
+             * @type {Array}
+             */
+            altitude: {
+                get: function() {
+                    return this.retrieve({name: 'altitude'});
+                }
+            }
+        });
     };
 
-    KmlLocation.prototype = Object.create(KmlObject.prototype);
+    KmlLocation.prototype.getTagNames = function() {
+        return ['Location'];
+    };
 
-    Object.defineProperties(KmlLocation.prototype, {
-        /**
-         * Array of the tag names representing Kml location.
-         * @memberof KmlLocation.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Location'];
-            }
-        },
-
-        /**
-         * Longitude of the location.
-         * @memberof KmlLocation.prototype
-         * @readonly
-         * @type {Array}
-         */
-        longitude: {
-            get: function() {
-                return this.retrieve({name: 'longitude'});
-            }
-        },
-
-        /**
-         * Latitude of the location.
-         * @memberof KmlLocation.prototype
-         * @readonly
-         * @type {Array}
-         */
-        latitude: {
-            get: function() {
-                return this.retrieve({name: 'latitude'});
-            }
-        },
-
-        /**
-         * Altitude of the location.
-         * @memberof KmlLocation.prototype
-         * @readonly
-         * @type {Array}
-         */
-        altitude: {
-            get: function() {
-                return this.retrieve({name: 'altitude'});
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlLocation.prototype.tagName[0], KmlLocation);
+    KmlElements.addKey(KmlLocation.prototype.getTagNames()[0], KmlLocation);
 
     return KmlLocation;
 });

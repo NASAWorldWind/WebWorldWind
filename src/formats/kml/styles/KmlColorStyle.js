@@ -20,49 +20,39 @@ define([
      */
     var KmlColorStyle = function(colorStyleNode) {
         KmlSubStyle.call(this, colorStyleNode);
+
+        Object.defineProperties(this, {
+            /**
+             * Color, which should be used. Shapes supporting colored styles must correctly apply the
+             * color.
+             * @memberof KmlColorStyle.prototype
+             * @readonly
+             * @type {String}
+             */
+            color: {
+                get: function() {
+                    return this.retrieve({name: 'color'});
+                }
+            },
+
+            /**
+             * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based on
+             * the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
+             * @memberof KmlColorStyle.prototype
+             * @readonly
+             * @type {String}
+             */
+            colorMode: {
+                get: function() {
+                    return this.retrieve({name: 'colorMode'})
+                }
+            }
+        });
     };
 
-    KmlColorStyle.prototype = Object.create(KmlSubStyle.prototype);
-
-    Object.defineProperties(KmlColorStyle.prototype, {
-        /**
-         * Array of tag names representing Kml color style types.
-         * @memberof KmlColorStyle.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['LineStyle','PolyStyle','IconStyle','LabelStyle'];
-            }
-        },
-
-        /**
-         * Color, which should be used. Shapes supporting colored styles must correctly apply the
-         * color.
-         * @memberof KmlColorStyle.prototype
-         * @readonly
-         * @type {String}
-         */
-        color: {
-            get: function() {
-                return this.retrieve({name: 'color'});
-            }
-        },
-
-        /**
-         * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based on
-         * the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
-         * @memberof KmlColorStyle.prototype
-         * @readonly
-         * @type {String}
-         */
-        colorMode: {
-            get: function() {
-                return this.retrieve({name: 'colorMode'})
-            }
-        }
-    });
+    KmlColorStyle.prototype.getTagNames = function() {
+        return ['LineStyle','PolyStyle','IconStyle','LabelStyle'];
+    };
 
     return KmlColorStyle;
 });

@@ -27,47 +27,33 @@ define([
      */
     var KmlPolyStyle = function(polyStyleNode){
         KmlColorStyle.call(this, polyStyleNode);
+
+        Object.defineProperties(this, {
+            /**
+             * If true the polygon's surface will be filled with color
+             * @memberof KmlPolyStyle.prototype
+             * @readonly
+             * @type {Boolean}
+             */
+            fill: {
+                get: function(){
+                    return this.retrieve({name: 'fill', transformer: WWUtil.transformToBoolean});
+                }
+            },
+
+            /**
+             * Specifies whether outline polygon. Outline style is defined by line style if present.
+             * @memberof KmlPolyStyle.prototype
+             * @readonly
+             * @type {Boolean}
+             */
+            outline: {
+                get: function(){
+                    return this.retrieve({name: 'outline', transformer: WWUtil.transformToBoolean});
+                }
+            }
+        });
     };
-
-    KmlPolyStyle.prototype = Object.create(KmlColorStyle.prototype);
-
-    Object.defineProperties(KmlPolyStyle.prototype, {
-        /**
-         * If true the polygon's surface will be filled with color
-         * @memberof KmlPolyStyle.prototype
-         * @readonly
-         * @type {Boolean}
-         */
-        fill: {
-            get: function(){
-                return this.retrieve({name: 'fill', transformer: WWUtil.transformToBoolean});
-            }
-        },
-
-        /**
-         * Specifies whether outline polygon. Outline style is defined by line style if present.
-         * @memberof KmlPolyStyle.prototype
-         * @readonly
-         * @type {Boolean}
-         */
-        outline: {
-            get: function(){
-                return this.retrieve({name: 'outline', transformer: WWUtil.transformToBoolean});
-            }
-        },
-
-        /**
-         * Array of the tag names representing Kml poly style.
-         * @memberof KmlPolyStyle.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['PolyStyle'];
-            }
-        }
-    });
 
     KmlPolyStyle.update = function(style, options) {
         style = style || {};
@@ -81,7 +67,11 @@ define([
         return shapeOptions;
     };
 
-    KmlElements.addKey(KmlPolyStyle.prototype.tagName[0], KmlPolyStyle);
+    KmlPolyStyle.prototype.getTagNames = function() {
+        return ['PolyStyle'];
+    };
+
+    KmlElements.addKey(KmlPolyStyle.prototype.getTagNames()[0], KmlPolyStyle);
 
     return KmlPolyStyle;
 });

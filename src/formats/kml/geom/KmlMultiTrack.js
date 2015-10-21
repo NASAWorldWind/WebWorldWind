@@ -25,23 +25,11 @@ define([
         KmlGeometry.call(this, node);
     };
 
-    KmlMultiTrack.prototype = Object.create(KmlGeometry.prototype);
+    KmlMultiTrack.prototype.getTagNames = function() {
+        return ['gx:MultiTrack'];
+    };
 
-    Object.defineProperties(KmlMultiTrack.prototype, {
-        /**
-         * Array of the tag names representing Kml multi track.
-         * @memberof KmlMultiTrack.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['gx:MultiTrack'];
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlMultiTrack.prototype.tagName[0], KmlMultiTrack);
+    KmlElements.addKey(KmlMultiTrack.prototype.getTagNames()[0], KmlMultiTrack);
 
     return KmlMultiTrack;
 });

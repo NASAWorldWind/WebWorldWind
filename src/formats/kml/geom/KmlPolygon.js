@@ -4,6 +4,7 @@
  */
 define([
     '../../../util/Color',
+    '../../../util/extend',
     '../KmlElements',
     './KmlGeometry',
     './KmlLinearRing',
@@ -16,6 +17,7 @@ define([
     '../../../util/WWUtil'
 ], function (
     Color,
+    extend,
     KmlElements,
     KmlGeometry,
     KmlLinearRing,
@@ -51,105 +53,90 @@ define([
         });
         this._style = pStyle;
         this._layer = null;
+
+        Object.defineProperties(this, {
+            /**
+             * In case that the polygon is above ground, this property decides whether there is going to be a line to the
+             * ground.
+             * @memberof KmlPolygon.prototype
+             * @type {Boolean}
+             * @readonly
+             */
+            kmlExtrude: {
+                get: function() {
+                    return this.retrieve({name: 'extrude', transformer: WWUtil.transformToBoolean});
+                }
+            },
+
+            /**
+             * Whether tessellation should be used for current node.
+             * @memberof KmlPolygon.prototype
+             * @readonly
+             * @type {Boolean}
+             */
+            kmlTessellate: {
+                get: function() {
+                    return this.retrieve({name: 'tessellate', transformer: WWUtil.transformToBoolean});
+                }
+            },
+
+            /**
+             * It explains how we should treat the altitude of the polygon. Possible choices are explained in:
+             * https://developers.google.com/kml/documentation/kmlreference#point
+             * @memberof KmlPolygon.prototype
+             * @type {String}
+             * @readonly
+             */
+            kmlAltitudeMode: {
+                get: function() {
+                    return this.retrieve({name: 'altitudeMode'});
+                }
+            },
+
+            /**
+             * Outer boundary of this polygon represented as a LinearRing.
+             * @memberof KmlPolygon.prototype
+             * @type {KmlLinearRing}
+             * @readonly
+             */
+            kmlOuterBoundary: {
+                get: function() {
+                    var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
+                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0]);
+                }
+            },
+
+            /**
+             * Inner boundary of this polygon represented as a LinearRing. Optional property
+             * @memberof KmlPolygon.prototype.
+             * @type {KmlLinearRing}
+             * @readonly
+             */
+            kmlInnerBoundary: {
+                get: function() {
+                    var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
+                    if(parentNode == null) {
+                        return null;
+                    }
+                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0]);
+                }
+            },
+
+            /**
+             * It returns center of outer boundaries of the polygon.
+             * @memberof KmlPolygon.prototype
+             * @readonly
+             * @type {Position}
+             */
+            kmlCenter: {
+                get: function() {
+                    return this.kmlOuterBoundary.center;
+                }
+            }
+        });
     };
 
     KmlPolygon.prototype = Object.create(Polygon.prototype);
-    KmlPolygon.prototype.kml = Object.create(KmlGeometry.prototype);
-
-    Object.defineProperties(KmlPolygon.prototype.kml, {
-        /**
-         * In case that the polygon is above ground, this property decides whether there is going to be a line to the
-         * ground.
-         * @memberof KmlPolygon.prototype
-         * @type {Boolean}
-         * @readonly
-         */
-        extrude: {
-            get: function() {
-                return this.retrieve({name: 'extrude', transformer: WWUtil.transformToBoolean});
-            }
-        },
-
-        /**
-         * Whether tessellation should be used for current node.
-         * @memberof KmlPolygon.prototype
-         * @readonly
-         * @type {Boolean}
-         */
-        tessellate: {
-            get: function() {
-                return this.retrieve({name: 'tessellate', transformer: WWUtil.transformToBoolean});
-            }
-        },
-
-        /**
-         * It explains how we should treat the altitude of the polygon. Possible choices are explained in:
-         * https://developers.google.com/kml/documentation/kmlreference#point
-         * @memberof KmlPolygon.prototype
-         * @type {String}
-         * @readonly
-         */
-        altitudeMode: {
-            get: function() {
-                return this.retrieve({name: 'altitudeMode'});
-            }
-        },
-
-        /**
-         * Outer boundary of this polygon represented as a LinearRing.
-         * @memberof KmlPolygon.prototype
-         * @type {KmlLinearRing}
-         * @readonly
-         */
-        outerBoundary: {
-            get: function() {
-                var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
-                return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0]);
-            }
-        },
-
-        /**
-         * Inner boundary of this polygon represented as a LinearRing. Optional property
-         * @memberof KmlPolygon.prototype.
-         * @type {KmlLinearRing}
-         * @readonly
-         */
-        innerBoundary: {
-            get: function() {
-                var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
-                if(parentNode == null) {
-                    return null;
-                }
-                return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0]);
-            }
-        },
-
-        /**
-         * It returns center of outer boundaries of the polygon.
-         * @memberof KmlPolygon.prototype
-         * @readonly
-         * @type {Position}
-         */
-        center: {
-            get: function() {
-                return this.outerBoundary.center;
-            }
-        }
-    });
-
-    Object.defineProperties(KmlPolygon.prototype, {
-        /**
-         * Array of the tag names representing Kml polygon.
-         * @memberof KmlPolygon.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['Polygon'];
-            }
-        }
-    });
 
     /**
      * Renders polygon as polygon applying valid styles.
@@ -184,7 +171,7 @@ define([
         var shapeOptions = KmlPolyStyle.update(pStyle && pStyle.PolyStyle);
         KmlLineStyle.update(pStyle && pStyle.LineStyle, shapeOptions);
 
-        shapeOptions._drawVerticals = this.kml.extrude || false;
+        shapeOptions._drawVerticals = this.kmlExtrude || false;
         shapeOptions._applyLighting = false;
         shapeOptions._depthTest = true;
         shapeOptions._outlineStippleFactor = 0;
@@ -196,16 +183,20 @@ define([
 
     KmlPolygon.prototype.prepareLocations = function() {
         var locations = [];
-        if(this.kml.innerBoundary != null) {
-            locations[0] = this.kml.innerBoundary.positions;
-            locations[1] = this.kml.outerBoundary.positions;
+        if(this.kmlInnerBoundary != null) {
+            locations[0] = this.kmlInnerBoundary.positions;
+            locations[1] = this.kmlOuterBoundary.positions;
         } else {
-            locations = this.kml.outerBoundary.positions;
+            locations = this.kmlOuterBoundary.positions;
         }
         return locations;
     };
 
-    KmlElements.addKey(KmlPolygon.prototype.tagName[0], KmlPolygon);
+    KmlPolygon.prototype.getTagNames = function() {
+        return ['Polygon'];
+    };
+
+    KmlElements.addKey(KmlPolygon.prototype.getTagNames()[0], KmlPolygon);
 
     return KmlPolygon;
 });

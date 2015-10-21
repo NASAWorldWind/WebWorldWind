@@ -25,23 +25,11 @@ define([
         KmlFeature.call(this, node);
     };
 
-    KmlTour.prototype = Object.create(KmlFeature.prototype);
+    KmlTour.prototype.getTagNames = function() {
+        return ['gx:Tour'];
+    };
 
-    Object.defineProperties(KmlTour.prototype, {
-        /**
-         * Array of the tag names representing Kml tour.
-         * @memberof KmlTour.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['gx:Tour'];
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlTour.prototype.tagName[0], KmlTour);
+    KmlElements.addKey(KmlTour.prototype.getTagNames()[0], KmlTour);
 
     return KmlTour;
 });

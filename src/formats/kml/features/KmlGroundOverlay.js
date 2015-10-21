@@ -27,78 +27,68 @@ define([
      */
     var KmlGroundOverlay = function(node) {
         KmlOverlay.call(this, node);
+
+        Object.defineProperties(this, {
+            /**
+             * Specifies the distance above the earth's surface, in meters, and is interpreted according to the altitude
+             * mode.
+             * @memberof KmlGroundOverlay.prototype
+             * @readonly
+             * @type {String}
+             */
+            altitude: {
+                get: function() {
+                    return this.retrieve({name: 'altitude'});
+                }
+            },
+
+            /**
+             * Specifies how the <altitude>is interpreted.
+             * @memberof KmlGroundOverlay.prototype
+             * @readonly
+             * @type {Array}
+             */
+            altitudeMode: {
+                get: function() {
+                    return this.retrieve({name: 'altitudeMode'});
+                }
+            },
+
+            /**
+             * Specifies where the top, bottom, right, and left sides of a bounding box for the ground overlay are aligned.
+             * @memberof KmlGroundOverlay.prototype
+             * @readonly
+             * @type {Array}
+             */
+            LatLonBox: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlLatLonBox.prototype.getTagNames()
+                    });
+                }
+            },
+
+            /**
+             * Used for nonrectangular quadrilateral ground overlays.
+             * @memberof KmlGroundOverlay.prototype
+             * @readonly
+             * @type {Array}
+             */
+            LatLonQuad: {
+                get: function() {
+                    return this.createChildElement({
+                        name: KmlLatLonQuad.prototype.getTagNames()
+                    });
+                }
+            }
+        });
     };
 
-    KmlGroundOverlay.prototype = Object.create(KmlOverlay.prototype);
+    KmlGroundOverlay.prototype.getTagNames = function() {
+        return ['GroundOverlay'];
+    };
 
-    Object.defineProperties(KmlGroundOverlay.prototype, {
-        /**
-         * Array of the tag names representing Kml ground overlay.
-         * @memberof KmlGroundOverlay.prototype
-         * @readonly
-         * @type {Array}
-         */
-        tagName: {
-            get: function() {
-                return ['GroundOverlay'];
-            }
-        },
-
-        /**
-         * Specifies the distance above the earth's surface, in meters, and is interpreted according to the altitude
-         * mode.
-         * @memberof KmlGroundOverlay.prototype
-         * @readonly
-         * @type {String}
-         */
-        altitude: {
-            get: function() {
-                return this.retrieve({name: 'altitude'});
-            }
-        },
-
-        /**
-         * Specifies how the <altitude>is interpreted.
-         * @memberof KmlGroundOverlay.prototype
-         * @readonly
-         * @type {Array}
-         */
-        altitudeMode: {
-            get: function() {
-                return this.retrieve({name: 'altitudeMode'});
-            }
-        },
-
-        /**
-         * Specifies where the top, bottom, right, and left sides of a bounding box for the ground overlay are aligned.
-         * @memberof KmlGroundOverlay.prototype
-         * @readonly
-         * @type {Array}
-         */
-        LatLonBox: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlLatLonBox.prototype.tagName
-                });
-            }
-        },
-
-        /**
-         * Used for nonrectangular quadrilateral ground overlays.
-         * @memberof KmlGroundOverlay.prototype
-         * @readonly
-         * @type {Array}
-         */
-        LatLonQuad: {
-            get: function() {
-                return this.createChildElement({
-                    name: KmlLatLonQuad.prototype.tagName
-                });
-            }
-        }
-    });
-
-    KmlElements.addKey(KmlGroundOverlay.prototype.tagName[0], KmlGroundOverlay);
+    KmlElements.addKey(KmlGroundOverlay.prototype.getTagNames()[0], KmlGroundOverlay);
 
     return KmlGroundOverlay;
 });
