@@ -3,6 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     './KmlStyleSelector',
     './../KmlElements',
     './KmlPolyStyle',
@@ -10,8 +11,10 @@ define([
     './KmlLabelStyle',
     './KmlLineStyle',
     './KmlListStyle',
-    './KmlBalloonStyle'
+    './KmlBalloonStyle',
+    '../../../util/Promise'
 ], function (
+    extend,
     KmlStyleSelector,
     KmlElements,
     KmlPolyStyle,
@@ -19,7 +22,8 @@ define([
     KmlLabelStyle,
     KmlLineStyle,
     KmlListStyle,
-    KmlBalloonStyle
+    KmlBalloonStyle,
+    Promise
 ) {
     "use strict";
 
@@ -122,6 +126,17 @@ define([
                     });
                 }
             }
+        });
+
+        extend(this, KmlStyle.prototype);
+    };
+
+    KmlStyle.prototype.getStyle = function() {
+        var self = this;
+        return new Promise(function(resolve, reject){
+            window.setTimeout(function(){
+                resolve(self);
+            }, 0);
         });
     };
 

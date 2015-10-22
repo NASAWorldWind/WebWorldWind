@@ -6,8 +6,10 @@
  * @exports KmlGeometry
  */
 define([
+    '../../../util/extend',
     './../KmlObject'
 ], function(
+    extend,
     KmlObject
 ){
     "use strict";
@@ -23,6 +25,8 @@ define([
      */
     var KmlGeometry = function(geometryNode) {
         KmlObject.call(this, geometryNode);
+
+        extend(this, KmlGeometry.prototype);
     };
 
     KmlGeometry.prototype.getTagNames = function() {

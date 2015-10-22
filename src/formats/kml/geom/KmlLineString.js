@@ -4,6 +4,7 @@
  */
 define([
         '../../../util/Color',
+        '../../../util/extend',
         './KmlGeometry',
         '../../../geom/Location',
         '../../../geom/Position',
@@ -13,6 +14,7 @@ define([
         '../../../util/WWUtil'
     ],
     function (Color,
+              extend,
               KmlGeometry,
               Location,
               Position,
@@ -35,14 +37,14 @@ define([
         var KmlLineString = function (lineStringNode) {
             KmlGeometry.call(this, lineStringNode);
 
-            Object.defineProperties(KmlLineString.prototype, {
+            Object.defineProperties(this, {
                 /**
                  * Whether current shape should be extruded.
                  * @memberof KmlLineString.prototype
                  * @readonly
                  * @type {Boolean}
                  */
-                extrude: {
+                kmlExtrude: {
                     get: function() {
                         return this.retrieve({name: 'extrude', transformer: Boolean}) || false;
                     }
@@ -54,7 +56,7 @@ define([
                  * @readonly
                  * @type {Boolean}
                  */
-                tessellate: {
+                kmlTessellate: {
                     get: function() {
                         return this.retrieve({name: 'tessellate', transformer: Boolean}) || false;
                     }
@@ -67,7 +69,7 @@ define([
                  * @readonly
                  * @type {String}
                  */
-                altitudeMode: {
+                kmlAltitudeMode: {
                     get: function() {
                         return this.retrieve({name: 'altitudeMode'}) || WorldWind.ABSOLUTE;
                     }
@@ -79,7 +81,7 @@ define([
                  * @readonly
                  * @type {Array}
                  */
-                positions: {
+                kmlPositions: {
                     get: function() {
                         var points = [];
                         var coordinates = this.retrieve({name: 'coordinates'}).split(' ');
@@ -100,7 +102,7 @@ define([
                 kmlCenter: {
                     get: function() {
                         // TODO choose better approximation than just plain average.
-                        var positions = this.positions;
+                        var positions = this.kmlPositions;
                         var midLatitude = 0;
                         var midLongitude = 0;
                         var midAltitude = 0;
@@ -110,13 +112,15 @@ define([
                             midAltitude += position.altitude;
                         });
                         return new Position(
-                            midLatitude / this.positions.length,
-                            midLongitude / this.positions.length,
-                            midAltitude / this.positions.length
+                            midLatitude / this.kmlPositions.length,
+                            midLongitude / this.kmlPositions.length,
+                            midAltitude / this.kmlPositions.length
                         );
                     }
                 }
             });
+
+            extend(this, KmlLineString.prototype);
         };
 
         /**
@@ -130,7 +134,7 @@ define([
             attributes.interiorColor = Color.WHITE;
             attributes.outlineWidth = 1;
 
-            var locations = this.positions.map(function(position){return new Location(position.latitude, position.longitude)});
+            var locations = this.kmlPositions.map(function(position){return new Location(position.latitude, position.longitude)});
             this._shape = new SurfacePolyline(locations, attributes);
             layer.addRenderable(this._shape);
         };
@@ -144,9 +148,9 @@ define([
             if(!toCompare) {
                 return false;
             }
-            var positionsEquals = WWUtil.arrayEquals(toCompare.positions, this.positions);
-            return positionsEquals && toCompare.extrude == this.extrude && toCompare.tessellate == this.tessellate &&
-                    toCompare.altitudeMode == this.altitudeMode;
+            var positionsEquals = WWUtil.arrayEquals(toCompare.positions, this.kmlPositions);
+            return positionsEquals && toCompare.extrude == this.kmlExtrude && toCompare.tessellate == this.kmlTessellate &&
+                    toCompare.altitudeMode == this.kmlAltitudeMode;
         };
 
         KmlLineString.prototype.getTagNames = function() {

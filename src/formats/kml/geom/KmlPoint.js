@@ -7,6 +7,7 @@
  */
 define([
     '../../../util/Color',
+    '../../../util/extend',
     './KmlGeometry',
     '../../../geom/Location',
     '../../../geom/Position',
@@ -15,6 +16,7 @@ define([
     '../KmlElements'
 ], function(
     Color,
+    extend,
     KmlGeometry,
     Location,
     Position,
@@ -90,6 +92,8 @@ define([
                 }
             }
         });
+
+        extend(this, KmlPoint.prototype);
     };
 
     /**

@@ -3,6 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     './../KmlObject',
     '../KmlAbstractView',
     '../styles/KmlStyle',
@@ -11,6 +12,7 @@ define([
     '../../../util/Promise',
     '../../../util/WWUtil'
 ], function(
+    extend,
     KmlObject,
     KmlAbstractView,
     KmlStyle,
@@ -195,12 +197,7 @@ define([
             }
         });
 
-        // TODO use extend instead.
-        for (var key in KmlFeature.prototype) {
-            if (KmlFeature.prototype.hasOwnProperty(key)) {
-                this[key] = KmlFeature.prototype[key];
-            }
-        }
+        extend(this, KmlFeature.prototype);
     };
 
     KmlFeature.prototype.getTagNames = function() {

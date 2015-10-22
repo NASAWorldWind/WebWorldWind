@@ -3,10 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     '../util/ItemIcon',
     './KmlSubStyle',
     '../KmlElements'
-], function (ItemIcon,
+], function (extend,
+             ItemIcon,
              KmlSubStyle,
              KmlElements) {
     "use strict";
@@ -77,6 +79,8 @@ define([
                 }
             }
         });
+
+        extend(this, KmlListStyle.prototype);
     };
 
     KmlListStyle.prototype.getTagNames = function() {

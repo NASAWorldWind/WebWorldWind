@@ -13,7 +13,6 @@ define([
     '../../../geom/Location',
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
-    '../../../WorldWind',
     '../../../util/WWUtil'
 ], function (
     Color,
@@ -26,7 +25,6 @@ define([
     Location,
     Polygon,
     ShapeAttributes,
-    WorldWind,
     WWUtil
 ) {
     "use strict";
@@ -48,7 +46,7 @@ define([
         // Default locations and attributes. Invisible unless called otherwise.
         pStyle.then(function(pStyle){
             // Once style is delivered create corresponding polygon.
-            Polygon.call(this, self.prepareLocations(), self.prepareAttributes(pStyle));
+            Polygon.call(self, self.prepareLocations(), self.prepareAttributes(pStyle));
             self.moveValidProperties();
         });
         this._style = pStyle;
@@ -130,10 +128,12 @@ define([
              */
             kmlCenter: {
                 get: function() {
-                    return this.kmlOuterBoundary.center;
+                    return this.kmlOuterBoundary.kmlCenter;
                 }
             }
         });
+
+        extend(this, KmlPolygon.prototype);
     };
 
     KmlPolygon.prototype = Object.create(Polygon.prototype);
@@ -143,28 +143,29 @@ define([
      * options.style
      */
     KmlPolygon.prototype.update = function(layer) {
+        var self = this;
         this._style.then(function(pStyle) {
-            var shapeOptions = this.prepareAttributes(pStyle);
-            this.attributes = shapeOptions;
-            this.highlightAttributes = shapeOptions;
+            var shapeOptions = self.prepareAttributes(pStyle);
+            self.attributes = shapeOptions;
+            self.highlightAttributes = shapeOptions;
 
-            this.locations = this.prepareLocations();
-            this.moveValidProperties();
+            self.locations = self.prepareLocations();
+            self.moveValidProperties();
 
-            if(this._layer != null ) {
+            if(self._layer != null ) {
                 // Remove renderable from this layer.
-                this._layer.removeRenderable(this);
+                self._layer.removeRenderable(self);
             }
-            layer.addRenderable(this);
-            this._layer = layer;
+            layer.addRenderable(self);
+            self._layer = layer;
         });
     };
 
     // Well anything that contains NetworkLink must also work using promises.
 
     KmlPolygon.prototype.moveValidProperties = function() {
-        this.extrude = this.kml.extrude || false;
-        this.altitudeMode = this.kml.altitudeMode || WorldWind.ABSOLUTE;
+        this.extrude = this.kmlExtrude || false;
+        this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
     };
 
     KmlPolygon.prototype.prepareAttributes = function(pStyle) {
@@ -184,10 +185,10 @@ define([
     KmlPolygon.prototype.prepareLocations = function() {
         var locations = [];
         if(this.kmlInnerBoundary != null) {
-            locations[0] = this.kmlInnerBoundary.positions;
-            locations[1] = this.kmlOuterBoundary.positions;
+            locations[0] = this.kmlInnerBoundary.kmlPositions;
+            locations[1] = this.kmlOuterBoundary.kmlPositions;
         } else {
-            locations = this.kmlOuterBoundary.positions;
+            locations = this.kmlOuterBoundary.kmlPositions;
         }
         return locations;
     };

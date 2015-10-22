@@ -7,10 +7,12 @@
  */
 define([
     '../../error/ArgumentError',
+    '../../util/extend',
     './KmlElements',
     '../../util/Logger',
     '../../util/Promise'
 ], function (ArgumentError,
+             extend,
              KmlElements,
              Logger,
              Promise
@@ -66,11 +68,7 @@ define([
             }
         });
 
-        for (var key in KmlObject.prototype) {
-            if (KmlObject.prototype.hasOwnProperty(key)) {
-                this[key] = KmlObject.prototype[key];
-            }
-        }
+        extend(this, KmlObject.prototype);
     };
 
 

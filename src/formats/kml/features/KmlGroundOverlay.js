@@ -3,11 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     './../KmlElements',
     '../KmlLatLonBox',
     '../KmlLatLonQuad',
     './KmlOverlay'
 ], function (
+    extend,
     KmlElements,
     KmlLatLonBox,
     KmlLatLonQuad,
@@ -82,6 +84,8 @@ define([
                 }
             }
         });
+
+        extend(this, KmlGroundOverlay.prototype);
     };
 
     KmlGroundOverlay.prototype.getTagNames = function() {

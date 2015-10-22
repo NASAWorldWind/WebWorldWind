@@ -4,11 +4,13 @@
  */
 define([
     '../../../util/Color',
+    '../../../util/extend',
     './KmlColorStyle',
     './../KmlElements',
     '../../../util/WWUtil'
 ], function (
     Color,
+    extend,
     KmlColorStyle,
     KmlElements,
     WWUtil
@@ -53,6 +55,8 @@ define([
                 }
             }
         });
+
+        extend(this, KmlPolyStyle.prototype);
     };
 
     KmlPolyStyle.update = function(style, options) {

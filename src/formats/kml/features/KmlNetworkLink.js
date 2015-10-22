@@ -3,20 +3,21 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     './../KmlElements',
     './KmlFeature',
     '../KmlLink',
     '../../../util/WWUtil'
-], function (KmlElements,
+], function (extend,
+             KmlElements,
              KmlFeature,
              KmlLink,
-             WWUtil
-) {
+             WWUtil) {
     "use strict";
 
     /**
-     * Constructs an KmlNetworkLink. Applications usually don't call this constructor. It is called by {@link KmlFile} as
-     * objects from Kml file are read. This object is already concrete implementation.
+     * Constructs an KmlNetworkLink. Applications usually don't call this constructor. It is called by {@link KmlFile}
+     * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlNetworkLink
      * @classdesc Contains the data associated with NetworkLink node.
      * @param node Node representing folder in the document.
@@ -29,12 +30,13 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Boolean value. A value of 0 leaves the visibility of features within the control of the Google Earth user.
-             * Set the value to 1 to reset the visibility of features each time the NetworkLink is refreshed. For example,
-             * suppose a Placemark within the linked KML file has <visibility> set to 1 and the NetworkLink has
-             * <refreshVisibility> set to 1. When the file is first loaded into Google Earth, the user can clear the check
-             * box next to the item to turn off display in the 3D viewer. However, when the NetworkLink is refreshed, the
-             * Placemark will be made visible again, since its original visibility state was TRUE.
+             * Boolean value. A value of 0 leaves the visibility of features within the control of the Google Earth
+             * user. Set the value to 1 to reset the visibility of features each time the NetworkLink is refreshed. For
+             * example, suppose a Placemark within the linked KML file has <visibility> set to 1 and the NetworkLink
+             * has
+             * <refreshVisibility> set to 1. When the file is first loaded into Google Earth, the user can clear the
+             * check box next to the item to turn off display in the 3D viewer. However, when the NetworkLink is
+             * refreshed, the Placemark will be made visible again, since its original visibility state was TRUE.
              * @memberof KmlNetworkLink.prototype
              * @readonly
              * @type {Array}
@@ -47,11 +49,11 @@ define([
 
             /**
              * Boolean value. A value of 1 causes Google Earth to fly to the view of the LookAt or Camera in the
-             * NetworkLinkControl (if it exists). If the NetworkLinkControl does not contain an AbstractView element, Google
-             * Earth flies to the LookAt or Camera element in the Feature child within the <kml> element in the refreshed
-             * file. If the <kml> element does not have a LookAt or Camera specified, the view is unchanged. For example,
-             * Google Earth would fly to the <LookAt> view of the parent Document, not the <LookAt> of the Placemarks
-             * contained within the Document.
+             * NetworkLinkControl (if it exists). If the NetworkLinkControl does not contain an AbstractView element,
+             * Google Earth flies to the LookAt or Camera element in the Feature child within the <kml> element in the
+             * refreshed file. If the <kml> element does not have a LookAt or Camera specified, the view is unchanged.
+             * For example, Google Earth would fly to the <LookAt> view of the parent Document, not the <LookAt> of the
+             * Placemarks contained within the Document.
              * @memberof KmlNetworkLink.prototype
              * @readonly
              * @type {Array}
@@ -76,9 +78,11 @@ define([
                 }
             }
         });
+
+        extend(this, KmlNetworkLink.prototype);
     };
 
-    KmlNetworkLink.prototype.getTagNames = function() {
+    KmlNetworkLink.prototype.getTagNames = function () {
         return ['NetworkLink'];
     };
 

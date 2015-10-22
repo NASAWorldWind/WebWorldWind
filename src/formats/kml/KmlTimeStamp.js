@@ -6,9 +6,11 @@
  * @exports KmlTimeStamp
  */
 define([
+    '../../util/extend',
     './KmlElements',
     './KmlTimePrimitive'
 ], function(
+    extend,
     KmlElements,
     KmlTimePrimitive
 ){
@@ -40,6 +42,8 @@ define([
                 }
             }
         });
+
+        extend(this, KmlTimeStamp.prototype);
     };
 
     KmlTimeStamp.prototype.getTagNames = function() {

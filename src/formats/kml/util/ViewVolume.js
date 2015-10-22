@@ -3,11 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     '../KmlElements',
     '../KmlObject'
-], function (KmlElements,
+], function (extend,
+             KmlElements,
              KmlObject) {
-    // TODO ViewVolume isn't actually descendant of the KmlObject. The relevant logic should be applied differently.
     "use strict";
     /**
      * Constructs a ViewVolume. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -86,6 +87,8 @@ define([
                 }
             }
         });
+
+        extend(this, ViewVolume.prototype);
     };
 
     ViewVolume.prototype.getTagNames = function() {

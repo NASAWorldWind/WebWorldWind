@@ -6,8 +6,10 @@
  * @exports KmlTimePrimitive
  */
 define([
+    '../../util/extend',
     './KmlObject'
 ], function(
+    extend,
     KmlObject
 ){
     "use strict";
@@ -22,6 +24,8 @@ define([
      */
     var KmlTimePrimitive = function(timePrimitiveNode) {
         KmlObject.call(this,timePrimitiveNode);
+
+        extend(this, KmlTimePrimitive.prototype);
     };
 
     KmlTimePrimitive.prototype.getTagNames = function() {

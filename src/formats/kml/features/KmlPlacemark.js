@@ -6,6 +6,7 @@
  * @export KmlPlacemark
  */
 define([
+    '../../../util/extend',
     './../KmlElements',
     './KmlFeature',
     '../geom/KmlGeometry',
@@ -16,6 +17,7 @@ define([
     '../../../util/Color',
     '../../../util/Offset'
 ], function (
+    extend,
     KmlElements,
     KmlFeature,
     KmlGeometry,
@@ -56,12 +58,7 @@ define([
             }
         });
 
-        // TODO use extend instead.
-        for (var key in KmlPlacemark.prototype) {
-            if (KmlPlacemark.prototype.hasOwnProperty(key)) {
-                this[key] = KmlPlacemark.prototype[key];
-            }
-        }
+        extend(this, KmlPlacemark.prototype);
     };
 
     /**

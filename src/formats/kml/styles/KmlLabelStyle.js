@@ -3,9 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     './KmlColorStyle',
     '../KmlElements'
 ], function (
+    extend,
     KmlColorStyle,
     KmlElements
 ) {
@@ -36,6 +38,8 @@ define([
                 }
             }
         });
+
+        extend(this, KmlLabelStyle.prototype);
     };
 
     KmlLabelStyle.update = function() {

@@ -4,10 +4,12 @@
  */
 define([
     '../../../util/Color',
+    '../../../util/extend',
     './KmlColorStyle',
     './../KmlElements'
 ], function (
     Color,
+    extend,
     KmlColorStyle,
     KmlElements
 ) {
@@ -88,6 +90,8 @@ define([
                 }
             }
         });
+
+        extend(this, KmlLineStyle.prototype);
     };
 
     KmlLineStyle.update = function(style, options) {

@@ -3,9 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../util/extend',
     '../KmlElements',
     '../KmlObject'
-], function (KmlElements,
+], function (extend,
+             KmlElements,
              KmlObject) {
     // TODO KmlSchema isn't actually descendant of the KmlObject. The relevant logic should be applied differently.
     "use strict";
@@ -74,6 +76,8 @@ define([
                 }
             }
         });
+
+        extend(this, ImagePyramid.prototype);
     };
 
     ImagePyramid.prototype.getTagNames = function() {
