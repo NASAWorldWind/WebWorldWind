@@ -9,6 +9,8 @@
 define([
         '../../error/ArgumentError',
         '../../util/jszip',
+        './KmlFileCache',
+        './styles/KmlStyle',
         '../../util/Logger',
         '../../util/Promise',
         '../../util/Remote',
@@ -19,6 +21,8 @@ define([
     function(
         ArgumentError,
         JsZip,
+        KmlFileCache,
+        KmlStyle,
         Logger,
         Promise,
         Remote,
@@ -50,15 +54,17 @@ define([
 
             if(options.local) {
                 this._document = new XmlDocument(options.document).dom();
-                return new Promise(function(resolve, reject) {
+                var filePromise = new Promise(function(resolve, reject) {
                     window.setTimeout(function(){
                         resolve(self);
                     }, 0);
                 });
+                KmlFileCache.add('', filePromise);
+                return filePromise;
             } else {
                 // Load the document
-                return new Promise(function(resolve, reject){
-                    var promise = self.requestUrl(options.url);
+                var filePromise = new Promise(function(resolve, reject){
+                    var promise = self.requestUrl(options.url, options);
                     promise.then(function(loadedDocument){
                         var rootDocument;
                         if(options.url.indexOf('.kmz') == -1) {
@@ -80,6 +86,8 @@ define([
 
 
                 });
+                KmlFileCache.add(options.url, filePromise);
+                return filePromise;
             }
         };
 
@@ -151,5 +159,18 @@ define([
             return new Remote(options);
         };
 
-         return KmlFile;
+        KmlFile.prototype.resolveStyle = function(id) {
+            var self = this;
+            id = id.substring(id.indexOf('#') + 1, id.length);
+            // It returns promise of the Style.
+            return new Promise(function(resolve, reject){
+                var style = self._document.getElementById(id);
+                if(!style) {
+                    reject();
+                }
+                resolve(new KmlStyle(style));
+            });
+        };
+
+        return KmlFile;
 });

@@ -235,5 +235,9 @@ define([
             "getStyle.");
     };
 
+    KmlObject.prototype.isFeature = function() {
+        return false;
+    };
+
     return KmlObject;
 });

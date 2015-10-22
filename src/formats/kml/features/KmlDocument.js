@@ -41,7 +41,7 @@ define([
                 get: function(){
                     var allElements = this.parse();
                     return allElements.filter(function(element){
-                        return element instanceof KmlFeature;
+                        return element.isFeature();
                     });
                 }
             },

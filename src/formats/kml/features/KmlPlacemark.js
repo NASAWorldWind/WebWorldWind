@@ -39,8 +39,13 @@ define([
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#placemark
      */
-    var KmlPlacemark = function (placemarkNode) {
+    var KmlPlacemark = function (placemarkNode, pStyle) {
         KmlFeature.call(this, placemarkNode);
+
+        pStyle.then(function(style){
+
+        });
+        this._style = pStyle;
 
         Object.defineProperties(this, {
             /**
@@ -61,11 +66,17 @@ define([
         extend(this, KmlPlacemark.prototype);
     };
 
+    KmlPlacemark.prototype = Object.create(Placemark.prototype);
+
     /**
      * It renders placemark with associated geometry.
      * @param layer Layer into which the placemark may be rendered.
      */
     KmlPlacemark.prototype.update = function(layer, style) {
+        if(!this.geometry) {
+            // For now don't display Placemarks without geometries.
+            return;
+        }
         // Work correctly with styles.
         var placemarkAttributes = new PlacemarkAttributes(null);
         KmlIconStyle.update(style && style.IconStyle, placemarkAttributes);
@@ -87,7 +98,7 @@ define([
         placemark.label = this.description;
         placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
 
-        layer.addRenderable(placemark);
+        layer.addRenderable(this);
 
         this.geometry.update(layer, this.StyleSelector);
     };

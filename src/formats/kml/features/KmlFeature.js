@@ -6,21 +6,23 @@ define([
     '../../../util/extend',
     './../KmlObject',
     '../KmlAbstractView',
+    '../KmlFile',
+    '../KmlFileCache',
     '../styles/KmlStyle',
     '../KmlRegion',
     '../KmlTimePrimitive',
     '../../../util/Promise',
     '../../../util/WWUtil'
-], function(
-    extend,
-    KmlObject,
-    KmlAbstractView,
-    KmlStyle,
-    KmlRegion,
-    KmlTimePrimitive,
-    Promise,
-    WWUtil
-){
+], function (extend,
+             KmlObject,
+             KmlAbstractView,
+             KmlFile,
+             KmlFileCache,
+             KmlStyle,
+             KmlRegion,
+             KmlTimePrimitive,
+             Promise,
+             WWUtil) {
     "use strict";
     /**
      * Constructs an KmlFeature. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -33,7 +35,7 @@ define([
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#feature
      */
-    var KmlFeature = function(featureNode, pStyle) {
+    var KmlFeature = function (featureNode, pStyle) {
         KmlObject.call(this, featureNode);
         this._style = pStyle;
 
@@ -45,7 +47,7 @@ define([
              * @readonly
              */
             name: {
-                get: function(){
+                get: function () {
                     return this.retrieve({name: 'name'});
                 }
             },
@@ -57,7 +59,7 @@ define([
              * @readonly
              */
             visibility: {
-                get: function(){
+                get: function () {
                     return this.retrieve({name: 'visibility', transformer: WWUtil.transformToBoolean});
                 }
             },
@@ -70,7 +72,7 @@ define([
              * @readonly
              */
             open: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'open', transformer: WWUtil.transformToBoolean});
                 }
             },
@@ -82,7 +84,7 @@ define([
              * @readonly
              */
             address: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'address'});
                 }
             },
@@ -94,7 +96,7 @@ define([
              * @readonly
              */
             phoneNumber: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'phoneNumber'});
                 }
             },
@@ -106,34 +108,38 @@ define([
              * @readonly
              */
             description: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'description'});
                 }
             },
 
             /**
-             * URL of a <Style> or <StyleMap> defined in a Document. If the style is in the same file, use a # reference.
-             * If the style is defined in an external file, use a full URL along with # referencing.
-             * If it references remote URL, this server must support CORS for us to be able to download it.
+             * URL of a <Style> or <StyleMap> defined in a Document. If the style is in the same file, use a #
+             * reference. If the style is defined in an external file, use a full URL along with # referencing. If it
+             * references remote URL, this server must support CORS for us to be able to download it.
              * @memberof KmlFeature.prototype
              * @type {String}
              * @readonly
              */
             styleUrl: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'styleUrl'});
                 }
             },
 
             /**
-             * A short description of the feature. In Google Earth, this description is displayed in the Places panel under
-             * the name of the feature. If a Snippet is not supplied, the first two lines of the <description> are used. In Google Earth, if a Placemark contains both a description and a Snippet, the <Snippet> appears beneath the Placemark in the Places panel, and the <description> appears in the Placemark's description balloon. This tag does not support HTML markup. <Snippet> has a maxLines attribute, an integer that specifies the maximum number of lines to display.
+             * A short description of the feature. In Google Earth, this description is displayed in the Places panel
+             * under the name of the feature. If a Snippet is not supplied, the first two lines of the <description>
+             * are used. In Google Earth, if a Placemark contains both a description and a Snippet, the <Snippet>
+             * appears beneath the Placemark in the Places panel, and the <description> appears in the Placemark's
+             * description balloon. This tag does not support HTML markup. <Snippet> has a maxLines attribute, an
+             * integer that specifies the maximum number of lines to display.
              * @memberof KmlFeature.prototype
              * @type {String}
              * @readonly
              */
             Snippet: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'Snippet'});
                 }
             },
@@ -146,7 +152,7 @@ define([
              * @readonly
              */
             AbstractView: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlAbstractView.prototype.getTagNames()
                     });
@@ -161,7 +167,7 @@ define([
              * @readonly
              */
             TimePrimitive: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlTimePrimitive.prototype.getTagNames()
                     });
@@ -175,7 +181,7 @@ define([
              * @readonly
              */
             StyleSelector: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlStyle.prototype.getTagNames()
                     });
@@ -189,7 +195,7 @@ define([
              * @readonly
              */
             Region: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlRegion.prototype.getTagNames()
                     });
@@ -200,28 +206,48 @@ define([
         extend(this, KmlFeature.prototype);
     };
 
-    KmlFeature.prototype.getTagNames = function() {
+    KmlFeature.prototype.getTagNames = function () {
         return ['NetworkLink', 'Placemark', 'PhotoOverlay', 'ScreenOverlay', 'GroundOverlay', 'Folder',
             'Document'];
     };
 
     // Is it possible that I created some type of loop?
     // It definitely looks like that.
-    KmlFeature.prototype.getStyle = function() {
+    KmlFeature.prototype.getStyle = function () {
         var self = this;
-        if(this._pStyle) {
+        if (this._pStyle) {
             return this._pStyle;
         }
-        this._pStyle = new Promise(function(resolve, reject) {
-            // Resolve this promise right now.
-            // Take into account this._style if present.
-            // Move this resolve to the end of the stack to prevent recursion.
-            window.setTimeout(function(){
-                resolve(self.StyleSelector);
-            }, 0);
+        this._pStyle = new Promise(function (resolve, reject) {
+            // Understand styleUrl
+            var filePromise;
+            if (self.styleUrl) {
+                filePromise = KmlFileCache.retrieve(self.styleUrl);
+                if(!filePromise) {
+                    filePromise = new KmlFile({url: self.styleUrl});
+                    KmlFileCache.add(filePromise);
+                }
+                filePromise.then(function(kmlFile){
+                    kmlFile.resolveStyle(self.styleUrl).then(function(style){
+                        resolve(style);
+                    });
+                });
+            } else {
+                // TODO: Take into account this._style if present.
+
+                // Resolve this promise right now.
+                // Move this resolve to the end of the stack to prevent recursion.
+                window.setTimeout(function () {
+                    resolve(self.StyleSelector);
+                }, 0);
+            }
         });
         // Use also styleUrl if valid and StyleSelector.
         return this._pStyle;
+    };
+
+    KmlFeature.prototype.isFeature = function() {
+        return true;
     };
 
     return KmlFeature;
