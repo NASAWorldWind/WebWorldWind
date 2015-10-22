@@ -3,9 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 requirejs(['../src/WorldWind',
-        '../src/formats/kml/KmlFile'],
+        '../src/formats/kml/KmlFile',
+        './LayerManager'],
     function (WorldWind,
-              KmlFile) {
+              KmlFile,
+              LayerManager) {
         var kmlFileXml = "countries_world.kml";
         var xhr = new XMLHttpRequest();
 
@@ -58,4 +60,10 @@ requirejs(['../src/WorldWind',
         }
 
         wwd.goTo(new WorldWind.Location(30.0596696, 14.4656239));
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManger = new LayerManager(wwd);
+
+        // Now set up to handle highlighting.
+        var highlightController = new WorldWind.HighlightController(wwd);
     });
