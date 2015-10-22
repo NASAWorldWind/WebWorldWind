@@ -66,10 +66,10 @@ define([
         // Unlike typical tiles, Tiles at the same level do not have the same sector size.
         MercatorTiledImageLayer.prototype.createTile = function (sector, level, row, column) {
             var mapSize = this.mapSizeForLevel(level.levelNumber),
-                swX = WWMath.clamp(column * this.imageSize - 0.5, 0, mapSize),
-                neY = WWMath.clamp(row * this.imageSize - 0.5, 0, mapSize),
-                neX = WWMath.clamp(swX + (this.imageSize) + 0.5, 0, mapSize),
-                swY = WWMath.clamp(neY + (this.imageSize) + 0.5, 0, mapSize),
+                swX = WWMath.clamp(column * this.imageSize, 0, mapSize),
+                neY = WWMath.clamp(row * this.imageSize, 0, mapSize),
+                neX = WWMath.clamp(swX + (this.imageSize), 0, mapSize),
+                swY = WWMath.clamp(neY + (this.imageSize), 0, mapSize),
                 x, y, swLat, swLon, neLat, neLon;
 
             x = (swX / mapSize) - 0.5;

@@ -150,7 +150,7 @@ define([
                     tile = tiles[i];
                     tile.selected = false;
                     tile.bindFramebuffer(dc);
-                    gl.clear(WebGLRenderingContext.COLOR_BUFFER_BIT);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
                 }
             } finally {
                 dc.bindFramebuffer(framebuffer);

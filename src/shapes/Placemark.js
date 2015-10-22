@@ -577,13 +577,13 @@ define([
             // that they be in separate buffers, so the code below uses the 3D buffer for vertex coords and the 2D
             // buffer for texture coords.
             program = dc.currentProgram;
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, dc.unitQuadBuffer());
-            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, WebGLRenderingContext.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer());
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(program.vertexPointLocation);
             gl.enableVertexAttribArray(program.vertexTexCoordLocation);
 
             // Tell the program which texture unit to use.
-            program.loadTextureUnit(gl, WebGLRenderingContext.TEXTURE0);
+            program.loadTextureUnit(gl, gl.TEXTURE0);
             program.loadModulateColor(gl, dc.pickingMode);
         };
 
@@ -597,8 +597,8 @@ define([
             gl.disableVertexAttribArray(program.vertexTexCoordLocation);
 
             // Clear GL bindings.
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, null);
-            gl.bindTexture(WebGLRenderingContext.TEXTURE_2D, null);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindTexture(gl.TEXTURE_2D, null);
         };
 
         // Internal. Intentionally not documented.
@@ -665,31 +665,31 @@ define([
                 program.loadModelviewProjection(gl, Placemark.matrix);
 
                 if (!this.activeAttributes.leaderLineAttributes.depthTest) {
-                    gl.disable(WebGLRenderingContext.DEPTH_TEST);
+                    gl.disable(gl.DEPTH_TEST);
                 }
 
                 gl.lineWidth(this.activeAttributes.leaderLineAttributes.outlineWidth);
 
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, leaderLineVboId);
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, this.leaderLinePoints, WebGLRenderingContext.STATIC_DRAW);
+                gl.bindBuffer(gl.ARRAY_BUFFER, leaderLineVboId);
+                gl.bufferData(gl.ARRAY_BUFFER, this.leaderLinePoints, gl.STATIC_DRAW);
                 dc.frameStatistics.incrementVboLoadCount(1);
-                gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
-                gl.drawArrays(WebGLRenderingContext.LINES, 0, 2);
+                gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+                gl.drawArrays(gl.LINES, 0, 2);
             }
 
             // Turn off depth testing for the placemark image if requested. The placemark label and leader line have
             // their own depth-test controls.
             if (!this.activeAttributes.depthTest) {
                 depthTest = false;
-                gl.disable(WebGLRenderingContext.DEPTH_TEST);
+                gl.disable(gl.DEPTH_TEST);
             }
 
             // Suppress frame buffer writes for the placemark image and its label.
             // tag, 6/17/15: It's not clear why this call was here. It was carried over from WWJ.
             //gl.depthMask(false);
 
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, dc.unitQuadBuffer3());
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer3());
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
 
             // Compute and specify the MVP matrix.
             Placemark.matrix.copy(dc.screenProjection);
@@ -734,7 +734,7 @@ define([
             }
 
             // Draw the placemark's image quad.
-            gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
             if (this.mustDrawLabel() && this.currentVisibility > 0) {
                 program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity * this.currentVisibility);
@@ -760,18 +760,18 @@ define([
                 if (this.activeAttributes.labelAttributes.depthTest) {
                     if (!depthTest) {
                         depthTest = true;
-                        gl.enable(WebGLRenderingContext.DEPTH_TEST);
+                        gl.enable(gl.DEPTH_TEST);
                     }
                 } else {
                     depthTest = false;
-                    gl.disable(WebGLRenderingContext.DEPTH_TEST);
+                    gl.disable(gl.DEPTH_TEST);
                 }
 
-                gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             }
 
             if (!depthTest) {
-                gl.enable(WebGLRenderingContext.DEPTH_TEST);
+                gl.enable(gl.DEPTH_TEST);
             }
 
             // tag, 6/17/15: See note on depthMask above in this function.

@@ -38,191 +38,235 @@ define([
         };
 
         WmsCapabilities.prototype.assembleDocument = function (dom) {
-            var e,
-                elements = dom.getElementsByTagName("WMS_Capabilities"); // WMS 1.3.0
-            if (elements.length == 0) {
-                elements = dom.getElementsByTagName("WMT_MS_Capabilities"); // WMS 1.1.1
-                if (elements.length == 0) {
-                    return;
-                }
-            }
-
-            var root = elements[0];
+            var root = dom.documentElement;
 
             this.version = root.getAttribute("version");
             this.updateSequence = root.getAttribute("updateSequence");
 
-            elements = root.getElementsByTagName("Service");
-            if (elements.length > 0) {
-                var serviceElement = elements[0];
-                this.service = {
-                    capsDoc: this
-                };
-
-                this.service.title = WmsCapabilities.getTag(serviceElement, "Title");
-                this.service.abstract = WmsCapabilities.getTag(serviceElement, "Abstract");
-
-                elements = serviceElement.getElementsByTagName("KeywordList");
-                if (elements.length > 0) {
-                    this.service.keywordList = [];
-                    elements = elements[0].getElementsByTagName("Keyword");
-                    for (e = 0; e < elements.length; e++) {
-                        this.service.keywordList.push(elements[e].textContent);
-                    }
-                }
-
-                elements = serviceElement.getElementsByTagName("OnlineResource");
-                if (elements.length > 0) {
-                    this.service.onlineResource = elements[0].getAttribute("xlink:href");
-                }
-
-                this.service.fees = WmsCapabilities.getTag(serviceElement, "Fees");
-                this.service.accessConstraints = WmsCapabilities.getTag(serviceElement, "AccessConstraints");
-                this.service.layerLimit = WmsCapabilities.getTag(serviceElement, "LayerLimit");
-
-                elements = serviceElement.getElementsByTagName("ContactInformation");
-                if (elements.length > 0) {
-                    var contactInfoElement = elements[0];
-                    this.service.contactInformation = {};
-
-                    elements = contactInfoElement.getElementsByTagName("ContactPersonPrimary");
-                    if (elements.length > 0) {
-                        var contactPersonElement = elements[0];
-                        this.service.contactInformation.contactPersonPrimary = {};
-
-                        this.service.contactInformation.contactPersonPrimary.contactPerson
-                            = WmsCapabilities.getTag(contactPersonElement, "ContactPerson");
-                        this.service.contactInformation.contactPersonPrimary.contactOrganization
-                            = WmsCapabilities.getTag(contactPersonElement, "ContactOrganization");
-                    }
-
-                    this.service.contactInformation.contactPosition
-                        = WmsCapabilities.getTag(contactInfoElement, "ContactPosition");
-                    this.service.contactInformation.contactVoiceTelephone
-                        = WmsCapabilities.getTag(contactInfoElement, "ContactVoiceTelephone");
-                    this.service.contactInformation.contactFaxsimileTelephone
-                        = WmsCapabilities.getTag(contactInfoElement, "ContactFacsimileTelephone");
-                    this.service.contactInformation.contactEmailAddress
-                        = WmsCapabilities.getTag(contactInfoElement, "ContactEmailAddress");
-
-                    elements = contactInfoElement.getElementsByTagName("ContactAddress");
-                    if (elements.length > 0) {
-                        var contactAddressElement = elements[0];
-                        this.service.contactInformation.contactAddress = {};
-
-                        this.service.contactInformation.contactAddress.addressType
-                            = WmsCapabilities.getTag(contactAddressElement, "AddressType");
-                        this.service.contactInformation.contactAddress.address
-                            = WmsCapabilities.getTag(contactAddressElement, "Address");
-                        this.service.contactInformation.contactAddress.city
-                            = WmsCapabilities.getTag(contactAddressElement, "City");
-                        this.service.contactInformation.contactAddress.stateOrProvince
-                            = WmsCapabilities.getTag(contactAddressElement, "StateOrProvince");
-                        this.service.contactInformation.contactAddress.postCode
-                            = WmsCapabilities.getTag(contactAddressElement, "PostCode");
-                        this.service.contactInformation.contactAddress.country
-                            = WmsCapabilities.getTag(contactAddressElement, "Country");
-                    }
-                }
-            }
-
-            elements = root.getElementsByTagName("Capability");
-            if (elements.length > 0) {
-                this.capability = {
-                    capsDoc: this
-                };
-                var capsElement = elements[0];
-
-                elements = capsElement.getElementsByTagName("Request");
-                if (elements.length > 0) {
-                    var requestNode = elements[0];
-                    this.capability.request = {};
-
-                    this.capability.request.getCapabilities
-                        = WmsCapabilities.getRequestInfo(requestNode, "GetCapabilities");
-                    this.capability.request.getMap
-                        = WmsCapabilities.getRequestInfo(requestNode, "GetMap");
-                    this.capability.request.getFeatureInfo
-                        = WmsCapabilities.getRequestInfo(requestNode, "GetFeatureInfo");
-                }
-
-                elements = capsElement.getElementsByTagName("Exception");
-                if (elements.length > 0) {
-                    this.capability.exception = {};
-
-                    elements = elements[0].getElementsByTagName("Format");
-                    if (elements.length > 0) {
-                        this.capability.exception.formats = [];
-                        for (e = 0; e < elements.length; e++) {
-                            this.capability.exception.formats.push(elements[e].textContent);
-                        }
-                    }
-                }
-
-                this.capability.layers = [];
-                var children = capsElement.children || capsElement.childNodes;
-                for (var c = 0; c < children.length; c++) {
-                    if (children[c].localName === "Layer") {
-                        this.capability.layers.push(new WmsLayerCapabilities(children[c], this.capability));
-                    }
-                }
-            }
-        };
-
-        WmsCapabilities.assembleLayers = function (parentElement, parentNode) {
-            var layers = [];
-
-            var children = parentElement.children || parentElement.childNodes;
+            var children = root.children || root.childNodes;
             for (var c = 0; c < children.length; c++) {
-                if (children[c].localName === "Layer") {
-                    layers.push(new WmsLayerCapabilities(children[c], parentNode));
+                var child = children[c];
+
+                if (child.localName === "Service") {
+                    this.service = this.assembleService(child);
+                } else if (child.localName === "Capability") {
+                    this.capability = this.assembleCapability(child);
                 }
             }
-
-            return layers;
         };
 
-        WmsCapabilities.getTag = function (parentElement, tagName) {
-            var children = parentElement.children || parentElement.childNodes;
+        WmsCapabilities.prototype.assembleService = function (element) {
+            var service = {
+                capsDoc: this
+            };
+
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
-                if (children[c].localName === tagName) {
-                    return children[c].textContent;
+                var child = children[c];
+
+                if (child.localName === "Name") {
+                    service.name = child.textContent;
+                } else if (child.localName === "Title") {
+                    service.title = child.textContent;
+                } else if (child.localName === "Abstract") {
+                    service.abstract = child.textContent;
+                } else if (child.localName === "KeywordList") {
+                    service.keywordList = this.assembleKeywordList(child);
+                } else if (child.localName === "OnlineResource") {
+                    service.onlineResource = child.getAttribute("xlink:href");
+                } else if (child.localName === "Fees") {
+                    service.fees = child.textContent;
+                } else if (child.localName === "AccessConstraints") {
+                    service.accessConstraints = child.textContent;
+                } else if (child.localName == "LayerLimit") {
+                    service.layerLimit = parseInt(child.textContent);
+                } else if (child.localName == "MaxWidth") {
+                    service.maxWidth = parseInt(child.textContent);
+                } else if (child.localName == "MaxHeight") {
+                    service.maxHeight = parseInt(child.textContent);
+                } else if (child.localName === "ContactInformation") {
+                    service.contactInformation = this.assembleContactInformation(child);
                 }
             }
+
+            return service;
         };
 
-        WmsCapabilities.getRequestInfo = function (parentElement, requestName) {
-            var elements = parentElement.getElementsByTagName(requestName);
-            if (elements.length > 0) {
-                var requestNode = elements[0],
-                    result = {};
+        WmsCapabilities.prototype.assembleKeywordList = function (element) {
+            var keywords = [];
 
-                elements = requestNode.getElementsByTagName("Format");
-                if (elements.length > 0) {
-                    result.formats = [];
-                    for (var e = 0; e < elements.length; e++) {
-                        result.formats.push(elements[e].textContent);
-                    }
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Keyword") {
+                    keywords.push(child.textContent);
                 }
+            }
 
-                elements = requestNode.getElementsByTagName("DCPType");
-                if (elements.length > 0) {
-                    elements = elements[0].getElementsByTagName("HTTP");
-                    if (elements.length > 0) {
-                        elements = elements[0].getElementsByTagName("Get");
-                        if (elements.length > 0) {
-                            elements = elements[0].getElementsByTagName("OnlineResource");
-                            if (elements.length > 0) {
-                                result.url = elements[0].getAttribute("xlink:href");
+            return keywords;
+        };
+
+        WmsCapabilities.prototype.assembleContactInformation = function (element) {
+            var contactInfo = {};
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "ContactPersonPrimary") {
+                    contactInfo.contactPersonPrimary = this.assembleContactPersonPrimary(child);
+                } else if (child.localName === "ContactPosition") {
+                    contactInfo.contactPosition = child.textContent;
+                } else if (child.localName === "ContactVoiceTelephone") {
+                    contactInfo.contactVoiceTelephone = child.textContent;
+                } else if (child.localName === "ContactFacsimileTelephone") {
+                    contactInfo.contactFacsimileTelephone = child.textContent;
+                } else if (child.localName === "ContactElectronicMailAddress") {
+                    contactInfo.contactElectronicMailAddress = child.textContent;
+                } else if (child.localName === "ContactAddress") {
+                    contactInfo.contactAddress = this.assembleContactAddress(child);
+                }
+            }
+
+            return contactInfo;
+        };
+
+        WmsCapabilities.prototype.assembleContactPersonPrimary = function (element) {
+            var info = {};
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "ContactPerson") {
+                    info.contactPerson = child.textContent;
+                } else if (child.localName === "ContactOrganization") {
+                    info.contactOrganization = child.textContent;
+                }
+            }
+
+            return info;
+        };
+
+        WmsCapabilities.prototype.assembleContactAddress = function (element) {
+            var address = {};
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "AddressType") {
+                    address.addressType = child.textContent;
+                } else if (child.localName === "Address") {
+                    address.address = child.textContent;
+                } else if (child.localName === "City") {
+                    address.city = child.textContent;
+                } else if (child.localName === "StateOrProvince") {
+                    address.stateOrProvince = child.textContent;
+                } else if (child.localName === "PostCode") {
+                    address.postCode = child.textContent;
+                } else if (child.localName === "Country") {
+                    address.country = child.textContent;
+                }
+            }
+
+            return address;
+        };
+
+        WmsCapabilities.prototype.assembleCapability = function (element) {
+            var capability = {
+                capsDoc: this
+            };
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Request") {
+                    capability.request = this.assembleRequests(child);
+                } else if (child.localName === "Exception") {
+                    capability.exception = this.assembleException(child);
+                } else if (child.localName === "Layer") {
+                    capability.layers = capability.layers || [];
+                    capability.layers.push(new WmsLayerCapabilities(child, capability));
+                }
+            }
+
+            return capability;
+        };
+
+        WmsCapabilities.prototype.assembleRequests = function (element) {
+            var requests = {};
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "GetCapabilities") {
+                    requests.getCapabilities = this.assembleRequest(child);
+                } else if (child.localName === "GetMap") {
+                    requests.getMap = this.assembleRequest(child);
+                } else if (child.localName === "GetFeatureInfo") {
+                    requests.getFeatureInfo = this.assembleRequest(child);
+                }
+            }
+
+            return requests;
+        };
+
+        WmsCapabilities.prototype.assembleRequest = function (element) {
+            var request = {
+                name: element.localName
+            };
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Format") {
+                    request.formats = request.formats || [];
+                    request.formats.push(child.textContent);
+                } else if (child.localName === "DCPType") {
+                    var children2 = child.children || child.childNodes;
+                    for (var c2 = 0; c2 < children2.length; c2++) {
+                        var child2 = children2[c2];
+                        if (child2.localName === "HTTP") {
+                            var children3 = child2.children || child2.childNodes;
+                            for (var c3 = 0; c3 < children3.length; c3++) {
+                                var child3 = children3[c3];
+                                if (child3.localName === "Get") {
+                                    var children4 = child3.children || child3.childNodes;
+                                    for (var c4 = 0; c4 < children4.length; c4++) {
+                                        var child4 = children4[c4];
+                                        if (child4.localName === "OnlineResource") {
+                                            request.url = child4.getAttribute("xlink:href");
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
-                return result;
-            } else {
-                return undefined;
             }
+
+            return request;
+        };
+
+        WmsCapabilities.prototype.assembleException = function (element) {
+            var exception = {};
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Format") {
+                    exception.formats = exception.formats || [];
+                    exception.formats.push(child.textContent);
+                }
+            }
+
+            return exception;
         };
 
         return WmsCapabilities;

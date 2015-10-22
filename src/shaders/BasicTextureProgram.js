@@ -254,7 +254,7 @@ define([
          * @param {Number} unit The texture unit.
          */
         BasicTextureProgram.prototype.loadTextureUnit = function (gl, unit) {
-            gl.uniform1i(this.textureUnitLocation, unit - WebGLRenderingContext.TEXTURE0);
+            gl.uniform1i(this.textureUnitLocation, unit - gl.TEXTURE0);
         };
 
         /**

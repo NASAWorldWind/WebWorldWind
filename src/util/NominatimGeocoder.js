@@ -34,11 +34,16 @@ define([
          * function is passed two arguments: this geocoder and an array containing the query results. See
          * [the OpenStreetMap Nominatim Wiki] {@link http://wiki.openstreetmap.org/wiki/Nominatim} for a description
          * of the results. The result passed to the callback is parsed JSON.
+         * @param {String} accessKey The MapQuest API access key to use for the request. See
+         * https://developer.mapquest.com/plan_purchase/free/business_edition/business_edition_free
+         * to obtain a key.
          */
-        NominatimGeocoder.prototype.lookup = function (queryString, callback) {
+        NominatimGeocoder.prototype.lookup = function (queryString, callback, accessKey) {
             var url = this.service + queryString.replace(" ", "%20") + "?format=json",
                 xhr = new XMLHttpRequest(),
                 thisGeocoder = this;
+
+            url += "&key=" + (accessKey || "lUvVRchXGGDh5Xwk3oidrXeIDAAevOUS");
 
             xhr.open("GET", url, true);
 

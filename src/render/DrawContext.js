@@ -437,7 +437,7 @@ define([
          */
         DrawContext.prototype.bindFramebuffer = function (framebuffer) {
             if (this.currentFramebuffer != framebuffer) {
-                this.currentGlContext.bindFramebuffer(WebGLRenderingContext.FRAMEBUFFER,
+                this.currentGlContext.bindFramebuffer(this.currentGlContext.FRAMEBUFFER,
                     framebuffer ? framebuffer.framebufferId : null);
                 this.currentFramebuffer = framebuffer;
             }
@@ -651,8 +651,8 @@ define([
             var glPickPoint = this.navigatorState.convertPointToViewport(pickPoint, new Vec2(0, 0)),
                 colorBytes = new Uint8Array(4);
 
-            this.currentGlContext.readPixels(glPickPoint[0], glPickPoint[1], 1, 1, WebGLRenderingContext.RGBA,
-                WebGLRenderingContext.UNSIGNED_BYTE, colorBytes);
+            this.currentGlContext.readPixels(glPickPoint[0], glPickPoint[1], 1, 1, this.currentGlContext.RGBA,
+                this.currentGlContext.UNSIGNED_BYTE, colorBytes);
 
             if (this.clearColor.equalsBytes(colorBytes)) {
                 return null;
@@ -675,13 +675,13 @@ define([
                 uniqueColors = {},
                 color,
                 blankColor = new Color(0, 0, 0, 0),
-                packAlignment = gl.getParameter(WebGLRenderingContext.PACK_ALIGNMENT);
+                packAlignment = gl.getParameter(gl.PACK_ALIGNMENT);
 
-            gl.pixelStorei(WebGLRenderingContext.PACK_ALIGNMENT, 1); // read byte aligned
+            gl.pixelStorei(gl.PACK_ALIGNMENT, 1); // read byte aligned
             this.currentGlContext.readPixels(pickRectangle.x, pickRectangle.y,
                 pickRectangle.width, pickRectangle.height,
-                WebGLRenderingContext.RGBA, WebGLRenderingContext.UNSIGNED_BYTE, colorBytes);
-            gl.pixelStorei(WebGLRenderingContext.PACK_ALIGNMENT, packAlignment); // restore the pack alignment
+                gl.RGBA, gl.UNSIGNED_BYTE, colorBytes);
+            gl.pixelStorei(gl.PACK_ALIGNMENT, packAlignment); // restore the pack alignment
 
             for (var i = 0, len = pickRectangle.width * pickRectangle.height; i < len; i++) {
                 var k = i * 4;
@@ -952,9 +952,9 @@ define([
                 points[i] = 1;
 
                 vboId = gl.createBuffer();
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, points, WebGLRenderingContext.STATIC_DRAW);
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, null);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+                gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
                 this.frameStatistics.incrementVboLoadCount(1);
 
                 this.gpuResourceCache.putResource(DrawContext.unitCubeKey, vboId, points.length * 4);
@@ -1060,9 +1060,9 @@ define([
                 elems[i] = 3;
 
                 vboId = gl.createBuffer();
-                gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, vboId);
-                gl.bufferData(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, elems, WebGLRenderingContext.STATIC_DRAW);
-                gl.bindBuffer(WebGLRenderingContext.ELEMENT_ARRAY_BUFFER, null);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, elems, gl.STATIC_DRAW);
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
                 this.frameStatistics.incrementVboLoadCount(1);
 
                 this.gpuResourceCache.putResource(DrawContext.unitCubeElementsKey, vboId, elems.length * 2);
@@ -1094,9 +1094,9 @@ define([
                 points[7] = 0;
 
                 vboId = gl.createBuffer();
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, points, WebGLRenderingContext.STATIC_DRAW);
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, null);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+                gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
                 this.frameStatistics.incrementVboLoadCount(1);
 
                 this.gpuResourceCache.putResource(DrawContext.unitQuadKey, vboId, points.length * 4);
@@ -1133,9 +1133,9 @@ define([
                 points[11] = 0;
 
                 vboId = gl.createBuffer();
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, vboId);
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER, points, WebGLRenderingContext.STATIC_DRAW);
-                gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, null);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+                gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
                 this.frameStatistics.incrementVboLoadCount(1);
 
                 this.gpuResourceCache.putResource(DrawContext.unitQuadKey3, vboId, points.length * 4);
