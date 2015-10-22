@@ -10,6 +10,7 @@ define([
         '../../error/ArgumentError',
         '../../util/jszip',
         '../../util/Logger',
+        '../../util/Promise',
         '../../util/Remote',
         '../../util/XmlDocument',
         './KmlElements',
@@ -19,6 +20,7 @@ define([
         ArgumentError,
         JsZip,
         Logger,
+        Promise,
         Remote,
         XmlDocument,
         KmlElements,
@@ -31,8 +33,7 @@ define([
          * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
          * rendered in one Layer.
          * @constructor
-         * @param {String} document Either url location of the KmlFile or String representation of valid Kml file.
-         * @param {Object} options callback to use when loaded over the http.
+         * @param {Object} Different options specifying how will the file behave.
          * @alias KmlFile
          * @classdesc Support for Kml File parsing and display.
          */
@@ -45,34 +46,40 @@ define([
             }
 
             // Default values.
-            options.callback = options.callback || function(document){};
             options.local = options.local || false;
 
             if(options.local) {
                 this._document = new XmlDocument(options.document).dom();
-                options.callback(document);
+                return new Promise(function(resolve, reject) {
+                    window.setTimeout(function(){
+                        resolve(self);
+                    }, 0);
+                });
             } else {
                 // Load the document
-                var success = function(loadedDocument) {
-                    var rootDocument = null;
+                return new Promise(function(resolve, reject){
+                    var promise = self.requestUrl(options.url);
+                    promise.then(function(loadedDocument){
+                        var rootDocument;
+                        if(options.url.indexOf('.kmz') == -1) {
+                            rootDocument = loadedDocument;
+                        } else {
+                            var kmzFile = new JsZip();
+                            kmzFile.load(loadedDocument);
+                            kmzFile.files.forEach(function (file) {
+                                if (file.endsWith(".kml") && rootDocument == null) {
+                                    rootDocument = file.asText();
+                                }
+                            });
+                        }
+                        self._document = new XmlDocument(rootDocument).dom();
+                        window.setTimeout(function(){
+                            resolve(self);
+                        }, 0);
+                    });
 
-                    if(options.url.indexOf('.kmz') == -1) {
-                        rootDocument = loadedDocument;
-                    } else {
-                        var kmzFile = new JsZip();
-                        kmzFile.load(loadedDocument);
-                        kmzFile.files.forEach(function (file) {
-                            if (file.endsWith(".kml") && rootDocument == null) {
-                                rootDocument = file.asText();
-                            }
-                        });
-                    }
-                    self._document = new XmlDocument(rootDocument).dom();
-                    // TODO what if the file doesn't exist at all.
-                    options.callback(rootDocument);
 
-                };
-                this.requestUrl(options.url, {success: success});
+                });
             }
         };
 
@@ -141,7 +148,7 @@ define([
                 options.ajax = true;
             }
 
-            new Remote(options);
+            return new Remote(options);
         };
 
          return KmlFile;

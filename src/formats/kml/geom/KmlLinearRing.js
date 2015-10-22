@@ -21,11 +21,13 @@ define([
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#linearring
      */
-    var KmlLinearRing = function(linearRingNode) {
-        KmlLineString.call(this, linearRingNode);
+    var KmlLinearRing = function(linearRingNode, pStyle) {
+        KmlLineString.call(this, linearRingNode, pStyle);
 
         extend(this, KmlLinearRing.prototype);
     };
+
+    KmlLinearRing.prototype = Object.create(KmlLineString.prototype);
 
     KmlLinearRing.prototype.getTagNames = function() {
         return ['LinearRing'];

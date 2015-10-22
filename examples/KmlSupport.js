@@ -17,9 +17,11 @@ requirejs(['../src/WorldWind',
                     var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
                     wwd.addLayer(renderableLayer);
 
-                    var kmlFileRepresentation = new KmlFile({document: text, local: true});
-                    kmlFileRepresentation.parseDocument();
-                    kmlFileRepresentation.update(renderableLayer);
+                    var kmlFilePromise = new KmlFile({document: text, local: true});
+                    kmlFilePromise.then(function(kmlFile){
+                        kmlFile.parseDocument();
+                        kmlFile.update(renderableLayer);
+                    });
                 }
             }
         }).bind(this);

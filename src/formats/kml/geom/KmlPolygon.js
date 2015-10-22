@@ -42,6 +42,7 @@ define([
      */
     var KmlPolygon = function(polygonNode, pStyle) {
         KmlGeometry.call(this, polygonNode);
+
         var self = this;
         // Default locations and attributes. Invisible unless called otherwise.
         pStyle.then(function(pStyle){
@@ -100,7 +101,7 @@ define([
             kmlOuterBoundary: {
                 get: function() {
                     var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
-                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0]);
+                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
                 }
             },
 
@@ -116,7 +117,7 @@ define([
                     if(parentNode == null) {
                         return null;
                     }
-                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0]);
+                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
                 }
             },
 
@@ -191,6 +192,10 @@ define([
             locations = this.kmlOuterBoundary.kmlPositions;
         }
         return locations;
+    };
+
+    KmlPolygon.prototype.getStyle = function() {
+        return this._style;
     };
 
     KmlPolygon.prototype.getTagNames = function() {

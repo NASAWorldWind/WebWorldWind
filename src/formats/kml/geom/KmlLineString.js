@@ -9,7 +9,7 @@ define([
         '../../../geom/Location',
         '../../../geom/Position',
         '../../../shapes/ShapeAttributes',
-        '../../../shapes/SurfacePolyline',
+        '../../../shapes/Path',
         '../KmlElements',
         '../../../util/WWUtil'
     ],
@@ -19,7 +19,7 @@ define([
               Location,
               Position,
               ShapeAttributes,
-              SurfacePolyline,
+              Path,
               KmlElements,
               WWUtil
     ) {
@@ -29,13 +29,22 @@ define([
          * Constructs an KmlLineString object.  Applications shouldn't use this constructor. It is used by
          * {@link KmlFile}. KmlLineString represents one line string.
          * @param lineStringNode {Node} Node representing this line string.
+         * @param pStyle Promise of style.
          * @constructor
          * @alias KmlLineString
          * @classdesc Class representing LineString element of KmlFile
          * @see https://developers.google.com/kml/documentation/kmlreference#linestring
          */
-        var KmlLineString = function (lineStringNode) {
+        var KmlLineString = function (lineStringNode, pStyle) {
             KmlGeometry.call(this, lineStringNode);
+
+            var self = this;
+            pStyle.then(function(style){
+                Path.call(self, self.prepareLocations(), self.prepareAttributes(style));
+                self.moveValidProperties();
+            });
+            this._style = pStyle;
+            this._layer = null;
 
             Object.defineProperties(this, {
                 /**
@@ -123,20 +132,49 @@ define([
             extend(this, KmlLineString.prototype);
         };
 
+        KmlLineString.prototype = Object.create(Path.prototype);
+
         /**
          * Renders LineString as Path.
          * @param layer Layer into which will be the shape rendered.
          */
         KmlLineString.prototype.update = function(layer) {
-            // TODO modify to update using path.
+            var self = this;
+            this._style.then(function(style){
+                var shapeOptions = self.prepareAttributes(style);
+                self.attributes = shapeOptions;
+                self.highlightAttributes = shapeOptions;
+
+                self.locations = self.prepareLocations();
+                self.moveValidProperties();
+
+                if(self._layer != null) {
+                    self._layer.removeRenderable(self);
+                }
+                layer.addRenderable(self);
+                self._layer = layer;
+            });
+        };
+
+        KmlLineString.prototype.prepareAttributes = function(style){
             var attributes = new ShapeAttributes(null);
             attributes.outlineColor = Color.WHITE;
             attributes.interiorColor = Color.WHITE;
             attributes.outlineWidth = 1;
 
-            var locations = this.kmlPositions.map(function(position){return new Location(position.latitude, position.longitude)});
-            this._shape = new SurfacePolyline(locations, attributes);
-            layer.addRenderable(this._shape);
+            return attributes;
+        };
+
+        KmlLineString.prototype.prepareLocations = function() {
+            return this.kmlPositions.map(function(position){
+                return new Location(position.latitude, position.longitude)
+            });
+        };
+
+        KmlLineString.prototype.moveValidProperties = function() {
+            this.extrude = this.kmlExtrude || false;
+            this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
+            this.tesselate = this.kmlTesselate || false;
         };
 
         /**
