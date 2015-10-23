@@ -102,7 +102,7 @@ requirejs([
             var newParagraph = document.createElement('p');
             newParagraph.setAttribute("id", paragraphId)
             newParagraph.textContent = "Loading " + regionName + ": " + loadingStatus + "/" + totalNoOfScenes;
-            document.getElementById("analyticalSurfacesStatus").appendChild(newParagraph);
+            document.getElementById("surfacesStatus").appendChild(newParagraph);
         }
 
         function updateLoadingStatus(paragraphId, regionName, loadingStatus, totalNoOfScenes){
