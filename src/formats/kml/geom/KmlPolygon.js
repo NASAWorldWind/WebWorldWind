@@ -36,7 +36,7 @@ define([
      * @constructor
      * @classdesc Contains the data associated with Kml polygon
      * @param polygonNode Node representing the Kml polygon.
-     * @param pStyle Style to be applied to current node.
+     * @param pStyle Style to be applied to current node. It is optional.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
@@ -45,12 +45,17 @@ define([
 
         var self = this;
         // Default locations and attributes. Invisible unless called otherwise.
-        pStyle.then(function(pStyle){
-            // Once style is delivered create corresponding polygon.
-            Polygon.call(self, self.prepareLocations(), self.prepareAttributes(pStyle));
+        if(pStyle) {
+            pStyle.then(function (style) {
+                // Once style is delivered create corresponding polygon.
+                Polygon.call(self, self.prepareLocations(), self.prepareAttributes(style));
+                self.moveValidProperties();
+            });
+            this._style = pStyle;
+        } else {
+            Polygon.call(self, self.prepareLocations(), self.prepareAttributes());
             self.moveValidProperties();
-        });
-        this._style = pStyle;
+        }
         this._layer = null;
 
         Object.defineProperties(this, {
@@ -143,10 +148,13 @@ define([
      * Renders polygon as polygon applying valid styles.
      * options.style
      */
-    KmlPolygon.prototype.update = function(layer) {
+    KmlPolygon.prototype.update = function(layer, pStyle) {
         var self = this;
-        this._style.then(function(pStyle) {
-            var shapeOptions = self.prepareAttributes(pStyle);
+        if(pStyle) {
+            this._style = pStyle;
+        }
+        this._style.then(function(style) {
+            var shapeOptions = self.prepareAttributes(style);
             self.attributes = shapeOptions;
             self.highlightAttributes = shapeOptions;
 
@@ -174,11 +182,11 @@ define([
         KmlLineStyle.update(pStyle && pStyle.kmlLineStyle, shapeOptions);
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
-        shapeOptions._applyLighting = false;
+        shapeOptions._applyLighting = true;
         shapeOptions._depthTest = true;
         shapeOptions._outlineStippleFactor = 0;
         shapeOptions._outlineStipplePattern = 61680;
-        shapeOptions._enableLighting = false;
+        shapeOptions._enableLighting = true;
 
         return new ShapeAttributes(shapeOptions);
     };

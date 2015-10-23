@@ -64,8 +64,8 @@ define([
         var shapeOptions = options || {};
         shapeOptions._drawInterior = style.kmlFill || true;
         shapeOptions._drawOutline = style.kmlOutline || false;
-        shapeOptions._outlineColor = style.kmlColor && Color.colorFromHex(style.kmlColor) || Color.WHITE;
-        shapeOptions._interiorColor = style.kmlColor && Color.colorFromHex(style.kmlColor) || Color.WHITE;
+        shapeOptions._outlineColor = style.kmlColor && Color.colorFromKmlHex(style.kmlColor) || Color.WHITE;
+        shapeOptions._interiorColor = style.kmlColor && Color.colorFromKmlHex(style.kmlColor) || Color.WHITE;
         shapeOptions._colorMode = style.kmlColorMode || 'normal'; // TODO Not yet supported.
 
         return shapeOptions;

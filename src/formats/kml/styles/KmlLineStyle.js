@@ -98,7 +98,7 @@ define([
         var shapeOptions = options || {};
         style = style || {};
 
-        shapeOptions._outlineColor = style.kmlColor && Color.colorFromHex(style.kmlColor) || Color.WHITE;
+        shapeOptions._outlineColor = style.kmlColor && Color.colorFromKmlHex(style.kmlColor) || Color.WHITE;
         shapeOptions._outlineWidth = style.kmlWidth || 10.0;
 
         return shapeOptions;

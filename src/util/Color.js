@@ -220,6 +220,11 @@ define([
             return Color.colorFromBytes(red, green, blue, alpha);
         };
 
+        Color.colorFromKmlHex = function(color) {
+            color = color.split("").reverse().join("");
+            return Color.colorFromHex(color);
+        };
+
         /**
          * Computes and sets this color to the next higher RBG color. If the color overflows, this color is set to
          * (1 / 255, 0, 0, *), where * indicates the current alpha value.

@@ -6,6 +6,8 @@ define([
         '../../../util/Color',
         '../../../util/extend',
         './KmlGeometry',
+        '../styles/KmlLineStyle',
+        '../styles/KmlPolyStyle',
         '../../../geom/Location',
         '../../../geom/Position',
         '../../../shapes/ShapeAttributes',
@@ -16,6 +18,8 @@ define([
     function (Color,
               extend,
               KmlGeometry,
+              KmlLineStyle,
+              KmlPolyStyle,
               Location,
               Position,
               ShapeAttributes,
@@ -93,7 +97,7 @@ define([
                 kmlPositions: {
                     get: function() {
                         var points = [];
-                        var coordinates = this.retrieve({name: 'coordinates'}).split(' ');
+                        var coordinates = this.retrieve({name: 'coordinates'}).trim().replace(/\s+/g, ' ').split(' ');
                         coordinates.forEach(function(coordinates){
                             coordinates = coordinates.split(',');
                             points.push(new Position(Number(coordinates[1]), Number(coordinates[0]), Number(coordinates[2])));
@@ -144,9 +148,9 @@ define([
                 this._style = pStyle;
             }
             this._style.then(function(style){
-                var shapeOptions = self.prepareAttributes(style);
-                self.attributes = shapeOptions;
-                self.highlightAttributes = shapeOptions;
+                var shapeAttributes = self.prepareAttributes(style);
+                self.attributes = shapeAttributes;
+                self.highlightAttributes = shapeAttributes;
 
                 self.locations = self.prepareLocations();
                 self.moveValidProperties();
@@ -160,18 +164,23 @@ define([
         };
 
         KmlLineString.prototype.prepareAttributes = function(style){
-            var attributes = new ShapeAttributes(null);
-            attributes.outlineColor = Color.WHITE;
-            attributes.interiorColor = Color.WHITE;
-            attributes.outlineWidth = 1;
+            var shapeOptions = KmlPolyStyle.update(style && style.kmlPolyStyle);
+            KmlLineStyle.update(style && style.kmlLineStyle, shapeOptions);
+            // PolyStyle defines internal color.
 
-            return attributes;
+            shapeOptions._applyLighting = true;
+            shapeOptions._drawOutline = true;
+            shapeOptions._drawInterior = true;
+            shapeOptions._drawVerticals = this.kmlExtrude || false;
+            shapeOptions._outlineStippleFactor = 0;
+            shapeOptions._outlineStipplePattern = 61680;
+            shapeOptions._enableLighting = true;
+
+            return new ShapeAttributes(shapeOptions);
         };
 
         KmlLineString.prototype.prepareLocations = function() {
-            return this.kmlPositions.map(function(position){
-                return new Location(position.latitude, position.longitude)
-            });
+            return this.kmlPositions;
         };
 
         KmlLineString.prototype.moveValidProperties = function() {
