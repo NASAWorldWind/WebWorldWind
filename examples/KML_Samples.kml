@@ -103,6 +103,65 @@
       </BalloonStyle>
     </Style>
     <Folder>
+      <name>Placemarks</name>
+      <description>These are just some of the different kinds of placemarks with
+        which you can mark your favorite places</description>
+      <LookAt>
+        <longitude>-122.0839597145766</longitude>
+        <latitude>37.42222904525232</latitude>
+        <altitude>0</altitude>
+        <heading>-148.4122922628044</heading>
+        <tilt>40.5575073395506</tilt>
+        <range>500.6566641072245</range>
+      </LookAt>
+      <Placemark>
+        <name>Simple placemark</name>
+        <description>Attached to the ground. Intelligently places itself at the
+          height of the underlying terrain.</description>
+        <Point>
+          <coordinates>-122.0822035425683,37.42228990140251,0</coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Floating placemark</name>
+        <visibility>0</visibility>
+        <description>Floats a defined distance above the ground.</description>
+        <LookAt>
+          <longitude>-122.0839597145766</longitude>
+          <latitude>37.42222904525232</latitude>
+          <altitude>0</altitude>
+          <heading>-148.4122922628044</heading>
+          <tilt>40.5575073395506</tilt>
+          <range>500.6566641072245</range>
+        </LookAt>
+        <styleUrl>#downArrowIcon</styleUrl>
+        <Point>
+          <altitudeMode>relativeToGround</altitudeMode>
+          <coordinates>-122.084075,37.4220033612141,50</coordinates>
+        </Point>
+      </Placemark>
+      <Placemark>
+        <name>Extruded placemark</name>
+        <visibility>0</visibility>
+        <description>Tethered to the ground by a customizable
+          &quot;tail&quot;</description>
+        <LookAt>
+          <longitude>-122.0845787421525</longitude>
+          <latitude>37.42215078737763</latitude>
+          <altitude>0</altitude>
+          <heading>-148.4126684946234</heading>
+          <tilt>40.55750733918048</tilt>
+          <range>365.2646606980322</range>
+        </LookAt>
+        <styleUrl>#globeIcon</styleUrl>
+        <Point>
+          <extrude>1</extrude>
+          <altitudeMode>relativeToGround</altitudeMode>
+          <coordinates>-122.0857667006183,37.42156927867553,50</coordinates>
+        </Point>
+      </Placemark>
+    </Folder>
+    <Folder>
       <name>Paths</name>
       <visibility>0</visibility>
       <description>Examples of paths. Note that the tessellate tag is by default

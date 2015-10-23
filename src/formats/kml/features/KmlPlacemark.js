@@ -43,7 +43,12 @@ define([
     var KmlPlacemark = function (placemarkNode) {
         KmlFeature.call(this, placemarkNode);
 
+        var self = this;
         this._style = this.getStyle();
+        this._style.then(function(style){
+            Placemark.call(self, self.kmlGeometry.kmlCenter, true, self.prepareAttributes(style));
+            self.moveValidProperties();
+        });
         this._layer = null;
 
         Object.defineProperties(this, {
@@ -81,8 +86,7 @@ define([
         this._style.then(function(style){
             self.attributes = self.prepareAttributes(style);
             self.position = self.kmlGeometry.kmlCenter;
-            self.label = self.kmlDescription;
-            self.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+            self.moveValidProperties();
 
             if(self._layer != null) {
                 self._layer.removeRenderable(self);
@@ -115,7 +119,10 @@ define([
     };
 
     KmlPlacemark.prototype.moveValidProperties = function() {
-        // To be finished later.
+        this.label = this.kmlName || '';
+        this.altitudeMode = this.kmlAltitudeMode || WorldWind.RELATIVE_TO_GROUND;
+
+        // Visualize the icons if present.
     };
 
     KmlPlacemark.prototype.getTagNames = function() {
