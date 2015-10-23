@@ -138,8 +138,11 @@ define([
          * Renders LineString as Path.
          * @param layer Layer into which will be the shape rendered.
          */
-        KmlLineString.prototype.update = function(layer) {
+        KmlLineString.prototype.update = function(layer, pStyle) {
             var self = this;
+            if(pStyle) {
+                this._style = pStyle;
+            }
             this._style.then(function(style){
                 var shapeOptions = self.prepareAttributes(style);
                 self.attributes = shapeOptions;

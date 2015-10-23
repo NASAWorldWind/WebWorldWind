@@ -188,7 +188,7 @@ define([
                     resolve(self.getStyle());
                 } else {
                     // Maybe reject. We will see later.
-                    resolve({});
+                    resolve(null);
                 }
             });
             shapes.push(new constructor(node, style));

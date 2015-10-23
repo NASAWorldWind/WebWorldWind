@@ -40,15 +40,10 @@ define([
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#placemark
      */
-    var KmlPlacemark = function (placemarkNode, pStyle) {
-        var self = this;
+    var KmlPlacemark = function (placemarkNode) {
         KmlFeature.call(this, placemarkNode);
 
-        pStyle.then(function(style){
-            Placemark.call(self, self.geometry.kmlCenter, self.prepareAttributes(style));
-            self.moveValidProperties();
-        });
-        this._style = pStyle;
+        this._style = this.getStyle();
         this._layer = null;
 
         Object.defineProperties(this, {
@@ -58,7 +53,7 @@ define([
              * @type {KmlGeometry}
              * @readonly
              */
-            geometry: {
+            kmlGeometry: {
                 get: function(){
                     return this.createChildElement({
                         name: KmlGeometry.prototype.getTagNames()
@@ -77,33 +72,32 @@ define([
      * @param layer Layer into which the placemark may be rendered.
      */
     KmlPlacemark.prototype.update = function(layer) {
-        if(!this.geometry) {
+        var self = this;
+        if(!self.kmlGeometry) {
             // For now don't display Placemarks without geometries.
             return;
         }
         // Work correctly with styles.
-        var self = this;
         this._style.then(function(style){
-            var placemarkAttributes = self.prepareAttributes(style);
+            self.attributes = self.prepareAttributes(style);
+            self.position = self.kmlGeometry.kmlCenter;
+            self.label = self.kmlDescription;
+            self.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
 
-            var placemark = new Placemark(self.geometry.kmlCenter, true, placemarkAttributes);
-            placemark.label = self.description;
-            placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
-
-            if(this._layer != null) {
-                this._layer.removeRenderable(self);
+            if(self._layer != null) {
+                self._layer.removeRenderable(self);
             }
-            this._layer = layer;
-            this._layer.addRenderable(self);
+            self._layer = layer;
+            self._layer.addRenderable(self);
 
-            self.geometry.update(layer, self.getStyle());
+            self.kmlGeometry.update(layer, self.getStyle());
         });
     };
 
     KmlPlacemark.prototype.prepareAttributes = function(style) {
         var placemarkAttributes = new PlacemarkAttributes(null);
-        KmlIconStyle.update(style && style.IconStyle, placemarkAttributes);
-        KmlLabelStyle.update(style && style.LabelStyle, placemarkAttributes);
+        KmlIconStyle.update(style && style.kmlIconStyle, placemarkAttributes);
+        KmlLabelStyle.update(style && style.kmlLabelStyle, placemarkAttributes);
 
         placemarkAttributes.imageScale = 1;
         placemarkAttributes.imageOffset = new Offset(

@@ -88,7 +88,7 @@ define([
              */
             kmlCenter: {
                 get: function() {
-                    return this.position;
+                    return this.kmlPosition;
                 }
             }
         });

@@ -170,8 +170,8 @@ define([
     };
 
     KmlPolygon.prototype.prepareAttributes = function(pStyle) {
-        var shapeOptions = KmlPolyStyle.update(pStyle && pStyle.PolyStyle);
-        KmlLineStyle.update(pStyle && pStyle.LineStyle, shapeOptions);
+        var shapeOptions = KmlPolyStyle.update(pStyle && pStyle.kmlPolyStyle);
+        KmlLineStyle.update(pStyle && pStyle.kmlLineStyle, shapeOptions);
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
         shapeOptions._applyLighting = false;
