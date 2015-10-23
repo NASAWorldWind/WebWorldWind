@@ -49,6 +49,10 @@ define([
         extend(this, KmlStyleMap.prototype);
     };
 
+    KmlStyleMap.prototype.generate = function(options) {
+
+    };
+
     KmlStyleMap.prototype.getTagNames = function() {
         return ['StyleMap'];
     };

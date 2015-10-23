@@ -176,7 +176,7 @@ define([
     };
 
     KmlPolygon.prototype.prepareAttributes = function(style) {
-        var shapeOptions = KmlStyle.update(style);
+        var shapeOptions = style && style.generate() || {};
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
         shapeOptions._applyLighting = true;

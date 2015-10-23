@@ -46,6 +46,10 @@ define([
         var self = this;
         this._style = this.getStyle();
         this._style.then(function (style) {
+            if (!self.kmlGeometry) {
+                // For now don't display Placemarks without geometries.
+                return;
+            }
             Placemark.call(self, self.kmlGeometry.kmlCenter, false, self.prepareAttributes(style));
             self.moveValidProperties();
         });
@@ -99,7 +103,7 @@ define([
     };
 
     KmlPlacemark.prototype.prepareAttributes = function (style) {
-        var options = KmlStyle.update(style);
+        var options = style && style.generate() || {};
         var placemarkAttributes = new PlacemarkAttributes(options);
 
         placemarkAttributes.imageOffset = new Offset(

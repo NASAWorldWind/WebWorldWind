@@ -131,9 +131,9 @@ define([
         extend(this, KmlStyle.prototype);
     };
 
-    KmlStyle.update = function(style, options) {
+    KmlStyle.prototype.generate = function(options) {
         options = options || {};
-        style = style || {};
+        var style = this || {};
 
         if(style.kmlIconStyle) {
             KmlIconStyle.update(style.kmlIconStyle, options);

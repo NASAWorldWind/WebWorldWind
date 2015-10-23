@@ -162,7 +162,7 @@ define([
         };
 
         KmlLineString.prototype.prepareAttributes = function(style){
-            var shapeOptions = KmlStyle.update(style);
+            var shapeOptions = style && style.generate() || {};
 
             shapeOptions._applyLighting = true;
             shapeOptions._drawOutline = true;

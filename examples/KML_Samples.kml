@@ -162,6 +162,170 @@
       </Placemark>
     </Folder>
     <Folder>
+      <name>Styles and Markup</name>
+      <visibility>0</visibility>
+      <description>With KML it is easy to create rich, descriptive markup to
+        annotate and enrich your placemarks</description>
+      <LookAt>
+        <longitude>-122.0845787422371</longitude>
+        <latitude>37.42215078726837</latitude>
+        <altitude>0</altitude>
+        <heading>-148.4126777488172</heading>
+        <tilt>40.55750733930874</tilt>
+        <range>365.2646826292919</range>
+      </LookAt>
+      <styleUrl>#noDrivingDirections</styleUrl>
+      <Document>
+        <name>Highlighted Icon</name>
+        <visibility>0</visibility>
+        <description>Place your mouse over the icon to see it display the new
+          icon</description>
+        <LookAt>
+          <longitude>-122.0856552124024</longitude>
+          <latitude>37.4224281311035</latitude>
+          <altitude>0</altitude>
+          <heading>0</heading>
+          <tilt>0</tilt>
+          <range>265.8520424250024</range>
+        </LookAt>
+        <Style id="highlightPlacemark">
+          <IconStyle>
+            <Icon>
+              <href>http://maps.google.com/mapfiles/kml/paddle/red-stars.png</href>
+            </Icon>
+          </IconStyle>
+        </Style>
+        <Style id="normalPlacemark">
+          <IconStyle>
+            <Icon>
+              <href>http://maps.google.com/mapfiles/kml/paddle/wht-blank.png</href>
+            </Icon>
+          </IconStyle>
+        </Style>
+        <StyleMap id="exampleStyleMap">
+          <Pair>
+            <key>normal</key>
+            <styleUrl>#normalPlacemark</styleUrl>
+          </Pair>
+          <Pair>
+            <key>highlight</key>
+            <styleUrl>#highlightPlacemark</styleUrl>
+          </Pair>
+        </StyleMap>
+        <Placemark>
+          <name>Roll over this icon</name>
+          <visibility>0</visibility>
+          <styleUrl>#exampleStyleMap</styleUrl>
+          <Point>
+            <coordinates>-122.0856545755255,37.42243077405461,0</coordinates>
+          </Point>
+        </Placemark>
+      </Document>
+      <Placemark>
+        <name>Descriptive HTML</name>
+        <visibility>0</visibility>
+        <description><![CDATA[Click on the blue link!<br><br>
+Placemark descriptions can be enriched by using many standard HTML tags.<br>
+For example:
+<hr>
+Styles:<br>
+<i>Italics</i>,
+<b>Bold</b>,
+<u>Underlined</u>,
+<s>Strike Out</s>,
+subscript<sub>subscript</sub>,
+superscript<sup>superscript</sup>,
+<big>Big</big>,
+<small>Small</small>,
+<tt>Typewriter</tt>,
+<em>Emphasized</em>,
+<strong>Strong</strong>,
+<code>Code</code>
+<hr>
+Fonts:<br>
+<font color="red">red by name</font>,
+<font color="#408010">leaf green by hexadecimal RGB</font>
+<br>
+<font size=1>size 1</font>,
+<font size=2>size 2</font>,
+<font size=3>size 3</font>,
+<font size=4>size 4</font>,
+<font size=5>size 5</font>,
+<font size=6>size 6</font>,
+<font size=7>size 7</font>
+<br>
+<font face=times>Times</font>,
+<font face=verdana>Verdana</font>,
+<font face=arial>Arial</font><br>
+<hr>
+Links:
+<br>
+<a href="http://earth.google.com/">Google Earth!</a>
+<br>
+ or:  Check out our website at www.google.com
+<hr>
+Alignment:<br>
+<p align=left>left</p>
+<p align=center>center</p>
+<p align=right>right</p>
+<hr>
+Ordered Lists:<br>
+<ol><li>First</li><li>Second</li><li>Third</li></ol>
+<ol type="a"><li>First</li><li>Second</li><li>Third</li></ol>
+<ol type="A"><li>First</li><li>Second</li><li>Third</li></ol>
+<hr>
+Unordered Lists:<br>
+<ul><li>A</li><li>B</li><li>C</li></ul>
+<ul type="circle"><li>A</li><li>B</li><li>C</li></ul>
+<ul type="square"><li>A</li><li>B</li><li>C</li></ul>
+<hr>
+Definitions:<br>
+<dl>
+<dt>Google:</dt><dd>The best thing since sliced bread</dd>
+</dl>
+<hr>
+Centered:<br><center>
+Time present and time past<br>
+Are both perhaps present in time future,<br>
+And time future contained in time past.<br>
+If all time is eternally present<br>
+All time is unredeemable.<br>
+</center>
+<hr>
+Block Quote:
+<br>
+<blockquote>
+We shall not cease from exploration<br>
+And the end of all our exploring<br>
+Will be to arrive where we started<br>
+And know the place for the first time.<br>
+<i>-- T.S. Eliot</i>
+</blockquote>
+<br>
+<hr>
+Headings:<br>
+<h1>Header 1</h1>
+<h2>Header 2</h2>
+<h3>Header 3</h3>
+<h3>Header 4</h4>
+<h3>Header 5</h5>
+<hr>
+Images:<br>
+<i>Remote image</i><br>
+<img src="//developers.google.com/kml/documentation/images/googleSample.png"><br>
+<i>Scaled image</i><br>
+<img src="//developers.google.com/kml/documentation/images/googleSample.png" width=100><br>
+<hr>
+Simple Tables:<br>
+<table border="1" padding="1">
+<tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+<tr><td>a</td><td>b</td><td>c</td><td>d</td><td>e</td></tr>
+</table>
+<br>
+[Did you notice that double-clicking on the placemark doesn't cause the viewer to take you anywhere? This is because it is possible to directly author a "placeless placemark". If you look at the code for this example, you will see that it has neither a point coordinate nor a LookAt element.]]]></description>
+      </Placemark>
+    </Folder>
+    <Folder>
       <name>Paths</name>
       <visibility>0</visibility>
       <description>Examples of paths. Note that the tessellate tag is by default
