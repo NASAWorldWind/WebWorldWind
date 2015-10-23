@@ -8,8 +8,7 @@ define([
     '../KmlElements',
     './KmlGeometry',
     './KmlLinearRing',
-    '../styles/KmlLineStyle',
-    '../styles/KmlPolyStyle',
+    '../styles/KmlStyle',
     '../../../geom/Location',
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
@@ -20,8 +19,7 @@ define([
     KmlElements,
     KmlGeometry,
     KmlLinearRing,
-    KmlLineStyle,
-    KmlPolyStyle,
+    KmlStyle,
     Location,
     Polygon,
     ShapeAttributes,
@@ -177,9 +175,8 @@ define([
         this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
     };
 
-    KmlPolygon.prototype.prepareAttributes = function(pStyle) {
-        var shapeOptions = KmlPolyStyle.update(pStyle && pStyle.kmlPolyStyle);
-        KmlLineStyle.update(pStyle && pStyle.kmlLineStyle, shapeOptions);
+    KmlPolygon.prototype.prepareAttributes = function(style) {
+        var shapeOptions = KmlStyle.update(style);
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
         shapeOptions._applyLighting = true;

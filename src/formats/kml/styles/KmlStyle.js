@@ -131,6 +131,31 @@ define([
         extend(this, KmlStyle.prototype);
     };
 
+    KmlStyle.update = function(style) {
+        var options = {};
+
+        if(style.kmlIconStyle) {
+            KmlIconStyle.update(style.kmlPolyStyle, options);
+        }
+        if(style.kmlListStyle) {
+            KmlListStyle.update(style.kmlPolyStyle, options);
+        }
+        if(style.kmlBalloonStyle) {
+            KmlBalloonStyle.update(style.kmlPolyStyle, options);
+        }
+        if(style.kmlLabelStyle) {
+            KmlLabelStyle.update(style.kmlPolyStyle, options);
+        }
+        if(style.kmlPolyStyle) {
+            KmlPolyStyle.update(style.kmlPolyStyle, options);
+        }
+        if(style.kmlLineStyle) {
+            KmlLineStyle.update(style.kmlLineStyle, options);
+        }
+
+        return options;
+    };
+
     KmlStyle.prototype.getStyle = function() {
         var self = this;
         return new Promise(function(resolve, reject){

@@ -6,8 +6,7 @@ define([
         '../../../util/Color',
         '../../../util/extend',
         './KmlGeometry',
-        '../styles/KmlLineStyle',
-        '../styles/KmlPolyStyle',
+        '../styles/KmlStyle',
         '../../../geom/Location',
         '../../../geom/Position',
         '../../../shapes/ShapeAttributes',
@@ -18,8 +17,7 @@ define([
     function (Color,
               extend,
               KmlGeometry,
-              KmlLineStyle,
-              KmlPolyStyle,
+              KmlStyle,
               Location,
               Position,
               ShapeAttributes,
@@ -164,9 +162,7 @@ define([
         };
 
         KmlLineString.prototype.prepareAttributes = function(style){
-            var shapeOptions = KmlPolyStyle.update(style && style.kmlPolyStyle);
-            KmlLineStyle.update(style && style.kmlLineStyle, shapeOptions);
-            // PolyStyle defines internal color.
+            var shapeOptions = KmlStyle.update(style);
 
             shapeOptions._applyLighting = true;
             shapeOptions._drawOutline = true;
