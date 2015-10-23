@@ -26,20 +26,20 @@ define([
          * with default attributes.
          */
         var ShapeAttributes = function (attributes) {
-
+            attributes = attributes || {};
             // All these are documented with their property accessors below.
-            this._drawInterior = attributes ? attributes._drawInterior : true;
-            this._drawOutline = attributes ? attributes._drawOutline : true;
-            this._enableLighting = attributes ? attributes._enableLighting : false;
-            this._interiorColor = attributes ? attributes._interiorColor : Color.WHITE;
-            this._outlineColor = attributes ? attributes._outlineColor : Color.RED;
-            this._outlineWidth = attributes ? attributes._outlineWidth : 1.0;
-            this._outlineStippleFactor = attributes ? attributes._outlineStippleFactor : 0;
-            this._outlineStipplePattern = attributes ? attributes._outlineStipplePattern : 0xF0F0;
-            this._imageSource = attributes ? attributes._imageSource : null;
-            this._depthTest = attributes ? attributes._depthTest : true;
-            this._drawVerticals = attributes ? attributes._drawVerticals : false;
-            this._applyLighting = attributes ? attributes._applyLighting : false;
+            this._drawInterior = attributes._drawInterior || true;
+            this._drawOutline = attributes._drawOutline || true;
+            this._enableLighting = attributes._enableLighting || false;
+            this._interiorColor = attributes._interiorColor || Color.WHITE;
+            this._outlineColor = attributes._outlineColor || Color.RED;
+            this._outlineWidth = attributes._outlineWidth || 1.0;
+            this._outlineStippleFactor = attributes._outlineStippleFactor || 0;
+            this._outlineStipplePattern = attributes._outlineStipplePattern || 0xF0F0;
+            this._imageSource = attributes._imageSource || null;
+            this._depthTest = attributes._depthTest || true;
+            this._drawVerticals = attributes._drawVerticals || false;
+            this._applyLighting = attributes._applyLighting || false;
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their

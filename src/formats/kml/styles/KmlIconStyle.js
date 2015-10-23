@@ -60,7 +60,7 @@ define([
             kmlIcon: {
                 get: function () {
                     return this.createChildElement({
-                        name: KmlIcon.prototype.tagName
+                        name: KmlIcon.prototype.getTagNames()
                     })
                 }
             },
@@ -123,8 +123,14 @@ define([
         extend(this, KmlIconStyle)
     };
 
-    KmlIconStyle.update = function() {
+    KmlIconStyle.update = function(style, options) {
+        style = style || {};
+        var shapeOptions = options || {};
 
+        shapeOptions._imageScale = style.kmlScale || 1;
+        shapeOptions._imageSource = style.kmlIcon && style.kmlIcon.kmlHref || null;
+
+        return shapeOptions;
     };
 
     KmlIconStyle.prototype.getTagNames = function() {

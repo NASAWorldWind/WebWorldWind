@@ -78,6 +78,10 @@ define([
         extend(this, KmlBalloonStyle.prototype);
     };
 
+    KmlBalloonStyle.update = function(style){
+
+    };
+
     KmlBalloonStyle.prototype.getTagNames = function() {
         return ['BalloonStyle']
     };

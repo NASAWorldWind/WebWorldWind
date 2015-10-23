@@ -27,18 +27,6 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Http address or a local file specification used to load the icon.
-             * @memberof KmlIcon.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlHref: {
-                get: function(){
-                    return this.retrieve({name: 'href'});
-                }
-            },
-
-            /**
              * The href can contain a pallet of icons. In this case this is offset from left border.
              * @memberof KmlIcon.prototype
              * @readonly

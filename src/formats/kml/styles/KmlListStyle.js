@@ -83,6 +83,10 @@ define([
         extend(this, KmlListStyle.prototype);
     };
 
+    KmlListStyle.update = function(style) {
+
+    };
+
     KmlListStyle.prototype.getTagNames = function() {
         return ['ListStyle'];
     };

@@ -131,20 +131,21 @@ define([
         extend(this, KmlStyle.prototype);
     };
 
-    KmlStyle.update = function(style) {
-        var options = {};
+    KmlStyle.update = function(style, options) {
+        options = options || {};
+        style = style || {};
 
         if(style.kmlIconStyle) {
-            KmlIconStyle.update(style.kmlPolyStyle, options);
+            KmlIconStyle.update(style.kmlIconStyle, options);
         }
         if(style.kmlListStyle) {
-            KmlListStyle.update(style.kmlPolyStyle, options);
+            KmlListStyle.update(style.kmlListStyle, options);
         }
         if(style.kmlBalloonStyle) {
-            KmlBalloonStyle.update(style.kmlPolyStyle, options);
+            KmlBalloonStyle.update(style.kmlBalloonStyle, options);
         }
         if(style.kmlLabelStyle) {
-            KmlLabelStyle.update(style.kmlPolyStyle, options);
+            KmlLabelStyle.update(style.kmlLabelStyle, options);
         }
         if(style.kmlPolyStyle) {
             KmlPolyStyle.update(style.kmlPolyStyle, options);
