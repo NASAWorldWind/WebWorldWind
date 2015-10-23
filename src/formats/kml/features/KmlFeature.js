@@ -8,7 +8,8 @@ define([
     '../KmlAbstractView',
     '../KmlFile',
     '../KmlFileCache',
-    '../styles/KmlStyle',
+    '../styles/KmlStyleMap',
+    '../styles/KmlStyleSelector',
     '../KmlRegion',
     '../KmlTimePrimitive',
     '../../../util/Promise',
@@ -18,7 +19,8 @@ define([
              KmlAbstractView,
              KmlFile,
              KmlFileCache,
-             KmlStyle,
+             KmlStyleMap,
+             KmlStyleSelector,
              KmlRegion,
              KmlTimePrimitive,
              Promise,
@@ -183,7 +185,7 @@ define([
             kmlStyleSelector: {
                 get: function () {
                     return this.createChildElement({
-                        name: KmlStyle.prototype.getTagNames()
+                        name: KmlStyleSelector.prototype.getTagNames()
                     });
                 }
             },
@@ -219,31 +221,40 @@ define([
             return this._pStyle;
         }
         this._pStyle = new Promise(function (resolve, reject) {
-            // Understand styleUrl
-            var filePromise;
-            if (self.kmlStyleUrl) {
-                filePromise = KmlFileCache.retrieve(self.kmlStyleUrl);
-                if(!filePromise) {
-                    filePromise = new KmlFile({url: self.kmlStyleUrl});
-                    KmlFileCache.add(filePromise);
-                }
-                filePromise.then(function(kmlFile){
-                    kmlFile.resolveStyle(self.kmlStyleUrl).then(function(style){
-                        resolve(style);
-                    });
-                });
-            } else {
-                // TODO: Take into account this._style if present.
-
-                // Resolve this promise right now.
-                // Move this resolve to the end of the stack to prevent recursion.
-                window.setTimeout(function () {
-                    resolve(self.kmlStyleSelector);
-                }, 0);
-            }
+            window.setTimeout(function(){
+                self.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject)
+            },0);
         });
         // Use also styleUrl if valid and StyleSelector.
         return this._pStyle;
+    };
+
+    KmlFeature.prototype.handleRemoteStyle = function(styleUrl, styleSelector, resolve, reject) {
+        // Understand styleUrl
+        // This should return normal and highlight style. as a part of resolving the promise.
+        var filePromise;
+        if (styleUrl) {
+            filePromise = KmlFileCache.retrieve(styleUrl);
+            if(!filePromise) {
+                filePromise = new KmlFile({url: styleUrl});
+                KmlFileCache.add(filePromise);
+            }
+            filePromise.then(function(kmlFile){
+                kmlFile.resolveStyle(styleUrl).then(function(style){
+                    resolve({normal: style, highlight: null});
+                });
+            });
+        } else {
+            if(styleSelector instanceof KmlStyleMap) {
+                // Unless you have StyleMap, Style is always normal, but  want it to return promise returning both,
+                // this way I can use it interchangeably.
+            } else {
+                // Move this resolve to the end of the stack to prevent recursion.
+                window.setTimeout(function () {
+                    resolve({normal: styleSelector, highlight: null});
+                }, 0);
+            }
+        }
     };
 
     KmlFeature.prototype.isFeature = function() {

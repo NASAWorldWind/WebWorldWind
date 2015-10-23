@@ -44,9 +44,9 @@ define([
         var self = this;
         // Default locations and attributes. Invisible unless called otherwise.
         if(pStyle) {
-            pStyle.then(function (style) {
+            pStyle.then(function (styles) {
                 // Once style is delivered create corresponding polygon.
-                Polygon.call(self, self.prepareLocations(), self.prepareAttributes(style));
+                Polygon.call(self, self.prepareLocations(), self.prepareAttributes(styles.normal));
                 self.moveValidProperties();
             });
             this._style = pStyle;
@@ -151,10 +151,12 @@ define([
         if(pStyle) {
             this._style = pStyle;
         }
-        this._style.then(function(style) {
-            var shapeOptions = self.prepareAttributes(style);
-            self.attributes = shapeOptions;
-            self.highlightAttributes = shapeOptions;
+        this._style.then(function(styles) {
+            var normal = styles.normal;
+            var highlight = styles.highlight;
+
+            self.attributes = self.prepareAttributes(normal);
+            self.highlightAttributes = highlight ? self.prepareAttributes(highlight): null;
 
             self.locations = self.prepareLocations();
             self.moveValidProperties();

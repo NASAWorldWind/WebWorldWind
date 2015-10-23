@@ -75,6 +75,10 @@ define([
         return ['Pair'];
     };
 
+    Pair.prototype.getStyle = function() {
+
+    };
+
     KmlElements.addKey(Pair.prototype.getTagNames()[0], Pair);
 
     return Pair;

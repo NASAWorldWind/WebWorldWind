@@ -35,22 +35,16 @@ define([
              * use a full URL along with # referencing.
              * @memberof KmlStyleMap.prototype
              * @readonly
-             * @type {Pair}
+             * @type {Array}
              */
-            kmlPair: {
+            kmlPairs: {
                 get: function () {
-                    return this.createChildElement({
-                        name: Pair.prototype.getTagNames()
-                    });
+                    return this.parse();
                 }
             }
         });
 
         extend(this, KmlStyleMap.prototype);
-    };
-
-    KmlStyleMap.prototype.generate = function(options) {
-
     };
 
     KmlStyleMap.prototype.getTagNames = function() {

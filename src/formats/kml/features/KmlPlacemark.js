@@ -45,12 +45,12 @@ define([
 
         var self = this;
         this._style = this.getStyle();
-        this._style.then(function (style) {
+        this._style.then(function (styles) {
             if (!self.kmlGeometry) {
                 // For now don't display Placemarks without geometries.
                 return;
             }
-            Placemark.call(self, self.kmlGeometry.kmlCenter, false, self.prepareAttributes(style));
+            Placemark.call(self, self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
             self.moveValidProperties();
         });
         this._layer = null;
@@ -87,8 +87,12 @@ define([
             return;
         }
         // Work correctly with styles.
-        this._style.then(function (style) {
-            self.attributes = self.prepareAttributes(style);
+        this._style.then(function (styles) {
+            var normal = styles.normal;
+            var highlight = styles.highlight;
+
+            self.attributes = self.prepareAttributes(normal);
+            self.highlightAttributes = highlight ? self.prepareAttributes(highlight): null;
             self.position = self.kmlGeometry.kmlCenter;
             self.moveValidProperties();
 
@@ -103,7 +107,7 @@ define([
     };
 
     KmlPlacemark.prototype.prepareAttributes = function (style) {
-        var options = style && style.generate() || {};
+        var options = style && style.generate() || {normal: {}, highlight:{}};
         var placemarkAttributes = new PlacemarkAttributes(options);
 
         placemarkAttributes.imageOffset = new Offset(

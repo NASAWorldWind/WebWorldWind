@@ -41,8 +41,8 @@ define([
             KmlGeometry.call(this, lineStringNode);
 
             var self = this;
-            pStyle.then(function(style){
-                Path.call(self, self.prepareLocations(), self.prepareAttributes(style));
+            pStyle.then(function(styles){
+                Path.call(self, self.prepareLocations(), self.prepareAttributes(styles.normal));
                 self.moveValidProperties();
             });
             this._style = pStyle;
@@ -145,10 +145,13 @@ define([
             if(pStyle) {
                 this._style = pStyle;
             }
-            this._style.then(function(style){
-                var shapeAttributes = self.prepareAttributes(style);
-                self.attributes = shapeAttributes;
-                self.highlightAttributes = shapeAttributes;
+            this._style.then(function(styles){
+                var normal = styles.normal;
+                var highlight = styles.highlight;
+
+                var normalAttributes = self.prepareAttributes(normal);
+                self.attributes = normalAttributes;
+                self.highlightAttributes = highlight ? self.prepareAttributes(highlight): normalAttributes;
 
                 self.locations = self.prepareLocations();
                 self.moveValidProperties();
