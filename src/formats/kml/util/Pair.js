@@ -35,7 +35,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            key: {
+            kmlKey: {
                 get: function() {
                     return this.retrieve({name: 'key'});
                 }
@@ -47,7 +47,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            styleUrl: {
+            kmlStyleUrl: {
                 get: function() {
                     return this.retrieve({name: 'styleUrl'});
                 }
@@ -59,7 +59,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            Style: {
+            kmlStyle: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlStyle.prototype.getTagNames()

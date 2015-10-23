@@ -31,7 +31,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            north: {
+            kmlNorth: {
                 get: function () {
                     return this.retrieve({name: 'north', transformer: Number});
                 }
@@ -43,7 +43,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            south: {
+            kmlSouth: {
                 get: function () {
                     return this.retrieve({name: 'south', transformer: Number});
                 }
@@ -55,7 +55,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            east: {
+            kmlEast: {
                 get: function () {
                     return this.retrieve({name: 'east', transformer: Number});
                 }
@@ -67,7 +67,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            west: {
+            kmlWest: {
                 get: function () {
                     return this.retrieve({name: 'west', transformer: Number});
                 }
@@ -79,7 +79,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            minAltitude: {
+            kmlMinAltitude: {
                 get: function () {
                     return this.retrieve({name: 'minAltitude'});
                 }
@@ -91,7 +91,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            maxAltitude: {
+            kmlMaxAltitude: {
                 get: function () {
                     return this.retrieve({name: 'maxAltitude'});
                 }

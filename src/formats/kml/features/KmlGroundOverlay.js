@@ -38,7 +38,7 @@ define([
              * @readonly
              * @type {String}
              */
-            altitude: {
+            kmlAltitude: {
                 get: function() {
                     return this.retrieve({name: 'altitude'});
                 }
@@ -50,7 +50,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            altitudeMode: {
+            kmlAltitudeMode: {
                 get: function() {
                     return this.retrieve({name: 'altitudeMode'});
                 }
@@ -62,7 +62,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            LatLonBox: {
+            kmlLatLonBox: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlLatLonBox.prototype.getTagNames()
@@ -76,7 +76,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            LatLonQuad: {
+            kmlLatLonQuad: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlLatLonQuad.prototype.getTagNames()

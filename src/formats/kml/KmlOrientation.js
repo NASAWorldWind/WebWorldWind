@@ -32,7 +32,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            heading: {
+            kmlHeading: {
                 get: function () {
                     return this.retrieve({name: 'heading', transformer: Number})
                 }
@@ -45,7 +45,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            tilt: {
+            kmlTilt: {
                 get: function () {
                     return this.retrieve({name: 'tilt', transformer: Number})
                 }
@@ -58,7 +58,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            roll: {
+            kmlRoll: {
                 get: function () {
                     return this.retrieve({name: 'roll', transformer: Number})
                 }

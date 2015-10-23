@@ -35,7 +35,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            coordinates: {
+            kmlCoordinates: {
                 get: function () {
                     return this.retrieve({name: 'coordinates'});
                 }

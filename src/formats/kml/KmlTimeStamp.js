@@ -36,7 +36,7 @@ define([
              * @type {DateTime}
              * @readonly
              */
-            when: {
+            kmlWhen: {
                 get: function () {
                     return this.retrieve({name: 'when'});
                 }

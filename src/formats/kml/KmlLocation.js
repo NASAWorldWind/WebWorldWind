@@ -33,7 +33,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            longitude: {
+            kmlLongitude: {
                 get: function() {
                     return this.retrieve({name: 'longitude'});
                 }
@@ -45,7 +45,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            latitude: {
+            kmlLatitude: {
                 get: function() {
                     return this.retrieve({name: 'latitude'});
                 }
@@ -57,7 +57,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            altitude: {
+            kmlAltitude: {
                 get: function() {
                     return this.retrieve({name: 'altitude'});
                 }

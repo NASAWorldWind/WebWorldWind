@@ -32,7 +32,7 @@ define([
              * @readonly
              * @type {String}
              */
-            href: {
+            kmlHref: {
                 get: function(){
                     return this.retrieve({name: 'href'});
                 }
@@ -44,7 +44,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            x: {
+            kmlX: {
                 get: function(){
                     return this.retrieve({name: 'gx:x', transformer: Number});
                 }
@@ -56,7 +56,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            y: {
+            kmlY: {
                 get: function() {
                     return this.retrieve({name: 'gx:y', transformer: Number});
                 }
@@ -68,7 +68,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            w: {
+            kmlW: {
                 get: function() {
                     return this.retrieve({name: 'gx:w'});
                 }
@@ -80,7 +80,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            h: {
+            kmlH: {
                 get: function() {
                     return this.retrieve({name: 'gx:h'});
                 }

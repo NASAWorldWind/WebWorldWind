@@ -33,7 +33,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            rotation: {
+            kmlRotation: {
                 get: function () {
                     return this.retrieve({name: 'rotation', transformer: Number});
                 }
@@ -46,7 +46,7 @@ define([
              * @readonly
              * @type {String}
              */
-            overlayXYx: {
+            kmlOverlayXYx: {
                 get: function () {
                     return this.retrieveAttribute({name: 'overlayXY', attributeName: 'x'});
                 }
@@ -59,7 +59,7 @@ define([
              * @readonly
              * @type {String}
              */
-            overlayXYy: {
+            kmlOverlayXYy: {
                 get: function () {
                     return this.retrieveAttribute({name: 'overlayXY', attributeName: 'y'});
                 }
@@ -73,7 +73,7 @@ define([
              * @readonly
              * @type {String}
              */
-            overlayXYxunits: {
+            kmlOverlayXYxunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'overlayXY', attributeName: 'xunits'});
                 }
@@ -87,7 +87,7 @@ define([
              * @readonly
              * @type {String}
              */
-            overlayXYyunits: {
+            kmlOverlayXYyunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'overlayXY', attributeName: 'yunits'});
                 }
@@ -100,7 +100,7 @@ define([
              * @readonly
              * @type {String}
              */
-            screenXYx: {
+            kmlScreenXYx: {
                 get: function () {
                     return this.retrieveAttribute({name: 'screenXY', attributeName: 'x'});
                 }
@@ -113,7 +113,7 @@ define([
              * @readonly
              * @type {String}
              */
-            screenXYy: {
+            kmlScreenXYy: {
                 get: function () {
                     return this.retrieveAttribute({name: 'screenXY', attributeName: 'y'});
                 }
@@ -127,7 +127,7 @@ define([
              * @readonly
              * @type {String}
              */
-            screenXYxunits: {
+            kmlScreenXYxunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'screenXY', attributeName: 'xunits'});
                 }
@@ -141,7 +141,7 @@ define([
              * @readonly
              * @type {String}
              */
-            screenXYyunits: {
+            kmlScreenXYyunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'screenXY', attributeName: 'yunits'});
                 }
@@ -153,7 +153,7 @@ define([
              * @readonly
              * @type {String}
              */
-            rotationXYx: {
+            kmlRotationXYx: {
                 get: function () {
                     return this.retrieveAttribute({name: 'rotationXY', attributeName: 'x'});
                 }
@@ -165,7 +165,7 @@ define([
              * @readonly
              * @type {String}
              */
-            rotationXYy: {
+            kmlRotationXYy: {
                 get: function () {
                     return this.retrieveAttribute({name: 'rotationXY', attributeName: 'y'});
                 }
@@ -179,7 +179,7 @@ define([
              * @readonly
              * @type {String}
              */
-            rotationXYxunits: {
+            kmlRotationXYxunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'rotationXY', attributeName: 'xunits'});
                 }
@@ -193,7 +193,7 @@ define([
              * @readonly
              * @type {String}
              */
-            rotationXYyunits: {
+            kmlRotationXYyunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'rotationXY', attributeName: 'yunits'});
                 }
@@ -207,7 +207,7 @@ define([
              * @readonly
              * @type {String}
              */
-            sizex: {
+            kmlSizex: {
                 get: function () {
                     return this.retrieveAttribute({name: 'size', attributeName: 'x'});
                 }
@@ -221,7 +221,7 @@ define([
              * @readonly
              * @type {String}
              */
-            sizey: {
+            kmlSizey: {
                 get: function () {
                     return this.retrieveAttribute({name: 'size', attributeName: 'y'});
                 }
@@ -235,7 +235,7 @@ define([
              * @readonly
              * @type {String}
              */
-            sizexunits: {
+            kmlSizexunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'size', attributeName: 'xunits'});
                 }
@@ -249,7 +249,7 @@ define([
              * @readonly
              * @type {String}
              */
-            sizeyunits: {
+            kmlSizeyunits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'size', attributeName: 'yunits'});
                 }

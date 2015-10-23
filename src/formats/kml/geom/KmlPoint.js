@@ -47,7 +47,7 @@ define([
              * @type {Position}
              * @readonly
              */
-            position: {
+            kmlPosition: {
                 get: function() {
                     var coordinates = this.retrieve({name: 'coordinates'}).split(',');
                     return new Position(coordinates[1], coordinates[0], coordinates[2]);
@@ -61,7 +61,7 @@ define([
              * @type {Boolean}
              * @readonly
              */
-            extrude: {
+            kmlExtrude: {
                 get: function() {
                     return this.retrieve({name: 'extrude', transformer: Boolean});
                 }
@@ -74,7 +74,7 @@ define([
              * @type {String}
              * @readonly
              */
-            altitudeMode: {
+            kmlAltitudeMode: {
                 get: function() {
                     return this.retrieve({name: 'altitudeMode'});
                 }
@@ -106,10 +106,10 @@ define([
         attributes.interiorColor = Color.WHITE;
         attributes.drawVerticals = false;
 
-        this._shape = new Polygon(this.createRectangleFromPosition(this.position), attributes);
+        this._shape = new Polygon(this.createRectangleFromPosition(this.kmlPosition), attributes);
 
-        this._shape.altitudeMode = this.altitudeMode || WorldWind.ABSOLUTE;
-        this._shape.extrude = this.extrude;
+        this._shape.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
+        this._shape.extrude = this.kmlExtrude;
         layer.addRenderable(this._shape);
     };
 

@@ -31,7 +31,7 @@ define([
              * @readonly
              * @type {String}
              */
-            color: {
+            kmlColor: {
                 get: function() {
                     return this.retrieve({name: 'color'});
                 }
@@ -44,7 +44,7 @@ define([
              * @readonly
              * @type {String}
              */
-            colorMode: {
+            kmlColorMode: {
                 get: function() {
                     return this.retrieve({name: 'colorMode'})
                 }

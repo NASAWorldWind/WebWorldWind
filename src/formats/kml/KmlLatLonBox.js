@@ -31,7 +31,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            north: {
+            kmlNorth: {
                 get: function () {
                     return this.retrieve({name: 'north', transformer: Number});
                 }
@@ -43,7 +43,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            south: {
+            kmlSouth: {
                 get: function () {
                     return this.retrieve({name: 'south', transformer: Number});
                 }
@@ -55,7 +55,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            east: {
+            kmlEast: {
                 get: function () {
                     return this.retrieve({name: 'east', transformer: Number});
                 }
@@ -67,7 +67,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            west: {
+            kmlWest: {
                 get: function () {
                     return this.retrieve({name: 'west', transformer: Number});
                 }
@@ -80,7 +80,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            rotation: {
+            kmlRotation: {
                 get: function () {
                     return this.retrieve({name: 'rotation'});
                 }

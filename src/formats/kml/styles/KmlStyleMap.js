@@ -37,7 +37,7 @@ define([
              * @readonly
              * @type {Pair}
              */
-            Pair: {
+            kmlPair: {
                 get: function () {
                     return this.createChildElement({
                         name: Pair.prototype.getTagNames()

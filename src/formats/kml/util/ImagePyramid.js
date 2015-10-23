@@ -33,7 +33,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            tileSize: {
+            kmlTileSize: {
                 get: function () {
                     return this.retrieve({name: 'tileSize', transformer: Number});
                 }
@@ -45,7 +45,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            maxWidth: {
+            kmlMaxWidth: {
                 get: function () {
                     return this.retrieve({name: 'maxWidth', transformer: Number});
                 }
@@ -57,7 +57,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            maxHeight: {
+            kmlMaxHeight: {
                 get: function () {
                     return this.retrieve({name: 'maxHeight', transformer: Number});
                 }
@@ -70,7 +70,7 @@ define([
              * @readonly
              * @type {String}
              */
-            gridOrigin: {
+            kmlGridOrigin: {
                 get: function () {
                     return this.retrieve({name: 'gridOrigin'});
                 }

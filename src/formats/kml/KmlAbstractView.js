@@ -35,7 +35,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            TimePrimitive: {
+            kmlTimePrimitive: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlTimePrimitive.prototype.getTagNames()

@@ -32,7 +32,7 @@ define([
              * @readonly
              * @type {String}
              */
-            bgColor: {
+            kmlBgColor: {
                 get: function(){
                     return this.retrieve({name: 'bgColor'});
                 }
@@ -44,7 +44,7 @@ define([
              * @readonly
              * @type {String}
              */
-            textColor: {
+            kmlTextColor: {
                 get: function() {
                     return this.retrieve({name: 'textColor'});
                 }
@@ -56,7 +56,7 @@ define([
              * @readonly
              * @type {String}
              */
-            text: {
+            kmlText: {
                 get: function(){
                     return this.retrieve({name: 'text'});
                 }
@@ -68,7 +68,7 @@ define([
              * @readonly
              * @type {String}
              */
-            displayMode: {
+            kmlDisplayMode: {
                 get: function() {
                     return this.retrieve({name: 'displayMode'});
                 }

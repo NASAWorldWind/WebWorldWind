@@ -33,7 +33,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            scale: {
+            kmlScale: {
                 get: function () {
                     return this.retrieve({name: 'scale', transformer: Number});
                 }
@@ -45,7 +45,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            heading: {
+            kmlHeading: {
                 get: function () {
                     return this.retrieve({name: 'heading'});
                 }
@@ -57,7 +57,7 @@ define([
              * @readonly
              * @type {KmlIcon}
              */
-            Icon: {
+            kmlIcon: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlIcon.prototype.tagName
@@ -72,7 +72,7 @@ define([
              * @readonly
              * @type {KmlIcon}
              */
-            hotSpotX: {
+            kmlHotSpotX: {
                 get: function () {
                     return this.retrieveAttribute({name: 'hotSpot', attributeName: 'x'});
                 }
@@ -85,7 +85,7 @@ define([
              * @readonly
              * @type {KmlIcon}
              */
-            hotSpotY: {
+            kmlHotSpotY: {
                 get: function () {
                     return this.retrieveAttribute({name: 'hotSpot', attributeName: 'y'});
                 }
@@ -99,7 +99,7 @@ define([
              * @readonly
              * @type {KmlIcon}
              */
-            hotSpotXUnits: {
+            kmlHotSpotXUnits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'hotSpot', attributeName: 'xunits'});
                 }
@@ -113,7 +113,7 @@ define([
              * @readonly
              * @type {KmlIcon}
              */
-            hotSpotYUnits: {
+            kmlHotSpotYUnits: {
                 get: function () {
                     return this.retrieveAttribute({name: 'hotSpot', attributeName: 'yunits'});
                 }

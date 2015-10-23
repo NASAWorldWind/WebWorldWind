@@ -33,7 +33,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            longitude: {
+            kmlLongitude: {
                 get: function () {
                     return this.retrieve({name: 'longitude', transformer: Number});
                 }
@@ -46,7 +46,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            latitude: {
+            kmlLatitude: {
                 get: function () {
                     return this.retrieve({name: 'latitude', transformer: Number});
                 }
@@ -58,7 +58,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            altitude: {
+            kmlAltitude: {
                 get: function () {
                     return this.retrieve({name: 'altitude', transformer: Number});
                 }
@@ -71,7 +71,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            heading: {
+            kmlHeading: {
                 get: function () {
                     return this.retrieve({name: 'heading', transformer: Number});
                 }
@@ -85,7 +85,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            tilt: {
+            kmlTilt: {
                 get: function () {
                     return this.retrieve({name: 'tilt', transformer: Number});
                 }
@@ -98,7 +98,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            range: {
+            kmlRange: {
                 get: function () {
                     return this.retrieve({name: 'range', transformer: Number});
                 }
@@ -114,7 +114,7 @@ define([
              * @readonly
              * @type {String}
              */
-            altitudeMode: {
+            kmlAltitudeMode: {
                 get: function () {
                     return this.retrieve({name: 'altitudeMode'});
                 }

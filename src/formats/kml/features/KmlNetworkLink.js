@@ -41,7 +41,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            refreshVisibility: {
+            kmlRefreshVisibility: {
                 get: function () {
                     return this.retrieve({name: 'refreshVisibility', transformer: WWUtil.transformToBoolean});
                 }
@@ -58,7 +58,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            flyToView: {
+            kmlFlyToView: {
                 get: function () {
                     return this.retrieve({name: 'flyToView', transformer: WWUtil.transformToBoolean});
                 }
@@ -70,7 +70,7 @@ define([
              * @type {KmlLink}
              * @see {KmlLink}
              */
-            Link: {
+            kmlLink: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlLink.prototype.getTagNames()

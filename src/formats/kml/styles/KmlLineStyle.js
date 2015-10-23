@@ -34,7 +34,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            width: {
+            kmlWidth: {
                 get: function() {
                     return this.retrieve({name: 'width', transformer: Number});
                 }
@@ -46,7 +46,7 @@ define([
              * @readonly
              * @type {String}
              */
-            outerColor: {
+            kmlOuterColor: {
                 get: function() {
                     return this.retrieve({name: 'gx:outerColor'});
                 }
@@ -59,7 +59,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            outerWidth: {
+            kmlOuterWidth: {
                 get: function() {
                     return this.retrieve({name: 'gx:outerWidth'});
                 }
@@ -71,7 +71,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            physicalWidth: {
+            kmlPhysicalWidth: {
                 get: function() {
                     return this.retrieve({name: 'gx:physicalWidth'});
                 }
@@ -84,7 +84,7 @@ define([
              * @readonly
              * @type {Boolean}
              */
-            labelVisibility: {
+            kmlLabelVisibility: {
                 get: function() {
                     return this.retrieve({name: 'gx:labelVisibility'});
                 }
@@ -98,8 +98,8 @@ define([
         var shapeOptions = options || {};
         style = style || {};
 
-        shapeOptions._outlineColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
-        shapeOptions._outlineWidth = style.width || 10.0;
+        shapeOptions._outlineColor = style.kmlColor && Color.colorFromHex(style.kmlColor) || Color.WHITE;
+        shapeOptions._outlineWidth = style.kmlWidth || 10.0;
 
         return shapeOptions;
     };

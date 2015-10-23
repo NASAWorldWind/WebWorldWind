@@ -37,7 +37,7 @@ define([
              * @readonly
              * @type {Boolean}
              */
-            fill: {
+            kmlFill: {
                 get: function(){
                     return this.retrieve({name: 'fill', transformer: WWUtil.transformToBoolean});
                 }
@@ -49,7 +49,7 @@ define([
              * @readonly
              * @type {Boolean}
              */
-            outline: {
+            kmlOutline: {
                 get: function(){
                     return this.retrieve({name: 'outline', transformer: WWUtil.transformToBoolean});
                 }
@@ -62,11 +62,11 @@ define([
     KmlPolyStyle.update = function(style, options) {
         style = style || {};
         var shapeOptions = options || {};
-        shapeOptions._drawInterior = style.fill || true;
-        shapeOptions._drawOutline = style.outline || false;
-        shapeOptions._outlineColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
-        shapeOptions._interiorColor = style.color && Color.colorFromHex(style.color) || Color.WHITE;
-        shapeOptions._colorMode = style.colorMode || 'normal'; // TODO Not yet supported.
+        shapeOptions._drawInterior = style.kmlFill || true;
+        shapeOptions._drawOutline = style.kmlOutline || false;
+        shapeOptions._outlineColor = style.kmlColor && Color.colorFromHex(style.kmlColor) || Color.WHITE;
+        shapeOptions._interiorColor = style.kmlColor && Color.colorFromHex(style.kmlColor) || Color.WHITE;
+        shapeOptions._colorMode = style.kmlColorMode || 'normal'; // TODO Not yet supported.
 
         return shapeOptions;
     };

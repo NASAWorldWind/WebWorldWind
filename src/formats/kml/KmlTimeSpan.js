@@ -35,7 +35,7 @@ define([
              * @type {DateTime}
              * @readonly
              */
-            begin: {
+            kmlBegin: {
                 get: function() {
                     return this.retrieve({name: 'begin'});
                 }
@@ -47,7 +47,7 @@ define([
              * @type {DateTime}
              * @readonly
              */
-            end: {
+            kmlEnd: {
                 get: function() {
                     return this.retrieve({name: 'end'});
                 }

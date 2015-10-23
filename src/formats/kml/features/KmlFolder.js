@@ -33,7 +33,7 @@ define([
              * @type {Array}
              * @see {KmlFeature}
              */
-            shapes: {
+            kmlShapes: {
                 get: function(){
                     return this.parse();
                 }
@@ -44,7 +44,7 @@ define([
     };
 
     KmlFolder.prototype.update = function(layer, style) {
-        this.shapes.forEach(function(shape) {
+        this.kmlShapes.forEach(function(shape) {
             shape.update(layer, style);
         });
     };

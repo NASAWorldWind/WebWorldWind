@@ -49,7 +49,7 @@ define([
              * @readonly
              * @type {KmlIconStyle|null}
              */
-            IconStyle: {
+            kmlIconStyle: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlIconStyle.prototype.getTagNames()
@@ -63,7 +63,7 @@ define([
              * @readonly
              * @type {KmlLabelStyle|null}
              */
-            LabelStyle: {
+            kmlLabelStyle: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlLabelStyle.prototype.getTagNames()
@@ -77,7 +77,7 @@ define([
              * @readonly
              * @type {KmlLineStyle|null}
              */
-            LineStyle: {
+            kmlLineStyle: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlLineStyle.prototype.getTagNames()
@@ -91,7 +91,7 @@ define([
              * @readonly
              * @type {KmlPolyStyle|null}
              */
-            PolyStyle: {
+            kmlPolyStyle: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlPolyStyle.prototype.getTagNames()
@@ -105,7 +105,7 @@ define([
              * @readonly
              * @type {KmlBalloonStyle|null}
              */
-            BalloonStyle: {
+            kmlBalloonStyle: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlBalloonStyle.prototype.getTagNames()
@@ -119,7 +119,7 @@ define([
              * @readonly
              * @type {KmlBalloonStyle|null}
              */
-            ListStyle: {
+            kmlListStyle: {
                 get: function() {
                     return this.createChildElement({
                         name: KmlListStyle.prototype.getTagNames()

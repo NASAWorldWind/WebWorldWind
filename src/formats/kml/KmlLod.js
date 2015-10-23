@@ -36,7 +36,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            minLodPixels: {
+            kmlMinLodPixels: {
                 get: function () {
                     return this.retrieve({name: 'minLodPixels', transformer: Number});
                 }
@@ -49,7 +49,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            maxLodPixels: {
+            kmlMaxLodPixels: {
                 get: function () {
                     return this.retrieve({name: 'maxLodPixels', transformer: Number});
                 }
@@ -62,7 +62,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            minFadeExtent: {
+            kmlMinFadeExtent: {
                 get: function () {
                     return this.retrieve({name: 'minFadeExtent', transformer: Number});
                 }
@@ -75,7 +75,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            maxFadeExtent: {
+            kmlMaxFadeExtent: {
                 get: function () {
                     return this.retrieve({name: 'maxFadeExtent', transformer: Number});
                 }

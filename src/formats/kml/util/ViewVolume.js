@@ -30,7 +30,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            leftFov: {
+            kmlLeftFov: {
                 get: function () {
                     return this.retrieve({name: 'leftFov'});
                 }
@@ -42,7 +42,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            rightFov: {
+            kmlRightFov: {
                 get: function () {
                     return this.retrieve({name: 'rightFov'});
                 }
@@ -54,7 +54,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            bottomFov: {
+            kmlBottomFov: {
                 get: function () {
                     return this.retrieve({name: 'bottomFov'});
                 }
@@ -66,7 +66,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            topFov: {
+            kmlTopFov: {
                 get: function () {
                     return this.retrieve({name: 'topFov'});
                 }
@@ -81,7 +81,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            near: {
+            kmlNear: {
                 get: function () {
                     return this.retrieve({name: 'near'});
                 }

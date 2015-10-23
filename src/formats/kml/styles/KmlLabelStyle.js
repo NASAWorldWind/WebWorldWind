@@ -32,7 +32,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            scale: {
+            kmlScale: {
                 get: function() {
                     return this.retrieve({name: 'scale', transformer: Number});
                 }

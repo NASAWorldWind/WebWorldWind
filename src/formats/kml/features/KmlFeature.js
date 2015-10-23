@@ -46,7 +46,7 @@ define([
              * @type {String}
              * @readonly
              */
-            name: {
+            kmlName: {
                 get: function () {
                     return this.retrieve({name: 'name'});
                 }
@@ -58,7 +58,7 @@ define([
              * @type {Boolean}
              * @readonly
              */
-            visibility: {
+            kmlVisibility: {
                 get: function () {
                     return this.retrieve({name: 'visibility', transformer: WWUtil.transformToBoolean});
                 }
@@ -71,7 +71,7 @@ define([
              * @type {Boolean}
              * @readonly
              */
-            open: {
+            kmlOpen: {
                 get: function () {
                     return this.retrieve({name: 'open', transformer: WWUtil.transformToBoolean});
                 }
@@ -83,7 +83,7 @@ define([
              * @type {String}
              * @readonly
              */
-            address: {
+            kmlAddress: {
                 get: function () {
                     return this.retrieve({name: 'address'});
                 }
@@ -95,7 +95,7 @@ define([
              * @type {String}
              * @readonly
              */
-            phoneNumber: {
+            kmlPhoneNumber: {
                 get: function () {
                     return this.retrieve({name: 'phoneNumber'});
                 }
@@ -107,7 +107,7 @@ define([
              * @type {String}
              * @readonly
              */
-            description: {
+            kmlDescription: {
                 get: function () {
                     return this.retrieve({name: 'description'});
                 }
@@ -121,7 +121,7 @@ define([
              * @type {String}
              * @readonly
              */
-            styleUrl: {
+            kmlStyleUrl: {
                 get: function () {
                     return this.retrieve({name: 'styleUrl'});
                 }
@@ -138,7 +138,7 @@ define([
              * @type {String}
              * @readonly
              */
-            Snippet: {
+            kmlSnippet: {
                 get: function () {
                     return this.retrieve({name: 'Snippet'});
                 }
@@ -151,7 +151,7 @@ define([
              * @type {KmlAbstractView}
              * @readonly
              */
-            AbstractView: {
+            kmlAbstractView: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlAbstractView.prototype.getTagNames()
@@ -166,7 +166,7 @@ define([
              * @type {KmlTimePrimitive}
              * @readonly
              */
-            TimePrimitive: {
+            kmlTimePrimitive: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlTimePrimitive.prototype.getTagNames()
@@ -180,7 +180,7 @@ define([
              * @type {KmlTimePrimitive}
              * @readonly
              */
-            StyleSelector: {
+            kmlStyleSelector: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlStyle.prototype.getTagNames()
@@ -194,7 +194,7 @@ define([
              * @type {KmlRegion}
              * @readonly
              */
-            Region: {
+            kmlRegion: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlRegion.prototype.getTagNames()
@@ -221,14 +221,14 @@ define([
         this._pStyle = new Promise(function (resolve, reject) {
             // Understand styleUrl
             var filePromise;
-            if (self.styleUrl) {
-                filePromise = KmlFileCache.retrieve(self.styleUrl);
+            if (self.kmlStyleUrl) {
+                filePromise = KmlFileCache.retrieve(self.kmlStyleUrl);
                 if(!filePromise) {
-                    filePromise = new KmlFile({url: self.styleUrl});
+                    filePromise = new KmlFile({url: self.kmlStyleUrl});
                     KmlFileCache.add(filePromise);
                 }
                 filePromise.then(function(kmlFile){
-                    kmlFile.resolveStyle(self.styleUrl).then(function(style){
+                    kmlFile.resolveStyle(self.kmlStyleUrl).then(function(style){
                         resolve(style);
                     });
                 });
@@ -238,7 +238,7 @@ define([
                 // Resolve this promise right now.
                 // Move this resolve to the end of the stack to prevent recursion.
                 window.setTimeout(function () {
-                    resolve(self.StyleSelector);
+                    resolve(self.kmlStyleSelector);
                 }, 0);
             }
         });

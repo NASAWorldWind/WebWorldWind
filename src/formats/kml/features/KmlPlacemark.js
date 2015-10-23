@@ -35,17 +35,21 @@ define([
      * @alias KmlPlacemark
      * @classdesc Contains the data associated with KmlPlacemark.
      * @param placemarkNode Node representing Kml Placemark
+     * @param pStyle Promise of the style to be delivered.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#placemark
      */
     var KmlPlacemark = function (placemarkNode, pStyle) {
+        var self = this;
         KmlFeature.call(this, placemarkNode);
 
         pStyle.then(function(style){
-
+            Placemark.call(self, self.geometry.kmlCenter, self.prepareAttributes(style));
+            self.moveValidProperties();
         });
         this._style = pStyle;
+        this._layer = null;
 
         Object.defineProperties(this, {
             /**
@@ -72,12 +76,31 @@ define([
      * It renders placemark with associated geometry.
      * @param layer Layer into which the placemark may be rendered.
      */
-    KmlPlacemark.prototype.update = function(layer, style) {
+    KmlPlacemark.prototype.update = function(layer) {
         if(!this.geometry) {
             // For now don't display Placemarks without geometries.
             return;
         }
         // Work correctly with styles.
+        var self = this;
+        this._style.then(function(style){
+            var placemarkAttributes = self.prepareAttributes(style);
+
+            var placemark = new Placemark(self.geometry.kmlCenter, true, placemarkAttributes);
+            placemark.label = self.description;
+            placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+
+            if(this._layer != null) {
+                this._layer.removeRenderable(self);
+            }
+            this._layer = layer;
+            this._layer.addRenderable(self);
+
+            self.geometry.update(layer, self.getStyle());
+        });
+    };
+
+    KmlPlacemark.prototype.prepareAttributes = function(style) {
         var placemarkAttributes = new PlacemarkAttributes(null);
         KmlIconStyle.update(style && style.IconStyle, placemarkAttributes);
         KmlLabelStyle.update(style && style.LabelStyle, placemarkAttributes);
@@ -94,13 +117,11 @@ define([
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes.outlineColor = Color.RED;
 
-        var placemark = new Placemark(this.geometry.kmlCenter, true, placemarkAttributes);
-        placemark.label = this.description;
-        placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+        return placemarkAttributes;
+    };
 
-        layer.addRenderable(this);
-
-        this.geometry.update(layer, this.StyleSelector);
+    KmlPlacemark.prototype.moveValidProperties = function() {
+        // To be finished later.
     };
 
     KmlPlacemark.prototype.getTagNames = function() {

@@ -36,7 +36,7 @@ define([
              * @readonly
              * @type {String}
              */
-            color: {
+            kmlColor: {
                 get: function() {
                     return this.retrieve({name: 'color'});
                 }
@@ -49,7 +49,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            drawOrder: {
+            kmlDrawOrder: {
                 get: function() {
                     return this.retrieve({name: 'drawOrder', transformer: Number});
                 }
@@ -64,7 +64,7 @@ define([
              * @readonly
              * @type {KmlIcon}
              */
-            Icon: {
+            kmlIcon: {
                 get: function(){
                     return this.createChildElement({
                         name: KmlIcon.prototype.getTagNames()

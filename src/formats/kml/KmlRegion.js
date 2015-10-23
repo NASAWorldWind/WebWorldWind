@@ -36,7 +36,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            LatLonAltBox: {
+            kmlLatLonAltBox: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlLatLonAltBox.prototype.getTagNames()
@@ -53,7 +53,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            Lod: {
+            kmlLod: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlLod.prototype.getTagNames()

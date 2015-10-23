@@ -33,7 +33,7 @@ define([
              * @readonly
              * @type {String}
              */
-            state: {
+            kmlState: {
                 get: function () {
                     return this.retrieve({name: 'state'});
                 }
@@ -45,7 +45,7 @@ define([
              * @readonly
              * @type {String}
              */
-            href: {
+            kmlHref: {
                 get: function () {
                     return this.retrieve({name: 'href'});
                 }

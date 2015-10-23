@@ -33,7 +33,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            x: {
+            kmlX: {
                 get: function() {
                     return this.retrieve({name: 'x'});
                 }
@@ -45,7 +45,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            y: {
+            kmlY: {
                 get: function() {
                     return this.retrieve({name: 'y'});
                 }
@@ -57,7 +57,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            z: {
+            kmlZ: {
                 get: function() {
                     return this.retrieve({name: 'z'});
                 }

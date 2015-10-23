@@ -37,7 +37,7 @@ define([
              * @type {Array}
              * @see {KmlFeature}
              */
-            shapes: {
+            kmlShapes: {
                 get: function(){
                     var allElements = this.parse();
                     return allElements.filter(function(element){
@@ -55,7 +55,7 @@ define([
              * @type {Array}
              * @see {Schema}
              */
-            schemas: {
+            kmlSchemas: {
                 get: function(){
                     var allElements = this.parse();
                     return allElements.filter(function(element){
@@ -69,7 +69,7 @@ define([
     };
 
     KmlDocument.prototype.update = function(layer, style) {
-        this.shapes.forEach(function(shape) {
+        this.kmlShapes.forEach(function(shape) {
             shape.update(layer, style);
         });
     };

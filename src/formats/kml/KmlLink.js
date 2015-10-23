@@ -35,7 +35,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            href: {
+            kmlHref: {
                 get: function () {
                     return this.retrieve({name: 'href'});
                 }
@@ -54,7 +54,7 @@ define([
              * @readonly
              * @type {String}
              */
-            refreshMode: {
+            kmlRefreshMode: {
                 get: function () {
                     return this.retrieve({name: 'refreshMode'});
                 }
@@ -66,7 +66,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            refreshInterval: {
+            kmlRefreshInterval: {
                 get: function () {
                     return this.retrieve({name: 'refreshInterval', transformer: Number});
                 }
@@ -84,7 +84,7 @@ define([
              * @readonly
              * @type {String}
              */
-            viewRefreshMode: {
+            kmlViewRefreshMode: {
                 get: function () {
                     return this.retrieve({name: 'viewRefreshMode'});
                 }
@@ -97,7 +97,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            viewRefreshTime: {
+            kmlViewRefreshTime: {
                 get: function () {
                     return this.retrieve({name: 'viewRefreshTime', transformer: Number});
                 }
@@ -111,7 +111,7 @@ define([
              * @readonly
              * @type {Number}
              */
-            viewBoundScale: {
+            kmlViewBoundScale: {
                 get: function () {
                     return this.retrieve({name: 'viewBoundScale', transformer: Number});
                 }
@@ -141,7 +141,7 @@ define([
              * @readonly
              * @type {String}
              */
-            viewFormat: {
+            kmlViewFormat: {
                 get: function () {
                     return this.retrieve({name: 'viewFormat'});
                 }
@@ -158,7 +158,7 @@ define([
              * @readonly
              * @type {String}
              */
-            httpQuery: {
+            kmlHttpQuery: {
                 get: function () {
                     return this.retrieve({name: 'httpQuery'});
                 }

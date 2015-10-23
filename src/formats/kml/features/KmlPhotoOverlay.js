@@ -38,7 +38,7 @@ define([
              * @readonly
              * @type {Array}
              */
-            rotation: {
+            kmlRotation: {
                 get: function () {
                     return this.retrieve({name: 'rotation'});
                 }
@@ -51,7 +51,7 @@ define([
              * @readonly
              * @type {String}
              */
-            shape: {
+            kmlShape: {
                 get: function () {
                     return this.retrieve({name: 'shape'});
                 }
@@ -65,7 +65,7 @@ define([
              * @readonly
              * @type {KmlPoint}
              */
-            Point: {
+            kmlPoint: {
                 get: function () {
                     return this.createChildElement({
                         name: KmlPoint.prototype.getTagNames()
@@ -81,7 +81,7 @@ define([
              * @readonly
              * @type {ViewVolume}
              */
-            ViewVolume: {
+            kmlViewVolume: {
                 get: function () {
                     return this.createChildElement({
                         name: ViewVolume.prototype.getTagNames()
@@ -105,7 +105,7 @@ define([
              * @readonly
              * @type {ImagePyramid}
              */
-            ImagePyramid: {
+            kmlImagePyramid: {
                 get: function () {
                     return this.createChildElement({
                         name: ImagePyramid.prototype.getTagNames()
