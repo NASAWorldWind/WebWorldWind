@@ -12,7 +12,7 @@
     <script src="//code.jquery.com/jquery-1.10.2.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-    <script data-main="AnalyticalSurface" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.min.js"></script>
+    <script data-main="NDVIViewer" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.min.js"></script>
 
     <style>
         table tr td:empty {
@@ -56,7 +56,7 @@
 
 <div class="container">
     <div class="jumbotron hidden-xs">
-        <h1 style="text-align:center">World Wind Analytical Surface</h1>
+        <h1 style="text-align:center">World Wind NDVI Viewer</h1>
     </div>
     <div class="row">
         <div class="col-sm-3">
@@ -69,8 +69,8 @@
             <div class="list-group" id="layerList">
             </div>
             <br>
-            <div id="analyticalSurfacesStatus">
-                <h4>Analytical Surface</h4>
+            <div id="surfacesStatus">
+                <h4>NDVI</h4>
             </div>
             <h5>Select region</h5>
             <select id="select-region">
@@ -81,7 +81,7 @@
                 <label>Datasource date:</label>
                 <input type="text" id="scene-date" readonly style="border:0; color:#f6931f; font-weight:bold;">
             </p>
-            <h5>Change AnalyticalSurface transparency</h5>
+            <h5>Change surface transparency</h5>
             <div id="transparency-slider" style="height:11px;width:200px"></div>
             <p>
                 <label>Opacity:</label>
