@@ -20,12 +20,6 @@ requirejs(['../src/WorldWind',
         backgroundLayer.hide = true; // Don't show it in the layer manager.
         wwd.addLayer(backgroundLayer);
 
-        // Create the Blue Marble layer and add it to the World Window's layer list.
-        var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
-
-        // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're loaded.
-        blueMarbleLayer.prePopulate(wwd);
-
         // Create a compass and view controls.
         wwd.addLayer(new WorldWind.CompassLayer());
         wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
@@ -33,6 +27,14 @@ requirejs(['../src/WorldWind',
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
+
+        wwd.redraw();
+
+        // Create the Blue Marble layer and add it to the World Window's layer list.
+        var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
+
+        // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're loaded.
+        blueMarbleLayer.prePopulate(wwd);
 
         // Wait for the layer to pre-populate all its sub-layers before adding it to the World Window.
         var prePopulateInterval = window.setInterval(function() {
