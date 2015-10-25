@@ -28,27 +28,30 @@ requirejs(['../src/WorldWind',
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
-        wwd.redraw();
-
-        // Create the Blue Marble layer and add it to the World Window's layer list.
-        var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
-
-        // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're loaded.
-        blueMarbleLayer.prePopulate(wwd);
-
         // Wait for the layer to pre-populate all its sub-layers before adding it to the World Window.
-        var prePopulateInterval = window.setInterval(function() {
-            if (blueMarbleLayer.isPrePopulated(wwd)) {
-                wwd.addLayer(blueMarbleLayer);
+        var prePopulateInterval = window.setInterval(function () {
+            if (!this.blueMarbleLayer) {
+                // Create the Blue Marble layer and add it to the World Window's layer list.
+                this.blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
+
+                // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're loaded.
+                this.blueMarbleLayer.prePopulate(wwd);
+
+                return;
+            }
+
+            // See if the layer is pre-populated now. If so, add it to the World Window.
+            if (this.blueMarbleLayer.isPrePopulated(wwd)) {
+                wwd.addLayer(this.blueMarbleLayer);
                 window.clearInterval(prePopulateInterval);
                 layerManger.synchronizeLayerList();
 
                 // Increment the Blue Marble layer's time at a specified frequency.
                 var currentIndex = 0;
-                window.setInterval(function (){
-                        currentIndex = ++currentIndex % WorldWind.BlueMarbleLayer.availableTimes.length;
-                        blueMarbleLayer.time = WorldWind.BlueMarbleLayer.availableTimes[currentIndex];
-                        wwd.redraw();
+                window.setInterval(function () {
+                    currentIndex = ++currentIndex % WorldWind.BlueMarbleLayer.availableTimes.length;
+                    this.blueMarbleLayer.time = WorldWind.BlueMarbleLayer.availableTimes[currentIndex];
+                    wwd.redraw();
                 }, 200);
             }
         }, 200);
