@@ -114,11 +114,14 @@ define([
          * Indicates whether this layer's level 0 tile images for all sub-layers have been retrieved and associated
          * with the tiles.
          * Use [prePopulate]{@link TiledImageLayer#prePopulate} to initiate retrieval of level 0 images.
+         * @param {WorldWindow} wwd The world window associated with this layer.
          * @returns {Boolean} true if all level 0 images have been retrieved, otherwise false.
+         * @throws {ArgumentError} If the specified world window is null or undefined.
          */
-        BlueMarbleLayer.prototype.isPrePopulated = function () {
-            for (var i = 0; i < this.layers.length; i++) {
-                if (!this.layers[i].isPrePopulated()) {
+        BlueMarbleLayer.prototype.isPrePopulated = function (wwd) {
+            for (var i = 0; i < this.layerNames.length; i++) {
+                var layer = this.layers[this.layerNames[i].month];
+                if (!layer || !layer.isPrePopulated(wwd)) {
                     return false;
                 }
             }

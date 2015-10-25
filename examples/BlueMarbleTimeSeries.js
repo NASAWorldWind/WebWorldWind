@@ -36,7 +36,7 @@ requirejs(['../src/WorldWind',
 
         // Wait for the layer to pre-populate all its sub-layers before adding it to the World Window.
         var prePopulateInterval = window.setInterval(function() {
-            if (blueMarbleLayer.isPrePopulated()) {
+            if (blueMarbleLayer.isPrePopulated(wwd)) {
                 wwd.addLayer(blueMarbleLayer);
                 window.clearInterval(prePopulateInterval);
                 layerManger.synchronizeLayerList();

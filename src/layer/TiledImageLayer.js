@@ -174,11 +174,18 @@ define([
         /**
          * Indicates whether this layer's level 0 tile images have been retrieved and associated with the tiles.
          * Use [prePopulate]{@link TiledImageLayer#prePopulate} to initiate retrieval of level 0 images.
+         * @param {WorldWindow} wwd The world window associated with this layer.
          * @returns {Boolean} true if all level 0 images have been retrieved, otherwise false.
+         * @throws {ArgumentError} If the specified world window is null or undefined.
          */
-        TiledImageLayer.prototype.isPrePopulated = function () {
+        TiledImageLayer.prototype.isPrePopulated = function (wwd) {
+            if (!wwd) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledImageLayer", "isPrePopulated", "missingWorldWindow"));
+            }
+
             for (var i = 0; i < this.topLevelTiles.length; i++) {
-                if (!this.isTileTextureInMemory(dc, this.topLevelTiles[i])) {
+                if (!this.isTileTextureInMemory(wwd.drawContext, this.topLevelTiles[i])) {
                     return false;
                 }
             }
