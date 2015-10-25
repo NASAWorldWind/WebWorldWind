@@ -4,8 +4,6 @@
  */
 /**
  * Displays a time series of the 12 months of Blue Marble imagery.
- *
- * @version $Id: BlueMarbleTimeSeries.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
 requirejs(['../src/WorldWind',
@@ -18,9 +16,15 @@ requirejs(['../src/WorldWind',
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        var backgroundLayer = new WorldWind.BMNGOneImageLayer();
+        backgroundLayer.hide = true; // Don't show it in the layer manager.
+        wwd.addLayer(backgroundLayer);
+
         // Create the Blue Marble layer and add it to the World Window's layer list.
         var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
-        wwd.addLayer(blueMarbleLayer);
+
+        // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're loaded.
+        blueMarbleLayer.prePopulate(wwd);
 
         // Create a compass and view controls.
         wwd.addLayer(new WorldWind.CompassLayer());
@@ -30,11 +34,20 @@ requirejs(['../src/WorldWind',
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
-        // Increment the Blue Marble layer's time at a specified frequency.
-        var currentIndex = 0;
-        window.setInterval(function (){
-            currentIndex = ++currentIndex % WorldWind.BlueMarbleLayer.availableTimes.length;
-            blueMarbleLayer.time = WorldWind.BlueMarbleLayer.availableTimes[currentIndex];
-            wwd.redraw();
+        // Wait for the layer to pre-populate all its sub-layers before adding it to the World Window.
+        var prePopulateInterval = window.setInterval(function() {
+            if (blueMarbleLayer.isPrePopulated()) {
+                wwd.addLayer(blueMarbleLayer);
+                window.clearInterval(prePopulateInterval);
+                layerManger.synchronizeLayerList();
+
+                // Increment the Blue Marble layer's time at a specified frequency.
+                var currentIndex = 0;
+                window.setInterval(function (){
+                        currentIndex = ++currentIndex % WorldWind.BlueMarbleLayer.availableTimes.length;
+                        blueMarbleLayer.time = WorldWind.BlueMarbleLayer.availableTimes[currentIndex];
+                        wwd.redraw();
+                }, 200);
+            }
         }, 200);
     });
