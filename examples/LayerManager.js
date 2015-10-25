@@ -4,7 +4,6 @@
  */
 /**
  * @exports LayerManager
- * @version $Id: LayerManager.js 3313 2015-07-10 17:59:29Z dcollins $
  */
 define(function () {
     "use strict";
@@ -137,8 +136,12 @@ define(function () {
             } else {
                 layerItem.removeClass("active");
             }
-            this.wwd.redraw();
         }
+
+        var self = this;
+        layerListItem.find("button").on("click", function (e) {
+            self.onLayerClick($(this));
+        });
     };
     //
     //LayerManager.prototype.updateVisibilityState = function (worldWindow) {
