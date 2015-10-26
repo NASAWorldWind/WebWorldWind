@@ -59,9 +59,11 @@ requirejs(['../src/WorldWind',
                 // Increment the Blue Marble layer's time at a specified frequency.
                 var currentIndex = 0;
                 window.setInterval(function () {
-                    currentIndex = ++currentIndex % WorldWind.BlueMarbleLayer.availableTimes.length;
-                    blueMarbleLayer.time = WorldWind.BlueMarbleLayer.availableTimes[currentIndex];
-                    wwd.redraw();
+                    if (blueMarbleLayer.enabled) {
+                        currentIndex = ++currentIndex % WorldWind.BlueMarbleLayer.availableTimes.length;
+                        blueMarbleLayer.time = WorldWind.BlueMarbleLayer.availableTimes[currentIndex];
+                        wwd.redraw();
+                    }
                 }, 200);
             }
         }, 200);
