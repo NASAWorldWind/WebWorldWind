@@ -198,8 +198,8 @@ define([
             // Add continuation string if text truncated
             if (heightExceeded)
             {
-                if (wrappedText.length() > 0) {
-                    wrappedText = wrappedText.substring(0, length - 1);
+                if (wrappedText.length > 0) {
+                    wrappedText = wrappedText.substring(0, wrappedText.length - 1);
                 }
 
                 wrappedText += "...";
