@@ -61,6 +61,7 @@ define([
                 + " tc " + this.textColor.toHexString(true)
                 + " dl " + this.drawLeader
                 + " lgw " + this.leaderGapWidth
+                + " lgh " + this.leaderGapHeight
                 + " op " + this.opacity
                 + " sc " + this.scale;
         };
