@@ -24,6 +24,7 @@ requirejs(['../src/WorldWind',
         // are preloaded, which is initiated below.
         var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
         blueMarbleLayer.enabled = false;
+        blueMarbleLayer.showSpinner = true;
         wwd.addLayer(blueMarbleLayer);
 
         // Create a compass and view controls.
@@ -51,6 +52,7 @@ requirejs(['../src/WorldWind',
             // See if the layer is pre-populated now. If so, enable it.
             if (blueMarbleLayer.isPrePopulated(wwd)) {
                 blueMarbleLayer.enabled = true;
+                blueMarbleLayer.showSpinner = false;
                 window.clearInterval(prePopulateInterval);
                 layerManger.synchronizeLayerList();
 
