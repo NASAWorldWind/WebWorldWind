@@ -504,11 +504,11 @@ define([
             Annotation.matrix.multiplyMatrix(this.calloutTransform);
             program.loadModelviewProjection(gl, Annotation.matrix);
 
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, calloutVboId);
+            gl.bindBuffer(gl.ARRAY_BUFFER, calloutVboId);
 
             if (refreshBuffers) {
-                gl.bufferData(WebGLRenderingContext.ARRAY_BUFFER,
-                    this.calloutPoints, WebGLRenderingContext.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER,
+                    this.calloutPoints, gl.STATIC_DRAW);
 
                 dc.frameStatistics.incrementVboLoadCount(1);
             }
@@ -516,10 +516,10 @@ define([
             program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.backgroundColor);
             program.loadTextureEnabled(gl, false);
 
-            gl.vertexAttribPointer(program.vertexPointLocation, 2, WebGLRenderingContext.FLOAT, false, 0, 0);
-            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, WebGLRenderingContext.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.vertexPointLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
 
-            gl.drawArrays(WebGLRenderingContext.TRIANGLE_FAN, 0, this.calloutPoints.length / 2);
+            gl.drawArrays(gl.TRIANGLE_FAN, 0, this.calloutPoints.length / 2);
 
             // Draw text
             Annotation.matrix.copy(dc.screenProjection);
@@ -530,11 +530,11 @@ define([
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 
-            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, dc.unitQuadBuffer3());
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
-            gl.vertexAttribPointer(program.vertexTexCoordLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer3());
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 3, gl.FLOAT, false, 0, 0);
 
-            gl.drawArrays(WebGLRenderingContext.TRIANGLE_STRIP, 0, 4);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
 
         return Annotation;
