@@ -43,6 +43,8 @@ define(['../../src/WorldWind',
 
             // Enable sub-surface rendering for the World Window.
             this.wwd.subsurfaceMode = true;
+            // Enable deep picking in order to detect the sub-surface shapes.
+            this.wwd.deepPicking = true;
 
             // Start the view pointing to a longitude within the current time zone.
             this.wwd.navigator.lookAtLocation.latitude = 30;
@@ -56,9 +58,34 @@ define(['../../src/WorldWind',
             this.layersPanel.synchronizeLayerList();
 
             this.loadSlabData("CAS", "cascadia_slab1.0_clip.xyz", 401, WorldWind.Color.YELLOW);
-            this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
-            this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
-            this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.MAGENTA);
+            //this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
+            //this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
+            //this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.MAGENTA);
+
+            var wwd = this.wwd;
+            var handlePick = function (o) {
+                var pickPoint = wwd.canvasCoordinates(o.clientX, o.clientY);
+
+                var pickList = wwd.pick(pickPoint);
+                if (pickList.objects.length > 0) {
+                    for (var p = 0; p < pickList.objects.length; p++) {
+                        var pickedObject = pickList.objects[p];
+                        if (pickedObject.userObject instanceof WorldWind.TriangleMesh) {
+                            if (pickedObject.position) {
+                                console.log("PO: " + pickedObject.position.toString() + " " + pickedObject.isOnTop);
+                                console.log("TN: " + pickList.terrainObject().position.toString() +
+                                    " " + pickList.terrainObject().isOnTop);
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
+            wwd.addEventListener("mousemove", handlePick);
+
+            // Listen for taps on mobile devices and highlight the placemarks that the user taps.
+            var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
         };
 
         USGSSlabs.prototype.loadSlabData = function (name, dataFile, width, color) {

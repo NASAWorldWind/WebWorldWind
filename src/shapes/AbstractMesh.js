@@ -12,6 +12,7 @@ define([
         '../geom/BoundingBox',
         '../util/Color',
         '../util/ImageSource',
+        '../geom/Line',
         '../geom/Location',
         '../util/Logger',
         '../geom/Matrix',
@@ -20,6 +21,7 @@ define([
         '../shapes/ShapeAttributes',
         '../geom/Vec2',
         '../geom/Vec3',
+        '../util/WWMath'
     ],
     function (AbstractShape,
               ArgumentError,
@@ -27,6 +29,7 @@ define([
               BoundingBox,
               Color,
               ImageSource,
+              Line,
               Location,
               Logger,
               Matrix,
@@ -34,7 +37,8 @@ define([
               Position,
               ShapeAttributes,
               Vec2,
-              Vec3) {
+              Vec3,
+              WWMath) {
         "use strict";
 
         /**
@@ -122,7 +126,7 @@ define([
             // Set the transformation matrix to correspond to the reference position.
             var refPt = currentData.referencePoint;
             dc.surfacePointForMode(this.referencePosition.latitude, this.referencePosition.longitude,
-                this.referencePosition.altitude, this._altitudeMode, refPt);
+                this.referencePosition.altitude * this._altitudeScale, this._altitudeMode, refPt);
             currentData.transformationMatrix.setToTranslation(refPt[0], refPt[1], refPt[2]);
 
             // Convert the geographic coordinates to the Cartesian coordinates that will be rendered.
@@ -468,10 +472,51 @@ define([
             }
 
             if (dc.pickingMode) {
-                var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, null,
+                var pickPosition = this.computePickPosition(dc);
+                var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, pickPosition,
                     dc.currentLayer, false);
                 dc.resolvePick(po);
             }
+        };
+
+        AbstractMesh.prototype.computePickPosition = function (dc) {
+            var currentData = this.currentData,
+                line = dc.navigatorState.rayFromScreenPoint(dc.pickPoint),
+                localLineOrigin = new Vec3(line.origin[0], line.origin[1], line.origin[2]).subtract(
+                    currentData.referencePoint),
+                localLine = new Line(localLineOrigin, line.direction),
+                intersectionPoints = [];
+
+            if (WWMath.computeIndexedTrianglesIntersection(localLine, currentData.meshPoints, this.meshIndices,
+                    intersectionPoints)) {
+                var iPoint = intersectionPoints[0];
+
+                if (intersectionPoints.length > 1) {
+                    // Find the intersection nearest the eye point.
+                    var distance2 = iPoint.distanceToSquared(dc.navigatorState.eyePoint);
+
+                    for (var i = 1; i < intersectionPoints.length; i++) {
+                        var d2 = intersectionPoints[i].distanceToSquared(dc.navigatorState.eyePoint);
+                        if (d2 < distance2) {
+                            distance2 = d2;
+                            iPoint = intersectionPoints[i];
+                        }
+                    }
+                }
+
+                var pos = new Position(0, 0, 0);
+                dc.globe.computePositionFromPoint(
+                    iPoint[0] + currentData.referencePoint[0],
+                    iPoint[1] + currentData.referencePoint[1],
+                    iPoint[2] + currentData.referencePoint[2],
+                    pos);
+
+                pos.altitude /= this._altitudeScale;
+
+                return pos;
+            }
+
+            return null;
         };
 
         // Overridden from AbstractShape base class.
