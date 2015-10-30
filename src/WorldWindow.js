@@ -644,9 +644,11 @@ define([
         WorldWindow.prototype.doNormalRepaint = function () {
             this.createTerrain();
             this.clearFrame();
+            this.deferOrderedRendering = false;
             if (this.drawContext.pickingMode) {
                 if (this.drawContext.makePickFrustum()) {
                     this.doPick();
+                    this.resolvePick();
                 }
             } else {
                 this.doDraw();
@@ -662,9 +664,20 @@ define([
             if (this.drawContext.pickingMode) {
                 if (this.drawContext.makePickFrustum()) {
                     this.pick2DContiguous();
+                    this.resolvePick();
                 }
             } else {
                 this.draw2DContiguous();
+            }
+        };
+
+        WorldWindow.prototype.resolvePick = function () {
+            if (this.drawContext.pickTerrainOnly) {
+                this.resolveTerrainPick();
+            } else if (this.drawContext.regionPicking) {
+                this.resolveRegionPick();
+            } else {
+                this.resolveTopPick();
             }
         };
 
@@ -802,14 +815,6 @@ define([
                         this.drawOrderedRenderables();
                     }
                 }
-            }
-
-            if (this.drawContext.pickTerrainOnly) {
-                this.resolveTerrainPick();
-            } else if (this.drawContext.regionPicking) {
-                this.resolveRegionPick();
-            } else {
-                this.resolveTopPick();
             }
         };
 
