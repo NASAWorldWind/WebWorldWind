@@ -767,15 +767,40 @@ define([
             }
 
             if (!this.drawContext.pickTerrainOnly) {
-                this.drawContext.surfaceShapeTileBuilder.clear();
+                if (this.subsurfaceMode && this.hasStencilBuffer) {
+                    // Draw the surface and collect the ordered renderables.
+                    this.drawContext.currentGlContext.disable(this.drawContext.currentGlContext.STENCIL_TEST);
+                    this.drawContext.surfaceShapeTileBuilder.clear();
+                    this.drawLayers(true);
+                    this.drawSurfaceRenderables();
+                    this.drawContext.surfaceShapeTileBuilder.doRender(this.drawContext);
 
-                this.drawLayers(true);
-                this.drawSurfaceRenderables();
+                    if (!this.deferOrderedRendering) {
+                        // Clear the depth and stencil buffers prior to rendering the ordered renderables. This allows
+                        // sub-surface renderables to be drawn beneath the terrain. Turn on stenciling to capture the
+                        // fragments that ordered renderables draw. The terrain and surface shapes will be subsequently
+                        // drawn again, and the stencil buffer will ensure that they are drawn only where they overlap
+                        // the fragments drawn by the ordered renderables.
+                        this.drawContext.currentGlContext.clear(
+                            this.drawContext.currentGlContext.DEPTH_BUFFER_BIT | this.drawContext.currentGlContext.STENCIL_BUFFER_BIT);
+                        this.drawContext.currentGlContext.enable(this.drawContext.currentGlContext.STENCIL_TEST);
+                        this.drawContext.currentGlContext.stencilFunc(this.drawContext.currentGlContext.ALWAYS, 1, 1);
+                        this.drawContext.currentGlContext.stencilOp(
+                            this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE);
+                        this.drawOrderedRenderables();
+                        this.drawContext.terrain.pick(this.drawContext);
+                    }
+                } else {
+                    this.drawContext.surfaceShapeTileBuilder.clear();
 
-                this.drawContext.surfaceShapeTileBuilder.doRender(this.drawContext);
+                    this.drawLayers(true);
+                    this.drawSurfaceRenderables();
 
-                if (!this.deferOrderedRendering) {
-                    this.drawOrderedRenderables();
+                    this.drawContext.surfaceShapeTileBuilder.doRender(this.drawContext);
+
+                    if (!this.deferOrderedRendering) {
+                        this.drawOrderedRenderables();
+                    }
                 }
             }
 

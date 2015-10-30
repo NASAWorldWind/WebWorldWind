@@ -49,11 +49,26 @@ define([],
 
         /**
          * Adds a picked object to this list.
+         * If the picked object is a terrain object and the list already contains a terrain object, the terrain
+         * object in the list is replaced by the specified one.
          * @param {PickedObject} pickedObject The picked object to add. If null, this list remains unchanged.
          */
         PickedObjectList.prototype.add = function (pickedObject) {
             if (pickedObject) {
-                this.objects.push(pickedObject);
+                if (pickedObject.isTerrain) {
+                    var terrainObjectIndex = this.objects.length;
+
+                    for (var i = 0, len = this.objects.length; i < len; i++) {
+                        if (this.objects[i].isTerrain) {
+                            terrainObjectIndex = i;
+                            break;
+                        }
+                    }
+
+                    this.objects[terrainObjectIndex] = pickedObject;
+                } else {
+                    this.objects.push(pickedObject);
+                }
             }
         };
 
