@@ -46,6 +46,8 @@ define(['../../src/WorldWind',
             // Enable deep picking in order to detect the sub-surface shapes.
             this.wwd.deepPicking = true;
 
+            this.wwd.surfaceOpacity = 0.7;
+
             // Start the view pointing to a longitude within the current time zone.
             this.wwd.navigator.lookAtLocation.latitude = 30;
             this.wwd.navigator.lookAtLocation.longitude = -(180 / 12) * ((new Date()).getTimezoneOffset() / 60);
@@ -72,9 +74,9 @@ define(['../../src/WorldWind',
                         var pickedObject = pickList.objects[p];
                         if (pickedObject.userObject instanceof WorldWind.TriangleMesh) {
                             if (pickedObject.position) {
-                                console.log("PO: " + pickedObject.position.toString() + " " + pickedObject.isOnTop);
-                                console.log("TN: " + pickList.terrainObject().position.toString() +
-                                    " " + pickList.terrainObject().isOnTop);
+                                //console.log("PO: " + pickedObject.position.toString() + " " + pickedObject.isOnTop);
+                                //console.log("TN: " + pickList.terrainObject().position.toString() +
+                                //    " " + pickList.terrainObject().isOnTop);
                             }
                         }
                     }
@@ -141,7 +143,8 @@ define(['../../src/WorldWind',
 
             for (var i = 0; i < splitShapes.length; i++) {
                 var mesh = new WorldWind.TriangleMesh(splitShapes[i].positions, splitShapes[i].indices, meshAttributes);
-                mesh.altitudeScale = 100;
+                //mesh.altitudeScale = 100;
+                mesh.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
                 mesh.highlightAttributes = highlightAttributes;
                 meshLayer.addRenderable(mesh);
             }
@@ -192,7 +195,7 @@ define(['../../src/WorldWind',
                         longitude -= 360;
                     }
 
-                    positions.push(new WorldWind.Position(latitude, longitude, altitude));
+                    positions.push(new WorldWind.Position(latitude, longitude, altitude * 1000));
                 }
 
                 ++originalIndex;
