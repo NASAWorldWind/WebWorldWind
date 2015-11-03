@@ -9,8 +9,9 @@ define([], function () {
      * Map representing the available Elements. This is solution to circular dependency when
      * parsing some of the elements may be dependent on elements, in which they may be present.
      * Like MultiGeometry present inside of some of the Geometries.
+     * @exports KmlElements
      */
-    return {
+    var KmlElements =  {
         /**
          * Internal storage for all key-values pairs
          */
@@ -34,4 +35,6 @@ define([], function () {
             return this.keys[key];
         }
     };
+
+    return KmlElements;
 });

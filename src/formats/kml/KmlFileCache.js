@@ -6,11 +6,20 @@ define([], function () {
     "use strict";
 
     // Contains all files that were already retrieved as a promises.
+    /**
+     * Provides Cache for Promises representing KmlFiles in current KmlDocument.
+     * @exports KmlFileCache
+     */
     var KmlFileCache = function () {
         this._rootFile = null;
         this._map = {};
     };
 
+    /**
+     * Retrieve relevant KmlFile from the cache representing this Document.
+     * @param url Url of the file to retrieve from this cache.
+     * @returns {Promise|null}
+     */
     KmlFileCache.prototype.retrieve = function (url) {
         if (url.indexOf('#') == 0 || url == null) {
             return this._rootFile;
@@ -28,8 +37,11 @@ define([], function () {
         return null;
     };
 
-    // This shouldn't know about KmlFile per se.
-
+    /**
+     * Adds new KmlFile to the KmlDocument represented by this Cache.
+     * @param url Url of the file for internal mapping
+     * @param filePromise {Promise} Promise of the file to be stored.
+     */
     KmlFileCache.prototype.add = function (url, filePromise) {
         if (!this._rootFile) {
             this._rootFile = filePromise;
