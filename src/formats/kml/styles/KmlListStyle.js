@@ -31,7 +31,7 @@ define([
              * range of values for any one color is 0 to 255 (00 to ff). For alpha, 00 is fully transparent and ff is
              * fully opaque. The order of expression is aabbggrr, where aa=alpha (00 to ff); bb=blue (00 to ff);
              * gg=green (00 to ff); rr=red (00 to ff). For example, if you want to apply a blue color with 50 percent
-             * opacity to an overlay, you would specify the following: <color>7fff0000</color>, where alpha=0x7f,
+             * opacity to an overlay, you would specify the following: &lt;color&gt;7fff0000&lt;/color&gt;, where alpha=0x7f,
              * blue=0xff, green=0x00, and red=0x00.
              * @memberof KmlListStyle.prototype
              * @readonly

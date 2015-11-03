@@ -45,7 +45,7 @@ define([
             },
 
             /**
-             * The PhotoOverlay is projected onto the <shape>. The <shape> can be one of the following:
+             * The PhotoOverlay is projected onto the &lt;shape&gt;. The &lt;shape&gt; can be one of the following:
              * rectangle (default) - for an ordinary photo
              * @memberof KmlPhotoOverlay.prototype
              * @readonly
@@ -58,10 +58,10 @@ define([
             },
 
             /**
-             * The <Point> element acts as a <Point> inside a <Placemark> element. It draws an icon to mark the
-             * position of the PhotoOverlay. The icon drawn is specified by the <styleUrl> and <StyleSelector> fields,
+             * The &lt;Point&gt; element acts as a &lt;Point&gt; inside a &lt;Placemark&gt; element. It draws an icon to mark the
+             * position of the PhotoOverlay. The icon drawn is specified by the &lt;styleUrl&gt; and &lt;StyleSelector&gt; fields,
              * just as it is for
-             * <Placemark>.
+             * &lt;Placemark&gt;.
              * @memberof KmlPhotoOverlay.prototype
              * @readonly
              * @type {KmlPoint}
@@ -100,7 +100,7 @@ define([
              * tiles. Since all the pixels in the original image can't be viewed on the screen at once, this
              * preprocessing allows Google Earth to achieve maximum performance because it loads only the portions of
              * the image that are in view, and only the pixel details that can be discerned by the user at the current
-             * viewpoint. When you specify an image pyramid, you also modify the <href> in the <Icon> element to
+             * viewpoint. When you specify an image pyramid, you also modify the &lt;href&gt; in the &lt;Icon&gt; element to
              * include specifications for which tiles to load.
              * @memberof KmlPhotoOverlay.prototype
              * @readonly

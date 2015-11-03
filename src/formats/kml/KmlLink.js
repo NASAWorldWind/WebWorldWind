@@ -26,10 +26,10 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * A URL (either an HTTP address or a local file specification). When the parent of <Link> is a
+             * A URL (either an HTTP address or a local file specification). When the parent of &lt;Link&gt; is a
              * NetworkLink,
-             * <href> is a KML file. When the parent of <Link> is a Model, <href> is a COLLADA file. When the parent of
-             * <Icon> (same fields as <Link>) is an Overlay, <href> is an image. Relative URLs can be used in this tag
+             * &lt;href&gt; is a KML file. When the parent of &lt;Link&gt; is a Model, &lt;href&gt; is a COLLADA file. When the parent of
+             * &lt;Icon&gt; (same fields as &lt;Link&gt;) is an Overlay, &lt;href&gt; is an image. Relative URLs can be used in this tag
              * and are evaluated relative to the enclosing KML file. See KMZ Files for details on constructing relative
              * references in KML and KMZ files.
              * @memberof KmlLink.prototype
@@ -45,10 +45,10 @@ define([
             /**
              * Specifies a time-based refresh mode, which can be one of the following:
              * onChange - refresh when the file is loaded and whenever the Link parameters change (the default).
-             * onInterval - refresh every n seconds (specified in <refreshInterval>).
+             * onInterval - refresh every n seconds (specified in &lt;refreshInterval&gt;).
              * onExpire - refresh the file when the expiration time is reached. If a fetched file has a
-             *  NetworkLinkControl, the <expires> time takes precedence over expiration times specified in HTTP
-             * headers. If no <expires> time is specified, the HTTP max-age header is used (if present). If max-age is
+             *  NetworkLinkControl, the &lt;expires&gt; time takes precedence over expiration times specified in HTTP
+             * headers. If no &lt;expires&gt; time is specified, the HTTP max-age header is used (if present). If max-age is
              * not present, the Expires HTTP header is used (if present). (See Section RFC261b of the Hypertext
              * Transfer Protocol - HTTP 1.1 for details on HTTP header fields.)
              * @memberof KmlLink.prototype
@@ -76,11 +76,11 @@ define([
             /**
              * Specifies how the link is refreshed when the "camera" changes.
              * Can be one of the following:
-             * never (default) - Ignore changes in the view. Also ignore <viewFormat> parameters, if any.
-             * onStop - Refresh the file n seconds after movement stops, where n is specified in <viewRefreshTime>.
+             * never (default) - Ignore changes in the view. Also ignore &lt;viewFormat&gt; parameters, if any.
+             * onStop - Refresh the file n seconds after movement stops, where n is specified in &lt;viewRefreshTime&gt;.
              * onRequest - Refresh the file only when the user explicitly requests it. (For example, in Google Earth,
              * the user right-clicks and selects Refresh in the Context menu.) onRegion - Refresh the file when the
-             * Region becomes active. See <Region>.
+             * Region becomes active. See &lt;Region&gt;.
              * @memberof KmlLink.prototype
              * @readonly
              * @type {String}
@@ -93,7 +93,7 @@ define([
 
             /**
              * After camera movement stops, specifies the number of seconds to wait before refreshing the view. (See
-             * <viewRefreshMode> and onStop above.)
+             * &lt;viewRefreshMode&gt; and onStop above.)
              * @memberof KmlLink.prototype
              * @readonly
              * @type {Number}
@@ -119,22 +119,22 @@ define([
             },
 
             /**
-             * Specifies the format of the query string that is appended to the Link's <href> before the file is
-             * fetched.(If the <href> specifies a local file, this element is ignored.) If you specify a
-             * <viewRefreshMode> of onStop and do not include the <viewFormat> tag in the file, the following
+             * Specifies the format of the query string that is appended to the Link's &lt;href&gt; before the file is
+             * fetched.(If the &lt;href&gt; specifies a local file, this element is ignored.) If you specify a
+             * &lt;viewRefreshMode&gt; of onStop and do not include the &lt;viewFormat&gt; tag in the file, the following
              * information is automatically appended to the query string:
              * BBOX=[bboxWest],[bboxSouth],[bboxEast],[bboxNorth] This information matches the Web Map Service (WMS)
-             * bounding box specification. If you specify an empty <viewFormat> tag, no information is appended to the
+             * bounding box specification. If you specify an empty &lt;viewFormat&gt; tag, no information is appended to the
              * query string. You can also specify a custom set of viewing parameters to add to the query string. If you
              * supply a format string, it is used instead of the BBOX information. If you also want the BBOX
              * information, you need to add those parameters along with the custom parameters. You can use any of the
              * following parameters in your format string (and Google Earth will substitute the appropriate current
              * value at the time it creates the query string):
-             * [lookatLon], [lookatLat] - longitude and latitude of the point that <LookAt> is viewing
-             * [lookatRange], [lookatTilt], [lookatHeading] - values used by the <LookAt> element (see descriptions of
-             *  <range>, <tilt>, and <heading> in <LookAt>)
+             * [lookatLon], [lookatLat] - longitude and latitude of the point that &lt;LookAt&gt; is viewing
+             * [lookatRange], [lookatTilt], [lookatHeading] - values used by the &lt;LookAt&gt; element (see descriptions of
+             *  &lt;range&gt;, &lt;tilt&gt;, and &lt;heading&gt; in &lt;LookAt&gt;)
              * [lookatTerrainLon], [lookatTerrainLat], [lookatTerrainAlt] - point on the terrain in degrees/meters that
-             *  <LookAt> is viewing
+             *  &lt;LookAt&gt; is viewing
              * [cameraLon], [cameraLat], [cameraAlt] - degrees/meters of the eyepoint for the camera
              * [horizFov], [vertFov] - horizontal, vertical field of view for the camera
              * [horizPixels], [vertPixels] - size in pixels of the 3D viewer

@@ -54,7 +54,7 @@ define([
 
             /**
              * Distance of the camera from the earth's surface, in meters. Interpreted according to the Camera's
-             * <altitudeMode> or <gx:altitudeMode>.
+             * &lt;altitudeMode&gt; or &lt;gx:altitudeMode&gt;.
              * @memberof KmlCamera.prototype
              * @readonly
              * @type {String}
@@ -80,9 +80,10 @@ define([
 
             /**
              * Rotation, in degrees, of the camera around the X axis. A value of 0 indicates that the view is aimed
-             * straight down toward the earth (the most common case). A value for 90 for <tilt> indicates that the view
+             * straight down toward the earth (the most common case). A value for 90 for &lt;tilt&gt; indicates that the
+             * view
              * is aimed toward the horizon. Values greater than 90 indicate that the view is pointed up into the sky.
-             * Values for <tilt> are clamped at +180 degrees.
+             * Values for &lt;tilt&gt; are clamped at +180 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
              * @type {String}
@@ -106,14 +107,15 @@ define([
             },
 
             /**
-             * Specifies how the <altitude> specified for the Camera is interpreted. Possible values are as follows:
-             * relativeToGround - (default) Interprets the <altitude> as a value in meters above the ground. If the
-             * point is over water, the <altitude> will be interpreted as a value in meters above sea level. See
-             * <gx:altitudeMode> below to specify points relative to the sea floor. clampToGround - For a camera, this
+             * Specifies how the &lt;altitude&gt; specified for the Camera is interpreted. Possible values are as
+             * follows:
+             * relativeToGround - (default) Interprets the &lt;altitude&gt; as a value in meters above the ground. If the
+             * point is over water, the &lt;altitude&gt; will be interpreted as a value in meters above sea level. See
+             * &lt;gx:altitudeMode&gt; below to specify points relative to the sea floor. clampToGround - For a camera, this
              * setting also places the camera relativeToGround, since putting the camera exactly at terrain height
              * would
              * mean that the eye would intersect the terrain (and the view would be blocked). absolute - Interprets the
-             * <altitude> as a value in meters above sea level.
+             * &lt;altitude&gt; as a value in meters above sea level.
              * @memberof KmlCamera.prototype
              * @readonly
              * @type {String}

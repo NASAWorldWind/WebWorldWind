@@ -26,7 +26,7 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Size of the tiles, in pixels. Tiles must be square, and <tileSize> must be a power of 2. A tile size of
+             * Size of the tiles, in pixels. Tiles must be square, and &lt;tileSize&gt; must be a power of 2. A tile size of
              * 256
              * (the default) or 512 is recommended. The original image is divided into tiles of this size, at varying
              * resolutions.

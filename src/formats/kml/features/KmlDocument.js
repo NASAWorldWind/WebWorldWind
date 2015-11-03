@@ -46,7 +46,7 @@ define([
 
             /**
              * Specifies a custom KML schema that is used to add custom data to KML Features. The "id" attribute is
-             * required and must be unique within the KML file. <Schema> is always a child of <Document>. This is array
+             * required and must be unique within the KML file. &lt;Schema&gt; is always a child of &lt;Document&gt;. This is array
              * of all Schemas in current document
              * @memberof KmlDocument.prototype
              * @readonly

@@ -77,8 +77,8 @@ define([
 
             /**
              * A boolean defining whether or not to display a text label on a LineString. A LineString's label is
-             * contained in the <name> element that is a sibling of <LineString> (i.e. contained within the same
-             * <Placemark> element).
+             * contained in the &lt;name&gt; element that is a sibling of &lt;LineString&gt; (i.e. contained within the same
+             * &lt;Placemark&gt; element).
              * @memberof KmlLineStyle.prototype
              * @readonly
              * @type {Boolean}

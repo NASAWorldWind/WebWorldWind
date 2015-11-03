@@ -27,10 +27,11 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Defines a key/value pair that maps a mode (normal or highlight) to the predefined <styleUrl>. <Pair>
+             * Defines a key/value pair that maps a mode (normal or highlight) to the predefined &lt;styleUrl&gt;.
+             * &lt;Pair&gt;
              * contains two elements (both are required):
-             * <key>, which identifies the key
-             * <styleUrl> or <Style>, which references the style. In <styleUrl>, for referenced style elements that are
+             * &lt;key&gt;, which identifies the key
+             * &lt;styleUrl&gt; or &lt;Style&gt;, which references the style. In &lt;styleUrl&gt;, for referenced style elements that are
              *  local to the KML document, a simple # referencing is used. For styles that are contained in external
              * files, use a full URL along with # referencing.
              * @memberof KmlStyleMap.prototype

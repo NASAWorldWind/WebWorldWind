@@ -29,7 +29,7 @@ define([
              * Indicates the angle of rotation of the parent object. A value of 0 means no rotation. The value is an
              * angle in degrees counterclockwise starting from north. Use +-180 to indicate the rotation of the parent
              * object from
-             * 0. The center of the <rotation>, if not (.5,.5), is specified in <rotationXY>.
+             * 0. The center of the &lt;rotation&gt;, if not (.5,.5), is specified in &lt;rotationXY&gt;.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
              * @type {Number}

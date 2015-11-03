@@ -43,7 +43,7 @@ define([
             },
 
             /**
-             * Specifies how the <altitude>is interpreted.
+             * Specifies how the &lt;altitude&gt;is interpreted.
              * @memberof KmlGroundOverlay.prototype
              * @readonly
              * @type {String}

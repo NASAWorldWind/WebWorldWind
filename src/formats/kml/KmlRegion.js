@@ -45,7 +45,7 @@ define([
             },
 
             /**
-             * Lod is an abbreviation for Level of Detail. <Lod> describes the size of the projected region on the
+             * Lod is an abbreviation for Level of Detail. &lt;Lod&gt; describes the size of the projected region on the
              * screen that is required in order for the region to be considered "active." Also specifies the size of
              * the pixel ramp used for fading in (from transparent to opaque) and fading out (from opaque to
              * transparent). See diagram below for a visual representation of these parameters.
