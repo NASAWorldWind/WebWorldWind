@@ -104,11 +104,6 @@ define([
             this.labelTransform = Matrix.fromIdentity();
 
             // Internal use only. Intentionally not documented.
-            this.attributes.textAttributes.offset = new WorldWind.Offset(
-                WorldWind.OFFSET_FRACTION, 0.5,
-                WorldWind.OFFSET_FRACTION, 1.0);
-
-            // Internal use only. Intentionally not documented.
             this.placePoint = new Vec3(0, 0, 0);
 
             // Internal use only. Intentionally not documented.
@@ -138,20 +133,6 @@ define([
                 set: function (value) {
                     this.label = value;
                     this.lastStateKey = null;
-                }
-            },
-
-            /**
-             * The text color for this annotation.
-             * @type {Color}
-             * @memberof Annotation.prototype
-             */
-            textColor: {
-                get: function () {
-                    return this.attributes.textColor;
-                },
-                set: function (value) {
-                    this.attributes.textColor = value;
                 }
             }
         });
