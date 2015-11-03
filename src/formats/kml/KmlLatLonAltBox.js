@@ -16,7 +16,7 @@ define([
      * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLatLonAltBox
      * @classdesc Contains the data associated with LatLonAltBox node.
-     * @param node Node representing alternative lat lon box in the document.
+     * @param node {Node} Node representing alternative lat lon box in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#latlonaltbox
@@ -101,6 +101,10 @@ define([
         extend(this, KmlLatLonAltBox.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLatLonAltBox.prototype.getTagNames = function() {
         return ['LatLonAltBox'];
     };

@@ -19,7 +19,7 @@ define([
      * Constructs an KmlMultiGeometry object. KmlMultiGeometry is object, which contains other geometry objects. This
      * class isn't intended to be used outside of the KmlObject hierarchy. It is already concrete implementation.
      * @param multiGeometryNode {Node} Node representing this MultiGeometry
-     * @param pStyle {StyleSelector}
+     * @param pStyle {Promise} Promise of the style to be delivered later.
      * @constructor
      * @classdesc Class representing MultiGeometry Element of Kml Document.
      * @alias KmlMultiGeometry
@@ -33,7 +33,7 @@ define([
             /**
              * It returns all shapes currently present in this node.
              * @memberof KmlMultiGeometry.prototype
-             * @type {Array}
+             * @type {KmlObject[]}
              * @readonly
              */
             kmlShapes: {
@@ -73,12 +73,18 @@ define([
         extend(this, KmlMultiGeometry.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlMultiGeometry.prototype.getTagNames = function() {
         return ["MultiGeometry"];
     };
 
     /**
      * It renders all associated shapes. It honors style associated with the MultiGeometry.
+     * @param layer {Layer} Layer into which this multi geometry should be rendered.
+     * @param style {Promise} Promise of style applied to the geometry objects.
      */
     KmlMultiGeometry.prototype.update = function(layer, style) {
         this.kmlShapes.forEach(function(shape) {

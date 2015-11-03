@@ -15,7 +15,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlContainer
      * @classdesc Contains the data associated with Container node.
-     * @param node Node representing container in the document.
+     * @param node {Node} Node representing container in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#container
@@ -26,6 +26,10 @@ define([
         extend(this, KmlContainer.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlContainer.prototype.getTagNames = function() {
         return ['Folder', 'Document'];
     };

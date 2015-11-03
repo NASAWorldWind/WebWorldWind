@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLod
      * @classdesc Contains the data associated with Lod node.
-     * @param node Node representing lod in the document.
+     * @param node {Node} Node representing lod in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#lod
@@ -85,6 +85,10 @@ define([
         extend(this, KmlLod.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLod.prototype.getTagNames = function() {
         return ['Lod'];
     };

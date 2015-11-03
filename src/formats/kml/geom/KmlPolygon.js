@@ -35,8 +35,8 @@ define([
      * @alias KmlPolygon
      * @constructor
      * @classdesc Contains the data associated with Kml polygon
-     * @param polygonNode Node representing the Kml polygon.
-     * @param pStyle Style to be applied to current node.
+     * @param polygonNode {Node} Node representing the Kml polygon.
+     * @param pStyle {Promise} Style to be applied to current node.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
@@ -45,9 +45,9 @@ define([
 
         var self = this;
         // Default locations and attributes. Invisible unless called otherwise.
-        pStyle.then(function(pStyle){
+        pStyle.then(function(style){
             // Once style is delivered create corresponding polygon.
-            Polygon.call(self, self.prepareLocations(), self.prepareAttributes(pStyle));
+            Polygon.call(self, self.prepareLocations(), self.prepareAttributes(style));
             self.moveValidProperties();
         });
         this._style = pStyle;
@@ -141,7 +141,7 @@ define([
 
     /**
      * Renders polygon as polygon applying valid styles.
-     * options.style
+     * @param layer {Layer} Layer into which this polygon is rendered.
      */
     KmlPolygon.prototype.update = function(layer) {
         var self = this;
@@ -194,10 +194,18 @@ define([
         return locations;
     };
 
+    /**
+     * Return promise of style valid for this Polygon.
+     * @returns {Promise} Promise of style valid for current polygon.
+     */
     KmlPolygon.prototype.getStyle = function() {
         return this._style;
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlPolygon.prototype.getTagNames = function() {
         return ['Polygon'];
     };

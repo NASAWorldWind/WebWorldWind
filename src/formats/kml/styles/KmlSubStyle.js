@@ -17,7 +17,7 @@ define([
      * @alias KmlSubStyle
      * @constructor
      * @classdesc Contains the data associated with Kml sub style
-     * @param subStyleNode Node representing the Kml sub style.
+     * @param subStyleNode {Node} Node representing the Kml sub style.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#substyle
      */
@@ -27,6 +27,10 @@ define([
         extend(this, KmlSubStyle.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlSubStyle.prototype.getTagNames = function(){
         return ['LineStyle','PolyStyle','IconStyle','LabelStyle', 'BalloonStyle', 'ListStyle'];
     };

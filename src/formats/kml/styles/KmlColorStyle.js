@@ -15,7 +15,7 @@ define([
      * objects from KmlFiles are read. This object is abstract. Only its descendants are instantiating it.
      * @alias KmlColorStyle
      * @classdesc Contains the data associated with ColorStyle node
-     * @param colorStyleNode Node representing ColorStyle from Kml document
+     * @param colorStyleNode {Node} Node representing ColorStyle from Kml document
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#colorstyle
@@ -46,7 +46,7 @@ define([
              */
             colorMode: {
                 get: function() {
-                    return this.retrieve({name: 'colorMode'})
+                    return this.retrieve({name: 'colorMode'});
                 }
             }
         });
@@ -54,6 +54,10 @@ define([
         extend(this, KmlColorStyle.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlColorStyle.prototype.getTagNames = function() {
         return ['LineStyle','PolyStyle','IconStyle','LabelStyle'];
     };

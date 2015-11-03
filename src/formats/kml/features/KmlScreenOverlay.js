@@ -16,7 +16,7 @@ define([
      * KmlFile} as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlScreenOverlay
      * @classdesc Contains the data associated with ScreenOverlay node.
-     * @param node Node representing screen overlay in the document.
+     * @param node {Node} Node representing screen overlay in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#screenoverlay
@@ -259,6 +259,10 @@ define([
         extend(this, KmlScreenOverlay.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlScreenOverlay.prototype.getTagNames = function() {
         return ['ScreenOverlay'];
     };

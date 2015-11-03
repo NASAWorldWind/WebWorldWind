@@ -28,7 +28,7 @@ define([], function () {
         return null;
     };
 
-    // This shouldn't now about KmlFile per se.
+    // This shouldn't know about KmlFile per se.
 
     KmlFileCache.prototype.add = function(url, filePromise) {
         if(!this._rootFile) {
@@ -38,8 +38,9 @@ define([], function () {
         }
     };
 
+    var cachedKmlFile;
     if (!cachedKmlFile) {
-        var cachedKmlFile = new KmlFileCache();
+        cachedKmlFile = new KmlFileCache();
     }
     return cachedKmlFile; // Return actually object. This is singleton used throughout the whole application.
 });

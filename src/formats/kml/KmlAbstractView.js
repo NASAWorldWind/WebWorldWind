@@ -20,7 +20,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlAbstractView
      * @classdesc Contains the data associated with AbstractView node.
-     * @param node Node representing abstract view in the document.
+     * @param node {Node} Node representing abstract view in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#abstractview
@@ -47,6 +47,10 @@ define([
         extend(this, KmlAbstractView.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlAbstractView.prototype.getTagNames = function() {
         return ['Camera', 'LookAt'];
     };

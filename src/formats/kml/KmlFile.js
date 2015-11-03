@@ -52,9 +52,10 @@ define([
             // Default values.
             options.local = options.local || false;
 
+            var filePromise;
             if(options.local) {
                 this._document = new XmlDocument(options.document).dom();
-                var filePromise = new Promise(function(resolve, reject) {
+                filePromise = new Promise(function(resolve) {
                     window.setTimeout(function(){
                         resolve(self);
                     }, 0);
@@ -63,7 +64,7 @@ define([
                 return filePromise;
             } else {
                 // Load the document
-                var filePromise = new Promise(function(resolve, reject){
+                filePromise = new Promise(function(resolve){
                     var promise = self.requestUrl(options.url, options);
                     promise.then(function(loadedDocument){
                         var rootDocument;
@@ -83,8 +84,6 @@ define([
                             resolve(self);
                         }, 0);
                     });
-
-
                 });
                 KmlFileCache.add(options.url, filePromise);
                 return filePromise;
@@ -135,6 +134,7 @@ define([
         /**
          * It renders all shapes, which are associated with current file.
          * @param layer
+         * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
          */
         KmlFile.prototype.update = function(layer) {
             if(!layer) {

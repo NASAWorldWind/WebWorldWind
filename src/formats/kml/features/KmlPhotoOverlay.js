@@ -22,7 +22,7 @@ define([
      * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlPhotoOverlay
      * @classdesc Contains the data associated with PhotoOverlay node.
-     * @param node Node representing photo overlay in the document.
+     * @param node {Node} Node representing photo overlay in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#photooverlay
@@ -36,7 +36,7 @@ define([
              * rotated and deviates slightly from a desired horizontal view.
              * @memberof KmlPhotoOverlay.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             rotation: {
                 get: function () {
@@ -117,6 +117,10 @@ define([
         extend(this, KmlPhotoOverlay.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlPhotoOverlay.prototype.getTagNames = function() {
         return ['PhotoOverlay'];
     };

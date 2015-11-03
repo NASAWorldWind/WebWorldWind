@@ -20,7 +20,7 @@ define([
      * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlNetworkLink
      * @classdesc Contains the data associated with NetworkLink node.
-     * @param node Node representing folder in the document.
+     * @param node {Node} Node representing folder in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#networklink
@@ -39,7 +39,7 @@ define([
              * refreshed, the Placemark will be made visible again, since its original visibility state was TRUE.
              * @memberof KmlNetworkLink.prototype
              * @readonly
-             * @type {Array}
+             * @type {Boolean}
              */
             refreshVisibility: {
                 get: function () {
@@ -56,7 +56,7 @@ define([
              * Placemarks contained within the Document.
              * @memberof KmlNetworkLink.prototype
              * @readonly
-             * @type {Array}
+             * @type {Boolean}
              */
             flyToView: {
                 get: function () {
@@ -82,6 +82,10 @@ define([
         extend(this, KmlNetworkLink.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlNetworkLink.prototype.getTagNames = function () {
         return ['NetworkLink'];
     };

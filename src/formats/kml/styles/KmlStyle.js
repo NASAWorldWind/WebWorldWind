@@ -35,7 +35,7 @@ define([
      * @alias KmlStyle
      * @constructor
      * @classdesc Contains the data associated with Kml style
-     * @param styleNode Node representing the Kml style.
+     * @param styleNode {Node} Node representing the Kml style.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#style
      */
@@ -133,13 +133,17 @@ define([
 
     KmlStyle.prototype.getStyle = function() {
         var self = this;
-        return new Promise(function(resolve, reject){
+        return new Promise(function(resolve){
             window.setTimeout(function(){
                 resolve(self);
             }, 0);
         });
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlStyle.prototype.getTagNames = function() {
         return ['Style'];
     };

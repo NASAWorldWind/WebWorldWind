@@ -17,7 +17,7 @@ define([
      * @alias ImagePyramid
      * @constructor
      * @classdesc Contains the data associated with Kml Image Pyramid
-     * @param node Node representing the Kml Image Pyramid.
+     * @param node {Node} Node representing the Kml Image Pyramid.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#imagepyramid
      */
@@ -80,6 +80,10 @@ define([
         extend(this, ImagePyramid.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     ImagePyramid.prototype.getTagNames = function() {
         return ['ImagePyramid'];
     };

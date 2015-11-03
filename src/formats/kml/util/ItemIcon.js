@@ -17,7 +17,7 @@ define([
      * @alias ItemIcon
      * @constructor
      * @classdesc Contains the data associated with Kml Item Icon
-     * @param node Node representing the Kml Item Icon.
+     * @param node {Node} Node representing the Kml Item Icon.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
      */
@@ -55,6 +55,10 @@ define([
         extend(this, ItemIcon.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     ItemIcon.prototype.getTagNames = function() {
         return ['ItemIcon'];
     };

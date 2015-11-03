@@ -34,7 +34,7 @@ define([
              */
             heading: {
                 get: function () {
-                    return this.retrieve({name: 'heading', transformer: Number})
+                    return this.retrieve({name: 'heading', transformer: Number});
                 }
             },
 
@@ -47,7 +47,7 @@ define([
              */
             tilt: {
                 get: function () {
-                    return this.retrieve({name: 'tilt', transformer: Number})
+                    return this.retrieve({name: 'tilt', transformer: Number});
                 }
             },
 
@@ -60,7 +60,7 @@ define([
              */
             roll: {
                 get: function () {
-                    return this.retrieve({name: 'roll', transformer: Number})
+                    return this.retrieve({name: 'roll', transformer: Number});
                 }
             }
         });
@@ -68,6 +68,10 @@ define([
         extend(this, KmlOrientation.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlOrientation.prototype.getTagNames = function() {
         return ['Orientation'];
     };

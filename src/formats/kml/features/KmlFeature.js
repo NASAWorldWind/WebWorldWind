@@ -29,8 +29,8 @@ define([
      * objects from Kml file are read
      * @alias KmlFeature
      * @classdesc Contains the data associated with KmlFeature.
-     * @param featureNode Node representing Kml Feature
-     * @param pStyle Promise of the future style.
+     * @param featureNode {Node} Node representing Kml Feature
+     * @param pStyle {Promise} Promise of the future style.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#feature
@@ -206,6 +206,10 @@ define([
         extend(this, KmlFeature.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlFeature.prototype.getTagNames = function () {
         return ['NetworkLink', 'Placemark', 'PhotoOverlay', 'ScreenOverlay', 'GroundOverlay', 'Folder',
             'Document'];
@@ -218,7 +222,7 @@ define([
         if (this._pStyle) {
             return this._pStyle;
         }
-        this._pStyle = new Promise(function (resolve, reject) {
+        this._pStyle = new Promise(function (resolve) {
             // Understand styleUrl
             var filePromise;
             if (self.styleUrl) {

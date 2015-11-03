@@ -18,7 +18,7 @@ define([
      * as objects from KmlFile are read.
      * @alias KmlTimePrimitive
      * @classdesc It is ancestor for all TimePrimitives - TimeSpan and TimeStamp
-     * @param timePrimitiveNode Node representing Kml TimePrimitive.
+     * @param timePrimitiveNode {Node} Node representing Kml TimePrimitive.
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#timeprimitive
      */
@@ -28,6 +28,10 @@ define([
         extend(this, KmlTimePrimitive.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlTimePrimitive.prototype.getTagNames = function() {
         return ['TimeSpan','TimeStamp'];
     };

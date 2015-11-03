@@ -19,7 +19,7 @@ define([
      * @alias Schema
      * @constructor
      * @classdesc Contains the data associated with Kml Schema
-     * @param node Node representing the Kml Schema.
+     * @param node {Node} Node representing the Kml Schema.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
      */
@@ -29,6 +29,10 @@ define([
         extend(this, Schema.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     Schema.prototype.getTagNames = function() {
         return ['Schema'];
     };

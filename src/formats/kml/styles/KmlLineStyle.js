@@ -104,6 +104,10 @@ define([
         return shapeOptions;
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLineStyle.prototype.getTagNames = function() {
         return ['LineStyle'];
     };

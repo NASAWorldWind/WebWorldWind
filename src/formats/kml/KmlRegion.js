@@ -20,7 +20,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlRegion
      * @classdesc Contains the data associated with Region node.
-     * @param node Node representing region in the document.
+     * @param node {Node} Node representing region in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#region
@@ -65,6 +65,10 @@ define([
         extend(this, KmlRegion.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlRegion.prototype.getTagNames = function() {
         return ['Region'];
     };

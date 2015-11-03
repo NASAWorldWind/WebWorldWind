@@ -19,7 +19,7 @@ define([
      * @alias Scale
      * @constructor
      * @classdesc Contains the data associated with Kml Scale
-     * @param node Node representing the Kml Scale
+     * @param node {Node} Node representing the Kml Scale
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#scale
      */
@@ -67,6 +67,10 @@ define([
         extend(this, Scale.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     Scale.prototype.getTagNames = function() {
         return ['Scale'];
     };

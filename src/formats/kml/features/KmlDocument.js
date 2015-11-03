@@ -21,7 +21,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlDocument
      * @classdesc Contains the data associated with Document node.
-     * @param node Node representing document in the document.
+     * @param node {Node} Node representing document in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#document
@@ -34,7 +34,7 @@ define([
              * Specifies any amount of features, which are part of this document.
              * @memberof KmlDocument.prototype
              * @readonly
-             * @type {Array}
+             * @type {Node[]}
              * @see {KmlFeature}
              */
             shapes: {
@@ -52,7 +52,7 @@ define([
              * This is array of all Schemas in current document
              * @memberof KmlDocument.prototype
              * @readonly
-             * @type {Array}
+             * @type {Schema[]}
              * @see {Schema}
              */
             schemas: {
@@ -74,6 +74,10 @@ define([
         });
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlDocument.prototype.getTagNames = function() {
         return ['Document'];
     };

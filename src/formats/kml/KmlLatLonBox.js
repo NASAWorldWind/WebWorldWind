@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLatLonBox
      * @classdesc Contains the data associated with LatLonBox node.
-     * @param node Node representing box lat lon in the document.
+     * @param node {Node} Node representing box lat lon in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#latlonbox
@@ -90,6 +90,10 @@ define([
         extend(this, KmlLatLonBox.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLatLonBox.prototype.getTagNames = function() {
         return ['LatLonBox'];
     };

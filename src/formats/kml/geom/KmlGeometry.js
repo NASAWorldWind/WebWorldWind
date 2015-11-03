@@ -19,7 +19,7 @@ define([
      * @alias KmlGeometry
      * @constructor
      * @classdesc Contains the data associated with Kml geometry
-     * @param geometryNode Node representing the Kml geometry.
+     * @param geometryNode {Node} Node representing the Kml geometry.
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#geometry
      */
@@ -29,6 +29,10 @@ define([
         extend(this, KmlGeometry.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlGeometry.prototype.getTagNames = function() {
         return ['Point', 'LinearRing', 'LineString', 'MultiGeometry', 'Polygon'];
     };

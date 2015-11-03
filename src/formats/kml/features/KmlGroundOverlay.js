@@ -22,7 +22,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlGroundOverlay
      * @classdesc Contains the data associated with GroundOverlay node.
-     * @param node Node representing ground overlay in the document.
+     * @param node {Node} Node representing ground overlay in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#groundoverlay
@@ -48,7 +48,7 @@ define([
              * Specifies how the <altitude>is interpreted.
              * @memberof KmlGroundOverlay.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             altitudeMode: {
                 get: function() {
@@ -60,7 +60,7 @@ define([
              * Specifies where the top, bottom, right, and left sides of a bounding box for the ground overlay are aligned.
              * @memberof KmlGroundOverlay.prototype
              * @readonly
-             * @type {Array}
+             * @type {KmlLatLonBox}
              */
             LatLonBox: {
                 get: function() {
@@ -74,7 +74,7 @@ define([
              * Used for nonrectangular quadrilateral ground overlays.
              * @memberof KmlGroundOverlay.prototype
              * @readonly
-             * @type {Array}
+             * @type {KmlLatLonQuad}
              */
             LatLonQuad: {
                 get: function() {
@@ -88,6 +88,10 @@ define([
         extend(this, KmlGroundOverlay.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlGroundOverlay.prototype.getTagNames = function() {
         return ['GroundOverlay'];
     };

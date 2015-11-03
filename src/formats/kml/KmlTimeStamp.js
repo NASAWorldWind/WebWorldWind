@@ -21,7 +21,7 @@ define([
      * objects from KmlFile are read.
      * @alias KmlTimeStamp
      * @classdesc Contains the data associated with Kml TimeStamp
-     * @param timeStampNode Node representing the Kml TimeStamp
+     * @param timeStampNode {Node} Node representing the Kml TimeStamp
      * @constructor
      * @throws {ArgumentError} If the content of the node contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#timestamp
@@ -46,6 +46,10 @@ define([
         extend(this, KmlTimeStamp.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlTimeStamp.prototype.getTagNames = function() {
         return ['TimeStamp'];
     };

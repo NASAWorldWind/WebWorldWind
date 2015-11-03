@@ -17,7 +17,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlListStyle
      * @classdesc Contains the data associated with ListStyle node.
-     * @param node Node representing list style in the document.
+     * @param node {Node} Node representing list style in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#liststyle
@@ -83,6 +83,10 @@ define([
         extend(this, KmlListStyle.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlListStyle.prototype.getTagNames = function() {
         return ['ListStyle'];
     };

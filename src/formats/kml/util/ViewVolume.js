@@ -16,7 +16,7 @@ define([
      * @alias ViewVolume
      * @constructor
      * @classdesc Contains the data associated with Kml View Volume
-     * @param node Node representing the Kml View Volume.
+     * @param node {Node} Node representing the Kml View Volume.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#viewvolume
      */
@@ -91,6 +91,10 @@ define([
         extend(this, ViewVolume.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     ViewVolume.prototype.getTagNames = function() {
         return ['ViewVolume'];
     };

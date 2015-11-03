@@ -18,7 +18,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLocation
      * @classdesc Contains the data associated with Location node.
-     * @param node Node representing location in the document.
+     * @param node {Node} Node representing location in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#location
@@ -67,6 +67,10 @@ define([
         extend(this, KmlLocation.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLocation.prototype.getTagNames = function() {
         return ['Location'];
     };

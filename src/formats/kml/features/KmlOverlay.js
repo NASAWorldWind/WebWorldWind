@@ -18,7 +18,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlOverlay
      * @classdesc Contains the data associated with Overlay node.
-     * @param node Node representing overlay in the document.
+     * @param node {Node} Node representing overlay in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#overlay
@@ -76,6 +76,10 @@ define([
         extend(this, KmlOverlay.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlOverlay.prototype.getTagNames = function() {
         return ['PhotoOverlay', 'ScreenOverlay', 'GroundOverlay'];
     };

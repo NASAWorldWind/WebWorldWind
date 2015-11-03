@@ -20,7 +20,7 @@ define([
      * objects from KmlFile are read.
      * @alias KmlTimeSpan
      * @classdesc Contains the data associated with Kml TimeSpan
-     * @param timeSpanNode Node representing the Kml TimeSpan
+     * @param timeSpanNode {Node} Node representing the Kml TimeSpan
      * @constructor
      * @throws {ArgumentError} If the content of the node contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#timespan
@@ -57,6 +57,10 @@ define([
         extend(this, KmlTimeSpan.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlTimeSpan.prototype.getTagNames = function() {
         return ['TimeSpan'];
     };

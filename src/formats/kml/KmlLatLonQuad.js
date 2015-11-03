@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLatLonQuad
      * @classdesc Contains the data associated with LatLonQuad node.
-     * @param node Node representing lat lon quadruple in the document.
+     * @param node {Node} Node representing lat lon quadruple in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxlatlonquad
@@ -45,6 +45,10 @@ define([
         extend(this, KmlLatLonQuad.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLatLonQuad.prototype.getTagNames = function() {
         return ['gx:LatLonQuad'];
     };

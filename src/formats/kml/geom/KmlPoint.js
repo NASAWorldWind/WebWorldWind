@@ -31,7 +31,7 @@ define([
      * @alias KmlPoint
      * @constructor
      * @classdesc Contains the data associated with Kml point
-     * @param pointNode Node representing the Kml point.
+     * @param pointNode {Node} Node representing the Kml point.
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#point
      */
@@ -129,6 +129,10 @@ define([
         return rectangle;
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlPoint.prototype.getTagNames = function() {
         return ['Point'];
     };

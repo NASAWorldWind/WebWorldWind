@@ -18,7 +18,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlTour
      * @classdesc Contains the data associated with Tour node.
-     * @param node Node representing tour in the document.
+     * @param node {Node} Node representing tour in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxtour
@@ -29,6 +29,10 @@ define([
         extend(this, KmlTour.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlTour.prototype.getTagNames = function() {
         return ['gx:Tour'];
     };

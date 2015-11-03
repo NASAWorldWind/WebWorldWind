@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLink
      * @classdesc Contains the data associated with Link node.
-     * @param node Node representing link in the document.
+     * @param node {Node} Node representing link in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#link
@@ -168,6 +168,10 @@ define([
         extend(this, KmlLink.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLink.prototype.getTagNames = function() {
         return ['Link'];
     };

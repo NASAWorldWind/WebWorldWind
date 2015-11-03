@@ -21,7 +21,7 @@ define([
      * @alias Pair
      * @constructor
      * @classdesc Contains the data associated with Kml Pair
-     * @param node Node representing the Kml Pair.
+     * @param node {Node} Node representing the Kml Pair.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#pair
      */
@@ -71,6 +71,10 @@ define([
         extend(this, Pair.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     Pair.prototype.getTagNames = function() {
         return ['Pair'];
     };

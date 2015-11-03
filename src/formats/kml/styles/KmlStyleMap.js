@@ -17,7 +17,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlStyleMap
      * @classdesc Contains the data associated with StyleMap node.
-     * @param node Node representing style map in the document.
+     * @param node {Node} Node representing style map in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#stylemap
@@ -49,6 +49,10 @@ define([
         extend(this, KmlStyleMap.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlStyleMap.prototype.getTagNames = function() {
         return ['StyleMap'];
     };

@@ -61,7 +61,7 @@ define([
                 get: function () {
                     return this.createChildElement({
                         name: KmlIcon.prototype.tagName
-                    })
+                    });
                 }
             },
 
@@ -120,13 +120,17 @@ define([
             }
         });
 
-        extend(this, KmlIconStyle)
+        extend(this, KmlIconStyle);
     };
 
     KmlIconStyle.update = function() {
 
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlIconStyle.prototype.getTagNames = function() {
         return ['IconStyle'];
     };

@@ -18,7 +18,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlMultiTrack
      * @classdesc Contains the data associated with MultiTrack node.
-     * @param node Node representing multi track in the document.
+     * @param node {Node} Node representing multi track in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxmultitrack
@@ -29,6 +29,10 @@ define([
         extend(this, KmlMultiTrack.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlMultiTrack.prototype.getTagNames = function() {
         return ['gx:MultiTrack'];
     };

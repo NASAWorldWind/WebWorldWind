@@ -16,7 +16,7 @@ define([
      * @alias KmlStyleSelector
      * @constructor
      * @classdesc Contains the data associated with Kml style selector
-     * @param styleSelectorNode Node representing the Kml style selector.
+     * @param styleSelectorNode {Node} Node representing the Kml style selector.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#styleselector
      */
@@ -26,6 +26,10 @@ define([
         extend(this, KmlStyleSelector.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlStyleSelector.prototype.getTagNames = function() {
         return ['Style','StyleMap'];
     };

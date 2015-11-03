@@ -29,7 +29,7 @@ define([
          * Constructs an KmlLineString object.  Applications shouldn't use this constructor. It is used by
          * {@link KmlFile}. KmlLineString represents one line string.
          * @param lineStringNode {Node} Node representing this line string.
-         * @param pStyle Promise of style.
+         * @param pStyle {Promise} Promise of style.
          * @constructor
          * @alias KmlLineString
          * @classdesc Class representing LineString element of KmlFile
@@ -88,17 +88,17 @@ define([
                  * Positions representing points used by the LineString.
                  * @memberof KmlLineString.prototype
                  * @readonly
-                 * @type {Array}
+                 * @type {Position[}
                  */
                 kmlPositions: {
                     get: function() {
-                        var points = [];
-                        var coordinates = this.retrieve({name: 'coordinates'}).split(' ');
-                        coordinates.forEach(function(coordinates){
+                        var positions = [];
+                        var coordinatesNode = this.retrieve({name: 'coordinates'}).split(' ');
+                        coordinatesNode.forEach(function(coordinates){
                             coordinates = coordinates.split(',');
-                            points.push(new Position(Number(coordinates[1]), Number(coordinates[0]), Number(coordinates[2])));
+                            positions.push(new Position(Number(coordinates[1]), Number(coordinates[0]), Number(coordinates[2])));
                         });
-                        return points;
+                        return positions;
                     }
                 },
 
@@ -156,7 +156,8 @@ define([
             });
         };
 
-        KmlLineString.prototype.prepareAttributes = function(style){
+        // For internal use only. Intentionally undocumented.
+        KmlLineString.prototype.prepareAttributes = function(){
             var attributes = new ShapeAttributes(null);
             attributes.outlineColor = Color.WHITE;
             attributes.interiorColor = Color.WHITE;
@@ -165,12 +166,14 @@ define([
             return attributes;
         };
 
+        // For internal use only. Intentionally undocumented.
         KmlLineString.prototype.prepareLocations = function() {
             return this.kmlPositions.map(function(position){
-                return new Location(position.latitude, position.longitude)
+                return new Location(position.latitude, position.longitude);
             });
         };
 
+        // For internal use only. Intentionally undocumented.
         KmlLineString.prototype.moveValidProperties = function() {
             this.extrude = this.kmlExtrude || false;
             this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
@@ -191,6 +194,10 @@ define([
                     toCompare.altitudeMode == this.kmlAltitudeMode;
         };
 
+        /**
+         * Returns tag name of this Node.
+         * @returns {String[]}
+         */
         KmlLineString.prototype.getTagNames = function() {
             return ['LineString'];
         };

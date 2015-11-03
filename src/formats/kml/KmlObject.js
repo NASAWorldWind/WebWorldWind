@@ -24,7 +24,7 @@ define([
      * It should be treated as mixin.
      * @alias KmlObject
      * @classdesc Contains the data associated with every Kml object.
-     * @param objectNode Node representing Kml Object
+     * @param objectNode {Node} Node representing Kml Object
      * @constructor
      * @throws {ArgumentError} If either node is null or id isn't present on the object.
      * @see https://developers.google.com/kml/documentation/kmlreference#object
@@ -111,12 +111,12 @@ define([
     // Intenationally undocumented. Internal use only.
     KmlObject.prototype.doesAttributeExist = function (node, attribute) {
         return node.attributes && node.attributes && node.attributes.getNamedItem(attribute) &&
-            node.attributes.getNamedItem(attribute).value
+            node.attributes.getNamedItem(attribute).value;
     };
 
     // Intenationally undocumented. Internal use only.
     KmlObject.prototype.getValueOfAttribute = function (node, attributeName) {
-        return node.attributes.getNamedItem(attributeName).value
+        return node.attributes.getNamedItem(attributeName).value;
     };
 
     /**
@@ -172,18 +172,18 @@ define([
         var self = this;
         var node = options && options.node || self.node;
         var shapes = [];
-        [].forEach.call(node.childNodes, function (node) {
-            if (node.nodeType != 1) {
+        [].forEach.call(node.childNodes, function (childNode) {
+            if (childNode.nodeType != 1) {
                 return;
             }
 
-            var constructor = self.retrieveElementForNode(node.nodeName);
+            var constructor = self.retrieveElementForNode(childNode.nodeName);
             if (constructor == null) {
                 Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "parse", "Element, which doesn't have internal " +
-                        "representation. Node name: " + node.nodeName);
+                        "representation. Node name: " + childNode.nodeName);
                 return;
             }
-            var style = new Promise(function(resolve, reject){
+            var style = new Promise(function(resolve){
                 if(self.getStyle) {
                     resolve(self.getStyle());
                 } else {
@@ -191,7 +191,7 @@ define([
                     resolve({});
                 }
             });
-            shapes.push(new constructor(node, style));
+            shapes.push(new constructor(childNode, style));
         });
 
         return shapes;

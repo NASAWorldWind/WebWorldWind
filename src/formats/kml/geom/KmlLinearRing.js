@@ -17,7 +17,7 @@ define([
      * the hierarchy of KmlObject.
      * @alias KmlLinearRing
      * @classdesc Contains the data associated with LinerRing
-     * @param linearRingNode Node of the object to be retrieved.
+     * @param linearRingNode {Node} Node of the object to be retrieved.
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#linearring
      */
@@ -29,6 +29,10 @@ define([
 
     KmlLinearRing.prototype = Object.create(KmlLineString.prototype);
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlLinearRing.prototype.getTagNames = function() {
         return ['LinearRing'];
     };

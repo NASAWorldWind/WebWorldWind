@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlCamera
      * @classdesc Contains the data associated with Camera node.
-     * @param node Node representing camera in the document.
+     * @param node {Node} Node representing camera in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#camera
@@ -127,6 +127,10 @@ define([
         extend(this, KmlCamera.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlCamera.prototype.getTagNames = function() {
         return ['Camera'];
     };

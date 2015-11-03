@@ -78,8 +78,12 @@ define([
         extend(this, KmlBalloonStyle.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlBalloonStyle.prototype.getTagNames = function() {
-        return ['BalloonStyle']
+        return ['BalloonStyle'];
     };
 
     KmlElements.addKey(KmlBalloonStyle.prototype.getTagNames()[0], KmlBalloonStyle);

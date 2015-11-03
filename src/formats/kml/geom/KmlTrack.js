@@ -18,7 +18,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlTrack
      * @classdesc Contains the data associated with Track node.
-     * @param node Node representing track in the document.
+     * @param node {Node} Node representing track in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxtrack
@@ -29,6 +29,10 @@ define([
         extend(this, KmlTrack.prototype);
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlTrack.prototype.getTagNames = function() {
         return ['gx:Track'];
     };
