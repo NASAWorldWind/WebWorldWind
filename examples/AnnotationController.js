@@ -234,7 +234,7 @@ define(function () {
     // Internal
     AnnotationController.prototype.changeTextColor = function(r, g, b) {
         this.textColorLabel.html("RGB(" + r + "," + g + "," + b + ")");
-        this.currentAnnotation.attributes.textColor = WorldWind.Color.colorFromBytes(r, g, b, 255);
+        this.currentAnnotation.attributes.textAttributes.color = WorldWind.Color.colorFromBytes(r, g, b, 255);
         this.worldWindow.redraw();
     };
 
@@ -256,9 +256,9 @@ define(function () {
         var bgRed = annotation.attributes.backgroundColor.red * 255,
             bgGreen = annotation.attributes.backgroundColor.green * 255,
             bgBlue = annotation.attributes.backgroundColor.blue * 255,
-            textRed = annotation.attributes.textColor.red * 255,
-            textGreen = annotation.attributes.textColor.green * 255,
-            textBlue = annotation.attributes.textColor.blue * 255;
+            textRed = annotation.attributes.textAttributes.color.red * 255,
+            textGreen = annotation.attributes.textAttributes.color.green * 255,
+            textBlue = annotation.attributes.textAttributes.color.blue * 255;
 
         // Load background RGB sliders and format label based on values
         this.backgroundR.slider('value', bgRed);

@@ -5,11 +5,13 @@
 define([
         '../util/Color',
         '../util/Font',
-        '../util/Insets'
+        '../util/Insets',
+        '../shapes/TextAttributes'
     ],
     function (Color,
               Font,
-              Insets) {
+              Insets,
+              TextAttributes) {
         "use strict";
 
         /**
@@ -34,6 +36,7 @@ define([
             this._drawLeader = attributes ? attributes._drawLeader : true;
             this._width = attributes ? attributes._width : 200;
             this._height = attributes ? attributes._height : 100;
+            this._textAttributes = attributes ? attributes._textAttributes : new TextAttributes(null);
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
@@ -63,6 +66,7 @@ define([
                 + " lgw " + this.leaderGapWidth
                 + " lgh " + this.leaderGapHeight
                 + " op " + this.opacity
+                + " ta " + this._textAttributes.stateKey
                 + " sc " + this.scale;
         };
 
@@ -161,6 +165,22 @@ define([
                 },
                 set: function (value) {
                     this._textColor = value;
+                    this.stateKeyInvalid = true;
+                }
+            },
+
+            /**
+             * Indicates the attributes to apply to the annotation's text.
+             * @type {TextAttributes}
+             * @default The defaults of {@link TextAttributes}.
+             * @memberof AnnotationAttributes.prototype
+             */
+            textAttributes: {
+                get: function () {
+                    return this._textAttributes;
+                },
+                set: function (value) {
+                    this._textAttributes = value;
                     this.stateKeyInvalid = true;
                 }
             },

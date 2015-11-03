@@ -104,10 +104,7 @@ define([
             this.labelTransform = Matrix.fromIdentity();
 
             // Internal use only. Intentionally not documented.
-            this.labelAttributes = new TextAttributes(null);
-
-            // Internal use only. Intentionally not documented.
-            this.labelAttributes.offset = new WorldWind.Offset(
+            this.attributes.textAttributes.offset = new WorldWind.Offset(
                 WorldWind.OFFSET_FRACTION, 0.5,
                 WorldWind.OFFSET_FRACTION, 1.0);
 
@@ -280,7 +277,7 @@ define([
             this.label = dc.textSupport.wrap(
                 this.label,
                 this.attributes.width,this.attributes.height,
-                this.labelAttributes.font);
+                this.attributes.textAttributes.font);
 
             // Compute the annotation's model point.
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
@@ -293,7 +290,7 @@ define([
                 return null;
             }
 
-            var labelFont = this.labelAttributes.font;
+            var labelFont = this.attributes.textAttributes.font;
             var labelKey = this.label + labelFont.toString();
 
             this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
@@ -526,7 +523,7 @@ define([
             Annotation.matrix.multiplyMatrix(this.labelTransform);
             program.loadModelviewProjection(gl, Annotation.matrix);
 
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textColor);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 
