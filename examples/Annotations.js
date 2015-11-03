@@ -79,7 +79,7 @@ requirejs(['../src/WorldWind',
             annotationAttributes.scale = 1;
             annotationAttributes.width = 200;
             annotationAttributes.height = 100;
-
+            annotationAttributes.textAttributes.color = WorldWind.Color.WHITE;
             annotationAttributes.insets = new WorldWind.Insets(10, 10, 10, 10);
 
             annotation = new WorldWind.Annotation(locations[z], annotationAttributes);
