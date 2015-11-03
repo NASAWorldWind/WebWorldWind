@@ -246,8 +246,7 @@ define([
             });
         } else {
             if(styleSelector instanceof KmlStyleMap) {
-                // Unless you have StyleMap, Style is always normal, but  want it to return promise returning both,
-                // this way I can use it interchangeably.
+                styleSelector.resolve(resolve, reject);
             } else {
                 // Move this resolve to the end of the stack to prevent recursion.
                 window.setTimeout(function () {

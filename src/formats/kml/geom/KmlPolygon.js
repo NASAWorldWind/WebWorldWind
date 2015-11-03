@@ -159,7 +159,7 @@ define([
             self.highlightAttributes = highlight ? self.prepareAttributes(highlight): null;
 
             self.locations = self.prepareLocations();
-            self.moveValidProperties();
+            //self.moveValidProperties();
 
             if(self._layer != null ) {
                 // Remove renderable from this layer.
@@ -173,7 +173,7 @@ define([
     // Well anything that contains NetworkLink must also work using promises.
 
     KmlPolygon.prototype.moveValidProperties = function() {
-        this.extrude = this.kmlExtrude || false;
+        this.extrude = this.kmlExtrude || true;
         this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
     };
 

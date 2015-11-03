@@ -47,6 +47,11 @@ define([
         extend(this, KmlStyleMap.prototype);
     };
 
+    KmlStyleMap.prototype.resolve = function(resolve, reject) {
+        // Make sure all styles are loaded and then resolve with object such as
+        // {normal: , highlight: }
+    };
+
     KmlStyleMap.prototype.getTagNames = function() {
         return ['StyleMap'];
     };

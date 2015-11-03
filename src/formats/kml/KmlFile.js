@@ -87,6 +87,9 @@ define([
 
                 });
                 KmlFileCache.add(options.url, filePromise);
+                filePromise.then(function(kmlFile){
+                    kmlFile.parseDocument();
+                });
                 return filePromise;
             }
         };
