@@ -21,8 +21,7 @@ define([
               ShapeAttributes,
               Path,
               KmlElements,
-              WWUtil
-    ) {
+              WWUtil) {
         "use strict";
 
         /**
@@ -39,7 +38,7 @@ define([
             KmlGeometry.call(this, lineStringNode);
 
             var self = this;
-            pStyle.then(function(style){
+            pStyle.then(function (style) {
                 Path.call(self, self.prepareLocations(), self.prepareAttributes(style));
                 self.moveValidProperties();
             });
@@ -54,7 +53,7 @@ define([
                  * @type {Boolean}
                  */
                 kmlExtrude: {
-                    get: function() {
+                    get: function () {
                         return this.retrieve({name: 'extrude', transformer: Boolean}) || false;
                     }
                 },
@@ -66,7 +65,7 @@ define([
                  * @type {Boolean}
                  */
                 kmlTessellate: {
-                    get: function() {
+                    get: function () {
                         return this.retrieve({name: 'tessellate', transformer: Boolean}) || false;
                     }
                 },
@@ -79,7 +78,7 @@ define([
                  * @type {String}
                  */
                 kmlAltitudeMode: {
-                    get: function() {
+                    get: function () {
                         return this.retrieve({name: 'altitudeMode'}) || WorldWind.ABSOLUTE;
                     }
                 },
@@ -91,10 +90,10 @@ define([
                  * @type {Position[]}
                  */
                 kmlPositions: {
-                    get: function() {
+                    get: function () {
                         var positions = [];
                         var coordinatesNode = this.retrieve({name: 'coordinates'}).split(' ');
-                        coordinatesNode.forEach(function(coordinates){
+                        coordinatesNode.forEach(function (coordinates) {
                             coordinates = coordinates.split(',');
                             positions.push(new Position(Number(coordinates[1]), Number(coordinates[0]), Number(coordinates[2])));
                         });
@@ -109,13 +108,13 @@ define([
                  * @type {Position}
                  */
                 kmlCenter: {
-                    get: function() {
+                    get: function () {
                         // TODO choose better approximation than just plain average.
                         var positions = this.kmlPositions;
                         var midLatitude = 0;
                         var midLongitude = 0;
                         var midAltitude = 0;
-                        positions.forEach(function(position){
+                        positions.forEach(function (position) {
                             midLatitude += position.latitude;
                             midLongitude += position.longitude;
                             midAltitude += position.altitude;
@@ -138,9 +137,9 @@ define([
          * Renders LineString as Path.
          * @param layer Layer into which will be the shape rendered.
          */
-        KmlLineString.prototype.update = function(layer) {
+        KmlLineString.prototype.update = function (layer) {
             var self = this;
-            this._style.then(function(style){
+            this._style.then(function (style) {
                 var shapeOptions = self.prepareAttributes(style);
                 self.attributes = shapeOptions;
                 self.highlightAttributes = shapeOptions;
@@ -148,7 +147,7 @@ define([
                 self.locations = self.prepareLocations();
                 self.moveValidProperties();
 
-                if(self._layer != null) {
+                if (self._layer != null) {
                     self._layer.removeRenderable(self);
                 }
                 layer.addRenderable(self);
@@ -157,7 +156,7 @@ define([
         };
 
         // For internal use only. Intentionally undocumented.
-        KmlLineString.prototype.prepareAttributes = function(){
+        KmlLineString.prototype.prepareAttributes = function () {
             var attributes = new ShapeAttributes(null);
             attributes.outlineColor = Color.WHITE;
             attributes.interiorColor = Color.WHITE;
@@ -167,14 +166,14 @@ define([
         };
 
         // For internal use only. Intentionally undocumented.
-        KmlLineString.prototype.prepareLocations = function() {
-            return this.kmlPositions.map(function(position){
+        KmlLineString.prototype.prepareLocations = function () {
+            return this.kmlPositions.map(function (position) {
                 return new Location(position.latitude, position.longitude);
             });
         };
 
         // For internal use only. Intentionally undocumented.
-        KmlLineString.prototype.moveValidProperties = function() {
+        KmlLineString.prototype.moveValidProperties = function () {
             this.extrude = this.kmlExtrude || false;
             this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
             this.tesselate = this.kmlTesselate || false;
@@ -185,20 +184,20 @@ define([
          * @param toCompare LineString to compare to.
          * @returns {Boolean}
          */
-        KmlLineString.prototype.equals = function(toCompare) {
-            if(!toCompare) {
+        KmlLineString.prototype.equals = function (toCompare) {
+            if (!toCompare) {
                 return false;
             }
             var positionsEquals = WWUtil.arrayEquals(toCompare.positions, this.kmlPositions);
             return positionsEquals && toCompare.extrude == this.kmlExtrude && toCompare.tessellate == this.kmlTessellate &&
-                    toCompare.altitudeMode == this.kmlAltitudeMode;
+                toCompare.altitudeMode == this.kmlAltitudeMode;
         };
 
         /**
          * Returns tag name of this Node.
          * @returns {String[]}
          */
-        KmlLineString.prototype.getTagNames = function() {
+        KmlLineString.prototype.getTagNames = function () {
             return ['LineString'];
         };
 

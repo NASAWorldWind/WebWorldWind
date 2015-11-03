@@ -39,8 +39,8 @@ define([
             },
 
             /**
-             * Rotation about the x axis. A positive rotation is clockwise around the x axis and specified in degrees from
-             * 0 to 180.
+             * Rotation about the x axis. A positive rotation is clockwise around the x axis and specified in degrees
+             * from 0 to 180.
              * @memberof KmlOrientation.prototype
              * @readonly
              * @type {Number}
@@ -52,8 +52,8 @@ define([
             },
 
             /**
-             * Rotation about the y axis. A positive rotation is clockwise around the y axis and specified in degrees from
-             * 0 to 180.
+             * Rotation about the y axis. A positive rotation is clockwise around the y axis and specified in degrees
+             * from 0 to 180.
              * @memberof KmlOrientation.prototype
              * @readonly
              * @type {Number}
@@ -72,7 +72,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlOrientation.prototype.getTagNames = function() {
+    KmlOrientation.prototype.getTagNames = function () {
         return ['Orientation'];
     };
 

@@ -14,19 +14,17 @@ define([
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../util/WWUtil'
-], function (
-    Color,
-    extend,
-    KmlElements,
-    KmlGeometry,
-    KmlLinearRing,
-    KmlLineStyle,
-    KmlPolyStyle,
-    Location,
-    Polygon,
-    ShapeAttributes,
-    WWUtil
-) {
+], function (Color,
+             extend,
+             KmlElements,
+             KmlGeometry,
+             KmlLinearRing,
+             KmlLineStyle,
+             KmlPolyStyle,
+             Location,
+             Polygon,
+             ShapeAttributes,
+             WWUtil) {
     "use strict";
     /**
      * Constructs an KmlPolygon. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -40,12 +38,12 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
-    var KmlPolygon = function(polygonNode, pStyle) {
+    var KmlPolygon = function (polygonNode, pStyle) {
         KmlGeometry.call(this, polygonNode);
 
         var self = this;
         // Default locations and attributes. Invisible unless called otherwise.
-        pStyle.then(function(style){
+        pStyle.then(function (style) {
             // Once style is delivered create corresponding polygon.
             Polygon.call(self, self.prepareLocations(), self.prepareAttributes(style));
             self.moveValidProperties();
@@ -55,14 +53,14 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * In case that the polygon is above ground, this property decides whether there is going to be a line to the
-             * ground.
+             * In case that the polygon is above ground, this property decides whether there is going to be a line to
+             * the ground.
              * @memberof KmlPolygon.prototype
              * @type {Boolean}
              * @readonly
              */
             kmlExtrude: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'extrude', transformer: WWUtil.transformToBoolean});
                 }
             },
@@ -74,7 +72,7 @@ define([
              * @type {Boolean}
              */
             kmlTessellate: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'tessellate', transformer: WWUtil.transformToBoolean});
                 }
             },
@@ -87,7 +85,7 @@ define([
              * @readonly
              */
             kmlAltitudeMode: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'altitudeMode'});
                 }
             },
@@ -99,7 +97,7 @@ define([
              * @readonly
              */
             kmlOuterBoundary: {
-                get: function() {
+                get: function () {
                     var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
                     return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
                 }
@@ -112,9 +110,9 @@ define([
              * @readonly
              */
             kmlInnerBoundary: {
-                get: function() {
+                get: function () {
                     var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
-                    if(parentNode == null) {
+                    if (parentNode == null) {
                         return null;
                     }
                     return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
@@ -128,7 +126,7 @@ define([
              * @type {Position}
              */
             kmlCenter: {
-                get: function() {
+                get: function () {
                     return this.kmlOuterBoundary.kmlCenter;
                 }
             }
@@ -143,9 +141,9 @@ define([
      * Renders polygon as polygon applying valid styles.
      * @param layer {Layer} Layer into which this polygon is rendered.
      */
-    KmlPolygon.prototype.update = function(layer) {
+    KmlPolygon.prototype.update = function (layer) {
         var self = this;
-        this._style.then(function(pStyle) {
+        this._style.then(function (pStyle) {
             var shapeOptions = self.prepareAttributes(pStyle);
             self.attributes = shapeOptions;
             self.highlightAttributes = shapeOptions;
@@ -153,7 +151,7 @@ define([
             self.locations = self.prepareLocations();
             self.moveValidProperties();
 
-            if(self._layer != null ) {
+            if (self._layer != null) {
                 // Remove renderable from this layer.
                 self._layer.removeRenderable(self);
             }
@@ -164,12 +162,12 @@ define([
 
     // Well anything that contains NetworkLink must also work using promises.
 
-    KmlPolygon.prototype.moveValidProperties = function() {
+    KmlPolygon.prototype.moveValidProperties = function () {
         this.extrude = this.kmlExtrude || false;
         this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
     };
 
-    KmlPolygon.prototype.prepareAttributes = function(pStyle) {
+    KmlPolygon.prototype.prepareAttributes = function (pStyle) {
         var shapeOptions = KmlPolyStyle.update(pStyle && pStyle.PolyStyle);
         KmlLineStyle.update(pStyle && pStyle.LineStyle, shapeOptions);
 
@@ -183,9 +181,9 @@ define([
         return new ShapeAttributes(shapeOptions);
     };
 
-    KmlPolygon.prototype.prepareLocations = function() {
+    KmlPolygon.prototype.prepareLocations = function () {
         var locations = [];
-        if(this.kmlInnerBoundary != null) {
+        if (this.kmlInnerBoundary != null) {
             locations[0] = this.kmlInnerBoundary.kmlPositions;
             locations[1] = this.kmlOuterBoundary.kmlPositions;
         } else {
@@ -198,7 +196,7 @@ define([
      * Return promise of style valid for this Polygon.
      * @returns {Promise} Promise of style valid for current polygon.
      */
-    KmlPolygon.prototype.getStyle = function() {
+    KmlPolygon.prototype.getStyle = function () {
         return this._style;
     };
 
@@ -206,7 +204,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlPolygon.prototype.getTagNames = function() {
+    KmlPolygon.prototype.getTagNames = function () {
         return ['Polygon'];
     };
 

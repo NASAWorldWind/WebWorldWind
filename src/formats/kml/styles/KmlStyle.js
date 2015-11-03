@@ -13,18 +13,16 @@ define([
     './KmlListStyle',
     './KmlBalloonStyle',
     '../../../util/Promise'
-], function (
-    extend,
-    KmlStyleSelector,
-    KmlElements,
-    KmlPolyStyle,
-    KmlIconStyle,
-    KmlLabelStyle,
-    KmlLineStyle,
-    KmlListStyle,
-    KmlBalloonStyle,
-    Promise
-) {
+], function (extend,
+             KmlStyleSelector,
+             KmlElements,
+             KmlPolyStyle,
+             KmlIconStyle,
+             KmlLabelStyle,
+             KmlLineStyle,
+             KmlListStyle,
+             KmlBalloonStyle,
+             Promise) {
     "use strict";
 
     /**
@@ -39,7 +37,7 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#style
      */
-    var KmlStyle = function(styleNode) {
+    var KmlStyle = function (styleNode) {
         KmlStyleSelector.call(this, styleNode);
 
         Object.defineProperties(this, {
@@ -50,7 +48,7 @@ define([
              * @type {KmlIconStyle|null}
              */
             IconStyle: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlIconStyle.prototype.getTagNames()
                     });
@@ -64,7 +62,7 @@ define([
              * @type {KmlLabelStyle|null}
              */
             LabelStyle: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlLabelStyle.prototype.getTagNames()
                     });
@@ -78,7 +76,7 @@ define([
              * @type {KmlLineStyle|null}
              */
             LineStyle: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlLineStyle.prototype.getTagNames()
                     });
@@ -92,7 +90,7 @@ define([
              * @type {KmlPolyStyle|null}
              */
             PolyStyle: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlPolyStyle.prototype.getTagNames()
                     });
@@ -106,7 +104,7 @@ define([
              * @type {KmlBalloonStyle|null}
              */
             BalloonStyle: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlBalloonStyle.prototype.getTagNames()
                     });
@@ -120,7 +118,7 @@ define([
              * @type {KmlListStyle|null}
              */
             ListStyle: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlListStyle.prototype.getTagNames()
                     });
@@ -131,10 +129,10 @@ define([
         extend(this, KmlStyle.prototype);
     };
 
-    KmlStyle.prototype.getStyle = function() {
+    KmlStyle.prototype.getStyle = function () {
         var self = this;
-        return new Promise(function(resolve){
-            window.setTimeout(function(){
+        return new Promise(function (resolve) {
+            window.setTimeout(function () {
                 resolve(self);
             }, 0);
         });
@@ -144,7 +142,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlStyle.prototype.getTagNames = function() {
+    KmlStyle.prototype.getTagNames = function () {
         return ['Style'];
     };
 

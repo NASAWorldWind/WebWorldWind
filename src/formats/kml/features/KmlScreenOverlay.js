@@ -13,7 +13,7 @@ define([
 
     /**
      * Constructs an KmlScreenOverlay. Applications usually don't call this constructor. It is called by {@link
-     * KmlFile} as objects from Kml file are read. This object is already concrete implementation.
+        * KmlFile} as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlScreenOverlay
      * @classdesc Contains the data associated with ScreenOverlay node.
      * @param node {Node} Node representing screen overlay in the document.
@@ -26,8 +26,9 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Indicates the angle of rotation of the parent object. A value of 0 means no rotation. The value is an angle
-             * in degrees counterclockwise starting from north. Use �180 to indicate the rotation of the parent object from
+             * Indicates the angle of rotation of the parent object. A value of 0 means no rotation. The value is an
+             * angle in degrees counterclockwise starting from north. Use +-180 to indicate the rotation of the parent
+             * object from
              * 0. The center of the <rotation>, if not (.5,.5), is specified in <rotationXY>.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
@@ -120,9 +121,10 @@ define([
             },
 
             /**
-             * Units in which the x value is specified. A value of "fraction" indicates the x value is a fraction of the
-             * screen. A value of "pixels" indicates the x value in pixels. A value of "insetPixels" indicates the indent
-             * from the right edge of the screen.
+             * Units in which the x value is specified. A value of "fraction" indicates the x value is a fraction of
+             * the
+             * screen. A value of "pixels" indicates the x value in pixels. A value of "insetPixels" indicates the
+             * indent from the right edge of the screen.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
              * @type {String}
@@ -135,8 +137,8 @@ define([
 
             /**
              * Units in which the y value is specified. A value of fraction indicates the y value is a fraction of the
-             * screen. A value of "pixels" indicates the y value in pixels. A value of "insetPixels" indicates the indent
-             * from the top edge of the screen.
+             * screen. A value of "pixels" indicates the y value in pixels. A value of "insetPixels" indicates the
+             * indent from the top edge of the screen.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
              * @type {String}
@@ -172,9 +174,10 @@ define([
             },
 
             /**
-             * Units in which the x value is specified. A value of "fraction" indicates the x value is a fraction of the
-             * screen. A value of "pixels" indicates the x value in pixels. A value of "insetPixels" indicates the indent
-             * from the right edge of the screen.
+             * Units in which the x value is specified. A value of "fraction" indicates the x value is a fraction of
+             * the
+             * screen. A value of "pixels" indicates the x value in pixels. A value of "insetPixels" indicates the
+             * indent from the right edge of the screen.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
              * @type {String}
@@ -187,8 +190,8 @@ define([
 
             /**
              * Units in which the y value is specified. A value of fraction indicates the y value is a fraction of the
-             * screen. A value of "pixels" indicates the y value in pixels. A value of "insetPixels" indicates the indent
-             * from the top edge of the screen.
+             * screen. A value of "pixels" indicates the y value in pixels. A value of "insetPixels" indicates the
+             * indent from the top edge of the screen.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
              * @type {String}
@@ -200,7 +203,7 @@ define([
             },
 
             /**
-             * A value of ?1 indicates to use the native dimension
+             * A value of +-1 indicates to use the native dimension
              * A value of 0 indicates to maintain the aspect ratio
              * A value of n sets the value of the dimension
              * @memberof KmlScreenOverlay.prototype
@@ -214,7 +217,7 @@ define([
             },
 
             /**
-             * A value of ?1 indicates to use the native dimension
+             * A value of +-1 indicates to use the native dimension
              * A value of 0 indicates to maintain the aspect ratio
              * A value of n sets the value of the dimension
              * @memberof KmlScreenOverlay.prototype
@@ -228,9 +231,10 @@ define([
             },
 
             /**
-             * Units in which the x value is specified. A value of "fraction" indicates the x value is a fraction of the
-             * screen. A value of "pixels" indicates the x value in pixels. A value of "insetPixels" indicates the indent
-             * from the right edge of the screen.
+             * Units in which the x value is specified. A value of "fraction" indicates the x value is a fraction of
+             * the
+             * screen. A value of "pixels" indicates the x value in pixels. A value of "insetPixels" indicates the
+             * indent from the right edge of the screen.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
              * @type {String}
@@ -243,8 +247,8 @@ define([
 
             /**
              * Units in which the y value is specified. A value of fraction indicates the y value is a fraction of the
-             * screen. A value of "pixels" indicates the y value in pixels. A value of "insetPixels" indicates the indent
-             * from the top edge of the screen.
+             * screen. A value of "pixels" indicates the y value in pixels. A value of "insetPixels" indicates the
+             * indent from the top edge of the screen.
              * @memberof KmlScreenOverlay.prototype
              * @readonly
              * @type {String}
@@ -263,7 +267,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlScreenOverlay.prototype.getTagNames = function() {
+    KmlScreenOverlay.prototype.getTagNames = function () {
         return ['ScreenOverlay'];
     };
 

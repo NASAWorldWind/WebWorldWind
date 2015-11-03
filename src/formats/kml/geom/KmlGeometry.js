@@ -8,10 +8,8 @@
 define([
     '../../../util/extend',
     './../KmlObject'
-], function(
-    extend,
-    KmlObject
-){
+], function (extend,
+             KmlObject) {
     "use strict";
     /**
      * Constructs an KmlGeometry. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -23,7 +21,7 @@ define([
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#geometry
      */
-    var KmlGeometry = function(geometryNode) {
+    var KmlGeometry = function (geometryNode) {
         KmlObject.call(this, geometryNode);
 
         extend(this, KmlGeometry.prototype);
@@ -33,7 +31,7 @@ define([
      * Returns tag name of all descendants of this abstract node.
      * @returns {String[]}
      */
-    KmlGeometry.prototype.getTagNames = function() {
+    KmlGeometry.prototype.getTagNames = function () {
         return ['Point', 'LinearRing', 'LineString', 'MultiGeometry', 'Polygon'];
     };
 

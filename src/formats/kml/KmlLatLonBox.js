@@ -26,7 +26,7 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to �90.
+             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to +-90.
              * @memberof KmlLatLonBox.prototype
              * @readonly
              * @type {Number}
@@ -38,7 +38,7 @@ define([
             },
 
             /**
-             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to �90.
+             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to +-90.
              * @memberof KmlLatLonBox.prototype
              * @readonly
              * @type {Number}
@@ -50,7 +50,7 @@ define([
             },
 
             /**
-             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to �180.
+             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to +-180.
              * @memberof KmlLatLonBox.prototype
              * @readonly
              * @type {Number}
@@ -62,7 +62,7 @@ define([
             },
 
             /**
-             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to �180.
+             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to +-180.
              * @memberof KmlLatLonBox.prototype
              * @readonly
              * @type {Number}
@@ -94,7 +94,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlLatLonBox.prototype.getTagNames = function() {
+    KmlLatLonBox.prototype.getTagNames = function () {
         return ['LatLonBox'];
     };
 

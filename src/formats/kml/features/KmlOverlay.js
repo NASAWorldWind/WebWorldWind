@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './KmlFeature',
     './../KmlIcon'
-], function (
-    extend,
-    KmlFeature,
-    KmlIcon
-) {
+], function (extend,
+             KmlFeature,
+             KmlIcon) {
     "use strict";
 
     /**
@@ -23,21 +21,22 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#overlay
      */
-    var KmlOverlay = function(node) {
+    var KmlOverlay = function (node) {
         KmlFeature.call(this, node);
 
         Object.defineProperties(this, {
             /**
-             * Color values are expressed in hexadecimal notation, including opacity (alpha) values. The order of expression
-             * is alpha, blue, green, red (aabbggrr). The range of values for any one color is 0 to 255 (00 to ff). For
-             * opacity, 00 is fully transparent and ff is fully opaque. For example, if you want to apply a blue color with
+             * Color values are expressed in hexadecimal notation, including opacity (alpha) values. The order of
+             * expression is alpha, blue, green, red (aabbggrr). The range of values for any one color is 0 to 255 (00
+             * to ff). For opacity, 00 is fully transparent and ff is fully opaque. For example, if you want to apply a
+             * blue color with
              * 50 percent opacity to an overlay, you would specify the following: <color>7fff0000</color>
              * @memberof KmlOverlay.prototype
              * @readonly
              * @type {String}
              */
             color: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'color'});
                 }
             },
@@ -50,22 +49,23 @@ define([
              * @type {Number}
              */
             drawOrder: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'drawOrder', transformer: Number});
                 }
             },
 
             /**
-             * Defines the image associated with the Overlay. The <href> element defines the location of the image to be
-             * used as the Overlay. This location can be either on a local file system or on a web server. If this element
-             * is omitted or contains no <href>, a rectangle is drawn using the color and size defined by the ground or
-             * screen overlay.
+             * Defines the image associated with the Overlay. The <href> element defines the location of the image to
+             * be
+             * used as the Overlay. This location can be either on a local file system or on a web server. If this
+             * element is omitted or contains no <href>, a rectangle is drawn using the color and size defined by the
+             * ground or screen overlay.
              * @memberof KmlOverlay.prototype
              * @readonly
              * @type {KmlIcon}
              */
             Icon: {
-                get: function(){
+                get: function () {
                     return this.createChildElement({
                         name: KmlIcon.prototype.getTagNames()
                     });
@@ -80,7 +80,7 @@ define([
      * Returns tag name of all descendants of this abstract node.
      * @returns {String[]}
      */
-    KmlOverlay.prototype.getTagNames = function() {
+    KmlOverlay.prototype.getTagNames = function () {
         return ['PhotoOverlay', 'ScreenOverlay', 'GroundOverlay'];
     };
 

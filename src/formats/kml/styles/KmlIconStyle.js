@@ -66,8 +66,8 @@ define([
             },
 
             /**
-             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the x component
-             * of a point on the icon.
+             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the x
+             * component of a point on the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
              * @type {String}
@@ -79,8 +79,8 @@ define([
             },
 
             /**
-             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the y component
-             * of a point on the icon.
+             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the y
+             * component of a point on the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
              * @type {String}
@@ -123,7 +123,7 @@ define([
         extend(this, KmlIconStyle);
     };
 
-    KmlIconStyle.update = function() {
+    KmlIconStyle.update = function () {
 
     };
 
@@ -131,7 +131,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlIconStyle.prototype.getTagNames = function() {
+    KmlIconStyle.prototype.getTagNames = function () {
         return ['IconStyle'];
     };
 

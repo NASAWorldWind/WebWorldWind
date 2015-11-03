@@ -26,9 +26,10 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Defines a square in screen space, with sides of the specified value in pixels. For example, 128 defines a
-             * square of 128 x 128 pixels. The region's bounding box must be larger than this square (and smaller than the
-             * maxLodPixels square) in order for the Region to be active.
+             * Defines a square in screen space, with sides of the specified value in pixels. For example, 128 defines
+             * a
+             * square of 128 x 128 pixels. The region's bounding box must be larger than this square (and smaller than
+             * the maxLodPixels square) in order for the Region to be active.
              *
              * More details are available in the Working with Regions chapter of the Developer's Guide, as well as the
              *  Google Earth Outreach documentation's Avoiding Overload with Regions tutorial.
@@ -43,8 +44,8 @@ define([
             },
 
             /**
-             * Measurement in screen pixels that represents the maximum limit of the visibility range for a given Region. A
-             * value of ?1, the default, indicates "active to infinite size."
+             * Measurement in screen pixels that represents the maximum limit of the visibility range for a given
+             * Region. A value of -1, the default, indicates "active to infinite size."
              * @memberof KmlLod.prototype
              * @readonly
              * @type {Number}
@@ -56,8 +57,8 @@ define([
             },
 
             /**
-             * Distance over which the geometry fades, from fully opaque to fully transparent. This ramp value, expressed
-             * in screen pixels, is applied at the minimum end of the LOD (visibility) limits.
+             * Distance over which the geometry fades, from fully opaque to fully transparent. This ramp value,
+             * expressed in screen pixels, is applied at the minimum end of the LOD (visibility) limits.
              * @memberof KmlLod.prototype
              * @readonly
              * @type {Number}
@@ -69,8 +70,8 @@ define([
             },
 
             /**
-             * Distance over which the geometry fades, from fully transparent to fully opaque. This ramp value, expressed
-             * in screen pixels, is applied at the maximum end of the LOD (visibility) limits.
+             * Distance over which the geometry fades, from fully transparent to fully opaque. This ramp value,
+             * expressed in screen pixels, is applied at the maximum end of the LOD (visibility) limits.
              * @memberof KmlLod.prototype
              * @readonly
              * @type {Number}
@@ -89,7 +90,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlLod.prototype.getTagNames = function() {
+    KmlLod.prototype.getTagNames = function () {
         return ['Lod'];
     };
 

@@ -8,10 +8,8 @@
 define([
     '../../util/extend',
     './KmlObject'
-], function(
-    extend,
-    KmlObject
-){
+], function (extend,
+             KmlObject) {
     "use strict";
     /**
      * Constructs an KmlTimePrimitive. Applications usually don't call this constructor. It is called by {@link KmlFile}
@@ -22,8 +20,8 @@ define([
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#timeprimitive
      */
-    var KmlTimePrimitive = function(timePrimitiveNode) {
-        KmlObject.call(this,timePrimitiveNode);
+    var KmlTimePrimitive = function (timePrimitiveNode) {
+        KmlObject.call(this, timePrimitiveNode);
 
         extend(this, KmlTimePrimitive.prototype);
     };
@@ -32,8 +30,8 @@ define([
      * Returns tag name of all descendants of this abstract node.
      * @returns {String[]}
      */
-    KmlTimePrimitive.prototype.getTagNames = function() {
-        return ['TimeSpan','TimeStamp'];
+    KmlTimePrimitive.prototype.getTagNames = function () {
+        return ['TimeSpan', 'TimeStamp'];
     };
 
     return KmlTimePrimitive;

@@ -6,11 +6,9 @@ define([
     '../../util/extend',
     './KmlElements',
     './KmlObject'
-], function (
-    extend,
-    KmlElements,
-    KmlObject
-) {
+], function (extend,
+             KmlElements,
+             KmlObject) {
     "use strict";
 
     /**
@@ -23,7 +21,7 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#location
      */
-    var KmlLocation = function(node) {
+    var KmlLocation = function (node) {
         KmlObject.call(this, node);
 
         Object.defineProperties(this, {
@@ -34,7 +32,7 @@ define([
              * @type {String}
              */
             longitude: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'longitude'});
                 }
             },
@@ -46,7 +44,7 @@ define([
              * @type {String}
              */
             latitude: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'latitude'});
                 }
             },
@@ -58,7 +56,7 @@ define([
              * @type {String}
              */
             altitude: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'altitude'});
                 }
             }
@@ -71,7 +69,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlLocation.prototype.getTagNames = function() {
+    KmlLocation.prototype.getTagNames = function () {
         return ['Location'];
     };
 

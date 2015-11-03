@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './../KmlElements',
     '../KmlObject'
-], function (
-    extend,
-    KmlElements,
-    KmlObject
-) {
+], function (extend,
+             KmlElements,
+             KmlObject) {
     // TODO KmlSchema isn't actually descendant of the KmlObject. The relevant logic should be applied differently.
     "use strict";
     /**
@@ -23,7 +21,7 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
      */
-    var Schema = function(node) {
+    var Schema = function (node) {
         KmlObject.call(this, node);
 
         extend(this, Schema.prototype);
@@ -33,7 +31,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    Schema.prototype.getTagNames = function() {
+    Schema.prototype.getTagNames = function () {
         return ['Schema'];
     };
 

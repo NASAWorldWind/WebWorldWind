@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './../KmlElements',
     '../KmlObject'
-], function (
-    extend,
-    KmlElements,
-    KmlObject
-) {
+], function (extend,
+             KmlElements,
+             KmlObject) {
     "use strict";
 
     /**
@@ -23,7 +21,7 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#scale
      */
-    var Scale = function(node) {
+    var Scale = function (node) {
         KmlObject.call(this, node);
 
         Object.defineProperties(this, {
@@ -34,7 +32,7 @@ define([
              * @type {Number}
              */
             x: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'x', transformer: Number});
                 }
             },
@@ -46,7 +44,7 @@ define([
              * @type {Number}
              */
             y: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'y', transformer: Number});
                 }
             },
@@ -58,7 +56,7 @@ define([
              * @type {Number}
              */
             z: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'z', transformer: Number});
                 }
             }
@@ -71,7 +69,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    Scale.prototype.getTagNames = function() {
+    Scale.prototype.getTagNames = function () {
         return ['Scale'];
     };
 

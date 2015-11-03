@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './KmlColorStyle',
     '../KmlElements'
-], function (
-    extend,
-    KmlColorStyle,
-    KmlElements
-) {
+], function (extend,
+             KmlColorStyle,
+             KmlElements) {
     "use strict";
     /**
      * Constructs an KmlLabelStyle. Applications don't usually call this constructor. It is called by {@link KmlFile} as
@@ -22,7 +20,7 @@ define([
      * @throws {ArgumentError} If node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#labelstyle
      */
-    var KmlLabelStyle = function(labelStyleNode) {
+    var KmlLabelStyle = function (labelStyleNode) {
         KmlColorStyle.call(this, labelStyleNode);
 
         Object.defineProperties(this, {
@@ -33,7 +31,7 @@ define([
              * @type {Number}
              */
             scale: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'scale', transformer: Number});
                 }
             }
@@ -42,7 +40,7 @@ define([
         extend(this, KmlLabelStyle.prototype);
     };
 
-    KmlLabelStyle.update = function() {
+    KmlLabelStyle.update = function () {
 
     };
 
@@ -50,7 +48,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlLabelStyle.prototype.getTagNames = function() {
+    KmlLabelStyle.prototype.getTagNames = function () {
         return ['LabelStyle'];
     };
 

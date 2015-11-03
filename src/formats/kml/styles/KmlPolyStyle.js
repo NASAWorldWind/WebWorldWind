@@ -8,13 +8,11 @@ define([
     './KmlColorStyle',
     './../KmlElements',
     '../../../util/WWUtil'
-], function (
-    Color,
-    extend,
-    KmlColorStyle,
-    KmlElements,
-    WWUtil
-) {
+], function (Color,
+             extend,
+             KmlColorStyle,
+             KmlElements,
+             WWUtil) {
     "use strict";
 
     /**
@@ -27,7 +25,7 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polystyle
      */
-    var KmlPolyStyle = function(polyStyleNode){
+    var KmlPolyStyle = function (polyStyleNode) {
         KmlColorStyle.call(this, polyStyleNode);
 
         Object.defineProperties(this, {
@@ -38,7 +36,7 @@ define([
              * @type {Boolean}
              */
             fill: {
-                get: function(){
+                get: function () {
                     return this.retrieve({name: 'fill', transformer: WWUtil.transformToBoolean});
                 }
             },
@@ -50,7 +48,7 @@ define([
              * @type {Boolean}
              */
             outline: {
-                get: function(){
+                get: function () {
                     return this.retrieve({name: 'outline', transformer: WWUtil.transformToBoolean});
                 }
             }
@@ -59,7 +57,7 @@ define([
         extend(this, KmlPolyStyle.prototype);
     };
 
-    KmlPolyStyle.update = function(style, options) {
+    KmlPolyStyle.update = function (style, options) {
         style = style || {};
         var shapeOptions = options || {};
         shapeOptions._drawInterior = style.fill || true;
@@ -75,7 +73,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlPolyStyle.prototype.getTagNames = function() {
+    KmlPolyStyle.prototype.getTagNames = function () {
         return ['PolyStyle'];
     };
 

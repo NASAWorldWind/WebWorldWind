@@ -9,11 +9,9 @@ define([
     '../../util/extend',
     './KmlTimePrimitive',
     './KmlElements'
-], function(
-    extend,
-    KmlTimePrimitive,
-    KmlElements
-){
+], function (extend,
+             KmlTimePrimitive,
+             KmlElements) {
     "use strict";
     /**
      * Constructs an KmlTimeSpan. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -25,7 +23,7 @@ define([
      * @throws {ArgumentError} If the content of the node contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#timespan
      */
-    var KmlTimeSpan = function(timeSpanNode) {
+    var KmlTimeSpan = function (timeSpanNode) {
         KmlTimePrimitive.call(this, timeSpanNode);
 
         Object.defineProperties(this, {
@@ -36,7 +34,7 @@ define([
              * @readonly
              */
             begin: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'begin'});
                 }
             },
@@ -48,7 +46,7 @@ define([
              * @readonly
              */
             end: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'end'});
                 }
             }
@@ -61,7 +59,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlTimeSpan.prototype.getTagNames = function() {
+    KmlTimeSpan.prototype.getTagNames = function () {
         return ['TimeSpan'];
     };
 

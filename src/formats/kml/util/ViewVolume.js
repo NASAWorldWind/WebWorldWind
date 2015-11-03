@@ -95,7 +95,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    ViewVolume.prototype.getTagNames = function() {
+    ViewVolume.prototype.getTagNames = function () {
         return ['ViewVolume'];
     };
 

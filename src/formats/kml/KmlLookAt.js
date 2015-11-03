@@ -27,8 +27,8 @@ define([
         Object.defineProperties(this, {
             /**
              * Longitude of the point the camera is looking at. Angular distance in degrees, relative to the Prime
-             * Meridian. Values west of the Meridian range from ?180 to 0 degrees. Values east of the Meridian range from 0
-             * to 180 degrees.
+             * Meridian. Values west of the Meridian range from -180 to 0 degrees. Values east of the Meridian range
+             * from 0 to 180 degrees.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {Number}
@@ -41,7 +41,7 @@ define([
 
             /**
              * Latitude of the point the camera is looking at. Degrees north or south of the Equator (0 degrees). Values
-             * range from ?90 degrees to 90 degrees.
+             * range from -90 degrees to 90 degrees.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {Number}
@@ -78,9 +78,10 @@ define([
             },
 
             /**
-             * Angle between the direction of the LookAt position and the normal to the surface of the earth. (See diagram
-             * below.) Values range from 0 to 90 degrees. Values for <tilt> cannot be negative. A <tilt> value of 0 degrees
-             * indicates viewing from directly above. A <tilt> value of 90 degrees indicates viewing along the horizon.
+             * Angle between the direction of the LookAt position and the normal to the surface of the earth. (See
+             * diagram below.) Values range from 0 to 90 degrees. Values for <tilt> cannot be negative. A <tilt> value
+             * of 0 degrees indicates viewing from directly above. A <tilt> value of 90 degrees indicates viewing along
+             * the horizon.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {Number}
@@ -105,11 +106,10 @@ define([
             },
 
             /**
-             * Specifies how the <altitude> specified for the LookAt point is interpreted. Possible values are as follows:
-             * clampToGround - (default) Indicates to ignore the <altitude> specification and place the LookAt position
-             *  on the ground.
-             * relativeToGround - Interprets the <altitude> as a value in meters above the ground.
-             * absolute - Interprets the <altitude> as a value in meters above sea level.
+             * Specifies how the <altitude> specified for the LookAt point is interpreted. Possible values are as
+             * follows: clampToGround - (default) Indicates to ignore the <altitude> specification and place the LookAt
+             * position on the ground. relativeToGround - Interprets the <altitude> as a value in meters above the
+             * ground. absolute - Interprets the <altitude> as a value in meters above sea level.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {String}
@@ -128,7 +128,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlLookAt.prototype.getTagNames = function() {
+    KmlLookAt.prototype.getTagNames = function () {
         return ['LookAt'];
     };
 

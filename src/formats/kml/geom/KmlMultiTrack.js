@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './../KmlElements',
     './KmlGeometry'
-], function (
-    extend,
-    KmlElements,
-    KmlGeometry
-) {
+], function (extend,
+             KmlElements,
+             KmlGeometry) {
     "use strict";
 
     /**
@@ -23,7 +21,7 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxmultitrack
      */
-    var KmlMultiTrack = function(node) {
+    var KmlMultiTrack = function (node) {
         KmlGeometry.call(this, node);
 
         extend(this, KmlMultiTrack.prototype);
@@ -33,7 +31,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlMultiTrack.prototype.getTagNames = function() {
+    KmlMultiTrack.prototype.getTagNames = function () {
         return ['gx:MultiTrack'];
     };
 

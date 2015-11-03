@@ -7,12 +7,10 @@ define([
     './../KmlElements',
     '../KmlObject',
     '../styles/KmlStyle'
-], function (
-    extend,
-    KmlElements,
-    KmlObject,
-    KmlStyle
-) {
+], function (extend,
+             KmlElements,
+             KmlObject,
+             KmlStyle) {
     "use strict";
 
     /**
@@ -25,7 +23,7 @@ define([
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#pair
      */
-    var Pair = function(node) {
+    var Pair = function (node) {
         KmlObject.call(this, node);
 
         Object.defineProperties(this, {
@@ -36,7 +34,7 @@ define([
              * @type {String}
              */
             key: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'key'});
                 }
             },
@@ -48,7 +46,7 @@ define([
              * @type {String}
              */
             styleUrl: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'styleUrl'});
                 }
             },
@@ -60,7 +58,7 @@ define([
              * @type {KmlStyle}
              */
             Style: {
-                get: function() {
+                get: function () {
                     return this.createChildElement({
                         name: KmlStyle.prototype.getTagNames()
                     });
@@ -75,7 +73,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    Pair.prototype.getTagNames = function() {
+    Pair.prototype.getTagNames = function () {
         return ['Pair'];
     };
 

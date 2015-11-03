@@ -26,7 +26,8 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Size of the tiles, in pixels. Tiles must be square, and <tileSize> must be a power of 2. A tile size of 256
+             * Size of the tiles, in pixels. Tiles must be square, and <tileSize> must be a power of 2. A tile size of
+             * 256
              * (the default) or 512 is recommended. The original image is divided into tiles of this size, at varying
              * resolutions.
              * @memberof ImagePyramid.prototype
@@ -84,7 +85,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    ImagePyramid.prototype.getTagNames = function() {
+    ImagePyramid.prototype.getTagNames = function () {
         return ['ImagePyramid'];
     };
 

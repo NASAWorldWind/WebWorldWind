@@ -6,11 +6,9 @@ define([
     '../../util/extend',
     './KmlLink',
     './KmlElements'
-], function (
-    extend,
-    KmlLink,
-    KmlElements
-) {
+], function (extend,
+             KmlLink,
+             KmlElements) {
     "use strict";
     /**
      * Constructs an KmlIcon. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -22,7 +20,7 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#icon
      */
-    var KmlIcon = function(iconNode) {
+    var KmlIcon = function (iconNode) {
         KmlLink.call(this, iconNode);
 
         Object.defineProperties(this, {
@@ -33,7 +31,7 @@ define([
              * @type {String}
              */
             href: {
-                get: function(){
+                get: function () {
                     return this.retrieve({name: 'href'});
                 }
             },
@@ -45,7 +43,7 @@ define([
              * @type {Number}
              */
             x: {
-                get: function(){
+                get: function () {
                     return this.retrieve({name: 'gx:x', transformer: Number});
                 }
             },
@@ -57,7 +55,7 @@ define([
              * @type {Number}
              */
             y: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'gx:y', transformer: Number});
                 }
             },
@@ -69,7 +67,7 @@ define([
              * @type {Number}
              */
             w: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'gx:w'});
                 }
             },
@@ -81,7 +79,7 @@ define([
              * @type {Number}
              */
             h: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'gx:h'});
                 }
             }
@@ -94,7 +92,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlIcon.prototype.getTagNames = function() {
+    KmlIcon.prototype.getTagNames = function () {
         return ['Icon'];
     };
 

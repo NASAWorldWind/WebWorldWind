@@ -9,11 +9,9 @@ define([
     '../../util/extend',
     './KmlElements',
     './KmlTimePrimitive'
-], function(
-    extend,
-    KmlElements,
-    KmlTimePrimitive
-){
+], function (extend,
+             KmlElements,
+             KmlTimePrimitive) {
     "use strict";
 
     /**
@@ -26,7 +24,7 @@ define([
      * @throws {ArgumentError} If the content of the node contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#timestamp
      */
-    var KmlTimeStamp = function(timeStampNode) {
+    var KmlTimeStamp = function (timeStampNode) {
         KmlTimePrimitive.call(this, timeStampNode);
 
         Object.defineProperties(this, {
@@ -50,7 +48,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlTimeStamp.prototype.getTagNames = function() {
+    KmlTimeStamp.prototype.getTagNames = function () {
         return ['TimeStamp'];
     };
 

@@ -16,18 +16,16 @@ define([
     '../../../shapes/Placemark',
     '../../../util/Color',
     '../../../util/Offset'
-], function (
-    extend,
-    KmlElements,
-    KmlFeature,
-    KmlGeometry,
-    KmlIconStyle,
-    KmlLabelStyle,
-    PlacemarkAttributes,
-    Placemark,
-    Color,
-    Offset
-) {
+], function (extend,
+             KmlElements,
+             KmlFeature,
+             KmlGeometry,
+             KmlIconStyle,
+             KmlLabelStyle,
+             PlacemarkAttributes,
+             Placemark,
+             Color,
+             Offset) {
     "use strict";
     /**
      * Constructs an KmlPlacemark. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -43,7 +41,7 @@ define([
     var KmlPlacemark = function (placemarkNode, pStyle) {
         KmlFeature.call(this, placemarkNode);
 
-        pStyle.then(function(style){
+        pStyle.then(function (style) {
 
         });
         this._style = pStyle;
@@ -56,7 +54,7 @@ define([
              * @readonly
              */
             geometry: {
-                get: function(){
+                get: function () {
                     return this.createChildElement({
                         name: KmlGeometry.prototype.getTagNames()
                     });
@@ -74,8 +72,8 @@ define([
      * @param layer {Layer} Layer into which the placemark may be rendered.
      * @param style {Promise} Promise of style, which will be eventually delivered.
      */
-    KmlPlacemark.prototype.update = function(layer, style) {
-        if(!this.geometry) {
+    KmlPlacemark.prototype.update = function (layer, style) {
+        if (!this.geometry) {
             // For now don't display Placemarks without geometries.
             return;
         }
@@ -109,7 +107,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlPlacemark.prototype.getTagNames = function() {
+    KmlPlacemark.prototype.getTagNames = function () {
         return ['Placemark'];
     };
 

@@ -26,11 +26,12 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Specifies the coordinates of the four corner points of a quadrilateral defining the overlay area. Exactly
+             * Specifies the coordinates of the four corner points of a quadrilateral defining the overlay area.
+             * Exactly
              * four coordinate tuples have to be provided, each consisting of floating point values for longitude and
              * latitude. Insert a space between tuples. Do not include spaces within a tuple. The coordinates must be
-             * specified in counter-clockwise order with the first coordinate corresponding to the lower-left corner of the
-             * overlayed image. The shape described by these corners must be convex.
+             * specified in counter-clockwise order with the first coordinate corresponding to the lower-left corner of
+             * the overlayed image. The shape described by these corners must be convex.
              * @memberof KmlLatLonQuad.prototype
              * @readonly
              * @type {String}
@@ -49,7 +50,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlLatLonQuad.prototype.getTagNames = function() {
+    KmlLatLonQuad.prototype.getTagNames = function () {
         return ['gx:LatLonQuad'];
     };
 

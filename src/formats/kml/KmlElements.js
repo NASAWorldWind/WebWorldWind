@@ -2,8 +2,7 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-define([], function (
-) {
+define([], function () {
     "use strict";
 
     /**
@@ -22,7 +21,7 @@ define([], function (
          * @param key Name of the node, by which it is retrieved. Name is case sensitive.
          * @param value Value represent constructor function to be instantiated
          */
-        addKey: function(key, value){
+        addKey: function (key, value) {
             this.keys[key] = value;
         },
 
@@ -31,7 +30,7 @@ define([], function (
          * @param key Name of the node.
          * @returns {*} Constructor function to be instantiated.
          */
-        getKey: function(key){
+        getKey: function (key) {
             return this.keys[key];
         }
     };

@@ -5,10 +5,8 @@
 define([
     '../../../util/extend',
     './KmlSubStyle'
-], function (
-    extend,
-    KmlSubStyle
-) {
+], function (extend,
+             KmlSubStyle) {
     "use strict";
     /**
      * Constructs an KmlColorStyle. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -20,7 +18,7 @@ define([
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#colorstyle
      */
-    var KmlColorStyle = function(colorStyleNode) {
+    var KmlColorStyle = function (colorStyleNode) {
         KmlSubStyle.call(this, colorStyleNode);
 
         Object.defineProperties(this, {
@@ -32,20 +30,20 @@ define([
              * @type {String}
              */
             color: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'color'});
                 }
             },
 
             /**
-             * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based on
-             * the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
+             * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based
+             * on the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
              * @memberof KmlColorStyle.prototype
              * @readonly
              * @type {String}
              */
             colorMode: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'colorMode'});
                 }
             }
@@ -58,8 +56,8 @@ define([
      * Returns tag name of all descendants of this abstract node.
      * @returns {String[]}
      */
-    KmlColorStyle.prototype.getTagNames = function() {
-        return ['LineStyle','PolyStyle','IconStyle','LabelStyle'];
+    KmlColorStyle.prototype.getTagNames = function () {
+        return ['LineStyle', 'PolyStyle', 'IconStyle', 'LabelStyle'];
     };
 
     return KmlColorStyle;

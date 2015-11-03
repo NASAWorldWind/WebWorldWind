@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './KmlContainer',
     './../KmlElements'
-], function (
-    extend,
-    KmlContainer,
-    KmlElements
-) {
+], function (extend,
+             KmlContainer,
+             KmlElements) {
     "use strict";
     /**
      * Constructs an KmlFolder. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -22,7 +20,7 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#folder
      */
-    var KmlFolder = function(node) {
+    var KmlFolder = function (node) {
         KmlContainer.call(this, node);
 
         Object.defineProperties(this, {
@@ -34,7 +32,7 @@ define([
              * @see {KmlFeature}
              */
             shapes: {
-                get: function(){
+                get: function () {
                     return this.parse();
                 }
             }
@@ -43,8 +41,8 @@ define([
         extend(this, KmlFolder.prototype);
     };
 
-    KmlFolder.prototype.update = function(layer, style) {
-        this.shapes.forEach(function(shape) {
+    KmlFolder.prototype.update = function (layer, style) {
+        this.shapes.forEach(function (shape) {
             shape.update(layer, style);
         });
     };
@@ -53,7 +51,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlFolder.prototype.getTagNames = function() {
+    KmlFolder.prototype.getTagNames = function () {
         return ['Folder'];
     };
 

@@ -7,12 +7,10 @@ define([
     '../../../util/extend',
     './KmlColorStyle',
     './../KmlElements'
-], function (
-    Color,
-    extend,
-    KmlColorStyle,
-    KmlElements
-) {
+], function (Color,
+             extend,
+             KmlColorStyle,
+             KmlElements) {
     "use strict";
 
     /**
@@ -24,7 +22,7 @@ define([
      * @classdesc Class representing LineStyle element of KmlFile
      * @see https://developers.google.com/kml/documentation/kmlreference#linestyle
      */
-    var KmlLineStyle = function(lineStyleNode) {
+    var KmlLineStyle = function (lineStyleNode) {
         KmlColorStyle.call(this, lineStyleNode);
 
         Object.defineProperties(this, {
@@ -35,7 +33,7 @@ define([
              * @type {Number}
              */
             width: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'width', transformer: Number});
                 }
             },
@@ -47,7 +45,7 @@ define([
              * @type {String}
              */
             outerColor: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'gx:outerColor'});
                 }
             },
@@ -60,7 +58,7 @@ define([
              * @type {Number}
              */
             outerWidth: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'gx:outerWidth', transformer: Number});
                 }
             },
@@ -72,20 +70,21 @@ define([
              * @type {Number}
              */
             physicalWidth: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'gx:physicalWidth', transformer: Number});
                 }
             },
 
             /**
-             * A boolean defining whether or not to display a text label on a LineString. A LineString's label is contained
-             * in the <name> element that is a sibling of <LineString> (i.e. contained within the same <Placemark> element).
+             * A boolean defining whether or not to display a text label on a LineString. A LineString's label is
+             * contained in the <name> element that is a sibling of <LineString> (i.e. contained within the same
+             * <Placemark> element).
              * @memberof KmlLineStyle.prototype
              * @readonly
              * @type {Boolean}
              */
             labelVisibility: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'gx:labelVisibility'});
                 }
             }
@@ -94,7 +93,7 @@ define([
         extend(this, KmlLineStyle.prototype);
     };
 
-    KmlLineStyle.update = function(style, options) {
+    KmlLineStyle.update = function (style, options) {
         var shapeOptions = options || {};
         style = style || {};
 
@@ -108,7 +107,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlLineStyle.prototype.getTagNames = function() {
+    KmlLineStyle.prototype.getTagNames = function () {
         return ['LineStyle'];
     };
 

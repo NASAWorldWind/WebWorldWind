@@ -11,16 +11,16 @@ define([], function () {
         this._map = {};
     };
 
-    KmlFileCache.prototype.retrieve = function(url) {
-        if(url.indexOf('#') == 0 || url == null) {
+    KmlFileCache.prototype.retrieve = function (url) {
+        if (url.indexOf('#') == 0 || url == null) {
             return this._rootFile;
         } else {
             var urlNormalized = url;
-            if(url.indexOf('#' != -1)) {
+            if (url.indexOf('#' != -1)) {
                 urlNormalized = url.substr(0, url.indexOf('#') - 1);
             }
             // Start of the URL use to store it in the map.
-            if(this._map[urlNormalized]) {
+            if (this._map[urlNormalized]) {
                 return this._map[urlNormalized];
             }
         }
@@ -30,8 +30,8 @@ define([], function () {
 
     // This shouldn't know about KmlFile per se.
 
-    KmlFileCache.prototype.add = function(url, filePromise) {
-        if(!this._rootFile) {
+    KmlFileCache.prototype.add = function (url, filePromise) {
+        if (!this._rootFile) {
             this._rootFile = filePromise;
         } else {
             this._map[url] = filePromise;

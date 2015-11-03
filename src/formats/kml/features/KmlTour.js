@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './../KmlElements',
     './KmlFeature'
-], function (
-    extend,
-    KmlElements,
-    KmlFeature
-) {
+], function (extend,
+             KmlElements,
+             KmlFeature) {
     "use strict";
 
     /**
@@ -23,7 +21,7 @@ define([
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxtour
      */
-    var KmlTour = function(node) {
+    var KmlTour = function (node) {
         KmlFeature.call(this, node);
 
         extend(this, KmlTour.prototype);
@@ -33,7 +31,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlTour.prototype.getTagNames = function() {
+    KmlTour.prototype.getTagNames = function () {
         return ['gx:Tour'];
     };
 

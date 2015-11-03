@@ -31,8 +31,8 @@ define([
              * contains two elements (both are required):
              * <key>, which identifies the key
              * <styleUrl> or <Style>, which references the style. In <styleUrl>, for referenced style elements that are
-             *  local to the KML document, a simple # referencing is used. For styles that are contained in external files,
-             * use a full URL along with # referencing.
+             *  local to the KML document, a simple # referencing is used. For styles that are contained in external
+             * files, use a full URL along with # referencing.
              * @memberof KmlStyleMap.prototype
              * @readonly
              * @type {Pair}
@@ -53,7 +53,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlStyleMap.prototype.getTagNames = function() {
+    KmlStyleMap.prototype.getTagNames = function () {
         return ['StyleMap'];
     };
 

@@ -59,7 +59,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    ItemIcon.prototype.getTagNames = function() {
+    ItemIcon.prototype.getTagNames = function () {
         return ['ItemIcon'];
     };
 

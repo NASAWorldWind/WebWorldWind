@@ -15,8 +15,7 @@ define([
              extend,
              KmlElements,
              Logger,
-             Promise
-) {
+             Promise) {
     "use strict";
     /**
      * Constructs an Kml object. Every node in the Kml document is either basic type or Kml object. Applications usually
@@ -40,8 +39,8 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Every object, which is part of the KML document has its identity. We will use it for changes in the document
-             * for binding.
+             * Every object, which is part of the KML document has its identity. We will use it for changes in the
+             * document for binding.
              * @memberof KmlObject.prototype
              * @type {String}
              * @readonly
@@ -70,7 +69,6 @@ define([
 
         extend(this, KmlObject.prototype);
     };
-
 
 
     /**
@@ -102,7 +100,7 @@ define([
             );
         }
         var validNode = this.retrieveNode(options);
-        if(this.doesAttributeExist(validNode, options.attributeName)) {
+        if (this.doesAttributeExist(validNode, options.attributeName)) {
             return this.getValueOfAttribute(validNode, options.attributeName);
         }
         return null;
@@ -180,11 +178,11 @@ define([
             var constructor = self.retrieveElementForNode(childNode.nodeName);
             if (constructor == null) {
                 Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "parse", "Element, which doesn't have internal " +
-                        "representation. Node name: " + childNode.nodeName);
+                    "representation. Node name: " + childNode.nodeName);
                 return;
             }
-            var style = new Promise(function(resolve){
-                if(self.getStyle) {
+            var style = new Promise(function (resolve) {
+                if (self.getStyle) {
                     resolve(self.getStyle());
                 } else {
                     // Maybe reject. We will see later.
@@ -213,7 +211,7 @@ define([
      */
     KmlObject.prototype.createChildElement = function (options) {
         var node = this.retrieveNode(options);
-        if(node == null) {
+        if (node == null) {
             return null;
         }
         var constructor = this.retrieveElementForNode(node.nodeName);
@@ -230,12 +228,12 @@ define([
     };
 
     // To be overriden in descendants.
-    KmlObject.prototype.getStyle = function() {
+    KmlObject.prototype.getStyle = function () {
         Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.getTagNames()[0] + " doesn't override  " +
             "getStyle.");
     };
 
-    KmlObject.prototype.isFeature = function() {
+    KmlObject.prototype.isFeature = function () {
         return false;
     };
 

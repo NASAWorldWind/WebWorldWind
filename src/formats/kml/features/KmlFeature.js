@@ -229,12 +229,12 @@ define([
             var filePromise;
             if (self.styleUrl) {
                 filePromise = KmlFileCache.retrieve(self.styleUrl);
-                if(!filePromise) {
+                if (!filePromise) {
                     filePromise = new KmlFile({url: self.styleUrl});
                     KmlFileCache.add(filePromise);
                 }
-                filePromise.then(function(kmlFile){
-                    kmlFile.resolveStyle(self.styleUrl).then(function(style){
+                filePromise.then(function (kmlFile) {
+                    kmlFile.resolveStyle(self.styleUrl).then(function (style) {
                         resolve(style);
                     });
                 });
@@ -252,7 +252,7 @@ define([
         return this._pStyle;
     };
 
-    KmlFeature.prototype.isFeature = function() {
+    KmlFeature.prototype.isFeature = function () {
         return true;
     };
 

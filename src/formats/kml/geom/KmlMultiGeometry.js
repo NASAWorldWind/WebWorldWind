@@ -7,12 +7,10 @@ define([
     './../KmlElements',
     './KmlGeometry',
     '../../../geom/Position'
-], function (
-    extend,
-    KmlElements,
-    KmlGeometry,
-    Position
-) {
+], function (extend,
+             KmlElements,
+             KmlGeometry,
+             Position) {
     "use strict";
 
     /**
@@ -25,7 +23,7 @@ define([
      * @alias KmlMultiGeometry
      * @see https://developers.google.com/kml/documentation/kmlreference#multigeometry
      */
-    var KmlMultiGeometry = function(multiGeometryNode, pStyle) {
+    var KmlMultiGeometry = function (multiGeometryNode, pStyle) {
         KmlGeometry.call(this, multiGeometryNode);
         this._style = pStyle;
 
@@ -37,7 +35,7 @@ define([
              * @readonly
              */
             kmlShapes: {
-                get: function(){
+                get: function () {
                     return this.parse();
                 }
             },
@@ -49,14 +47,14 @@ define([
              * @readonly
              */
             kmlCenter: {
-                get: function() {
-                    var positions = this.kmlShapes.map(function(shape){
+                get: function () {
+                    var positions = this.kmlShapes.map(function (shape) {
                         return shape.kmlCenter;
                     });
                     var midLatitude = 0;
                     var midLongitude = 0;
                     var midAltitude = 0;
-                    positions.forEach(function(position){
+                    positions.forEach(function (position) {
                         midLatitude += position.latitude;
                         midLongitude += position.longitude;
                         midAltitude += position.altitude;
@@ -77,7 +75,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlMultiGeometry.prototype.getTagNames = function() {
+    KmlMultiGeometry.prototype.getTagNames = function () {
         return ["MultiGeometry"];
     };
 
@@ -86,13 +84,13 @@ define([
      * @param layer {Layer} Layer into which this multi geometry should be rendered.
      * @param style {Promise} Promise of style applied to the geometry objects.
      */
-    KmlMultiGeometry.prototype.update = function(layer, style) {
-        this.kmlShapes.forEach(function(shape) {
+    KmlMultiGeometry.prototype.update = function (layer, style) {
+        this.kmlShapes.forEach(function (shape) {
             shape.update(layer, style);
         });
     };
 
-    KmlMultiGeometry.prototype.getStyle = function() {
+    KmlMultiGeometry.prototype.getStyle = function () {
         return this._style;
     };
 

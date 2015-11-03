@@ -14,16 +14,14 @@ define([
     '../../../shapes/ShapeAttributes',
     '../../../shapes/Polygon',
     '../KmlElements'
-], function(
-    Color,
-    extend,
-    KmlGeometry,
-    Location,
-    Position,
-    ShapeAttributes,
-    Polygon,
-    KmlElements
-){
+], function (Color,
+             extend,
+             KmlGeometry,
+             Location,
+             Position,
+             ShapeAttributes,
+             Polygon,
+             KmlElements) {
     "use strict";
     /**
      * Constructs an KmlPoint. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -35,7 +33,7 @@ define([
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#point
      */
-    var KmlPoint = function(pointNode) {
+    var KmlPoint = function (pointNode) {
         KmlGeometry.call(this, pointNode);
 
         this._shape = null;
@@ -48,7 +46,7 @@ define([
              * @readonly
              */
             position: {
-                get: function() {
+                get: function () {
                     var coordinates = this.retrieve({name: 'coordinates'}).split(',');
                     return new Position(coordinates[1], coordinates[0], coordinates[2]);
                 }
@@ -62,7 +60,7 @@ define([
              * @readonly
              */
             extrude: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'extrude', transformer: Boolean});
                 }
             },
@@ -75,7 +73,7 @@ define([
              * @readonly
              */
             altitudeMode: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'altitudeMode'});
                 }
             },
@@ -87,7 +85,7 @@ define([
              * @readonly
              */
             kmlCenter: {
-                get: function() {
+                get: function () {
                     return this.position;
                 }
             }
@@ -100,7 +98,7 @@ define([
      * It renders KmlPoint as Polygon.
      * @param layer Layer into which the point should be added.
      */
-    KmlPoint.prototype.update = function(layer) {
+    KmlPoint.prototype.update = function (layer) {
         var attributes = new ShapeAttributes(null);
         attributes.outlineColor = Color.WHITE;
         attributes.interiorColor = Color.WHITE;
@@ -114,7 +112,7 @@ define([
     };
 
     // For internal use only. Intentionally left undocumented.
-    KmlPoint.prototype.createRectangleFromPosition = function(position) {
+    KmlPoint.prototype.createRectangleFromPosition = function (position) {
         var rectangle = [];
 
         var latitude = Number(position.latitude),
@@ -133,7 +131,7 @@ define([
      * Returns tag name of this Node.
      * @returns {String[]}
      */
-    KmlPoint.prototype.getTagNames = function() {
+    KmlPoint.prototype.getTagNames = function () {
         return ['Point'];
     };
 
