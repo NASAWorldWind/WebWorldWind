@@ -32,7 +32,6 @@ define([
             this._leaderGapHeight = attributes ? attributes._leaderGapHeight : 30;
             this._opacity = attributes ? attributes._opacity : 1;
             this._scale = attributes ? attributes._scale : 1;
-            this._textColor = attributes ? attributes._textColor : new Color(1, 1, 1, 1);
             this._drawLeader = attributes ? attributes._drawLeader : true;
             this._width = attributes ? attributes._width : 200;
             this._height = attributes ? attributes._height : 100;
@@ -61,7 +60,6 @@ define([
                 + " cr " + this._cornerRadius
                 + " in " + this._insets.toString()
                 + " bg " + this.backgroundColor.toHexString(true)
-                + " tc " + this.textColor.toHexString(true)
                 + " dl " + this.drawLeader
                 + " lgw " + this.leaderGapWidth
                 + " lgh " + this.leaderGapHeight
@@ -153,21 +151,6 @@ define([
                 }
             },
 
-             /**
-             * Indicates the text color.
-             * @type {Color}
-             * @default 1, 1, 1, 1
-             * @memberof AnnotationAttributes.prototype
-             */
-            textColor: {
-                get: function () {
-                    return this._textColor;
-                },
-                set: function (value) {
-                    this._textColor = value;
-                    this.stateKeyInvalid = true;
-                }
-            },
 
             /**
              * Indicates the attributes to apply to the annotation's text.
