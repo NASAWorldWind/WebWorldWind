@@ -530,9 +530,14 @@ define([
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 
-            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer3());
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.vertexAttribPointer(program.vertexTexCoordLocation, 3, gl.FLOAT, false, 0, 0);
+            // Configure GL to use the draw context's unit quad VBOs for both model coordinates and texture coordinates.
+            // Most browsers can share the same buffer for vertex and texture coordinates, but Internet Explorer requires
+            // that they be in separate buffers, so the code below uses the 3D buffer for vertex coords and the 2D
+            // buffer for texture coords.
+            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, dc.unitQuadBuffer3());
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, WebGLRenderingContext.FLOAT, false, 0, 0);
+            gl.bindBuffer(WebGLRenderingContext.ARRAY_BUFFER, dc.unitQuadBuffer());
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, WebGLRenderingContext.FLOAT, false, 0, 0);
 
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
