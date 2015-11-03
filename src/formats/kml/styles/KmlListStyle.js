@@ -35,7 +35,7 @@ define([
              * and red=0x00.
              * @memberof KmlListStyle.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             bgColor: {
                 get: function () {
@@ -48,14 +48,14 @@ define([
              * check (default) - The Feature's visibility is tied to its item's checkbox.
              * radioFolder - When specified for a Container, only one of the Container's items is visible at a time
              * checkOffOnly - When specified for a Container or Network Link, prevents all items from being made visible
-             *  at once�that is, the user can turn everything in the Container or Network Link off but cannot turn
+             *  at once that is, the user can turn everything in the Container or Network Link off but cannot turn
              * everything on at the same time. This setting is useful for Containers or Network Links containing large
              * amounts of data. checkHideChildren - Use a normal checkbox for visibility but do not display the Container
              * or Network Link's children in the list view. A checkbox allows the user to toggle visibility of the child
              * objects in the viewer.
              * @memberof KmlListStyle.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             listItemType: {
                 get: function () {
@@ -69,7 +69,7 @@ define([
              * fetching1, and fetching2 modes are used for Network Links.
              * @memberof KmlListStyle.prototype
              * @readonly
-             * @type {Array}
+             * @type {ItemIcon}
              */
             ItemIcon: {
                 get: function () {

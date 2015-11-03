@@ -33,7 +33,7 @@ define([
              * references in KML and KMZ files.
              * @memberof KmlLink.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             href: {
                 get: function () {

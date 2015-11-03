@@ -33,7 +33,7 @@ define([
              * overlayed image. The shape described by these corners must be convex.
              * @memberof KmlLatLonQuad.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             coordinates: {
                 get: function () {

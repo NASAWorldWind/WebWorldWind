@@ -31,7 +31,7 @@ define([
              * Longitude of the location.
              * @memberof KmlLocation.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             longitude: {
                 get: function() {
@@ -43,7 +43,7 @@ define([
              * Latitude of the location.
              * @memberof KmlLocation.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             latitude: {
                 get: function() {
@@ -55,7 +55,7 @@ define([
              * Altitude of the location.
              * @memberof KmlLocation.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             altitude: {
                 get: function() {

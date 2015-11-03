@@ -117,7 +117,7 @@ define([
              * Style used for lists in current node and all children nodes.
              * @memberof KmlStyle.prototype
              * @readonly
-             * @type {KmlBalloonStyle|null}
+             * @type {KmlListStyle|null}
              */
             ListStyle: {
                 get: function() {

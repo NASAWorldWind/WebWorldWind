@@ -61,7 +61,7 @@ define([
              */
             outerWidth: {
                 get: function() {
-                    return this.retrieve({name: 'gx:outerWidth'});
+                    return this.retrieve({name: 'gx:outerWidth', transformer: Number});
                 }
             },
 
@@ -73,7 +73,7 @@ define([
              */
             physicalWidth: {
                 get: function() {
-                    return this.retrieve({name: 'gx:physicalWidth'});
+                    return this.retrieve({name: 'gx:physicalWidth', transformer: Number});
                 }
             },
 

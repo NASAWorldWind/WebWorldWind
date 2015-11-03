@@ -88,7 +88,7 @@ define([
                  * Positions representing points used by the LineString.
                  * @memberof KmlLineString.prototype
                  * @readonly
-                 * @type {Position[}
+                 * @type {Position[]}
                  */
                 kmlPositions: {
                     get: function() {

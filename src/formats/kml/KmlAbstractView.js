@@ -33,7 +33,7 @@ define([
              * Time associated with current view. It shouldn't be displayed outside of this time frame.
              * @memberof KmlAbstractView.prototype
              * @readonly
-             * @type {Array}
+             * @type {KmlTimePrimitive}
              */
             TimePrimitive: {
                 get: function() {

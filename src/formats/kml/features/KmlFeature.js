@@ -177,7 +177,7 @@ define([
             /**
              * One style element per Feature, with possible children of different substyles.
              * @memberof KmlFeature.prototype
-             * @type {KmlTimePrimitive}
+             * @type {KmlStyle}
              * @readonly
              */
             StyleSelector: {
@@ -215,8 +215,10 @@ define([
             'Document'];
     };
 
-    // Is it possible that I created some type of loop?
-    // It definitely looks like that.
+    /**
+     * Gets promise of the style pased on the children of this node.
+     * @returns {Promise} It returns promise of the style.
+     */
     KmlFeature.prototype.getStyle = function () {
         var self = this;
         if (this._pStyle) {

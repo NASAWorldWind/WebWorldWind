@@ -31,7 +31,7 @@ define([
              * degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             longitude: {
                 get: function () {
@@ -44,7 +44,7 @@ define([
              * degrees to 90 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             latitude: {
                 get: function () {
@@ -57,7 +57,7 @@ define([
              * <altitudeMode> or <gx:altitudeMode>.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             altitude: {
                 get: function () {
@@ -70,7 +70,7 @@ define([
              * 360 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             heading: {
                 get: function () {
@@ -85,7 +85,7 @@ define([
              * for <tilt> are clamped at +180 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             tilt: {
                 get: function () {
@@ -97,7 +97,7 @@ define([
              * Rotation, in degrees, of the camera around the Z axis. Values range from ?180 to +180 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             roll: {
                 get: function () {
@@ -115,7 +115,7 @@ define([
              * <altitude> as a value in meters above sea level.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             altitudeMode: {
                 get: function () {

@@ -47,7 +47,7 @@ define([
              */
             heading: {
                 get: function () {
-                    return this.retrieve({name: 'heading'});
+                    return this.retrieve({name: 'heading', transformer: Number});
                 }
             },
 
@@ -70,7 +70,7 @@ define([
              * of a point on the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             hotSpotX: {
                 get: function () {
@@ -83,7 +83,7 @@ define([
              * of a point on the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             hotSpotY: {
                 get: function () {
@@ -97,7 +97,7 @@ define([
              * the right edge of the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             hotSpotXUnits: {
                 get: function () {
@@ -111,7 +111,7 @@ define([
              * the top edge of the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             hotSpotYUnits: {
                 get: function () {

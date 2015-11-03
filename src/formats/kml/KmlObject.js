@@ -43,7 +43,7 @@ define([
              * Every object, which is part of the KML document has its identity. We will use it for changes in the document
              * for binding.
              * @memberof KmlObject.prototype
-             * @type {Number}
+             * @type {String}
              * @readonly
              */
             id: {

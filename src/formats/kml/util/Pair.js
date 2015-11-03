@@ -33,7 +33,7 @@ define([
              * Identifies the key
              * @memberof Pair.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             key: {
                 get: function() {
@@ -45,7 +45,7 @@ define([
              * References the style using Url. If part of the same document start with the prefix #
              * @memberof Pair.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             styleUrl: {
                 get: function() {
@@ -57,7 +57,7 @@ define([
              * Definition of styles applied to this Pair.
              * @memberof Pair.prototype
              * @readonly
-             * @type {Array}
+             * @type {KmlStyle}
              */
             Style: {
                 get: function() {

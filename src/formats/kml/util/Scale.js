@@ -31,11 +31,11 @@ define([
              * Scales model along x axis
              * @memberof Scale.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             x: {
                 get: function() {
-                    return this.retrieve({name: 'x'});
+                    return this.retrieve({name: 'x', transformer: Number});
                 }
             },
 
@@ -43,11 +43,11 @@ define([
              * Scales model along y axis
              * @memberof Scale.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             y: {
                 get: function() {
-                    return this.retrieve({name: 'y'});
+                    return this.retrieve({name: 'y', transformer: Number});
                 }
             },
 
@@ -55,11 +55,11 @@ define([
              * Scales model along z axis
              * @memberof Scale.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             z: {
                 get: function() {
-                    return this.retrieve({name: 'z'});
+                    return this.retrieve({name: 'z', transformer: Number});
                 }
             }
         });

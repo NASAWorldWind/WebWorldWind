@@ -94,7 +94,7 @@ define([
             /**
              * Contains shapes present in the document. Cache so that we don't need to parse the document every time
              * it is passed through.
-             * @type {Array}
+             * @type {KmlObject[]}
              * @memberof KmlFile.prototype
              * @readonly
              */

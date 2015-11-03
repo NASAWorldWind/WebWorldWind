@@ -34,7 +34,7 @@ define([
              * values and required fields are as follows:
              * @memberof KmlRegion.prototype
              * @readonly
-             * @type {Array}
+             * @type {KmlLatLonBox}
              */
             LatLonAltBox: {
                 get: function () {
@@ -51,7 +51,7 @@ define([
              * diagram below for a visual representation of these parameters.
              * @memberof KmlRegion.prototype
              * @readonly
-             * @type {Array}
+             * @type {KmlLod}
              */
             Lod: {
                 get: function () {
