@@ -8,6 +8,8 @@
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
         './error/AbstractError',
         './geom/Angle',
+        './shapes/Annotation',
+        './shapes/AnnotationAttributes',
         './error/ArgumentError',
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
@@ -53,6 +55,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/HighlightController',
         './util/ImageSource',
         './render/ImageTile',
+        './util/Insets',
         './layer/LandsatRestLayer',
         './layer/Layer',
         './util/Level',
@@ -148,6 +151,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './globe/ZeroElevationModel'],
     function (AbstractError,
               Angle,
+              Annotation,
+              AnnotationAttributes,
               ArgumentError,
               BasicProgram,
               BasicTextureProgram,
@@ -193,6 +198,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               HighlightController,
               ImageSource,
               ImageTile,
+              Insets,
               LandsatRestLayer,
               Layer,
               Level,
@@ -497,6 +503,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
 
         WorldWind['AbstractError'] = AbstractError;
         WorldWind['Angle'] = Angle;
+        WorldWind['Annotation'] = Annotation;
+        WorldWind['AnnotationAttributes'] = AnnotationAttributes;
         WorldWind['ArgumentError'] = ArgumentError;
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
@@ -542,6 +550,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
+        WorldWind['Insets'] = Insets;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
         WorldWind['Level'] = Level;
