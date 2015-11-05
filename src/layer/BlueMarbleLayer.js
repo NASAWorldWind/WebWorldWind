@@ -6,11 +6,11 @@
  * @exports BlueMarbleLayer
  */
 define([
-        '../layer/BMNGRestLayer',
-        '../layer/Layer'
+        '../layer/Layer',
+        '../layer/RestTiledImageLayer'
     ],
-    function (BMNGRestLayer,
-              Layer) {
+    function (Layer,
+              RestTiledImageLayer) {
         "use strict";
 
         /**
@@ -25,8 +25,11 @@ define([
          * undefined.
          * @param {Date} initialTime A date value indicating the month to display. The nearest month to the specified
          * time is displayed. January is displayed if this argument is null or undefined, i.e., new Date("2004-01");
+         * @param {{}} configuration An optional object with properties defining the layer configuration.
+         * See {@link RestTiledImageLayer} for a description of its contents. May be null, in which case default
+         * values are used.
          */
-        var BlueMarbleLayer = function (displayName, initialTime) {
+        var BlueMarbleLayer = function (displayName, initialTime, configuration) {
             Layer.call(this, displayName || "Blue Marble");
 
             /**
@@ -35,6 +38,8 @@ define([
              * @default January 2004 (new Date("2004-01"));
              */
             this.time = initialTime || new Date("2004-01");
+
+            this.configuration = configuration;
 
             this.pickEnabled = false;
 
@@ -151,7 +156,8 @@ define([
 
         BlueMarbleLayer.prototype.createSubLayer = function (layerName) {
             var dataPath = this.pathToData + layerName;
-            this.layers[layerName] = new BMNGRestLayer(this.serverAddress, dataPath, this.displayName);
+            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, dataPath, this.displayName,
+                this.configuration);
         };
 
         // Intentionally not documented.

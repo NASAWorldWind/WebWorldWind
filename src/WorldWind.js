@@ -21,7 +21,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGLandsatLayer',
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
-        './layer/BMNGRestLayer',
         './geom/BoundingBox',
         './gesture/ClickRecognizer',
         './util/Color',
@@ -94,6 +93,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Rectangle',
         './render/Renderable',
         './layer/RenderableLayer',
+        './layer/RestTiledImageLayer',
         './gesture/RotationRecognizer',
         './shapes/ScreenImage',
         './shapes/ScreenText',
@@ -164,7 +164,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGLandsatLayer,
               BMNGLayer,
               BMNGOneImageLayer,
-              BMNGRestLayer,
               BoundingBox,
               ClickRecognizer,
               Color,
@@ -237,6 +236,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Rectangle,
               Renderable,
               RenderableLayer,
+              RestTiledImageLayer,
               RotationRecognizer,
               ScreenImage,
               ScreenText,
@@ -516,7 +516,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGLandsatLayer'] = BMNGLandsatLayer;
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
-        WorldWind['BMNGRestLayer'] = BMNGRestLayer;
         WorldWind['BoundingBox'] = BoundingBox;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['Color'] = Color;
@@ -589,6 +588,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Rectangle'] = Rectangle;
         WorldWind['Renderable'] = Renderable;
         WorldWind['RenderableLayer'] = RenderableLayer;
+        WorldWind['RestTiledImageLayer'] = RestTiledImageLayer;
         WorldWind['RotationRecognizer'] = RotationRecognizer;
         WorldWind['ScreenText'] = ScreenText;
         WorldWind['ScreenImage'] = ScreenImage;
