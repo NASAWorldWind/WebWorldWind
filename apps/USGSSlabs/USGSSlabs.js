@@ -9,12 +9,14 @@ define(['../../src/WorldWind',
         '../util/GoToBox',
         '../util/LayersPanel',
         '../util/ProjectionMenu',
-        '../util/TerrainOpacityController'],
+        '../util/TerrainOpacityController',
+        'DataGrid'],
     function (ww,
               GoToBox,
               LayersPanel,
               ProjectionMenu,
-              TerrainOpacityController) {
+              TerrainOpacityController,
+              DataGrid) {
         "use strict";
 
         var USGSSlabs = function () {
@@ -57,23 +59,46 @@ define(['../../src/WorldWind',
             this.projectionMenu = new ProjectionMenu(this.wwd);
             this.terrainOpacityController = new TerrainOpacityController(this.wwd);
 
+            this.screenText = new WorldWind.ScreenText(
+                new WorldWind.Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0), "Upper Left");
+            var textAttributes = new WorldWind.TextAttributes(textAttributes);
+            // Use offset to position the lower left corner of the text string at the shape's screen location.
+            textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
+            this.screenText.attributes = textAttributes;
+            this.textLayer = new WorldWind.RenderableLayer();
+            this.textLayer.hide = true;
+            this.textLayer.enabled = false;
+            this.textLayer.addRenderable(this.screenText);
+            this.wwd.addLayer(this.textLayer);
+
             this.layersPanel.synchronizeLayerList();
 
             this.loadSlabData("CAS", "cascadia_slab1.0_clip.xyz", 401, WorldWind.Color.YELLOW);
-            //this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
-            //this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
+            this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
+            this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
             //this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.MAGENTA);
 
-            var wwd = this.wwd;
-            var handlePick = function (o) {
-                var pickPoint = wwd.canvasCoordinates(o.clientX, o.clientY);
+            var handlePick = (function (o) {
+                var pickPoint = this.wwd.canvasCoordinates(o.clientX, o.clientY);
 
-                var pickList = wwd.pick(pickPoint);
+                this.textLayer.enabled = false;
+                this.wwd.redraw();
+
+                var pickList = this.wwd.pick(pickPoint);
                 if (pickList.objects.length > 0) {
                     for (var p = 0; p < pickList.objects.length; p++) {
                         var pickedObject = pickList.objects[p];
                         if (pickedObject.userObject instanceof WorldWind.TriangleMesh) {
                             if (pickedObject.position) {
+                                var latitude = pickedObject.position.latitude,
+                                    longitude = pickedObject.position.longitude,
+                                    altitude = pickedObject.userObject.dataGrid.lookupValue(latitude, longitude);
+                                if (altitude !== null) {
+                                    this.screenText.screenOffset.x = pickPoint[0];
+                                    this.screenText.screenOffset.y = this.wwd.viewport.width - pickPoint[1];
+                                    this.screenText.text = Math.floor(Math.abs(altitude) / 1000).toString() + " Km";
+                                    this.textLayer.enabled = true;
+                                }
                                 //console.log("PO: " + pickedObject.position.toString() + " " + pickedObject.isOnTop);
                                 //console.log("TN: " + pickList.terrainObject().position.toString() +
                                 //    " " + pickList.terrainObject().isOnTop);
@@ -81,13 +106,13 @@ define(['../../src/WorldWind',
                         }
                     }
                 }
-            };
+            }).bind(this);
 
             // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
-            wwd.addEventListener("mousemove", handlePick);
+            this.wwd.addEventListener("mousemove", handlePick);
 
             // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-            var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
+            var tapRecognizer = new WorldWind.TapRecognizer(this.wwd, handlePick);
         };
 
         USGSSlabs.prototype.loadSlabData = function (name, dataFile, width, color) {
@@ -100,7 +125,8 @@ define(['../../src/WorldWind',
             xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        this.parse(name, width, color, xhr.responseText);
+                        var dataGrid = new DataGrid(xhr.responseText);
+                        this.addGridToWorldWindow(name, dataGrid, color);
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -120,9 +146,7 @@ define(['../../src/WorldWind',
             xhr.send(null);
         };
 
-        USGSSlabs.prototype.parse = function (name, width, color, responseText) {
-            var lines = responseText.split("\n");
-
+        USGSSlabs.prototype.addGridToWorldWindow = function (name, dataGrid, color) {
             var meshLayer = new WorldWind.RenderableLayer();
             meshLayer.displayName = name;
             this.wwd.addLayer(meshLayer);
@@ -136,95 +160,19 @@ define(['../../src/WorldWind',
             var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
             highlightAttributes.outlineColor = WorldWind.Color.WHITE;
 
-            var positions = this.makePositionList(lines);
-            var gridIndices = this.makeGridIndices(width, positions.numOriginalPositions / width);
-            var indices = this.findTriangles(gridIndices, positions.indexMap);
-            var splitShapes = WorldWind.TriangleMesh.split(positions.positions, indices, null, null);
+            var indices = dataGrid.findTriangles();
+            var splitShapes = WorldWind.TriangleMesh.split(dataGrid.positions, indices, null, null);
 
             for (var i = 0; i < splitShapes.length; i++) {
                 var mesh = new WorldWind.TriangleMesh(splitShapes[i].positions, splitShapes[i].indices, meshAttributes);
-                //mesh.altitudeScale = 100;
-                mesh.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+                mesh.altitudeMode = WorldWind.ABSOLUTE;
                 mesh.highlightAttributes = highlightAttributes;
+                mesh.dataGrid = dataGrid;
                 meshLayer.addRenderable(mesh);
             }
 
             this.layersPanel.synchronizeLayerList();
             this.wwd.redraw();
-        };
-
-        USGSSlabs.prototype.makeGridIndices = function (width, height) {
-            var indices = [], i = 0;
-
-            for (var r = 0; r < height - 1; r++) {
-                for (var c = 0; c < width - 1; c++) {
-                    var k = r * width + c;
-
-                    indices[i++] = k;
-                    indices[i++] = k + 1;
-                    indices[i++] = k + width;
-                    indices[i++] = k + 1;
-                    indices[i++] = k + 1 + width;
-                    indices[i++] = k + width;
-                }
-            }
-
-            return indices;
-        };
-
-        USGSSlabs.prototype.makePositionList = function (lines) {
-            var positions = [],
-                indices = [],
-                originalIndex = 0,
-                latitude, longitude, altitude;
-
-            for (var i = 0; i < lines.length; i++) {
-                var rawPosition = lines[i].trim().split("\t");
-                if (rawPosition.length != 3) {
-                    continue;
-                }
-
-                if (rawPosition[2] != "NaN") {
-                    indices[originalIndex] = positions.length;
-
-                    longitude = parseFloat(rawPosition[0]);
-                    latitude = parseFloat(rawPosition[1]);
-                    altitude = parseFloat(rawPosition[2]);
-
-                    if (longitude > 180) {
-                        longitude -= 360;
-                    }
-
-                    positions.push(new WorldWind.Position(latitude, longitude, altitude * 1000));
-                }
-
-                ++originalIndex;
-            }
-
-            return {positions: positions, indexMap: indices, numOriginalPositions: originalIndex};
-        };
-
-        USGSSlabs.prototype.findTriangles = function (gridIndices, indexMap) {
-            var mappedIndices = [],
-                ia, ib, ic, iaMapped, ibMapped, icMapped;
-
-            for (var i = 0; i < gridIndices.length; i += 3) {
-                ia = gridIndices[i];
-                ib = gridIndices[i + 1];
-                ic = gridIndices[i + 2];
-
-                iaMapped = indexMap[ia];
-                ibMapped = indexMap[ib];
-                icMapped = indexMap[ic];
-
-                if (iaMapped && ibMapped && icMapped) {
-                    mappedIndices.push(iaMapped);
-                    mappedIndices.push(ibMapped);
-                    mappedIndices.push(icMapped);
-                }
-            }
-
-            return mappedIndices;
         };
 
         return USGSSlabs;
