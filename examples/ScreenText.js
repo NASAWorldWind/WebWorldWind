@@ -91,4 +91,27 @@ requirejs(['../src/WorldWind',
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
+
+        // Set up to handle picking.
+        var handlePick = (function (o) {
+            var pickPoint = wwd.canvasCoordinates(o.clientX, o.clientY);
+
+            var pickList = wwd.pick(pickPoint);
+            if (pickList.objects.length > 0) {
+                for (var p = 0; p < pickList.objects.length; p++) {
+                    var pickedObject = pickList.objects[p];
+                    if (!pickedObject.isTerrain) {
+                        if (pickedObject.userObject instanceof WorldWind.ScreenText) {
+                            console.log(pickedObject.userObject.text);
+                        }
+                    }
+                }
+            }
+        }).bind(this);
+
+        // Listen for mouse moves and highlight text that the cursor rolls over.
+        wwd.addEventListener("mousemove", handlePick);
+
+        // Listen for taps on mobile devices and highlight text that the user taps.
+        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     });
