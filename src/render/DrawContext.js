@@ -628,9 +628,9 @@ define([
          * @returns {OrderedRenderable} The first ordered renderable in this draw context's ordered renderable list, or
          * null if the ordered renderable list is empty.
          */
-        DrawContext.prototype.popScreenRenderable = function () {
+        DrawContext.prototype.nextScreenRenderable = function () {
             if (this.screenRenderables.length > 0) {
-                var ore = this.screenRenderables.pop();
+                var ore = this.screenRenderables.shift();
                 this.globeStateKey = ore.globeStateKey;
 
                 if (this.globe.continuous) {

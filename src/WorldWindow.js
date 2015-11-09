@@ -1074,7 +1074,7 @@ define([
             var dc = this.drawContext,
                 or;
 
-            while (or = dc.popScreenRenderable()) {
+            while (or = dc.nextScreenRenderable()) {
                 try {
                     or.renderOrdered(dc);
                 } catch (e) {
