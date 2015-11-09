@@ -170,6 +170,12 @@ define([
              */
             this.orderedRenderables = [];
 
+            /**
+             * The list of screen renderables.
+             * @type {Array}
+             */
+            this.screeRenderables = [];
+
             // Internal. Intentionally not documented. Provides ordinal IDs to ordered renderables.
             this.orderedRenderablesCounter = 0; // Number
 
@@ -361,6 +367,7 @@ define([
             this.surfaceRenderables = []; // clears the surface renderables array
             this.orderedRenderingMode = false;
             this.orderedRenderables = []; // clears the ordered renderables array
+            this.screenRenderables = [];
             this.orderedRenderablesCounter = 0;
 
             // Advance the per-frame timestamp.
@@ -551,7 +558,11 @@ define([
                     ore.globeOffset = this.globe.offset;
                 }
 
-                this.orderedRenderables.push(ore);
+                if (ore.eyeDistance === 0) {
+                    this.screenRenderables.push(ore);
+                } else {
+                    this.orderedRenderables.push(ore);
+                }
             }
         };
 
@@ -599,6 +610,27 @@ define([
         DrawContext.prototype.popOrderedRenderable = function () {
             if (this.orderedRenderables.length > 0) {
                 var ore = this.orderedRenderables.pop();
+                this.globeStateKey = ore.globeStateKey;
+
+                if (this.globe.continuous) {
+                    // Restore the globe state to that when the ordered renderable was created.
+                    this.globe.offset = ore.globeOffset;
+                }
+
+                return ore.orderedRenderable;
+            } else {
+                return null;
+            }
+        };
+
+        /**
+         * Returns the ordered renderable at the head of the ordered renderable list and removes it from the list.
+         * @returns {OrderedRenderable} The first ordered renderable in this draw context's ordered renderable list, or
+         * null if the ordered renderable list is empty.
+         */
+        DrawContext.prototype.popScreenRenderable = function () {
+            if (this.screenRenderables.length > 0) {
+                var ore = this.screenRenderables.pop();
                 this.globeStateKey = ore.globeStateKey;
 
                 if (this.globe.continuous) {

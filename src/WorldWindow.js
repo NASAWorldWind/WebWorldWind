@@ -51,7 +51,7 @@ define([
          * @constructor
          * @classdesc Represents a World Wind window for an HTML canvas.
          * @param {String} canvasName The name assigned to the HTML canvas in the document.
-         * @param {ElevationModel} An optional argument indicating the elevation model to use for the World
+         * @param {ElevationModel} elevationModel An optional argument indicating the elevation model to use for the World
          * Window. If missing or null, a default elevation model is used.
          * @throws {ArgumentError} If there is no HTML element with the specified name in the document, or if the
          * HTML canvas does not support WebGL.
@@ -654,6 +654,7 @@ define([
                 this.doDraw();
                 if (this.subsurfaceMode && this.hasStencilBuffer) {
                     this.redrawSurface();
+                    this.drawScreenRenderables();
                 }
             }
         };
@@ -755,6 +756,7 @@ define([
 
                 if (!this.deferOrderedRendering) {
                     this.drawOrderedRenderables();
+                    this.drawScreenRenderables();
                 }
 
                 this.drawContext.screenCreditController.drawCredits(this.drawContext);
@@ -764,6 +766,7 @@ define([
         WorldWindow.prototype.redrawSurface = function () {
             // Draw the terrain and surface shapes but only where the current stencil buffer is non-zero.
             // The non-zero fragments are from drawing the ordered renderables previously.
+            this.drawContext.currentGlContext.enable(this.drawContext.currentGlContext.STENCIL_TEST);
             this.drawContext.currentGlContext.stencilFunc(this.drawContext.currentGlContext.EQUAL, 1, 1);
             this.drawContext.currentGlContext.stencilOp(
                 this.drawContext.currentGlContext.KEEP, this.drawContext.currentGlContext.KEEP, this.drawContext.currentGlContext.KEEP);
@@ -771,6 +774,7 @@ define([
             this.drawLayers(false);
             this.drawSurfaceRenderables();
             this.drawContext.surfaceShapeTileBuilder.doRender(this.drawContext);
+            this.drawContext.currentGlContext.disable(this.drawContext.currentGlContext.STENCIL_TEST);
         };
 
         // Internal function. Intentionally not documented.
@@ -802,6 +806,7 @@ define([
                             this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE);
                         this.drawOrderedRenderables();
                         this.drawContext.terrain.pick(this.drawContext);
+                        this.drawScreenRenderables();
                     }
                 } else {
                     this.drawContext.surfaceShapeTileBuilder.clear();
@@ -813,6 +818,7 @@ define([
 
                     if (!this.deferOrderedRendering) {
                         this.drawOrderedRenderables();
+                        this.drawScreenRenderables();
                     }
                 }
             }
@@ -918,6 +924,8 @@ define([
                     this.redrawSurface();
                 }
             }
+
+            this.drawScreenRenderables();
         };
 
         WorldWindow.prototype.pick2DContiguous = function () {
@@ -1060,6 +1068,21 @@ define([
 
             dc.orderedRenderingMode = false;
             dc.frameStatistics.orderedRenderingTime = Date.now() - beginTime;
+        };
+
+        WorldWindow.prototype.drawScreenRenderables = function () {
+            var dc = this.drawContext,
+                or;
+
+            while (or = dc.popScreenRenderable()) {
+                try {
+                    or.renderOrdered(dc);
+                } catch (e) {
+                    Logger.logMessage(Logger.LEVEL_WARNING, "WorldWindow", "drawOrderedRenderables",
+                        "Error while rendering a screen renderable.\n" + e.message);
+                    // Keep going. Render the rest of the screen renderables.
+                }
+            }
         };
 
         // Internal function. Intentionally not documented.
