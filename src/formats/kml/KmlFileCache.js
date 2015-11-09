@@ -17,7 +17,7 @@ define([], function () {
 
     /**
      * Retrieve relevant KmlFile from the cache representing this Document.
-     * @param url Url of the file to retrieve from this cache.
+     * @param url {String} Url of the file to retrieve from this cache.
      * @returns {Promise|null}
      */
     KmlFileCache.prototype.retrieve = function (url) {
@@ -39,7 +39,7 @@ define([], function () {
 
     /**
      * Adds new KmlFile to the KmlDocument represented by this Cache.
-     * @param url Url of the file for internal mapping
+     * @param url {String} Url of the file for internal mapping
      * @param filePromise {Promise} Promise of the file to be stored.
      */
     KmlFileCache.prototype.add = function (url, filePromise) {

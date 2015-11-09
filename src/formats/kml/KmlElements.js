@@ -19,8 +19,8 @@ define([], function () {
 
         /**
          * Adds key representing name of the node and constructor to be used.
-         * @param key Name of the node, by which it is retrieved. Name is case sensitive.
-         * @param value Value represent constructor function to be instantiated
+         * @param key {String} Name of the node, by which it is retrieved. Name is case sensitive.
+         * @param value {KmlObject} Value represent constructor function to be instantiated
          */
         addKey: function (key, value) {
             this.keys[key] = value;
@@ -28,7 +28,7 @@ define([], function () {
 
         /**
          * Returns constructor function to be instantiated.
-         * @param key Name of the node.
+         * @param key {String} Name of the node.
          * @returns {*} Constructor function to be instantiated.
          */
         getKey: function (key) {
