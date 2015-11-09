@@ -562,7 +562,7 @@ define([
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
                 if (!this.activeAttributes.depthTest) {
                     // Turn depth testing back on.
-                    gl.disable(gl.DEPTH_TEST, true);
+                    gl.enable(gl.DEPTH_TEST, true);
                 }
             }
         };
