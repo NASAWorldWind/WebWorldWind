@@ -47,7 +47,7 @@ define([
              */
             kmlHeading: {
                 get: function () {
-                    return this.retrieve({name: 'heading'});
+                    return this.retrieve({name: 'heading', transformer: Number});
                 }
             },
 
@@ -66,11 +66,11 @@ define([
             },
 
             /**
-             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the x component
-             * of a point on the icon.
+             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the x
+             * component of a point on the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             kmlHotSpotX: {
                 get: function () {
@@ -79,11 +79,11 @@ define([
             },
 
             /**
-             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the y component
-             * of a point on the icon.
+             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the y
+             * component of a point on the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             kmlHotSpotY: {
                 get: function () {
@@ -97,7 +97,7 @@ define([
              * the right edge of the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             kmlHotSpotXUnits: {
                 get: function () {
@@ -111,7 +111,7 @@ define([
              * the top edge of the icon.
              * @memberof KmlIconStyle.prototype
              * @readonly
-             * @type {KmlIcon}
+             * @type {String}
              */
             kmlHotSpotYUnits: {
                 get: function () {
@@ -120,7 +120,7 @@ define([
             }
         });
 
-        extend(this, KmlIconStyle)
+        extend(this, KmlIconStyle);
     };
 
     KmlIconStyle.update = function(style, options) {
@@ -133,7 +133,11 @@ define([
         return shapeOptions;
     };
 
-    KmlIconStyle.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlIconStyle.prototype.getTagNames = function () {
         return ['IconStyle'];
     };
 

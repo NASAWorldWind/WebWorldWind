@@ -15,8 +15,7 @@ define([
              extend,
              KmlElements,
              Logger,
-             Promise
-) {
+             Promise) {
     "use strict";
     /**
      * Constructs an Kml object. Every node in the Kml document is either basic type or Kml object. Applications usually
@@ -24,7 +23,7 @@ define([
      * It should be treated as mixin.
      * @alias KmlObject
      * @classdesc Contains the data associated with every Kml object.
-     * @param objectNode Node representing Kml Object
+     * @param objectNode {Node} Node representing Kml Object
      * @constructor
      * @throws {ArgumentError} If either node is null or id isn't present on the object.
      * @see https://developers.google.com/kml/documentation/kmlreference#object
@@ -40,10 +39,10 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Every object, which is part of the KML document has its identity. We will use it for changes in the document
-             * for binding.
+             * Every object, which is part of the KML document has its identity. We will use it for changes in the
+             * document for binding.
              * @memberof KmlObject.prototype
-             * @type {Number}
+             * @type {String}
              * @readonly
              */
             id: {
@@ -70,7 +69,6 @@ define([
 
         extend(this, KmlObject.prototype);
     };
-
 
 
     /**
@@ -102,7 +100,7 @@ define([
             );
         }
         var validNode = this.retrieveNode(options);
-        if(this.doesAttributeExist(validNode, options.attributeName)) {
+        if (this.doesAttributeExist(validNode, options.attributeName)) {
             return this.getValueOfAttribute(validNode, options.attributeName);
         }
         return null;
@@ -111,12 +109,12 @@ define([
     // Intenationally undocumented. Internal use only.
     KmlObject.prototype.doesAttributeExist = function (node, attribute) {
         return node.attributes && node.attributes && node.attributes.getNamedItem(attribute) &&
-            node.attributes.getNamedItem(attribute).value
+            node.attributes.getNamedItem(attribute).value;
     };
 
     // Intenationally undocumented. Internal use only.
     KmlObject.prototype.getValueOfAttribute = function (node, attributeName) {
-        return node.attributes.getNamedItem(attributeName).value
+        return node.attributes.getNamedItem(attributeName).value;
     };
 
     /**
@@ -172,26 +170,26 @@ define([
         var self = this;
         var node = options && options.node || self.node;
         var shapes = [];
-        [].forEach.call(node.childNodes, function (node) {
-            if (node.nodeType != 1) {
+        [].forEach.call(node.childNodes, function (childNode) {
+            if (childNode.nodeType != 1) {
                 return;
             }
 
-            var constructor = self.retrieveElementForNode(node.nodeName);
+            var constructor = self.retrieveElementForNode(childNode.nodeName);
             if (constructor == null) {
                 Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "parse", "Element, which doesn't have internal " +
-                        "representation. Node name: " + node.nodeName);
+                    "representation. Node name: " + childNode.nodeName);
                 return;
             }
-            var style = new Promise(function(resolve, reject){
-                if(self.getStyle) {
+            var style = new Promise(function (resolve) {
+                if (self.getStyle) {
                     resolve(self.getStyle());
                 } else {
                     // Maybe reject. We will see later.
                     resolve(null);
                 }
             });
-            shapes.push(new constructor(node, style));
+            shapes.push(new constructor(childNode, style));
         });
 
         return shapes;
@@ -213,7 +211,7 @@ define([
      */
     KmlObject.prototype.createChildElement = function (options) {
         var node = this.retrieveNode(options);
-        if(node == null) {
+        if (node == null) {
             return null;
         }
         var constructor = this.retrieveElementForNode(node.nodeName);
@@ -230,12 +228,12 @@ define([
     };
 
     // To be overriden in descendants.
-    KmlObject.prototype.getStyle = function() {
+    KmlObject.prototype.getStyle = function () {
         Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.getTagNames()[0] + " doesn't override  " +
             "getStyle.");
     };
 
-    KmlObject.prototype.isFeature = function() {
+    KmlObject.prototype.isFeature = function () {
         return false;
     };
 

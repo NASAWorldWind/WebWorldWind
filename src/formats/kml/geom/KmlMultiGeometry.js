@@ -7,25 +7,23 @@ define([
     './../KmlElements',
     './KmlGeometry',
     '../../../geom/Position'
-], function (
-    extend,
-    KmlElements,
-    KmlGeometry,
-    Position
-) {
+], function (extend,
+             KmlElements,
+             KmlGeometry,
+             Position) {
     "use strict";
 
     /**
      * Constructs an KmlMultiGeometry object. KmlMultiGeometry is object, which contains other geometry objects. This
      * class isn't intended to be used outside of the KmlObject hierarchy. It is already concrete implementation.
      * @param multiGeometryNode {Node} Node representing this MultiGeometry
-     * @param pStyle {StyleSelector}
+     * @param pStyle {Promise} Promise of the style to be delivered later.
      * @constructor
      * @classdesc Class representing MultiGeometry Element of Kml Document.
      * @alias KmlMultiGeometry
      * @see https://developers.google.com/kml/documentation/kmlreference#multigeometry
      */
-    var KmlMultiGeometry = function(multiGeometryNode, pStyle) {
+    var KmlMultiGeometry = function (multiGeometryNode, pStyle) {
         KmlGeometry.call(this, multiGeometryNode);
         this._style = pStyle;
 
@@ -33,11 +31,11 @@ define([
             /**
              * It returns all shapes currently present in this node.
              * @memberof KmlMultiGeometry.prototype
-             * @type {Array}
+             * @type {KmlObject[]}
              * @readonly
              */
             kmlShapes: {
-                get: function(){
+                get: function () {
                     return this.parse();
                 }
             },
@@ -49,14 +47,14 @@ define([
              * @readonly
              */
             kmlCenter: {
-                get: function() {
-                    var positions = this.kmlShapes.map(function(shape){
+                get: function () {
+                    var positions = this.kmlShapes.map(function (shape) {
                         return shape.kmlCenter;
                     });
                     var midLatitude = 0;
                     var midLongitude = 0;
                     var midAltitude = 0;
-                    positions.forEach(function(position){
+                    positions.forEach(function (position) {
                         midLatitude += position.latitude;
                         midLongitude += position.longitude;
                         midAltitude += position.altitude;
@@ -73,20 +71,26 @@ define([
         extend(this, KmlMultiGeometry.prototype);
     };
 
-    KmlMultiGeometry.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlMultiGeometry.prototype.getTagNames = function () {
         return ["MultiGeometry"];
     };
 
     /**
      * It renders all associated shapes. It honors style associated with the MultiGeometry.
+     * @param layer {Layer} Layer into which this multi geometry should be rendered.
+     * @param style {Promise} Promise of style applied to the geometry objects.
      */
-    KmlMultiGeometry.prototype.update = function(layer, style) {
-        this.kmlShapes.forEach(function(shape) {
+    KmlMultiGeometry.prototype.update = function (layer, style) {
+        this.kmlShapes.forEach(function (shape) {
             shape.update(layer, style);
         });
     };
 
-    KmlMultiGeometry.prototype.getStyle = function() {
+    KmlMultiGeometry.prototype.getStyle = function () {
         return this._style;
     };
 

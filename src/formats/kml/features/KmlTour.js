@@ -6,11 +6,9 @@ define([
     '../../../util/extend',
     './../KmlElements',
     './KmlFeature'
-], function (
-    extend,
-    KmlElements,
-    KmlFeature
-) {
+], function (extend,
+             KmlElements,
+             KmlFeature) {
     "use strict";
 
     /**
@@ -18,18 +16,22 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlTour
      * @classdesc Contains the data associated with Tour node.
-     * @param node Node representing tour in the document.
+     * @param node {Node} Node representing tour in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxtour
      */
-    var KmlTour = function(node) {
+    var KmlTour = function (node) {
         KmlFeature.call(this, node);
 
         extend(this, KmlTour.prototype);
     };
 
-    KmlTour.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlTour.prototype.getTagNames = function () {
         return ['gx:Tour'];
     };
 

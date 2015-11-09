@@ -6,22 +6,20 @@ define([
     '../../../util/extend',
     './KmlLineString',
     '../KmlElements'
-], function (
-    extend,
-    KmlLineString,
-    KmlElements
-) {
+], function (extend,
+             KmlLineString,
+             KmlElements) {
     "use strict";
     /**
      * Constructs an KmlLinearRing element. Applications don't usually call this constructor. It is called by objects in
      * the hierarchy of KmlObject.
      * @alias KmlLinearRing
      * @classdesc Contains the data associated with LinerRing
-     * @param linearRingNode Node of the object to be retrieved.
+     * @param linearRingNode {Node} Node of the object to be retrieved.
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#linearring
      */
-    var KmlLinearRing = function(linearRingNode, pStyle) {
+    var KmlLinearRing = function (linearRingNode, pStyle) {
         KmlLineString.call(this, linearRingNode, pStyle);
 
         extend(this, KmlLinearRing.prototype);
@@ -29,7 +27,11 @@ define([
 
     KmlLinearRing.prototype = Object.create(KmlLineString.prototype);
 
-    KmlLinearRing.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlLinearRing.prototype.getTagNames = function () {
         return ['LinearRing'];
     };
 

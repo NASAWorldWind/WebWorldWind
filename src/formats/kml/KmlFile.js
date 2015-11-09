@@ -18,18 +18,16 @@ define([
         './KmlElements',
         './KmlObject'
     ],
-    function(
-        ArgumentError,
-        JsZip,
-        KmlFileCache,
-        KmlStyle,
-        Logger,
-        Promise,
-        Remote,
-        XmlDocument,
-        KmlElements,
-        KmlObject
-    ){
+    function (ArgumentError,
+              JsZip,
+              KmlFileCache,
+              KmlStyle,
+              Logger,
+              Promise,
+              Remote,
+              XmlDocument,
+              KmlElements,
+              KmlObject) {
         "use strict";
 
         /**
@@ -41,9 +39,9 @@ define([
          * @alias KmlFile
          * @classdesc Support for Kml File parsing and display.
          */
-        var KmlFile = function(options) {
+        var KmlFile = function (options) {
             var self = this;
-            if(!options || (!options.document && !options.url)) {
+            if (!options || (!options.document && !options.url)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "constructor", "invalidDocumentPassed")
                 );
@@ -52,10 +50,11 @@ define([
             // Default values.
             options.local = options.local || false;
 
-            if(options.local) {
+            var filePromise;
+            if (options.local) {
                 this._document = new XmlDocument(options.document).dom();
-                var filePromise = new Promise(function(resolve, reject) {
-                    window.setTimeout(function(){
+                filePromise = new Promise(function (resolve) {
+                    window.setTimeout(function () {
                         resolve(self);
                     }, 0);
                 });
@@ -63,11 +62,11 @@ define([
                 return filePromise;
             } else {
                 // Load the document
-                var filePromise = new Promise(function(resolve, reject){
+                filePromise = new Promise(function (resolve) {
                     var promise = self.requestUrl(options.url, options);
-                    promise.then(function(loadedDocument){
+                    promise.then(function (loadedDocument) {
                         var rootDocument;
-                        if(options.url.indexOf('.kmz') == -1) {
+                        if (options.url.indexOf('.kmz') == -1) {
                             rootDocument = loadedDocument;
                         } else {
                             var kmzFile = new JsZip();
@@ -79,12 +78,10 @@ define([
                             });
                         }
                         self._document = new XmlDocument(rootDocument).dom();
-                        window.setTimeout(function(){
+                        window.setTimeout(function () {
                             resolve(self);
                         }, 0);
                     });
-
-
                 });
                 KmlFileCache.add(options.url, filePromise);
                 filePromise.then(function(kmlFile){
@@ -98,12 +95,12 @@ define([
             /**
              * Contains shapes present in the document. Cache so that we don't need to parse the document every time
              * it is passed through.
-             * @type {Array}
+             * @type {KmlObject[]}
              * @memberof KmlFile.prototype
              * @readonly
              */
             shapes: {
-                get: function() {
+                get: function () {
                     return this.parseDocument();
                 }
             },
@@ -115,7 +112,7 @@ define([
              * @readonly
              */
             node: {
-                get: function() {
+                get: function () {
                     return this._document.getElementsByTagName("kml")[0];
                 }
             }
@@ -124,7 +121,7 @@ define([
         /**
          * @see KmlObject.prototype.parse
          */
-        KmlFile.prototype.parseDocument = function() {
+        KmlFile.prototype.parseDocument = function () {
             return KmlObject.prototype.parse.call(this);
         };
 
@@ -138,22 +135,23 @@ define([
         /**
          * It renders all shapes, which are associated with current file.
          * @param layer
+         * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
          */
-        KmlFile.prototype.update = function(layer) {
-            if(!layer) {
+        KmlFile.prototype.update = function (layer) {
+            if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "update", "Layer must be defined in order to update document.")
                 );
             }
 
-            this.shapes.forEach(function(shape){
+            this.shapes.forEach(function (shape) {
                 shape.update(layer);
             });
         };
 
-        KmlFile.prototype.requestUrl = function(url, options) {
+        KmlFile.prototype.requestUrl = function (url, options) {
             options.url = url;
-            if(url.endsWith(".kmz")) {
+            if (url.endsWith(".kmz")) {
                 options.zip = true;
             } else {
                 options.ajax = true;
@@ -162,13 +160,13 @@ define([
             return new Remote(options);
         };
 
-        KmlFile.prototype.resolveStyle = function(id) {
+        KmlFile.prototype.resolveStyle = function (id) {
             var self = this;
             id = id.substring(id.indexOf('#') + 1, id.length);
             // It returns promise of the Style.
-            return new Promise(function(resolve, reject){
+            return new Promise(function (resolve, reject) {
                 var style = self._document.getElementById(id);
-                if(!style) {
+                if (!style) {
                     reject();
                 }
                 resolve(new KmlStyle(style));
@@ -176,4 +174,4 @@ define([
         };
 
         return KmlFile;
-});
+    });

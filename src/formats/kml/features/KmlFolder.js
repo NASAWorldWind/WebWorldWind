@@ -17,12 +17,12 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlFolder
      * @classdesc Contains the data associated with Folder node.
-     * @param node Node representing folder in the document.
+     * @param node {Node} Node representing folder in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#folder
      */
-    var KmlFolder = function(node) {
+    var KmlFolder = function (node) {
         KmlContainer.call(this, node);
 
         Object.defineProperties(this, {
@@ -30,7 +30,7 @@ define([
              * Specifies any amount of features, which are part of this document.
              * @memberof KmlFolder.prototype
              * @readonly
-             * @type {Array}
+             * @type {KmlObject[]}
              * @see {KmlFeature}
              */
             kmlShapes: {
@@ -49,7 +49,11 @@ define([
         });
     };
 
-    KmlFolder.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlFolder.prototype.getTagNames = function () {
         return ['Folder'];
     };
 

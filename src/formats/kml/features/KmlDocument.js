@@ -21,12 +21,12 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlDocument
      * @classdesc Contains the data associated with Document node.
-     * @param node Node representing document in the document.
+     * @param node {Node} Node representing document in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#document
      */
-    var KmlDocument = function(node) {
+    var KmlDocument = function (node) {
         KmlContainer.call(this, node);
 
         Object.defineProperties(this, {
@@ -34,31 +34,31 @@ define([
              * Specifies any amount of features, which are part of this document.
              * @memberof KmlDocument.prototype
              * @readonly
-             * @type {Array}
+             * @type {Node[]}
              * @see {KmlFeature}
              */
             kmlShapes: {
                 get: function(){
                     var allElements = this.parse();
-                    return allElements.filter(function(element){
+                    return allElements.filter(function (element) {
                         return element.isFeature();
                     });
                 }
             },
 
             /**
-             * Specifies a custom KML schema that is used to add custom data to KML Features. The "id" attribute is required
-             * and must be unique within the KML file. <Schema> is always a child of <Document>.
-             * This is array of all Schemas in current document
+             * Specifies a custom KML schema that is used to add custom data to KML Features. The "id" attribute is
+             * required and must be unique within the KML file. &lt;Schema&gt; is always a child of &lt;Document&gt;. This is array
+             * of all Schemas in current document
              * @memberof KmlDocument.prototype
              * @readonly
-             * @type {Array}
+             * @type {Schema[]}
              * @see {Schema}
              */
             kmlSchemas: {
                 get: function(){
                     var allElements = this.parse();
-                    return allElements.filter(function(element){
+                    return allElements.filter(function (element) {
                         return element instanceof Schema;
                     });
                 }
@@ -74,7 +74,11 @@ define([
         });
     };
 
-    KmlDocument.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlDocument.prototype.getTagNames = function () {
         return ['Document'];
     };
 

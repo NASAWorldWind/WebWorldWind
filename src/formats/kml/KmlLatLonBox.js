@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLatLonBox
      * @classdesc Contains the data associated with LatLonBox node.
-     * @param node Node representing box lat lon in the document.
+     * @param node {Node} Node representing box lat lon in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#latlonbox
@@ -26,7 +26,7 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to �90.
+             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to +-90.
              * @memberof KmlLatLonBox.prototype
              * @readonly
              * @type {Number}
@@ -38,10 +38,10 @@ define([
             },
 
             /**
-             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to �90.
+             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to +-90.
              * @memberof KmlLatLonBox.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlSouth: {
                 get: function () {
@@ -50,10 +50,10 @@ define([
             },
 
             /**
-             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to �180.
+             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to +-180.
              * @memberof KmlLatLonBox.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlEast: {
                 get: function () {
@@ -62,10 +62,10 @@ define([
             },
 
             /**
-             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to �180.
+             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to +-180.
              * @memberof KmlLatLonBox.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlWest: {
                 get: function () {
@@ -74,11 +74,11 @@ define([
             },
 
             /**
-             * Specifies a rotation of the overlay about its center, in degrees. Values can be �180. The default is 0
+             * Specifies a rotation of the overlay about its center, in degrees. Values can be +-180. The default is 0
              * (north). Rotations are specified in a counterclockwise direction.
              * @memberof KmlLatLonBox.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlRotation: {
                 get: function () {
@@ -90,7 +90,11 @@ define([
         extend(this, KmlLatLonBox.prototype);
     };
 
-    KmlLatLonBox.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlLatLonBox.prototype.getTagNames = function () {
         return ['LatLonBox'];
     };
 

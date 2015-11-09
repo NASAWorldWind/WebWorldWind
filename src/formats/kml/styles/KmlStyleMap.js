@@ -17,7 +17,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlStyleMap
      * @classdesc Contains the data associated with StyleMap node.
-     * @param node Node representing style map in the document.
+     * @param node {Node} Node representing style map in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#stylemap
@@ -27,15 +27,16 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Defines a key/value pair that maps a mode (normal or highlight) to the predefined <styleUrl>. <Pair>
+             * Defines a key/value pair that maps a mode (normal or highlight) to the predefined &lt;styleUrl&gt;.
+             * &lt;Pair&gt;
              * contains two elements (both are required):
-             * <key>, which identifies the key
-             * <styleUrl> or <Style>, which references the style. In <styleUrl>, for referenced style elements that are
-             *  local to the KML document, a simple # referencing is used. For styles that are contained in external files,
-             * use a full URL along with # referencing.
+             * &lt;key&gt;, which identifies the key
+             * &lt;styleUrl&gt; or &lt;Style&gt;, which references the style. In &lt;styleUrl&gt;, for referenced style elements that are
+             *  local to the KML document, a simple # referencing is used. For styles that are contained in external
+             * files, use a full URL along with # referencing.
              * @memberof KmlStyleMap.prototype
              * @readonly
-             * @type {Array}
+             * @type {Pair[]}
              */
             kmlPairs: {
                 get: function () {
@@ -52,6 +53,10 @@ define([
         // {normal: , highlight: }
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlStyleMap.prototype.getTagNames = function() {
         return ['StyleMap'];
     };

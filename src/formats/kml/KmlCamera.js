@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlCamera
      * @classdesc Contains the data associated with Camera node.
-     * @param node Node representing camera in the document.
+     * @param node {Node} Node representing camera in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#camera
@@ -27,11 +27,11 @@ define([
         Object.defineProperties(this, {
             /**
              * Longitude of the virtual camera (eye point). Angular distance in degrees, relative to the Prime Meridian.
-             * Values west of the Meridian range from ?180 to 0 degrees. Values east of the Meridian range from 0 to 180
-             * degrees.
+             * Values west of the Meridian range from +-180 to 0 degrees. Values east of the Meridian range from 0
+             * to 180 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlLongitude: {
                 get: function () {
@@ -40,11 +40,11 @@ define([
             },
 
             /**
-             * Latitude of the virtual camera. Degrees north or south of the Equator (0 degrees). Values range from ?90
+             * Latitude of the virtual camera. Degrees north or south of the Equator (0 degrees). Values range from -90
              * degrees to 90 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlLatitude: {
                 get: function () {
@@ -54,10 +54,10 @@ define([
 
             /**
              * Distance of the camera from the earth's surface, in meters. Interpreted according to the Camera's
-             * <altitudeMode> or <gx:altitudeMode>.
+             * &lt;altitudeMode&gt; or &lt;gx:altitudeMode&gt;.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlAltitude: {
                 get: function () {
@@ -66,11 +66,11 @@ define([
             },
 
             /**
-             * Direction (azimuth) of the camera, in degrees. Default=0 (true North). (See diagram.) Values range from 0 to
-             * 360 degrees.
+             * Direction (azimuth) of the camera, in degrees. Default=0 (true North). (See diagram.) Values range from
+             * 0 to 360 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlHeading: {
                 get: function () {
@@ -80,12 +80,13 @@ define([
 
             /**
              * Rotation, in degrees, of the camera around the X axis. A value of 0 indicates that the view is aimed
-             * straight down toward the earth (the most common case). A value for 90 for <tilt> indicates that the view is
-             * aimed toward the horizon. Values greater than 90 indicate that the view is pointed up into the sky. Values
-             * for <tilt> are clamped at +180 degrees.
+             * straight down toward the earth (the most common case). A value for 90 for &lt;tilt&gt; indicates that the
+             * view
+             * is aimed toward the horizon. Values greater than 90 indicate that the view is pointed up into the sky.
+             * Values for &lt;tilt&gt; are clamped at +180 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlTilt: {
                 get: function () {
@@ -94,10 +95,10 @@ define([
             },
 
             /**
-             * Rotation, in degrees, of the camera around the Z axis. Values range from ?180 to +180 degrees.
+             * Rotation, in degrees, of the camera around the Z axis. Values range from -180 to +180 degrees.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlRoll: {
                 get: function () {
@@ -106,16 +107,18 @@ define([
             },
 
             /**
-             * Specifies how the <altitude> specified for the Camera is interpreted. Possible values are as follows:
-             * relativeToGround - (default) Interprets the <altitude> as a value in meters above the ground. If the point
-             *  is over water, the <altitude> will be interpreted as a value in meters above sea level. See
-             * <gx:altitudeMode> below to specify points relative to the sea floor. clampToGround - For a camera, this
-             * setting also places the camera relativeToGround, since putting the camera exactly at terrain height would
+             * Specifies how the &lt;altitude&gt; specified for the Camera is interpreted. Possible values are as
+             * follows:
+             * relativeToGround - (default) Interprets the &lt;altitude&gt; as a value in meters above the ground. If the
+             * point is over water, the &lt;altitude&gt; will be interpreted as a value in meters above sea level. See
+             * &lt;gx:altitudeMode&gt; below to specify points relative to the sea floor. clampToGround - For a camera, this
+             * setting also places the camera relativeToGround, since putting the camera exactly at terrain height
+             * would
              * mean that the eye would intersect the terrain (and the view would be blocked). absolute - Interprets the
-             * <altitude> as a value in meters above sea level.
+             * &lt;altitude&gt; as a value in meters above sea level.
              * @memberof KmlCamera.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlAltitudeMode: {
                 get: function () {
@@ -127,7 +130,11 @@ define([
         extend(this, KmlCamera.prototype);
     };
 
-    KmlCamera.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlCamera.prototype.getTagNames = function () {
         return ['Camera'];
     };
 

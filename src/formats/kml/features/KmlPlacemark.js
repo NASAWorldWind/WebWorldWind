@@ -34,8 +34,8 @@ define([
      * Objects from Kml file are read
      * @alias KmlPlacemark
      * @classdesc Contains the data associated with KmlPlacemark.
-     * @param placemarkNode Node representing Kml Placemark
-     * @param pStyle Promise of the style to be delivered.
+     * @param placemarkNode {Node} Node representing Kml Placemark
+     * @param pStyle {Promise} Promise of a style to be delivered later.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#placemark
@@ -78,7 +78,7 @@ define([
 
     /**
      * It renders placemark with associated geometry.
-     * @param layer Layer into which the placemark may be rendered.
+     * @param layer {Layer} Layer into which the placemark may be rendered.
      */
     KmlPlacemark.prototype.update = function (layer) {
         var self = this;
@@ -134,6 +134,10 @@ define([
         this.enableLeaderLinePicking = true;
     };
 
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
     KmlPlacemark.prototype.getTagNames = function () {
         return ['Placemark'];
     };

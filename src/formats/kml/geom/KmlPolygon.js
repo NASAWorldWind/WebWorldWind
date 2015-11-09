@@ -33,12 +33,12 @@ define([
      * @alias KmlPolygon
      * @constructor
      * @classdesc Contains the data associated with Kml polygon
-     * @param polygonNode Node representing the Kml polygon.
-     * @param pStyle Style to be applied to current node. It is optional.
+     * @param polygonNode {Node} Node representing the Kml polygon.
+     * @param pStyle {Promise} Style to be applied to current node.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
-    var KmlPolygon = function(polygonNode, pStyle) {
+    var KmlPolygon = function (polygonNode, pStyle) {
         KmlGeometry.call(this, polygonNode);
 
         var self = this;
@@ -58,14 +58,14 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * In case that the polygon is above ground, this property decides whether there is going to be a line to the
-             * ground.
+             * In case that the polygon is above ground, this property decides whether there is going to be a line to
+             * the ground.
              * @memberof KmlPolygon.prototype
              * @type {Boolean}
              * @readonly
              */
             kmlExtrude: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'extrude', transformer: WWUtil.transformToBoolean});
                 }
             },
@@ -77,7 +77,7 @@ define([
              * @type {Boolean}
              */
             kmlTessellate: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'tessellate', transformer: WWUtil.transformToBoolean});
                 }
             },
@@ -90,7 +90,7 @@ define([
              * @readonly
              */
             kmlAltitudeMode: {
-                get: function() {
+                get: function () {
                     return this.retrieve({name: 'altitudeMode'});
                 }
             },
@@ -102,7 +102,7 @@ define([
              * @readonly
              */
             kmlOuterBoundary: {
-                get: function() {
+                get: function () {
                     var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
                     return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
                 }
@@ -115,9 +115,9 @@ define([
              * @readonly
              */
             kmlInnerBoundary: {
-                get: function() {
+                get: function () {
                     var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
-                    if(parentNode == null) {
+                    if (parentNode == null) {
                         return null;
                     }
                     return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
@@ -131,7 +131,7 @@ define([
              * @type {Position}
              */
             kmlCenter: {
-                get: function() {
+                get: function () {
                     return this.kmlOuterBoundary.kmlCenter;
                 }
             }
@@ -144,7 +144,8 @@ define([
 
     /**
      * Renders polygon as polygon applying valid styles.
-     * options.style
+     * @param layer {Layer} Layer into which this polygon is rendered.
+     * @param pStyle {KmlStyle} Style applied to updated polygon
      */
     KmlPolygon.prototype.update = function(layer, pStyle) {
         var self = this;
@@ -190,9 +191,9 @@ define([
         return new ShapeAttributes(shapeOptions);
     };
 
-    KmlPolygon.prototype.prepareLocations = function() {
+    KmlPolygon.prototype.prepareLocations = function () {
         var locations = [];
-        if(this.kmlInnerBoundary != null) {
+        if (this.kmlInnerBoundary != null) {
             locations[0] = this.kmlInnerBoundary.kmlPositions;
             locations[1] = this.kmlOuterBoundary.kmlPositions;
         } else {
@@ -201,11 +202,19 @@ define([
         return locations;
     };
 
-    KmlPolygon.prototype.getStyle = function() {
+    /**
+     * Return promise of style valid for this Polygon.
+     * @returns {Promise} Promise of style valid for current polygon.
+     */
+    KmlPolygon.prototype.getStyle = function () {
         return this._style;
     };
 
-    KmlPolygon.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlPolygon.prototype.getTagNames = function () {
         return ['Polygon'];
     };
 

@@ -19,11 +19,11 @@ define([
      * @alias Scale
      * @constructor
      * @classdesc Contains the data associated with Kml Scale
-     * @param node Node representing the Kml Scale
+     * @param node {Node} Node representing the Kml Scale
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#scale
      */
-    var Scale = function(node) {
+    var Scale = function (node) {
         KmlObject.call(this, node);
 
         Object.defineProperties(this, {
@@ -31,7 +31,7 @@ define([
              * Scales model along x axis
              * @memberof Scale.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlX: {
                 get: function() {
@@ -43,7 +43,7 @@ define([
              * Scales model along y axis
              * @memberof Scale.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlY: {
                 get: function() {
@@ -55,7 +55,7 @@ define([
              * Scales model along z axis
              * @memberof Scale.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlZ: {
                 get: function() {
@@ -67,7 +67,11 @@ define([
         extend(this, Scale.prototype);
     };
 
-    Scale.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    Scale.prototype.getTagNames = function () {
         return ['Scale'];
     };
 

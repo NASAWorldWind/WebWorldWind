@@ -31,11 +31,11 @@ define([
      * @alias KmlPoint
      * @constructor
      * @classdesc Contains the data associated with Kml point
-     * @param pointNode Node representing the Kml point.
+     * @param pointNode {Node} Node representing the Kml point.
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#point
      */
-    var KmlPoint = function(pointNode) {
+    var KmlPoint = function (pointNode) {
         KmlGeometry.call(this, pointNode);
 
         this._shape = null;
@@ -100,7 +100,7 @@ define([
      * It renders KmlPoint as Polygon.
      * @param layer Layer into which the point should be added.
      */
-    KmlPoint.prototype.update = function(layer) {
+    KmlPoint.prototype.update = function (layer) {
         var attributes = new ShapeAttributes(null);
         attributes.outlineColor = Color.WHITE;
         attributes.interiorColor = Color.WHITE;
@@ -114,7 +114,7 @@ define([
     };
 
     // For internal use only. Intentionally left undocumented.
-    KmlPoint.prototype.createRectangleFromPosition = function(position) {
+    KmlPoint.prototype.createRectangleFromPosition = function (position) {
         var rectangle = [];
 
         var latitude = Number(position.latitude),
@@ -129,7 +129,11 @@ define([
         return rectangle;
     };
 
-    KmlPoint.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlPoint.prototype.getTagNames = function () {
         return ['Point'];
     };
 

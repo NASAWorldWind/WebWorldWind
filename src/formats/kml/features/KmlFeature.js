@@ -31,8 +31,8 @@ define([
      * objects from Kml file are read
      * @alias KmlFeature
      * @classdesc Contains the data associated with KmlFeature.
-     * @param featureNode Node representing Kml Feature
-     * @param pStyle Promise of the future style.
+     * @param featureNode {Node} Node representing Kml Feature
+     * @param pStyle {Promise} Promise of the future style.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#feature
@@ -116,7 +116,7 @@ define([
             },
 
             /**
-             * URL of a <Style> or <StyleMap> defined in a Document. If the style is in the same file, use a #
+             * URL of a &lt;Style&gt; or &lt;StyleMap&gt; defined in a Document. If the style is in the same file, use a #
              * reference. If the style is defined in an external file, use a full URL along with # referencing. If it
              * references remote URL, this server must support CORS for us to be able to download it.
              * @memberof KmlFeature.prototype
@@ -131,10 +131,10 @@ define([
 
             /**
              * A short description of the feature. In Google Earth, this description is displayed in the Places panel
-             * under the name of the feature. If a Snippet is not supplied, the first two lines of the <description>
-             * are used. In Google Earth, if a Placemark contains both a description and a Snippet, the <Snippet>
-             * appears beneath the Placemark in the Places panel, and the <description> appears in the Placemark's
-             * description balloon. This tag does not support HTML markup. <Snippet> has a maxLines attribute, an
+             * under the name of the feature. If a Snippet is not supplied, the first two lines of the &lt;description&gt;
+             * are used. In Google Earth, if a Placemark contains both a description and a Snippet, the &lt;Snippet&gt;
+             * appears beneath the Placemark in the Places panel, and the &lt;description&gt; appears in the Placemark's
+             * description balloon. This tag does not support HTML markup. &lt;Snippet&gt; has a maxLines attribute, an
              * integer that specifies the maximum number of lines to display.
              * @memberof KmlFeature.prototype
              * @type {String}
@@ -179,7 +179,7 @@ define([
             /**
              * One style element per Feature, with possible children of different substyles.
              * @memberof KmlFeature.prototype
-             * @type {KmlTimePrimitive}
+             * @type {KmlStyle}
              * @readonly
              */
             kmlStyleSelector: {
@@ -191,7 +191,7 @@ define([
             },
 
             /**
-             * Features and geometry associated with a Region are drawn only when the Region is active. See <Region>.
+             * Features and geometry associated with a Region are drawn only when the Region is active. See &lt;Region&gt;.
              * @memberof KmlFeature.prototype
              * @type {KmlRegion}
              * @readonly
@@ -208,13 +208,19 @@ define([
         extend(this, KmlFeature.prototype);
     };
 
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
     KmlFeature.prototype.getTagNames = function () {
         return ['NetworkLink', 'Placemark', 'PhotoOverlay', 'ScreenOverlay', 'GroundOverlay', 'Folder',
             'Document'];
     };
 
-    // Is it possible that I created some type of loop?
-    // It definitely looks like that.
+    /**
+     * Gets promise of the style pased on the children of this node.
+     * @returns {Promise} It returns promise of the style.
+     */
     KmlFeature.prototype.getStyle = function () {
         var self = this;
         if (this._pStyle) {
@@ -256,7 +262,7 @@ define([
         }
     };
 
-    KmlFeature.prototype.isFeature = function() {
+    KmlFeature.prototype.isFeature = function () {
         return true;
     };
 

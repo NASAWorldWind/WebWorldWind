@@ -17,7 +17,7 @@ define([
      * @alias ImagePyramid
      * @constructor
      * @classdesc Contains the data associated with Kml Image Pyramid
-     * @param node Node representing the Kml Image Pyramid.
+     * @param node {Node} Node representing the Kml Image Pyramid.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#imagepyramid
      */
@@ -26,7 +26,8 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Size of the tiles, in pixels. Tiles must be square, and <tileSize> must be a power of 2. A tile size of 256
+             * Size of the tiles, in pixels. Tiles must be square, and &lt;tileSize&gt; must be a power of 2. A tile size of
+             * 256
              * (the default) or 512 is recommended. The original image is divided into tiles of this size, at varying
              * resolutions.
              * @memberof ImagePyramid.prototype
@@ -80,7 +81,11 @@ define([
         extend(this, ImagePyramid.prototype);
     };
 
-    ImagePyramid.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    ImagePyramid.prototype.getTagNames = function () {
         return ['ImagePyramid'];
     };
 

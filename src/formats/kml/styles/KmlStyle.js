@@ -35,11 +35,11 @@ define([
      * @alias KmlStyle
      * @constructor
      * @classdesc Contains the data associated with Kml style
-     * @param styleNode Node representing the Kml style.
+     * @param styleNode {Node} Node representing the Kml style.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#style
      */
-    var KmlStyle = function(styleNode) {
+    var KmlStyle = function (styleNode) {
         KmlStyleSelector.call(this, styleNode);
 
         Object.defineProperties(this, {
@@ -117,7 +117,7 @@ define([
              * Style used for lists in current node and all children nodes.
              * @memberof KmlStyle.prototype
              * @readonly
-             * @type {KmlBalloonStyle|null}
+             * @type {KmlListStyle|null}
              */
             kmlListStyle: {
                 get: function() {
@@ -166,7 +166,11 @@ define([
         });
     };
 
-    KmlStyle.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlStyle.prototype.getTagNames = function () {
         return ['Style'];
     };
 

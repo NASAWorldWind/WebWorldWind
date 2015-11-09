@@ -23,11 +23,11 @@ define([
      * @alias KmlPolyStyle
      * @constructor
      * @classdesc Contains the data associated with Kml poly style
-     * @param polyStyleNode Node representing the Kml poly style.
+     * @param polyStyleNode {Node} Node representing the Kml poly style.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polystyle
      */
-    var KmlPolyStyle = function(polyStyleNode){
+    var KmlPolyStyle = function (polyStyleNode) {
         KmlColorStyle.call(this, polyStyleNode);
 
         Object.defineProperties(this, {
@@ -59,7 +59,7 @@ define([
         extend(this, KmlPolyStyle.prototype);
     };
 
-    KmlPolyStyle.update = function(style, options) {
+    KmlPolyStyle.update = function (style, options) {
         style = style || {};
         var shapeOptions = options || {};
         shapeOptions._drawInterior = style.kmlFill || true;
@@ -71,7 +71,11 @@ define([
         return shapeOptions;
     };
 
-    KmlPolyStyle.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlPolyStyle.prototype.getTagNames = function () {
         return ['PolyStyle'];
     };
 

@@ -18,12 +18,12 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLocation
      * @classdesc Contains the data associated with Location node.
-     * @param node Node representing location in the document.
+     * @param node {Node} Node representing location in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#location
      */
-    var KmlLocation = function(node) {
+    var KmlLocation = function (node) {
         KmlObject.call(this, node);
 
         Object.defineProperties(this, {
@@ -31,7 +31,7 @@ define([
              * Longitude of the location.
              * @memberof KmlLocation.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlLongitude: {
                 get: function() {
@@ -43,7 +43,7 @@ define([
              * Latitude of the location.
              * @memberof KmlLocation.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlLatitude: {
                 get: function() {
@@ -55,7 +55,7 @@ define([
              * Altitude of the location.
              * @memberof KmlLocation.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlAltitude: {
                 get: function() {
@@ -67,7 +67,11 @@ define([
         extend(this, KmlLocation.prototype);
     };
 
-    KmlLocation.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlLocation.prototype.getTagNames = function () {
         return ['Location'];
     };
 

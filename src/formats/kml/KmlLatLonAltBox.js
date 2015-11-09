@@ -16,7 +16,7 @@ define([
      * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLatLonAltBox
      * @classdesc Contains the data associated with LatLonAltBox node.
-     * @param node Node representing alternative lat lon box in the document.
+     * @param node {Node} Node representing alternative lat lon box in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#latlonaltbox
@@ -26,7 +26,7 @@ define([
 
         Object.defineProperties(this, {
             /**
-             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to �90.
+             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to +-90.
              * @memberof KmlLatLonAltBox.prototype
              * @readonly
              * @type {Number}
@@ -38,7 +38,7 @@ define([
             },
 
             /**
-             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to �90.
+             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to +-90.
              * @memberof KmlLatLonAltBox.prototype
              * @readonly
              * @type {Number}
@@ -50,7 +50,7 @@ define([
             },
 
             /**
-             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to �180.
+             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to +-180.
              * @memberof KmlLatLonAltBox.prototype
              * @readonly
              * @type {Number}
@@ -62,7 +62,7 @@ define([
             },
 
             /**
-             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to �180.
+             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to +-180.
              * @memberof KmlLatLonAltBox.prototype
              * @readonly
              * @type {Number}
@@ -101,7 +101,11 @@ define([
         extend(this, KmlLatLonAltBox.prototype);
     };
 
-    KmlLatLonAltBox.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlLatLonAltBox.prototype.getTagNames = function () {
         return ['LatLonAltBox'];
     };
 

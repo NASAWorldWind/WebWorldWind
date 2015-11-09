@@ -24,7 +24,7 @@ define([
      * @classdesc Class representing LineStyle element of KmlFile
      * @see https://developers.google.com/kml/documentation/kmlreference#linestyle
      */
-    var KmlLineStyle = function(lineStyleNode) {
+    var KmlLineStyle = function (lineStyleNode) {
         KmlColorStyle.call(this, lineStyleNode);
 
         Object.defineProperties(this, {
@@ -78,8 +78,9 @@ define([
             },
 
             /**
-             * A boolean defining whether or not to display a text label on a LineString. A LineString's label is contained
-             * in the <name> element that is a sibling of <LineString> (i.e. contained within the same <Placemark> element).
+             * A boolean defining whether or not to display a text label on a LineString. A LineString's label is
+             * contained in the &lt;name&gt; element that is a sibling of &lt;LineString&gt; (i.e. contained within the same
+             * &lt;Placemark&gt; element).
              * @memberof KmlLineStyle.prototype
              * @readonly
              * @type {Boolean}
@@ -94,7 +95,7 @@ define([
         extend(this, KmlLineStyle.prototype);
     };
 
-    KmlLineStyle.update = function(style, options) {
+    KmlLineStyle.update = function (style, options) {
         var shapeOptions = options || {};
         style = style || {};
 
@@ -104,7 +105,11 @@ define([
         return shapeOptions;
     };
 
-    KmlLineStyle.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlLineStyle.prototype.getTagNames = function () {
         return ['LineStyle'];
     };
 

@@ -16,7 +16,7 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLookAt
      * @classdesc Contains the data associated with LookAt node.
-     * @param node Node representing looking at something in the document.
+     * @param node {Node} Node representing looking at something in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#lookat
@@ -27,8 +27,8 @@ define([
         Object.defineProperties(this, {
             /**
              * Longitude of the point the camera is looking at. Angular distance in degrees, relative to the Prime
-             * Meridian. Values west of the Meridian range from ?180 to 0 degrees. Values east of the Meridian range from 0
-             * to 180 degrees.
+             * Meridian. Values west of the Meridian range from -180 to 0 degrees. Values east of the Meridian range
+             * from 0 to 180 degrees.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {Number}
@@ -41,7 +41,7 @@ define([
 
             /**
              * Latitude of the point the camera is looking at. Degrees north or south of the Equator (0 degrees). Values
-             * range from ?90 degrees to 90 degrees.
+             * range from -90 degrees to 90 degrees.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {Number}
@@ -78,9 +78,10 @@ define([
             },
 
             /**
-             * Angle between the direction of the LookAt position and the normal to the surface of the earth. (See diagram
-             * below.) Values range from 0 to 90 degrees. Values for <tilt> cannot be negative. A <tilt> value of 0 degrees
-             * indicates viewing from directly above. A <tilt> value of 90 degrees indicates viewing along the horizon.
+             * Angle between the direction of the LookAt position and the normal to the surface of the earth. (See
+             * diagram below.) Values range from 0 to 90 degrees. Values for &lt;tilt&gt; cannot be negative. A &lt;tilt&gt; value
+             * of 0 degrees indicates viewing from directly above. A &lt;tilt&gt; value of 90 degrees indicates viewing along
+             * the horizon.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {Number}
@@ -92,7 +93,7 @@ define([
             },
 
             /**
-             * Distance in meters from the point specified by <longitude>, <latitude>, and <altitude> to the LookAt
+             * Distance in meters from the point specified by &lt;longitude&gt;, &lt;latitude&gt;, and &lt;altitude&gt; to the LookAt
              * position. (See diagram below.)
              * @memberof KmlLookAt.prototype
              * @readonly
@@ -105,11 +106,10 @@ define([
             },
 
             /**
-             * Specifies how the <altitude> specified for the LookAt point is interpreted. Possible values are as follows:
-             * clampToGround - (default) Indicates to ignore the <altitude> specification and place the LookAt position
-             *  on the ground.
-             * relativeToGround - Interprets the <altitude> as a value in meters above the ground.
-             * absolute - Interprets the <altitude> as a value in meters above sea level.
+             * Specifies how the &lt;altitude&gt; specified for the LookAt point is interpreted. Possible values are as
+             * follows: clampToGround - (default) Indicates to ignore the &lt;altitude&gt; specification and place the LookAt
+             * position on the ground. relativeToGround - Interprets the &lt;altitude&gt; as a value in meters above the
+             * ground. absolute - Interprets the &lt;altitude&gt; as a value in meters above sea level.
              * @memberof KmlLookAt.prototype
              * @readonly
              * @type {String}
@@ -124,7 +124,11 @@ define([
         extend(this, KmlLookAt.prototype);
     };
 
-    KmlLookAt.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlLookAt.prototype.getTagNames = function () {
         return ['LookAt'];
     };
 

@@ -34,33 +34,33 @@ define([
              */
             kmlHeading: {
                 get: function () {
-                    return this.retrieve({name: 'heading', transformer: Number})
+                    return this.retrieve({name: 'heading', transformer: Number});
                 }
             },
 
             /**
-             * Rotation about the x axis. A positive rotation is clockwise around the x axis and specified in degrees from
-             * 0 to 180.
+             * Rotation about the x axis. A positive rotation is clockwise around the x axis and specified in degrees
+             * from 0 to 180.
              * @memberof KmlOrientation.prototype
              * @readonly
              * @type {Number}
              */
             kmlTilt: {
                 get: function () {
-                    return this.retrieve({name: 'tilt', transformer: Number})
+                    return this.retrieve({name: 'tilt', transformer: Number});
                 }
             },
 
             /**
-             * Rotation about the y axis. A positive rotation is clockwise around the y axis and specified in degrees from
-             * 0 to 180.
+             * Rotation about the y axis. A positive rotation is clockwise around the y axis and specified in degrees
+             * from 0 to 180.
              * @memberof KmlOrientation.prototype
              * @readonly
              * @type {Number}
              */
             kmlRoll: {
                 get: function () {
-                    return this.retrieve({name: 'roll', transformer: Number})
+                    return this.retrieve({name: 'roll', transformer: Number});
                 }
             }
         });
@@ -68,7 +68,11 @@ define([
         extend(this, KmlOrientation.prototype);
     };
 
-    KmlOrientation.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    KmlOrientation.prototype.getTagNames = function () {
         return ['Orientation'];
     };
 

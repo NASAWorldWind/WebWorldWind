@@ -16,7 +16,7 @@ define([
      * @alias ViewVolume
      * @constructor
      * @classdesc Contains the data associated with Kml View Volume
-     * @param node Node representing the Kml View Volume.
+     * @param node {Node} Node representing the Kml View Volume.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#viewvolume
      */
@@ -28,11 +28,11 @@ define([
              * Angle, in degrees, between the camera's viewing direction and the left side of the view volume.
              * @memberof ViewVolume.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlLeftFov: {
                 get: function () {
-                    return this.retrieve({name: 'leftFov'});
+                    return this.retrieve({name: 'leftFov', transformer: Number});
                 }
             },
 
@@ -40,11 +40,11 @@ define([
              * Angle, in degrees, between the camera's viewing direction and the right side of the view volume.
              * @memberof ViewVolume.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlRightFov: {
                 get: function () {
-                    return this.retrieve({name: 'rightFov'});
+                    return this.retrieve({name: 'rightFov', transformer: Number});
                 }
             },
 
@@ -52,11 +52,11 @@ define([
              * Angle, in degrees, between the camera's viewing direction and the bottom side of the view volume.
              * @memberof ViewVolume.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlBottomFov: {
                 get: function () {
-                    return this.retrieve({name: 'bottomFov'});
+                    return this.retrieve({name: 'bottomFov', transformer: Number});
                 }
             },
 
@@ -64,11 +64,11 @@ define([
              * Angle, in degrees, between the camera's viewing direction and the top side of the view volume.
              * @memberof ViewVolume.prototype
              * @readonly
-             * @type {Array}
+             * @type {Number}
              */
             kmlTopFov: {
                 get: function () {
-                    return this.retrieve({name: 'topFov'});
+                    return this.retrieve({name: 'topFov', transformer: Number});
                 }
             },
 
@@ -79,7 +79,7 @@ define([
              *  of view, which has the shape of a truncated pyramid, as shown here:
              * @memberof ViewVolume.prototype
              * @readonly
-             * @type {Array}
+             * @type {String}
              */
             kmlNear: {
                 get: function () {
@@ -91,7 +91,11 @@ define([
         extend(this, ViewVolume.prototype);
     };
 
-    ViewVolume.prototype.getTagNames = function() {
+    /**
+     * Returns tag name of this Node.
+     * @returns {String[]}
+     */
+    ViewVolume.prototype.getTagNames = function () {
         return ['ViewVolume'];
     };
 

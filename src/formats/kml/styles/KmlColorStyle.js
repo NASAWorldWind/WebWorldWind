@@ -15,12 +15,12 @@ define([
      * objects from KmlFiles are read. This object is abstract. Only its descendants are instantiating it.
      * @alias KmlColorStyle
      * @classdesc Contains the data associated with ColorStyle node
-     * @param colorStyleNode Node representing ColorStyle from Kml document
+     * @param colorStyleNode {Node} Node representing ColorStyle from Kml document
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#colorstyle
      */
-    var KmlColorStyle = function(colorStyleNode) {
+    var KmlColorStyle = function (colorStyleNode) {
         KmlSubStyle.call(this, colorStyleNode);
 
         Object.defineProperties(this, {
@@ -38,8 +38,8 @@ define([
             },
 
             /**
-             * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based on
-             * the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
+             * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based
+             * on the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
              * @memberof KmlColorStyle.prototype
              * @readonly
              * @type {String}
@@ -54,8 +54,12 @@ define([
         extend(this, KmlColorStyle.prototype);
     };
 
-    KmlColorStyle.prototype.getTagNames = function() {
-        return ['LineStyle','PolyStyle','IconStyle','LabelStyle'];
+    /**
+     * Returns tag name of all descendants of this abstract node.
+     * @returns {String[]}
+     */
+    KmlColorStyle.prototype.getTagNames = function () {
+        return ['LineStyle', 'PolyStyle', 'IconStyle', 'LabelStyle'];
     };
 
     return KmlColorStyle;
