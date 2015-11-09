@@ -264,6 +264,8 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
+            this.eyeDistance = dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+
             // Compute the annotation's screen point in the OpenGL coordinate system of the WorldWindow
             // by projecting its model coordinate point onto the viewport. Apply a depth offset in order
             // to cause the annotation to appear above nearby terrain.

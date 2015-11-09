@@ -535,13 +535,15 @@ define([
          * Adds an ordered renderable to this draw context's ordered renderable list.
          * @param {OrderedRenderable} orderedRenderable The ordered renderable to add. May be null, in which case the
          * current ordered renderable list remains unchanged.
+         * @param {Number} eyeDistance An optional argument indicating the ordered renderable's eye distance.
+         * If this parameter is not specified then the ordered renderable must have an eyeDistance property.
          */
-        DrawContext.prototype.addOrderedRenderable = function (orderedRenderable) {
+        DrawContext.prototype.addOrderedRenderable = function (orderedRenderable, eyeDistance) {
             if (orderedRenderable) {
                 var ore = {
                     orderedRenderable: orderedRenderable,
                     insertionOrder: this.orderedRenderablesCounter++,
-                    eyeDistance: orderedRenderable.eyeDistance,
+                    eyeDistance: eyeDistance || orderedRenderable.eyeDistance,
                     globeStateKey: this.globeStateKey
                 };
 
