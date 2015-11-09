@@ -29,10 +29,6 @@ define(function () {
 
         this.synchronizeLayerList();
 
-        $("#layerList").find("button").on("click", function (e) {
-            thisExplorer.onLayerClick($(this));
-        });
-
         $("#searchBox").find("button").on("click", function (e) {
             thisExplorer.onSearchButton(e);
         });
@@ -112,6 +108,7 @@ define(function () {
                     layerButton.removeClass("active");
                 }
                 this.wwd.redraw();
+                break;
             }
         }
     };
