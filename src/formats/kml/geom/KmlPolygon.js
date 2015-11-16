@@ -175,7 +175,7 @@ define([
 
     KmlPolygon.prototype.moveValidProperties = function() {
         this.extrude = this.kmlExtrude || true;
-        this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
+        this.altitudeMode = this.kmlAltitudeMode || WorldWind.CLAMP_TO_GROUND;
     };
 
     KmlPolygon.prototype.prepareAttributes = function(style) {

@@ -50,7 +50,7 @@ define([
             kmlPosition: {
                 get: function() {
                     var coordinates = this.retrieve({name: 'coordinates'}).split(',');
-                    return new Position(coordinates[1], coordinates[0], coordinates[2]);
+                    return new Position(coordinates[1], coordinates[0], coordinates[2] || 0);
                 }
             },
 

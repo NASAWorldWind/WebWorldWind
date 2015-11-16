@@ -98,7 +98,7 @@ define([
                         var coordinates = this.retrieve({name: 'coordinates'}).trim().replace(/\s+/g, ' ').split(' ');
                         coordinates.forEach(function(coordinates){
                             coordinates = coordinates.split(',');
-                            positions.push(new Position(Number(coordinates[1]), Number(coordinates[0]), Number(coordinates[2])));
+                            positions.push(new Position(Number(coordinates[1]), Number(coordinates[0]), Number(coordinates[2] || 0)));
                         });
                         return positions;
                     }
