@@ -159,13 +159,18 @@ define([
             return new Remote(options);
         };
 
-        KmlFile.prototype.resolveStyle = function (id) {
+        KmlFile.prototype.resolveStyle = function (pId) {
             var self = this;
-            id = id.substring(id.indexOf('#') + 1, id.length);
+            var id = pId.substring(pId.indexOf('#') + 1, pId.length);
             // It returns promise of the Style.
             return new Promise(function (resolve, reject) {
-                var style = self._document.getElementById(id);
-                if (!style) {
+                var style;
+                if(self._document.querySelector) {
+                    style = self._document.querySelector("*[id='" + id + "']");
+                } else {
+                    style = self._document.getElementById(id);
+                }
+                if (!style || style == null) {
                     reject();
                 }
 
