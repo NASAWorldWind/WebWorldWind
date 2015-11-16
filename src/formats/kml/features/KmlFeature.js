@@ -13,6 +13,7 @@ define([
     '../KmlRegion',
     '../KmlTimePrimitive',
     '../../../util/Promise',
+    '../util/StyleResolver',
     '../../../util/WWUtil'
 ], function (extend,
              KmlObject,
@@ -24,6 +25,7 @@ define([
              KmlRegion,
              KmlTimePrimitive,
              Promise,
+             StyleResolver,
              WWUtil) {
     "use strict";
     /**
@@ -228,38 +230,11 @@ define([
         }
         this._pStyle = new Promise(function (resolve, reject) {
             window.setTimeout(function(){
-                self.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject)
+                StyleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject)
             },0);
         });
         // Use also styleUrl if valid and StyleSelector.
         return this._pStyle;
-    };
-
-    KmlFeature.prototype.handleRemoteStyle = function(styleUrl, styleSelector, resolve, reject) {
-        // Understand styleUrl
-        // This should return normal and highlight style. as a part of resolving the promise.
-        var filePromise;
-        if (styleUrl) {
-            filePromise = KmlFileCache.retrieve(styleUrl);
-            if(!filePromise) {
-                filePromise = new KmlFile({url: styleUrl});
-                KmlFileCache.add(filePromise);
-            }
-            filePromise.then(function(kmlFile){
-                kmlFile.resolveStyle(styleUrl).then(function(style){
-                    resolve({normal: style, highlight: null});
-                });
-            });
-        } else {
-            if(styleSelector instanceof KmlStyleMap) {
-                styleSelector.resolve(resolve, reject);
-            } else {
-                // Move this resolve to the end of the stack to prevent recursion.
-                window.setTimeout(function () {
-                    resolve({normal: styleSelector, highlight: null});
-                }, 0);
-            }
-        }
     };
 
     KmlFeature.prototype.isFeature = function () {

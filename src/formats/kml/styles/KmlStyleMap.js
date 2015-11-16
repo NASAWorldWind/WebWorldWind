@@ -6,11 +6,13 @@ define([
     '../../../util/extend',
     '../KmlElements',
     './KmlSubStyle',
-    '../util/Pair'
+    '../util/Pair',
+    '../../../util/Promise'
 ], function (extend,
              KmlElements,
              KmlSubStyle,
-             Pair) {
+             Pair,
+             Promise) {
     "use strict";
     /**
      * Constructs an KmlStyleMap. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -42,6 +44,12 @@ define([
                 get: function () {
                     return this.parse();
                 }
+            },
+
+            isMap: {
+                get: function() {
+                    return true;
+                }
             }
         });
 
@@ -49,8 +57,32 @@ define([
     };
 
     KmlStyleMap.prototype.resolve = function(resolve, reject) {
-        // Make sure all styles are loaded and then resolve with object such as
-        // {normal: , highlight: }
+        // Create promise which resolves, when all styles are resolved.
+        var self = this;
+        var results = {};
+        var promises = [];
+        var pairs = self.kmlPairs;
+        pairs.forEach(function(pair) {
+            var key = pair.kmlKey;
+            var style = pair.getStyle();
+            promises.push(style);
+            style.then(function(pStyle){
+                results[key] = pStyle.normal;
+            });
+        });
+
+        var compoundPromise = Promise.all(promises);
+        compoundPromise.then(function(){
+            if(!results['normal']){
+                results['normal'] = null;
+            }
+
+            if(!results['highlight']){
+                results['highlight'] =  null;
+            }
+
+            resolve(results);
+        });
     };
 
     /**

@@ -6,12 +6,16 @@ define([
     '../../../util/extend',
     './../KmlElements',
     '../KmlObject',
-    '../styles/KmlStyle'
+    '../styles/KmlStyleSelector',
+    '../../../util/Promise',
+    '../util/StyleResolver'
 ], function (
     extend,
     KmlElements,
     KmlObject,
-    KmlStyle
+    KmlStyleSelector,
+    Promise,
+    StyleResolver
 ) {
     "use strict";
 
@@ -59,10 +63,10 @@ define([
              * @readonly
              * @type {KmlStyle}
              */
-            kmlStyle: {
+            kmlStyleSelector: {
                 get: function() {
                     return this.createChildElement({
-                        name: KmlStyle.prototype.getTagNames()
+                        name: KmlStyleSelector.prototype.getTagNames()
                     });
                 }
             }
@@ -80,7 +84,12 @@ define([
     };
 
     Pair.prototype.getStyle = function() {
-
+        var self = this;
+        return new Promise(function (resolve, reject) {
+            window.setTimeout(function(){
+                StyleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
+            },0);
+        });
     };
 
     KmlElements.addKey(Pair.prototype.getTagNames()[0], Pair);

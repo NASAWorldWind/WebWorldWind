@@ -11,6 +11,7 @@ define([
         '../../util/jszip',
         './KmlFileCache',
         './styles/KmlStyle',
+        './styles/KmlStyleMap',
         '../../util/Logger',
         '../../util/Promise',
         '../../util/Remote',
@@ -22,6 +23,7 @@ define([
               JsZip,
               KmlFileCache,
               KmlStyle,
+              KmlStyleMap,
               Logger,
               Promise,
               Remote,
@@ -169,7 +171,15 @@ define([
                 if (!style) {
                     reject();
                 }
-                resolve(new KmlStyle(style));
+
+                if(style.nodeName == KmlStyle.prototype.getTagNames()[0]) {
+                    resolve(new KmlStyle(style));
+                } else if(style.nodeName == KmlStyleMap.prototype.getTagNames()[0]) {
+                    resolve(new KmlStyleMap(style));
+                } else {
+                    Logger.logMessage(Logger.LEVEL_WARNING, "KmlFile", "resolveStyle", "Style must contain either" +
+                        " Style node or StyleMap node.");
+                }
             });
         };
 

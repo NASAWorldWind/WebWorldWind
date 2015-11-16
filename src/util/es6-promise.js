@@ -962,6 +962,7 @@
       this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
     }
 
+    var global = {};
     lib$es6$promise$polyfill$$default();
 }).call(this);
 

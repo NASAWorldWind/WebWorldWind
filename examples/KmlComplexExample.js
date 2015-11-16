@@ -39,7 +39,6 @@ requirejs(['../src/WorldWind',
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
             wwd.addLayer(renderableLayer);
 
-            kmlFile.parseDocument();
             kmlFile.update(renderableLayer);
         });
 
