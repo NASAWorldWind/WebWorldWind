@@ -104,6 +104,7 @@
     </Style>
     <Folder>
       <name>Placemarks</name>
+      <visibility>1</visibility>
       <description>These are just some of the different kinds of placemarks with
         which you can mark your favorite places</description>
       <LookAt>
@@ -116,6 +117,7 @@
       </LookAt>
       <Placemark>
         <name>Simple placemark</name>
+        <visibility>1</visibility>
         <description>Attached to the ground. Intelligently places itself at the
           height of the underlying terrain.</description>
         <Point>
@@ -124,7 +126,7 @@
       </Placemark>
       <Placemark>
         <name>Floating placemark</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Floats a defined distance above the ground.</description>
         <LookAt>
           <longitude>-122.0839597145766</longitude>
@@ -142,7 +144,7 @@
       </Placemark>
       <Placemark>
         <name>Extruded placemark</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Tethered to the ground by a customizable
           &quot;tail&quot;</description>
         <LookAt>
@@ -163,7 +165,7 @@
     </Folder>
     <Folder>
       <name>Styles and Markup</name>
-      <visibility>0</visibility>
+      <visibility>1</visibility>
       <description>With KML it is easy to create rich, descriptive markup to
         annotate and enrich your placemarks</description>
       <LookAt>
@@ -177,7 +179,7 @@
       <styleUrl>#noDrivingDirections</styleUrl>
       <Document>
         <name>Highlighted Icon</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Place your mouse over the icon to see it display the new
           icon</description>
         <LookAt>
@@ -214,7 +216,7 @@
         </StyleMap>
         <Placemark>
           <name>Roll over this icon</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <styleUrl>#exampleStyleMap</styleUrl>
           <Point>
             <coordinates>-122.0856545755255,37.42243077405461,0</coordinates>
@@ -224,13 +226,13 @@
     </Folder>
     <Folder>
       <name>Paths</name>
-      <visibility>0</visibility>
+      <visibility>1</visibility>
       <description>Examples of paths. Note that the tessellate tag is by default
         set to 0. If you want to create tessellated lines, they must be authored
         (or edited) directly in KML.</description>
       <Placemark>
         <name>Tessellated</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description><![CDATA[If the <tessellate> tag has a value of 1, the line will contour to the underlying terrain]]></description>
         <LookAt>
           <longitude>-112.0822680013139</longitude>
@@ -248,7 +250,7 @@
       </Placemark>
       <Placemark>
         <name>Untessellated</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description><![CDATA[If the <tessellate> tag has a value of 0, the line follow a simple straight-line path from point to point]]></description>
         <LookAt>
           <longitude>-112.0822680013139</longitude>
@@ -266,7 +268,7 @@
       </Placemark>
       <Placemark>
         <name>Absolute</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Transparent purple line</description>
         <LookAt>
           <longitude>-112.2719329043177</longitude>
@@ -295,7 +297,7 @@
       </Placemark>
       <Placemark>
         <name>Absolute Extruded</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Transparent green wall with yellow outlines</description>
         <LookAt>
           <longitude>-112.2643334742529</longitude>
@@ -325,7 +327,7 @@
       </Placemark>
       <Placemark>
         <name>Relative</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Black line (10 pixels wide), height tracks terrain</description>
         <LookAt>
           <longitude>-112.2580438551384</longitude>
@@ -354,7 +356,7 @@
       </Placemark>
       <Placemark>
         <name>Relative Extruded</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Opaque blue walls with red outline, height tracks terrain</description>
         <LookAt>
           <longitude>-112.2683594333433</longitude>
@@ -385,11 +387,11 @@
     </Folder>
     <Folder>
       <name>Polygons</name>
-      <visibility>0</visibility>
+      <visibility>1</visibility>
       <description>Examples of polygon shapes</description>
       <Folder>
         <name>Google Campus</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>A collection showing how easy it is to create 3-dimensional
           buildings</description>
         <LookAt>
@@ -402,7 +404,7 @@
         </LookAt>
         <Placemark>
           <name>Building 40</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <styleUrl>#transRedPoly</styleUrl>
           <Polygon>
             <extrude>1</extrude>
@@ -437,7 +439,7 @@
         </Placemark>
         <Placemark>
           <name>Building 41</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <styleUrl>#transBluePoly</styleUrl>
           <Polygon>
             <extrude>1</extrude>
@@ -469,7 +471,7 @@
         </Placemark>
         <Placemark>
           <name>Building 42</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <styleUrl>#transGreenPoly</styleUrl>
           <Polygon>
             <extrude>1</extrude>
@@ -506,7 +508,7 @@
         </Placemark>
         <Placemark>
           <name>Building 43</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <styleUrl>#transYellowPoly</styleUrl>
           <Polygon>
             <extrude>1</extrude>
@@ -544,9 +546,11 @@
         </Placemark>
       </Folder>
       <Folder>
+        <visibility>1</visibility>
         <name>Extruded Polygon</name>
         <description>A simple way to model a building</description>
         <Placemark>
+          <visibility>1</visibility>
           <name>The Pentagon</name>
           <LookAt>
             <longitude>-77.05580139178142</longitude>
@@ -583,7 +587,7 @@
       </Folder>
       <Folder>
         <name>Absolute and Relative</name>
-        <visibility>0</visibility>
+        <visibility>1</visibility>
         <description>Four structures whose roofs meet exactly. Turn on/off
           terrain to see the difference between relative and absolute
           positioning.</description>
@@ -597,7 +601,7 @@
         </LookAt>
         <Placemark>
           <name>Absolute</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <styleUrl>#transBluePoly</styleUrl>
           <Polygon>
             <tessellate>1</tessellate>
@@ -615,7 +619,7 @@
         </Placemark>
         <Placemark>
           <name>Absolute Extruded</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <styleUrl>#transRedPoly</styleUrl>
           <Polygon>
             <extrude>1</extrude>
@@ -634,7 +638,7 @@
         </Placemark>
         <Placemark>
           <name>Relative</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <LookAt>
             <longitude>-112.3350152490417</longitude>
             <latitude>36.14943123077423</latitude>
@@ -664,7 +668,7 @@
         </Placemark>
         <Placemark>
           <name>Relative Extruded</name>
-          <visibility>0</visibility>
+          <visibility>1</visibility>
           <LookAt>
             <longitude>-112.3351587892382</longitude>
             <latitude>36.14979247129029</latitude>

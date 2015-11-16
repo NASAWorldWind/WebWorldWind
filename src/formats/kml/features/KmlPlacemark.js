@@ -86,6 +86,15 @@ define([
             // For now don't display Placemarks without geometries.
             return;
         }
+
+        if (self._layer != null) {
+            self._layer.removeRenderable(self);
+        }
+
+        if(!self.kmlVisibility) {
+            return;
+        }
+
         // Work correctly with styles.
         this._style.then(function (styles) {
             var normal = styles.normal;
@@ -96,9 +105,6 @@ define([
             self.position = self.kmlGeometry.kmlCenter;
             self.moveValidProperties();
 
-            if (self._layer != null) {
-                self._layer.removeRenderable(self);
-            }
             self._layer = layer;
             self._layer.addRenderable(self);
 

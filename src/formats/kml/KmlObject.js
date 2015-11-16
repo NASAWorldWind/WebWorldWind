@@ -36,6 +36,7 @@ define([
         }
         this._node = objectNode;
         this._shape = null;
+        this._cache = {};
 
         Object.defineProperties(this, {
             /**
@@ -167,6 +168,7 @@ define([
      * @returns {Array} Array of retrieved shapes.
      */
     KmlObject.prototype.parse = function (options) {
+        // Implement internal cache.
         var self = this;
         var node = options && options.node || self.node;
         var shapes = [];
@@ -189,7 +191,10 @@ define([
                     resolve(null);
                 }
             });
-            shapes.push(new constructor(childNode, style));
+            // Insert new ones but retain old ones. If there is no id present then generate id and
+            // append it to the node.
+            var shape = new constructor(childNode, style);
+            shapes.push(shape);
         });
 
         return shapes;

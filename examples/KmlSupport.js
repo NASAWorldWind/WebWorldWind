@@ -22,6 +22,11 @@ requirejs(['../src/WorldWind',
                     var kmlFilePromise = new KmlFile({document: text, local: true});
                     kmlFilePromise.then(function(kmlFile){
                         kmlFile.update(renderableLayer);
+
+                        window.setInterval(function(){
+                            console.log("Update file.");
+                            kmlFile.update(renderableLayer);
+                        }, 10000);
                     });
                 }
             }
