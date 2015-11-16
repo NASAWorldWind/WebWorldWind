@@ -86,9 +86,6 @@ define([
                     });
                 });
                 KmlFileCache.add(options.url, filePromise);
-                filePromise.then(function(kmlFile){
-                    kmlFile.parseDocument();
-                });
                 return filePromise;
             }
         };
@@ -153,7 +150,7 @@ define([
 
         KmlFile.prototype.requestUrl = function (url, options) {
             options.url = url;
-            if (url.endsWith(".kmz")) {
+            if ((url.endsWith && url.endsWith(".kmz")) || (url.indexOf(".kmz") != -1)) {
                 options.zip = true;
             } else {
                 options.ajax = true;
