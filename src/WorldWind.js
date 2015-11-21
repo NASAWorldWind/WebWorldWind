@@ -90,6 +90,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './projections/ProjectionMercator',
         './projections/ProjectionPolarEquidistant',
         './projections/ProjectionUPS',
+        './projections/ProjectionWgs84',
         './geom/Rectangle',
         './render/Renderable',
         './layer/RenderableLayer',
@@ -233,6 +234,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ProjectionMercator,
               ProjectionPolarEquidistant,
               ProjectionUPS,
+              ProjectionWgs84,
               Rectangle,
               Renderable,
               RenderableLayer,
@@ -585,6 +587,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ProjectionMercator'] = ProjectionMercator;
         WorldWind['ProjectionPolarEquidistant'] = ProjectionPolarEquidistant;
         WorldWind['ProjectionUPS'] = ProjectionUPS;
+        WorldWind['ProjectionWgs84'] = ProjectionWgs84;
         WorldWind['Rectangle'] = Rectangle;
         WorldWind['Renderable'] = Renderable;
         WorldWind['RenderableLayer'] = RenderableLayer;
