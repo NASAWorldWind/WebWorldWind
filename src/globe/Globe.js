@@ -388,6 +388,12 @@ define([
                     "missingResult"));
             }
 
+            // For backwards compatibility, check whether the projection defines a surfaceNormalAtPoint function
+            // before calling it. If it's not available, use the old code to compute the normal.
+            if (this.projection.surfaceNormalAtPoint) {
+                return this.projection.surfaceNormalAtPoint(this, x, y, z, result);
+            }
+
             if (this.is2D()) {
                 result[0] = 0;
                 result[1] = 0;

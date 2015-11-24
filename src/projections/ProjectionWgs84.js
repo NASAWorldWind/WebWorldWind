@@ -272,5 +272,21 @@ define([
             return this.northTangentAtLocation(globe, this.scratchPosition.latitude, this.scratchPosition.longitude, result);
         };
 
+        ProjectionWgs84.prototype.surfaceNormalAtPoint = function (globe, x, y, z, result) {
+            if (!globe) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ProjectionWgs84",
+                    "surfaceNormalAtPoint", "missingGlobe"));
+            }
+
+            var eSquared = globe.equatorialRadius * globe.equatorialRadius,
+                polSquared = globe.polarRadius * globe.polarRadius;
+
+            result[0] = x / eSquared;
+            result[1] = y / polSquared;
+            result[2] = z / eSquared;
+
+            return result.normalize();
+        };
+
         return ProjectionWgs84;
     });

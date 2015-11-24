@@ -199,5 +199,30 @@ define([
             return result;
         };
 
+        /**
+         * Computes the Cartesian surface normal vector at a specified Cartesian point.
+         *
+         * @param {Globe} globe The globe this projection is applied to.
+         * @param {number} x The X component of the Cartesian point.
+         * @param {number} y The Y component of the Cartesian point.
+         * @param {number} z The Z component of the Cartesian point.
+         * @param {Vec3} result A variable in which to return the computed vector.
+         *
+         * @returns{Vec3} The specified result argument containing the computed vector.
+         * @throws {ArgumentError} If either the specified globe or result argument is null or undefined.
+         */
+        GeographicProjection.prototype.surfaceNormalAtPoint = function (globe, x, y, z, result) {
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "GeographicProjection", "surfaceNormalAtPoint",
+                    "missingResult"));
+            }
+
+            result[0] = 0;
+            result[1] = 0;
+            result[2] = 1;
+
+            return result;
+        };
+
         return GeographicProjection;
     });
