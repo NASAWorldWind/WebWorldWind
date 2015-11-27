@@ -96,9 +96,9 @@ define([
                     get: function() {
                         var positions = [];
                         var coordinates = this.retrieve({name: 'coordinates'}).trim().replace(/\s+/g, ' ').split(' ');
-                        coordinates.forEach(function(coordinates){
-                            coordinates = coordinates.split(',');
-                            positions.push(new Position(Number(coordinates[1]), Number(coordinates[0]), Number(coordinates[2] || 0)));
+                        coordinates.forEach(function(pCoordinates){
+                            pCoordinates = pCoordinates.split(',');
+                            positions.push(new Position(Number(pCoordinates[1]), Number(pCoordinates[0]), Number(pCoordinates[2] || 0)));
                         });
                         return positions;
                     }
@@ -138,7 +138,8 @@ define([
 
         /**
          * Renders LineString as Path.
-         * @param layer Layer into which will be the shape rendered.
+         * @param layer {Layer} Layer into which will be the shape rendered.
+         * @param pStyle {Promise} Promise of the style to be delivered.
          */
         KmlLineString.prototype.update = function(layer, pStyle) {
             var self = this;
@@ -185,6 +186,7 @@ define([
         KmlLineString.prototype.moveValidProperties = function() {
             this.extrude = this.kmlExtrude || false;
             this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
+            //noinspection JSUnusedGlobalSymbols
             this.tesselate = this.kmlTesselate || false;
         };
 

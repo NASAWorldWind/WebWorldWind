@@ -63,6 +63,7 @@ define([
              */
             node: {
                 get: function () {
+                    //noinspection JSPotentiallyInvalidUsageOfThis
                     return this._node;
                 }
             }
@@ -90,7 +91,7 @@ define([
     /**
      * It allows retrieval of attributes from any child node. If kml node contains another node, where the values
      * are given as attributes, this is way to go. It can retrieve the node and find the correct attribute on it.
-     * @param options - name, attributeName
+     * @param options {Object} - name, attributeName
      * @returns {String | null} Either found value or null if such value doesn't exist.
      */
     KmlObject.prototype.retrieveAttribute = function (options) {
@@ -148,7 +149,7 @@ define([
     /**
      * It retrieves all nodes with names in the options.name
      * @param options {Object} name: Array
-     * @returns {Array} Array of nodes with given names. If there is no such node empty array is returned.
+     * @returns {Node[]} Array of nodes with given names. If there is no such node empty array is returned.
      */
     KmlObject.prototype.retrieveNodes = function (options) {
         var self = this;
@@ -165,7 +166,7 @@ define([
     /**
      * Retrieve all shapes, which are children of current node. It fails if there is some element for which there is no
      * adequate internal representation.
-     * @returns {Array} Array of retrieved shapes.
+     * @returns {KmlObject[]} Array of retrieved shapes.
      */
     KmlObject.prototype.parse = function (options) {
         // Implement internal cache.
@@ -202,7 +203,7 @@ define([
 
     /**
      * It returns either associated shape for given element or null, if no such node exist.
-     * @param name Name of the element.
+     * @param name {String} Name of the element.
      * @returns {KmlObject|null}
      */
     KmlObject.prototype.retrieveElementForNode = function (name) {

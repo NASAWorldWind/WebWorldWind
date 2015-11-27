@@ -230,7 +230,7 @@ define([
         }
         this._pStyle = new Promise(function (resolve, reject) {
             window.setTimeout(function(){
-                StyleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject)
+                StyleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
             },0);
         });
         // Use also styleUrl if valid and StyleSelector.

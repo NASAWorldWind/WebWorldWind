@@ -173,11 +173,13 @@ define([
 
     // Well anything that contains NetworkLink must also work using promises.
 
+    // For internal use only. Intentionally left undocumented.
     KmlPolygon.prototype.moveValidProperties = function() {
         this.extrude = this.kmlExtrude || true;
         this.altitudeMode = this.kmlAltitudeMode || WorldWind.CLAMP_TO_GROUND;
     };
 
+    // For internal use only. Intentionally left undocumented.
     KmlPolygon.prototype.prepareAttributes = function(style) {
         var shapeOptions = style && style.generate() || {};
 
@@ -191,6 +193,7 @@ define([
         return new ShapeAttributes(shapeOptions);
     };
 
+    // For internal use only. Intentionally left undocumented.
     KmlPolygon.prototype.prepareLocations = function () {
         var locations = [];
         if (this.kmlInnerBoundary != null) {
@@ -212,7 +215,7 @@ define([
 
     /**
      * Returns tag name of this Node.
-     * @returns {String[]}
+     * @returns {String[]} Names associated with Polygon.
      */
     KmlPolygon.prototype.getTagNames = function () {
         return ['Polygon'];

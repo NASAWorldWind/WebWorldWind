@@ -159,7 +159,7 @@ define([
 
     KmlStyle.prototype.getStyle = function() {
         var self = this;
-        return new Promise(function(resolve, reject){
+        return new Promise(function(resolve){
             window.setTimeout(function(){
                 resolve(self);
             }, 0);

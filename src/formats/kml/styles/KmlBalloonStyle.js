@@ -87,7 +87,7 @@ define([
      * @returns {String[]}
      */
     KmlBalloonStyle.prototype.getTagNames = function() {
-        return ['BalloonStyle']
+        return ['BalloonStyle'];
     };
 
     KmlElements.addKey(KmlBalloonStyle.prototype.getTagNames()[0], KmlBalloonStyle);

@@ -16,7 +16,7 @@ define([
      * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlOrientation
      * @classdesc Contains the data associated with Orientation node.
-     * @param node Node representing orientation in the document.
+     * @param node {Node} Node representing orientation in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#orientation

@@ -17,7 +17,7 @@ define([
      * objects from KmlFile are read. This object is already concrete implementation.
      * @alias KmlIconStyle
      * @classdesc Contains the data associated with IconStyle node
-     * @param iconStyleNode Node representing IconStyle in the document.
+     * @param iconStyleNode {Node} Node representing IconStyle in the document.
      * @returns {KmlIconStyle}
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined
@@ -61,7 +61,7 @@ define([
                 get: function () {
                     return this.createChildElement({
                         name: KmlIcon.prototype.getTagNames()
-                    })
+                    });
                 }
             },
 

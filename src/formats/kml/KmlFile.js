@@ -37,7 +37,7 @@ define([
          * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
          * rendered in one Layer.
          * @constructor
-         * @param {Object} Different options specifying how will the file behave.
+         * @param options {Object} Different options specifying how will the file behave.
          * @alias KmlFile
          * @classdesc Support for Kml File parsing and display.
          */
@@ -118,6 +118,7 @@ define([
         });
 
         /**
+         * Calling method from KmlObject on current KmlFile.
          * @see KmlObject.prototype.parse
          */
         KmlFile.prototype.parseDocument = function () {
@@ -133,7 +134,7 @@ define([
 
         /**
          * It renders all shapes, which are associated with current file.
-         * @param layer
+         * @param layer {Layer} Layer into which should the whole file be rendered.
          * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
          */
         KmlFile.prototype.update = function (layer) {

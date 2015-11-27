@@ -46,7 +46,7 @@ define([
              */
             kmlColorMode: {
                 get: function() {
-                    return this.retrieve({name: 'colorMode'})
+                    return this.retrieve({name: 'colorMode'});
                 }
             }
         });

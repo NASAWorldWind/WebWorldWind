@@ -56,7 +56,7 @@ define([
         extend(this, KmlStyleMap.prototype);
     };
 
-    KmlStyleMap.prototype.resolve = function(resolve, reject) {
+    KmlStyleMap.prototype.resolve = function(resolve) {
         // Create promise which resolves, when all styles are resolved.
         var self = this;
         var results = {};
