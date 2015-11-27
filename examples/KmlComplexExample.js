@@ -31,7 +31,7 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
         var kmlFileOptions = {
-            url: 'KML_samples.kml'
+            url: 'KML_Samples.kml'
         };
 
         var kmlFilePromise = new KmlFile(kmlFileOptions);
