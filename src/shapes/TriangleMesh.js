@@ -135,7 +135,7 @@ define([
                     }
 
                     this._positions = positions;
-                    this.referencePosition = this.determineReferencePosition(this._positions);
+                    this.referencePosition = this._positions[0];
                     this.reset();
                 }
             },

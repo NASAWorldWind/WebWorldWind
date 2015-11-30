@@ -22,7 +22,7 @@ define(function () {
         this.wwd = worldWindow;
 
         this.slider = $("#terrainOpacitySlider").slider({
-            value: 100,
+            value: this.wwd.surfaceOpacity * 100,
             min: 0,
             max: 100,
             animate: true,

@@ -46,13 +46,6 @@ define([
              */
             this.config = config;
 
-            /**
-             * The time to display. This property selects the sub-layer that represents the specified time.
-             * If null, no sub-layer is displayed.
-             * @type {Date}
-             */
-            this.time = null;
-
             // Intentionally not documented.
             this.displayName = config.title;
             this.pickEnabled = false;

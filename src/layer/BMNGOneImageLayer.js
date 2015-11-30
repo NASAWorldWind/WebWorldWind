@@ -29,7 +29,7 @@ define([
             RenderableLayer.call(this, "Blue Marble Image");
 
             var surfaceImage = new SurfaceImage(Sector.FULL_SPHERE,
-                WWUtil.currentUrlSansFilePart() + "/../images/BMNG_world.topo.bathy.200405.3.2048x1024.jpg");
+                WorldWind.configuration.baseUrl + "images/BMNG_world.topo.bathy.200405.3.2048x1024.jpg");
 
             this.addRenderable(surfaceImage);
 

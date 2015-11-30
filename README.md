@@ -1,4 +1,4 @@
-#Web World Wind#
+# Web World Wind #
 
 Web World Wind is a 3D virtual globe API for JavaScript. You can use it to provide a geographic context, complete
 with terrain, for visualizing geographic or geo-located information. Web World Wind provides high-resolution terrain

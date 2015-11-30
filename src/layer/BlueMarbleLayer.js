@@ -4,14 +4,13 @@
  */
 /**
  * @exports BlueMarbleLayer
- * @version $Id: BlueMarbleLayer.js 3126 2015-05-29 14:48:36Z tgaskins $
  */
 define([
-        '../layer/BMNGLayer',
-        '../layer/Layer'
+        '../layer/Layer',
+        '../layer/RestTiledImageLayer'
     ],
-    function (BMNGLayer,
-              Layer) {
+    function (Layer,
+              RestTiledImageLayer) {
         "use strict";
 
         /**
@@ -26,8 +25,11 @@ define([
          * undefined.
          * @param {Date} initialTime A date value indicating the month to display. The nearest month to the specified
          * time is displayed. January is displayed if this argument is null or undefined, i.e., new Date("2004-01");
+         * @param {{}} configuration An optional object with properties defining the layer configuration.
+         * See {@link RestTiledImageLayer} for a description of its contents. May be null, in which case default
+         * values are used.
          */
-        var BlueMarbleLayer = function (displayName, initialTime) {
+        var BlueMarbleLayer = function (displayName, initialTime, configuration) {
             Layer.call(this, displayName || "Blue Marble");
 
             /**
@@ -36,6 +38,8 @@ define([
              * @default January 2004 (new Date("2004-01"));
              */
             this.time = initialTime || new Date("2004-01");
+
+            this.configuration = configuration;
 
             this.pickEnabled = false;
 
@@ -57,6 +61,9 @@ define([
                 {month: "BlueMarble-200411", time: BlueMarbleLayer.availableTimes[10]},
                 {month: "BlueMarble-200412", time: BlueMarbleLayer.availableTimes[11]}
             ];
+
+            this.serverAddress = null;
+            this.pathToData = "../standalonedata/Earth/BlueMarble256/";
         };
 
         BlueMarbleLayer.prototype = Object.create(Layer.prototype);
@@ -78,8 +85,54 @@ define([
             new Date("2004-09"),
             new Date("2004-10"),
             new Date("2004-11"),
-            new Date("2004-12"),
+            new Date("2004-12")
         ];
+
+        /**
+         * Initiates retrieval of this layer's level 0 images for all sub-layers. Use
+         * [isPrePopulated]{@link TiledImageLayer#isPrePopulated} to determine when the images have been retrieved
+         * and associated with the level 0 tiles.
+         * Pre-populating is not required. It is used to eliminate the visual effect of loading tiles incrementally,
+         * but only for level 0 tiles. An application might pre-populate a layer in order to delay displaying it
+         * within a time series until all the level 0 images have been retrieved and added to memory.
+         * @param {WorldWindow} wwd The world window for which to pre-populate this layer.
+         * @throws {ArgumentError} If the specified world window is null or undefined.
+         */
+        BlueMarbleLayer.prototype.prePopulate = function (wwd) {
+            if (!wwd) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "BlueMarbleLayer", "prePopulate", "missingWorldWindow"));
+            }
+
+            for (var i = 0; i < this.layerNames.length; i++) {
+                var layerName = this.layerNames[i].month;
+
+                if (!this.layers[layerName]) {
+                    this.createSubLayer(layerName);
+                }
+
+                this.layers[layerName].prePopulate(wwd);
+            }
+        };
+
+        /**
+         * Indicates whether this layer's level 0 tile images for all sub-layers have been retrieved and associated
+         * with the tiles.
+         * Use [prePopulate]{@link TiledImageLayer#prePopulate} to initiate retrieval of level 0 images.
+         * @param {WorldWindow} wwd The world window associated with this layer.
+         * @returns {Boolean} true if all level 0 images have been retrieved, otherwise false.
+         * @throws {ArgumentError} If the specified world window is null or undefined.
+         */
+        BlueMarbleLayer.prototype.isPrePopulated = function (wwd) {
+            for (var i = 0; i < this.layerNames.length; i++) {
+                var layer = this.layers[this.layerNames[i].month];
+                if (!layer || !layer.isPrePopulated(wwd)) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
 
         BlueMarbleLayer.prototype.doRender = function (dc) {
             var layer = this.nearestLayer(this.time);
@@ -95,10 +148,16 @@ define([
             var nearestName = this.nearestLayerName(time);
 
             if (!this.layers[nearestName]) {
-                this.layers[nearestName] = new BMNGLayer(nearestName);
+                this.createSubLayer(nearestName);
             }
 
             return this.layers[nearestName];
+        };
+
+        BlueMarbleLayer.prototype.createSubLayer = function (layerName) {
+            var dataPath = this.pathToData + layerName;
+            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, dataPath, this.displayName,
+                this.configuration);
         };
 
         // Intentionally not documented.
@@ -117,7 +176,7 @@ define([
                 var leftTime = this.layerNames[i].time.getTime(),
                     rightTime = this.layerNames[i + 1].time.getTime();
 
-                if  (milliseconds >= leftTime && milliseconds <= rightTime) {
+                if (milliseconds >= leftTime && milliseconds <= rightTime) {
                     var dLeft = milliseconds - leftTime,
                         dRight = rightTime - milliseconds;
 

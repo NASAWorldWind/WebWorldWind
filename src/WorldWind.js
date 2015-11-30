@@ -3,11 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @version $Id: WorldWind.js 3351 2015-07-28 22:03:20Z dcollins $
+ * @version $Id: WorldWind.js 3418 2015-08-22 00:17:05Z tgaskins $
  */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
         './error/AbstractError',
         './geom/Angle',
+        './shapes/Annotation',
+        './shapes/AnnotationAttributes',
         './error/ArgumentError',
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
@@ -19,13 +21,13 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGLandsatLayer',
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
-        './layer/BMNGRestLayer',
         './geom/BoundingBox',
         './gesture/ClickRecognizer',
         './util/Color',
         './shapes/Compass',
         './layer/CompassLayer',
         './layer/CoordinatesDisplayLayer',
+        './layer/DigitalGlobeTiledImageLayer',
         './gesture/DragRecognizer',
         './render/DrawContext',
         './globe/EarthElevationModel',
@@ -53,6 +55,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
         './render/ImageTile',
+        './util/Insets',
         './formats/kml/util/ItemIcon',
         './formats/kml/KmlAbstractView',
         './formats/kml/styles/KmlBalloonStyle',
@@ -123,6 +126,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/util/Pair',
         './gesture/PanRecognizer',
         './shapes/Path',
+        './util/PeriodicTimeSequence',
         './pick/PickedObject',
         './pick/PickedObjectList',
         './gesture/PinchRecognizer',
@@ -136,9 +140,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './projections/ProjectionMercator',
         './projections/ProjectionPolarEquidistant',
         './projections/ProjectionUPS',
+        './projections/ProjectionWgs84',
         './geom/Rectangle',
         './render/Renderable',
         './layer/RenderableLayer',
+        './layer/RestTiledImageLayer',
         './gesture/RotationRecognizer',
         './formats/kml/util/Scale',
         './formats/kml/util/Schema',
@@ -187,17 +193,21 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',
+        './layer/WmsTimeDimensionedLayer',
         './util/WmsUrlBuilder',
         './ogc/WmtsCapabilities',
         './layer/WmtsLayer',
         './ogc/WmtsLayerCapabilities',
         './WorldWindow',
         './util/WWMath',
+        './util/WWMessage',
         './util/WWUtil',
         './util/XmlDocument',
         './globe/ZeroElevationModel'],
     function (AbstractError,
               Angle,
+              Annotation,
+              AnnotationAttributes,
               ArgumentError,
               BasicProgram,
               BasicTextureProgram,
@@ -209,13 +219,13 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGLandsatLayer,
               BMNGLayer,
               BMNGOneImageLayer,
-              BMNGRestLayer,
               BoundingBox,
               ClickRecognizer,
               Color,
               Compass,
               CompassLayer,
               CoordinatesDisplayLayer,
+              DigitalGlobeTiledImageLayer,
               DragRecognizer,
               DrawContext,
               EarthElevationModel,
@@ -243,6 +253,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ImagePyramid,
               ImageSource,
               ImageTile,
+              Insets,
               ItemIcon,
               KmlAbstractView,
               KmlBalloonStyle,
@@ -313,6 +324,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Pair,
               PanRecognizer,
               Path,
+              PeriodicTimeSequence,
               PickedObject,
               PickedObjectList,
               PinchRecognizer,
@@ -326,9 +338,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ProjectionMercator,
               ProjectionPolarEquidistant,
               ProjectionUPS,
+              ProjectionWgs84,
               Rectangle,
               Renderable,
               RenderableLayer,
+              RestTiledImageLayer,
               RotationRecognizer,
               Scale,
               Schema,
@@ -377,12 +391,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
+              WmsTimeDimensionedLayer,
               WmsUrlBuilder,
               WmtsCapabilities,
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
               WWMath,
+              WWMessage,
               WWUtil,
               XmlDocument,
               ZeroElevationModel) {
@@ -597,6 +613,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
 
         WorldWind['AbstractError'] = AbstractError;
         WorldWind['Angle'] = Angle;
+        WorldWind['Annotation'] = Annotation;
+        WorldWind['AnnotationAttributes'] = AnnotationAttributes;
         WorldWind['ArgumentError'] = ArgumentError;
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
@@ -608,13 +626,13 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGLandsatLayer'] = BMNGLandsatLayer;
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
-        WorldWind['BMNGRestLayer'] = BMNGRestLayer;
         WorldWind['BoundingBox'] = BoundingBox;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['Color'] = Color;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
         WorldWind['CoordinatesDisplayLayer'] = CoordinatesDisplayLayer;
+        WorldWind['DigitalGlobeTiledImageLayer'] = DigitalGlobeTiledImageLayer;
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
         WorldWind['EarthElevationModel'] = EarthElevationModel;
@@ -641,6 +659,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
+        WorldWind['Insets'] = Insets;
         WorldWind['KmlFile'] = KmlFile;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
@@ -663,6 +682,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['OpenStreetMapImageLayer'] = OpenStreetMapImageLayer;
         WorldWind['PanRecognizer'] = PanRecognizer;
         WorldWind['Path'] = Path;
+        WorldWind['PeriodicTimeSequence'] = PeriodicTimeSequence;
         WorldWind['PickedObject'] = PickedObject;
         WorldWind['PickedObjectList'] = PickedObjectList;
         WorldWind['PinchRecognizer'] = PinchRecognizer;
@@ -676,9 +696,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ProjectionMercator'] = ProjectionMercator;
         WorldWind['ProjectionPolarEquidistant'] = ProjectionPolarEquidistant;
         WorldWind['ProjectionUPS'] = ProjectionUPS;
+        WorldWind['ProjectionWgs84'] = ProjectionWgs84;
         WorldWind['Rectangle'] = Rectangle;
         WorldWind['Renderable'] = Renderable;
         WorldWind['RenderableLayer'] = RenderableLayer;
+        WorldWind['RestTiledImageLayer'] = RestTiledImageLayer;
         WorldWind['RotationRecognizer'] = RotationRecognizer;
         WorldWind['ScreenText'] = ScreenText;
         WorldWind['ScreenImage'] = ScreenImage;
@@ -724,11 +746,13 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
+        WorldWind['WmsTimeDimensionedLayer'] = WmsTimeDimensionedLayer;
         WorldWind['WmsUrlBuilder'] = WmsUrlBuilder;
         WorldWind['WmtsCapabilities'] = WmtsCapabilities;
         WorldWind['WmtsLayer'] = WmtsLayer;
         WorldWind['WmtsLayerCapabilities'] = WmtsLayerCapabilities;
         WorldWind['WWMath'] = WWMath;
+        WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;

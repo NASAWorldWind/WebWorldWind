@@ -9,22 +9,26 @@
 define([
         '../geom/Angle',
         '../error/ArgumentError',
+        '../geom/BoundingBox',
         '../globe/ElevationModel',
         '../geom/Line',
         '../geom/Location',
         '../util/Logger',
         '../geom/Position',
+        '../projections/ProjectionWgs84',
         '../geom/Sector',
         '../globe/Tessellator',
         '../geom/Vec3',
         '../util/WWMath'],
     function (Angle,
               ArgumentError,
+              BoundingBox,
               ElevationModel,
               Line,
               Location,
               Logger,
               Position,
+              ProjectionWgs84,
               Sector,
               Tessellator,
               Vec3,
@@ -47,9 +51,11 @@ define([
          *     All Cartesian coordinates and elevations are in meters.
 
          * @param {ElevationModel} elevationModel The elevation model to use for this globe.
+         * @param {GeographicProjection} projection The projection to apply to the globe. May be null or undefined,
+         * in which case no projection is applied and the globe is a WGS84 ellipsoid.
          * @throws {ArgumentError} If the specified elevation model is null or undefined.
          */
-        var Globe = function (elevationModel) {
+        var Globe = function (elevationModel, projection) {
             if (!elevationModel) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Globe",
                     "constructor", "Elevation model is null or undefined."));
@@ -87,9 +93,14 @@ define([
              */
             this.tessellator = new Tessellator();
 
-            // Used internally to eliminate temporary allocations for certain calculations.
-            this.scratchPosition = new Position(0, 0, 0);
-            this.scratchPoint = new Vec3(0, 0, 0);
+            // Internal. Intentionally not documented.
+            this._projection = projection || new ProjectionWgs84();
+
+            // Internal. Intentionally not documented.
+            this._offset = 0;
+
+            // Internal. Intentionally not documented.
+            this.offsetVector = new Vec3(0, 0, 0);
 
             // A unique ID for this globe. Intentionally not documented.
             this.id = ++Globe.idPool;
@@ -110,7 +121,72 @@ define([
              */
             stateKey: {
                 get: function () {
-                    return this._stateKey + this.elevationModel.stateKey;
+                    return this._stateKey + this.elevationModel.stateKey + "offset " + this.offset.toString() + " "
+                        + this.projection.stateKey;
+                }
+            },
+
+            /**
+             * Indicates whether this globe is 2D and continuous with itself -- that it should scroll continuously
+             * horizontally.
+             * @memberof Globe.prototype
+             * @readonly
+             * @type {Boolean}
+             */
+            continuous: {
+                get: function () {
+                    return this.projection.continuous;
+                }
+            },
+
+            /**
+             * The projection used by this globe.
+             * @memberof Globe.prototype
+             * @default {@link ProjectionWgs84}
+             * @type {GeographicProjection}
+             */
+            projection: {
+                get: function () {
+                    return this._projection;
+                },
+                set: function (projection) {
+                    if (!projection) {
+                        throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Globe",
+                            "projection", "missingProjection"));
+                    }
+
+                    if (this.projection != projection) {
+                        this.tessellator = new Tessellator();
+                    }
+                    this._projection = projection;
+                }
+            },
+
+            /**
+             * The projection limits of the associated projection.
+             * @memberof Globe.prototype
+             * @type {Sector}
+             */
+            projectionLimits: {
+                get: function () {
+                    return this._projection.projectionLimits;
+                }
+            },
+
+            /**
+             * An offset to apply to this globe when translating between Geographic positions and Cartesian points.
+             * Used during scrolling to position points appropriately.
+             * Applications typically do not access this property. It is used by the associated globe.
+             * @memberof Globe.prototype
+             * @type {Number}
+             */
+            offset: {
+                get: function () {
+                    return this._offset;
+                },
+                set: function (offset) {
+                    this._offset = offset;
+                    this.offsetVector[0] = offset * 2 * Math.PI * this.equatorialRadius;
                 }
             }
         });
@@ -120,7 +196,7 @@ define([
          * @returns {Boolean} true if this is a 2D globe, otherwise false.
          */
         Globe.prototype.is2D = function () {
-            return false;
+            return this.projection.is2D;
         };
 
         /**
@@ -140,17 +216,7 @@ define([
                     "missingResult"));
             }
 
-            var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
-                sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
-                cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
-                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS),
-                rpm = this.equatorialRadius / Math.sqrt(1.0 - this.eccentricitySquared * sinLat * sinLat);
-
-            result[0] = (rpm + altitude) * cosLat * sinLon;
-            result[1] = (rpm * (1.0 - this.eccentricitySquared) + altitude) * sinLat;
-            result[2] = (rpm + altitude) * cosLat * cosLon;
-
-            return result;
+            return this.projection.geographicToCartesian(this, latitude, longitude, altitude, this.offsetVector, result);
         };
 
         /**
@@ -220,51 +286,8 @@ define([
                     "Result array is null, undefined or insufficient length."));
             }
 
-            var minLat = sector.minLatitude * Angle.DEGREES_TO_RADIANS,
-                maxLat = sector.maxLatitude * Angle.DEGREES_TO_RADIANS,
-                minLon = sector.minLongitude * Angle.DEGREES_TO_RADIANS,
-                maxLon = sector.maxLongitude * Angle.DEGREES_TO_RADIANS,
-                deltaLat = (maxLat - minLat) / (numLat > 1 ? numLat - 1 : 1),
-                deltaLon = (maxLon - minLon) / (numLon > 1 ? numLon - 1 : 1),
-                refCenter = referencePoint ? referencePoint : new Vec3(0, 0, 0),
-                latIndex, lonIndex,
-                elevIndex = 0, resultIndex = 0,
-                lat, lon, rpm, elev,
-                cosLat, sinLat,
-                cosLon = new Float64Array(numLon), sinLon = new Float64Array(numLon);
-
-            // Compute and save values that are a function of each unique longitude value in the specified sector. This
-            // eliminates the need to re-compute these values for each column of constant longitude.
-            for (lonIndex = 0, lon = minLon; lonIndex < numLon; lonIndex++, lon += deltaLon) {
-                if (lonIndex === numLon - 1) {
-                    lon = maxLon; // explicitly set the last lon to the max longitude to ensure alignment
-                }
-
-                cosLon[lonIndex] = Math.cos(lon);
-                sinLon[lonIndex] = Math.sin(lon);
-            }
-
-            // Iterate over the latitude and longitude coordinates in the specified sector, computing the Cartesian
-            // point corresponding to each latitude and longitude.
-            for (latIndex = 0, lat = minLat; latIndex < numLat; latIndex++, lat += deltaLat) {
-                if (latIndex === numLat - 1) {
-                    lat = maxLat; // explicitly set the last lat to the max longitude to ensure alignment
-                }
-
-                // Latitude is constant for each row. Values that are a function of latitude can be computed once per row.
-                cosLat = Math.cos(lat);
-                sinLat = Math.sin(lat);
-                rpm = this.equatorialRadius / Math.sqrt(1.0 - this.eccentricitySquared * sinLat * sinLat);
-
-                for (lonIndex = 0; lonIndex < numLon; lonIndex++) {
-                    elev = elevations[elevIndex++];
-                    result[resultIndex++] = (rpm + elev) * cosLat * sinLon[lonIndex] - refCenter[0];
-                    result[resultIndex++] = (rpm * (1.0 - this.eccentricitySquared) + elev) * sinLat - refCenter[1];
-                    result[resultIndex++] = (rpm + elev) * cosLat * cosLon[lonIndex] - refCenter[2];
-                }
-            }
-
-            return result;
+            return this.projection.geographicToCartesianGrid(this, sector, numLat, numLon, elevations, referencePoint,
+                this.offsetVector, result);
         };
 
         /**
@@ -285,105 +308,16 @@ define([
                     "missingResult"));
             }
 
-            // Contributed by Nathan Kronenfeld. Updated on 1/24/2011. Brings this calculation in line with Vermeille's most
-            // recent update.
+            this.projection.cartesianToGeographic(this, x, y, z, this.offsetVector, result);
 
-            // According to H. Vermeille, "An analytical method to transform geocentric into geodetic coordinates"
-            // http://www.springerlink.com/content/3t6837t27t351227/fulltext.pdf
-            // Journal of Geodesy, accepted 10/2010, not yet published
-            var X = z,
-                Y = x,
-                Z = y,
-                XXpYY = X * X + Y * Y,
-                sqrtXXpYY = Math.sqrt(XXpYY),
-                a = this.equatorialRadius,
-                ra2 = 1 / (a * a),
-                e2 = this.eccentricitySquared,
-                e4 = e2 * e2,
-                p = XXpYY * ra2,
-                q = Z * Z * (1 - e2) * ra2,
-                r = (p + q - e4) / 6,
-                h,
-                phi,
-                u,
-                evoluteBorderTest = 8 * r * r * r + e4 * p * q,
-                rad1,
-                rad2,
-                rad3,
-                atan,
-                v,
-                w,
-                k,
-                D,
-                sqrtDDpZZ,
-                e,
-                lambda,
-                s2;
-
-            if (evoluteBorderTest > 0 || q != 0) {
-                if (evoluteBorderTest > 0) {
-                    // Step 2: general case
-                    rad1 = Math.sqrt(evoluteBorderTest);
-                    rad2 = Math.sqrt(e4 * p * q);
-
-                    // 10*e2 is my arbitrary decision of what Vermeille means by "near... the cusps of the evolute".
-                    if (evoluteBorderTest > 10 * e2) {
-                        rad3 = WWMath.cbrt((rad1 + rad2) * (rad1 + rad2));
-                        u = r + 0.5 * rad3 + 2 * r * r / rad3;
-                    }
-                    else {
-                        u = r + 0.5 * WWMath.cbrt((rad1 + rad2) * (rad1 + rad2))
-                        + 0.5 * WWMath.cbrt((rad1 - rad2) * (rad1 - rad2));
-                    }
+            // Wrap if the globe is continuous.
+            if (this.continuous) {
+                if (result.longitude < -180) {
+                    result.longitude += 360;
+                } else if (result.longitude > 180) {
+                    result.longitude -= 360;
                 }
-                else {
-                    // Step 3: near evolute
-                    rad1 = Math.sqrt(-evoluteBorderTest);
-                    rad2 = Math.sqrt(-8 * r * r * r);
-                    rad3 = Math.sqrt(e4 * p * q);
-                    atan = 2 * Math.atan2(rad3, rad1 + rad2) / 3;
-
-                    u = -4 * r * Math.sin(atan) * Math.cos(Math.PI / 6 + atan);
-                }
-
-                v = Math.sqrt(u * u + e4 * q);
-                w = e2 * (u + v - q) / (2 * v);
-                k = (u + v) / (Math.sqrt(w * w + u + v) + w);
-                D = k * sqrtXXpYY / (k + e2);
-                sqrtDDpZZ = Math.sqrt(D * D + Z * Z);
-
-                h = (k + e2 - 1) * sqrtDDpZZ / k;
-                phi = 2 * Math.atan2(Z, sqrtDDpZZ + D);
             }
-            else {
-                // Step 4: singular disk
-                rad1 = Math.sqrt(1 - e2);
-                rad2 = Math.sqrt(e2 - p);
-                e = Math.sqrt(e2);
-
-                h = -a * rad1 * rad2 / e;
-                phi = rad2 / (e * rad2 + rad1 * Math.sqrt(p));
-            }
-
-            // Compute lambda
-            s2 = Math.sqrt(2);
-            if ((s2 - 1) * Y < sqrtXXpYY + X) {
-                // case 1 - -135deg < lambda < 135deg
-                lambda = 2 * Math.atan2(Y, sqrtXXpYY + X);
-            }
-            else if (sqrtXXpYY + Y < (s2 + 1) * X) {
-                // case 2 - -225deg < lambda < 45deg
-                lambda = -Math.PI * 0.5 + 2 * Math.atan2(X, sqrtXXpYY - Y);
-            }
-            else {
-                // if (sqrtXXpYY-Y<(s2=1)*X) {  // is the test, if needed, but it's not
-                // case 3: - -45deg < lambda < 225deg
-                lambda = Math.PI * 0.5 - 2 * Math.atan2(X, sqrtXXpYY + Y);
-            }
-
-            result.latitude = Angle.RADIANS_TO_DEGREES * phi;
-            result.longitude = Angle.RADIANS_TO_DEGREES * lambda;
-            result.altitude = h;
 
             return result;
         };
@@ -416,6 +350,14 @@ define([
                     "missingResult"));
             }
 
+            if (this.is2D()) {
+                result[0] = 0;
+                result[1] = 0;
+                result[2] = 1;
+
+                return result;
+            }
+
             var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
                 cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
                 sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
@@ -446,6 +388,20 @@ define([
                     "missingResult"));
             }
 
+            // For backwards compatibility, check whether the projection defines a surfaceNormalAtPoint function
+            // before calling it. If it's not available, use the old code to compute the normal.
+            if (this.projection.surfaceNormalAtPoint) {
+                return this.projection.surfaceNormalAtPoint(this, x, y, z, result);
+            }
+
+            if (this.is2D()) {
+                result[0] = 0;
+                result[1] = 0;
+                result[2] = 1;
+
+                return result;
+            }
+
             var eSquared = this.equatorialRadius * this.equatorialRadius,
                 polSquared = this.polarRadius * this.polarRadius;
 
@@ -471,29 +427,7 @@ define([
                     "missingResult"));
             }
 
-            // The north-pointing tangent is derived by rotating the vector (0, 1, 0) about the Y-axis by longitude degrees,
-            // then rotating it about the X-axis by -latitude degrees. The latitude angle must be inverted because latitude
-            // is a clockwise rotation about the X-axis, and standard rotation matrices assume counter-clockwise rotation.
-            // The combined rotation can be represented by a combining two rotation matrices Rlat, and Rlon, then
-            // transforming the vector (0, 1, 0) by the combined transform:
-            //
-            // NorthTangent = (Rlon * Rlat) * (0, 1, 0)
-            //
-            // This computation can be simplified and encoded inline by making two observations:
-            // - The vector's X and Z coordinates are always 0, and its Y coordinate is always 1.
-            // - Inverting the latitude rotation angle is equivalent to inverting sinLat. We know this by the
-            //  trigonometric identities cos(-x) = cos(x), and sin(-x) = -sin(x).
-
-            var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
-                cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
-                sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
-                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS);
-
-            result[0] = -sinLat * sinLon;
-            result[1] = cosLat;
-            result[2] = -sinLat * cosLon;
-
-            return result.normalize();
+            return this.projection.northTangentAtLocation(this, latitude, longitude, result);
         };
 
         /**
@@ -512,9 +446,7 @@ define([
                     "missingResult"));
             }
 
-            this.computePositionFromPoint(x, y, z, this.scratchPosition);
-
-            return this.northTangentAtLocation(this.scratchPosition.latitude, this.scratchPosition.longitude, result);
+            return this.projection.northTangentAtPoint(this, x, y, z, this.offsetVector, result);
         };
 
         /**
@@ -527,6 +459,14 @@ define([
             if (!frustum) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "intersectsFrustum", "missingFrustum"));
+            }
+
+            if (this.is2D()) {
+                var bbox = new BoundingBox();
+                bbox.setToSector(Sector.FULL_SPHERE, this, this.elevationModel.minElevation,
+                    this.elevationModel.maxElevation);
+
+                return bbox.intersectsFrustum(frustum);
             }
 
             if (frustum.far.distance <= this.equatorialRadius)
@@ -561,6 +501,31 @@ define([
 
             if (!result) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "intersectsLine", "missingResult"));
+            }
+
+            if (this.is2D()) {
+                var vx = line.direction[0],
+                    vy = line.direction[1],
+                    vz = line.direction[2],
+                    sx = line.origin[0],
+                    sy = line.origin[1],
+                    sz = line.origin[2],
+                    t;
+
+                if (vz == 0 && sz != 0) { // ray is parallel to and not coincident with the XY plane
+                    return false;
+                }
+
+                t = -sz / vz; // intersection distance, simplified for the XY plane
+                if (t < 0) { // intersection is behind the ray's origin
+                    return false;
+                }
+
+                result[0] = sx + vx * t;
+                result[1] = sy + vy * t;
+                result[2] = sz + vz * t;
+
+                return true;
             }
 
             return WWMath.computeEllipsoidalGlobeIntersection(line, this.equatorialRadius, this.polarRadius, result);

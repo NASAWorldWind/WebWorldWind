@@ -208,6 +208,58 @@ define([
                 }
             },
 
+            computeIndexedTrianglesIntersection: function (line, points, indices, results) {
+                if (!line) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingLine"));
+                }
+
+                if (!points) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingPoints"));
+                }
+
+                if (!indices) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingIndices"));
+                }
+
+                if (!results) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingResults"));
+                }
+
+                var v0 = new Vec3(0, 0, 0),
+                    v1 = new Vec3(0, 0, 0),
+                    v2 = new Vec3(0, 0, 0),
+                    iPoint = new Vec3(0, 0, 0);
+
+                for (var i = 0, len = indices.length; i < len; i += 3) {
+                    var i0 = 3 * indices[i],
+                        i1 = 3 * indices[i + 1],
+                        i2 = 3 * indices[i + 2];
+
+                    v0[0] = points[i0];
+                    v0[1] = points[i0 + 1];
+                    v0[2] = points[i0 + 2];
+
+                    v1[0] = points[i1];
+                    v1[1] = points[i1 + 1];
+                    v1[2] = points[i1 + 2];
+
+                    v2[0] = points[i2];
+                    v2[1] = points[i2 + 1];
+                    v2[2] = points[i2 + 2];
+
+                    if (WWMath.computeTriangleIntersection(line, v0, v1, v2, iPoint)) {
+                        results.push(iPoint);
+                        iPoint = new Vec3(0, 0, 0);
+                    }
+                }
+
+                return results.length > 0;
+            },
+
             /**
              * Computes the Cartesian intersection points of a specified line with a triangle strip. The triangle strip
              * is specified by a list of vertex points and a list of indices indicating the triangle strip tessellation
