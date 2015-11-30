@@ -4,7 +4,6 @@
  */
 /**
  * @exports LayerManager
- * @version $Id: LayerManager.js 3313 2015-07-10 17:59:29Z dcollins $
  */
 define(function () {
     "use strict";
@@ -29,10 +28,6 @@ define(function () {
         });
 
         this.synchronizeLayerList();
-
-        $("#layerList").find("button").on("click", function (e) {
-            thisExplorer.onLayerClick($(this));
-        });
 
         $("#searchBox").find("button").on("click", function (e) {
             thisExplorer.onSearchButton(e);
@@ -113,6 +108,7 @@ define(function () {
                     layerButton.removeClass("active");
                 }
                 this.wwd.redraw();
+                break;
             }
         }
     };
@@ -132,13 +128,25 @@ define(function () {
             var layerItem = $('<button class="list-group-item btn btn-block">' + layer.displayName + '</button>');
             layerListItem.append(layerItem);
 
+            if (layer.showSpinner && Spinner) {
+                var opts = {
+                    scale: 0.9,
+                };
+                var spinner = new Spinner(opts).spin();
+                layerItem.append(spinner.el);
+            }
+
             if (layer.enabled) {
                 layerItem.addClass("active");
             } else {
                 layerItem.removeClass("active");
             }
-            this.wwd.redraw();
         }
+
+        var self = this;
+        layerListItem.find("button").on("click", function (e) {
+            self.onLayerClick($(this));
+        });
     };
     //
     //LayerManager.prototype.updateVisibilityState = function (worldWindow) {

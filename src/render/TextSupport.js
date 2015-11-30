@@ -130,5 +130,153 @@ define([
             return new Texture(gl, canvas2D);
         };
 
+        /**
+         * Calculates maximum line height based on a font
+         * @param {Font} font The font to use.
+         * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels based on the passed font.
+         */
+        TextSupport.prototype.getMaxLineHeight = function(font)
+        {
+            // Check underscore + capital E with acute accent
+            return this.textSize("_\u00c9", font, 0)[1];
+        };
+
+        /**
+         * Wraps the text based on width and height using new linew delimiter
+         * @param {String} text The text to wrap.
+         * @param {Number} width The width in pixels.
+         * @param {Number} height The height in pixels.
+         * @param {Font} font The font to use.
+         * @returns {String} The wrapped text.
+         */
+        TextSupport.prototype.wrap = function(text, width, height, font)
+        {
+            if (!text) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.WARNING, "TextSupport", "wrap", "missing text"));
+            }
+
+            var i;
+
+            var lines = text.split("\n");
+            var wrappedText = "";
+
+            // Wrap each line
+            for (i = 0; i < lines.length; i++)
+            {
+                lines[i] = this.wrapLine(lines[i], width, font);
+            }
+            // Concatenate all lines in one string with new line separators
+            // between lines - not at the end
+            // Checks for height limit.
+            var currentHeight = 0;
+            var heightExceeded = false;
+            var maxLineHeight = this.getMaxLineHeight(font);
+            for (i = 0; i < lines.length && !heightExceeded; i++)
+            {
+                var subLines = lines[i].split("\n");
+                for (var j = 0; j < subLines.length && !heightExceeded; j++)
+                {
+                    if (height <= 0 || currentHeight + maxLineHeight <= height)
+                    {
+                        wrappedText += subLines[j];
+                        currentHeight += maxLineHeight + this.lineSpacing;
+                        if (j < subLines.length - 1) {
+                            wrappedText += '\n';
+                        }
+                    }
+                    else
+                    {
+                        heightExceeded = true;
+                    }
+                }
+
+                if (i < lines.length - 1 && !heightExceeded) {
+                    wrappedText += '\n';
+                }
+            }
+            // Add continuation string if text truncated
+            if (heightExceeded)
+            {
+                if (wrappedText.length > 0) {
+                    wrappedText = wrappedText.substring(0, wrappedText.length - 1);
+                }
+
+                wrappedText += "...";
+            }
+
+            return wrappedText;
+        };
+
+        /**
+         * Wraps a line of text based on width and height
+         * @param {String} text The text to wrap.
+         * @param {Number} width The width in pixels.
+         * @param {Font} font The font to use.
+         * @returns {String} The wrapped text.
+         */
+        TextSupport.prototype.wrapLine = function(text, width, font)
+        {
+            var wrappedText = "";
+
+            // Single line - trim leading and trailing spaces
+            var source = text.trim();
+            var lineBounds = this.textSize(source, font, 0);
+            if (lineBounds[0] > width)
+            {
+                // Split single line to fit preferred width
+                var line = "";
+                var start = 0;
+                var end = source.indexOf(' ', start + 1);
+                while (start < source.length)
+                {
+                    if (end == -1) {
+                        end = source.length;   // last word
+                    }
+
+                    // Extract a 'word' which is in fact a space and a word
+                    var word = source.substring(start, end);
+                    var linePlusWord = line + word;
+                    if (this.textSize(linePlusWord, font, 0)[0] <= width)
+                    {
+                        // Keep adding to the current line
+                        line += word;
+                    }
+                    else
+                    {
+                        // Width exceeded
+                        if (line.length != 0)
+                        {
+                            // Finish current line and start new one
+                            wrappedText += line;
+                            wrappedText += '\n';
+                            line = "";
+                            line += word.trim();  // get read of leading space(s)
+                        }
+                        else
+                        {
+                            // Line is empty, force at least one word
+                            line += word.trim();
+                        }
+                    }
+                    // Move forward in source string
+                    start = end;
+                    if (start < source.length - 1)
+                    {
+                        end = source.indexOf(' ', start + 1);
+                    }
+                }
+                // Gather last line
+                wrappedText += line;
+            }
+            else
+            {
+                // Line doesn't need to be wrapped
+                wrappedText += source;
+            }
+
+            return wrappedText;
+        };
+
         return TextSupport;
     });

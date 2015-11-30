@@ -70,6 +70,13 @@ define([
              * @readonly
              */
             this.inCurrentFrame = false;
+
+            /**
+             * The time to display. This property selects the layer contents that represents the specified time.
+             * If null, layer-type dependent contents are displayed.
+             * @type {Date}
+             */
+            this.time = null;
         };
 
         /**
