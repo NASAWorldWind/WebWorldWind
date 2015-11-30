@@ -19,8 +19,8 @@ define(['../KmlFile',
 
         /**
          * This function externalizes handling of the remote style based on the type of the style
-         * @param styleUrl {String || null} Url of the style. Optional.
-         * @param styleSelector {KmlStyleSelector || null} Style to be applied. Optional.
+         * @param styleUrl {String} Url of the style. Optional.
+         * @param styleSelector {KmlStyleSelector} Style to be applied. Optional.
          * @param resolve {function} Function for resolving dependant promise
          * @param reject {function} Function for rejecting dependant promise
          * @param filePromise {Promise} Promise of the file. It is applied in the case of style url.
