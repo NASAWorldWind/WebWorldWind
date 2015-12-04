@@ -25,9 +25,7 @@ define(['../../src/WorldWind',
             // Create the World Window.
             this.wwd = new WorldWind.WorldWindow("canvasOne");
 
-            /**
-             * Added imagery layers.
-             */
+            // Configure the World Window layers.
             var layers = [
                 {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
                 {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
@@ -43,76 +41,31 @@ define(['../../src/WorldWind',
                 this.wwd.addLayer(layers[l].layer);
             }
 
+            // Configure the USGS earthquake slab layers.
+            this.loadSlabData("CAS", "cascadia_slab1.0_clip.xyz", 401, WorldWind.Color.YELLOW);
+            this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
+            this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
+            //this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.MAGENTA);
+
             // Enable sub-surface rendering for the World Window.
             this.wwd.subsurfaceMode = true;
             // Enable deep picking in order to detect the sub-surface shapes.
             this.wwd.deepPicking = true;
-
+            // Make the surface semi-transparent in order to see the sub-surface shapes.
             this.wwd.surfaceOpacity = 0.7;
 
             // Start the view pointing to a longitude within the current time zone.
             this.wwd.navigator.lookAtLocation.latitude = 30;
             this.wwd.navigator.lookAtLocation.longitude = -(180 / 12) * ((new Date()).getTimezoneOffset() / 60);
 
+            // Establish the shapes and the controllers to handle picking.
+            this.setupPicking();
+
+            // Create controllers for the user interface elements.
             this.goToBox = new GoToBox(this.wwd);
             this.layersPanel = new LayersPanel(this.wwd);
             this.projectionMenu = new ProjectionMenu(this.wwd);
             this.terrainOpacityController = new TerrainOpacityController(this.wwd);
-
-            this.screenText = new WorldWind.ScreenText(
-                new WorldWind.Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0), "Upper Left");
-            var textAttributes = new WorldWind.TextAttributes(textAttributes);
-            // Use offset to position the lower left corner of the text string at the shape's screen location.
-            textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
-            this.screenText.attributes = textAttributes;
-            this.textLayer = new WorldWind.RenderableLayer();
-            this.textLayer.hide = true;
-            this.textLayer.enabled = false;
-            this.textLayer.addRenderable(this.screenText);
-            this.wwd.addLayer(this.textLayer);
-
-            this.layersPanel.synchronizeLayerList();
-
-            this.loadSlabData("CAS", "cascadia_slab1.0_clip.xyz", 401, WorldWind.Color.YELLOW);
-            this.loadSlabData("SOL", "sol_slab1.0_clip.xyz", 1001, WorldWind.Color.YELLOW);
-            this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
-            //this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.MAGENTA);
-
-            var handlePick = (function (o) {
-                var pickPoint = this.wwd.canvasCoordinates(o.clientX, o.clientY);
-
-                this.textLayer.enabled = false;
-                this.wwd.redraw();
-
-                var pickList = this.wwd.pick(pickPoint);
-                if (pickList.objects.length > 0) {
-                    for (var p = 0; p < pickList.objects.length; p++) {
-                        var pickedObject = pickList.objects[p];
-                        if (pickedObject.userObject instanceof WorldWind.TriangleMesh) {
-                            if (pickedObject.position) {
-                                var latitude = pickedObject.position.latitude,
-                                    longitude = pickedObject.position.longitude,
-                                    altitude = pickedObject.userObject.dataGrid.lookupValue(latitude, longitude);
-                                if (altitude !== null) {
-                                    this.screenText.screenOffset.x = pickPoint[0];
-                                    this.screenText.screenOffset.y = this.wwd.viewport.width - pickPoint[1];
-                                    this.screenText.text = Math.floor(Math.abs(altitude) / 1000).toString() + " Km";
-                                    this.textLayer.enabled = true;
-                                }
-                                //console.log("PO: " + pickedObject.position.toString() + " " + pickedObject.isOnTop);
-                                //console.log("TN: " + pickList.terrainObject().position.toString() +
-                                //    " " + pickList.terrainObject().isOnTop);
-                            }
-                        }
-                    }
-                }
-            }).bind(this);
-
-            // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
-            this.wwd.addEventListener("mousemove", handlePick);
-
-            // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-            var tapRecognizer = new WorldWind.TapRecognizer(this.wwd, handlePick);
         };
 
         USGSSlabs.prototype.loadSlabData = function (name, dataFile, width, color) {
@@ -173,6 +126,51 @@ define(['../../src/WorldWind',
 
             this.layersPanel.synchronizeLayerList();
             this.wwd.redraw();
+        };
+
+        USGSSlabs.prototype.setupPicking = function () {
+            this.screenText = new WorldWind.ScreenText(new WorldWind.Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0), " ");
+            this.screenText.attributes = new WorldWind.TextAttributes();
+            this.screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
+
+            this.textLayer = new WorldWind.RenderableLayer();
+            this.textLayer.hide = true;
+            this.textLayer.enabled = false;
+            this.textLayer.addRenderable(this.screenText);
+            this.wwd.addLayer(this.textLayer);
+
+            var handlePick = (function (o) {
+                var pickPoint = this.wwd.canvasCoordinates(o.clientX, o.clientY);
+
+                this.textLayer.enabled = false;
+                this.wwd.redraw();
+
+                var pickList = this.wwd.pick(pickPoint);
+                if (pickList.objects.length > 0) {
+                    for (var p = 0; p < pickList.objects.length; p++) {
+                        var pickedObject = pickList.objects[p];
+                        if (pickedObject.userObject instanceof WorldWind.TriangleMesh) {
+                            if (pickedObject.position) {
+                                var latitude = pickedObject.position.latitude,
+                                    longitude = pickedObject.position.longitude,
+                                    altitude = pickedObject.userObject.dataGrid.lookupValue(latitude, longitude);
+                                if (altitude !== null) {
+                                    this.screenText.screenOffset.x = pickPoint[0];
+                                    this.screenText.screenOffset.y = this.wwd.viewport.width - pickPoint[1];
+                                    this.screenText.text = Math.floor(Math.abs(altitude) / 1000).toString() + " Km";
+                                    this.textLayer.enabled = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }).bind(this);
+
+            // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
+            this.wwd.addEventListener("mousemove", handlePick);
+
+            // Listen for taps on mobile devices and highlight the placemarks that the user taps.
+            var tapRecognizer = new WorldWind.TapRecognizer(this.wwd, handlePick);
         };
 
         return USGSSlabs;
