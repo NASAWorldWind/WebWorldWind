@@ -105,16 +105,14 @@ define([
 
             this.levels = new LevelSet(sector, levelZeroDelta, numLevels, tileWidth, tileHeight);
 
-            this.detailHintOrigin = 2.4;
-
             /**
-             * Affects the degree of detail shown by this layer. Values greater than zero increase detail, but at the
-             * expense of performance. Values less than zero decrease detail. To increase detail, try values greater
-             * than but near 0, such as 0.1 and 0.2, until the desired detail is achieved.
+             * Controls the level of detail switching for this layer. The next highest resolution level is
+             * used when an image's texel size is greater than this number of pixels, up to the maximum resolution
+             * of this layer.
              * @type {Number}
-             * @default 0
+             * @default 1.75
              */
-            this.detailHint = 0;
+            this.detailHint = 1.75;
 
             /* Intentionally not documented.
              * Indicates the time at which this layer's imagery expire. Expired images are re-retrieved
@@ -383,9 +381,9 @@ define([
 
         // Intentionally not documented.
         TiledImageLayer.prototype.tileMeetsRenderingCriteria = function (dc, tile) {
-            var s = this.detailHintOrigin + this.detailHint;
+            var s = this.detailHint;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
-                s *= 0.9;
+                s *= 1.2;
             }
             return tile.level.isLastLevel() || !tile.mustSubdivide(dc, s);
         };
