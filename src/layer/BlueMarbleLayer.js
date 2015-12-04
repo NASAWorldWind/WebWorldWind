@@ -7,9 +7,11 @@
  */
 define([
         '../layer/Layer',
+        '../util/PeriodicTimeSequence',
         '../layer/RestTiledImageLayer'
     ],
     function (Layer,
+              PeriodicTimeSequence,
               RestTiledImageLayer) {
         "use strict";
 
@@ -61,6 +63,7 @@ define([
                 {month: "BlueMarble-200411", time: BlueMarbleLayer.availableTimes[10]},
                 {month: "BlueMarble-200412", time: BlueMarbleLayer.availableTimes[11]}
             ];
+            this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
 
             this.serverAddress = null;
             this.pathToData = "../standalonedata/Earth/BlueMarble256/";
