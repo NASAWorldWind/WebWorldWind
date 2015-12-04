@@ -210,16 +210,70 @@ define([
                 || !this.lasTtMVP || !dc.navigatorState.modelviewProjection.equals(this.lasTtMVP)
                 || dc.globeStateKey != this.lastGlobeStateKey) {
                 this.currentTilesInvalid = false;
-                this.assembleTiles(dc);
+
+                // Tile fading works visually only when the surface tiles are opaque, otherwise the surface flashes
+                // when two tiles are drawn over the same area, even though one of them is semi-transparent.
+                // So do not provide fading when the surface opacity is less than 1;
+                if (dc.surfaceOpacity >= 1) {
+                    // Fading of outgoing tiles requires determination of the those tiles. Prepare an object with all of
+                    // the preceding frame's tiles so that we can subsequently compare the list of newly selected tiles
+                    // with the previously selected tiles.
+                    this.previousTiles = {};
+                    for (var j = 0; j < this.currentTiles.length; j++) {
+                        this.previousTiles[this.currentTiles[j].imagePath] = this.currentTiles[j];
+                    }
+
+                    this.assembleTiles(dc);
+                    this.fadeOutgoingTiles(dc);
+                } else {
+                    this.assembleTiles(dc);
+                }
+
             }
 
             this.lasTtMVP = dc.navigatorState.modelviewProjection;
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {
-                dc.surfaceTileRenderer.renderTiles(dc, this.currentTiles, this.opacity);
+                dc.surfaceTileRenderer.renderTiles(dc, this.currentTiles, this.opacity, dc.surfaceOpacity >= 1);
                 dc.frameStatistics.incrementImageTileCount(this.currentTiles.length);
                 this.inCurrentFrame = true;
+            }
+        };
+
+        TiledImageLayer.prototype.fadeOutgoingTiles = function (dc) {
+            // Determine which files are outgoing and fade their disappearance. Must be called after this frame's
+            // current tiles for this layer have been determined.
+
+            var visibilityDelta = (dc.timestamp - dc.previousRedrawTimestamp) / dc.fadeTime;
+
+            // Create a hash table of the current tiles so that we can check for tile inclusion below.
+            var current = {};
+            for (var i = 0; i < this.currentTiles.length; i++) {
+                var tile = this.currentTiles[i];
+                current[tile.imagePath] = tile;
+            }
+
+            // Determine whether the tile was in the previous frame but is not in this one.  If that's the case,
+            // then the tile is outgoing and its opacity needs to be reduced.
+            for (var tileImagePath in this.previousTiles) {
+                if (this.previousTiles.hasOwnProperty(tileImagePath)) {
+                    tile = this.previousTiles[tileImagePath];
+
+                    if (tile.opacity > 0 && !current[tile.imagePath]) {
+                        // Compute the reduced.
+                        tile.opacity = Math.max(0, tile.opacity - visibilityDelta);
+
+                        // If not fully faded, add the tile to the list of current tiles and request a redraw so that
+                        // we'll be called continuously until all tiles have faded completely. Note that order in the
+                        // current tiles list is important: the non-opaque tiles must be drawn after the opaque tiles.
+                        if (tile.opacity > 0) {
+                            this.currentTiles.push(tile);
+                            this.currentTilesInvalid = true;
+                            dc.redrawRequested = true;
+                        }
+                    }
+                }
             }
         };
 
@@ -295,6 +349,7 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
+                tile.opacity = 1;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
