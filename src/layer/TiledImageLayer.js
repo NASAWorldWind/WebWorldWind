@@ -112,7 +112,7 @@ define([
              * @type {Number}
              * @default 1.75
              */
-            this.detailHint = 1.75;
+            this.detailControl = 1.75;
 
             /* Intentionally not documented.
              * Indicates the time at which this layer's imagery expire. Expired images are re-retrieved
@@ -381,7 +381,7 @@ define([
 
         // Intentionally not documented.
         TiledImageLayer.prototype.tileMeetsRenderingCriteria = function (dc, tile) {
-            var s = this.detailHint;
+            var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
                 s *= 1.2;
             }

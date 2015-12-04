@@ -137,8 +137,8 @@ define([
         BlueMarbleLayer.prototype.doRender = function (dc) {
             var layer = this.nearestLayer(this.time);
             layer.opacity = this.opacity;
-            if (this.detailHint) {
-                layer.detailHint = this.detailHint;
+            if (this.detailControl) {
+                layer.detailControl = this.detailControl;
             }
 
             layer.doRender(dc);

@@ -56,7 +56,7 @@ define([
              * @type {Number}
              * @default 1.75
              */
-            this.detailHint = 1.75;
+            this.detailControl = 1.75;
 
             // Internal. Intentionally not documented.
             this.levels = new LevelSet(Sector.FULL_SPHERE, new Location(45, 45), 16, this.tileWidth, this.tileHeight);
@@ -239,7 +239,7 @@ define([
 
         // Internal. Intentionally not documented.
         FramebufferTileController.prototype.tileMeetsRenderingCriteria = function (dc, tile) {
-            var s = this.detailHint;
+            var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
                 s *= 1.2;
             }

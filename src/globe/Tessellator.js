@@ -81,7 +81,7 @@ define([
              * @type {Number}
              * @default 1.75
              */
-            this.detailHint = 40;
+            this.detailControl = 40;
 
             this.levels = new LevelSet(
                 Sector.FULL_SPHERE,
@@ -948,7 +948,7 @@ define([
         };
 
         Tessellator.prototype.tileMeetsRenderCriteria = function (dc, tile) {
-            var s = this.detailHint;
+            var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
                 s *= 2;
             }
