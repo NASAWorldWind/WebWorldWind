@@ -37,8 +37,8 @@ define(['../../src/WorldWind',
 
             // Configure the USGS installed well layers.
             var layer = new WorldWind.RenderableLayer("USGS Wells");
-            this.addWellShape(33.098751, -117.01714, 270, 30, "Cloverdale\n330555117010101-3\n12S/1W-30J3-5", layer);
-            this.addWellShape(33.087345, -116.974756, 340, 30, "Santa Ysabel\n330514116582901-3\n12S/1W-34L2-5", layer);
+            this.addWellShape(33.098751, -117.01714, 270, 30, "Cloverdale - SDCD (12S/1W-30J3-5)\nPerforation depth 190-270 (ft)", layer);
+            this.addWellShape(33.087345, -116.974756, 340, 30, "Santa Ysabel - SDSY (12S/1W-34L2-5)\nPerforation depth 280-340 (ft)", layer);
             this.wwd.addLayer(layer);
 
             // Enable sub-surface rendering for the World Window.
