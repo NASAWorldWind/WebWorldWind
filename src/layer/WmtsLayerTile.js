@@ -130,18 +130,11 @@ define([
         };
 
         WmtsLayerTile.prototype.mustSubdivide = function (dc, detailFactor) {
-            // Split when the cell height (length of a texel) becomes greater than the specified fraction of the eye
-            // distance. The fraction is specified as a power of 10. For example, a detail factor of 3 means split when
-            // the cell height becomes more than one thousandth of the eye distance. Another way to say it is, use the
-            // current tile if the cell height is less than the specified fraction of the eye distance.
-            //
-            // Note: It's tempting to instead compare a screen pixel size to the texel size, but that calculation is
-            // window-size dependent and results in selecting an excessive number of tiles when the window is large.
-
             var cellSize = dc.globe.equatorialRadius * this.texelSize,
-                distance = this.distanceTo(dc.navigatorState.eyePoint);
+                distance = this.distanceTo(dc.navigatorState.eyePoint),
+                pixelSize = dc.navigatorState.pixelSizeAtDistance(distance);
 
-            return cellSize > distance * Math.pow(10, -detailFactor);
+            return cellSize > Math.max(detailFactor * pixelSize, 0.5);
         };
 
         WmtsLayerTile.prototype.update = function (dc) {

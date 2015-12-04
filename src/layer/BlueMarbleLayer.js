@@ -64,8 +64,6 @@ define([
 
             this.serverAddress = null;
             this.pathToData = "../standalonedata/Earth/BlueMarble256/";
-
-            this.detailHint = 0;
         };
 
         BlueMarbleLayer.prototype = Object.create(Layer.prototype);
@@ -139,7 +137,9 @@ define([
         BlueMarbleLayer.prototype.doRender = function (dc) {
             var layer = this.nearestLayer(this.time);
             layer.opacity = this.opacity;
-            layer.detailHint = this.detailHint;
+            if (this.detailHint) {
+                layer.detailHint = this.detailHint;
+            }
 
             layer.doRender(dc);
 

@@ -38,7 +38,6 @@ define([
 
             this.displayName = displayName;
             this.pickEnabled = false;
-            this.detailHintOrigin = 2.6; // layer looks better at higher resolution
 
             this.detectBlankImages = true;
 
