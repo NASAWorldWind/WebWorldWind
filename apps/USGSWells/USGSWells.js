@@ -37,8 +37,21 @@ define(['../../src/WorldWind',
 
             // Configure the USGS installed well layers.
             var layer = new WorldWind.RenderableLayer("USGS Wells");
-            this.addWellShape(33.098751, -117.01714, 270, 30, "Cloverdale - SDCD (12S/1W-30J3-5)\nPerforation depth 190-270 (ft)", layer);
+            this.addWellShape(33.098751, -117.01714, 270, 30, "Cloverdale - SDCD (12S/1W-30J3-5)\nPerforation depth 190-270 (ft)", layer); 
             this.addWellShape(33.087345, -116.974756, 340, 30, "Santa Ysabel - SDSY (12S/1W-34L2-5)\nPerforation depth 280-340 (ft)", layer);
+             this.addWellShape(33.055677, -117.046409, 270, 30, "Lake Hodges - SDSY (13S/2W-12M1-3)\nPerforation depth 170-250 (ft)", layer); 
+            this.addWellShape(33.008894, -117.262179, 1120, 30, "San Elijo - SDSE (13S/4W-26Q1-3)\nPerforation depth 300-1220 (ft)", layer);
+             this.addWellShape(32.778096, -117.120867, 940, 30, "Aqua Culture - SDAQ (16S/2W-18J3-7)\nPerforation depth 840-940 (ft)", layer); 
+            this.addWellShape(32.737766, -117.072251, 1100, 30, "Chollas Park - SDCP (16S/2W-34G1-6)\nPerforation depth 920-1060 (ft)", layer); 
+            this.addWellShape(32.721841, -117.142123, 1490, 30, "Balboa Park - SDBP (17S/3W-1K1-5)\nPerforation depth 1470-1490 (ft)", layer);
+            this.addWellShape(32.718938, -117.109959, 1620, 30, "Home & Federal - SDHF (17S/2W-5Q1-6)\nPerforation depth 1580-1620 (ft)", layer);
+             this.addWellShape(32.687799, -117.085609, 1300, 30, "El Toyon Park - SDEP (17S/2W-16Q9-13)\nPerforation depth 1260-1300 (ft)", layer);
+             this.addWellShape(32.682085, -117.112392, 1500, 30, "Naval Base - SDNB (17S/2W-20F1-5)\nPerforation depth 1460-1500 (ft)", layer);
+             this.addWellShape(32.659041, -117.085590, 1990, 30, "Sweetwater - SDSW (17S/2W-28R4-9)\nPerforation depth 1810-1850 (ft)", layer);
+             this.addWellShape(32.654419, -117.098256, 1480, 30, "Mile of Cars - SDMC (17S/2W-33D1-5)\nPerforation depth 1440-1480 (ft)", layer); 
+            this.addWellShape(32.616602, -117.059423, 1720, 30, "Country Club - SDCC (18S/2W-11P1-6)\nPerforation depth 1660-1700 (ft)", layer);
+             this.addWellShape(32.591241, -117.053904, 1472, 30, "Otay River - SDOR (18S/2W-23G2-6)\nPerforation depth 1420-1460 (ft)", layer);
+             this.addWellShape(32.553649, -117.061615, 1430, 30, "Boundary Waters - SDBW (19S/2W-2C7-11)\nPerforation depth 1340-1360 (ft)", layer);
             this.wwd.addLayer(layer);
 
             // Enable sub-surface rendering for the World Window.
