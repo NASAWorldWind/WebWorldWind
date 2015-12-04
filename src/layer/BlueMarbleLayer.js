@@ -6,11 +6,15 @@
  * @exports BlueMarbleLayer
  */
 define([
+        '../error/ArgumentError',
         '../layer/Layer',
+        '../util/Logger',
         '../util/PeriodicTimeSequence',
         '../layer/RestTiledImageLayer'
     ],
-    function (Layer,
+    function (ArgumentError,
+              Layer,
+              Logger,
               PeriodicTimeSequence,
               RestTiledImageLayer) {
         "use strict";
