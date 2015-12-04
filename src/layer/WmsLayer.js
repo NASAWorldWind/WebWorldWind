@@ -161,6 +161,36 @@ define([
         };
 
         WmsLayer.parseTimeDimensions = function (wmsLayerCapabilities) {
+            var dimensions = wmsLayerCapabilities.dimensions || wmsLayerCapabilities.extents,
+                parsedDimensions = null;
+
+            if (dimensions) {
+                parsedDimensions = [];
+
+                for (var i = 0; i < dimensions.length; i++) {
+                    var dimension = dimensions[i];
+
+                    if (dimension.name.toLowerCase() === "time" && dimension.units.toLowerCase() === "iso8601") {
+                        var individualDimensions = dimension.content.split(",");
+
+                        for (var j = 0; j < individualDimensions.length; j++) {
+                            var individualDimension = individualDimensions[j],
+                                splitDimension = individualDimension.split("/");
+
+                            if (splitDimension.length === 1) {
+                                parsedDimensions.push(new Date(individualDimension));
+                            } else if (splitDimension.length === 3) {
+                                parsedDimensions.push(new PeriodicTimeSequence(individualDimension));
+                            }
+                        }
+                    }
+                }
+            }
+
+            return parsedDimensions;
+        };
+
+        WmsLayer.parseTimeDimensions = function (wmsLayerCapabilities) {
             var dimensions = wmsLayerCapabilities.extents || wmsLayerCapabilities.dimensions,
                 parsedDimensions = null;
 

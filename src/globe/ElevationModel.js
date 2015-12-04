@@ -4,7 +4,7 @@
  */
 /**
  * @exports ElevationModel
- * @version $Id: ElevationModel.js 2936 2015-03-27 22:04:59Z tgaskins $
+ * @version $Id: ElevationModel.js 3415 2015-08-20 19:15:57Z tgaskins $
  */
 define([
         '../util/AbsentResourceList',
@@ -458,7 +458,7 @@ define([
 
             // If the tile's elevations have expired, cause it to be re-retrieved. Note that the current,
             // expired elevations are still used until the updated ones arrive.
-            if ((image == null || this.isTileImageExpired(tile) && retrieveTiles)) {
+            if (image == null && retrieveTiles) {
                 this.retrieveTileImage(tile);
             }
 
@@ -547,17 +547,6 @@ define([
         // Intentionally not documented.
         ElevationModel.prototype.addToCurrentTiles = function (tile) {
             this.currentTiles.push(tile);
-
-            // If the tile's elevations have expired, cause it to be re-retrieved. Note that the current,
-            // expired elevations are still used until the updated ones arrive.
-            if (this.isTileImageExpired(tile)) {
-                this.retrieveTileImage(tile);
-            }
-        };
-
-        // Intentionally not documented.
-        ElevationModel.prototype.isTileImageExpired = function (tile) {
-            return !(!this.expiration || this.expiration > Date.now());
         };
 
         // Intentionally not documented.
@@ -670,6 +659,9 @@ define([
             if (this.retrievalImageFormat == "application/bil16") {
                 elevationImage.imageData = new Int16Array(xhr.response);
                 elevationImage.size = elevationImage.imageData.length * 2;
+            } else if (this.retrievalImageFormat == "application/bil32") {
+                elevationImage.imageData = new Float32Array(xhr.response);
+                elevationImage.size = elevationImage.imageData.length * 4;
             }
 
             if (elevationImage.imageData) {

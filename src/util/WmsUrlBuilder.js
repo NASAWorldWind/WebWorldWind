@@ -4,7 +4,7 @@
  */
 /**
  * @exports WmsUrlBuilder
- * @version $Id: WmsUrlBuilder.js 3290 2015-06-30 16:11:24Z tgaskins $
+ * @version $Id: WmsUrlBuilder.js 3362 2015-07-31 19:29:12Z tgaskins $
  */
 define([
         '../error/ArgumentError',
@@ -24,10 +24,12 @@ define([
          * @param {String} styleNames The comma-separated list of names of the styles to retrieve. May be null.
          * @param {String} wmsVersion The version of the WMS server. May be null, in which case version 1.3.0 is
          * assumed.
+         * @param {String} timeString The time parameter included in GetMap requests.
+         * May be null, in which case no time parameter is included in the request.
          * @throws {ArgumentError} If the service address or layer names are null or empty.
          *
          */
-        var WmsUrlBuilder = function (serviceAddress, layerNames, styleNames, wmsVersion) {
+        var WmsUrlBuilder = function (serviceAddress, layerNames, styleNames, wmsVersion, timeString) {
             if (!serviceAddress || (serviceAddress.length === 0)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmsUrlBuilder", "constructor",
@@ -79,6 +81,12 @@ define([
              * @default EPSG:4326
              */
             this.crs = "EPSG:4326";
+
+            /**
+             * The time parameter included in GetMap requests. If null, no time parameter is included in the requests.
+             * @type {String}
+             */
+            this.timeString = timeString;
         };
 
         /**
@@ -115,6 +123,10 @@ define([
             sb = sb + "&format=" + imageFormat;
             sb = sb + "&width=" + tile.tileWidth;
             sb = sb + "&height=" + tile.tileHeight;
+
+            if (this.timeString) {
+                sb = sb + "&time=" + this.timeString;
+            }
 
             if (this.isWms130OrGreater) {
                 sb = sb + "&crs=" + this.crs;

@@ -24,7 +24,7 @@ define(['../error/AbstractError'],
             var stack;
             try {
                 //noinspection ExceptionCaughtLocallyJS
-                 throw new Error();
+                throw new Error();
             } catch (e) {
                 stack = e.stack;
             }

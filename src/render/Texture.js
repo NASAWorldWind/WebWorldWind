@@ -4,7 +4,7 @@
  */
 /**
  * @exports Texture
- * @version $Id: Texture.js 3101 2015-05-19 18:15:32Z dcollins $
+ * @version $Id: Texture.js 3414 2015-08-20 19:09:19Z tgaskins $
  */
 define([
         '../error/ArgumentError',
@@ -74,6 +74,12 @@ define([
             }
 
             this.textureId = textureId;
+
+            /**
+             * The time at which this texture was created.
+             * @type {Date}
+             */
+            this.creationTime = new Date();
         };
 
         /**

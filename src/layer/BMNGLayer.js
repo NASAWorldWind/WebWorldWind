@@ -4,7 +4,7 @@
  */
 /**
  * @exports BMNGLayer
- * @version $Id: BMNGLayer.js 3123 2015-05-28 22:19:28Z tgaskins $
+ * @version $Id: BMNGLayer.js 3403 2015-08-15 02:00:01Z tgaskins $
  */
 define([
         '../geom/Location',
@@ -35,7 +35,7 @@ define([
             this.displayName = "Blue Marble";
             this.pickEnabled = false;
 
-            this.urlBuilder = new WmsUrlBuilder("http://worldwind25.arc.nasa.gov/wms",
+            this.urlBuilder = new WmsUrlBuilder(location.protocol + "//worldwind25.arc.nasa.gov/wms",
                 layerName || "BlueMarble-200405", "", "1.3.0");
         };
 

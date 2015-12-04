@@ -4,7 +4,7 @@
  */
 /**
  * @exports BingWMSLayer
- * @version $Id: BingWMSLayer.js 2939 2015-03-30 16:50:49Z tgaskins $
+ * @version $Id: BingWMSLayer.js 3403 2015-08-15 02:00:01Z tgaskins $
  */
 define([
         '../geom/Location',
@@ -27,7 +27,7 @@ define([
             this.pickEnabled = false;
             this.maxActiveAltitude = 10e3;
 
-            this.urlBuilder = new WmsUrlBuilder("http://worldwind27.arc.nasa.gov/wms/virtualearth", "ve", "", "1.3.0");
+            this.urlBuilder = new WmsUrlBuilder(location.protocol + "//worldwind27.arc.nasa.gov/wms/virtualearth", "ve", "", "1.3.0");
         };
 
         BingWMSLayer.prototype = Object.create(TiledImageLayer.prototype);

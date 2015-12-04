@@ -4,6 +4,7 @@
  */
 /**
  * @exports TiledImageLayer
+ * @version $Id: TiledImageLayer.js 3414 2015-08-20 19:09:19Z tgaskins $
  */
 define([
         '../util/AbsentResourceList',
@@ -402,7 +403,7 @@ define([
 
         // Intentionally not documented.
         TiledImageLayer.prototype.createTexture = function (dc, tile, image) {
-            return new Texture(dc.currentGlContext, image);
+            return  new Texture(dc.currentGlContext, image);
         };
 
         // Intentionally not documented.

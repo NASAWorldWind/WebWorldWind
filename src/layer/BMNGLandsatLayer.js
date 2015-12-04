@@ -4,7 +4,7 @@
  */
 /**
  * @exports BMNGLandsatLayer
- * @version $Id: BMNGLandsatLayer.js 2939 2015-03-30 16:50:49Z tgaskins $
+ * @version $Id: BMNGLandsatLayer.js 3403 2015-08-15 02:00:01Z tgaskins $
  */
 define([
         '../geom/Location',
@@ -32,7 +32,7 @@ define([
             this.displayName = "Blue Marble & Landsat";
             this.pickEnabled = false;
 
-            this.urlBuilder = new WmsUrlBuilder("http://worldwind25.arc.nasa.gov/wms",
+            this.urlBuilder = new WmsUrlBuilder(location.protocol + "//worldwind25.arc.nasa.gov/wms",
                 "BlueMarble-200405,esat", "", "1.3.0");
         };
 
