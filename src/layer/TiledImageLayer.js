@@ -212,7 +212,7 @@ define([
                 // Tile fading works visually only when the surface tiles are opaque, otherwise the surface flashes
                 // when two tiles are drawn over the same area, even though one of them is semi-transparent.
                 // So do not provide fading when the surface opacity is less than 1;
-                if (dc.surfaceOpacity >= 1) {
+                if (dc.surfaceOpacity >= 1 && this.opacity >= 1) {
                     // Fading of outgoing tiles requires determination of the those tiles. Prepare an object with all of
                     // the preceding frame's tiles so that we can subsequently compare the list of newly selected tiles
                     // with the previously selected tiles.
@@ -347,7 +347,7 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
-                tile.opacity = 1;
+                tile.opacity = this.opacity;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
