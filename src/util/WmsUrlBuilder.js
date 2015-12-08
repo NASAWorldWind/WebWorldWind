@@ -73,7 +73,7 @@ define([
              * @default 1.3.0
              */
             this.wmsVersion = (wmsVersion && wmsVersion.length > 0) ? wmsVersion : "1.3.0";
-            this.isWms130OrGreater = wmsVersion >= "1.3.0";
+            this.isWms130OrGreater = this.wmsVersion >= "1.3.0";
 
             /**
              * The coordinate reference system to use when requesting layers.
