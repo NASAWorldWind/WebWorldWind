@@ -26,12 +26,12 @@ define([
          * in which case the new instance contains default attributes.
          */
         var TextAttributes = function (attributes) {
-            attributes = attributes || {};
-            this._color = attributes._color || new Color(1, 1, 1, 1);
-            this._font = attributes._font || new Font(14);
-            this._offset = attributes._offset || new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
-            this._scale = attributes._scale || 1;
-            this._depthTest = attributes._depthTest || false;
+            this._color = attributes ? attributes._color : new Color(1, 1, 1, 1);
+            this._font = attributes ? attributes._font : new Font(14);
+            this._offset = attributes ? attributes._offset
+                : new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
+            this._scale = attributes ? attributes._scale : 1;
+            this._depthTest = attributes ? attributes._depthTest : false;
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their

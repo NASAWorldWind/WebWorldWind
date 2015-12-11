@@ -32,17 +32,16 @@ define([
          * in which case the new instance contains default attributes.
          */
         var PlacemarkAttributes = function (attributes) {
-            attributes = attributes || {};
             // These are all documented with their property accessors below.
-            this._imageColor = attributes._imageColor || new Color(1, 1, 1, 1);
-            this._imageOffset = attributes._imageOffset||
-                new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
-            this._imageScale = attributes._imageScale || 1;
-            this._imageSource = attributes._imageSource || null;
-            this._depthTest = attributes._depthTest || true;
-            this._labelAttributes = attributes._labelAttributes || new TextAttributes(null);
-            this._drawLeaderLine = attributes._drawLeaderLine || false;
-            this._leaderLineAttributes = attributes._leaderLineAttributes || new ShapeAttributes(null);
+            this._imageColor = attributes ? attributes._imageColor : new Color(1, 1, 1, 1);
+            this._imageOffset = attributes ? attributes._imageOffset
+                : new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
+            this._imageScale = attributes ? attributes._imageScale : 1;
+            this._imageSource = attributes ? attributes._imageSource : null;
+            this._depthTest = attributes ? attributes._depthTest : true;
+            this._labelAttributes = attributes ? attributes._labelAttributes : new TextAttributes(null);
+            this._drawLeaderLine = attributes ? attributes._drawLeaderLine : false;
+            this._leaderLineAttributes = attributes ? attributes._leaderLineAttributes : new ShapeAttributes(null);
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
