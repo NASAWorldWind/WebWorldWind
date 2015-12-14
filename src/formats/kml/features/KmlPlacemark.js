@@ -7,6 +7,7 @@
  */
 define([
     '../../../util/extend',
+    '../../../util/Font',
     './../KmlElements',
     './KmlFeature',
     '../geom/KmlGeometry',
@@ -18,6 +19,7 @@ define([
     '../../../shapes/TextAttributes',
     '../../../util/Offset'
 ], function (extend,
+             Font,
              KmlElements,
              KmlFeature,
              KmlGeometry,
@@ -114,24 +116,36 @@ define([
 
     KmlPlacemark.prototype.prepareAttributes = function (style) {
         var options = style && style.generate() || {normal: {}, highlight:{}};
-        var placemarkAttributes = new PlacemarkAttributes(options);
-
-        placemarkAttributes.imageOffset = new Offset(
+        options._imageOffset = new Offset(
             WorldWind.OFFSET_FRACTION, 0.3,
             WorldWind.OFFSET_FRACTION, 0.0);
-        placemarkAttributes.imageColor = Color.WHITE;
-        placemarkAttributes.labelAttributes = new TextAttributes({
+        options._imageColor = Color.WHITE;
+        options._drawLeaderLine = true;
+        options._depthTest = false;
+        options._labelAttributes = new TextAttributes({
             _offset: new Offset(
                 WorldWind.OFFSET_FRACTION, 0.5,
                 WorldWind.OFFSET_FRACTION, 1.0),
-            _color: Color.YELLOW
-        });
-        placemarkAttributes.drawLeaderLine = true;
-        placemarkAttributes.leaderLineAttributes = new ShapeAttributes({
-            outlineColor: Color.RED
+            _color: Color.YELLOW,
+            _font: new Font(14),
+            _scale: 1,
+            _depthTest: false
         });
 
-        return placemarkAttributes;
+        options._leaderLineAttributes = new ShapeAttributes({
+            _outlineColor: Color.RED,
+            _outlineWidth: 1.0,
+            _drawInterior: true,
+            _drawOutline: true,
+            _enableLighting: false,
+            _interiorColor: Color.WHITE,
+            _outlineStippleFactor: 0,
+            _outlineStipplePattern: 0xF0F0,
+            _depthTest: false,
+            _drawVerticals: true
+        });
+
+        return new PlacemarkAttributes(options);
     };
 
     KmlPlacemark.prototype.moveValidProperties = function () {
