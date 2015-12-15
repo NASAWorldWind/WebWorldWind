@@ -389,6 +389,7 @@ define([
                 if (this.isTileTextureInMemory(dc, this.currentAncestorTile)) {
                     // Set up to map the ancestor tile into the current one.
                     tile.fallbackTile = this.currentAncestorTile;
+                    tile.fallbackTile.opacity = this.opacity;
                     this.currentTiles.push(tile);
                 }
             }
