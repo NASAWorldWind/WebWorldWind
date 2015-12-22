@@ -168,23 +168,15 @@ define([
         KmlLineString.prototype.prepareAttributes = function(style){
             var shapeOptions = style && style.generate() || {};
 
+            shapeOptions._applyLighting = true;
             shapeOptions._drawOutline = true;
             shapeOptions._drawInterior = true;
             shapeOptions._drawVerticals = this.kmlExtrude || false;
             shapeOptions._outlineStippleFactor = 0;
-            shapeOptions._outlineStipplePattern = 0xF0F0;
+            shapeOptions._outlineStipplePattern = 61680;
+            shapeOptions._enableLighting = true;
 
-            shapeOptions._applyLighting = false;
-            shapeOptions._enableLighting = false;
-
-            shapeOptions._interiorColor = Color.WHITE;
-            shapeOptions._outlineColor = Color.RED;
-            shapeOptions._outlineWidth = 1.0;
-
-            shapeOptions._imageSource = null;
-            shapeOptions._depthTest = true;
-
-            return new ShapeAttributes(shapeOptions);
+            return new ShapeAttributes(KmlStyle.shapeAttributes(shapeOptions));
         };
 
         KmlLineString.prototype.prepareLocations = function() {

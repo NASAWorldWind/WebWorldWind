@@ -190,7 +190,7 @@ define([
         shapeOptions._outlineStipplePattern = 61680;
         shapeOptions._enableLighting = true;
 
-        return new ShapeAttributes(shapeOptions);
+        return new ShapeAttributes(KmlStyle.shapeAttributes(shapeOptions));
     };
 
     // For internal use only. Intentionally left undocumented.
