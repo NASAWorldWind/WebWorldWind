@@ -24,6 +24,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#abstractview
+     * @augments KmlObject
      */
     var KmlAbstractView = function (node) {
         KmlObject.call(this, node);
@@ -48,8 +49,7 @@ define([
     };
 
     /**
-     * Returns tag name of all descendants of this abstract node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlAbstractView.prototype.getTagNames = function () {
         return ['Camera', 'LookAt'];

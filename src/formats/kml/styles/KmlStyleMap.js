@@ -23,6 +23,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#stylemap
+     * @augments KmlSubStyle
      */
     var KmlStyleMap = function (node) {
         KmlSubStyle.call(this, node);
@@ -86,8 +87,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlStyleMap.prototype.getTagNames = function() {
         return ['StyleMap'];

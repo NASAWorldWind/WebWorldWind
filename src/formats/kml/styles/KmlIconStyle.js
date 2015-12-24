@@ -22,6 +22,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined
      * @see https://developers.google.com/kml/documentation/kmlreference#iconstyle
+     * @augments KmlColorStyle
      */
     var KmlIconStyle = function (iconStyleNode) {
         KmlColorStyle.call(this, iconStyleNode);
@@ -134,8 +135,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlIconStyle.prototype.getTagNames = function () {
         return ['IconStyle'];

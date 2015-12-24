@@ -8,10 +8,12 @@
 define([
     '../../util/extend',
     './KmlElements',
-    './KmlTimePrimitive'
+    './KmlTimePrimitive',
+    '../../util/WWUtil'
 ], function (extend,
              KmlElements,
-             KmlTimePrimitive) {
+             KmlTimePrimitive,
+             WWUtil) {
     "use strict";
 
     /**
@@ -19,34 +21,34 @@ define([
      * objects from KmlFile are read.
      * @alias KmlTimeStamp
      * @classdesc Contains the data associated with Kml TimeStamp
-     * @param timeStampNode {Node} Node representing the Kml TimeStamp
+     * @param options {Node} Node representing the Kml TimeStamp
      * @constructor
      * @throws {ArgumentError} If the content of the node contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#timestamp
+     * @augments KmlTimePrimitive
      */
-    var KmlTimeStamp = function (timeStampNode) {
-        KmlTimePrimitive.call(this, timeStampNode);
-
+    var KmlTimeStamp = function (options) {
+        options.isTimeStamp = true;
         Object.defineProperties(this, {
             /**
              * This property specifies when exactly the event happen.
              * @memberof KmlTimeStamp.prototype
-             * @type {DateTime}
+             * @type {Date}
              * @readonly
              */
             kmlWhen: {
                 get: function () {
-                    return this.retrieve({name: 'when'});
+                    return this.retrieve({name: 'when', transformer: WWUtil.date});
                 }
             }
         });
+        KmlTimePrimitive.call(this, options);
 
         extend(this, KmlTimeStamp.prototype);
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlTimeStamp.prototype.getTagNames = function () {
         return ['TimeStamp'];

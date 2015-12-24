@@ -24,6 +24,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#networklink
+     * @augments KmlFeature
      */
     var KmlNetworkLink = function (node) {
         KmlFeature.call(this, node);
@@ -83,8 +84,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlNetworkLink.prototype.getTagNames = function () {
         return ['NetworkLink'];

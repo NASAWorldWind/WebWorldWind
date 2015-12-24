@@ -36,16 +36,16 @@ define([
          * @alias KmlLineString
          * @classdesc Class representing LineString element of KmlFile
          * @see https://developers.google.com/kml/documentation/kmlreference#linestring
+         * @augments KmlGeometry
          */
-        var KmlLineString = function (lineStringNode, pStyle) {
-            KmlGeometry.call(this, lineStringNode);
+        var KmlLineString = function (options) {
+            KmlGeometry.call(this, options);
 
             var self = this;
-            pStyle.then(function(styles){
-                Path.call(self, self.prepareLocations(), self.prepareAttributes(styles.normal));
-                self.moveValidProperties();
+            options.style.then(function(styles){
+                self.createPath(styles);
             });
-            this._style = pStyle;
+            this._style = options.style;
             this._layer = null;
 
             Object.defineProperties(this, {
@@ -136,35 +136,24 @@ define([
 
         KmlLineString.prototype = Object.create(Path.prototype);
 
-        /**
-         * Renders LineString as Path.
-         * @param layer {Layer} Layer into which will be the shape rendered.
-         * @param pStyle {Promise} Promise of the style to be delivered.
-         */
-        KmlLineString.prototype.update = function(layer, pStyle) {
-            var self = this;
-            if(pStyle) {
-                this._style = pStyle;
+        KmlLineString.prototype.createPath = function(styles) {
+            if(!this.initialized) {
+                Path.call(this, this.prepareLocations(), this.prepareAttributes(styles.normal));
+                this.moveValidProperties();
+                this.initialized = true;
             }
-            this._style.then(function(styles){
-                var normal = styles.normal;
-                var highlight = styles.highlight;
-
-                var normalAttributes = self.prepareAttributes(normal);
-                self.attributes = normalAttributes;
-                self.highlightAttributes = highlight ? self.prepareAttributes(highlight): normalAttributes;
-
-                self.locations = self.prepareLocations();
-                self.moveValidProperties();
-
-                if (self._layer != null) {
-                    self._layer.removeRenderable(self);
-                }
-                layer.addRenderable(self);
-                self._layer = layer;
-            });
         };
 
+        /**
+         * @inheritDoc
+         */
+        KmlLineString.prototype.styleResolutionStarted = function(styles) {
+            this.createPath(styles);
+        };
+
+        /**
+         * @inheritDoc
+         */
         KmlLineString.prototype.prepareAttributes = function(style){
             var shapeOptions = style && style.generate() || {};
 
@@ -205,8 +194,7 @@ define([
         };
 
         /**
-         * Returns tag name of this Node.
-         * @returns {String[]}
+         * @inheritDoc
          */
         KmlLineString.prototype.getTagNames = function () {
             return ['LineString'];

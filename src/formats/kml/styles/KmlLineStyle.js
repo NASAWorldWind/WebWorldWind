@@ -23,6 +23,7 @@ define([
      * @alias KmlLineStyle
      * @classdesc Class representing LineStyle element of KmlFile
      * @see https://developers.google.com/kml/documentation/kmlreference#linestyle
+     * @augments KmlColorStyle
      */
     var KmlLineStyle = function (lineStyleNode) {
         KmlColorStyle.call(this, lineStyleNode);
@@ -106,8 +107,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlLineStyle.prototype.getTagNames = function () {
         return ['LineStyle'];

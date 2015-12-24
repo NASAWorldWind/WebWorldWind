@@ -10,12 +10,14 @@ define([
     '../../util/extend',
     './KmlElements',
     '../../util/Logger',
-    '../../util/Promise'
+    '../../util/Promise',
+    '../../util/WWUtil'
 ], function (ArgumentError,
              extend,
              KmlElements,
              Logger,
-             Promise) {
+             Promise,
+             WWUtil) {
     "use strict";
     /**
      * Constructs an Kml object. Every node in the Kml document is either basic type or Kml object. Applications usually
@@ -23,20 +25,23 @@ define([
      * It should be treated as mixin.
      * @alias KmlObject
      * @classdesc Contains the data associated with every Kml object.
-     * @param objectNode {Node} Node representing Kml Object
+     * @param options {Node} Node representing Kml Object
      * @constructor
      * @throws {ArgumentError} If either node is null or id isn't present on the object.
      * @see https://developers.google.com/kml/documentation/kmlreference#object
      */
-    var KmlObject = function (objectNode) {
-        if (!objectNode) {
+    var KmlObject = function (options) {
+        options = options || {};
+        if (!options.objectNode) {
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "KmlObject", "constructor", "Passed node isn't defined.")
             );
         }
-        this._node = objectNode;
+        this._node = options.objectNode;
         this._shape = null;
         this._cache = {};
+
+        this._controls = options.controls || [];
 
         Object.defineProperties(this, {
             /**
@@ -70,6 +75,8 @@ define([
         });
 
         extend(this, KmlObject.prototype);
+
+        this.hook(this._controls, options);
     };
 
 
@@ -166,11 +173,15 @@ define([
     /**
      * Retrieve all shapes, which are children of current node. It fails if there is some element for which there is no
      * adequate internal representation.
+     * @param options
      * @returns {KmlObject[]} Array of retrieved shapes.
      */
     KmlObject.prototype.parse = function (options) {
         // Implement internal cache.
         var self = this;
+        if (!self._cache) {
+            self._cache = {};
+        }
         var node = options && options.node || self.node;
         var shapes = [];
         [].forEach.call(node.childNodes, function (childNode) {
@@ -178,27 +189,65 @@ define([
                 return;
             }
 
-            var constructor = self.retrieveElementForNode(childNode.nodeName);
-            if (constructor == null) {
-                Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "parse", "Element, which doesn't have internal " +
-                    "representation. Node name: " + childNode.nodeName);
-                return;
-            }
-            var style = new Promise(function (resolve) {
-                if (self.getStyle) {
-                    resolve(self.getStyle());
-                } else {
-                    // Maybe reject. We will see later.
-                    resolve(null);
-                }
-            });
-            // Insert new ones but retain old ones. If there is no id present then generate id and
-            // append it to the node.
-            var shape = new constructor(childNode, style);
-            shapes.push(shape);
+            self.parseOneNode(options, childNode, shapes)
         });
 
         return shapes;
+    };
+
+    /**
+     * It parses one node and create valid object based on this information.
+     * @param options
+     * @param childNode
+     * @param shapes
+     */
+    KmlObject.prototype.parseOneNode = function (options, childNode, shapes) {
+        var cached = this.retrieveFromCache(childNode);
+        if (cached.element) {
+            shapes.push(cached.element);
+            return;
+        }
+
+        var self = this;
+        var style = new Promise(function (resolve) {
+            if (self.getStyle) {
+                resolve(self.getStyle());
+            } else {
+                // Maybe reject. We will see later.
+                resolve(null);
+            }
+        });
+
+        var shape = this.instantiateDescendant(childNode.nodeName, childNode, style);
+        if (!shape) {
+            return;
+        }
+        this._cache[cached.id] = shape;
+        shapes.push(shape);
+    };
+
+    /**
+     * Looks into the internal cache. If the node was already parsed it is stored in the cache associated with the
+     * current node. If the cache doesn't exist so far, create one.
+     * @param node
+     * @returns {*}
+     */
+    KmlObject.prototype.retrieveFromCache = function (node) {
+        var id;
+        if (this.doesAttributeExist(node, "id")) {
+            id = this.getValueOfAttribute(node, "id");
+        } else {
+            id = WWUtil.guid();
+            var idAttr = node.ownerDocument.createAttribute("id");
+            idAttr.value = id;
+            node.setAttributeNode(idAttr);
+        }
+
+        if (this._cache[id]) {
+            return {id: id, element: this._cache[id]};
+        } else {
+            return {id: id, element: null};
+        }
     };
 
     /**
@@ -220,27 +269,167 @@ define([
         if (node == null) {
             return null;
         }
-        var constructor = this.retrieveElementForNode(node.nodeName);
-        return new constructor(node, this.getStyle());
+
+        // Take cache into account.
+        var cached = this.retrieveFromCache(node);
+        if (cached.element) {
+            return cached.element;
+        }
+
+        var element = this.instantiateDescendant(node.nodeName, node, this.getStyle());
+        this._cache[cached.id] = element;
+        return element;
     };
 
     /**
-     * To be overridden in subclasses.
-     * It is prepared to update the current state of renderables in the KML tree.
+     * It finds correct element and then it retrieves
+     * @param name Name of the node.
+     * @param node Node which is represented by this Kml Element
+     * @param style Promise of the style to be delivered.
+     * @returns {KmlObject} Descendant of the KmlObject.
      */
-    KmlObject.prototype.update = function () {
-        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "update", this.getTagNames()[0] + " doesn't yet support " +
-            "rendering.");
+    KmlObject.prototype.instantiateDescendant = function (name, node, style) {
+        var constructor = this.retrieveElementForNode(name);
+        if (constructor == null) {
+            Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "parse", "Element, which doesn't have internal " +
+                "representation. Node name: " + name);
+            return null;
+        }
+
+        return new constructor({
+            objectNode: node,
+            style: style,
+            controls: this._controls
+        });
     };
 
-    // To be overriden in descendants.
+    /**
+     * It calls all controls associated with current KmlFile with the link to this.
+     * @param controls {KmlControls[]} Controls associated with current tree.
+     */
+    KmlObject.prototype.hook = function (controls, options) {
+        var self = this;
+        controls.forEach(function (control) {
+            control.hook(self, options);
+        });
+    };
+
+    /**
+     * This function solves update. It offers some hooks, which may be overridden in subclasses.
+     * What does this method do, when there are no renderables to speak about?
+     * Available hooks:
+     * - getAppliedStyle
+
+     * - beforeStyleResolution - If false is returned, nothing else happens.
+     * - styleResolutionStarted - Style is passed in as a parameter.
+     * - afterStyleResolution
+     *
+     * - prepareAttributes: REQUIRED
+     * - moveValidProperties
+     *
+     * @param pOptions {Object} Options to be applied to the updating process.
+     */
+    KmlObject.prototype.update = function (pOptions) {
+        var options = WWUtil.clone(pOptions);
+
+        if (!this.beforeStyleResolution(options)) {
+            return;
+        }
+
+        this.solveEnabled(options);
+
+        var self = this;
+        self.getAppliedStyle().then(function (styles) {
+            self.styleResolutionStarted(styles);
+            var normal = styles.normal;
+            var highlight = styles.highlight;
+
+            self.attributes = self.prepareAttributes(normal);
+            self.highlightAttributes = highlight ? self.prepareAttributes(highlight) : null;
+            self.moveValidProperties();
+
+            options.style = self.getStyle();
+            self.afterStyleResolution(options);
+        });
+    };
+
+    /**
+     * It decides whether current shape should be enabled and therefore visible on the map. If any of the ancestors
+     * in the document is disabled all their descendants also are. If it isn't and there is information about
+     * visibility as a part of this Element respect it, otherwise it is visible.
+     * @param options {Object} For purpose of this function we care only about enabled property.
+     */
+    KmlObject.prototype.solveEnabled = function (options) {
+        if (options.enabled == null || typeof options.enabled == 'undefined') {
+            if (this.kmlVisibility) {
+                this.enabled = options.enabled = this.kmlVisibility;
+            }
+            else {
+                this.enabled = options.enabled = true;
+            }
+        } else {
+            this.enabled = options.enabled;
+        }
+    };
+
+    /**
+     * This method is called during the update lifecycle to retrieve a promise of style.
+     * @returns {Promise} Promise of styles used further in the processing.
+     */
+    KmlObject.prototype.getAppliedStyle = function () {
+        return new Promise(function (resolve, reject) {});
+    };
+
+    /**
+     * This method is called once the style was already resolved but before any further processing goes on.
+     * @param styles {Object} normal, highlight containing either null or style
+     */
+    KmlObject.prototype.styleResolutionStarted = function (styles) {
+    };
+
+    /**
+     * This method is called once the style was resolved and all general processing of the style is finished.
+     * @param options {Object} Object with options passed into the update.
+     */
+    KmlObject.prototype.afterStyleResolution = function (options) {
+    };
+
+    /**
+     * This method is called as a first thing in the lifecycle of the update method. It is possible to stop further
+     * processing if this method returns false.
+     * @param options {Object} Object with options which was passed into the update.
+     * @returns {boolean} True continue with the processing. False leave the processing be.
+     */
+    KmlObject.prototype.beforeStyleResolution = function (options) {
+        return true;
+    };
+
+    /**
+     * This method is called during the processing of the update function. It is required and should therefore be
+     * overridden. It prepares attributes changing how different attributes are visualized.
+     * @param style {KmlStyle} Style to use when preparing different types of attributes.
+     */
+    KmlObject.prototype.prepareAttributes = function (style) {
+        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "prepareAttributes", this.getTagNames()[0] + " doesn't override  " +
+            "prepareAttributes.");
+        return {};
+    };
+
+    /**
+     * This is function, which is called to decide which style should be applied.
+     * @return {Promise} Promise of the style to be delivered
+     */
     KmlObject.prototype.getStyle = function () {
         Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.getTagNames()[0] + " doesn't override  " +
             "getStyle.");
     };
 
-    KmlObject.prototype.isFeature = function () {
-        return false;
+    /**
+     * Returns tag name of all descendants of abstract node or the tag name for current node.
+     * @returns {String[]}
+     */
+    KmlObject.prototype.getTagNames = function () {
+        return [];
     };
 
     return KmlObject;

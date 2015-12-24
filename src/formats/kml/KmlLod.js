@@ -20,6 +20,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#lod
+     * @augments KmlObject
      */
     var KmlLod = function (node) {
         KmlObject.call(this, node);
@@ -87,8 +88,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlLod.prototype.getTagNames = function () {
         return ['Lod'];

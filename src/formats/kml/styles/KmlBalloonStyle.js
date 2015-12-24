@@ -21,6 +21,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined
      * @see https://developers.google.com/kml/documentation/kmlreference#balloonstyle
+     * @augments KmlSubStyle
      */
     var KmlBalloonStyle = function (balloonStyleNode) {
         KmlSubStyle.call(this, balloonStyleNode);
@@ -83,8 +84,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlBalloonStyle.prototype.getTagNames = function() {
         return ['BalloonStyle'];

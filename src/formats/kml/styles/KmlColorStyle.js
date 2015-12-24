@@ -19,6 +19,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#colorstyle
+     * @augments KmlSubStyle
      */
     var KmlColorStyle = function (colorStyleNode) {
         KmlSubStyle.call(this, colorStyleNode);
@@ -55,8 +56,7 @@ define([
     };
 
     /**
-     * Returns tag name of all descendants of this abstract node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlColorStyle.prototype.getTagNames = function () {
         return ['LineStyle', 'PolyStyle', 'IconStyle', 'LabelStyle'];

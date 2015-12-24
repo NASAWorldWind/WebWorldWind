@@ -26,6 +26,7 @@ define([
      * @param polyStyleNode {Node} Node representing the Kml poly style.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polystyle
+     * @augments KmlColorStyle
      */
     var KmlPolyStyle = function (polyStyleNode) {
         KmlColorStyle.call(this, polyStyleNode);
@@ -72,8 +73,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlPolyStyle.prototype.getTagNames = function () {
         return ['PolyStyle'];

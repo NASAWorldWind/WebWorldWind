@@ -20,16 +20,16 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxtrack
+     * @augments KmlGeometry
      */
-    var KmlTrack = function (node) {
-        KmlGeometry.call(this, node);
+    var KmlTrack = function (options) {
+        KmlGeometry.call(this, options);
 
         extend(this, KmlTrack.prototype);
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlTrack.prototype.getTagNames = function () {
         return ['gx:Track'];

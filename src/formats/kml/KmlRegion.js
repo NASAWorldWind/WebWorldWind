@@ -66,8 +66,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlRegion.prototype.getTagNames = function () {
         return ['Region'];

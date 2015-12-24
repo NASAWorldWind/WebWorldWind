@@ -19,6 +19,7 @@ define([
      * @param timePrimitiveNode {Node} Node representing Kml TimePrimitive.
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#timeprimitive
+     * @augments KmlObject
      */
     var KmlTimePrimitive = function (timePrimitiveNode) {
         KmlObject.call(this, timePrimitiveNode);
@@ -26,9 +27,30 @@ define([
         extend(this, KmlTimePrimitive.prototype);
     };
 
+    KmlTimePrimitive.prototype.timeRange = function() {
+        var from, to;
+        if(this.kmlBegin) {
+            to = from = this.kmlBegin.valueOf();
+        }
+        if(this.kmlEnd) {
+            to = this.kmlEnd.valueOf();
+            if(!from) {
+                from = to;
+            }
+        }
+
+        if(this.kmlWhen) {
+            to = from = this.kmlWhen.valueOf();
+        }
+
+        return {
+            from: from,
+            to: to
+        };
+    };
+
     /**
-     * Returns tag name of all descendants of this abstract node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlTimePrimitive.prototype.getTagNames = function () {
         return ['TimeSpan', 'TimeStamp'];

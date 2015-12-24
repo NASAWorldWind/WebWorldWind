@@ -20,6 +20,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#overlay
+     * @augments KmlFeature
      */
     var KmlOverlay = function (node) {
         KmlFeature.call(this, node);
@@ -77,8 +78,7 @@ define([
     };
 
     /**
-     * Returns tag name of all descendants of this abstract node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlOverlay.prototype.getTagNames = function () {
         return ['PhotoOverlay', 'ScreenOverlay', 'GroundOverlay'];

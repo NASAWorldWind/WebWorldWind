@@ -20,6 +20,7 @@ define([
      * @param node {Node} Node representing the Kml Image Pyramid.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#imagepyramid
+     * @augments KmlObject
      */
     var ImagePyramid = function (node) {
         KmlObject.call(this, node);
@@ -82,8 +83,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     ImagePyramid.prototype.getTagNames = function () {
         return ['ImagePyramid'];

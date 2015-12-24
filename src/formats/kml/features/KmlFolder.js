@@ -21,6 +21,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#folder
+     * @augments KmlContainer
      */
     var KmlFolder = function (node) {
         KmlContainer.call(this, node);
@@ -43,15 +44,20 @@ define([
         extend(this, KmlFolder.prototype);
     };
 
-    KmlFolder.prototype.update = function(layer, style) {
+    /**
+     * Instead of standard update processing for the element only pass the processing on descendants.
+     * @inheritDoc
+     */
+    KmlFolder.prototype.beforeStyleResolution = function(options) {
         this.kmlShapes.forEach(function(shape) {
-            shape.update(layer, style);
+            shape.update(options);
         });
+
+        return false;
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlFolder.prototype.getTagNames = function () {
         return ['Folder'];

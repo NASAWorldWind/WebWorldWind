@@ -20,6 +20,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxtour
+     * @augments KmlFeature
      */
     var KmlTour = function (node) {
         KmlFeature.call(this, node);
@@ -28,8 +29,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlTour.prototype.getTagNames = function () {
         return ['gx:Tour'];

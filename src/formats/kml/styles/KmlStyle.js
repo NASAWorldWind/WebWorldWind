@@ -48,6 +48,7 @@ define([
      * @param styleNode {Node} Node representing the Kml style.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#style
+     * @augments KmlStyleSelector
      */
     var KmlStyle = function (styleNode) {
         KmlStyleSelector.call(this, styleNode);
@@ -167,6 +168,9 @@ define([
         return options;
     };
 
+    /**
+     * @inheritDoc
+     */
     KmlStyle.prototype.getStyle = function() {
         var self = this;
         return new Promise(function(resolve){
@@ -177,15 +181,19 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlStyle.prototype.getTagNames = function () {
         return ['Style'];
     };
 
     KmlElements.addKey(KmlStyle.prototype.getTagNames()[0], KmlStyle);
-    
+
+    /**
+     * Prepare default values for the placemark Attributes.
+     * @param attributes
+     * @returns {Object}
+     */
     KmlStyle.placemarkAttributes = function(attributes) {
         attributes = attributes || {};
         // These are all documented with their property accessors below.
@@ -198,10 +206,15 @@ define([
         attributes._labelAttributes = attributes._labelAttributes || new TextAttributes(KmlStyle.textAttributes());
         attributes._drawLeaderLine = attributes._drawLeaderLine || false;
         attributes._leaderLineAttributes = attributes._leaderLineAttributes || new ShapeAttributes(KmlStyle.shapeAttributes());
-        
+
         return attributes;
     };
 
+    /**
+     * Prepare default values for text attributes
+     * @param attributes
+     * @returns {Object}
+     */
     KmlStyle.textAttributes = function(attributes) {
         attributes = attributes || {};
         attributes._color = attributes._color || new Color(1, 1, 1, 1);
@@ -209,10 +222,15 @@ define([
         attributes._offset = attributes._offset || new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
         attributes._scale = attributes._scale || 1;
         attributes._depthTest = attributes._depthTest || false;
-        
+
         return attributes;
     };
 
+    /**
+     * Prepare default values for shape attributes
+     * @param attributes
+     * @returns {*|{}}
+     */
     KmlStyle.shapeAttributes = function(attributes) {
         attributes = attributes || {};
         // All these are documented with their property accessors below.
@@ -228,7 +246,7 @@ define([
         attributes._depthTest = attributes._depthTest || true;
         attributes._drawVerticals = attributes._drawVerticals || false;
         attributes._applyLighting = attributes._applyLighting || false;
-        
+
         return attributes;
     };
 

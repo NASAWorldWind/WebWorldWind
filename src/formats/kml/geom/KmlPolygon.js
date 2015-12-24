@@ -13,18 +13,16 @@ define([
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../util/WWUtil'
-], function (
-    Color,
-    extend,
-    KmlElements,
-    KmlGeometry,
-    KmlLinearRing,
-    KmlStyle,
-    Location,
-    Polygon,
-    ShapeAttributes,
-    WWUtil
-) {
+], function (Color,
+             extend,
+             KmlElements,
+             KmlGeometry,
+             KmlLinearRing,
+             KmlStyle,
+             Location,
+             Polygon,
+             ShapeAttributes,
+             WWUtil) {
     "use strict";
     /**
      * Constructs an KmlPolygon. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -33,26 +31,23 @@ define([
      * @alias KmlPolygon
      * @constructor
      * @classdesc Contains the data associated with Kml polygon
-     * @param polygonNode {Node} Node representing the Kml polygon.
-     * @param pStyle {Promise} Style to be applied to current node.
+     * @param options {Object} Node representing the Kml polygon.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
-    var KmlPolygon = function (polygonNode, pStyle) {
-        KmlGeometry.call(this, polygonNode);
+    var KmlPolygon = function (options) {
+        KmlGeometry.call(this, options);
 
+        this.initialized = false;
         var self = this;
         // Default locations and attributes. Invisible unless called otherwise.
-        if(pStyle) {
-            pStyle.then(function (styles) {
-                // Once style is delivered create corresponding polygon.
-                Polygon.call(self, self.prepareLocations(), self.prepareAttributes(styles.normal));
-                self.moveValidProperties();
+        if (options.style) {
+            options.style.then(function (styles) {
+                self.createPolygon(styles);
             });
-            this._style = pStyle;
+            this._style = options.style;
         } else {
-            Polygon.call(self, self.prepareLocations(), self.prepareAttributes());
-            self.moveValidProperties();
+            self.createPolygon();
         }
         this._layer = null;
 
@@ -104,7 +99,10 @@ define([
             kmlOuterBoundary: {
                 get: function () {
                     var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
-                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
+                    return new KmlLinearRing({
+                        objectNode: parentNode.getElementsByTagName("LinearRing")[0],
+                        style: this.getStyle()
+                    });
                 }
             },
 
@@ -120,7 +118,10 @@ define([
                     if (parentNode == null) {
                         return null;
                     }
-                    return new KmlLinearRing(parentNode.getElementsByTagName("LinearRing")[0], this.getStyle());
+                    return new KmlLinearRing({
+                        objectNode: parentNode.getElementsByTagName("LinearRing")[0],
+                        style: this.getStyle()
+                    });
                 }
             },
 
@@ -143,44 +144,34 @@ define([
     KmlPolygon.prototype = Object.create(Polygon.prototype);
 
     /**
-     * Renders polygon as polygon applying valid styles.
-     * @param layer {Layer} Layer into which this polygon is rendered.
-     * @param pStyle {KmlStyle} Style applied to updated polygon
+     * Internal use only. Once create the instance of actual polygon.
+     * @param styles {Object} Object containing normal and highlighted styles.
      */
-    KmlPolygon.prototype.update = function(layer, pStyle) {
-        var self = this;
-        if(pStyle) {
-            this._style = pStyle;
+    KmlPolygon.prototype.createPolygon = function(styles) {
+        if(!this.initialized) {
+            Polygon.call(this, this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this.moveValidProperties();
+            this.initialized = true;
         }
-        this._style.then(function(styles) {
-            var normal = styles.normal;
-            var highlight = styles.highlight;
-
-            self.attributes = self.prepareAttributes(normal);
-            self.highlightAttributes = highlight ? self.prepareAttributes(highlight): null;
-
-            self.locations = self.prepareLocations();
-            //self.moveValidProperties();
-
-            if(self._layer != null ) {
-                // Remove renderable from this layer.
-                self._layer.removeRenderable(self);
-            }
-            layer.addRenderable(self);
-            self._layer = layer;
-        });
     };
 
-    // Well anything that contains NetworkLink must also work using promises.
+    /**
+     * @inheritDoc
+     */
+    KmlPolygon.prototype.styleResolutionStarted = function (styles) {
+        this.createPolygon(styles);
+    };
 
     // For internal use only. Intentionally left undocumented.
-    KmlPolygon.prototype.moveValidProperties = function() {
+    KmlPolygon.prototype.moveValidProperties = function () {
         this.extrude = this.kmlExtrude || true;
         this.altitudeMode = this.kmlAltitudeMode || WorldWind.CLAMP_TO_GROUND;
     };
 
-    // For internal use only. Intentionally left undocumented.
-    KmlPolygon.prototype.prepareAttributes = function(style) {
+    /**
+     * @inheritDoc
+     */
+    KmlPolygon.prototype.prepareAttributes = function (style) {
         var shapeOptions = style && style.generate() || {};
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
@@ -206,16 +197,14 @@ define([
     };
 
     /**
-     * Return promise of style valid for this Polygon.
-     * @returns {Promise} Promise of style valid for current polygon.
+     * @inheritDoc
      */
     KmlPolygon.prototype.getStyle = function () {
         return this._style;
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]} Names associated with Polygon.
+     * @inheritDoc
      */
     KmlPolygon.prototype.getTagNames = function () {
         return ['Polygon'];

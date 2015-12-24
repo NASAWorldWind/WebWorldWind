@@ -22,6 +22,7 @@ define([
      * @param node {Node} Node representing the Kml Scale
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#scale
+     * @augments KmlObject
      */
     var Scale = function (node) {
         KmlObject.call(this, node);
@@ -68,8 +69,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     Scale.prototype.getTagNames = function () {
         return ['Scale'];

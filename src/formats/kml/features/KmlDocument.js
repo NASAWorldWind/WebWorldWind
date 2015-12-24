@@ -20,14 +20,15 @@ define([
      * Constructs an KmlDocument. Applications usually don't call this constructor. It is called by {@link KmlFile} as
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlDocument
-     * @classdesc Contains the data associated with Document node.
-     * @param node {Node} Node representing document in the document.
+     * @classdesc Contains the data associated with Document options.
+     * @param options {Node} Node representing document in the document.
      * @constructor
-     * @throws {ArgumentError} If the node is null or undefined.
+     * @throws {ArgumentError} If the options is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#document
+     * @augments KmlContainer
      */
-    var KmlDocument = function (node) {
-        KmlContainer.call(this, node);
+    var KmlDocument = function (options) {
+        KmlContainer.call(this, options);
 
         Object.defineProperties(this, {
             /**
@@ -41,15 +42,15 @@ define([
                 get: function(){
                     var allElements = this.parse();
                     return allElements.filter(function (element) {
-                        return element.isFeature();
+                        return element.isFeature && element.isFeature();
                     });
                 }
             },
 
             /**
              * Specifies a custom KML schema that is used to add custom data to KML Features. The "id" attribute is
-             * required and must be unique within the KML file. &lt;Schema&gt; is always a child of &lt;Document&gt;. This is array
-             * of all Schemas in current document
+             * required and must be unique within the KML file. &lt;Schema&gt; is always a child of &lt;Document&gt;.
+             * This is array of all Schemas in current document
              * @memberof KmlDocument.prototype
              * @readonly
              * @type {Schema[]}
@@ -68,15 +69,20 @@ define([
         extend(this, KmlDocument.prototype);
     };
 
-    KmlDocument.prototype.update = function(layer, style) {
+    /**
+     * Instead of standard update lifecycle only call update on contained elements.
+     * @inheritDoc
+     */
+    KmlDocument.prototype.beforeStyleResolution = function(options) {
         this.kmlShapes.forEach(function(shape) {
-            shape.update(layer, style);
+            shape.update(options);
         });
+
+        return false;
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlDocument.prototype.getTagNames = function () {
         return ['Document'];

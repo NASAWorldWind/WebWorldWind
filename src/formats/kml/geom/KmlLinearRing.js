@@ -18,9 +18,10 @@ define([
      * @param linearRingNode {Node} Node of the object to be retrieved.
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#linearring
+     * @augments KmlLineString
      */
-    var KmlLinearRing = function (linearRingNode, pStyle) {
-        KmlLineString.call(this, linearRingNode, pStyle);
+    var KmlLinearRing = function (options) {
+        KmlLineString.call(this, options);
 
         extend(this, KmlLinearRing.prototype);
     };
@@ -28,8 +29,7 @@ define([
     KmlLinearRing.prototype = Object.create(KmlLineString.prototype);
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlLinearRing.prototype.getTagNames = function () {
         return ['LinearRing'];

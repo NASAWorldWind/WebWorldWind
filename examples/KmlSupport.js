@@ -8,40 +8,6 @@ requirejs(['../src/WorldWind',
     function (WorldWind,
               KmlFile,
               LayerManager) {
-        var kmlFileXml = "countries_world.kml";
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("GET", kmlFileXml, true);
-        xhr.onreadystatechange = (function () {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    var text = xhr.responseText;
-                    var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
-                    wwd.addLayer(renderableLayer);
-
-                    var kmlFilePromise = new KmlFile({document: text, local: true});
-                    kmlFilePromise.then(function(kmlFile){
-                        kmlFile.update(renderableLayer);
-
-                        window.setInterval(function(){
-                            console.log("Update file.");
-                            kmlFile.update(renderableLayer);
-                        }, 10000);
-                    });
-                }
-            }
-        }).bind(this);
-
-        xhr.onerror = (function () {
-            console.log("Error");
-        }).bind(this);
-
-        xhr.ontimeout = (function () {
-            console.log("Timeout");
-        }).bind(this);
-
-        xhr.send(null);
-
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
@@ -66,8 +32,19 @@ requirejs(['../src/WorldWind',
         wwd.goTo(new WorldWind.Location(30.0596696, 14.4656239));
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        new LayerManager(wwd);
 
         // Now set up to handle highlighting.
-        var highlightController = new WorldWind.HighlightController(wwd);
+        new WorldWind.HighlightController(wwd);
+
+        var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
+        wwd.addLayer(renderableLayer);
+
+        var kmlFileOptions = {
+            url: 'countries_world.kml'
+        };
+        var kmlFilePromise = new KmlFile(kmlFileOptions);
+        kmlFilePromise.then(function(kmlFile) {
+            kmlFile.update({layer: renderableLayer});
+        });
     });

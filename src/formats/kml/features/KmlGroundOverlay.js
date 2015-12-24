@@ -26,6 +26,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#groundoverlay
+     * @augments KmlOverlay
      */
     var KmlGroundOverlay = function (node) {
         KmlOverlay.call(this, node);
@@ -90,8 +91,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlGroundOverlay.prototype.getTagNames = function () {
         return ['GroundOverlay'];

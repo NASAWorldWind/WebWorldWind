@@ -8,11 +8,13 @@
 define([
     '../../util/extend',
     './KmlTimePrimitive',
-    './KmlElements'
+    './KmlElements',
+    '../../util/WWUtil'
 ], function(
     extend,
     KmlTimePrimitive,
-    KmlElements
+    KmlElements,
+    WWUtil
 ){
     "use strict";
     /**
@@ -20,46 +22,47 @@ define([
      * objects from KmlFile are read.
      * @alias KmlTimeSpan
      * @classdesc Contains the data associated with Kml TimeSpan
-     * @param timeSpanNode {Node} Node representing the Kml TimeSpan
+     * @param options {Node} Node representing the Kml TimeSpan
      * @constructor
      * @throws {ArgumentError} If the content of the node contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#timespan
+     * @augments KmlTimePrimitive
      */
-    var KmlTimeSpan = function (timeSpanNode) {
-        KmlTimePrimitive.call(this, timeSpanNode);
-
+    var KmlTimeSpan = function (options) {
+        options.isTimeSpan = true;
         Object.defineProperties(this, {
             /**
              * Time from which is the event valid.
              * @memberof KmlTimeSpan.prototype
-             * @type {DateTime}
+             * @type {Date}
              * @readonly
              */
             kmlBegin: {
                 get: function() {
-                    return this.retrieve({name: 'begin'});
+                    return this.retrieve({name: 'begin', transformer: WWUtil.date});
                 }
             },
 
             /**
              * Time to which is the event valid.
              * @memberof KmlTimeSpan.prototype
-             * @type {DateTime}
+             * @type {Date}
              * @readonly
              */
             kmlEnd: {
                 get: function() {
-                    return this.retrieve({name: 'end'});
+                    return this.retrieve({name: 'end', transformer: WWUtil.date});
                 }
             }
         });
+
+        KmlTimePrimitive.call(this, options);
 
         extend(this, KmlTimeSpan.prototype);
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlTimeSpan.prototype.getTagNames = function () {
         return ['TimeSpan'];

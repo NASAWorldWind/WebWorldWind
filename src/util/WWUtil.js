@@ -6,16 +6,10 @@
  * @version $Id: WWUtil.js 3402 2015-08-14 17:28:09Z tgaskins $
  */
 define([
-        '../error/ArgumentError',
-        '../geom/Line',
-        '../util/Logger',
-        '../geom/Rectangle',
-        '../geom/Vec3'],
-    function (ArgumentError,
-              Line,
-              Logger,
-              Rectangle,
-              Vec3) {
+    './Date'
+], function (
+        Date
+    ) {
         "use strict";
         /**
          * Provides math constants and functions.
@@ -204,6 +198,68 @@ define([
 
                 // Add the script element to the document, causing the browser to invoke it.
                 head.appendChild(script);
+            },
+
+            arrayEquals: function (array1, array2) {
+                return (array1.length == array2.length) && array1.every(function (element, index) {
+                        return element === array2[index] || element.equals && element.equals(array2[index]);
+                    });
+            },
+
+            /**
+             * It transforms given item to the boolean. It respects that 0, "0" and "false" are percieved as false
+             * on top of the standard Boolean function.
+             * @param item {String} Item to transform
+             * @returns {boolean} Value transformed to the boolean.
+             */
+            transformToBoolean: function (item) {
+                if (item == 0 || item == "0" || item == "false") {
+                    return false;
+                } else {
+                    return Boolean(item);
+                }
+            },
+
+            /**
+             * It clones original object into the new one. It is necessary to retain the options information valid
+             * for all nodes.
+             * @param original Object to clone
+             * @returns {Object} Cloned object
+             */
+            clone: function (original) {
+                var clone = {};
+                var i, keys = Object.keys(original);
+
+                for (i = 0; i < keys.length; i++) {
+                    // copy each property into the clone
+                    clone[keys[i]] = original[keys[i]];
+                }
+
+                return clone;
+            },
+
+            /**
+             * It returns unique GUID.
+             * @returns {string} String representing unique identifier in the application.
+             */
+            guid: function () {
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+                }
+
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                    s4() + '-' + s4() + s4() + s4();
+            },
+
+            /**
+             * Transforms item to date. It accepts ISO-8601 format.
+             * @param item {String} To transform.
+             * @returns {Date} Date extracted from the current information.
+             */
+            date: function(item) {
+                return new Date(item);
             }
         };
 

@@ -11,6 +11,8 @@ define([
     './KmlFeature',
     '../geom/KmlGeometry',
     '../styles/KmlStyle',
+    '../KmlTimeSpan',
+    '../KmlTimeStamp',
     '../../../shapes/PlacemarkAttributes',
     '../../../shapes/Placemark',
     '../../../util/Color',
@@ -22,6 +24,8 @@ define([
              KmlFeature,
              KmlGeometry,
              KmlStyle,
+             KmlTimeSpan,
+             KmlTimeStamp,
              PlacemarkAttributes,
              Placemark,
              Color,
@@ -35,10 +39,10 @@ define([
      * @alias KmlPlacemark
      * @classdesc Contains the data associated with KmlPlacemark.
      * @param placemarkNode {Node} Node representing Kml Placemark
-     * @param pStyle {Promise} Promise of a style to be delivered later.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#placemark
+     * @augments KmlFeature
      */
     var KmlPlacemark = function (placemarkNode) {
         KmlFeature.call(this, placemarkNode);
@@ -77,39 +81,37 @@ define([
     KmlPlacemark.prototype = Object.create(Placemark.prototype);
 
     /**
-     * It renders placemark with associated geometry.
-     * @param layer {Layer} Layer into which the placemark may be rendered.
+     * @inheritDoc
      */
-    KmlPlacemark.prototype.update = function (layer) {
-        var self = this;
-        if (!self.kmlGeometry) {
-            // For now don't display Placemarks without geometries.
-            return;
+    KmlPlacemark.prototype.getAppliedStyle = function() {
+        return this._style;
+    };
+
+    /**
+     * First call the predecessor and then take care of moving the feature to different layer.
+     * @inheritDoc
+     */
+    KmlPlacemark.prototype.beforeStyleResolution = function(options) {
+        KmlFeature.prototype.beforeStyleResolution.call(this, options);
+
+        // Add to the layer.
+        // TODO Solve movement of the hierarchy into another layer
+        if(this._layer == null) {
+            this._layer = options.layer;
+            this._layer.addRenderable(this);
         }
 
-        if (self._layer != null) {
-            self._layer.removeRenderable(self);
-        }
+        return true;
+    };
 
-        if(!self.kmlVisibility) {
-            return;
-        }
+    /**
+     * After style was resolved update the geometry for this placemark.
+     * @inheritDoc
+     */
+    KmlPlacemark.prototype.afterStyleResolution = function(options) {
+        this.position = this.kmlGeometry.kmlCenter;
 
-        // Work correctly with styles.
-        this._style.then(function (styles) {
-            var normal = styles.normal;
-            var highlight = styles.highlight;
-
-            self.attributes = self.prepareAttributes(normal);
-            self.highlightAttributes = highlight ? self.prepareAttributes(highlight): null;
-            self.position = self.kmlGeometry.kmlCenter;
-            self.moveValidProperties();
-
-            self._layer = layer;
-            self._layer.addRenderable(self);
-
-            self.kmlGeometry.update(layer, self.getStyle());
-        });
+        this.kmlGeometry.update(options);
     };
 
     KmlPlacemark.prototype.prepareAttributes = function (style) {

@@ -20,6 +20,7 @@ define([
      * @param geometryNode {Node} Node representing the Kml geometry.
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#geometry
+     * @augments KmlObject
      */
     var KmlGeometry = function (geometryNode) {
         KmlObject.call(this, geometryNode);
@@ -27,9 +28,31 @@ define([
         extend(this, KmlGeometry.prototype);
     };
 
+    KmlGeometry.prototype.getAppliedStyle = function() {
+        return this._style;
+    };
+
     /**
-     * Returns tag name of all descendants of this abstract node.
-     * @returns {String[]}
+     * Added prepareLocations hook.
+     * @inheritDoc
+     */
+    KmlGeometry.prototype.beforeStyleResolution = function(options) {
+        if(options.style) {
+            this._style = options.style;
+        }
+
+        this.locations = this.prepareLocations();
+
+        if(!this._layer && options.layer) {
+            options.layer.addRenderable(this);
+            this._layer = options.layer;
+        }
+
+        return true;
+    };
+
+    /**
+     * @inheritDoc
      */
     KmlGeometry.prototype.getTagNames = function () {
         return ['Point', 'LinearRing', 'LineString', 'MultiGeometry', 'Polygon'];

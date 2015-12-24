@@ -20,6 +20,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#latlonaltbox
+     * @aguments KmlObject
      */
     var KmlLatLonAltBox = function (node) {
         KmlObject.call(this, node);
@@ -102,8 +103,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlLatLonAltBox.prototype.getTagNames = function () {
         return ['LatLonAltBox'];

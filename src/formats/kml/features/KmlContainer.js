@@ -12,21 +12,21 @@ define([
      * Constructs an KmlContainer. Applications usually don't call this constructor. It is called by {@link KmlFile} as
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlContainer
-     * @classdesc Contains the data associated with Container node.
-     * @param node {Node} Node representing container in the document.
+     * @classdesc Contains the data associated with Container options.
+     * @param options {Node} Node representing container in the document.
      * @constructor
-     * @throws {ArgumentError} If the node is null or undefined.
+     * @throws {ArgumentError} If the options is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#container
+     * @augments KmlFeature
      */
-    var KmlContainer = function (node) {
-        KmlFeature.call(this, node);
+    var KmlContainer = function (options) {
+        KmlFeature.call(this, options);
 
         extend(this, KmlContainer.prototype);
     };
 
     /**
-     * Returns tag name of all descendants of this abstract node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlContainer.prototype.getTagNames = function () {
         return ['Folder', 'Document'];

@@ -20,6 +20,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#link
+     * @augments KmlObject
      */
     var KmlLink = function (node) {
         KmlObject.call(this, node);
@@ -173,8 +174,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlLink.prototype.getTagNames = function () {
         return ['Link'];

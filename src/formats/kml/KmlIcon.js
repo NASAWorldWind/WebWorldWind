@@ -21,6 +21,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#icon
+     * @augments KmlLink
      */
     var KmlIcon = function (iconNode) {
         KmlLink.call(this, iconNode);
@@ -79,8 +80,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlIcon.prototype.getTagNames = function () {
         return ['Icon'];

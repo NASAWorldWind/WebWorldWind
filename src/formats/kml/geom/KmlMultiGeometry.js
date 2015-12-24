@@ -22,10 +22,11 @@ define([
      * @classdesc Class representing MultiGeometry Element of Kml Document.
      * @alias KmlMultiGeometry
      * @see https://developers.google.com/kml/documentation/kmlreference#multigeometry
+     * @augments KmlGeometry
      */
-    var KmlMultiGeometry = function (multiGeometryNode, pStyle) {
-        KmlGeometry.call(this, multiGeometryNode);
-        this._style = pStyle;
+    var KmlMultiGeometry = function (options) {
+        KmlGeometry.call(this, options);
+        this._style = options.style;
 
         Object.defineProperties(this, {
             /**
@@ -72,24 +73,27 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlMultiGeometry.prototype.getTagNames = function () {
         return ["MultiGeometry"];
     };
 
     /**
-     * It renders all associated shapes. It honors style associated with the MultiGeometry.
-     * @param layer {Layer} Layer into which this multi geometry should be rendered.
-     * @param style {Promise} Promise of style applied to the geometry objects.
+     * Instead of standard processing only delegate the processing to the descendants.
+     * @inheritDoc
      */
-    KmlMultiGeometry.prototype.update = function (layer, style) {
+    KmlMultiGeometry.prototype.beforeStyleResolution = function (options) {
         this.kmlShapes.forEach(function (shape) {
-            shape.update(layer, style);
+            shape.update(options);
         });
+
+        return false;
     };
 
+    /**
+     * @inheritDoc
+     */
     KmlMultiGeometry.prototype.getStyle = function () {
         return this._style;
     };

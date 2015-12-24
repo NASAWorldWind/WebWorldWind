@@ -13,7 +13,8 @@ define([
     '../../../geom/Position',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/Polygon',
-    '../KmlElements'
+    '../KmlElements',
+    '../../../util/WWUtil'
 ], function(
     Color,
     extend,
@@ -22,7 +23,8 @@ define([
     Position,
     ShapeAttributes,
     Polygon,
-    KmlElements
+    KmlElements,
+    WWUtil
 ){
     "use strict";
     /**
@@ -34,9 +36,10 @@ define([
      * @param pointNode {Node} Node representing the Kml point.
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#point
+     * @augments KmlGeometry
      */
-    var KmlPoint = function (pointNode) {
-        KmlGeometry.call(this, pointNode);
+    var KmlPoint = function (options) {
+        KmlGeometry.call(this, options);
 
         this._shape = null;
 
@@ -96,11 +99,14 @@ define([
         extend(this, KmlPoint.prototype);
     };
 
+    // TODO: Fix Point and create it meaningfully.
     /**
      * It renders KmlPoint as Polygon.
      * @param layer Layer into which the point should be added.
      */
-    KmlPoint.prototype.update = function (layer) {
+    KmlPoint.prototype.update = function (pOptions) {
+        // TODO Fix the update to work with the current status of the information.
+        var options = WWUtil.clone(pOptions);
         var attributes = new ShapeAttributes(null);
         attributes.outlineColor = Color.WHITE;
         attributes.interiorColor = Color.WHITE;
@@ -110,7 +116,9 @@ define([
 
         this._shape.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
         this._shape.extrude = this.kmlExtrude;
-        layer.addRenderable(this._shape);
+        if(options.layer) {
+            options.layer.addRenderable(this._shape);
+        }
     };
 
     // For internal use only. Intentionally left undocumented.
@@ -130,8 +138,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlPoint.prototype.getTagNames = function () {
         return ['Point'];

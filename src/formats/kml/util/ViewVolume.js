@@ -19,6 +19,7 @@ define([
      * @param node {Node} Node representing the Kml View Volume.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#viewvolume
+     * @augments KmlObject
      */
     var ViewVolume = function (node) {
         KmlObject.call(this, node);
@@ -92,8 +93,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     ViewVolume.prototype.getTagNames = function () {
         return ['ViewVolume'];

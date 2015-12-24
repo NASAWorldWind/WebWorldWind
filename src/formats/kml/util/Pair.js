@@ -28,6 +28,7 @@ define([
      * @param node {Node} Node representing the Kml Pair.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#pair
+     * @augments KmlObject
      */
     var Pair = function (node) {
         KmlObject.call(this, node);
@@ -76,13 +77,15 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     Pair.prototype.getTagNames = function () {
         return ['Pair'];
     };
 
+    /**
+     * @inheritDoc
+     */
     Pair.prototype.getStyle = function() {
         var self = this;
         return new Promise(function (resolve, reject) {

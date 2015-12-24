@@ -20,6 +20,7 @@ define([
      * @param node {Node} Node representing the Kml Schema.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
+     * @augments KmlObject
      */
     var Schema = function (node) {
         KmlObject.call(this, node);
@@ -28,8 +29,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     Schema.prototype.getTagNames = function () {
         return ['Schema'];

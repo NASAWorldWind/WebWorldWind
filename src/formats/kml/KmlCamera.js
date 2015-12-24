@@ -20,6 +20,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#camera
+     * @augments KmlAbstractView
      */
     var KmlCamera = function (node) {
         KmlAbstractView.call(this, node);
@@ -131,8 +132,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlCamera.prototype.getTagNames = function () {
         return ['Camera'];

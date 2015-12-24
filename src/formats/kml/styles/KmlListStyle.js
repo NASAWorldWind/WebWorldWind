@@ -21,6 +21,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#liststyle
+     * @augments KmlSubStyle
      */
     var KmlListStyle = function (node) {
         KmlSubStyle.call(this, node);
@@ -89,8 +90,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlListStyle.prototype.getTagNames = function () {
         return ['ListStyle'];

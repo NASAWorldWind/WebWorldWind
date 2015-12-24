@@ -20,16 +20,16 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxmultitrack
+     * @augments KmlGeometry
      */
-    var KmlMultiTrack = function (node) {
-        KmlGeometry.call(this, node);
+    var KmlMultiTrack = function (options) {
+        KmlGeometry.call(this, options);
 
         extend(this, KmlMultiTrack.prototype);
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlMultiTrack.prototype.getTagNames = function () {
         return ['gx:MultiTrack'];

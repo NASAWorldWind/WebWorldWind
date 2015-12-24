@@ -20,6 +20,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxlatlonquad
+     * @augments KmlObject
      */
     var KmlLatLonQuad = function (node) {
         KmlObject.call(this, node);
@@ -47,8 +48,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlLatLonQuad.prototype.getTagNames = function () {
         return ['gx:LatLonQuad'];

@@ -5,10 +5,13 @@
 define([
     '../../util/extend',
     './KmlElements',
-    './KmlAbstractView'
+    './KmlAbstractView',
+    '../../geom/Position'
 ], function (extend,
              KmlElements,
-             KmlAbstractView) {
+             KmlAbstractView,
+             Position
+) {
     "use strict";
 
     /**
@@ -20,6 +23,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#lookat
+     * @augments KmlAbstractView
      */
     var KmlLookAt = function (node) {
         KmlAbstractView.call(this, node);
@@ -125,8 +129,18 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * Go to the look at location.
+     */
+    KmlLookAt.prototype.update = function(options) {
+        if(options.wwd) {
+            var altitude = this.kmlAltitude || 4000;
+            // TODO: Respect altitude mode.
+            options.wwd.goTo(new Position(this.kmlLatitude, this.kmlLongitude, altitude));
+        }
+    };
+
+    /**
+     * @inheritDoc
      */
     KmlLookAt.prototype.getTagNames = function () {
         return ['LookAt'];

@@ -21,6 +21,7 @@ define([
      * @constructor
      * @throws {ArgumentError} If node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#labelstyle
+     * @augments KmlColorStyle
      */
     var KmlLabelStyle = function (labelStyleNode) {
         KmlColorStyle.call(this, labelStyleNode);
@@ -47,8 +48,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     KmlLabelStyle.prototype.getTagNames = function () {
         return ['LabelStyle'];

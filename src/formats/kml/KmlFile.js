@@ -12,6 +12,8 @@ define([
         './KmlFileCache',
         './styles/KmlStyle',
         './styles/KmlStyleMap',
+        './KmlTimeSpan',
+        './KmlTimeStamp',
         '../../util/Logger',
         '../../util/Promise',
         '../../util/Remote',
@@ -24,6 +26,8 @@ define([
               KmlFileCache,
               KmlStyle,
               KmlStyleMap,
+              KmlTimeSpan,
+              KmlTimeStamp,
               Logger,
               Promise,
               Remote,
@@ -51,6 +55,7 @@ define([
 
             // Default values.
             options.local = options.local || false;
+            this._controls = options.controls || null;
 
             var filePromise;
             if (options.local) {
@@ -132,20 +137,31 @@ define([
          */
         KmlFile.prototype.retrieveElementForNode = KmlObject.prototype.retrieveElementForNode;
 
+        KmlFile.prototype.doesAttributeExist = KmlObject.prototype.doesAttributeExist;
+
+        KmlFile.prototype.getValueOfAttribute = KmlObject.prototype.getValueOfAttribute;
+
+        KmlFile.prototype.retrieveFromCache = KmlObject.prototype.retrieveFromCache;
+
+        KmlFile.prototype.parseOneNode = KmlObject.prototype.parseOneNode;
+
+        KmlFile.prototype.instantiateDescendant = KmlObject.prototype.instantiateDescendant;
+
         /**
          * It renders all shapes, which are associated with current file.
-         * @param layer {Layer} Layer into which should the whole file be rendered.
+         * @param options {Object} - layer: Layer into which the objects should be rendered.
          * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
          */
-        KmlFile.prototype.update = function (layer) {
-            if (!layer) {
+        KmlFile.prototype.update = function (options) {
+            if (!options.layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "update", "Layer must be defined in order to update document.")
                 );
             }
 
+            options.controls = this._controls;
             this.shapes.forEach(function (shape) {
-                shape.update(layer);
+                shape.update(options);
             });
         };
 
@@ -176,9 +192,9 @@ define([
                 }
 
                 if(style.nodeName == KmlStyle.prototype.getTagNames()[0]) {
-                    resolve(new KmlStyle(style));
+                    resolve(new KmlStyle({objectNode: style}));
                 } else if(style.nodeName == KmlStyleMap.prototype.getTagNames()[0]) {
-                    resolve(new KmlStyleMap(style));
+                    resolve(new KmlStyleMap({objectNode: style}));
                 } else {
                     Logger.logMessage(Logger.LEVEL_WARNING, "KmlFile", "resolveStyle", "Style must contain either" +
                         " Style node or StyleMap node.");

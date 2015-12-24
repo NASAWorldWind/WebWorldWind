@@ -4,9 +4,11 @@
  */
 requirejs(['../src/WorldWind',
         '../src/formats/kml/KmlFile',
+        '../src/formats/kml/controls/KmlTreeVisibility',
         './LayerManager'],
     function (WorldWind,
               KmlFile,
+              KmlTreeVisibility,
               LayerManager) {
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -31,7 +33,8 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
         var kmlFileOptions = {
-            url: 'KML_Samples.kml'
+            url: 'KML_Samples.kml',
+            controls:[new KmlTreeVisibility('treeControls', wwd)]
         };
 
         var kmlFilePromise = new KmlFile(kmlFileOptions);
@@ -39,7 +42,7 @@ requirejs(['../src/WorldWind',
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
             wwd.addLayer(renderableLayer);
 
-            kmlFile.update(renderableLayer);
+            kmlFile.update({layer:renderableLayer});
         });
 
         // Create a layer manager for controlling layer visibility.

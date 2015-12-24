@@ -21,7 +21,7 @@ define([], function () {
      * @returns {Promise|null}
      */
     KmlFileCache.prototype.retrieve = function (url) {
-        if (url.indexOf('#') == 0 || url == null) {
+        if (url.indexOf('#') == 0 || url == null || url.indexOf('http') != 0) {
             return this._rootFile;
         } else {
             var urlNormalized = url;

@@ -20,6 +20,7 @@ define([
      * @param node {Node} Node representing the Kml Item Icon.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
+     * @augments KmlObject
      */
     var ItemIcon = function (node) {
         KmlObject.call(this, node);
@@ -56,8 +57,7 @@ define([
     };
 
     /**
-     * Returns tag name of this Node.
-     * @returns {String[]}
+     * @inheritDoc
      */
     ItemIcon.prototype.getTagNames = function () {
         return ['ItemIcon'];
