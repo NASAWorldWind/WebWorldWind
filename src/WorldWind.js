@@ -24,6 +24,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/BoundingBox',
         './gesture/ClickRecognizer',
         './util/Color',
+        './formats/collada/ColladaLoader',
         './shapes/Compass',
         './layer/CompassLayer',
         './layer/CoordinatesDisplayLayer',
@@ -96,6 +97,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/RenderableLayer',
         './layer/RestTiledImageLayer',
         './gesture/RotationRecognizer',
+        './shapes/Scene',
         './shapes/ScreenImage',
         './shapes/ScreenText',
         './geom/Sector',
@@ -168,6 +170,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BoundingBox,
               ClickRecognizer,
               Color,
+              ColladaLoader,
               Compass,
               CompassLayer,
               CoordinatesDisplayLayer,
@@ -240,6 +243,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               RenderableLayer,
               RestTiledImageLayer,
               RotationRecognizer,
+              Scene,
               ScreenImage,
               ScreenText,
               Sector,
@@ -521,6 +525,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BoundingBox'] = BoundingBox;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['Color'] = Color;
+        WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
         WorldWind['CoordinatesDisplayLayer'] = CoordinatesDisplayLayer;
@@ -593,6 +598,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['RenderableLayer'] = RenderableLayer;
         WorldWind['RestTiledImageLayer'] = RestTiledImageLayer;
         WorldWind['RotationRecognizer'] = RotationRecognizer;
+        WorldWind['Scene'] = Scene;
         WorldWind['ScreenText'] = ScreenText;
         WorldWind['ScreenImage'] = ScreenImage;
         WorldWind['Sector'] = Sector;
