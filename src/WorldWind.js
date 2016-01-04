@@ -84,6 +84,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Placemark',
         './shapes/PlacemarkAttributes',
         './geom/Plane',
+        './util/JSPolyfills',
         './shapes/Polygon',
         './geom/Position',
         './projections/ProjectionEquirectangular',
@@ -230,6 +231,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Placemark,
               PlacemarkAttributes,
               Plane,
+              JSPolyfills,
               Polygon,
               Position,
               ProjectionEquirectangular,
@@ -585,6 +587,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Placemark'] = Placemark;
         WorldWind['PlacemarkAttributes'] = PlacemarkAttributes;
         WorldWind['Plane'] = Plane;
+        WorldWind['JSPolyfills'] = JSPolyfills;
         WorldWind['Polygon'] = Polygon;
         WorldWind['Position'] = Position;
         WorldWind['ProjectionEquirectangular'] = ProjectionEquirectangular;
