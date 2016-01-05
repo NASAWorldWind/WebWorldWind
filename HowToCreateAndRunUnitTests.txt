@@ -54,6 +54,7 @@ using requirejs.
     });
 
     I will add commentary about what is in this file a little later; some of it is CRITICAL for unit testing to work.
+    Name of the test case method must start with the test. In this case it is testTest.
 16) go to the Run top level menu entry and select "Run <Name_Of_Test>" (where <Name_Of_Test> is "Vec3" for what I
     created above)
 17) open your browser of choice (whatever you configured WebStorm to run the unit tests)

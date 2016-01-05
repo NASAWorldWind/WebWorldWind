@@ -212,6 +212,19 @@ define([
             return new Color(redByte / 255, greenByte / 255, blueByte / 255, alphaByte / 255);
         };
 
+        Color.colorFromHex = function(color) {
+            var red = parseInt(color.substring(0, 2), 16);
+            var green = parseInt(color.substring(2,4), 16);
+            var blue = parseInt(color.substring(4,6), 16);
+            var alpha = parseInt(color.substring(6,8), 16);
+            return Color.colorFromBytes(red, green, blue, alpha);
+        };
+
+        Color.colorFromKmlHex = function(color) {
+            color = color.split("").reverse().join("");
+            return Color.colorFromHex(color);
+        };
+
         /**
          * Computes and sets this color to the next higher RBG color. If the color overflows, this color is set to
          * (1 / 255, 0, 0, *), where * indicates the current alpha value.

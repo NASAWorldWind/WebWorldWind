@@ -204,6 +204,26 @@ define([
 
                 // Add the script element to the document, causing the browser to invoke it.
                 head.appendChild(script);
+            },
+
+            arrayEquals: function (array1, array2) {
+                return (array1.length == array2.length) && array1.every(function (element, index) {
+                        return element === array2[index] || element.equals && element.equals(array2[index]);
+                    });
+            },
+
+            /**
+             * It transforms given item to the boolean. It respects that 0, "0" and "false" are percieved as false
+             * on top of the standard Boolean function.
+             * @param item {String} Item to transform
+             * @returns {boolean} Value transformed to the boolean.
+             */
+            transformToBoolean: function (item) {
+                if (item == 0 || item == "0" || item == "false") {
+                    return false;
+                } else {
+                    return Boolean(item);
+                }
             }
         };
 
