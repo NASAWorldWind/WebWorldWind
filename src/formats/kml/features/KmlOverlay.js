@@ -16,14 +16,15 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlOverlay
      * @classdesc Contains the data associated with Overlay node.
-     * @param node {Node} Node representing overlay in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing Overlay
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#overlay
      * @augments KmlFeature
      */
-    var KmlOverlay = function (node) {
-        KmlFeature.call(this, node);
+    var KmlOverlay = function (options) {
+        KmlFeature.call(this, options);
 
         Object.defineProperties(this, {
             /**

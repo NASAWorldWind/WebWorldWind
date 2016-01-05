@@ -17,13 +17,14 @@ define([
      * @alias Schema
      * @constructor
      * @classdesc Contains the data associated with Kml Schema
-     * @param node {Node} Node representing the Kml Schema.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml Schema.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
      * @augments KmlObject
      */
-    var Schema = function (node) {
-        KmlObject.call(this, node);
+    var Schema = function (options) {
+        KmlObject.call(this, options);
 
         extend(this, Schema.prototype);
     };

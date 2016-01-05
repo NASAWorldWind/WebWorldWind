@@ -33,7 +33,9 @@ define([
      * objects from Kml file are read
      * @alias KmlFeature
      * @classdesc Contains the data associated with KmlFeature.
-     * @param options {Node} Node representing Kml Feature
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Feature
+     * @param options.style {Promise} Promise of the style to be applied to current Feature.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#feature
@@ -274,10 +276,6 @@ define([
         });
         // Use also styleUrl if valid and StyleSelector.
         return this._pStyle;
-    };
-
-    KmlFeature.prototype.isFeature = function () {
-        return true;
     };
 
     return KmlFeature;

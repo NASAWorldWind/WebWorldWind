@@ -18,15 +18,16 @@ define([
     /**
      * Constructs an KmlLineStyle object.  Applications shouldn't use this constructor. It is used by
      * {@link KmlFile}. KmlLineStyle represents one line style.
-     * @param lineStyleNode {Node} Node representing this line style.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing this line style.
      * @constructor
      * @alias KmlLineStyle
      * @classdesc Class representing LineStyle element of KmlFile
      * @see https://developers.google.com/kml/documentation/kmlreference#linestyle
      * @augments KmlColorStyle
      */
-    var KmlLineStyle = function (lineStyleNode) {
-        KmlColorStyle.call(this, lineStyleNode);
+    var KmlLineStyle = function (options) {
+        KmlColorStyle.call(this, options);
 
         Object.defineProperties(this, {
             /**

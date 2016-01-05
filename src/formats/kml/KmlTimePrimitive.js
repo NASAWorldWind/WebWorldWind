@@ -16,17 +16,22 @@ define([
      * as objects from KmlFile are read.
      * @alias KmlTimePrimitive
      * @classdesc It is ancestor for all TimePrimitives - TimeSpan and TimeStamp
-     * @param timePrimitiveNode {Node} Node representing Kml TimePrimitive.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing Kml TimePrimitive.
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#timeprimitive
      * @augments KmlObject
      */
-    var KmlTimePrimitive = function (timePrimitiveNode) {
-        KmlObject.call(this, timePrimitiveNode);
+    var KmlTimePrimitive = function (options) {
+        KmlObject.call(this, options);
 
         extend(this, KmlTimePrimitive.prototype);
     };
 
+    /**
+     * It returns range applicable to current time.
+     * @returns {{from: Date, to: Date}}
+     */
     KmlTimePrimitive.prototype.timeRange = function() {
         var from, to;
         if(this.kmlBegin) {

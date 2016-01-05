@@ -23,13 +23,14 @@ define([
      * @alias KmlPolyStyle
      * @constructor
      * @classdesc Contains the data associated with Kml poly style
-     * @param polyStyleNode {Node} Node representing the Kml poly style.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml poly style.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polystyle
      * @augments KmlColorStyle
      */
-    var KmlPolyStyle = function (polyStyleNode) {
-        KmlColorStyle.call(this, polyStyleNode);
+    var KmlPolyStyle = function (options) {
+        KmlColorStyle.call(this, options);
 
         Object.defineProperties(this, {
             /**

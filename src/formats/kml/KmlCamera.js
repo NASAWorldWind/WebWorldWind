@@ -16,14 +16,15 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlCamera
      * @classdesc Contains the data associated with Camera node.
-     * @param node {Node} Node representing camera in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing camera in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#camera
      * @augments KmlAbstractView
      */
-    var KmlCamera = function (node) {
-        KmlAbstractView.call(this, node);
+    var KmlCamera = function (options) {
+        KmlAbstractView.call(this, options);
 
         Object.defineProperties(this, {
             /**

@@ -57,6 +57,10 @@ define([
         extend(this, KmlStyleMap.prototype);
     };
 
+    /**
+     * Resolve the information from style map and create the options with normal and highlight.
+     * @param resolve Callback to be called when all promises are resolved with correct style.
+     */
     KmlStyleMap.prototype.resolve = function(resolve) {
         // Create promise which resolves, when all styles are resolved.
         var self = this;

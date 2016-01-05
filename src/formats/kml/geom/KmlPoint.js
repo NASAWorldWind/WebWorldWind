@@ -33,7 +33,8 @@ define([
      * @alias KmlPoint
      * @constructor
      * @classdesc Contains the data associated with Kml point
-     * @param pointNode {Node} Node representing the Kml point.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing Point.
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#point
      * @augments KmlGeometry

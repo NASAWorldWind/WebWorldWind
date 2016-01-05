@@ -17,13 +17,14 @@ define([
      * @alias ImagePyramid
      * @constructor
      * @classdesc Contains the data associated with Kml Image Pyramid
-     * @param node {Node} Node representing the Kml Image Pyramid.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml Image Pyramid.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#imagepyramid
      * @augments KmlObject
      */
-    var ImagePyramid = function (node) {
-        KmlObject.call(this, node);
+    var ImagePyramid = function (options) {
+        KmlObject.call(this, options);
 
         Object.defineProperties(this, {
             /**

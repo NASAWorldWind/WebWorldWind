@@ -16,14 +16,15 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLink
      * @classdesc Contains the data associated with Link node.
-     * @param node {Node} Node representing link in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing link in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#link
      * @augments KmlObject
      */
-    var KmlLink = function (node) {
-        KmlObject.call(this, node);
+    var KmlLink = function (options) {
+        KmlObject.call(this, options);
 
         Object.defineProperties(this, {
             /**

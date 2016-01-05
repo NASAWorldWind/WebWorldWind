@@ -22,14 +22,15 @@ define([
      * KmlFile} as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlGroundOverlay
      * @classdesc Contains the data associated with GroundOverlay node.
-     * @param node {Node} Node representing ground overlay in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing GroundOverlay
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#groundoverlay
      * @augments KmlOverlay
      */
-    var KmlGroundOverlay = function (node) {
-        KmlOverlay.call(this, node);
+    var KmlGroundOverlay = function (options) {
+        KmlOverlay.call(this, options);
 
         Object.defineProperties(this, {
             /**

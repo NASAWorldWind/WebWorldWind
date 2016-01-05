@@ -17,13 +17,14 @@ define([
      * @alias ItemIcon
      * @constructor
      * @classdesc Contains the data associated with Kml Item Icon
-     * @param node {Node} Node representing the Kml Item Icon.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml Item Icon.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
      * @augments KmlObject
      */
-    var ItemIcon = function (node) {
-        KmlObject.call(this, node);
+    var ItemIcon = function (options) {
+        KmlObject.call(this, options);
 
         Object.defineProperties(this, {
             /**

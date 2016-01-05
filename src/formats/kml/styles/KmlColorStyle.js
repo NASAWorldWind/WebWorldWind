@@ -15,14 +15,15 @@ define([
      * objects from KmlFiles are read. This object is abstract. Only its descendants are instantiating it.
      * @alias KmlColorStyle
      * @classdesc Contains the data associated with ColorStyle node
-     * @param colorStyleNode {Node} Node representing ColorStyle from Kml document
+     * @param options {Object}
+     * @param options.objectNode {Node}  Node representing ColorStyle from Kml document
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#colorstyle
      * @augments KmlSubStyle
      */
-    var KmlColorStyle = function (colorStyleNode) {
-        KmlSubStyle.call(this, colorStyleNode);
+    var KmlColorStyle = function (options) {
+        KmlSubStyle.call(this, options);
 
         Object.defineProperties(this, {
             /**

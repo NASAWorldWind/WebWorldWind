@@ -17,14 +17,15 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlListStyle
      * @classdesc Contains the data associated with ListStyle node.
-     * @param node {Node} Node representing list style in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing list style in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#liststyle
      * @augments KmlSubStyle
      */
-    var KmlListStyle = function (node) {
-        KmlSubStyle.call(this, node);
+    var KmlListStyle = function (options) {
+        KmlSubStyle.call(this, options);
 
         Object.defineProperties(this, {
             /**

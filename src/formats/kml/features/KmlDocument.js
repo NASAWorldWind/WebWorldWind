@@ -21,7 +21,8 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlDocument
      * @classdesc Contains the data associated with Document options.
-     * @param options {Node} Node representing document in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the document.
      * @constructor
      * @throws {ArgumentError} If the options is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#document

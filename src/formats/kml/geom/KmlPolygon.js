@@ -31,7 +31,9 @@ define([
      * @alias KmlPolygon
      * @constructor
      * @classdesc Contains the data associated with Kml polygon
-     * @param options {Object} Node representing the Kml polygon.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing Polygon
+     * @param options.style {Promise} Promise of styles to be applied to this Polygon.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#polygon
      */
@@ -145,7 +147,9 @@ define([
 
     /**
      * Internal use only. Once create the instance of actual polygon.
-     * @param styles {Object} Object containing normal and highlighted styles.
+     * @param styles {Object}
+     * @param styles.normal {KmlStyle} Style to apply when not highlighted
+     * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
     KmlPolygon.prototype.createPolygon = function(styles) {
         if(!this.initialized) {

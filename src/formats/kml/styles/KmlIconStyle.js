@@ -17,15 +17,16 @@ define([
      * objects from KmlFile are read. This object is already concrete implementation.
      * @alias KmlIconStyle
      * @classdesc Contains the data associated with IconStyle node
-     * @param iconStyleNode {Node} Node representing IconStyle in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing IconStyle in the document.
      * @returns {KmlIconStyle}
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined
      * @see https://developers.google.com/kml/documentation/kmlreference#iconstyle
      * @augments KmlColorStyle
      */
-    var KmlIconStyle = function (iconStyleNode) {
-        KmlColorStyle.call(this, iconStyleNode);
+    var KmlIconStyle = function (options) {
+        KmlColorStyle.call(this, options);
 
         Object.defineProperties(this, {
             /**

@@ -30,8 +30,9 @@ define([
         /**
          * Constructs an KmlLineString object.  Applications shouldn't use this constructor. It is used by
          * {@link KmlFile}. KmlLineString represents one line string.
-         * @param lineStringNode {Node} Node representing this line string.
-         * @param pStyle {Promise} Promise of style.
+         * @param options {Object}
+         * @param options.objectNode {Node} Node representing LineString.
+         * @param options.style {Promise} Promise of style to be applied to current geometry
          * @constructor
          * @alias KmlLineString
          * @classdesc Class representing LineString element of KmlFile
@@ -136,6 +137,12 @@ define([
 
         KmlLineString.prototype = Object.create(Path.prototype);
 
+        /**
+         * It creates Path repreesnting this LineString unless already intialized.
+         * @param styles {Object}
+         * @param styles.normal {KmlStyle} Style applied when item not highlighted
+         * @param styles.highlight {KmlStyle} Style applied when item is highlighted
+         */
         KmlLineString.prototype.createPath = function(styles) {
             if(!this.initialized) {
                 Path.call(this, this.prepareLocations(), this.prepareAttributes(styles.normal));
@@ -168,10 +175,17 @@ define([
             return new ShapeAttributes(KmlStyle.shapeAttributes(shapeOptions));
         };
 
+        /**
+         * Prepare locations representing current Line String.
+         * @returns {Position[]} Positions representing this LineString.
+         */
         KmlLineString.prototype.prepareLocations = function() {
             return this.kmlPositions;
         };
 
+        /**
+         * Moves KML properties from current object into the internal shape representation.
+         */
         KmlLineString.prototype.moveValidProperties = function() {
             this.extrude = this.kmlExtrude || false;
             this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
@@ -181,8 +195,8 @@ define([
 
         /**
          * Two line strings are equal when the properties and positions are equal.
-         * @param toCompare LineString to compare to.
-         * @returns {Boolean}
+         * @param toCompare {KmlLineString} LineString to compare to.
+         * @returns {Boolean} True if the LineStrings are equal.
          */
         KmlLineString.prototype.equals = function (toCompare) {
             if (!toCompare) {

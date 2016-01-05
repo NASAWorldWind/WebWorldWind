@@ -19,14 +19,15 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLookAt
      * @classdesc Contains the data associated with LookAt node.
-     * @param node {Node} Node representing looking at something in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing looking at something in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#lookat
      * @augments KmlAbstractView
      */
-    var KmlLookAt = function (node) {
-        KmlAbstractView.call(this, node);
+    var KmlLookAt = function (options) {
+        KmlAbstractView.call(this, options);
 
         Object.defineProperties(this, {
             /**

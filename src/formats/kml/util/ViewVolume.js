@@ -16,13 +16,14 @@ define([
      * @alias ViewVolume
      * @constructor
      * @classdesc Contains the data associated with Kml View Volume
-     * @param node {Node} Node representing the Kml View Volume.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml View Volume.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#viewvolume
      * @augments KmlObject
      */
-    var ViewVolume = function (node) {
-        KmlObject.call(this, node);
+    var ViewVolume = function (options) {
+        KmlObject.call(this, options);
 
         Object.defineProperties(this, {
             /**

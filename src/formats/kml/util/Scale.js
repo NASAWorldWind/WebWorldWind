@@ -19,13 +19,14 @@ define([
      * @alias Scale
      * @constructor
      * @classdesc Contains the data associated with Kml Scale
-     * @param node {Node} Node representing the Kml Scale
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml Scale
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#scale
      * @augments KmlObject
      */
-    var Scale = function (node) {
-        KmlObject.call(this, node);
+    var Scale = function (options) {
+        KmlObject.call(this, options);
 
         Object.defineProperties(this, {
             /**

@@ -15,7 +15,9 @@ define([
      * the hierarchy of KmlObject.
      * @alias KmlLinearRing
      * @classdesc Contains the data associated with LinerRing
-     * @param linearRingNode {Node} Node of the object to be retrieved.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing LinearRing.
+     * @param options.style {Promise} Promise of style to be applied to current geometry
      * @constructor
      * @see https://developers.google.com/kml/documentation/kmlreference#linearring
      * @augments KmlLineString

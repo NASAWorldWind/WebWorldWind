@@ -41,7 +41,11 @@ define([
          * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
          * rendered in one Layer.
          * @constructor
-         * @param options {Object} Different options specifying how will the file behave.
+         * @param options {Object}
+         * @param options.document {String} String representing the document if it is local.
+         * @param options.url {String} Url of the remote document.
+         * @param options.local {Boolean} True if the document is local.
+         * @param options.controls {KmlControls[]} List of controls applied to this File.
          * @alias KmlFile
          * @classdesc Support for Kml File parsing and display.
          */
@@ -149,7 +153,8 @@ define([
 
         /**
          * It renders all shapes, which are associated with current file.
-         * @param options {Object} - layer: Layer into which the objects should be rendered.
+         * @param options {Object}
+         * @param options.layer {Layer} Layer into which the objects should be rendered.
          * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
          */
         KmlFile.prototype.update = function (options) {

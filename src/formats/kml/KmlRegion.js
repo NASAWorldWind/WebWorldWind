@@ -20,13 +20,14 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlRegion
      * @classdesc Contains the data associated with Region node.
-     * @param node {Node} Node representing region in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing region in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#region
      */
-    var KmlRegion = function (node) {
-        KmlObject.call(this, node);
+    var KmlRegion = function (options) {
+        KmlObject.call(this, options);
 
         Object.defineProperties(this, {
             /**

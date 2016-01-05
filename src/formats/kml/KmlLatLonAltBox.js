@@ -16,14 +16,15 @@ define([
      * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlLatLonAltBox
      * @classdesc Contains the data associated with LatLonAltBox node.
-     * @param node {Node} Node representing alternative lat lon box in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing alternative lat lon box in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#latlonaltbox
      * @aguments KmlObject
      */
-    var KmlLatLonAltBox = function (node) {
-        KmlObject.call(this, node);
+    var KmlLatLonAltBox = function (options) {
+        KmlObject.call(this, options);
 
         Object.defineProperties(this, {
             /**

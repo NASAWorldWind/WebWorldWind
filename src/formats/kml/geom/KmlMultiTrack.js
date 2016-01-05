@@ -16,7 +16,8 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlMultiTrack
      * @classdesc Contains the data associated with MultiTrack node.
-     * @param node {Node} Node representing multi track in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing MultiTrack.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxmultitrack

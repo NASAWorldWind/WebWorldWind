@@ -17,14 +17,15 @@ define([
      * objects from KmlFile are read. This object is already concrete implementation.
      * @alias KmlLabelStyle
      * @classdesc Contains the data associated with LabelStyle
-     * @param labelStyleNode {Node} Node representing the LabelStyle in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the LabelStyle in the document.
      * @constructor
      * @throws {ArgumentError} If node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#labelstyle
      * @augments KmlColorStyle
      */
-    var KmlLabelStyle = function (labelStyleNode) {
-        KmlColorStyle.call(this, labelStyleNode);
+    var KmlLabelStyle = function (options) {
+        KmlColorStyle.call(this, options);
 
         Object.defineProperties(this, {
             /**

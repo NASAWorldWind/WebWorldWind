@@ -21,7 +21,8 @@ define([
      * objects from KmlFile are read.
      * @alias KmlTimeStamp
      * @classdesc Contains the data associated with Kml TimeStamp
-     * @param options {Node} Node representing the Kml TimeStamp
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml TimeStamp
      * @constructor
      * @throws {ArgumentError} If the content of the node contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#timestamp

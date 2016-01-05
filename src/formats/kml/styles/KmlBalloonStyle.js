@@ -17,14 +17,15 @@ define([
      * as objects from KmlFile are read. This object is already concrete implementation.
      * @alias KmlBalloonStyle
      * @classdesc Contains the data associated with BalloonStyle node
-     * @param balloonStyleNode Node representing BallonStyle in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing BalloonStyle
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined
      * @see https://developers.google.com/kml/documentation/kmlreference#balloonstyle
      * @augments KmlSubStyle
      */
-    var KmlBalloonStyle = function (balloonStyleNode) {
-        KmlSubStyle.call(this, balloonStyleNode);
+    var KmlBalloonStyle = function (options) {
+        KmlSubStyle.call(this, options);
 
         Object.defineProperties(this, {
             /**

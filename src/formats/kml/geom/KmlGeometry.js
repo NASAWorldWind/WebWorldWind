@@ -17,17 +17,22 @@ define([
      * @alias KmlGeometry
      * @constructor
      * @classdesc Contains the data associated with Kml geometry
-     * @param geometryNode {Node} Node representing the Kml geometry.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Geometry
      * @throws {ArgumentError} If either the node is null or the content of the Kml point contains invalid elements.
      * @see https://developers.google.com/kml/documentation/kmlreference#geometry
      * @augments KmlObject
      */
-    var KmlGeometry = function (geometryNode) {
-        KmlObject.call(this, geometryNode);
+    var KmlGeometry = function (options) {
+        KmlObject.call(this, options);
 
         extend(this, KmlGeometry.prototype);
     };
 
+    /**
+     * It returns actually applied style valid for current geometry.
+     * @returns {KmlStyleSelector}
+     */
     KmlGeometry.prototype.getAppliedStyle = function() {
         return this._style;
     };

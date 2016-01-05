@@ -22,14 +22,15 @@ define([
      * as objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlPhotoOverlay
      * @classdesc Contains the data associated with PhotoOverlay node.
-     * @param node {Node} Node representing photo overlay in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing Photo Overlay.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#photooverlay
      * @augments KmlOverlay
      */
-    var KmlPhotoOverlay = function (node) {
-        KmlOverlay.call(this, node);
+    var KmlPhotoOverlay = function (options) {
+        KmlOverlay.call(this, options);
 
         Object.defineProperties(this, {
             /**

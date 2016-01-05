@@ -14,13 +14,14 @@ define([
      * @alias KmlStyleSelector
      * @constructor
      * @classdesc Contains the data associated with Kml style selector
-     * @param styleSelectorNode {Node} Node representing the Kml style selector.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Kml style selector.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#styleselector
      * @augments KmlObject
      */
-    var KmlStyleSelector = function (styleSelectorNode) {
-        KmlObject.call(this, styleSelectorNode);
+    var KmlStyleSelector = function (options) {
+        KmlObject.call(this, options);
 
         extend(this, KmlStyleSelector.prototype);
     };

@@ -38,20 +38,21 @@ define([
      * Objects from Kml file are read
      * @alias KmlPlacemark
      * @classdesc Contains the data associated with KmlPlacemark.
-     * @param placemarkNode {Node} Node representing Kml Placemark
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing Placemark.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#placemark
      * @augments KmlFeature
      */
-    var KmlPlacemark = function (placemarkNode) {
-        KmlFeature.call(this, placemarkNode);
+    var KmlPlacemark = function (options) {
+        KmlFeature.call(this, options);
 
         var self = this;
         this._style = this.getStyle();
         this._style.then(function (styles) {
             if (!self.kmlGeometry) {
-                // For now don't display Placemarks without geometries.
+                // TODO: Show Placemarks without geometry.
                 return;
             }
             Placemark.call(self, self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
@@ -114,6 +115,11 @@ define([
         this.kmlGeometry.update(options);
     };
 
+    /**
+     * Prepare attributes for displaying the Placemark.
+     * @param style {KmlStyle} Style altering the defaults.
+     * @returns {PlacemarkAttributes} Attributes representing the current Placemark.
+     */
     KmlPlacemark.prototype.prepareAttributes = function (style) {
         var options = style && style.generate() || {normal: {}, highlight:{}};
         var placemarkAttributes = new PlacemarkAttributes(KmlStyle.placemarkAttributes(options));
@@ -136,6 +142,9 @@ define([
         return placemarkAttributes;
     };
 
+    /**
+     * It takes properties from the KML definition and move them into the internal objects.
+     */
     KmlPlacemark.prototype.moveValidProperties = function () {
         this.label = this.kmlName || '';
         this.altitudeMode = this.kmlAltitudeMode || WorldWind.RELATIVE_TO_GROUND;

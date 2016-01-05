@@ -16,7 +16,8 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlTrack
      * @classdesc Contains the data associated with Track node.
-     * @param node {Node} Node representing track in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing the Track.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#gxtrack

@@ -17,14 +17,15 @@ define([
      * objects from Kml file are read. This object is already concrete implementation.
      * @alias KmlIcon
      * @classdesc Contains the data associated with Icon node.
-     * @param iconNode {Node} Node representing icon in the document.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing icon in the document.
      * @constructor
      * @throws {ArgumentError} If the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#icon
      * @augments KmlLink
      */
-    var KmlIcon = function (iconNode) {
-        KmlLink.call(this, iconNode);
+    var KmlIcon = function (options) {
+        KmlLink.call(this, options);
 
         Object.defineProperties(this, {
             /**

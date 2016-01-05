@@ -16,8 +16,9 @@ define([
     /**
      * Constructs an KmlMultiGeometry object. KmlMultiGeometry is object, which contains other geometry objects. This
      * class isn't intended to be used outside of the KmlObject hierarchy. It is already concrete implementation.
-     * @param multiGeometryNode {Node} Node representing this MultiGeometry
-     * @param pStyle {Promise} Promise of the style to be delivered later.
+     * @param options {Object}
+     * @param options.objectNode {Node} Node representing current geometry
+     * @param options.style {Promise} Promise of style to be applied to current geometry
      * @constructor
      * @classdesc Class representing MultiGeometry Element of Kml Document.
      * @alias KmlMultiGeometry
