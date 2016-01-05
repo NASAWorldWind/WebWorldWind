@@ -188,9 +188,9 @@ define([
             if (!toCompare) {
                 return false;
             }
-            var positionsEquals = WWUtil.arrayEquals(toCompare.positions, this.kmlPositions);
-            return positionsEquals && toCompare.extrude == this.kmlExtrude && toCompare.tessellate == this.kmlTessellate &&
-                toCompare.altitudeMode == this.kmlAltitudeMode;
+            var positionsEquals = WWUtil.arrayEquals(toCompare.kmlPositions, this.kmlPositions);
+            return positionsEquals && toCompare.kmlExtrude == this.kmlExtrude && toCompare.kmlTessellate == this.kmlTessellate &&
+                toCompare.kmlAltitudeMode == this.kmlAltitudeMode;
         };
 
         /**

@@ -31,8 +31,8 @@ require({
             var style = new KmlRegion(
                 kmlRepresentation.getElementsByTagName("Region")[0]);
 
-            assertTrue(style.LatLonAltBox instanceof KmlLatLonAltBox);
-            assertTrue(style.Lod instanceof KmlLod);
+            assertTrue(style.kmlLatLonAltBox instanceof KmlLatLonAltBox);
+            assertTrue(style.kmlLod instanceof KmlLod);
         })
     })
 });

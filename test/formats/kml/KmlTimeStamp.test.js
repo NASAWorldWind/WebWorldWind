@@ -23,7 +23,7 @@ require({
             var kmlRepresentation = new XmlDocument(validTimeStampXml).dom();
             var timeStamp = new KmlTimeStamp(kmlRepresentation.getElementsByTagName("TimeStamp")[0],{});
 
-            assertEquals("1997-07-16T07:30:15Z", timeStamp.when);
+            assertEquals("1997-07-16T07:30:15Z", timeStamp.kmlWhen);
         })
     });
 });

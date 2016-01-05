@@ -6,10 +6,16 @@
  * @version $Id: WWUtil.js 3402 2015-08-14 17:28:09Z tgaskins $
  */
 define([
-    './Date'
-], function (
-        Date
-    ) {
+        '../error/ArgumentError',
+        '../geom/Line',
+        '../util/Logger',
+        '../geom/Rectangle',
+        '../geom/Vec3'],
+    function (ArgumentError,
+              Line,
+              Logger,
+              Rectangle,
+              Vec3) {
         "use strict";
         /**
          * Provides math constants and functions.

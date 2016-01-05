@@ -30,10 +30,10 @@ require({
             var networkLink = new KmlNetworkLink(
                 kmlRepresentation.getElementsByTagName("NetworkLink")[0]);
 
-            assertEquals(true, networkLink.refreshVisibility);
-            assertEquals(true, networkLink.flyToView);
+            assertEquals(true, networkLink.kmlRefreshVisibility);
+            assertEquals(true, networkLink.kmlFlyToView);
 
-            assertTrue(networkLink.Link instanceof KmlLink);
+            assertTrue(networkLink.kmlLink instanceof KmlLink);
         })
     })
 });

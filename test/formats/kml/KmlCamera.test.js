@@ -32,13 +32,13 @@ require({
             var camera = new KmlCamera(
                 kmlRepresentation.getElementsByTagName("Camera")[0]);
 
-            assertEquals(10, camera.longitude);
-            assertEquals(9, camera.latitude);
-            assertEquals(8, camera.altitude);
-            assertEquals(1, camera.heading);
-            assertEquals(7, camera.tilt);
-            assertEquals(6, camera.roll);
-            assertEquals("clampToGround", camera.altitudeMode);
+            assertEquals(10, camera.kmlLongitude);
+            assertEquals(9, camera.kmlLatitude);
+            assertEquals(8, camera.kmlAltitude);
+            assertEquals(1, camera.kmlHeading);
+            assertEquals(7, camera.kmlTilt);
+            assertEquals(6, camera.kmlRoll);
+            assertEquals("clampToGround", camera.kmlAltitudeMode);
         })
     })
 });

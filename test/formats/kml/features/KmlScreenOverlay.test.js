@@ -26,7 +26,7 @@ require({
             var screenOverlay = new KmlScreenOverlay(
                 kmlRepresentation.getElementsByTagName("ScreenOverlay")[0]);
 
-            assertEquals(0, screenOverlay.rotation);
+            assertEquals(0, screenOverlay.kmlRotation);
         })
     })
 });

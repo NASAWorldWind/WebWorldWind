@@ -29,10 +29,10 @@ require({
             var lod = new KmlLod(
                 kmlRepresentation.getElementsByTagName("Lod")[0]);
 
-            assertEquals(256, lod.minLodPixels);
-            assertEquals(-1, lod.maxLodPixels);
-            assertEquals(0, lod.minFadeExtent);
-            assertEquals(0, lod.maxFadeExtent);
+            assertEquals(256, lod.kmlMinLodPixels);
+            assertEquals(-1, lod.kmlMaxLodPixels);
+            assertEquals(0, lod.kmlMinFadeExtent);
+            assertEquals(0, lod.kmlMaxFadeExtent);
         })
     })
 });

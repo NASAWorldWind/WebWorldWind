@@ -28,7 +28,7 @@ require({
             var overlay = new KmlAbstractView(
                 kmlRepresentation.getElementsByTagName("AbstractView")[0]);
 
-            assertTrue(overlay.TimePrimitive instanceof KmlTimeSpan);
+            assertTrue(overlay.kmlTimePrimitive instanceof KmlTimeSpan);
         })
     })
 });

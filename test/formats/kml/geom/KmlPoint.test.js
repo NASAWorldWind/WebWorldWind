@@ -28,12 +28,12 @@ require({
             var kmlRepresentation = new XmlDocument(kmlFile).dom();
             var point = new KmlPoint(kmlRepresentation.getElementsByTagName("Point")[0]);
 
-            assertEquals(-122.0822035425683, point.position.longitude);
-            assertEquals(37.42228990140251, point.position.latitude);
-            assertEquals(0, point.position.altitude);
+            assertEquals(-122.0822035425683, point.kmlPosition.longitude);
+            assertEquals(37.42228990140251, point.kmlPosition.latitude);
+            assertEquals(0, point.kmlPosition.altitude);
 
-            assertEquals(true, point.extrude);
-            assertEquals("clampToGround", point.altitudeMode);
+            assertEquals(true, point.kmlExtrude);
+            assertEquals("clampToGround", point.kmlAltitudeMode);
 
             assertEquals("1", point.id);
         })

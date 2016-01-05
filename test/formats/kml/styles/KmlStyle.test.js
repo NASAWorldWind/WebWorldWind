@@ -43,12 +43,12 @@ require({
             var style = new KmlStyle(
                 kmlRepresentation.getElementsByTagName("Style")[0]);
 
-            assertTrue(style.IconStyle instanceof KmlIconStyle);
-            assertTrue(style.LabelStyle instanceof KmlLabelStyle);
-            assertTrue(style.LineStyle instanceof KmlLineStyle);
-            assertTrue(style.PolyStyle instanceof KmlPolyStyle);
-            assertTrue(style.BalloonStyle instanceof KmlBalloonStyle);
-            assertTrue(style.ListStyle instanceof KmlListStyle);
+            assertTrue(style.kmlIconStyle instanceof KmlIconStyle);
+            assertTrue(style.kmlLabelStyle instanceof KmlLabelStyle);
+            assertTrue(style.kmlLineStyle instanceof KmlLineStyle);
+            assertTrue(style.kmlPolyStyle instanceof KmlPolyStyle);
+            assertTrue(style.kmlBalloonStyle instanceof KmlBalloonStyle);
+            assertTrue(style.kmlListStyle instanceof KmlListStyle);
         })
     })
 });

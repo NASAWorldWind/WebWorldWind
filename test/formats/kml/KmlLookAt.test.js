@@ -32,13 +32,13 @@ require({
             var lookAt = new KmlLookAt(
                 kmlRepresentation.getElementsByTagName("LookAt")[0]);
 
-            assertEquals(10, lookAt.longitude);
-            assertEquals(9, lookAt.latitude);
-            assertEquals(8, lookAt.altitude);
-            assertEquals(1, lookAt.heading);
-            assertEquals(7, lookAt.tilt);
-            assertEquals(6, lookAt.range);
-            assertEquals("clampToGround", lookAt.altitudeMode);
+            assertEquals(10, lookAt.kmlLongitude);
+            assertEquals(9, lookAt.kmlLatitude);
+            assertEquals(8, lookAt.kmlAltitude);
+            assertEquals(1, lookAt.kmlHeading);
+            assertEquals(7, lookAt.kmlTilt);
+            assertEquals(6, lookAt.kmlRange);
+            assertEquals("clampToGround", lookAt.kmlAltitudeMode);
         })
     })
 });

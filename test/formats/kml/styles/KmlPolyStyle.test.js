@@ -29,8 +29,8 @@ require({
                 var polyStyle = new KmlPolyStyle(
                     kmlRepresentation.getElementsByTagName("PolyStyle")[0]);
 
-                assertEquals(true, polyStyle.fill);
-                assertEquals(false, polyStyle.outline);
+                assertEquals(true, polyStyle.kmlFill);
+                assertEquals(false, polyStyle.kmlOutline);
             }
         });
     });

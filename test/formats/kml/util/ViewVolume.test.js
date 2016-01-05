@@ -30,11 +30,11 @@ require({
             var viewVolume = new ViewVolume(
                 kmlRepresentation.getElementsByTagName("ViewVolume")[0]);
 
-            assertEquals(0, viewVolume.leftFov);
-            assertEquals(0, viewVolume.rightFov);
-            assertEquals(0, viewVolume.bottomFov);
-            assertEquals(0, viewVolume.topFov);
-            assertEquals(0, viewVolume.near);
+            assertEquals(0, viewVolume.kmlLeftFov);
+            assertEquals(0, viewVolume.kmlRightFov);
+            assertEquals(0, viewVolume.kmlBottomFov);
+            assertEquals(0, viewVolume.kmlTopFov);
+            assertEquals(0, viewVolume.kmlNear);
         })
     })
 });

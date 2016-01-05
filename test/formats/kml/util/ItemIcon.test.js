@@ -27,8 +27,8 @@ require({
             var scale = new ItemIcon(
                 kmlRepresentation.getElementsByTagName("ItemIcon")[0]);
 
-            assertEquals("open", scale.state);
-            assertEquals("validUrl", scale.href);
+            assertEquals("open", scale.kmlState);
+            assertEquals("validUrl", scale.kmlHref);
         })
     })
 });

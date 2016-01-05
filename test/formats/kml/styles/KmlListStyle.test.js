@@ -31,10 +31,10 @@ require({
             var listStyle = new KmlListStyle(
                 kmlRepresentation.getElementsByTagName("ListStyle")[0]);
 
-            assertEquals('check', listStyle.listItemType);
-            assertEquals('ffffffff', listStyle.bgColor);
+            assertEquals('check', listStyle.kmlListItemType);
+            assertEquals('ffffffff', listStyle.kmlBgColor);
 
-            assertTrue(listStyle.ItemIcon instanceof ItemIcon);
+            assertTrue(listStyle.kmlItemIcon instanceof ItemIcon);
         }
     });
 });

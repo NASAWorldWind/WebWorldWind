@@ -28,9 +28,9 @@ require({
             var scale = new Scale(
                 kmlRepresentation.getElementsByTagName("Scale")[0]);
 
-            assertEquals(1, scale.x);
-            assertEquals(1, scale.y);
-            assertEquals(1, scale.z);
+            assertEquals(1, scale.kmlX);
+            assertEquals(1, scale.kmlY);
+            assertEquals(1, scale.kmlZ);
         })
     })
 });

@@ -76,7 +76,7 @@ define([
             kmlItemIcon: {
                 get: function () {
                     return this.createChildElement({
-                        name: ItemIcon.prototype.tagName
+                        name: ItemIcon.prototype.getTagNames()
                     });
                 }
             }

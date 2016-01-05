@@ -33,11 +33,11 @@ require({
             var groundOverlay = new KmlGroundOverlay(
                 kmlRepresentation.getElementsByTagName("GroundOverlay")[0]);
 
-            assertEquals(0, groundOverlay.altitude);
-            assertEquals('clampToGround', groundOverlay.altitudeMode);
+            assertEquals(0, groundOverlay.kmlAltitude);
+            assertEquals('clampToGround', groundOverlay.kmlAltitudeMode);
 
-            assertTrue(groundOverlay.LatLonBox instanceof KmlLatLonBox);
-            assertTrue(groundOverlay.LatLonQuad instanceof KmlLatLonQuad);
+            assertTrue(groundOverlay.kmlLatLonBox instanceof KmlLatLonBox);
+            assertTrue(groundOverlay.kmlLatLonQuad instanceof KmlLatLonQuad);
         })
     })
 });

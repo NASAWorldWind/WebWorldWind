@@ -28,9 +28,9 @@ require({
             var location = new KmlLocation(
                 kmlRepresentation.getElementsByTagName("Location")[0]);
 
-            assertEquals(45.0, location.longitude);
-            assertEquals(10.0, location.latitude);
-            assertEquals(0.0, location.altitude);
+            assertEquals(45.0, location.kmlLongitude);
+            assertEquals(10.0, location.kmlLatitude);
+            assertEquals(0.0, location.kmlAltitude);
         })
     })
 });

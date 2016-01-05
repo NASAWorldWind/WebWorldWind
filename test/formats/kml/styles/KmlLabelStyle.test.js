@@ -30,7 +30,7 @@ require({
             var labelStyle = new KmlLabelStyle(
                 kmlRepresentation.getElementsByTagName("LabelStyle")[0]);
 
-            assertEquals(1, labelStyle.scale);
+            assertEquals(1, labelStyle.kmlScale);
         })
     });
 });

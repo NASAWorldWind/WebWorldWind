@@ -28,9 +28,9 @@ require({
             var orientation = new KmlOrientation(
                 kmlRepresentation.getElementsByTagName("Orientation")[0]);
 
-            assertEquals(45.0, orientation.heading);
-            assertEquals(10.0, orientation.tilt);
-            assertEquals(0.0, orientation.roll);
+            assertEquals(45.0, orientation.kmlHeading);
+            assertEquals(10.0, orientation.kmlTilt);
+            assertEquals(0.0, orientation.kmlRoll);
         })
     })
 });

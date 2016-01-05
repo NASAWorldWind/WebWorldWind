@@ -30,10 +30,10 @@ require({
             var overlay = new KmlOverlay(
                 kmlRepresentation.getElementsByTagName("Overlay")[0]);
 
-            assertEquals('ffffffff', overlay.color);
-            assertEquals(1, overlay.drawOrder);
+            assertEquals('ffffffff', overlay.kmlColor);
+            assertEquals(1, overlay.kmlDrawOrder);
 
-            assertTrue(overlay.Icon instanceof KmlIcon);
+            assertTrue(overlay.kmlIcon instanceof KmlIcon);
         })
     })
 });
