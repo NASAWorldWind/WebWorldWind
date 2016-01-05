@@ -8,7 +8,7 @@ define([], function () {
      * Descendant of Date.
      * @param dateInFormat Any format of date accepted by the Date constructor.
      * @constructor
-     * @alias
+     * @alias DateWW
      */
     var DateWW = function(dateInFormat) {
         if(dateInFormat) {
