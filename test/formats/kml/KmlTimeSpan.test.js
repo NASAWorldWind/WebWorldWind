@@ -26,8 +26,8 @@ require({
             var kmlRepresentation = new XmlDocument(validTimeSpanXml).dom();
             var timeSpan = new KmlTimeSpan(kmlRepresentation.getElementsByTagName("TimeSpan")[0],{});
 
-            assertEquals("1997-07-16T07:30:15Z", timeSpan.begin);
-            assertEquals("1997-07-16T08:30:15Z", timeSpan.end);
+            assertEquals("1997-07-16T07:30:15Z", timeSpan.kmlBegin);
+            assertEquals("1997-07-16T08:30:15Z", timeSpan.kmlEnd);
         })
     });
 });

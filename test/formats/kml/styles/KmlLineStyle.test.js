@@ -34,11 +34,11 @@ require({
             var lineStyle = new KmlLineStyle(
                 kmlRepresentation.getElementsByTagName("LineStyle")[0]);
 
-            assertEquals(1, lineStyle.width);
-            assertEquals('ffffffff', lineStyle.outerColor);
-            assertEquals(0.5, lineStyle.outerWidth);
-            assertEquals(0.4, lineStyle.physicalWidth);
-            assertEquals(false, lineStyle.labelVisibility);
+            assertEquals(1, lineStyle.kmlWidth);
+            assertEquals('ffffffff', lineStyle.kmlOuterColor);
+            assertEquals(0.5, lineStyle.kmlOuterWidth);
+            assertEquals(0.4, lineStyle.kmlPhysicalWidth);
+            assertEquals(false, lineStyle.kmlLabelVisibility);
         }
     });
 });

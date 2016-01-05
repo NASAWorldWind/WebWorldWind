@@ -30,10 +30,10 @@ require({
             var balloonStyle = new KmlBalloonStyle(
                 kmlRepresentation.getElementsByTagName("BalloonStyle")[0]);
 
-            assertEquals('ffffffff', balloonStyle.bgColor);
-            assertEquals('ff000000', balloonStyle.textColor);
-            assertEquals('TextToTest', balloonStyle.text);
-            assertEquals('default', balloonStyle.displayMode);
+            assertEquals('ffffffff', balloonStyle.kmlBgColor);
+            assertEquals('ff000000', balloonStyle.kmlTextColor);
+            assertEquals('TextToTest', balloonStyle.kmlText);
+            assertEquals('default', balloonStyle.kmlDisplayMode);
         })
     });
 });

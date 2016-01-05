@@ -18,7 +18,8 @@ require({
                 var success = callbacks.add(function (fileContent) {
                     loadedFile = fileContent;
                 });
-                new Remote({url: fileLocation, ajax: true, success: success});
+                var promise = new Remote({url: fileLocation, ajax: true});
+                promise.then(success);
             });
 
             queue.call('Remote request finished', function () {

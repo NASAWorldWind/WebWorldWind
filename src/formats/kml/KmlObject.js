@@ -239,6 +239,10 @@ define([
             "getStyle.");
     };
 
+    KmlObject.prototype.getTagNames = function() {
+        return [];
+    };
+
     KmlObject.prototype.isFeature = function () {
         return false;
     };

@@ -7,12 +7,12 @@ require({
 }, [
     'test/CatchTest',
     'src/formats/kml/util/Pair',
-    'src/formats/kml/styles/KmlStyleSelector',
+    'src/formats/kml/styles/KmlStyle',
     'src/util/XmlDocument'
 ], function (
     CatchTest,
     Pair,
-    KmlStyleSelector,
+    KmlStyle,
     XmlDocument
 ) {
     "use strict";
@@ -30,10 +30,10 @@ require({
             var scale = new Pair(
                 kmlRepresentation.getElementsByTagName("Pair")[0]);
 
-            assertEquals('normal', scale.key);
-            assertEquals('validUrl', scale.styleUrl);
+            assertEquals('normal', scale.kmlKey);
+            assertEquals('validUrl', scale.kmlStyleUrl);
 
-            assertTrue(scale.Style instanceof KmlStyleSelector);
+            assertTrue(scale.kmlStyleSelector instanceof KmlStyle);
         })
     })
 });

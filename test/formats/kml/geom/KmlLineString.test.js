@@ -29,22 +29,22 @@ require({
     TestCase("KmlLineString", {
         setUp: function(){
             var kmlRepresentation = new XmlDocument(kmlContainingLineString).dom();
-            lineString = new KmlLineString(kmlRepresentation.getElementsByTagName("LineString")[0],{});
+            lineString = new KmlLineString(kmlRepresentation.getElementsByTagName("LineString")[0],{then: function(){}});
         },
 
         "testParsing": CatchTest(function() {
-            assertEquals(2, lineString.positions.length);
-            assertEqualsPosition(new Position(37.824787,-122.364167,0), lineString.positions[0]);
-            assertEqualsPosition(new Position(37.824423,-122.363917,0), lineString.positions[1]);
+            assertEquals(2, lineString.kmlPositions.length);
+            assertEqualsPosition(new Position(37.824787,-122.364167,0), lineString.kmlPositions[0]);
+            assertEqualsPosition(new Position(37.824423,-122.363917,0), lineString.kmlPositions[1]);
         }),
 
         testValidEquals: CatchTest(function(){
-            assertTrue(lineString.equals({positions: [
+            assertTrue(lineString.equals({kmlPositions: [
                 new Position(37.824787,-122.364167,0),
                 new Position(37.824423,-122.363917,0)],
-                altitudeMode: 'absolute',
-                extrude: false,
-                tessellate: false
+                kmlAltitudeMode: 'absolute',
+                kmlExtrude: false,
+                kmlTessellate: false
                 }));
         }),
 

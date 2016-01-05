@@ -30,7 +30,7 @@ require({
             var placemark = new KmlPlacemark(
                 kmlRepresentation.getElementsByTagName("Placemark")[0]);
 
-            assertTrue(placemark.geometry instanceof KmlPoint);
+            assertTrue(placemark.kmlGeometry instanceof KmlPoint);
         })
     });
 });

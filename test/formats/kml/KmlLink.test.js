@@ -33,14 +33,14 @@ require({
             var link = new KmlLink(
                 kmlRepresentation.getElementsByTagName("Link")[0]);
 
-            assertEquals('link', link.href);
-            assertEquals('onChange', link.refreshMode);
-            assertEquals(4, link.refreshInterval);
-            assertEquals('never', link.viewRefreshMode);
-            assertEquals(4, link.viewRefreshTime);
-            assertEquals(1, link.viewBoundScale);
-            assertEquals('BBOX=10,10,10,10', link.viewFormat);
-            assertEquals('validQuery', link.httpQuery);
+            assertEquals('link', link.kmlHref);
+            assertEquals('onChange', link.kmlRefreshMode);
+            assertEquals(4, link.kmlRefreshInterval);
+            assertEquals('never', link.kmlViewRefreshMode);
+            assertEquals(4, link.kmlViewRefreshTime);
+            assertEquals(1, link.kmlViewBoundScale);
+            assertEquals('BBOX=10,10,10,10', link.kmlViewFormat);
+            assertEquals('validQuery', link.kmlHttpQuery);
         })
     })
 });

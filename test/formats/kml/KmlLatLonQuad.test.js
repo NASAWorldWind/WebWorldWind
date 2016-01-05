@@ -27,7 +27,7 @@ require({
                 kmlRepresentation.getElementsByTagName("LatLonQuad")[0]);
 
             assertEquals("81.601884,44.160723 83.529902,43.665148 82.947737,44.248831 81.509322,44.321015",
-                latLonQuad.coordinates);
+                latLonQuad.kmlCoordinates);
         })
     })
 });

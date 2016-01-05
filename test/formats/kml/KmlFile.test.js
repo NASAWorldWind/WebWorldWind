@@ -11,7 +11,7 @@ require({
              KmlFile) {
     "use strict";
     AsyncTestCase("KmlFile", {
-        "testSimpleKml": CatchTest(function () {
+        "testSimpleKml": CatchTest(function (queue) {
             var kmlFileXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Point id=\"1\">" +
@@ -21,27 +21,41 @@ require({
                 "</Point>" +
                 "</kml>";
 
-            var kmlFile = new KmlFile({local: true, document: kmlFileXml});
-            assertEquals(1, kmlFile.shapes.length);
-        }),
-
-        "testLoadingKmlFromRelativeRemote": CatchTest(function (queue) {
-            var kmlLocation = "/test/test/testFile.kml";
-            var kmlFile = null;
             var loadedFile = null;
             queue.call('Load the file remotely', function (callbacks) {
                 // callback is called when loaded.
-                kmlFile = new KmlFile({
-                    url: kmlLocation, callback: callbacks.add(function (loaded) {
-                        // This means we are at the end.
-                        loadedFile = loaded;
-                    })
+                var callback = callbacks.add(function (loaded) {
+                    // This means we are at the end.
+                    loadedFile = loaded;
                 });
+                var kmlFile = new KmlFile({local: true, document: kmlFileXml});
+                kmlFile.then(callback);
             });
 
             queue.call('File was loaded.', function () {
                 assertTrue(loadedFile != null);
-                assertEquals(kmlFile.shapes.length, 1);
+                assertEquals(loadedFile.shapes.length, 1);
+            });
+        }),
+
+        "testLoadingKmlFromRelativeRemote": CatchTest(function (queue) {
+            var kmlLocation = "/test/test/testFile.kml";
+            var loadedFile = null;
+            queue.call('Load the file remotely', function (callbacks) {
+                // callback is called when loaded.
+                var callback = callbacks.add(function (loaded) {
+                    // This means we are at the end.
+                    loadedFile = loaded;
+                });
+                var kmlFile = new KmlFile({
+                    url: kmlLocation
+                });
+                kmlFile.then(callback);
+            });
+
+            queue.call('File was loaded.', function () {
+                assertTrue(loadedFile != null);
+                assertEquals(loadedFile.shapes.length, 1);
             });
         }),
 

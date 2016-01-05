@@ -36,12 +36,12 @@ require({
             var photoOverlay = new KmlPhotoOverlay(
                 kmlRepresentation.getElementsByTagName("PhotoOverlay")[0]);
 
-            assertEquals(0, photoOverlay.rotation);
-            assertEquals('rectangle', photoOverlay.shape);
+            assertEquals(0, photoOverlay.kmlRotation);
+            assertEquals('rectangle', photoOverlay.kmlShape);
 
-            assertTrue(photoOverlay.ViewVolume instanceof ViewVolume);
-            assertTrue(photoOverlay.ImagePyramid instanceof ImagePyramid);
-            assertTrue(photoOverlay.Point instanceof KmlPoint);
+            assertTrue(photoOverlay.kmlViewVolume instanceof ViewVolume);
+            assertTrue(photoOverlay.kmlImagePyramid instanceof ImagePyramid);
+            assertTrue(photoOverlay.kmlPoint instanceof KmlPoint);
         })
     })
 });

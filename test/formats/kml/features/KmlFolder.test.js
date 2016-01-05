@@ -28,8 +28,8 @@ require({
             var folder = new KmlFolder(
                 kmlRepresentation.getElementsByTagName("Document")[0]);
 
-            assertEquals(1, folder.shapes.length);
-            assertTrue(folder.shapes[0] instanceof KmlPlacemark);
+            assertEquals(1, folder.kmlShapes.length);
+            assertTrue(folder.kmlShapes[0] instanceof KmlPlacemark);
         })
     })
 });

@@ -31,7 +31,7 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var multiGeometry = new KmlMultiGeometry(kmlRepresentation.getElementsByTagName("MultiGeometry")[0]);
 
-            assertEquals(multiGeometry.shapes.length, 2);
+            assertEquals(multiGeometry.kmlShapes.length, 2);
         })
     });
 });

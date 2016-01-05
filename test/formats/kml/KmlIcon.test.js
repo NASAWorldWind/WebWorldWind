@@ -37,18 +37,18 @@ require({
             var link = new KmlIcon(
                 kmlRepresentation.getElementsByTagName("Icon")[0]);
 
-            assertEquals(0, link.x);
-            assertEquals(0, link.y);
-            assertEquals(-1, link.w);
-            assertEquals(-1, link.h);
-            assertEquals('link', link.href);
-            assertEquals('onChange', link.refreshMode);
-            assertEquals(4, link.refreshInterval);
-            assertEquals('never', link.viewRefreshMode);
-            assertEquals(4, link.viewRefreshTime);
-            assertEquals(1, link.viewBoundScale);
-            assertEquals('BBOX=10,10,10,10', link.viewFormat);
-            assertEquals('validQuery', link.httpQuery);
+            assertEquals(0, link.kmlX);
+            assertEquals(0, link.kmlY);
+            assertEquals(-1, link.kmlW);
+            assertEquals(-1, link.kmlH);
+            assertEquals('link', link.kmlHref);
+            assertEquals('onChange', link.kmlRefreshMode);
+            assertEquals(4, link.kmlRefreshInterval);
+            assertEquals('never', link.kmlViewRefreshMode);
+            assertEquals(4, link.kmlViewRefreshTime);
+            assertEquals(1, link.kmlViewBoundScale);
+            assertEquals('BBOX=10,10,10,10', link.kmlViewFormat);
+            assertEquals('validQuery', link.kmlHttpQuery);
         })
     })
 });

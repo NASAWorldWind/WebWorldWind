@@ -29,10 +29,10 @@ require({
             var imagePyramid = new ImagePyramid(
                 kmlRepresentation.getElementsByTagName("ImagePyramid")[0]);
 
-            assertEquals(256, imagePyramid.tileSize);
-            assertEquals(10, imagePyramid.maxWidth);
-            assertEquals(10, imagePyramid.maxHeight);
-            assertEquals("lowerLeft", imagePyramid.gridOrigin);
+            assertEquals(256, imagePyramid.kmlTileSize);
+            assertEquals(10, imagePyramid.kmlMaxWidth);
+            assertEquals(10, imagePyramid.kmlMaxHeight);
+            assertEquals("lowerLeft", imagePyramid.kmlGridOrigin);
         })
     })
 });

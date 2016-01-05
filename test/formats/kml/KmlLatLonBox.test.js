@@ -30,11 +30,11 @@ require({
             var lod = new KmlLatLonBox(
                 kmlRepresentation.getElementsByTagName("LatLonBox")[0]);
 
-            assertEquals(48.25475939255556, lod.north);
-            assertEquals(48.25207367852141, lod.south);
-            assertEquals(-90.86591508839973, lod.east);
-            assertEquals(-90.8714285289695, lod.west);
-            assertEquals(39.37878630116985, lod.rotation);
+            assertEquals(48.25475939255556, lod.kmlNorth);
+            assertEquals(48.25207367852141, lod.kmlSouth);
+            assertEquals(-90.86591508839973, lod.kmlEast);
+            assertEquals(-90.8714285289695, lod.kmlWest);
+            assertEquals(39.37878630116985, lod.kmlRotation);
         })
     })
 });

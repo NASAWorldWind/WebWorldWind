@@ -45,19 +45,19 @@ require({
             var feature = new KmlFeature(
                 kmlRepresentation.getElementsByTagName("Feature")[0]);
 
-            assertEquals('featureName', feature.name);
-            assertEquals(true, feature.visibility);
-            assertEquals(false, feature.open);
-            assertEquals('validAddress', feature.address);
-            assertEquals('validPhoneNumber', feature.phoneNumber);
-            assertEquals('validSnippet', feature.Snippet);
-            assertEquals('validDescription', feature.description);
-            assertEquals('someUrl', feature.styleUrl);
+            assertEquals('featureName', feature.kmlName);
+            assertEquals(true, feature.kmlVisibility);
+            assertEquals(false, feature.kmlOpen);
+            assertEquals('validAddress', feature.kmlAddress);
+            assertEquals('validPhoneNumber', feature.kmlPhoneNumber);
+            assertEquals('validSnippet', feature.kmlSnippet);
+            assertEquals('validDescription', feature.kmlDescription);
+            assertEquals('someUrl', feature.kmlStyleUrl);
 
-            assertTrue(feature.AbstractView instanceof KmlCamera);
-            assertTrue(feature.TimePrimitive instanceof KmlTimeSpan);
-            assertTrue(feature.StyleSelector instanceof KmlStyle);
-            assertTrue(feature.Region instanceof KmlRegion);
+            assertTrue(feature.kmlAbstractView instanceof KmlCamera);
+            assertTrue(feature.kmlTimePrimitive instanceof KmlTimeSpan);
+            assertTrue(feature.kmlStyleSelector instanceof KmlStyle);
+            assertTrue(feature.kmlRegion instanceof KmlRegion);
         })
     })
 });

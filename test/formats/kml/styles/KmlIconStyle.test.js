@@ -34,11 +34,11 @@ require({
             var iconStyle = new KmlIconStyle(
                 kmlRepresentation.getElementsByTagName("IconStyle")[0]);
 
-            assertEquals('ffffffff', iconStyle.color);
-            assertEquals('normal', iconStyle.colorMode);
-            assertEquals(1, iconStyle.scale);
-            assertEquals(0, iconStyle.heading);
-            assertEquals('test', iconStyle.Icon.href);
+            assertEquals('ffffffff', iconStyle.kmlColor);
+            assertEquals('normal', iconStyle.kmlColorMode);
+            assertEquals(1, iconStyle.kmlScale);
+            assertEquals(0, iconStyle.kmlHeading);
+            assertEquals('test', iconStyle.kmlIcon.kmlHref);
         })
     });
 });
