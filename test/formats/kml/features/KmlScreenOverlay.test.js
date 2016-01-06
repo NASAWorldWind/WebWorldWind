@@ -23,8 +23,8 @@ require({
                 "</ScreenOverlay>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var screenOverlay = new KmlScreenOverlay(
-                kmlRepresentation.getElementsByTagName("ScreenOverlay")[0]);
+            var screenOverlay = new KmlScreenOverlay({objectNode:
+                kmlRepresentation.getElementsByTagName("ScreenOverlay")[0]});
 
             assertEquals(0, screenOverlay.kmlRotation);
         })

@@ -25,8 +25,8 @@ require({
                 "</StyleMap>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var styleMap = new KmlStyleMap(
-                kmlRepresentation.getElementsByTagName("StyleMap")[0]);
+            var styleMap = new KmlStyleMap({objectNode:
+                kmlRepresentation.getElementsByTagName("StyleMap")[0]});
 
             assertTrue(styleMap.kmlPairs[0] instanceof Pair);
         })

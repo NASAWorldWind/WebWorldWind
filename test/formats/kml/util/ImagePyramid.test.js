@@ -26,8 +26,8 @@ require({
                 "</ImagePyramid>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var imagePyramid = new ImagePyramid(
-                kmlRepresentation.getElementsByTagName("ImagePyramid")[0]);
+            var imagePyramid = new ImagePyramid({objectNode:
+                kmlRepresentation.getElementsByTagName("ImagePyramid")[0]});
 
             assertEquals(256, imagePyramid.kmlTileSize);
             assertEquals(10, imagePyramid.kmlMaxWidth);

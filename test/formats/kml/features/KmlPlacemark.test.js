@@ -27,8 +27,8 @@ require({
     TestCase('KmlPlacemark', {
         testValidKml: CatchTest(function(){
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var placemark = new KmlPlacemark(
-                kmlRepresentation.getElementsByTagName("Placemark")[0]);
+            var placemark = new KmlPlacemark({objectNode:
+                kmlRepresentation.getElementsByTagName("Placemark")[0]});
 
             assertTrue(placemark.kmlGeometry instanceof KmlPoint);
         })

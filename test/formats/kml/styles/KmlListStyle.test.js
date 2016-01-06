@@ -28,8 +28,8 @@ require({
     TestCase('KmlListStyleTest', {
         testValidKml: function(){
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var listStyle = new KmlListStyle(
-                kmlRepresentation.getElementsByTagName("ListStyle")[0]);
+            var listStyle = new KmlListStyle({objectNode:
+                kmlRepresentation.getElementsByTagName("ListStyle")[0]});
 
             assertEquals('check', listStyle.kmlListItemType);
             assertEquals('ffffffff', listStyle.kmlBgColor);

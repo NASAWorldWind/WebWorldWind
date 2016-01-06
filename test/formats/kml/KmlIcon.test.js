@@ -34,8 +34,8 @@ require({
                 "</Icon>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var link = new KmlIcon(
-                kmlRepresentation.getElementsByTagName("Icon")[0]);
+            var link = new KmlIcon({objectNode:
+                kmlRepresentation.getElementsByTagName("Icon")[0]});
 
             assertEquals(0, link.kmlX);
             assertEquals(0, link.kmlY);

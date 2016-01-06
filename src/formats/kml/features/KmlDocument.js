@@ -43,7 +43,7 @@ define([
                 get: function(){
                     var allElements = this.parse();
                     return allElements.filter(function (element) {
-                        return element.isFeature && element.isFeature();
+                        return element.isFeature;
                     });
                 }
             },

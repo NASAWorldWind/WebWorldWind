@@ -25,8 +25,8 @@ require({
                 "</Document>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var folder = new KmlFolder(
-                kmlRepresentation.getElementsByTagName("Document")[0]);
+            var folder = new KmlFolder({objectNode:
+                kmlRepresentation.getElementsByTagName("Document")[0]});
 
             assertEquals(1, folder.kmlShapes.length);
             assertTrue(folder.kmlShapes[0] instanceof KmlPlacemark);

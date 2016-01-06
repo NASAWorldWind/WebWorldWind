@@ -26,8 +26,8 @@ require({
         TestCase('KmlPolyStyle', {
             testValidKml: function() {
                 var kmlRepresentation = new XmlDocument(validKml).dom();
-                var polyStyle = new KmlPolyStyle(
-                    kmlRepresentation.getElementsByTagName("PolyStyle")[0]);
+                var polyStyle = new KmlPolyStyle({objectNode:
+                    kmlRepresentation.getElementsByTagName("PolyStyle")[0]});
 
                 assertEquals(true, polyStyle.kmlFill);
                 assertEquals(false, polyStyle.kmlOutline);

@@ -28,8 +28,8 @@ require({
                 "</Region>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var style = new KmlRegion(
-                kmlRepresentation.getElementsByTagName("Region")[0]);
+            var style = new KmlRegion({objectNode:
+                kmlRepresentation.getElementsByTagName("Region")[0]});
 
             assertTrue(style.kmlLatLonAltBox instanceof KmlLatLonAltBox);
             assertTrue(style.kmlLod instanceof KmlLod);

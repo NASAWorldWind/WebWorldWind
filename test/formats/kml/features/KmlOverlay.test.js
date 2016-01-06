@@ -27,8 +27,8 @@ require({
                 "</Overlay>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var overlay = new KmlOverlay(
-                kmlRepresentation.getElementsByTagName("Overlay")[0]);
+            var overlay = new KmlOverlay({objectNode:
+                kmlRepresentation.getElementsByTagName("Overlay")[0]});
 
             assertEquals('ffffffff', overlay.kmlColor);
             assertEquals(1, overlay.kmlDrawOrder);

@@ -24,10 +24,10 @@ require({
                 "</kml>";
 
             var kmlRepresentation = new XmlDocument(validTimeSpanXml).dom();
-            var timeSpan = new KmlTimeSpan(kmlRepresentation.getElementsByTagName("TimeSpan")[0],{});
+            var timeSpan = new KmlTimeSpan({objectNode:kmlRepresentation.getElementsByTagName("TimeSpan")[0], style: {}});
 
-            assertEquals("1997-07-16T07:30:15Z", timeSpan.kmlBegin);
-            assertEquals("1997-07-16T08:30:15Z", timeSpan.kmlEnd);
+            assertEquals("Wed, 16 Jul 1997 07:30:15 GMT", timeSpan.kmlBegin.toUTCString());
+            assertEquals("Wed, 16 Jul 1997 08:30:15 GMT", timeSpan.kmlEnd.toUTCString());
         })
     });
 });

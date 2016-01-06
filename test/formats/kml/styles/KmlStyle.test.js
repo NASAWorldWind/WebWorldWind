@@ -40,8 +40,8 @@ require({
                 "</Style>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var style = new KmlStyle(
-                kmlRepresentation.getElementsByTagName("Style")[0]);
+            var style = new KmlStyle({objectNode:
+                kmlRepresentation.getElementsByTagName("Style")[0]});
 
             assertTrue(style.kmlIconStyle instanceof KmlIconStyle);
             assertTrue(style.kmlLabelStyle instanceof KmlLabelStyle);

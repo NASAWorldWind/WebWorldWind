@@ -44,7 +44,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithValidInformation).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode,{}).retrieve({name: 'extrude', transformer: Boolean});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).retrieve({name: 'extrude', transformer: Boolean});
             assertEquals(true, retrievedValue);
         }),
 
@@ -58,7 +58,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithValidInformation).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode,{}).retrieve({name: 'extrude'});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).retrieve({name: 'extrude'});
             assertEquals("true", retrievedValue);
         }),
 
@@ -72,7 +72,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithValidInformation).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode,{}).retrieve({name: 'extrude'});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).retrieve({name: 'extrude'});
             assertEquals("", retrievedValue);
         }),
 
@@ -85,7 +85,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithoutSubNode).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode,{}).retrieve({name: 'id', isAttribute: true, transformer: Number});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).retrieve({name: 'id', isAttribute: true, transformer: Number});
             assertEquals(1, retrievedValue);
         }),
 
@@ -98,7 +98,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithoutAttribute).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode,{}).retrieve({name: 'class', isAttribute: true});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).retrieve({name: 'class', isAttribute: true});
             assertEquals(null, retrievedValue);
         }),
 
@@ -111,7 +111,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithoutSubNode).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode,{}).retrieve({name: 'extrude', transformer: Boolean});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).retrieve({name: 'extrude', transformer: Boolean});
             assertEquals(null, retrievedValue);
         }),
 
@@ -125,7 +125,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithValidInformation).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode).createChildElement({name: 'Point'});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).createChildElement({name: 'Point'});
             assertTrue(retrievedValue instanceof KmlPoint);
         }),
 
@@ -139,7 +139,7 @@ require({
 
             var kmlDocument = new XmlDocument(validKmlWithValidInformation).dom();
             var kmlNode = kmlDocument.getElementsByTagName("Point")[0];
-            var retrievedValue = new KmlObject(kmlNode).retrieveAttribute({name: 'Point', attributeName: 'randAttr'});
+            var retrievedValue = new KmlObject({objectNode: kmlNode}).retrieveAttribute({name: 'Point', attributeName: 'randAttr'});
             assertEquals("value", retrievedValue);
         })
     });

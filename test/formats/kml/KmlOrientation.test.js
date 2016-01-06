@@ -25,8 +25,8 @@ require({
                 "</Orientation>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var orientation = new KmlOrientation(
-                kmlRepresentation.getElementsByTagName("Orientation")[0]);
+            var orientation = new KmlOrientation({objectNode:
+                kmlRepresentation.getElementsByTagName("Orientation")[0]});
 
             assertEquals(45.0, orientation.kmlHeading);
             assertEquals(10.0, orientation.kmlTilt);

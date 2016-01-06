@@ -25,8 +25,8 @@ require({
                 "</Location>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var location = new KmlLocation(
-                kmlRepresentation.getElementsByTagName("Location")[0]);
+            var location = new KmlLocation({objectNode:
+                kmlRepresentation.getElementsByTagName("Location")[0]});
 
             assertEquals(45.0, location.kmlLongitude);
             assertEquals(10.0, location.kmlLatitude);

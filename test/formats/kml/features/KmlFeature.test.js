@@ -42,8 +42,8 @@ require({
                 "</Feature>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var feature = new KmlFeature(
-                kmlRepresentation.getElementsByTagName("Feature")[0]);
+            var feature = new KmlFeature({objectNode:
+                kmlRepresentation.getElementsByTagName("Feature")[0]});
 
             assertEquals('featureName', feature.kmlName);
             assertEquals(true, feature.kmlVisibility);

@@ -26,7 +26,7 @@ require({
                 "</kml>";
 
             var kmlRepresentation = new XmlDocument(kmlFile).dom();
-            var point = new KmlPoint(kmlRepresentation.getElementsByTagName("Point")[0]);
+            var point = new KmlPoint({objectNode: kmlRepresentation.getElementsByTagName("Point")[0]});
 
             assertEquals(-122.0822035425683, point.kmlPosition.longitude);
             assertEquals(37.42228990140251, point.kmlPosition.latitude);

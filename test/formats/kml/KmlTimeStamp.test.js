@@ -21,9 +21,9 @@ require({
                 "</kml>";
 
             var kmlRepresentation = new XmlDocument(validTimeStampXml).dom();
-            var timeStamp = new KmlTimeStamp(kmlRepresentation.getElementsByTagName("TimeStamp")[0],{});
+            var timeStamp = new KmlTimeStamp({objectNode:kmlRepresentation.getElementsByTagName("TimeStamp")[0],style: {}});
 
-            assertEquals("1997-07-16T07:30:15Z", timeStamp.kmlWhen);
+            assertEquals("Wed, 16 Jul 1997 07:30:15 GMT", timeStamp.kmlWhen.toUTCString());
         })
     });
 });

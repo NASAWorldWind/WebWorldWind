@@ -30,8 +30,8 @@ require({
                 "</GroundOverlay>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var groundOverlay = new KmlGroundOverlay(
-                kmlRepresentation.getElementsByTagName("GroundOverlay")[0]);
+            var groundOverlay = new KmlGroundOverlay({objectNode:
+                kmlRepresentation.getElementsByTagName("GroundOverlay")[0]});
 
             assertEquals(0, groundOverlay.kmlAltitude);
             assertEquals('clampToGround', groundOverlay.kmlAltitudeMode);

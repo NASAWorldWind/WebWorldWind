@@ -24,8 +24,8 @@ require({
                 "</ItemIcon>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var scale = new ItemIcon(
-                kmlRepresentation.getElementsByTagName("ItemIcon")[0]);
+            var scale = new ItemIcon({objectNode:
+                kmlRepresentation.getElementsByTagName("ItemIcon")[0]});
 
             assertEquals("open", scale.kmlState);
             assertEquals("validUrl", scale.kmlHref);

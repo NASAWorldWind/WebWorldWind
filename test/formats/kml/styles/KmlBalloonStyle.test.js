@@ -27,8 +27,8 @@ require({
     TestCase("BallonStyle", {
         testValidKml: CatchTest(function(){
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var balloonStyle = new KmlBalloonStyle(
-                kmlRepresentation.getElementsByTagName("BalloonStyle")[0]);
+            var balloonStyle = new KmlBalloonStyle({objectNode:
+                kmlRepresentation.getElementsByTagName("BalloonStyle")[0]});
 
             assertEquals('ffffffff', balloonStyle.kmlBgColor);
             assertEquals('ff000000', balloonStyle.kmlTextColor);

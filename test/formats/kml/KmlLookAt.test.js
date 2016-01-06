@@ -29,8 +29,8 @@ require({
                 "</LookAt>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var lookAt = new KmlLookAt(
-                kmlRepresentation.getElementsByTagName("LookAt")[0]);
+            var lookAt = new KmlLookAt({objectNode:
+                kmlRepresentation.getElementsByTagName("LookAt")[0]});
 
             assertEquals(10, lookAt.kmlLongitude);
             assertEquals(9, lookAt.kmlLatitude);

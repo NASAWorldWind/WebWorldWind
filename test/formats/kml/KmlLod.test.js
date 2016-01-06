@@ -26,8 +26,8 @@ require({
                 "</Lod>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var lod = new KmlLod(
-                kmlRepresentation.getElementsByTagName("Lod")[0]);
+            var lod = new KmlLod({objectNode:
+                kmlRepresentation.getElementsByTagName("Lod")[0]});
 
             assertEquals(256, lod.kmlMinLodPixels);
             assertEquals(-1, lod.kmlMaxLodPixels);

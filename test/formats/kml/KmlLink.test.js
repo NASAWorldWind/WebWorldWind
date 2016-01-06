@@ -30,8 +30,8 @@ require({
                 "</Link>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var link = new KmlLink(
-                kmlRepresentation.getElementsByTagName("Link")[0]);
+            var link = new KmlLink({objectNode:
+                kmlRepresentation.getElementsByTagName("Link")[0]});
 
             assertEquals('link', link.kmlHref);
             assertEquals('onChange', link.kmlRefreshMode);

@@ -25,8 +25,8 @@ require({
                 "</AbstractView>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var overlay = new KmlAbstractView(
-                kmlRepresentation.getElementsByTagName("AbstractView")[0]);
+            var overlay = new KmlAbstractView({objectNode:
+                kmlRepresentation.getElementsByTagName("AbstractView")[0]});
 
             assertTrue(overlay.kmlTimePrimitive instanceof KmlTimeSpan);
         })

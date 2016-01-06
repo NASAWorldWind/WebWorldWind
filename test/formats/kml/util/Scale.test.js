@@ -25,8 +25,8 @@ require({
                 "</Scale>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var scale = new Scale(
-                kmlRepresentation.getElementsByTagName("Scale")[0]);
+            var scale = new Scale({objectNode:
+                kmlRepresentation.getElementsByTagName("Scale")[0]});
 
             assertEquals(1, scale.kmlX);
             assertEquals(1, scale.kmlY);

@@ -27,8 +27,8 @@ require({
                 "</NetworkLink>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var networkLink = new KmlNetworkLink(
-                kmlRepresentation.getElementsByTagName("NetworkLink")[0]);
+            var networkLink = new KmlNetworkLink({objectNode:
+                kmlRepresentation.getElementsByTagName("NetworkLink")[0]});
 
             assertEquals(true, networkLink.kmlRefreshVisibility);
             assertEquals(true, networkLink.kmlFlyToView);

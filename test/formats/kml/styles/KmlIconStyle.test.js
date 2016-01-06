@@ -31,8 +31,8 @@ require({
     TestCase('KmlIconStyle', {
         testValidKml: CatchTest(function() {
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var iconStyle = new KmlIconStyle(
-                kmlRepresentation.getElementsByTagName("IconStyle")[0]);
+            var iconStyle = new KmlIconStyle({objectNode:
+                kmlRepresentation.getElementsByTagName("IconStyle")[0]});
 
             assertEquals('ffffffff', iconStyle.kmlColor);
             assertEquals('normal', iconStyle.kmlColorMode);

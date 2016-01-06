@@ -27,8 +27,8 @@ require({
                 "</LatLonBox>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var lod = new KmlLatLonBox(
-                kmlRepresentation.getElementsByTagName("LatLonBox")[0]);
+            var lod = new KmlLatLonBox({objectNode:
+                kmlRepresentation.getElementsByTagName("LatLonBox")[0]});
 
             assertEquals(48.25475939255556, lod.kmlNorth);
             assertEquals(48.25207367852141, lod.kmlSouth);

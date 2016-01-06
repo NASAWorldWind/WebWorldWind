@@ -31,8 +31,8 @@ require({
     TestCase('KmlLineStyle', {
         testValidKml: function(){
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var lineStyle = new KmlLineStyle(
-                kmlRepresentation.getElementsByTagName("LineStyle")[0]);
+            var lineStyle = new KmlLineStyle({objectNode:
+                kmlRepresentation.getElementsByTagName("LineStyle")[0]});
 
             assertEquals(1, lineStyle.kmlWidth);
             assertEquals('ffffffff', lineStyle.kmlOuterColor);

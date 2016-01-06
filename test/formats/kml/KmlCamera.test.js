@@ -29,8 +29,8 @@ require({
                 "</Camera>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var camera = new KmlCamera(
-                kmlRepresentation.getElementsByTagName("Camera")[0]);
+            var camera = new KmlCamera({objectNode:
+                kmlRepresentation.getElementsByTagName("Camera")[0]});
 
             assertEquals(10, camera.kmlLongitude);
             assertEquals(9, camera.kmlLatitude);

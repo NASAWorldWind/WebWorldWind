@@ -27,8 +27,8 @@ require({
                 "</ViewVolume>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var viewVolume = new ViewVolume(
-                kmlRepresentation.getElementsByTagName("ViewVolume")[0]);
+            var viewVolume = new ViewVolume({objectNode:
+                kmlRepresentation.getElementsByTagName("ViewVolume")[0]});
 
             assertEquals(0, viewVolume.kmlLeftFov);
             assertEquals(0, viewVolume.kmlRightFov);

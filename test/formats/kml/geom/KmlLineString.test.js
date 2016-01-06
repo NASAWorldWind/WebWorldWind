@@ -29,7 +29,7 @@ require({
     TestCase("KmlLineString", {
         setUp: function(){
             var kmlRepresentation = new XmlDocument(kmlContainingLineString).dom();
-            lineString = new KmlLineString(kmlRepresentation.getElementsByTagName("LineString")[0],{then: function(){}});
+            lineString = new KmlLineString({objectNode: kmlRepresentation.getElementsByTagName("LineString")[0], style: {then: function(){}}});
         },
 
         "testParsing": CatchTest(function() {

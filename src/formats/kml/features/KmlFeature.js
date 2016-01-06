@@ -42,7 +42,7 @@ define([
      * @augments KmlObject
      */
     var KmlFeature = function (options) {
-        options.isFeature = true;
+        this.isFeature = options.isFeature = true;
         Object.defineProperties(this, {
             /**
              * Name of this feature. Every feature should have name.

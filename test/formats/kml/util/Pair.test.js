@@ -27,8 +27,8 @@ require({
                 "</Pair>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var scale = new Pair(
-                kmlRepresentation.getElementsByTagName("Pair")[0]);
+            var scale = new Pair({objectNode:
+                kmlRepresentation.getElementsByTagName("Pair")[0]});
 
             assertEquals('normal', scale.kmlKey);
             assertEquals('validUrl', scale.kmlStyleUrl);

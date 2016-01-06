@@ -33,8 +33,8 @@ require({
                 "</PhotoOverlay>" +
                 "</kml>";
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var photoOverlay = new KmlPhotoOverlay(
-                kmlRepresentation.getElementsByTagName("PhotoOverlay")[0]);
+            var photoOverlay = new KmlPhotoOverlay({objectNode:
+                kmlRepresentation.getElementsByTagName("PhotoOverlay")[0]});
 
             assertEquals(0, photoOverlay.kmlRotation);
             assertEquals('rectangle', photoOverlay.kmlShape);

@@ -27,8 +27,8 @@ require({
     TestCase('KmlLabelStyle', {
         testValidKml: CatchTest(function(){
             var kmlRepresentation = new XmlDocument(validKml).dom();
-            var labelStyle = new KmlLabelStyle(
-                kmlRepresentation.getElementsByTagName("LabelStyle")[0]);
+            var labelStyle = new KmlLabelStyle({objectNode:
+                kmlRepresentation.getElementsByTagName("LabelStyle")[0]});
 
             assertEquals(1, labelStyle.kmlScale);
         })
