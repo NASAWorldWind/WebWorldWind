@@ -155,6 +155,7 @@ define([
          * It renders all shapes, which are associated with current file.
          * @param options {Object}
          * @param options.layer {Layer} Layer into which the objects should be rendered.
+         * @param options.controls {KmlControls[]} Controls to be notified when the file is updated.
          * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
          */
         KmlFile.prototype.update = function (options) {

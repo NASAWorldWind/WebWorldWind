@@ -42,6 +42,7 @@ define([
      * @augments KmlObject
      */
     var KmlFeature = function (options) {
+        //noinspection JSUndefinedPropertyAssignment
         this.isFeature = options.isFeature = true;
         Object.defineProperties(this, {
             /**

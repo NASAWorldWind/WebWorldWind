@@ -30,6 +30,7 @@ define([
      * @augments KmlTimePrimitive
      */
     var KmlTimeSpan = function (options) {
+        //noinspection JSUndefinedPropertyAssignment
         options.isTimeSpan = true;
         Object.defineProperties(this, {
             /**

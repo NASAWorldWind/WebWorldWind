@@ -119,13 +119,13 @@ define([
         return null;
     };
 
-    // Intenationally undocumented. Internal use only.
+    // Intentionally undocumented. Internal use only.
     KmlObject.prototype.doesAttributeExist = function (node, attribute) {
         return node.attributes && node.attributes && node.attributes.getNamedItem(attribute) &&
             node.attributes.getNamedItem(attribute).value;
     };
 
-    // Intenationally undocumented. Internal use only.
+    // Intentionally undocumented. Internal use only.
     KmlObject.prototype.getValueOfAttribute = function (node, attributeName) {
         return node.attributes.getNamedItem(attributeName).value;
     };

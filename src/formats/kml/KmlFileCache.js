@@ -25,7 +25,7 @@ define([], function () {
             return this._rootFile;
         } else {
             var urlNormalized = url;
-            if (url.indexOf('#' != -1)) {
+            if (url.indexOf('#') != -1) {
                 urlNormalized = url.substr(0, url.indexOf('#') - 1);
             }
             // Start of the URL use to store it in the map.

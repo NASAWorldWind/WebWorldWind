@@ -29,6 +29,7 @@ define([
      * @augments KmlTimePrimitive
      */
     var KmlTimeStamp = function (options) {
+        //noinspection JSUndefinedPropertyAssignment
         options.isTimeStamp = true;
         Object.defineProperties(this, {
             /**

@@ -138,7 +138,7 @@ define([
         KmlLineString.prototype = Object.create(Path.prototype);
 
         /**
-         * It creates Path repreesnting this LineString unless already intialized.
+         * It creates Path representing this LineString unless already initialized.
          * @param styles {Object}
          * @param styles.normal {KmlStyle} Style applied when item not highlighted
          * @param styles.highlight {KmlStyle} Style applied when item is highlighted

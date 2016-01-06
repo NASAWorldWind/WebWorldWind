@@ -65,7 +65,7 @@ define([
             },
 
             /**
-             * The href can contain a pallet of icons. In this case this is height of the icon on the pallete.
+             * The href can contain a pallet of icons. In this case this is height of the icon on the palette.
              * @memberof KmlIcon.prototype
              * @readonly
              * @type {Number}

@@ -103,11 +103,12 @@ define([
     // TODO: Fix Point and create it meaningfully.
     /**
      * It renders KmlPoint as Polygon.
-     * @param layer Layer into which the point should be added.
+     * @param options {Object}
+     * @param options.layer {Layer} Layer to put Point into.
      */
-    KmlPoint.prototype.update = function (pOptions) {
+    KmlPoint.prototype.update = function (options) {
         // TODO Fix the update to work with the current status of the information.
-        var options = WWUtil.clone(pOptions);
+        options = WWUtil.clone(options);
         var attributes = new ShapeAttributes(null);
         attributes.outlineColor = Color.WHITE;
         attributes.interiorColor = Color.WHITE;

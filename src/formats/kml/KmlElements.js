@@ -5,6 +5,7 @@
 define([], function () {
     "use strict";
 
+    //noinspection UnnecessaryLocalVariableJS
     /**
      * Map representing the available Elements. This is solution to circular dependency when
      * parsing some of the elements may be dependent on elements, in which they may be present.
