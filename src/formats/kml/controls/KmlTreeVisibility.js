@@ -9,15 +9,18 @@ define([
              KmlControls
     ) {
     "use strict";
+
     /**
      * This class represents the structure of Documents, Folders and Features in the document. It renders them into
      * some of the outside area with defined classes, so that user can specify the look and feel.
      * Important part of this effort is to allow user show/hide subset of the Features present in the document.
      * Implementing this functionality also simplifies the manual testing.
      * @param visualElementId {String} Id of the element into which this will be rendered.
-     * @param wwd
+     * @param wwd {WorldWindow} WorldWindow instance necessary to control the redraw in the framework.
      * @constructor
      * @augments KmlControls
+     * @alias KmlTreeVisibility
+     * @classdesc Class for controlling the visibility of features.
      */
     var KmlTreeVisibility = function (visualElementId, wwd) {
         KmlControls.apply(this);
@@ -28,12 +31,16 @@ define([
 
     KmlTreeVisibility.prototype = Object.create(KmlControls.prototype);
 
+    /**
+     * @inheritDoc
+     */
     KmlTreeVisibility.prototype.hook = function (node, options) {
         if(options.isFeature) {
             this.createControls(node);
         }
     };
 
+    // For internal use only.
     KmlTreeVisibility.prototype.createControls = function (node) {
         var name = node.kmlName || node.id || WWUtil.guid();
         var enabled = node.enabled || node.kmlVisibility === true;
@@ -69,6 +76,7 @@ define([
         }
     };
 
+    // Internal use only. Updates all descendants of given Feature.
     KmlTreeVisibility.prototype.updateDescendants = function (node, enabled) {
         node.update({enabled: enabled});
     };
