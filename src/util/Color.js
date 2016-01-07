@@ -269,7 +269,7 @@ define([
                 bbB = Math.round(color.blue * 255),
                 abB = Math.round(color.alpha * 255);
 
-            return rbA === rbB && gbA === gbB && bbA === bbB && abA === abB
+            return rbA === rbB && gbA === gbB && bbA === bbB && abA === abB;
         };
 
         /**

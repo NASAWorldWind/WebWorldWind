@@ -44,6 +44,12 @@ define([
     var KmlFeature = function (options) {
         //noinspection JSUndefinedPropertyAssignment
         this.isFeature = options.isFeature = true;
+        function getKmlTimePrimitive () {
+            return this.createChildElement({
+                name: KmlTimePrimitive.prototype.getTagNames()
+            });
+        }
+
         Object.defineProperties(this, {
             /**
              * Name of this feature. Every feature should have name.
@@ -172,11 +178,7 @@ define([
              * @readonly
              */
             kmlTimePrimitive: {
-                get: function () {
-                    return this.createChildElement({
-                        name: KmlTimePrimitive.prototype.getTagNames()
-                    });
-                }
+                get: getKmlTimePrimitive
             },
 
             /**
@@ -215,7 +217,7 @@ define([
         extend(this, KmlFeature.prototype);
 
         // Make sure that time is parsed.
-        var timePrimitive = this.kmlTimePrimitive;
+        getKmlTimePrimitive();
     };
 
     /**

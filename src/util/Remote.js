@@ -12,6 +12,14 @@ define([
     Promise
 ) {
     "use strict";
+    /**
+     * Creates representation of Remote object, which returns Promise of this object.
+     * @param options {Object}
+     * @param options.ajax {Boolean} If we should use plain AJAX
+     * @param options.zip {Boolean} If we are downloading kmz
+     * @param options.responseType {String} Optional responseType applied in specific circumstances for the kmz
+     * @constructor
+     */
     var Remote = function(options) {
         // Returns promise.
         if(options.ajax) {
@@ -27,6 +35,13 @@ define([
         }
     };
 
+    /**
+     * Retrieves the data from remote server.
+     * @param url {String} Url to query for data
+     * @param options {Object}
+     * @param options.responseType {String} If set, rewrites default responseType.
+     * @returns {Promise} Promise of the data.
+     */
     Remote.prototype.ajax = function(url, options) {
         // Return promise.
         return new Promise(function (resolve, reject) {

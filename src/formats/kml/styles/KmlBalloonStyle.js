@@ -80,7 +80,7 @@ define([
         extend(this, KmlBalloonStyle.prototype);
     };
 
-    KmlBalloonStyle.update = function(style){
+    KmlBalloonStyle.update = function(){
 
     };
 

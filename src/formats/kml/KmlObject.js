@@ -197,7 +197,7 @@ define([
                 return;
             }
 
-            self.parseOneNode(options, childNode, shapes)
+            self.parseOneNode(childNode, shapes);
         });
 
         return shapes;
@@ -205,11 +205,10 @@ define([
 
     /**
      * It parses one node and create valid object based on this information.
-     * @param options
-     * @param childNode
-     * @param shapes
+     * @param childNode {Node} Node which is being parsed into the element.
+     * @param shapes {KmlObject[]} Array of returned shapes it is in as well as out parameter.
      */
-    KmlObject.prototype.parseOneNode = function (options, childNode, shapes) {
+    KmlObject.prototype.parseOneNode = function (childNode, shapes) {
         var cached = this.retrieveFromCache(childNode);
         if (cached.element) {
             shapes.push(cached.element);
@@ -292,9 +291,9 @@ define([
 
     /**
      * It finds correct element and then it retrieves
-     * @param name Name of the node.
-     * @param node Node which is represented by this Kml Element
-     * @param style Promise of the style to be delivered.
+     * @param name {String} Name of the node.
+     * @param node {Node} Node which is represented by this Kml Element
+     * @param style {Promise} Promise of the style to be delivered.
      * @returns {KmlObject} Descendant of the KmlObject.
      */
     KmlObject.prototype.instantiateDescendant = function (name, node, style) {
@@ -391,6 +390,7 @@ define([
         return new Promise(function (resolve, reject) {});
     };
 
+    // The parameters are used in the descendants.
     /**
      * This method is called once the style was already resolved but before any further processing goes on.
      * @param styles {Object}
@@ -400,6 +400,7 @@ define([
     KmlObject.prototype.styleResolutionStarted = function (styles) {
     };
 
+    // The parameters are used in the descendants.
     /**
      * This method is called once the style was resolved and all general processing of the style is finished.
      * @param options {Object} Object with options passed into the update.
@@ -407,6 +408,8 @@ define([
     KmlObject.prototype.afterStyleResolution = function (options) {
     };
 
+    // The parameters are used in the descendants.
+    //noinspection JSUnusedLocalSymbols
     /**
      * This method is called as a first thing in the lifecycle of the update method. It is possible to stop further
      * processing if this method returns false.
@@ -417,6 +420,8 @@ define([
         return true;
     };
 
+    // The parameters are used in the descendants.
+    //noinspection JSUnusedLocalSymbols
     /**
      * This method is called during the processing of the update function. It is required and should therefore be
      * overridden. It prepares attributes changing how different attributes are visualized.

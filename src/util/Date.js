@@ -6,7 +6,7 @@ define([], function () {
     "use strict";
     /**
      * Descendant of Date.
-     * @param dateInFormat Any format of date accepted by the Date constructor.
+     * @param dateInFormat {String} Any format of date accepted by the Date constructor.
      * @constructor
      * @alias DateWW
      */
@@ -41,7 +41,7 @@ define([], function () {
         var comparedDate = date.valueOf();
 
         if(currentDate > comparedDate) {
-            return -1
+            return -1;
         } else if(currentDate < comparedDate) {
             return 1;
         } else {
