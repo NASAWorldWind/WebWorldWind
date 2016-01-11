@@ -105,16 +105,14 @@ define([
 
             this.levels = new LevelSet(sector, levelZeroDelta, numLevels, tileWidth, tileHeight);
 
-            this.detailHintOrigin = 2.4;
-
             /**
-             * Affects the degree of detail shown by this layer. Values greater than zero increase detail, but at the
-             * expense of performance. Values less than zero decrease detail. To increase detail, try values greater
-             * than but near 0, such as 0.1 and 0.2, until the desired detail is achieved.
+             * Controls the level of detail switching for this layer. The next highest resolution level is
+             * used when an image's texel size is greater than this number of pixels, up to the maximum resolution
+             * of this layer.
              * @type {Number}
-             * @default 0
+             * @default 1.75
              */
-            this.detailHint = 0;
+            this.detailControl = 1.75;
 
             /* Intentionally not documented.
              * Indicates the time at which this layer's imagery expire. Expired images are re-retrieved
@@ -166,7 +164,31 @@ define([
                 var tile = this.topLevelTiles[i];
 
                 if (!this.isTileTextureInMemory(dc, tile)) {
-                    this.retrieveTileImage(dc, tile);
+                    this.retrieveTileImage(dc, tile, true); // suppress redraw upon successful retrieval
+                }
+            }
+        };
+
+        /**
+         * Initiates retrieval of this layer's tiles that are visible in the specified World Window. Pre-populating is
+         * not required. It is used to eliminate the visual effect of loading tiles incrementally.
+         * @param {WorldWindow} wwd The world window for which to pre-populate this layer.
+         * @throws {ArgumentError} If the specified world window is null or undefined.
+         */
+        TiledImageLayer.prototype.prePopulateCurrentTiles = function (wwd) {
+            if (!wwd) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledImageLayer", "prePopulate", "missingWorldWindow"));
+            }
+
+            var dc = wwd.drawContext;
+            this.assembleTiles(dc);
+
+            for (var i = 0, len = this.currentTiles.length; i < len; i++) {
+                var tile = this.currentTiles[i];
+
+                if (!this.isTileTextureInMemory(dc, tile)) {
+                    this.retrieveTileImage(dc, tile, true); // suppress redraw upon successful retrieval
                 }
             }
         };
@@ -210,16 +232,70 @@ define([
                 || !this.lasTtMVP || !dc.navigatorState.modelviewProjection.equals(this.lasTtMVP)
                 || dc.globeStateKey != this.lastGlobeStateKey) {
                 this.currentTilesInvalid = false;
-                this.assembleTiles(dc);
+
+                // Tile fading works visually only when the surface tiles are opaque, otherwise the surface flashes
+                // when two tiles are drawn over the same area, even though one of them is semi-transparent.
+                // So do not provide fading when the surface opacity is less than 1;
+                if (dc.surfaceOpacity >= 1 && this.opacity >= 1) {
+                    // Fading of outgoing tiles requires determination of the those tiles. Prepare an object with all of
+                    // the preceding frame's tiles so that we can subsequently compare the list of newly selected tiles
+                    // with the previously selected tiles.
+                    this.previousTiles = {};
+                    for (var j = 0; j < this.currentTiles.length; j++) {
+                        this.previousTiles[this.currentTiles[j].imagePath] = this.currentTiles[j];
+                    }
+
+                    this.assembleTiles(dc);
+                    this.fadeOutgoingTiles(dc);
+                } else {
+                    this.assembleTiles(dc);
+                }
+
             }
 
             this.lasTtMVP = dc.navigatorState.modelviewProjection;
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {
-                dc.surfaceTileRenderer.renderTiles(dc, this.currentTiles, this.opacity);
+                dc.surfaceTileRenderer.renderTiles(dc, this.currentTiles, this.opacity, dc.surfaceOpacity >= 1);
                 dc.frameStatistics.incrementImageTileCount(this.currentTiles.length);
                 this.inCurrentFrame = true;
+            }
+        };
+
+        TiledImageLayer.prototype.fadeOutgoingTiles = function (dc) {
+            // Determine which files are outgoing and fade their disappearance. Must be called after this frame's
+            // current tiles for this layer have been determined.
+
+            var visibilityDelta = (dc.timestamp - dc.previousRedrawTimestamp) / dc.fadeTime;
+
+            // Create a hash table of the current tiles so that we can check for tile inclusion below.
+            var current = {};
+            for (var i = 0; i < this.currentTiles.length; i++) {
+                var tile = this.currentTiles[i];
+                current[tile.imagePath] = tile;
+            }
+
+            // Determine whether the tile was in the previous frame but is not in this one.  If that's the case,
+            // then the tile is outgoing and its opacity needs to be reduced.
+            for (var tileImagePath in this.previousTiles) {
+                if (this.previousTiles.hasOwnProperty(tileImagePath)) {
+                    tile = this.previousTiles[tileImagePath];
+
+                    if (tile.opacity > 0 && !current[tile.imagePath]) {
+                        // Compute the reduced.
+                        tile.opacity = Math.max(0, tile.opacity - visibilityDelta);
+
+                        // If not fully faded, add the tile to the list of current tiles and request a redraw so that
+                        // we'll be called continuously until all tiles have faded completely. Note that order in the
+                        // current tiles list is important: the non-opaque tiles must be drawn after the opaque tiles.
+                        if (tile.opacity > 0) {
+                            this.currentTiles.push(tile);
+                            this.currentTilesInvalid = true;
+                            dc.redrawRequested = true;
+                        }
+                    }
+                }
             }
         };
 
@@ -295,6 +371,7 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
+                tile.opacity = 1;;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
@@ -312,6 +389,7 @@ define([
                 if (this.isTileTextureInMemory(dc, this.currentAncestorTile)) {
                     // Set up to map the ancestor tile into the current one.
                     tile.fallbackTile = this.currentAncestorTile;
+                    tile.fallbackTile.opacity = 1;
                     this.currentTiles.push(tile);
                 }
             }
@@ -328,9 +406,9 @@ define([
 
         // Intentionally not documented.
         TiledImageLayer.prototype.tileMeetsRenderingCriteria = function (dc, tile) {
-            var s = this.detailHintOrigin + this.detailHint;
+            var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
-                s *= 0.9;
+                s *= 1.2;
             }
             return tile.level.isLastLevel() || !tile.mustSubdivide(dc, s);
         };
@@ -350,9 +428,11 @@ define([
          * compute or otherwise create the image.
          * @param {DrawContext} dc The current draw context.
          * @param {ImageTile} tile The tile for which to retrieve the resource.
+         * @param {Boolean} suppressRedraw true to suppress generation of redraw events when an image is successfully
+         * retrieved, otherwise false.
          * @protected
          */
-        TiledImageLayer.prototype.retrieveTileImage = function (dc, tile) {
+        TiledImageLayer.prototype.retrieveTileImage = function (dc, tile, suppressRedraw) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
                 if (this.absentResourceList.isResourceAbsent(tile.imagePath)) {
                     return;
@@ -381,10 +461,12 @@ define([
                         layer.currentTilesInvalid = true;
                         layer.absentResourceList.unmarkResourceAbsent(imagePath);
 
-                        // Send an event to request a redraw.
-                        var e = document.createEvent('Event');
-                        e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
-                        canvas.dispatchEvent(e);
+                        if (!suppressRedraw) {
+                            // Send an event to request a redraw.
+                            var e = document.createEvent('Event');
+                            e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                            canvas.dispatchEvent(e);
+                        }
                     }
                 };
 

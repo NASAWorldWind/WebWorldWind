@@ -218,8 +218,14 @@ define([
 
             this.pickEnabled = false;
 
-            this.detailHintOrigin = 2.4;
-            this.detailHint = 0;
+            /**
+             * Controls the level of detail switching for this layer. The next highest resolution level is
+             * used when an image's texel size is greater than this number of pixels, up to the maximum resolution
+             * of this layer.
+             * @type {Number}
+             * @default 1.75
+             */
+            this.detailControl = 1.75;
         };
 
         WmtsLayer.prototype = Object.create(Layer.prototype);
@@ -344,9 +350,9 @@ define([
         };
 
         WmtsLayer.prototype.tileMeetsRenderingCriteria = function (dc, tile) {
-            var s = this.detailHintOrigin + this.detailHint;
+            var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
-                s *= 0.9;
+                s *= 1.2;
             }
             return tile.tileMatrix.levelNumber === (this.tileMatrixSet.tileMatrix.length - 1) || !tile.mustSubdivide(dc, s);
         };

@@ -51,13 +51,12 @@ define([
             this.tileHeight = 256;
 
             /**
-             * Indicates the relationship of tile resolution to screen resolution as the viewing altitude changes.
-             * Values greater than 0 cause tiles to appear at higher resolution at greater altitudes than normal, but at
-             * an increased performance cost. Values less than 0 decrease the default resolution at any given altitude.
-             * The default value is 0. Values typically range between -0.5 and 0.5.
+             * Controls the level of detail switching for this controller. The next highest resolution level is
+             * used when an image's texel size is greater than this number of pixels.
              * @type {Number}
+             * @default 1.75
              */
-            this.detailHint = 0;
+            this.detailControl = 1.75;
 
             // Internal. Intentionally not documented.
             this.levels = new LevelSet(Sector.FULL_SPHERE, new Location(45, 45), 16, this.tileWidth, this.tileHeight);
@@ -79,9 +78,6 @@ define([
 
             // Internal. Intentionally not documented.
             this.key = "FramebufferTileController " + ++FramebufferTileController.keyPool;
-
-            // Internal. Intentionally not documented.
-            this.detailHintOrigin = 2.4;
         };
 
         // Internal. Intentionally not documented.
@@ -243,9 +239,9 @@ define([
 
         // Internal. Intentionally not documented.
         FramebufferTileController.prototype.tileMeetsRenderingCriteria = function (dc, tile) {
-            var s = this.detailHintOrigin + this.detailHint;
+            var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
-                s *= 0.9;
+                s *= 1.2;
             }
 
             return tile.level.isLastLevel() || !tile.mustSubdivide(dc, s);

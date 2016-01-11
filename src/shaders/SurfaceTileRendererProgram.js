@@ -61,8 +61,8 @@ define([
                         /*
                          * Returns true when the texture coordinate samples texels outside the texture image.
                          */
-                    'bool isOutsideTextureImage(const vec2 coord) {\n' +
-                    '    return coord.x < 0.0 || coord.x > 1.0 || coord.y < 0.0 || coord.y > 1.0;\n' +
+                    'bool isInsideTextureImage(const vec2 coord) {\n' +
+                    '    return coord.x >= 0.0 && coord.x <= 1.0 && coord.y >= 0.0 && coord.y <= 1.0;\n' +
                     '}\n' +
                         /*
                          * OpenGL ES Shading Language v1.00 fragment shader for SurfaceTileRendererProgram. Writes the value of the texture 2D
@@ -71,13 +71,12 @@ define([
                          * standard range of [0,1].
                          */
                     'void main(void) {\n' +
-                    'if (isOutsideTextureImage(texMaskCoord)) {\n' +
-                    '    discard;\n' +
-                    '} else if (modulateColor) {\n' +
-                    '    gl_FragColor = color * floor(texture2D(texSampler, texSamplerCoord).a + 0.5);\n' +
+                        'float mask = float(isInsideTextureImage(texMaskCoord));' +
+                    'if (modulateColor) {\n' +
+                    '    gl_FragColor = color * mask * floor(texture2D(texSampler, texSamplerCoord).a + 0.5);\n' +
                     '} else {\n' +
                         /* Return either the sampled texture2D color multiplied by opacity or transparent black. */
-                    '    gl_FragColor = texture2D(texSampler, texSamplerCoord) * opacity;\n' +
+                    '    gl_FragColor = texture2D(texSampler, texSamplerCoord) * mask * opacity;\n' +
                     '}\n' +
                     '}';
 
