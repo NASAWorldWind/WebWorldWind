@@ -10,7 +10,6 @@ requirejs(['../src/WorldWind',
 
 		var bboxBtn = $("#bbox");
 
-		var sliderX = $("#sliderX");
 		var sliderY = $("#sliderY");
 		var sliderZ = $("#sliderZ");
 
@@ -22,14 +21,14 @@ requirejs(['../src/WorldWind',
 		var sliderRotateYDuck = $("#sliderRotateYDuck");
 		var sliderRotateZDuck = $("#sliderRotateZDuck");
 
-		var sliderScaleSentinel2 = $('#sliderScaleSentinel2');
-		var sliderRotateXSentinel2 = $('#sliderRotateXSentinel2');
-		var sliderRotateYSentinel2 = $('#sliderRotateYSentinel2');
-		var sliderRotateZSentinel2 = $('#sliderRotateZSentinel2');
+		var sliderScaleEngine = $('#sliderScaleEngine');
+		var sliderRotateXEngine = $('#sliderRotateXEngine');
+		var sliderRotateYEngine = $('#sliderRotateYEngine');
+		var sliderRotateZEngine = $('#sliderRotateZEngine');
 
 		var scaleSpanBox = $("#scaleSpanBox");
 		var scaleSpanDuck = $("#scaleSpanDuck");
-		var scaleSpanSentinel2 = $('#scaleSpanSentinel2');
+		var scaleSpanEngine = $('#scaleSpanEngine');
 
 		var spanRotateXBox = $("#spanRotateXBox");
 		var spanRotateYBox = $("#spanRotateYBox");
@@ -39,18 +38,16 @@ requirejs(['../src/WorldWind',
 		var spanRotateYDuck = $("#spanRotateYDuck");
 		var spanRotateZDuck = $("#spanRotateZDuck");
 
-		var spanRotateXSentinel2 = $('#spanRotateXSentinel2');
-		var spanRotateYSentinel2 = $('#spanRotateYSentinel2');
-		var spanRotateZSentinel2 = $('#spanRotateZSentinel2');
+		var spanRotateXEngine = $('#spanRotateXEngine');
+		var spanRotateYEngine = $('#spanRotateYEngine');
+		var spanRotateZEngine = $('#spanRotateZEngine');
 
 		var xValue, yValue, zValue;
 		var boxSceneScale = 500000;
 		var duckSceneScale = 5000;
-		var sentinel2Scale = 2000;
+		var engineScale = 2000;
 
         var computeBbox = false;
-
-		//bboxBtn.button();
 
 		bboxBtn.on('click',function(event){
 			if (this.checked) {
@@ -59,11 +56,11 @@ requirejs(['../src/WorldWind',
 
 				boxScene.computeBoundingBox();
 				duckScene.computeBoundingBox();
-				sentinel2Scene.computeBoundingBox();
+				engineScene.computeBoundingBox();
 
 				bboxLayer.addRenderable(boxScene.boundingBox);
 				bboxLayer.addRenderable(duckScene.boundingBox);
-				bboxLayer.addRenderable(sentinel2Scene.boundingBox);
+				bboxLayer.addRenderable(engineScene.boundingBox);
 			}
 			else {
                 computeBbox = false;
@@ -71,16 +68,6 @@ requirejs(['../src/WorldWind',
 			}
 		});
 
-		sliderX.slider({
-			min: -100,
-			max: 100,
-			disabled: true,
-			slide: function( event, ui ) {
-				xValue = (ui.value - 1) / 100;
-				boxScene.translateX(xValue);
-				wwd.redraw();
-			}
-		});
 		sliderY.slider({
 			min: 0,
 			max: 1000,
@@ -190,54 +177,54 @@ requirejs(['../src/WorldWind',
 			}
 		});
 
-		sliderScaleSentinel2.slider({
+		sliderScaleEngine.slider({
 			min:0,
 			max:2000,
-			value:sentinel2Scale,
+			value:engineScale,
 			slide: function(event,ui){
-				scaleSpanSentinel2.html(ui.value.toLocaleString());
-				sentinel2Scene.setScale(ui.value);
+				scaleSpanEngine.html(ui.value.toLocaleString());
+				engineScene.setScale(ui.value);
                 if (computeBbox){
-                    sentinel2Scene.computeBoundingBox();
+                    engineScene.computeBoundingBox();
                 }
 				wwd.redraw();
 			}
 		});
-		sliderRotateXSentinel2.slider({
+		sliderRotateXEngine.slider({
 			min:0,
 			max:360,
 			value:0,
 			slide: function(event, ui){
-				spanRotateXSentinel2.html(ui.value);
-				sentinel2Scene.setRotationX(ui.value);
+				spanRotateXEngine.html(ui.value);
+				engineScene.setRotationX(ui.value);
                 if (computeBbox){
-                    sentinel2Scene.computeBoundingBox();
+                    engineScene.computeBoundingBox();
                 }
 				wwd.redraw();
 			}
 		});
-		sliderRotateYSentinel2.slider({
+		sliderRotateYEngine.slider({
 			min:0,
 			max:360,
 			value:0,
 			slide: function(event, ui){
-				spanRotateYSentinel2.html(ui.value);
-				sentinel2Scene.setRotationY(ui.value);
+				spanRotateYEngine.html(ui.value);
+				engineScene.setRotationY(ui.value);
                 if (computeBbox){
-                    sentinel2Scene.computeBoundingBox();
+                    engineScene.computeBoundingBox();
                 }
 				wwd.redraw();
 			}
 		});
-		sliderRotateZSentinel2.slider({
+		sliderRotateZEngine.slider({
 			min:0,
 			max:360,
 			value:0,
 			slide: function(event, ui){
-				spanRotateZSentinel2.html(ui.value);
-				sentinel2Scene.setRotationZ(ui.value);
+				spanRotateZEngine.html(ui.value);
+				engineScene.setRotationZ(ui.value);
                 if (computeBbox){
-                    sentinel2Scene.computeBoundingBox();
+                    engineScene.computeBoundingBox();
                 }
 				wwd.redraw();
 			}
@@ -245,7 +232,7 @@ requirejs(['../src/WorldWind',
 
 		scaleSpanBox.html(boxSceneScale.toLocaleString());
 		scaleSpanDuck.html(duckSceneScale.toLocaleString());
-		scaleSpanSentinel2.html(sentinel2Scale.toLocaleString());
+		scaleSpanEngine.html(engineScale.toLocaleString());
 
 		WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -279,10 +266,8 @@ requirejs(['../src/WorldWind',
 		var position = new WorldWind.Position(45, -100, 1000e3);
 		var boxScene = new WorldWind.Scene(position);
 		boxScene.setScale(boxSceneScale);
-		boxScene.setProgram('original');
 
 		var colladaLoader = new WorldWind.ColladaLoader();
-
 		colladaLoader.init({filePath: './data/'});
 		colladaLoader.load('box.dae', function (sceneData) {
 			console.log('box', sceneData);
@@ -327,12 +312,11 @@ requirejs(['../src/WorldWind',
 		var position1 = new WorldWind.Position(20, -100, 1000e3);
 		var duckScene = new WorldWind.Scene(position1);
 		duckScene.setScale(duckSceneScale);
-		duckScene.setProgram('original');
 		//duckScene.setRotationZ(6);
 
 		var colladaLoader2 = new WorldWind.ColladaLoader();
-        colladaLoader.init({filePath: './data/'});
-        colladaLoader.load('duck.dae', function (sceneData) {
+        colladaLoader2.init({filePath: './data/'});
+        colladaLoader2.load('duck.dae', function (sceneData) {
 			console.log('duck', sceneData);
 			duckScene.add(sceneData);
 			duckLayer.addRenderable(duckScene);
@@ -348,18 +332,17 @@ requirejs(['../src/WorldWind',
 
 		placemarkLayer.addRenderable(placemark1);
 
-		var satelliteLayer = new WorldWind.RenderableLayer("satellite");
-		wwd.addLayer(satelliteLayer);
+		var engineLayer = new WorldWind.RenderableLayer("satellite");
+		wwd.addLayer(engineLayer);
 		var position3 = new WorldWind.Position(0, -100, 1000e3);
-		var sentinel2Scene = new WorldWind.Scene(position3);
-		sentinel2Scene.setScale(sentinel2Scale);
-		sentinel2Scene.setProgram('original');
+		var engineScene = new WorldWind.Scene(position3);
+		engineScene.setScale(engineScale);
 		var colladaLoader3 = new WorldWind.ColladaLoader();
 		colladaLoader3.init({filePath: './data/'});
 		colladaLoader3.load('2_cylinder_engine.dae', function (sceneData) {
-			console.log('sentinel2', sceneData);
-			sentinel2Scene.add(sceneData);
-			satelliteLayer.addRenderable(sentinel2Scene);
+			console.log('engine', sceneData);
+			engineScene.add(sceneData);
+			engineLayer.addRenderable(engineScene);
 		});
 
 		var placemark2 = new WorldWind.Placemark(position3, true, null);

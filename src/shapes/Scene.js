@@ -10,17 +10,15 @@ define([
         '../shaders/BasicTextureProgram',
         '../geom/BoundingBox',
         '../util/Color',
-        '../geom/Line',
         '../geom/Matrix',
         '../util/Offset',
         '../geom/Position',
         '../pick/PickedObject',
         '../render/Renderable',
-        //'../shaders/TextureProgram01',
         '../geom/Vec2',
         '../geom/Vec3'
     ],
-    function (BasicTextureProgram, BoundingBox, Color, Line, Matrix, Offset, Position, PickedObject, Renderable/*, TextureProgram01*/, Vec2, Vec3) {
+    function (BasicTextureProgram, BoundingBox, Color, Matrix, Offset, Position, PickedObject, Renderable, Vec2, Vec3) {
         "use strict";
 
         /**
@@ -63,10 +61,6 @@ define([
              * @default WorldWind.ABSOLUTE
              */
             this.altitudeMode = WorldWind.ABSOLUTE;
-
-            //the program to use when rendering the scene. Only BasicTextureProgram is implemented.
-            this.program = BasicTextureProgram;
-            this.programIndex = 0;
 
             this.layer = null;
 
@@ -150,22 +144,6 @@ define([
         };
 
         /**
-         * Sets the render program for this scene.
-         * @param {String} program The scene's render program.
-         */
-        Scene.prototype.setProgram = function (program) {
-            if (program == 'original') {
-                this.program = BasicTextureProgram;
-                this.programIndex = 0;
-            }
-            else if (program == 'custom') {
-                //this.program = TextureProgram01;
-                this.program = BasicTextureProgram;
-                this.programIndex = 1;
-            }
-        };
-
-        /**
          * Adds the data needed to render this scene.
          * @param {Object} sceneData The scene's data containing the nodes, meshes, materials, textures and other
          * info needed to render the scene.
@@ -196,7 +174,15 @@ define([
 
         // Internal. Intentionally not documented.
         Scene.prototype.renderOrdered = function (dc) {
+
             this.drawOrderedScene(dc);
+
+            if (dc.pickingMode) {
+                var po = new PickedObject(this.pickColor.clone(), this,
+                    this.position, this.layer, false);
+
+                dc.resolvePick(po);
+            }
         };
 
         // Internal. Intentionally not documented.
@@ -214,7 +200,7 @@ define([
         Scene.prototype.beginDrawing = function (dc) {
             var gl = dc.currentGlContext;
 
-            dc.findAndBindProgram(this.program);
+            dc.findAndBindProgram(BasicTextureProgram);
 
             gl.enable(gl.CULL_FACE);
             gl.enable(gl.DEPTH_TEST);
@@ -228,22 +214,12 @@ define([
         // Internal. Intentionally not documented.
         Scene.prototype.doDrawOrderedScene = function (dc) {
 
-            switch (this.programIndex) {
-                case 0: //BasicTextureProgram
+            if (dc.pickingMode) {
+                this.pickColor = dc.uniquePickColor();
+            }
 
-                    for (var i = 0, nodesLen = this.nodes.length; i < nodesLen; i++) {
-                        this.traverseNodeTree(dc, this.nodes[i]);
-                    }
-
-                    break;
-
-                case 1: //TextureProgram01
-
-                    for (i = 0; i < nodesLen; i++) {
-                        this.traverseNodeTree(dc, this.nodes[i]);
-                    }
-
-                    break;
+            for (var i = 0, nodesLen = this.nodes.length; i < nodesLen; i++) {
+                this.traverseNodeTree(dc, this.nodes[i]);
             }
         };
 
@@ -258,9 +234,7 @@ define([
 
                     var materialKey = buffers[j].material;
                     var material = this.materials[materialKey];
-                    //console.log('draw', meshKey, j, node._depth);
-                    //if (meshKey === 'Geometry-mesh019')
-                    this.draw0(dc, buffers[j], material, node.worldMatrix);
+                    this.draw(dc, buffers[j], material, node.worldMatrix);
                 }
             }
 
@@ -271,8 +245,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        Scene.prototype.draw0 = function (dc, buffers, material, worldMatrix) {
-            //BasicTextureProgram
+        Scene.prototype.draw = function (dc, buffers, material, worldMatrix) {
 
             var gl = dc.currentGlContext,
                 program = dc.currentProgram,
@@ -306,7 +279,12 @@ define([
 
             program.loadTextureEnabled(gl, false);
 
-            var diffuse = material.diffuse;
+            if (material.techniqueType === 'constant'){
+                var diffuse = material.reflective;
+            }
+            else {
+                diffuse = material.diffuse;
+            }
             var opacity;
             var r = 1, g = 1, b = 1, a = 1;
             if (diffuse) {
@@ -325,7 +303,7 @@ define([
             var hasTexture = (material.textures != null);
             if (hasTexture) {
 
-                if (material.textures.diffuse){
+                if (material.textures.diffuse) {
                     var imageKey = material.textures.diffuse.mapId;
                 }
                 else {
@@ -405,7 +383,7 @@ define([
                 gl.vertexAttribPointer(program.normalVectorLocation, 3, gl.FLOAT, false, 0, 0);
             }
 
-            this.applyMatrix0(dc, hasLighting, worldMatrix);
+            this.applyMatrix(dc, hasLighting, worldMatrix);
 
             if (!buffers.indicesVboCacheKey) {
                 buffers.indicesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
@@ -466,6 +444,7 @@ define([
         Scene.prototype.makeOrderedRenderable = function (dc) {
 
             var refPt = new Vec3(0, 0, 0);
+            this.globe = dc.globe;
 
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, refPt);
@@ -508,7 +487,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        Scene.prototype.applyMatrix0 = function (dc, hasLighting, worldMatrix) {
+        Scene.prototype.applyMatrix = function (dc, hasLighting, worldMatrix) {
 
             var mvpMatrix = Matrix.fromIdentity();
             mvpMatrix.copy(dc.navigatorState.modelviewProjection);
@@ -520,7 +499,7 @@ define([
             if (hasLighting) {
                 var normalMatrix = Matrix.fromIdentity();
                 normalMatrix.copy(dc.navigatorState.modelviewNormalTransform);
-                normalMatrix.multiplyMatrix(this.rotationMatrix);
+                normalMatrix.multiplyMatrix(this.normalMatrix);
 
                 if (worldMatrix && this.upAxis === 'Y_UP') {
                     var rot = worldMatrix.upper3By3();
@@ -538,22 +517,46 @@ define([
         Scene.prototype.computeRotationMatrix = function () {
 
             this.rotationMatrix = Matrix.fromIdentity();
-
-            if (this.zRotation > 0) {
-                this.rotationMatrix.multiplyByRotation(0, 0, 1, this.zRotation);
-            }
-
-            if (this.yRotation > 0) {
-                this.rotationMatrix.multiplyByRotation(0, 1, 0, this.yRotation);
-            }
-
-            if (this.xRotation > 0) {
-                this.rotationMatrix.multiplyByRotation(1, 0, 0, this.xRotation);
-            }
+            this.rotationMatrix.multiplyByRotation(1, 0, 0, this.xRotation);
+            this.rotationMatrix.multiplyByRotation(0, 1, 0, this.yRotation);
+            this.rotationMatrix.multiplyByRotation(0, 0, 1, this.zRotation);
         };
 
         // Computes this scene's transformation matrix.
         Scene.prototype.computeTransformationMatrix = function () {
+
+            this.transformationMatrix = Matrix.fromIdentity();
+
+            if (!this.rotationMatrix) {
+                this.computeRotationMatrix();
+            }
+
+            if (this.globe) {
+                this.transformationMatrix.multiplyByLocalCoordinateTransform(this.placePoint, this.globe);
+            }
+            else {
+                this.transformationMatrix.multiplyByTranslation(this.placePoint[0], this.placePoint[1], this.placePoint[2]);
+            }
+
+            this.transformationMatrix.multiplyMatrix(this.rotationMatrix);
+            this.transformationMatrix.multiplyByScale(this.scale, this.scale, this.scale);
+
+            this.computeNormalMatrix();
+
+        };
+
+        // Computes this scene's normal matrix.
+        Scene.prototype.computeNormalMatrix = function () {
+            this.rotAngles = new Vec3(0, 0, 0);
+            this.transformationMatrix.extractRotationAngles(this.rotAngles);
+            this.normalMatrix = Matrix.fromIdentity();
+            this.normalMatrix.multiplyByRotation(-1, 0, 0, this.rotAngles[0]);
+            this.normalMatrix.multiplyByRotation(0, -1, 0, this.rotAngles[1]);
+            this.normalMatrix.multiplyByRotation(0, 0, -1, this.rotAngles[2]);
+        };
+
+        // Computes this scene's transformation matrix.
+        Scene.prototype.computeTransformationMatrix_old = function () {
 
             this.transformationMatrix = Matrix.fromIdentity();
 
@@ -604,7 +607,13 @@ define([
                             var vertex = new Vec3(vertices[k], vertices[k + 1], vertices[k + 2]);
 
                             vertex.multiply(this.scale);
-                            vertex.multiplyByMatrix(this.rotationMatrix);
+
+                            this.normalRotationMatrix1 = Matrix.fromIdentity();
+                            this.normalRotationMatrix1.multiplyByRotation(1, 0, 0, this.rotAngles[0]);
+                            this.normalRotationMatrix1.multiplyByRotation(0, 1, 0, this.rotAngles[1]);
+                            this.normalRotationMatrix1.multiplyByRotation(0, 0, 1, this.rotAngles[2]);
+
+                            vertex.multiplyByMatrix(this.normalRotationMatrix1);
                             vertex.add(this.placePoint);
 
                             points.push(vertex[0]);

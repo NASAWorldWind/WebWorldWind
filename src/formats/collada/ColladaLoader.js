@@ -179,7 +179,7 @@ define(['../../geom/Matrix'], function (Matrix) {
         //a check to determine if this node has multiple materials
         var materials = xmlNode.querySelectorAll("instance_material");
         if (materials && materials.length > 1) {
-            console.log('multi material node', nodeId);
+            //console.log('multi material node', nodeId);
             multiMaterial = true;
         }
 
@@ -319,6 +319,10 @@ define(['../../geom/Matrix'], function (Matrix) {
                         //remove the "#" char to get the id of the <material> element
                         var materialId = xmlMaterial.getAttribute("target").toString().substr(1);
 
+                        // the material symbol links the material specified in the node with the one specified in the
+                        // mesh
+                        var materialSymbol = xmlMaterial.getAttribute("symbol").toString();
+
                         //the same material can be used in multiple nodes, so check if we processed it
                         if (!this.scene.materials[materialId]) {
 
@@ -337,7 +341,7 @@ define(['../../geom/Matrix'], function (Matrix) {
                         if (!this.scene.meshes[url]) {
 
                             //parse and compute this mesh
-                            var meshData = this.parseGeometry(url, j);
+                            var meshData = this.parseGeometry(url, j, materialSymbol);
                             if (meshData) {
                                 //add it to the scene meshes map
                                 meshData.name = meshId;
@@ -373,7 +377,7 @@ define(['../../geom/Matrix'], function (Matrix) {
      * @param {Number} index The index of the shape/material in the mesh.
      * A mesh may have more than one shape (multi material node/mesh).
      */
-    ColladaLoader.prototype.parseGeometry = function (id, index) {
+    ColladaLoader.prototype.parseGeometry = function (id, index, materialSymbol) {
         index = index || 0;
 
         var __id = id.substr(1); //remove the "#" char to get the id of the <geometry> element
@@ -432,36 +436,46 @@ define(['../../geom/Matrix'], function (Matrix) {
         var mesh = null;
 
         //next is parsing the primitives and constructing a shape/buffer with vertices, uvs, normals and indices
-        //we check the length of the primitive nodes vs the index of the material we are processing in the parseNode
-        //method
-
-        //we use the same index(material), but the order that materials are in the node may differ from the order
-        //that materials are in the mesh. If this is the case the shape will not use the correct material(color/texture)
-        //TODO change this so that the order does not matter
+        //the order that materials are in the node may differ from the order that materials are in the mesh,
+        //so we first find the correct material
 
         var polygons = xmlMesh.querySelectorAll("polygons");
-        if (polygons && polygons.length > index) {
-            mesh = this.parseTriangles(polygons[index], sources);
+        if (polygons) {
+            for (sh = 0; sh < polygons.length; sh++) {
+                var polygon = polygons[sh];
+                _materialId = polygon.getAttribute("material");
+                if (_materialId === materialSymbol) {
+                    mesh = this.parseTriangles(polygon, sources);
+                    break;
+                }
+            }
         }
 
         if (!mesh) {
             var triangles = xmlMesh.querySelectorAll("triangles");
-            if (triangles && triangles.length > index) {
-                mesh = this.parseTriangles(triangles[index], sources);
+            if (triangles) {
+                for (var sh = 0; sh < triangles.length; sh++){
+                    var triangle = triangles[sh];
+                    var _materialId = triangle.getAttribute("material");
+                    if (_materialId === materialSymbol){
+                        mesh = this.parseTriangles(triangle, sources);
+                        break;
+                    }
+                }
             }
         }
 
         if (!mesh) {
-            var polylist = xmlMesh.querySelectorAll("polylist");
-            if (polylist && polylist.length > index) {
-                mesh = this.parsePolylist(polylist[index], sources);
-            }
-        }
-
-        if (!mesh) {
-            var lineStrip = xmlMesh.querySelectorAll("linestrips");
-            if (lineStrip && lineStrip.length > index) {
-                mesh = this.parseLineStrip(sources, lineStrip[index]);
+            var polylists = xmlMesh.querySelectorAll("polylist");
+            if (polylists) {
+                for (sh = 0 ; sh < polylists.length; sh++){
+                    var polylist = polylists[sh];
+                    _materialId =  polylist.getAttribute("material");
+                    if (_materialId === materialSymbol){
+                        mesh = this.parsePolylist(polylist, sources);
+                        break;
+                    }
+                }
             }
         }
 
@@ -677,14 +691,6 @@ define(['../../geom/Matrix'], function (Matrix) {
     };
 
     /**
-     * Parses the line strips primitive and computes the indices and vertices.
-     * Internal. Applications should not call this function.
-     */
-    ColladaLoader.prototype.parseLineStrip = function () {
-        //not yet implemented
-    };
-
-    /**
      * Parses the shape of a mesh.
      * Internal. Applications should not call this function.
      * @param {Node} shape.
@@ -827,16 +833,20 @@ define(['../../geom/Matrix'], function (Matrix) {
 
         var material = {};
 
-        //get the techniqueType, can be one of the three bellow
+        //get the techniqueType, can be one of the four bellow
         var techniqueType = xmlTechnique.querySelector("phong");
+        material.techniqueType = 'phong';
         if (!techniqueType) {
             techniqueType = xmlTechnique.querySelector("blinn");
+            material.techniqueType = 'blinn';
         }
         if (!techniqueType) {
             techniqueType = xmlTechnique.querySelector("lambert");
+            material.techniqueType = 'lambert';
         }
         if (!techniqueType) {
             techniqueType = xmlTechnique.querySelector("constant");
+            material.techniqueType = 'constant';
         }
         if (!techniqueType) return null;
 
