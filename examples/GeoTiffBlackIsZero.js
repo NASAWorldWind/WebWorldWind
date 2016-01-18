@@ -14,7 +14,9 @@ requirejs(['../src/WorldWind',
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         var layers = [
-            {layer: new WorldWind.BMNGLayer(), enabled: true},
+            {layer: new WorldWind.BMNGLayer(), enabled: false},
+            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -25,25 +27,35 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        //var resourcesUrl = "./geotiff_data/world.tiff";
-        //var resourcesUrl = "./geotiff_data/Namib.tiff";
-        var resourcesUrl = "./geotiff_data/GeogToWGS84GeoKey5.tif";
-
-
+        var resourcesUrl = "./geotiff_data/single_band.tif";
 
         var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
+
+        var start = new Date().getTime();
+
         var geoTiffImage = geotiffObject.readAsImage(function (image) {
-            //console.log(image);
+            var bbox = geotiffObject.metadata.geotiff.bbox;
+            console.log("Bounding Box:");
+            console.log(bbox);
             var surfaceGeoTiff = new WorldWind.SurfaceImage(
-                new WorldWind.Sector(40, 50, -120, -100),
-                new WorldWind.ImageSource(image));
+                new WorldWind.Sector(bbox.lowerLeft.latitude, bbox.upperLeft.latitude, bbox.upperLeft.longitude, bbox.upperRight.longitude),
+                new WorldWind.ImageSource(image)
+            );
+
+            var end = new Date().getTime();
+            var time = end-start;
+            console.log("Execution time: " + time);
 
             // GeoTiff test
             var geotiffLayer = new WorldWind.RenderableLayer("GeoTiff");
             geotiffLayer.addRenderable(surfaceGeoTiff);
             wwd.addLayer(geotiffLayer);
 
+            wwd.goTo(new WorldWind.Position(38.02, 15.65, 112000));
+
             // Create a layer manager for controlling layer visibility.
             var layerManger = new LayerManager(wwd);
         });
+
+
     });

@@ -9,22 +9,18 @@ define([],
     function () {
         "use strict";
 
+        /**
+         * Provides all of the TIFF tag and subtag constants.
+         * @alias Tiff
+         * @constructor
+         * @classdesc Contains all of the TIFF tags that are used to store TIFF information of any type.
+         */
         var Tiff = {
-            Type: {
-                'BYTE': 1,
-                'ASCII': 2,
-                'SHORT': 3,
-                'LONG': 4,
-                'RATIONAL': 5,
-                'SBYTE': 6,
-                'UNDEFINED': 7,
-                'SSHORT': 8,
-                'SLONG': 9,
-                'SRATIONAL': 10,
-                'FLOAT': 11,
-                'DOUBLE': 12
-            },
-
+            /**
+             * An object containing all TIFF specific tags.
+             * @memberof Tiff
+             * @type {Object}
+             */
             Tag: {
                 'NEW_SUBFILE_TYPE': 254,
                 'SUBFILE_TYPE': 255,
@@ -102,6 +98,26 @@ define([],
                 'COPYRIGHT': 33432
             },
 
+            /**
+             * An object containing all TIFF compression types.
+             * @memberof Tiff
+             * @type {Object}
+             */
+            Compression: {
+                'UNCOMPRESSED': 1,
+                'CCITT_1D': 2,
+                'GROUP_3_FAX': 3,
+                'GROUP_4_FAX': 4,
+                'LZW': 5,
+                'JPEG': 6,
+                'PACK_BITS': 32773
+            },
+
+            /**
+             * An object containing all TIFF orientation types.
+             * @memberof Tiff
+             * @type {Object}
+             */
             Orientation: {
                 'Row0_IS_TOP__Col0_IS_LHS': 1,
                 'Row0_IS_TOP__Col0_IS_RHS': 2,
@@ -113,16 +129,11 @@ define([],
                 'Row0_IS_LHS__Col0_IS_BOTTOM': 8
             },
 
-            Compression: {
-                'UNCOMPRESSED': 1,
-                'CCITT_1D': 2,
-                'GROUP_3_FAX': 3,
-                'GROUP_4_FAX': 4,
-                'LZW': 5,
-                'JPEG': 6,
-                'PACK_BITS': 32773
-            },
-
+            /**
+             * An object containing all TIFF photometric interpretation types.
+             * @memberof Tiff
+             * @type {Object}
+             */
             PhotometricInterpretation: {
                 'WHITE_IS_ZERO': 0,
                 'BLACK_IS_ZERO': 1,
@@ -134,6 +145,32 @@ define([],
                 'CIE_LAB': 7
             },
 
+            /**
+             * An object containing all TIFF planar configuration types.
+             * @memberof Tiff
+             * @type {Object}
+             */
+            PlanarConfiguration: {
+                'CHUNKY': 1,
+                'PLANAR': 2
+            },
+
+            /**
+             * An object containing all TIFF resolution unit types.
+             * @memberof Tiff
+             * @type {Object}
+             */
+            ResolutionUnit: {
+                'NONE': 1,
+                'INCH': 2,
+                'CENTIMETER': 3
+            },
+
+            /**
+             * An object containing all TIFF sample format types.
+             * @memberof Tiff
+             * @type {Object}
+             */
             SampleFormat: {
                 'UNSIGNED': 1,
                 'SIGNED': 2,
@@ -142,38 +179,27 @@ define([],
                 'DEFAULT': 1
             },
 
-            ResolutionUnit: {
-                'NONE': 1,
-                'INCH': 2,
-                'CENTIMETER': 3
-            },
-
-            PlanarConfiguration: {
-                'CHUNKY': 1,
-                'PLANAR': 2
-            },
-
-            getTagValueAsString: function (tagName, tagValue) {
-                for (var property in tagName) {
-                    if (tagName[property] === tagValue) {
-                        return property;
-                    }
-                }
-                return undefined;
-            },
-
-            getTagString: function (tagValue) {
-                for (var tagEntry in this.Tag) {
-                    if (this.Tag[tagEntry] === tagValue) {
-                        return tagEntry;
-                    }
-                }
-                return undefined;
+            /**
+             * An object containing all TIFF field types.
+             * @memberof Tiff
+             * @type {Object}
+             */
+            Type: {
+                'BYTE': 1,
+                'ASCII': 2,
+                'SHORT': 3,
+                'LONG': 4,
+                'RATIONAL': 5,
+                'SBYTE': 6,
+                'UNDEFINED': 7,
+                'SSHORT': 8,
+                'SLONG': 9,
+                'SRATIONAL': 10,
+                'FLOAT': 11,
+                'DOUBLE': 12
             }
         };
 
         return Tiff;
     }
 );
-
-

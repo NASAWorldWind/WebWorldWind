@@ -5,268 +5,143 @@
 /**
  * @exports GeoTiffReader
  */
-define(['../../error/AbstractError',
+define([
+        '../../error/AbstractError',
         '../../error/ArgumentError',
         './GeoTiff',
+        './GeoTiffKeyEntry',
+        './GeoTiffMetadata',
         './GeoTiffUtil',
+        '../../geom/Location',
         '../../util/Logger',
+        '../../util/proj4-src',
         './Tiff',
         './TiffIFDEntry'
     ],
     function (AbstractError,
               ArgumentError,
               GeoTiff,
+              GeoTiffKeyEntry,
+              GeoTiffMetadata,
               GeoTiffUtil,
+              Location,
               Logger,
+              Proj4,
               Tiff,
-              TiffIFDEntry
-              ) {
+              TiffIFDEntry) {
         "use strict";
 
+        /**
+         * Constructs a geotiff reader object for a specified geotiff URL.
+         * Call [readAsImage]{@link GeoTiffReader#readAsImage} to retrieve the image as a canvas or
+         * [readAsData]{@link GeoTiffReader#readAsData} to retrieve the elevaton as an array of elevation values.
+         * @alias GeoTiffReader
+         * @constructor
+         * @classdesc Parses a geotiff and creates an image or an elevation array representing its contents.
+         * @param {String} url The location of the geotiff.
+         * @throws {ArgumentError} If the specified URL is null or undefined.
+         */
         var GeoTiffReader = function (url) {
             if (!url) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missingUrl"));
             }
 
-            this._isLittleEndian = false;
-
-            this._layer = null;
-
+            // Documented in defineProperties below.
             this._url = url;
 
-            this._geoTiffData = null;
+            // Documented in defineProperties below.
+            this._isLittleEndian = false;
 
+            // Documented in defineProperties below.
             this._imageFileDirectories = [];
 
-            this._imageWidth = null;
+            // Documented in defineProperties below.
+            this._geoTiffData = null;
 
-            this._imageLength = null;
+            // Documented in defineProperties below.
+            this._metadata = new GeoTiffMetadata();
 
-            this._bitsPerSample = null;
-
-            this._compression = null;
-
-            this._photometricInterpretation = null;
-
-            this._samplesPerPixel = null;
-
-            this._planarConfiguration = null;
-
-            this._artist = null;
-
-            this._software = null;
-
-            this._dateTime = null;
-
-            this._xResolution = null;
-
-            this._yResolution = null;
-
-            this._resolutionUnit= null;
-
-            this._orientation = null;
-
-            this._rowsPerStrip = null;
-
-            this._stripByteCounts = null;
-
-            this._stripOffsets = null;
-
-            this._fillOrder = null;
-
-            this._newSubfileType = null;
-
-            this._sampleFormat = null;
-
-            this._colorMap = null;
-
+            // Documented in defineProperties below.
+            this._geoKeys = [];
         };
 
         Object.defineProperties(GeoTiffReader.prototype, {
 
-            isLittleEndian: {
-                get: function () {
-                    return this._isLittleEndian;
-                }
-            },
-
-            layer: {
-                get: function () {
-                    return this._layer;
-                }
-            },
-
+            /**
+             * The geotiff URL as specified to this GeoTiffReader's constructor.
+             * @memberof GeoTiffReader.prototype
+             * @type {String}
+             * @readonly
+             */
             url: {
                 get: function () {
                     return this._url;
                 }
             },
 
-            geoTiffData: {
+            /**
+             *Indicates whether the geotiff byte order is little endian..
+             * @memberof GeoTiffReader.prototype
+             * @type {Boolean}
+             * @readonly
+             */
+            isLittleEndian: {
                 get: function () {
-                    return this._geoTiffData;
+                    return this._isLittleEndian;
                 }
             },
 
+            /**
+             * An array containing all the image file directories of the geotiff file.
+             * @memberof GeoTiffReader.prototype
+             * @type {TiffIFDEntry[]}
+             * @readonly
+             */
             imageFileDirectories: {
                 get: function () {
                     return this._imageFileDirectories;
                 }
             },
 
-            imageWidth: {
+            /**
+             * The buffer descriptor of the geotiff file's content.
+             * @memberof GeoTiffReader.prototype
+             * @type {ArrayBuffer}
+             * @readonly
+             */
+            geoTiffData: {
                 get: function () {
-                    return this._imageWidth;
+                    return this._geoTiffData;
                 }
             },
 
-            imageLength: {
+            /**
+             * An objct containing all tiff and geotiff metadata of the geotiff file.
+             * @memberof GeoTiffReader.prototype
+             * @type {Object}
+             * @readonly
+             */
+            metadata: {
                 get: function () {
-                    return this._imageLength;
+                    return this._metadata;
                 }
             },
 
-            bitsPerSample: {
+            /**
+             * An array containing the GeoKeys of the geotiff file.
+             * @memberof GeoTiffReader.prototype
+             * @type {GeoTiffKeyEntry[]}
+             * @readonly
+             */
+            geoKeys: {
                 get: function () {
-                    return this._bitsPerSample;
-                }
-            },
-
-            compression: {
-                get: function () {
-                    return this._compression;
-                }
-            },
-
-            photometricInterpretation: {
-                get: function () {
-                    return this._photometricInterpretation;
-                }
-            },
-
-            samplesPerPixel: {
-                get: function () {
-                    return this._samplesPerPixel;
-                }
-            },
-
-            planarConfiguration: {
-                get: function () {
-                    return this._planarConfiguration;
-                }
-            },
-
-            artist: {
-                get: function () {
-                    return this._artist;
-                }
-            },
-
-            software: {
-                get: function () {
-                    return this._software;
-                }
-            },
-
-            dateTime: {
-                get: function () {
-                    return this._dateTime;
-                }
-            },
-
-            xResolution: {
-                get: function () {
-                    return this._xResolution;
-                }
-            },
-
-            yResolution: {
-                get: function () {
-                    return this._yResolution;
-                }
-            },
-
-            resolutionUnit: {
-                get: function () {
-                    return this._resolutionUnit;
-                }
-            },
-
-            orientation: {
-                get: function () {
-                    return this._orientation;
-                }
-            },
-
-            rowsPerStrip: {
-                get: function () {
-                    return this._rowsPerStrip;
-                }
-            },
-
-            stripByteCounts: {
-                get: function () {
-                    return this._stripByteCounts;
-                }
-            },
-
-            stripOffsets: {
-                get: function () {
-                    return this._stripOffsets;
-                }
-            },
-
-            fillOrder: {
-                get: function () {
-                    return this._fillOrder;
-                }
-            },
-
-            newSubfileType: {
-                get: function () {
-                    return this._newSubfileType;
-                }
-            },
-
-            sampleFormat: {
-                get: function () {
-                    return this._sampleFormat;
-                }
-            },
-
-            colorMap: {
-                get: function () {
-                    return this._colorMap;
+                    return this._geoKeys;
                 }
             }
         });
 
-        GeoTiffReader.prototype.readAsImage = function (callback) {
-            this.requestUrl(this.url, (function(){
-
-                var canvas = document.createElement('canvas');
-                canvas.width = this.imageWidth[0];
-                canvas.height = this.imageLength[0];
-
-                var ctx = canvas.getContext("2d");
-                ctx.rect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle="red";
-                ctx.fill();
-
-                callback(GeoTiffUtil.canvasToTiffImage(canvas));
-            }).bind(this));
-        };
-
-        GeoTiffReader.prototype.readAsData = function () {
-            this.requestUrl(this.url);
-        };
-
-        //GeoTiffReader.prototype.load = function (layer) {
-        //    this._layer = layer || new RenderableLayer();
-        //    this.requestUrl(this.url);
-        //};
-
+        // Get geotiff file as an array buffer using XMLHttpRequest. Internal use only.
         GeoTiffReader.prototype.requestUrl = function (url, callback) {
             var xhr = new XMLHttpRequest();
 
@@ -276,7 +151,7 @@ define(['../../error/AbstractError',
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         var arrayBuffer = xhr.response;
-                        if(arrayBuffer){
+                        if (arrayBuffer) {
                             this.parse(arrayBuffer);
                             callback();
                         }
@@ -299,158 +174,492 @@ define(['../../error/AbstractError',
             xhr.send(null);
         };
 
+        // Parse geotiff file. Internal use only
         GeoTiffReader.prototype.parse = function (arrayBuffer) {
             this._geoTiffData = new DataView(arrayBuffer);
-            this.setEndianness();
-            //console.log("Is little endian:" + this.isLittleEndian);
+            this.getEndianness();
 
-            if (!this.isTiffFileType()){
+            if (!this.isTiffFileType()) {
                 throw new AbstractError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "parse", "invalidTiffFileType"));
             }
 
             var firstIFDOffset = GeoTiffUtil.getBytes(this.geoTiffData, 4, 4, this.isLittleEndian);
-            //console.log("First IFD offset: " + firstIFDOffset);
 
             this.parseImageFileDirectory(firstIFDOffset);
+            this.getMetadataFromImageFileDirectory();
+            this.parseGeoKeys();
+            this.getMetadataFromGeoKeys();
+            this.getBBox(this.metadata.tiff['IMAGE_LENGTH'], this.metadata.tiff['IMAGE_WIDTH']);
 
-            console.log("*****")
             console.log("Is GeoTiff: " + this.isGeoTiff());
 
-
-            this._imageWidth = this.getIFDByTag(Tiff.Tag.IMAGE_WIDTH).getIFDEntryValue(this.isLittleEndian);
-            this._imageLength = this.getIFDByTag(Tiff.Tag.IMAGE_LENGTH).getIFDEntryValue(this.isLittleEndian);
-            this._bitsPerSample = this.getIFDByTag(Tiff.Tag.BITS_PER_SAMPLE).getIFDEntryValue(this.isLittleEndian);
-            this._compression = this.getIFDByTag(Tiff.Tag.COMPRESSION).getIFDEntryValue(this.isLittleEndian);
-            this._photometricInterpretation = this.getIFDByTag(Tiff.Tag.PHOTOMETRIC_INTERPRETATION).getIFDEntryValue(this.isLittleEndian);
-            this._samplesPerPixel = this.getIFDByTag(Tiff.Tag.SAMPLES_PER_PIXEL).getIFDEntryValue(this.isLittleEndian);
-            this._planarConfiguration = this.getIFDByTag(Tiff.Tag.PLANAR_CONFIGURATION).getIFDEntryValue(this.isLittleEndian);
-            this._artist = this.getIFDByTag(Tiff.Tag.ARTIST).getIFDEntryValue(this.isLittleEndian);
-            this._software = this.getIFDByTag(Tiff.Tag.SOFTWARE).getIFDEntryValue(this.isLittleEndian);
-            this._dateTime = this.getIFDByTag(Tiff.Tag.DATE_TIME).getIFDEntryValue(this.isLittleEndian);
-            this._xResolution = this.getIFDByTag(Tiff.Tag.X_RESOLUTION).getIFDEntryValue(this.isLittleEndian);
-            this._yResolution = this.getIFDByTag(Tiff.Tag.Y_RESOLUTION).getIFDEntryValue(this.isLittleEndian);
-            this._resolutionUnit = this.getIFDByTag(Tiff.Tag.RESOLUTION_UNIT).getIFDEntryValue(this.isLittleEndian);
-            this._orientation = this.getIFDByTag(Tiff.Tag.ORIENTATION).getIFDEntryValue(this.isLittleEndian);
-            this._rowsPerStrip = this.getIFDByTag(Tiff.Tag.ROWS_PER_STRIP).getIFDEntryValue(this.isLittleEndian);
-            this._stripByteCounts = this.getIFDByTag(Tiff.Tag.STRIP_BYTE_COUNTS).getIFDEntryValue(this.isLittleEndian);
-            this._stripOffsets = this.getIFDByTag(Tiff.Tag.STRIP_OFFSETS).getIFDEntryValue(this.isLittleEndian);
-            this._fillOrder = this.getIFDByTag(Tiff.Tag.FILL_ORDER).getIFDEntryValue(this.isLittleEndian);
-            this._newSubfileType = this.getIFDByTag(Tiff.Tag.NEW_SUBFILE_TYPE).getIFDEntryValue(this.isLittleEndian);
-
-            if (this.getIFDByTag(Tiff.Tag.SAMPLE_FORMAT)){
-                this._sampleFormat = this.getIFDByTag(Tiff.Tag.SAMPLE_FORMAT).getIFDEntryValue(this.isLittleEndian);
-            }
-            else{
-                this._sampleFormat = Tiff.SampleFormat.DEFAULT;
-            }
-
-            this._colorMap = this.getIFDByTag(Tiff.Tag.COLOR_MAP).getIFDEntryValue(this.isLittleEndian);
-
-            console.log("Image width: " + this.imageWidth);
-            console.log("Image length: " + this.imageLength);
-            console.log("Bits per sample: " + this.bitsPerSample);
-            console.log("Compression: " + Tiff.getTagValueAsString(Tiff.Compression, this.compression[0]));
-            console.log("Photometric interpretation: " + Tiff.getTagValueAsString(Tiff.PhotometricInterpretation, this.photometricInterpretation[0]));
-            console.log("Samples per pixel: " + this.samplesPerPixel);
-            console.log("Planar configuration: " + Tiff.getTagValueAsString(Tiff.PlanarConfiguration, this.planarConfiguration[0]));
-            console.log("Artist: " + this.artist);
-            console.log("Software: " + this.software);
-            console.log("Date time: " + this.dateTime);
-            console.log("X resolution: " + this.xResolution);
-            console.log("Y resolution: " + this.yResolution);
-            console.log("Resolution unit: " + Tiff.getTagValueAsString(Tiff.ResolutionUnit, this.resolutionUnit[0]));
-            console.log("Orientation: " + Tiff.getTagValueAsString(Tiff.Orientation, this.orientation[0]));
-            console.log("Rows per strip: " + this.rowsPerStrip);
-            console.log("Strip byte counts:");
-            console.log(this.stripByteCounts);
-            console.log("Strip offsets:");
-            console.log(this.stripOffsets);
-            console.log("Fill order: " + this.fillOrder);
-            console.log("New subfile type: " + this.newSubfileType);
-            console.log("Sample format: " + this.sampleFormat);
-            console.log("Color map:");
-            console.log(this.colorMap);
+            console.log("Metadata: ");
+            console.log(this.metadata);
         };
 
-        GeoTiffReader.prototype.setEndianness = function () {
+        // Get byte order of the geotiff file. Internal use only.
+        GeoTiffReader.prototype.getEndianness = function () {
             var byteOrderValue = GeoTiffUtil.getBytes(this.geoTiffData, 0, 2, this.isLittleEndian);
-            if (byteOrderValue === 0x4949){
+            if (byteOrderValue === 0x4949) {
                 this._isLittleEndian = true;
             }
-            else if (byteOrderValue === 0x4D4D){
+            else if (byteOrderValue === 0x4D4D) {
                 this._isLittleEndian = false;
+            }
+            else {
+                throw new AbstractError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "getEndianness", "invalidByteOrderValue"));
+            }
+        };
+
+        /**
+         * Indicates whether this geotiff is a tiff file type.
+         *
+         * @return {Boolean} True if this geotiff file is a tiff file type.
+         */
+        GeoTiffReader.prototype.isTiffFileType = function () {
+            var fileTypeValue = GeoTiffUtil.getBytes(this.geoTiffData, 2, 2, this.isLittleEndian);
+            if (fileTypeValue === 42) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+
+        /**
+         * Indicates whether this geotiff is a geotiff file type.
+         *
+         * @return {Boolean} True if this geotiff file is a geotiff file type.
+         */
+        GeoTiffReader.prototype.isGeoTiff = function () {
+            if (this.getIFDByTag(GeoTiff.Tag.GEO_KEY_DIRECTORY)) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+
+        /**
+         * Retrieve the image as a canvas from a geotiff file.
+         *
+         * @return {Canvas} A canvas representing the geotiff image.
+         */
+        GeoTiffReader.prototype.readAsImage = function (callback) {
+            this.requestUrl(this.url, (function () {
+                var bitsPerSample = this.metadata.tiff['BITS_PER_SAMPLE'];
+                var samplesPerPixel = this.metadata.tiff['SAMPLES_PER_PIXEL'][0];
+
+                if (this.metadata.tiff['STRIP_OFFSETS']){
+                    var strips = this.parseStrips();
+
+                    var imageLength = this.metadata.tiff['IMAGE_LENGTH'][0];
+                    var imageWidth = this.metadata.tiff['IMAGE_WIDTH'][0];
+                    if (this.metadata.tiff['ROWS_PER_STRIP']) {
+                        var rowsPerStrip = this.metadata.tiff['ROWS_PER_STRIP'][0];
+                    } else {
+                        var rowsPerStrip = imageLength;
+                    }
+
+                    var photometricInterpretation = this.metadata.tiff['PHOTOMETRIC_INTERPRETATION'][0];
+
+                    var canvas = document.createElement('canvas');
+                    canvas.width = this.metadata.tiff['IMAGE_WIDTH'][0];
+                    canvas.height = this.metadata.tiff['IMAGE_LENGTH'][0];
+                    var ctx = canvas.getContext("2d");
+
+                    var numOfStrips = strips.length;
+                    var numRowsInPreviousStrip = 0;
+                    var numRowsInStrip = rowsPerStrip;
+                    var imageLengthModRowsPerStrip = imageLength % rowsPerStrip;
+                    var rowsInLastStrip = (imageLengthModRowsPerStrip === 0) ? rowsPerStrip :
+                        imageLengthModRowsPerStrip;
+
+                    for (var i=0; i < numOfStrips; i++){
+
+                        if ((i + 1) === numOfStrips) {
+                            numRowsInStrip = rowsInLastStrip;
+                        }
+
+                        var numOfPixels = strips[i].length;
+                        var yPadding = numRowsInPreviousStrip * i;
+
+                        for(var y= 0, j=0; y < numRowsInStrip, j < numOfPixels; y++){
+                            for (var x=0; x < imageWidth; x++, j++ ){
+                                var pixelSamples = strips[i][j];
+
+                                var red = 0.0;
+                                var green = 0.0;
+                                var blue = 0.0;
+                                var opacity = 1.0;
+
+                                switch (photometricInterpretation){
+                                    case Tiff.PhotometricInterpretation.WHITE_IS_ZERO:
+                                        //todo
+                                        console.log("Photometric interpretation: WHITE_IS_ZERO");
+                                        break;
+                                    case Tiff.PhotometricInterpretation.BLACK_IS_ZERO:
+                                        red = green = blue =  GeoTiffUtil.clampColorSample(
+                                            pixelSamples[0],
+                                            bitsPerSample[0]);
+                                        break;
+                                    case Tiff.PhotometricInterpretation.RGB:
+                                        red = GeoTiffUtil.clampColorSample(pixelSamples[0], bitsPerSample[0]);
+                                        green = GeoTiffUtil.clampColorSample(pixelSamples[1], bitsPerSample[1]);
+                                        blue = GeoTiffUtil.clampColorSample(pixelSamples[2], bitsPerSample[2]);
+
+                                        if(samplesPerPixel === 4){
+                                            var maxValue = Math.pow(2, bitsPerSample[3]);
+                                            opacity = pixelSamples[3] / maxValue;
+                                        }
+                                        break;
+                                    case Tiff.PhotometricInterpretation.RGB_PALETTE:
+                                        //todo
+                                        console.log("Photometric interpretation: RGB_PALETTE");
+                                        break;
+                                    case Tiff.PhotometricInterpretation.TRANSPARENCY_MASK:
+                                        //todo
+                                        console.log("Photometric interpretation: TRANSPARENCY_MASK");
+                                        break;
+                                    case Tiff.PhotometricInterpretation.CMYK:
+                                        //todo
+                                        console.log("Photometric interpretation: CMYK");
+                                        break;
+                                    case Tiff.PhotometricInterpretation.Y_Cb_Cr:
+                                        //todo
+                                        console.log("Photometric interpretation: Y_Cb_Cr");
+                                        break;
+                                    case Tiff.PhotometricInterpretation.CIE_LAB:
+                                        //todo
+                                        console.log("Photometric interpretation: CIE_LAB");
+                                        break;
+                                    default:
+                                        console.log("Unknown photometric interpretation: " + photometricInterpretation);
+                                        break;
+
+                                }
+
+                                ctx.fillStyle = GeoTiffUtil.getRGBAFillValue(red, green, blue, opacity);
+                                ctx.fillRect(x, yPadding + y, 1,1);
+                            }
+                        }
+
+                        numRowsInPreviousStrip = rowsPerStrip;
+                    }
+
+                    //callback(GeoTiffUtil.canvasToTiffImage(canvas));
+                    callback(canvas);
+                }
+                else if (this.metadata.tiff['TILES_OFFSETS']){
+                    this.parseTiles();
+                }
+            }).bind(this));
+        };
+
+        /**
+         * Retrieve the elevation data as an array of elevations.
+         *
+         * @return {Number[]} An array containing geotiff's elevation data.
+         */
+        GeoTiffReader.prototype.readAsData = function () {
+            this.requestUrl(this.url, (function () {
+                //TODO read as data
+            }));
+        };
+
+        // Parse geotiff strips. Internal use only
+        GeoTiffReader.prototype.parseStrips = function(){
+            var samplesPerPixel = this.metadata.tiff['SAMPLES_PER_PIXEL'][0];
+            var bitsPerSample = this.metadata.tiff['BITS_PER_SAMPLE'];
+            var stripOffsets = this.metadata.tiff['STRIP_OFFSETS'];
+            var stripByteCounts = this.metadata.tiff['STRIP_BYTE_COUNTS'];
+            var compression = this.metadata.tiff['COMPRESSION'][0];
+            var sampleFormat = this.metadata.tiff['SAMPLE_FORMAT'];
+
+            var bitsPerPixel = samplesPerPixel * bitsPerSample[0];
+            var bytesPerPixel = bitsPerPixel / 8;
+
+            var strips = [];
+            // Loop through strips
+            for (var i = 0; i < stripOffsets.length; i++) {
+                var stripOffset = stripOffsets[i];
+                strips[i] = [];
+                var stripByteCount = stripByteCounts[i];
+
+                    switch (compression) {
+                        case Tiff.Compression.UNCOMPRESSED:
+                            // Loop through pixels.
+                            for (var byteOffset = 0, increment = bytesPerPixel;
+                                 byteOffset < stripByteCount; byteOffset += increment) {
+                                // Loop through samples (sub-pixels).
+                                    for (var m = 0, pixel = []; m < samplesPerPixel; m++) {
+                                        var bytesPerSample = bitsPerSample[m] / 8;
+                                        var sampleOffset = m * bytesPerSample;
+
+                                        pixel.push(GeoTiffUtil.getSampleBytes(
+                                            this.geoTiffData,
+                                            stripOffset + byteOffset + sampleOffset,
+                                            bytesPerSample,
+                                            sampleFormat[m],
+                                            this.isLittleEndian));
+                                    }
+                                    strips[i].push(pixel);
+                            }
+                            break;
+                        case Tiff.Compression.CCITT_1D:
+                            //todo
+                            console.log("Compression type: CCITT_1D");
+                            break;
+                        case Tiff.Compression.GROUP_3_FAX:
+                            //todo
+                            console.log("Compression type: GROUP_3_FAX");
+                            break;
+                        case Tiff.Compression.GROUP_4_FAX:
+                            //todo
+                            console.log("Compression type: GROUP_4_FAX");
+                            break;
+                        case Tiff.Compression.LZW:
+                            //todo
+                            console.log("Compression type: LZW");
+                            break;
+                        case Tiff.Compression.JPEG:
+                            //todo
+                            console.log("Compression type: JPEG");
+                            break;
+                        case Tiff.Compression.PACK_BITS:
+                            //todo
+                            console.log("Compression type: PACK_BITS");
+                            break;
+                        default:
+                            console.log("Unknown compression type: " + compression);
+                            break;
+                    }
+            }
+
+            return strips;
+        }
+
+        // Parse geotiff tiles. Internal use only
+        GeoTiffReader.prototype.parseTiles = function(){
+            //todo
+        }
+
+        // Translate a pixel/line coordinates to projection coordinate. Interna use only.
+        GeoTiffReader.prototype.geoTiffImageToPCS = function (xValue, yValue) {
+            if (xValue === null || xValue === undefined) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "geoTiffImageToPCS", "missingXValue"));
+            }
+            if (yValue === null || yValue === undefined) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "geoTiffImageToPCS", "missingYValue"));
+            }
+
+            var res = [xValue, yValue];
+
+            var tiePointValues = this.metadata.geotiff['MODEL_TIEPOINT'];
+            var modelPixelScaleValues = this.metadata.geotiff['MODEL_PIXEL_SCALE'];
+            var modelTransformationValues = this.metadata.geotiff['MODEL_TRANSFORMATION'];
+
+            var tiePointCount = tiePointValues ? tiePointValues.length : 0;
+            var modelPixelScaleCount = modelPixelScaleValues ? modelPixelScaleValues.length : 0;
+            var modelTransformationCount = modelTransformationValues ? modelTransformationValues.length : 0;
+
+            if (tiePointCount > 6 && modelPixelScaleCount === 0){
+                //todo
+            }
+            else if (modelTransformationCount === 16) {
+                var x_in = xValue;
+                var y_in = yValue;
+
+                xValue = x_in * modelTransformationValues[0] + y_in * modelTransformationValues[1] +
+                    modelTransformationValues[3];
+                yValue = x_in * modelTransformationValues[4] + y_in * modelTransformationValues[5] +
+                    modelTransformationValues[7];
+
+                res = [xValue, yValue];
+            }
+            else if (modelPixelScaleCount < 3 || tiePointCount < 6){
+                res = [xValue, yValue];
+            }
+            else {
+                xValue = (xValue - tiePointValues[0]) * modelPixelScaleValues[0] + tiePointValues[3];
+                yValue = (yValue - tiePointValues[1]) * (-1 *  modelPixelScaleValues[1]) + tiePointValues[4];
+
+                res = [xValue, yValue];
+            }
+
+            Proj4.defs([
+                [
+                    'EPSG:26771',
+                    '+proj=tmerc +lat_0=36.66666666666666 +lon_0=-88.33333333333333 +k=0.9999749999999999 +' +
+                    'x_0=152400.3048006096 +y_0=0 +ellps=clrk66 +datum=NAD27 +to_meter=0.3048006096012192 +no_defs '
+                ],
+                [
+                    'EPSG:32633',
+                    '+proj=utm +zone=33 +datum=WGS84 +units=m +no_defs'
+                ]
+            ]);
+
+            if (this.metadata.geotiff.geoKeys['ProjectedCSTypeGeoKey']){
+                res = Proj4('EPSG:' + this.metadata.geotiff.geoKeys['ProjectedCSTypeGeoKey'], 'EPSG:4326', res);
+            }
+
+            return new Location(res[1], res[0]);
+        };
+
+        /**
+         * Get the bounding box of the geotiff file.
+         *
+         * @return {Object} An object containing the bounding box having attributes: upperLeft, upperRight,
+         * lowerLeft, lowerRight.
+         * @param {Number} imageLength The length of the image in pixels.
+         * @param {Number} imageWidth The width of the image in pixels.
+         * @throws {ArgumentError} If the specified imageLength or  imageWidth are null or undefined.
+         */
+        GeoTiffReader.prototype.getBBox = function (imageLength, imageWidth) {
+            if (!imageLength) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "setBbox", "missingImageLength"));
+            }
+
+            if (!imageWidth) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "setBbox", "missingImageWidth"));
+            }
+
+            this.metadata.geotiff.bbox.upperLeft = this.geoTiffImageToPCS(0, 0);
+            this.metadata.geotiff.bbox.upperRight = this.geoTiffImageToPCS(imageWidth, 0);
+            this.metadata.geotiff.bbox.lowerLeft = this.geoTiffImageToPCS(0, imageLength);
+            this.metadata.geotiff.bbox.lowerRight = this.geoTiffImageToPCS(imageWidth, imageLength);
+        }
+
+        // Get metadata from image file directory. Internal use only.
+        GeoTiffReader.prototype.getMetadataFromImageFileDirectory = function () {
+            for (var i = 0; i < this.imageFileDirectories[0].length; i++) {
+
+                var tagAsString = GeoTiffUtil.getTagValueAsString(Tiff.Tag, this.imageFileDirectories[0][i].tag);
+
+                if (tagAsString){
+                    this._metadata.tiff[tagAsString] =
+                        this.imageFileDirectories[0][i].getIFDEntryValue();
+                }
+                else{
+                    tagAsString = GeoTiffUtil.getTagValueAsString(GeoTiff.Tag, this.imageFileDirectories[0][i].tag);
+                    if (tagAsString){
+                        this._metadata.geotiff[tagAsString] =
+                            this.imageFileDirectories[0][i].getIFDEntryValue();
+                    }
+                    else{
+                        console.log("Unknown GeoTiff tag: " + this.imageFileDirectories[0][i].tag);
+                        //throw new AbstractError(
+                            //Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader",
+                            // "getMetadataFromImageFileDirectory", "invalidGeoTiffTag"));
+                    }
+                }
+            }
+        }
+
+        // Get metadata from GeoKeys. Internal use only.
+        GeoTiffReader.prototype.getMetadataFromGeoKeys = function () {
+            for (var i = 0; i < this.geoKeys.length; i++) {
+                var keyAsString = GeoTiffUtil.getTagValueAsString(GeoTiff.Key, this.geoKeys[i].keyId);
+
+                if (keyAsString){
+                    this._metadata.geotiff.geoKeys[keyAsString] = this.geoKeys[i].getGeoKeyValue(
+                        this.metadata.geotiff['GEO_DOUBLE_PARAMS'],
+                        this.metadata.geotiff['GEO_ASCII_PARAMS']);
+                }
+                else{
+                    console.log("Unknown GeoTiff key: " + this.imageFileDirectories[0][i].tag);
+                    //throw new AbstractError(
+                    //            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader",
+                    // "getMetadataFromGeoKeys", "invalidGeoTiffKey"));
+                }
+            }
+        }
+
+        // Parse GeoKeys. Internal use only.
+        GeoTiffReader.prototype.parseGeoKeys = function () {
+            if (!this.isGeoTiff()) {
+                throw new AbstractError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "parse", "invalidGeoTiffFile"));
+            }
+
+            var geoKeyDirectory = this.metadata.geotiff['GEO_KEY_DIRECTORY'];
+            if (geoKeyDirectory){
+                var keyDirectoryVersion = geoKeyDirectory[0];
+                var keyRevision = geoKeyDirectory[1];
+                var minorRevision = geoKeyDirectory[2];
+                var numberOfKeys = geoKeyDirectory[3];
+
+                for (var i=0; i < numberOfKeys; i++){
+                    var keyId = geoKeyDirectory[4 + i*4];
+                    var tiffTagLocation = geoKeyDirectory[5 + i*4];
+                    var count = geoKeyDirectory[6 + i*4];
+                    var valueOffset = geoKeyDirectory[7 + i*4];
+
+                    this._geoKeys.push(new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset));
+                }
             }
             else{
                 throw new AbstractError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "setEndianness", "invalidByteOrderValue"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "parseGeoKeys",
+                        "missingGeoKeyDirectoryTag"));
             }
         };
 
-        GeoTiffReader.prototype.isTiffFileType = function () {
-            var fileTypeValue = GeoTiffUtil.getBytes(this.geoTiffData, 2, 2, this.isLittleEndian);
-            if (fileTypeValue === 42){
-                return true;
-            }
-            else{
-                return false;
-            }
-        };
-
-        GeoTiffReader.prototype.isGeoTiff = function () {
-            if(this.getIFDByTag(GeoTiff.Tag.GEO_KEY_DIRECTORY)){
-                return true;
-            }
-            else{
-                return false;
-            }
-        };
-
+        // Parse image file directory. Internal use only.
         GeoTiffReader.prototype.parseImageFileDirectory = function (offset) {
             if (!offset) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "parseImageFileDirectory", "missingOffset"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "parseImageFileDirectory",
+                        "missingOffset"));
             }
 
             var noOfDirectoryEntries = GeoTiffUtil.getBytes(this.geoTiffData, offset, 2, this.isLittleEndian);
-            //console.log("No of directory entries: " + noOfDirectoryEntries);
 
             var directoryEntries = [];
 
-            for (var i = offset + 2, directoryEntryCounter = 0; directoryEntryCounter < noOfDirectoryEntries; i += 12, directoryEntryCounter++){
+            for (var i = offset + 2, directoryEntryCounter = 0; directoryEntryCounter < noOfDirectoryEntries;
+                 i += 12, directoryEntryCounter++) {
                 var tag = GeoTiffUtil.getBytes(this.geoTiffData, i, 2, this.isLittleEndian);
                 var type = GeoTiffUtil.getBytes(this.geoTiffData, i + 2, 2, this.isLittleEndian);
                 var count = GeoTiffUtil.getBytes(this.geoTiffData, i + 4, 4, this.isLittleEndian);
                 var valueOffset = GeoTiffUtil.getBytes(this.geoTiffData, i + 8, 4, this.isLittleEndian);
 
-                //console.log("Tag: " + Tiff.getTagString(tag));
-                //console.log("Type: " + type);
-                //console.log("Count: " + count);
-                //console.log("Value Offset:" + valueOffset);
-
-                directoryEntries.push(new TiffIFDEntry(tag, type, count, valueOffset, this.geoTiffData, this.isLittleEndian));
+                directoryEntries.push(new TiffIFDEntry(
+                    tag,
+                    type,
+                    count,
+                    valueOffset,
+                    this.geoTiffData,
+                    this.isLittleEndian));
             }
 
             this._imageFileDirectories.push(directoryEntries);
 
             var nextIFDOffset = GeoTiffUtil.getBytes(this.geoTiffData, i, 4, this.isLittleEndian);
 
-            if (nextIFDOffset === 0){
+            if (nextIFDOffset === 0) {
                 return;
             }
-            else{
+            else {
                 this.parseImageFileDirectory(nextIFDOffset);
             }
         };
 
-        GeoTiffReader.prototype.getIFDByTag = function(tag){
+        // Get image file directory by tag value. Internal use only.
+        GeoTiffReader.prototype.getIFDByTag = function (tag) {
             if (!tag) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "getIFDByTag", "missingTag"));
             }
 
-            for (var i = 0; i <  this.imageFileDirectories[0].length; i++){
-                if (this.imageFileDirectories[0][i].tag === tag){
+            for (var i = 0; i < this.imageFileDirectories[0].length; i++) {
+                if (this.imageFileDirectories[0][i].tag === tag) {
                     return this.imageFileDirectories[0][i];
                 }
             }

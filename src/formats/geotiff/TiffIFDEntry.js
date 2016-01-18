@@ -5,7 +5,8 @@
 /**
  * @exports TiffIFDEntry
  */
-define(['../../error/AbstractError',
+define([
+        '../../error/AbstractError',
         '../../error/ArgumentError',
         './GeoTiffUtil',
         '../../util/Logger',
@@ -18,6 +19,23 @@ define(['../../error/AbstractError',
               Tiff) {
         "use strict";
 
+        /**
+         * Constructs an image file directory entry. Applications typically do not call this constructor. It is called
+         * by {@link GeoTiffReader} as GeoTIFF image file directories are read.
+         * @alias TiffIFDEntry
+         * @constructor
+         * @classdesc Contains the data associated with a GeoTIFF image file directory. An image file directory
+         * contains information about the image, as well as pointers to the actual image data.
+         * @param {Number} tag The TIFF tag that identifies the field.
+         * @param {Number} type The type of the field.
+         * @param {Number} count The number of values, count of the indicated type.
+         * @param {Number} valueOffset  The file offset (in bytes) of the Value for the field. This file offset may
+         * point anywhere in the file, even after the image data.
+         * @param {ArrayBuffer} geoTiffData The buffer descriptor of the geotiff file's content.
+         * @param {Boolean} isLittleEndian Indicates whether the geotiff byte order is little endian.
+         * @throws {ArgumentError} If either the specified tag, type, count, valueOffset, geoTiffData or isLittleEndian
+         * are null or undefined.
+         */
         var TiffIFDEntry = function (tag, type, count, valueOffset, geoTiffData, isLittleEndian) {
             if (!tag) {
                 throw new ArgumentError(
@@ -34,10 +52,10 @@ define(['../../error/AbstractError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingCount"));
             }
 
-            //if (!valueOffset) {
-            //    throw new ArgumentError(
-            //        Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingValueOffset"));
-            //}
+            if (valueOffset === undefined) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingValueOffset"));
+            }
 
             if (!geoTiffData) {
                 throw new ArgumentError(
@@ -49,51 +67,93 @@ define(['../../error/AbstractError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingIsLittleEndian"));
             }
 
+            // Documented in defineProperties below.
             this._tag = tag;
 
+            // Documented in defineProperties below.
             this._type = type;
 
+            // Documented in defineProperties below.
             this._count = count;
 
+            // Documented in defineProperties below.
             this._valueOffset = valueOffset;
 
+            // Documented in defineProperties below.
             this._geoTiffData = geoTiffData;
 
+            // Documented in defineProperties below.
             this._isLittleEndian = isLittleEndian;
         };
 
         Object.defineProperties(TiffIFDEntry.prototype, {
 
+            /**
+             * The tag that identifies the field as specified to this TiffIFDEntry's constructor.
+             * @memberof TiffIFDEntry.prototype
+             * @type {Number}
+             * @readonly
+             */
             tag: {
                 get: function () {
                     return this._tag;
                 }
             },
 
+            /**
+             * The field type as specified to this TiffIFDEntry's constructor.
+             * @memberof TiffIFDEntry.prototype
+             * @type {Number}
+             * @readonly
+             */
             type: {
                 get: function () {
                     return this._type;
                 }
             },
 
+            /**
+             * The number of the values as specified to this TiffIFDEntry's constructor.
+             * @memberof TiffIFDEntry.prototype
+             * @type {Number}
+             * @readonly
+             */
             count: {
                 get: function () {
                     return this._count;
                 }
             },
 
+            /**
+             * The file offset as specified to this TiffIFDEntry's constructor.
+             * @memberof TiffIFDEntry.prototype
+             * @type {Number}
+             * @readonly
+             */
             valueOffset: {
                 get: function () {
                     return this._valueOffset;
                 }
             },
 
+            /**
+             * The geotiff buffer data as specified to this TiffIFDEntry's constructor.
+             * @memberof TiffIFDEntry.prototype
+             * @type {ArrayBuffer}
+             * @readonly
+             */
             geoTiffData: {
                 get: function () {
                     return this._geoTiffData;
                 }
             },
 
+            /**
+             * The little endian byte order flag as specified to this TiffIFDEntry's constructor.
+             * @memberof TiffIFDEntry.prototype
+             * @type {Boolean}
+             * @readonly
+             */
             isLittleEndian: {
                 get: function () {
                     return this._isLittleEndian;
@@ -101,7 +161,11 @@ define(['../../error/AbstractError',
             }
         });
 
-        TiffIFDEntry.prototype.getIFDTypeLength = function (fieldTypeName) {
+        /**
+         * Get the number of bytes of an image file directory depending on its type.
+         * @returns {Number}
+         */
+        TiffIFDEntry.prototype.getIFDTypeLength = function () {
             switch(this.type){
                 case Tiff.Type.BYTE:
                 case Tiff.Type.ASCII:
@@ -124,14 +188,18 @@ define(['../../error/AbstractError',
             }
         }
 
-        TiffIFDEntry.prototype.getIFDEntryValue = function (isLittleEndian) {
+        /**
+         * Get the value of an image file directory.
+         * @returns {Number[]}
+         */
+        TiffIFDEntry.prototype.getIFDEntryValue = function () {
             var ifdValues = [];
             var value = null;
-            var ifdTypeLength = this.getIFDTypeLength(this.type);
+            var ifdTypeLength = this.getIFDTypeLength();
             var ifdValueSize = ifdTypeLength * this.count;
 
             if (ifdValueSize <= 4) {
-                if (isLittleEndian === false) {
+                if (this.isLittleEndian === false) {
                     value = this.valueOffset >>> ((4 - ifdTypeLength) * 8);
                 } else {
                     value = this.valueOffset;
@@ -168,7 +236,6 @@ define(['../../error/AbstractError',
             }
 
             return ifdValues;
-
         };
 
         return TiffIFDEntry;
