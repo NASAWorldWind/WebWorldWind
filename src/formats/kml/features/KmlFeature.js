@@ -44,8 +44,9 @@ define([
     var KmlFeature = function (options) {
         //noinspection JSUndefinedPropertyAssignment
         this.isFeature = options.isFeature = true;
+        var self = this;
         function getKmlTimePrimitive () {
-            return this.createChildElement({
+            return self.createChildElement({
                 name: KmlTimePrimitive.prototype.getTagNames()
             });
         }

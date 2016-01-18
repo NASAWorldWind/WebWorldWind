@@ -58,10 +58,10 @@ requirejs(['../src/WorldWind',
                 }
 
                 if (min.isAfter(date)) {
-                    min = date;
+                    min = new DateWW(date);
                 }
                 if (max.isBefore(date)) {
-                    max = date;
+                    max = new DateWW(date);
                 }
             };
 
