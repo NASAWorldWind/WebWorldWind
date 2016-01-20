@@ -6,7 +6,7 @@ require({
     baseUrl: '/test/'
 }, [
     'test/CatchTest',
-    'src/util/Remote'
+    'src/formats/kml/util/Remote'
 ], function (CatchTest,
              Remote) {
     "use strict";
