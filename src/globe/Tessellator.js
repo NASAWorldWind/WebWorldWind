@@ -74,12 +74,14 @@ define([
             this.tileWidth = 32; // baseline: 32
             this.tileHeight = 32; // baseline: 32
 
-            // detailHintOrigin - a parameter that describes the size of the sampling grid when fully zoomed in.
-            // The size of the tile sampling grid when fully zoomed in is related to the logarithm base 10 of this parameter.
-            // A parameter of 2 will have a sampling size approximately 10 times finer than a parameter of 1.
-            // Parameters which result in changes of a factor of two are: 1.1, 1.4, 1.7, 2.0.
-            this.detailHintOrigin = 1.1; // baseline: 1.1
-            this.detailHint = 0;
+            /**
+             * Controls the level of detail switching for this layer. The next highest resolution level is
+             * used when an elevation tile's cell size is greater than this number of pixels, up to the maximum
+             * resolution of the elevation model.
+             * @type {Number}
+             * @default 1.75
+             */
+            this.detailControl = 40;
 
             this.levels = new LevelSet(
                 Sector.FULL_SPHERE,
@@ -946,9 +948,9 @@ define([
         };
 
         Tessellator.prototype.tileMeetsRenderCriteria = function (dc, tile) {
-            var s = this.detailHintOrigin + this.detailHint;
+            var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
-                s *= 0.5;
+                s *= 2;
             }
             return tile.level.isLastLevel() || !tile.mustSubdivide(dc, s);
         };

@@ -74,7 +74,6 @@ define([
 
             this.displayName = displayName;
             this.pickEnabled = false;
-            this.detailHintOrigin = 2.9; // layer looks better at higher resolution
 
             // Create a canvas we can use when unprojecting retrieved images.
             this.destCanvas = document.createElement("canvas");

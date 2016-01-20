@@ -111,7 +111,7 @@ define([
              *
              * @type {Number}
              */
-            this.SPLIT_SCALE = 2.9;
+            this.detailControl = 1.25;
 
             // Internal use only. Intentionally not documented.
             this.tileCache = new MemoryCache(500000, 400000);
@@ -531,7 +531,7 @@ define([
          * @return {Boolean} true if the tile meets the rendering criteria; false otherwise.
          */
         SurfaceShapeTileBuilder.prototype.meetsRenderCriteria = function(dc, levels, tile) {
-            return tile.level.levelNumber == levels.lastLevel().levelNumber || !tile.mustSubdivide(dc, this.SPLIT_SCALE);
+            return tile.level.levelNumber == levels.lastLevel().levelNumber || !tile.mustSubdivide(dc, this.detailControl);
         };
 
         /**

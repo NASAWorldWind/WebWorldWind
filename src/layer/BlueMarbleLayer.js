@@ -6,10 +6,16 @@
  * @exports BlueMarbleLayer
  */
 define([
+        '../error/ArgumentError',
         '../layer/Layer',
+        '../util/Logger',
+        '../util/PeriodicTimeSequence',
         '../layer/RestTiledImageLayer'
     ],
-    function (Layer,
+    function (ArgumentError,
+              Layer,
+              Logger,
+              PeriodicTimeSequence,
               RestTiledImageLayer) {
         "use strict";
 
@@ -61,6 +67,7 @@ define([
                 {month: "BlueMarble-200411", time: BlueMarbleLayer.availableTimes[10]},
                 {month: "BlueMarble-200412", time: BlueMarbleLayer.availableTimes[11]}
             ];
+            this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
 
             this.serverAddress = null;
             this.pathToData = "../standalonedata/Earth/BlueMarble256/";
@@ -137,6 +144,9 @@ define([
         BlueMarbleLayer.prototype.doRender = function (dc) {
             var layer = this.nearestLayer(this.time);
             layer.opacity = this.opacity;
+            if (this.detailControl) {
+                layer.detailControl = this.detailControl;
+            }
 
             layer.doRender(dc);
 
