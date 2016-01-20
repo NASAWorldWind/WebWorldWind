@@ -3,9 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../error/ArgumentError',
-    './Logger',
-    './Promise'
+    '../../../error/ArgumentError',
+    '../../../util/Logger',
+    '../../../util/Promise'
 ], function (
     ArgumentError,
     Logger,
