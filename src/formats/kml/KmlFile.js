@@ -16,7 +16,7 @@ define([
         './KmlTimeStamp',
         '../../util/Logger',
         '../../util/Promise',
-        '../../util/Remote',
+        './util/Remote',
         '../../util/XmlDocument',
         './KmlElements',
         './KmlObject'
