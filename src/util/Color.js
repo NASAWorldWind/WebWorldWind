@@ -324,5 +324,17 @@ define([
             return result;
         };
 
+        /**
+         * Create a rgba color string that CSS can use.
+         * @returns {string} A color string suitable for CSS.
+         */
+        Color.prototype.toRGBAString = function () {
+            var red = Math.floor(this.red * 255),
+                green = Math.floor(this.green * 255),
+                blue = Math.floor(this.blue * 255);
+
+            return 'rgba(' + red + ' ,' + green + ' ,' + blue + ' ,' + this.alpha + ')';
+        };
+
         return Color;
     });
