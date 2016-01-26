@@ -64,6 +64,8 @@ define([
 
             this.layer = null;
 
+            this.localTransforms = true;
+
             //the scene's transformation matrix
             this.transformationMatrix = null;
 
@@ -88,6 +90,22 @@ define([
                 this.position.longitude = position.longitude;
                 this.position.altitude = position.altitude;
             }
+        };
+
+        /**
+         * Sets the altitude mode of the scene.
+         * @param {String} altitudeMode The scene's altitude mode.
+         */
+        Scene.prototype.setAltitudeMode = function (altitudeMode) {
+            this.altitudeMode = altitudeMode;
+        };
+
+        /**
+         * Force the use of the nodes transformation info.
+         * @param {Boolean} useLocalTransforms
+         */
+        Scene.prototype.useLocalTransforms = function (useLocalTransforms) {
+            this.localTransforms = useLocalTransforms;
         };
 
         /**
@@ -149,26 +167,16 @@ define([
          * info needed to render the scene.
          */
         Scene.prototype.add = function (sceneData) {
-            var i, len;
 
             if (sceneData) {
 
-                this.nodes = [];
-                for (i = 0, len = sceneData.root.children.length; i < len; i++) {
-                    this.nodes.push(sceneData.root.children[i]);
-                }
-
-                this.meshes = Object.assign({}, sceneData.meshes);
-                this.materials = Object.assign({}, sceneData.materials);
-                this.images = Object.assign({}, sceneData.images);
+                this.nodes = sceneData.root.children;
+                this.meshes = sceneData.meshes;
+                this.materials = sceneData.materials;
+                this.images = sceneData.images;
                 this.upAxis = sceneData.metadata.up_axis;
                 this.filePath = sceneData.filePath;
 
-                if (this.upAxis === 'Y_UP') {
-                    for (i = 0, len = this.nodes.length; i < len; i++) {
-                        this.updateWorldMatrix(this.nodes[i]);
-                    }
-                }
             }
         };
 
@@ -187,11 +195,13 @@ define([
 
         // Internal. Intentionally not documented.
         Scene.prototype.drawOrderedScene = function (dc) {
+
             this.beginDrawing(dc);
 
             try {
                 this.doDrawOrderedScene(dc);
-            } finally {
+            }
+            finally {
                 this.endDrawing(dc);
             }
         };
@@ -223,18 +233,27 @@ define([
             }
         };
 
-        // Recursively traverses the node tree and draws each node
+        // Internal. Intentionally not documented.
         Scene.prototype.traverseNodeTree = function (dc, node) {
 
             if (node.mesh) {
                 var meshKey = node.mesh;
                 var buffers = this.meshes[meshKey].buffers;
 
-                for (var j = 0, bufLen = buffers.length; j < bufLen; j++) {
+                for (var i = 0, bufLen = buffers.length; i < bufLen; i++) {
 
-                    var materialKey = buffers[j].material;
+                    var materialBuf = buffers[i].material;
+
+                    for (var j = 0; j < node.materials.length; j++) {
+                        if (materialBuf === node.materials[j].symbol) {
+                            var materialKey = node.materials[j].id;
+                            break;
+                        }
+                    }
+
                     var material = this.materials[materialKey];
-                    this.draw(dc, buffers[j], material, node.worldMatrix);
+
+                    this.draw(dc, buffers[i], material, node.worldMatrix, node.normalMatrix);
                 }
             }
 
@@ -245,15 +264,11 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        Scene.prototype.draw = function (dc, buffers, material, worldMatrix) {
+        Scene.prototype.draw = function (dc, buffers, material, nodeWorldMatrix, nodeNormalMatrix) {
 
             var gl = dc.currentGlContext,
                 program = dc.currentProgram,
-                textureBound, vboId, pickColor;
-
-            if (dc.pickingMode) {
-                pickColor = dc.uniquePickColor();
-            }
+                vboId;
 
             if (!buffers.verticesVboCacheKey) {
                 buffers.verticesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
@@ -279,111 +294,19 @@ define([
 
             program.loadTextureEnabled(gl, false);
 
-            if (material.techniqueType === 'constant'){
-                var diffuse = material.reflective;
-            }
-            else {
-                diffuse = material.diffuse;
-            }
-            var opacity;
-            var r = 1, g = 1, b = 1, a = 1;
-            if (diffuse) {
-                r = diffuse[0];
-                g = diffuse[1];
-                b = diffuse[2];
-                a = diffuse[3] != null ? diffuse[3] : 1;
-            }
+            this.applyColor(dc, material);
 
-            var color = new Color(r, g, b, a);
-            opacity = a * dc.currentLayer.opacity;
-            gl.depthMask(opacity >= 1 || dc.pickingMode);
-            program.loadColor(gl, dc.pickingMode ? pickColor : color);
-            program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
-
-            var hasTexture = (material.textures != null);
+            var hasTexture = (material && material.textures != null && buffers.uvs && buffers.uvs.length);
             if (hasTexture) {
-
-                if (material.textures.diffuse) {
-                    var imageKey = material.textures.diffuse.mapId;
-                }
-                else {
-                    imageKey = material.textures.reflective.mapId;
-                }
-
-                var image = this.images[imageKey].filename || this.images[imageKey].path;
-
-                buffers.activeTexture = dc.gpuResourceCache.resourceForKey(this.filePath + image + "");
-                if (!buffers.activeTexture) {
-                    buffers.activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.filePath + image + "");
-                }
-
-                textureBound = buffers.activeTexture && buffers.activeTexture.bind(dc);
-                if (textureBound) {
-                    if (!buffers.texCoordsVboCacheKey) {
-                        buffers.texCoordsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
-                    }
-
-                    vboId = dc.gpuResourceCache.resourceForKey(buffers.texCoordsVboCacheKey);
-                    if (!vboId) {
-                        vboId = gl.createBuffer();
-                        dc.gpuResourceCache.putResource(buffers.texCoordsVboCacheKey, vboId,
-                            buffers.uvs.length);
-                        buffers.refreshTexCoordBuffer = true;
-                    }
-
-                    gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-                    if (buffers.refreshTexCoordBuffer) {
-                        gl.bufferData(gl.ARRAY_BUFFER, buffers.uvs,
-                            gl.STATIC_DRAW);
-                        dc.frameStatistics.incrementVboLoadCount(1);
-                        buffers.refreshTexCoordBuffer = false;
-                    }
-
-                    if (buffers.isClamp) {
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-                    }
-                    else {
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-                        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-                    }
-
-                    program.loadTextureEnabled(gl, true);
-                    gl.enableVertexAttribArray(program.vertexTexCoordLocation);
-                    gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
-                    program.loadTextureUnit(gl, gl.TEXTURE0);
-                    program.loadModulateColor(gl, dc.pickingMode);
-                }
+                this.applyTexture(dc, buffers, material);
             }
 
             var hasLighting = (buffers.normals != null && buffers.normals.length > 0);
             if (hasLighting) {
-                program.loadApplyLighting(gl, true);
-                if (!buffers.normalsVboCacheKey) {
-                    buffers.normalsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
-                }
-
-                vboId = dc.gpuResourceCache.resourceForKey(buffers.normalsVboCacheKey);
-                if (!vboId) {
-                    vboId = gl.createBuffer();
-                    dc.gpuResourceCache.putResource(buffers.normalsVboCacheKey, vboId,
-                        buffers.normals.length);
-                    buffers.refreshNormalBuffer = true;
-                }
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-                if (buffers.refreshNormalBuffer) {
-                    gl.bufferData(gl.ARRAY_BUFFER, buffers.normals, gl.STATIC_DRAW);
-                    dc.frameStatistics.incrementVboLoadCount(1);
-                    buffers.refreshNormalBuffer = false;
-                }
-
-                gl.enableVertexAttribArray(program.normalVectorLocation);
-                gl.vertexAttribPointer(program.normalVectorLocation, 3, gl.FLOAT, false, 0, 0);
+                this.applyLighting(dc, buffers);
             }
 
-            this.applyMatrix(dc, hasLighting, worldMatrix);
+            this.applyMatrix(dc, hasLighting, nodeWorldMatrix, nodeNormalMatrix);
 
             if (!buffers.indicesVboCacheKey) {
                 buffers.indicesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
@@ -392,8 +315,7 @@ define([
             vboId = dc.gpuResourceCache.resourceForKey(buffers.indicesVboCacheKey);
             if (!vboId) {
                 vboId = gl.createBuffer();
-                dc.gpuResourceCache.putResource(buffers.indicesVboCacheKey, vboId,
-                    buffers.indices.length);
+                dc.gpuResourceCache.putResource(buffers.indicesVboCacheKey, vboId, buffers.indices.length);
                 buffers.refreshIndicesBuffer = true;
             }
 
@@ -406,16 +328,8 @@ define([
 
             gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_SHORT, 0);
 
-            if (hasLighting) {
-                program.loadApplyLighting(gl, false);
-                gl.disableVertexAttribArray(program.normalVectorLocation);
-            }
+            this.resetDraw(dc, hasLighting, hasTexture);
 
-            if (hasTexture) {
-                gl.disableVertexAttribArray(program.vertexTexCoordLocation);
-            }
-
-            gl.disableVertexAttribArray(program.vertexPointLocation);
         };
 
         // Internal. Intentionally not documented.
@@ -424,10 +338,6 @@ define([
             var orderedScene;
             if (this.lastFrameTime !== dc.timestamp) {
                 orderedScene = this.makeOrderedRenderable(dc);
-            }
-            else {
-                //var annotationCopy = this.clone();
-                //orderedScene = annotationCopy.makeOrderedRenderable(dc);
             }
 
             if (!orderedScene) {
@@ -466,34 +376,14 @@ define([
 
         };
 
-        // Recursively traverses the node tree and sets the world matrix of each node.
-        Scene.prototype.updateWorldMatrix = function (node) {
-
-            var matrix = node.localMatrix;
-            if (!node.worldMatrix) {
-                node.worldMatrix = Matrix.fromIdentity();
-                node.worldMatrix.multiplyMatrix(matrix);
-            }
-
-            for (var j = 0; j < node.children.length; j++) {
-                var child = node.children[j];
-                if (!child.worldMatrix) {
-                    child.worldMatrix = Matrix.fromIdentity();
-                    child.worldMatrix.setToMultiply(node.worldMatrix, child.localMatrix);
-                }
-
-                this.updateWorldMatrix(child);
-            }
-        };
-
         // Internal. Intentionally not documented.
-        Scene.prototype.applyMatrix = function (dc, hasLighting, worldMatrix) {
+        Scene.prototype.applyMatrix = function (dc, hasLighting, nodeWorldMatrix, nodeNormalMatrix) {
 
             var mvpMatrix = Matrix.fromIdentity();
             mvpMatrix.copy(dc.navigatorState.modelviewProjection);
             mvpMatrix.multiplyMatrix(this.transformationMatrix);
-            if (worldMatrix && this.upAxis === 'Y_UP') {
-                mvpMatrix.multiplyMatrix(worldMatrix);
+            if (nodeWorldMatrix && this.localTransforms) {
+                mvpMatrix.multiplyMatrix(nodeWorldMatrix);
             }
 
             if (hasLighting) {
@@ -501,9 +391,8 @@ define([
                 normalMatrix.copy(dc.navigatorState.modelviewNormalTransform);
                 normalMatrix.multiplyMatrix(this.normalMatrix);
 
-                if (worldMatrix && this.upAxis === 'Y_UP') {
-                    var rot = worldMatrix.upper3By3();
-                    normalMatrix.multiplyMatrix(rot);
+                if (nodeNormalMatrix && this.localTransforms){
+                    normalMatrix.multiplyMatrix(nodeNormalMatrix);
                 }
 
                 dc.currentProgram.loadModelviewInverse(dc.currentGlContext, normalMatrix);
@@ -511,6 +400,144 @@ define([
 
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, mvpMatrix);
 
+        };
+
+        // Internal. Intentionally not documented.
+        Scene.prototype.applyTexture = function(dc, buffers, material){
+
+            var textureBound, vboId,
+                gl = dc.currentGlContext,
+                program = dc.currentProgram;
+
+            if (material.textures.diffuse) {
+                var imageKey = material.textures.diffuse.mapId;
+            }
+            else {
+                imageKey = material.textures.reflective.mapId;
+            }
+
+            var image = this.images[imageKey].filename || this.images[imageKey].path;
+
+            buffers.activeTexture = dc.gpuResourceCache.resourceForKey(this.filePath + image + "");
+            if (!buffers.activeTexture) {
+                buffers.activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.filePath + image + "");
+            }
+
+            textureBound = buffers.activeTexture && buffers.activeTexture.bind(dc);
+            if (textureBound) {
+                if (!buffers.texCoordsVboCacheKey) {
+                    buffers.texCoordsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
+                }
+
+                vboId = dc.gpuResourceCache.resourceForKey(buffers.texCoordsVboCacheKey);
+                if (!vboId) {
+                    vboId = gl.createBuffer();
+                    dc.gpuResourceCache.putResource(buffers.texCoordsVboCacheKey, vboId, buffers.uvs.length);
+                    buffers.refreshTexCoordBuffer = true;
+                }
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+                if (buffers.refreshTexCoordBuffer) {
+                    gl.bufferData(gl.ARRAY_BUFFER, buffers.uvs, gl.STATIC_DRAW);
+                    dc.frameStatistics.incrementVboLoadCount(1);
+                    buffers.refreshTexCoordBuffer = false;
+                }
+
+                if (buffers.isClamp) {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+                }
+                else {
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                }
+
+                program.loadTextureEnabled(gl, true);
+                gl.enableVertexAttribArray(program.vertexTexCoordLocation);
+                gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
+                program.loadTextureUnit(gl, gl.TEXTURE0);
+                program.loadModulateColor(gl, dc.pickingMode);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        Scene.prototype.applyLighting = function(dc, buffers){
+
+            var vboId,
+                gl = dc.currentGlContext,
+                program = dc.currentProgram;
+
+            program.loadApplyLighting(gl, true);
+            if (!buffers.normalsVboCacheKey) {
+                buffers.normalsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
+            }
+
+            vboId = dc.gpuResourceCache.resourceForKey(buffers.normalsVboCacheKey);
+            if (!vboId) {
+                vboId = gl.createBuffer();
+                dc.gpuResourceCache.putResource(buffers.normalsVboCacheKey, vboId, buffers.normals.length);
+                buffers.refreshNormalBuffer = true;
+            }
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+            if (buffers.refreshNormalBuffer) {
+                gl.bufferData(gl.ARRAY_BUFFER, buffers.normals, gl.STATIC_DRAW);
+                dc.frameStatistics.incrementVboLoadCount(1);
+                buffers.refreshNormalBuffer = false;
+            }
+
+            gl.enableVertexAttribArray(program.normalVectorLocation);
+            gl.vertexAttribPointer(program.normalVectorLocation, 3, gl.FLOAT, false, 0, 0);
+        };
+
+        // Internal. Intentionally not documented.
+        Scene.prototype.applyColor = function(dc, material){
+
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram;
+
+            if (material) {
+                if (material.techniqueType === 'constant') {
+                    var diffuse = material.reflective;
+                }
+                else {
+                    diffuse = material.diffuse;
+                }
+            }
+
+            var opacity;
+            var r = 1, g = 1, b = 1, a = 1;
+
+            if (diffuse) {
+                r = diffuse[0];
+                g = diffuse[1];
+                b = diffuse[2];
+                a = diffuse[3] != null ? diffuse[3] : 1;
+            }
+
+            var color = new Color(r, g, b, a);
+            opacity = a * dc.currentLayer.opacity;
+            gl.depthMask(opacity >= 1 || dc.pickingMode);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : color);
+            program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+        };
+
+        Scene.prototype.resetDraw = function(dc, hasLighting, hasTexture){
+
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram;
+
+            if (hasLighting) {
+                program.loadApplyLighting(gl, false);
+                gl.disableVertexAttribArray(program.normalVectorLocation);
+            }
+
+            if (hasTexture) {
+                gl.disableVertexAttribArray(program.vertexTexCoordLocation);
+            }
+
+            gl.disableVertexAttribArray(program.vertexPointLocation);
         };
 
         // Computes this scene's rotation matrix.
@@ -555,24 +582,6 @@ define([
             this.normalMatrix.multiplyByRotation(0, 0, -1, this.rotAngles[2]);
         };
 
-        // Computes this scene's transformation matrix.
-        Scene.prototype.computeTransformationMatrix_old = function () {
-
-            this.transformationMatrix = Matrix.fromIdentity();
-
-            if (!this.rotationMatrix) {
-                this.computeRotationMatrix();
-            }
-
-            this.transformationMatrix.multiplyByTranslation(this.placePoint[0], this.placePoint[1], this.placePoint[2]);
-
-            this.transformationMatrix.multiplyMatrix(this.rotationMatrix);
-
-            if (this.scale !== 1) {
-                this.transformationMatrix.multiplyByScale(this.scale, this.scale, this.scale);
-            }
-        };
-
         // Computes this scene's bounding box.
         Scene.prototype.computeBoundingBox = function () {
 
@@ -582,15 +591,10 @@ define([
 
             var points = this.concatenateVertices();
 
-            /*this.boundingBox.scale(this.scale);
-             this.boundingBox.rotate(this.rotationMatrix);
-             this.boundingBox.translate(this.placePoint);*/
-
             this.boundingBox.setToPoints(points);
         };
 
         // Concatenates all the vertices of the scene's meshes in one typed array.
-        // This may not work as expected for Y_UP models as we might need to use the world matrix of each node.
         Scene.prototype.concatenateVertices = function () {
 
             var points = [];

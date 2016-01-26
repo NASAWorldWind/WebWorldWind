@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!--@version $Id: BasicExample.html 3314 2015-07-10 18:28:45Z dcollins $-->
 <html lang="en">
 <head>
     <!--NOTE: Most Web World Wind examples use jquery, Bootstrap and requirejs but those technologies are NOT-->
@@ -17,10 +16,8 @@
             margin-bottom: 10px;
         }
     </style>
-
 </head>
 <body>
-
 
 <div class="container">
     <div class="jumbotron hidden-xs">
@@ -49,62 +46,36 @@
                 </span>
             </div>
 
-            <h4>Controls</h4>
+            <br>
 
-            <input type="checkbox" id="bbox"><label for="bbox">Bounding Box</label>
+            <h4>Models</h4>
+            <br>
+            <div class="dropdown" id="collada-models">
+                <button class="btn btn-default dropdown-toggle" type="button" id="modelDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span id="button-value">Select a model</span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="modelDropdownMenu" id="model-list">
+                </ul>
+            </div>
+            <br>
 
             <div style="background-color: #ededed; padding: 20px;">
-                <p id="scaleBox">Scale Box: <span id="scaleSpanBox"></span></p>
+                <p id="scale">Scale: <span id="scaleSpan"></span></p>
 
-                <div id="sliderY" class="my-slider"></div>
+                <div id="sliderScale" class="my-slider"></div>
 
-                <p>Rotate X Box: <span id="spanRotateXBox">0</span></p>
+                <p>Rotate X: <span id="spanRotateX">0</span></p>
 
-                <div id="sliderRotateXBox" class="my-slider"></div>
+                <div id="sliderRotateX" class="my-slider"></div>
 
-                <p>Rotate Y Box: <span id="spanRotateYBox">0</span></p>
+                <p>Rotate Y: <span id="spanRotateY">0</span></p>
 
-                <div id="sliderRotateYBox" class="my-slider"></div>
+                <div id="sliderRotateY" class="my-slider"></div>
 
-                <p>Rotate Z Box: <span id="spanRotateZBox">0</span></p>
+                <p>Rotate Z: <span id="spanRotateZ">0</span></p>
 
-                <div id="sliderRotateZBox" class="my-slider"></div>
-            </div>
-
-            <div style="background-color: #fff; padding: 20px;">
-                <p id="scaleDuck">Scale Duck: <span id="scaleSpanDuck"></span></p>
-
-                <div id="sliderZ" class="my-slider"></div>
-
-                <p>Rotate X Duck: <span id="spanRotateXDuck">0</span></p>
-
-                <div id="sliderRotateXDuck" class="my-slider"></div>
-
-                <p>Rotate Y Duck: <span id="spanRotateYDuck">0</span></p>
-
-                <div id="sliderRotateYDuck" class="my-slider"></div>
-
-                <p>Rotate Z Duck: <span id="spanRotateZDuck">0</span></p>
-
-                <div id="sliderRotateZDuck" class="my-slider"></div>
-            </div>
-
-            <div style="background-color: #ededed; padding: 20px;">
-                <p id="scaleEngine">Scale Engine: <span id="scaleSpanEngine"></span></p>
-
-                <div id="sliderScaleEngine" class="my-slider"></div>
-
-                <p>Rotate X Engine: <span id="spanRotateXEngine">0</span></p>
-
-                <div id="sliderRotateXEngine" class="my-slider"></div>
-
-                <p>Rotate Y Engine: <span id="spanRotateYEngine">0</span></p>
-
-                <div id="sliderRotateYEngine" class="my-slider"></div>
-
-                <p>Rotate Z Engine: <span id="spanRotateZEngine">0</span></p>
-
-                <div id="sliderRotateZEngine" class="my-slider"></div>
+                <div id="sliderRotateZ" class="my-slider"></div>
             </div>
 
         </div>
@@ -115,5 +86,6 @@
         </div>
     </div>
 </div>
+
 </body>
 </html>
