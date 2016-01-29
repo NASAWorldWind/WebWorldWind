@@ -41,15 +41,20 @@ define([
          * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
          * rendered in one Layer.
          * @constructor
-         * @param options {Object}
-         * @param options.document {String} String representing the document if it is local.
-         * @param options.url {String} Url of the remote document.
-         * @param options.local {Boolean} True if the document is local.
-         * @param options.controls {KmlControls[]} List of controls applied to this File.
+         * @param document {String} String representing the document if it is local.
+         * @param url {String} Url of the remote document.
+         * @param local {Boolean} True if the document is local.
+         * @param controls {KmlControls[]} List of controls applied to this File.
          * @alias KmlFile
          * @classdesc Support for Kml File parsing and display.
          */
-        var KmlFile = function (options) {
+        var KmlFile = function (url, controls, document, local) {
+            var options = {
+                document: document,
+                url: url,
+                local: local,
+                controls: controls
+            };
             var self = this;
             if (!options || (!options.document && !options.url)) {
                 throw new ArgumentError(
@@ -58,7 +63,6 @@ define([
             }
 
             // Default values.
-            options.local = options.local || false;
             this._controls = options.controls || null;
 
             var filePromise;

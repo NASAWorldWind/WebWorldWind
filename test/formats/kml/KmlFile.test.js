@@ -28,7 +28,7 @@ require({
                     // This means we are at the end.
                     loadedFile = loaded;
                 });
-                var kmlFile = new KmlFile({local: true, document: kmlFileXml});
+                var kmlFile = new KmlFile('', null, kmlFileXml, true);
                 kmlFile.then(callback);
             });
 
@@ -47,9 +47,7 @@ require({
                     // This means we are at the end.
                     loadedFile = loaded;
                 });
-                var kmlFile = new KmlFile({
-                    url: kmlLocation
-                });
+                var kmlFile = new KmlFile(kmlLocation);
                 kmlFile.then(callback);
             });
 
