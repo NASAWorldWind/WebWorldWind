@@ -19,6 +19,7 @@ define([
              Promise,
              WWUtil) {
     "use strict";
+
     /**
      * Constructs an Kml object. Every node in the Kml document is either basic type or Kml object. Applications usually
      * don't call this constructor. It is usually called only by its descendants.
