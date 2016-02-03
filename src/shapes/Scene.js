@@ -210,7 +210,7 @@ define([
 
             dc.findAndBindProgram(BasicTextureProgram);
 
-            //gl.enable(gl.CULL_FACE);
+            gl.enable(gl.CULL_FACE);
             gl.enable(gl.DEPTH_TEST);
         };
 
@@ -596,7 +596,6 @@ define([
         Scene.prototype.concatenateVertices = function () {
 
             var points = [];
-            var rotationMatrix = Matrix.fromIdentity();
 
             for (var key in this.meshes) {
                 if (this.meshes.hasOwnProperty(key)) {
