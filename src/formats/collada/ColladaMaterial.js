@@ -145,7 +145,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
 
             var child = element.childNodes[i];
 
-            if (child.nodeType != 1) {
+            if (child.nodeType !== 1) {
                 continue;
             }
 

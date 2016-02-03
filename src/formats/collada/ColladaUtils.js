@@ -24,11 +24,10 @@ define([], function () {
 
             var text = xmlNode.textContent;
             text = text.replace(/\n/gi, " ");
-            //text = text.replace(/\s\s/gi, " ");
             text = text.replace(/\s+/gi, " ");
             text = text.trim();
 
-            if (text.length == 0) {
+            if (text.length === 0) {
                 return null;
             }
 
@@ -149,7 +148,7 @@ define([], function () {
                 if (!attrId) {
                     continue;
                 }
-                if (attrId.toString() == id) {
+                if (attrId.toString() === id) {
                     return nodes.item(i);
                 }
             }

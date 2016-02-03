@@ -17,6 +17,9 @@ define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh'
          * @classdesc Represents a Collada Loader. Fetches and parses a collada document and returns the
          * necessary information to render the collada model.
          * @param {Object} config Configuration options for the loader.
+         * <ul>
+         *  <li>filePath - the path to the collada file</li>
+         * </ul>
          */
         var ColladaLoader = function (config) {
 
@@ -28,6 +31,9 @@ define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh'
         /**
          * Initialization of the ColladaLoader
          * @param {Object} config Configuration options for the loader.
+         * <ul>
+         *  <li>filePath - the path to the collada file</li>
+         * </ul>
          */
         ColladaLoader.prototype.init = function (config) {
             if (config) {

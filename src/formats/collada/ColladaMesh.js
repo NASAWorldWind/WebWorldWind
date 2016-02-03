@@ -35,6 +35,10 @@ define(['./ColladaUtils'], function (ColladaUtils) {
 
             var child = element.childNodes[i];
 
+            if (child.nodeType !== 1) {
+                continue;
+            }
+
             switch (child.nodeName) {
 
                 case 'source':
@@ -104,7 +108,9 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var count = parseInt(element.getAttribute("count"));
         var material = element.getAttribute("material");
 
-        var inputs = this.parseInputs(element, sources);
+        var inputData = this.parseInputs(element, sources);
+        var inputs = inputData.inputs;
+        var maxOffset = inputData.maxOffset;
 
         var primitives = element.querySelector("p");
         var primitiveData = [];
@@ -122,7 +128,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         for (var i = 0; i < count; i++) {
 
             if (arrVCount.length) {
-                var numVertices = arrVCount[i];
+                var numVertices = parseInt(arrVCount[i]);
             }
             else {
                 numVertices = vCount;
@@ -134,7 +140,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
 
             for (var k = 0; k < numVertices; k++) {
 
-                var vecId = primitiveData.slice(pos, pos + nrOfInputs).join(" ");
+                var vecId = primitiveData.slice(pos, pos + maxOffset).join(" ");
 
                 prevIndex = currentIndex;
                 if (indexMap.hasOwnProperty(vecId)) {
@@ -145,7 +151,8 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                     for (var j = 0; j < nrOfInputs; j++) {
 
                         var input = inputs[j];
-                        var index = parseInt(primitiveData[pos + j]);
+                        var offset = input[4];
+                        var index = parseInt(primitiveData[pos + offset]);
                         var array = input[1];
                         var source = input[3];
                         index *= input[2];
@@ -161,17 +168,18 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                 }
 
                 if (numVertices > 3) {
-                    if (k == 0) {
+                    if (k === 0) {
                         firstIndex = currentIndex;
                     }
-                    if (k > 2 * nrOfInputs) {
+                    if (k > 2 * maxOffset) {
                         indicesArray.push(firstIndex);
                         indicesArray.push(prevIndex);
                     }
                 }
 
                 indicesArray.push(currentIndex);
-                pos += nrOfInputs;
+                pos += maxOffset;
+
             }
         }
 
@@ -194,7 +202,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
      */
     ColladaMesh.prototype.parseInputs = function (element, sources) {
 
-        var inputs = [];
+        var inputs = [], maxOffset = 0;
 
         var xmlInputs = element.querySelectorAll("input");
 
@@ -209,6 +217,8 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             var source = sources[sourceUrl.substr(1)];
             var offset = parseInt(xmlInput.getAttribute("offset"));
 
+            maxOffset = ( maxOffset < offset + 1 ) ? offset + 1 : maxOffset;
+
             //indicates which inputs should be grouped together as a single set.
             //multiple inputs may share the same semantics.
             var dataSet = 0;
@@ -219,7 +229,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             inputs.push([semantic, [], source.stride, source.data, offset, dataSet]);
         }
 
-        return inputs;
+        return {inputs: inputs, maxOffset: maxOffset};
     };
 
     /**

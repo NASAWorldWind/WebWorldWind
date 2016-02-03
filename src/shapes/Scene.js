@@ -11,26 +11,24 @@ define([
         '../geom/BoundingBox',
         '../util/Color',
         '../geom/Matrix',
-        '../util/Offset',
         '../geom/Position',
         '../pick/PickedObject',
         '../render/Renderable',
-        '../geom/Vec2',
         '../geom/Vec3'
     ],
-    function (BasicTextureProgram, BoundingBox, Color, Matrix, Offset, Position, PickedObject, Renderable, Vec2, Vec3) {
+    function (BasicTextureProgram, BoundingBox, Color, Matrix, Position, PickedObject, Renderable, Vec3) {
         "use strict";
 
         /**
          * Constructs a scene
          * @alias Scene
+         * @constructor
          * @augments Renderable
          * @classdesc Represents a Scene shape. A scene is a collection of nodes with meshes, materials and textures.
          * @param {Position} position The scene's geographic position.
          * @param {Object} sceneData The scene's data containing the nodes, meshes, materials, textures and other
          * info needed to render the scene.
          */
-
         var Scene = function (position, sceneData) {
 
             Renderable.call(this);
@@ -212,7 +210,7 @@ define([
 
             dc.findAndBindProgram(BasicTextureProgram);
 
-            gl.enable(gl.CULL_FACE);
+            //gl.enable(gl.CULL_FACE);
             gl.enable(gl.DEPTH_TEST);
         };
 
@@ -598,6 +596,7 @@ define([
         Scene.prototype.concatenateVertices = function () {
 
             var points = [];
+            var rotationMatrix = Matrix.fromIdentity();
 
             for (var key in this.meshes) {
                 if (this.meshes.hasOwnProperty(key)) {
@@ -612,12 +611,12 @@ define([
 
                             vertex.multiply(this.scale);
 
-                            this.normalRotationMatrix1 = Matrix.fromIdentity();
-                            this.normalRotationMatrix1.multiplyByRotation(1, 0, 0, this.rotAngles[0]);
-                            this.normalRotationMatrix1.multiplyByRotation(0, 1, 0, this.rotAngles[1]);
-                            this.normalRotationMatrix1.multiplyByRotation(0, 0, 1, this.rotAngles[2]);
+                            var rotationMatrix = Matrix.fromIdentity();
+                            rotationMatrix.multiplyByRotation(1, 0, 0, this.rotAngles[0]);
+                            rotationMatrix.multiplyByRotation(0, 1, 0, this.rotAngles[1]);
+                            rotationMatrix.multiplyByRotation(0, 0, 1, this.rotAngles[2]);
 
-                            vertex.multiplyByMatrix(this.normalRotationMatrix1);
+                            vertex.multiplyByMatrix(rotationMatrix);
                             vertex.add(this.placePoint);
 
                             points.push(vertex[0]);
