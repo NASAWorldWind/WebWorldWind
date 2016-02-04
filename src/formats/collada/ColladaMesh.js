@@ -269,14 +269,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             }
         }
 
-        if (indicesArray && indicesArray.length) {
-            if (mesh.vertices.length > 256 * 256) {
-                mesh.indices = new Uint32Array(indicesArray);
-            }
-            else {
-                mesh.indices = new Uint16Array(indicesArray);
-            }
-        }
+        mesh.indices = new Uint16Array(indicesArray);
 
         return mesh;
     };
