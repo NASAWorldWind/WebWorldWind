@@ -252,8 +252,13 @@ define([
                 var bitsPerSample = this.metadata.tiff['BITS_PER_SAMPLE'];
                 var samplesPerPixel = this.metadata.tiff['SAMPLES_PER_PIXEL'][0];
 
+                if (this.metadata.tiff['COLOR_MAP']){
+                    var colorMapValues = this.metadata.tiff['COLOR_MAP'];
+                    var colorMapSampleSize = Math.pow(2, bitsPerSample[0]);
+                }
+
                 if (this.metadata.tiff['STRIP_OFFSETS']){
-                    var strips = this.parseStrips();
+                    var strips = this.parseStrips(false);
 
                     var imageLength = this.metadata.tiff['IMAGE_LENGTH'][0];
                     var imageWidth = this.metadata.tiff['IMAGE_WIDTH'][0];
@@ -304,6 +309,13 @@ define([
                                         red = green = blue =  GeoTiffUtil.clampColorSample(
                                             pixelSamples[0],
                                             bitsPerSample[0]);
+
+                                        if (this.metadata.tiff['MIN_SAMPLE_VALUE'][0] &&
+                                            this.metadata.tiff['MAX_SAMPLE_VALUE'][0] &&
+                                            (pixelSamples < this.metadata.tiff['MIN_SAMPLE_VALUE'][0] ||
+                                             pixelSamples > this.metadata.tiff['MAX_SAMPLE_VALUE'][0])){
+                                            opacity = 0;
+                                        }
                                         break;
                                     case Tiff.PhotometricInterpretation.RGB:
                                         red = GeoTiffUtil.clampColorSample(pixelSamples[0], bitsPerSample[0]);
@@ -313,11 +325,21 @@ define([
                                         if(samplesPerPixel === 4){
                                             var maxValue = Math.pow(2, bitsPerSample[3]);
                                             opacity = pixelSamples[3] / maxValue;
+                                            console.log(opacity);
                                         }
                                         break;
                                     case Tiff.PhotometricInterpretation.RGB_PALETTE:
-                                        //todo
-                                        console.log("Photometric interpretation: RGB_PALETTE");
+                                        if (colorMapValues){
+                                            var colorMapIndex = pixelSamples[0];
+
+                                            red = GeoTiffUtil.clampColorSample(colorMapValues[colorMapIndex], 16);
+                                            green = GeoTiffUtil.clampColorSample(
+                                                colorMapValues[colorMapSampleSize + colorMapIndex],
+                                                16);
+                                            blue = GeoTiffUtil.clampColorSample(
+                                                colorMapValues[(2 * colorMapSampleSize) + colorMapIndex],
+                                                16);
+                                        }
                                         break;
                                     case Tiff.PhotometricInterpretation.TRANSPARENCY_MASK:
                                         //todo
@@ -358,25 +380,82 @@ define([
             }).bind(this));
         };
 
+        GeoTiffReader.prototype.createTypedElevationArray = function(bitsPerSample, sampleFormat, untypedElevationArray){
+            switch(bitsPerSample){
+                case 8:
+                    if (sampleFormat === Tiff.SampleFormat.SIGNED){
+                        return new Int8Array(untypedElevationArray);
+                    }
+                    else{
+                        return new UInt8Array(untypedElevationArray);
+                    }
+                    break
+                case 16:
+                    if (sampleFormat === Tiff.SampleFormat.SIGNED){
+                        return new Int16Array(untypedElevationArray);
+                    }
+                    else{
+                        return new UInt16Array(untypedElevationArray);
+                    }
+                    break;
+                case 32:
+                    if (sampleFormat === Tiff.SampleFormat.SIGNED){
+                        return new Int32Array(untypedElevationArray);
+                    }
+                    else if (sampleFormat === Tiff.SampleFormat.IEEE_FLOAT){
+                        return new Float32Array(untypedElevationArray);
+                    }
+                    else {
+                        return new Uint32Array(untypedElevationArray);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
         /**
          * Retrieve the elevation data as an array of elevations.
          *
          * @return {Number[]} An array containing geotiff's elevation data.
          */
-        GeoTiffReader.prototype.readAsData = function () {
+        GeoTiffReader.prototype.readAsData = function (callback) {
             this.requestUrl(this.url, (function () {
-                //TODO read as data
-            }));
+                if (this.metadata.tiff['STRIP_OFFSETS']) {
+                    var strips = this.parseStrips(true);
+
+                    var elevationArray = [];
+
+                    for (var i = 0; i < strips.length; i++ ){
+                        elevationArray = elevationArray.concat(strips[i]);
+                    }
+
+                    callback(this.createTypedElevationArray(
+                        this.metadata.tiff['BITS_PER_SAMPLE'][0],
+                        this.metadata.tiff['SAMPLE_FORMAT'][0],
+                        elevationArray
+                    ));
+                }
+                else if (this.metadata.tiff['TILES_OFFSETS']){
+                    this.parseTiles();
+                }
+
+            }).bind(this));
         };
 
         // Parse geotiff strips. Internal use only
-        GeoTiffReader.prototype.parseStrips = function(){
+        GeoTiffReader.prototype.parseStrips = function(isElevation){
             var samplesPerPixel = this.metadata.tiff['SAMPLES_PER_PIXEL'][0];
             var bitsPerSample = this.metadata.tiff['BITS_PER_SAMPLE'];
             var stripOffsets = this.metadata.tiff['STRIP_OFFSETS'];
             var stripByteCounts = this.metadata.tiff['STRIP_BYTE_COUNTS'];
             var compression = this.metadata.tiff['COMPRESSION'][0];
-            var sampleFormat = this.metadata.tiff['SAMPLE_FORMAT'];
+            if (this.metadata.tiff['SAMPLE_FORMAT']){
+                var sampleFormat = this.metadata.tiff['SAMPLE_FORMAT'];
+            }
+            else{
+                var sampleFormat = Tiff.SampleFormat.UNSIGNED;
+            }
 
             var bitsPerPixel = samplesPerPixel * bitsPerSample[0];
             var bytesPerPixel = bitsPerPixel / 8;
@@ -405,7 +484,12 @@ define([
                                             sampleFormat[m],
                                             this.isLittleEndian));
                                     }
+                                if (isElevation){
+                                    strips[i].push(pixel[0]);
+                                }
+                                else{
                                     strips[i].push(pixel);
+                                }
                             }
                             break;
                         case Tiff.Compression.CCITT_1D:
@@ -429,8 +513,71 @@ define([
                             console.log("Compression type: JPEG");
                             break;
                         case Tiff.Compression.PACK_BITS:
-                            //todo
-                            console.log("Compression type: PACK_BITS");
+                            //Loop until you get the number of unpacked bytes you are expecting:
+                            //Read the next source byte into n.
+                            //If n is between 0 and 127 inclusive, copy the next n+1 bytes literally.
+                            //Else if n is between -127 and -1 inclusive, copy the next byte -n+1
+                            //times.
+                            //    Else if n is -128, noop.
+                            //Endloop
+                            // Loop through pixels.
+
+
+                            var newBlock = true;
+                            var numOfParsedSamples = 0;
+                            var currentSample = 0;
+                            var numOfBytes = 0;
+                            var pixel = [];
+                            var blockLength = 0;
+                            var numOfIterations = 0;
+
+                            for (var byteOffset = 0; byteOffset < stripByteCount; byteOffset += 1) {
+                                if (newBlock){
+                                    blockLength = 1;
+                                    numOfIterations = 1;
+                                    newBlock = false;
+
+                                    var nextSourceByte = this.geoTiffData.getInt8(stripOffset + byteOffset, this.isLittleEndian);
+
+                                    if (nextSourceByte >= 0 && nextSourceByte <= 127){
+                                        blockLength = nextSourceByte + 1;
+                                    }
+                                    else if (nextSourceByte >= -127 && nextSourceByte <= -1){
+                                        numOfIterations = -nextSourceByte + 1;
+                                    }
+                                    else{
+                                        newBlock = true;
+                                    }
+                                }
+                                else {
+                                    var currentByte = GeoTiffUtil.getBytes(this.geoTiffData, stripOffset + byteOffset, 1, this.isLittleEndian);
+
+                                    for (var currentIteration = 0; currentIteration < numOfIterations; currentIteration++){
+                                        currentSample = (currentSample << (8 * numOfBytes)) | currentByte;
+                                        numOfBytes++;
+
+                                        if (numOfBytes === bitsPerSample[0] / 8){
+                                            pixel.push(currentSample);
+                                            currentSample = numOfBytes = 0;
+                                            numOfParsedSamples++;
+                                        }
+
+                                        if (numOfParsedSamples === samplesPerPixel)
+                                        {
+                                            strips[i].push(pixel);
+                                            pixel = [];
+                                            numOfParsedSamples = 0;
+                                        }
+                                    }
+
+                                    blockLength--;
+
+                                    if (blockLength === 0){
+                                        newBlock = true;
+                                    }
+
+                                }
+                            }
                             break;
                         default:
                             console.log("Unknown compression type: " + compression);
@@ -573,7 +720,7 @@ define([
                         this.metadata.geotiff['GEO_ASCII_PARAMS']);
                 }
                 else{
-                    console.log("Unknown GeoTiff key: " + this.imageFileDirectories[0][i].tag);
+                    console.log("Unknown GeoTiff key: " + this.geoKeys[i].keyId);
                     //throw new AbstractError(
                     //            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader",
                     // "getMetadataFromGeoKeys", "invalidGeoTiffKey"));
@@ -601,7 +748,9 @@ define([
                     var count = geoKeyDirectory[6 + i*4];
                     var valueOffset = geoKeyDirectory[7 + i*4];
 
-                    this._geoKeys.push(new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset));
+                    if (keyId){
+                        this._geoKeys.push(new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset));
+                    }
                 }
             }
             else{

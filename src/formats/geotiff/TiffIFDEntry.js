@@ -52,7 +52,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingCount"));
             }
 
-            if (valueOffset === undefined) {
+            if (valueOffset === null || valueOffset === undefined) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingValueOffset"));
             }
@@ -62,7 +62,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingGeoTiffData"));
             }
 
-            if (!isLittleEndian) {
+            if (isLittleEndian === null || isLittleEndian === undefined) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "constructor", "missingIsLittleEndian"));
             }
@@ -229,7 +229,12 @@ define([
 
             if (this.type === Tiff.Type.ASCII) {
                 ifdValues.forEach(function (element, index, array) {
-                    array[index] = String.fromCharCode(element);
+                    if (element === 0){
+                        array.splice(index, 1);
+                    }
+                    else{
+                        array[index] = String.fromCharCode(element);
+                    }
                 });
 
                 return ifdValues.join("");

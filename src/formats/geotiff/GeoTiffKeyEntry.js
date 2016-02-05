@@ -9,7 +9,7 @@ define([
         '../../error/AbstractError',
         '../../error/ArgumentError',
         './GeoTiff',
-        '../../util/Logger',
+        '../../util/Logger'
     ],
     function (AbstractError,
               ArgumentError,

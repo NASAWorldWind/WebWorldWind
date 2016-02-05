@@ -46,7 +46,6 @@ define([
                         res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian);
                         break;
                     case Tiff.SampleFormat.IEEE_FLOAT:
-                    {
                         if (numOfBytes == 3) {
                             res = geoTiffData.getFloat32(byteOffset, isLittleEndian) >>> 8;
                         } else if (numOfBytes == 4) {
@@ -55,7 +54,7 @@ define([
                         else{
                             console.log("Do not attempt to parse the data  not handled  : " + sampleFormat);
                         }
-                    }
+                        break;
                     case Tiff.SampleFormat.UNDEFINED:
                     default:
                         res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian);

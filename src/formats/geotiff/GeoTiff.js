@@ -92,7 +92,7 @@ define([],
                 'VerticalCSTypeGeoKey': 4096,
                 'VerticalCitationGeoKey': 4097,
                 'VerticalDatumGeoKey': 4098,
-                'VerticalUnitsGeoKey': 409
+                'VerticalUnitsGeoKey': 4099
             }
         };
 
