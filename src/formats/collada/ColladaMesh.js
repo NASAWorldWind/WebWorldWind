@@ -93,7 +93,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
     /**
      * Parses the polygons primitive and computes the indices and vertices.
      * Internal. Applications should not call this function.
-     * @param {Node} element.
+     * @param {Node} element The node containing the primitives and inputs.
      * @param {Object} sources An object containing the inputs for vertices, normals and uvs.
      * @param {Number} vCount Optional parameter, specifies the the vertex count for a polygon
      */
@@ -197,7 +197,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
     /**
      * Parses the inputs of a mesh.
      * Internal. Applications should not call this function.
-     * @param {Node} element.
+     * @param {Node} element The node containing the primitives and inputs.
      * @param {Object} sources An object containing the vertices source and stride.
      */
     ColladaMesh.prototype.parseInputs = function (element, sources) {
@@ -236,8 +236,8 @@ define(['./ColladaUtils'], function (ColladaUtils) {
      * Packs the data in the mesh object.
      * Internal. Applications should not call this function.
      * @param {Object} mesh The mesh that will be returned.
-     * @param {Array} inputs An array containing geometry data.
-     * @param {Array} indicesArray An array containing the indices.
+     * @param {Array} inputs The array containing the inputs of the mesh.
+     * @param {Number[]} indicesArray An array containing the indices.
      */
     ColladaMesh.prototype.transformMeshInfo = function (mesh, inputs, indicesArray) {
         var translator = {

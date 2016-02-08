@@ -15,7 +15,7 @@ define([], function () {
         /**
          * Packs data from a node in an array.
          * Internal. Applications should not call this function.
-         * @param {Node} xmlNode.
+         * @param {Node} xmlNode A node from which to extract values.
          */
         getRawValues: function (xmlNode) {
             if (!xmlNode) {
@@ -37,7 +37,7 @@ define([], function () {
         /**
          * Packs data from a node as a Float32Array.
          * Internal. Applications should not call this function.
-         * @param {Node} xmlNode.
+         * @param {Node} xmlNode A node from which to extract values.
          */
         bufferDataFloat32: function (xmlNode) {
 
@@ -59,7 +59,7 @@ define([], function () {
         /**
          * Packs data from a node as a UInt32Array.
          * Internal. Applications should not call this function.
-         * @param {Node} xmlNode.
+         * @param {Node} xmlNode A node from which to extract values.
          */
         bufferDataUInt32: function (xmlNode) {
 
@@ -107,7 +107,7 @@ define([], function () {
         /**
          * Returns the filename without slashes.
          * Internal. Applications should not call this function.
-         * @param {String} filePath.
+         * @param {String} filePath
          */
         getFilename: function (filePath) {
 
@@ -127,7 +127,7 @@ define([], function () {
         /**
          * Replaces the spaces in a string with an "_".
          * Internal. Applications should not call this function.
-         * @param {String} str.
+         * @param {String} str
          */
         replaceSpace: function (str) {
             if (!str) {
@@ -159,7 +159,7 @@ define([], function () {
          * Determines the rendering method for a texture.
          * The method can be CLAMP or REPEAT.
          * Internal. Applications should not call this function.
-         * @param {Array} uvs The uvs array.
+         * @param {Number[]} uvs The uvs array.
          */
         getTextureType: function (uvs) {
             var clamp = true;

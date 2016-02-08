@@ -30,8 +30,8 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
      * Parses a visual_scene node.
      * Internal. Applications should not call this function.
      * @param {Node} element A visual_scene node.
-     * @param {NodeList} iNodes Nodes from library_nodes
-     * @param {Matrix} parentWorldMatrix The transformation matrix of it's parent
+     * @param {NodeList} iNodes Nodes from library_nodes.
+     * @param {Matrix} parentWorldMatrix The transformation matrix of it's parent.
      */
     ColladaNode.prototype.parse = function (element, iNodes, parentWorldMatrix) {
 
@@ -103,7 +103,7 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
      * Computes the transformation and normal matrix of a node
      * Internal. Applications should not call this function.
      * @param {Node} element A visual_scene node.
-     * @param {Matrix} parentWorldMatrix The transformation matrix of it's parent
+     * @param {Matrix} parentWorldMatrix The transformation matrix of it's parent.
      */
     ColladaNode.prototype.setNodeTransforms = function (element, parentWorldMatrix) {
 
