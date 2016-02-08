@@ -186,14 +186,6 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
             localTransform: true
         },
         {
-            displayName: 'cesiumMilkTruck',
-            fileName: 'CesiumMilkTruck.dae',
-            path: 'CesiumMilkTruck',
-            initialScale: 500000,
-            maxScale: 1000000,
-            localTransform: true
-        },
-        {
             displayName: 'kmlBuilding',
             fileName: 'CU Macky.dae',
             path: 'kmlBuilding',
