@@ -27,19 +27,17 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        var resourcesUrl = "./geotiff_data/black_sea_111.tif";
-        //var resourcesUrl = "http://wo2.terrasigna.com/geotiff-format/examples/geotiff_data/black_sea_111.tif";
+        var resourcesUrl = "http://wo2.terrasigna.com/geotiff-support/examples/geotiff_data/black_sea_rgb.tif";
 
         var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
 
         var start = new Date().getTime();
 
         var geoTiffImage = geotiffObject.readAsImage(function (image) {
-            var bbox = geotiffObject.metadata.geotiff.bbox;
-            console.log("Bounding Box:");
-            console.log(bbox);
+            console.log("Geotiff object:");
+            console.log(geotiffObject);
             var surfaceGeoTiff = new WorldWind.SurfaceImage(
-                new WorldWind.Sector(bbox.lowerLeft.latitude, bbox.upperLeft.latitude, bbox.upperLeft.longitude, bbox.upperRight.longitude),
+                geotiffObject.metadata.bbox,
                 new WorldWind.ImageSource(image)
             );
 

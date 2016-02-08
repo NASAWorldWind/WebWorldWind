@@ -519,7 +519,8 @@ define([
                                     numOfIterations = 1;
                                     newBlock = false;
 
-                                    var nextSourceByte = this.geoTiffData.getInt8(stripOffset + byteOffset, this.isLittleEndian);
+                                    var nextSourceByte = this.geoTiffData.getInt8(stripOffset + byteOffset,
+                                        this.isLittleEndian);
 
                                     if (nextSourceByte >= 0 && nextSourceByte <= 127){
                                         blockLength = nextSourceByte + 1;
@@ -532,9 +533,11 @@ define([
                                     }
                                 }
                                 else {
-                                    var currentByte = GeoTiffUtil.getBytes(this.geoTiffData, stripOffset + byteOffset, 1, this.isLittleEndian);
+                                    var currentByte = GeoTiffUtil.getBytes(this.geoTiffData, stripOffset + byteOffset,
+                                        1, this.isLittleEndian);
 
-                                    for (var currentIteration = 0; currentIteration < numOfIterations; currentIteration++){
+                                    for (var currentIteration = 0; currentIteration < numOfIterations;
+                                         currentIteration++){
                                         currentSample = (currentSample << (8 * numOfBytes)) | currentByte;
                                         numOfBytes++;
 

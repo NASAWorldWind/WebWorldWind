@@ -212,17 +212,21 @@ define([
                     if (ifdTypeLength >= 8) {
                         if (this.type === Tiff.Type.RATIONAL || this.type === Tiff.Type.SRATIONAL) {
                             // Numerator
-                            ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset, 4, this.isLittleEndian));
+                            ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset, 4,
+                                this.isLittleEndian));
                             // Denominator
-                            ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset + 4, 4, this.isLittleEndian));
+                            ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset + 4, 4,
+                                this.isLittleEndian));
                         } else if (this.type === Tiff.Type.DOUBLE) {
-                            ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset, 8, this.isLittleEndian));
+                            ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset, 8,
+                                this.isLittleEndian));
                         } else {
                             throw new AbstractError(
                                 Logger.logMessage(Logger.LEVEL_SEVERE, "TiffIFDEntry", "parse", "invalidTypeOfIFD"));
                         }
                     } else {
-                        ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset, ifdTypeLength, this.isLittleEndian));
+                        ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset,
+                            ifdTypeLength, this.isLittleEndian));
                     }
                 }
             }

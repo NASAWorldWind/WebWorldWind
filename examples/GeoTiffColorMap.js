@@ -27,8 +27,7 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        var resourcesUrl = "http://wo2.terrasigna.com/geotiff-support/examples/geotiff_data/craterlake-imagery-30m.tif";
-
+        var resourcesUrl = "http://wo2.terrasigna.com/geotiff-support/examples/geotiff_data/europe_srtm_colormap.tif";
 
         var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
 
@@ -36,8 +35,9 @@ requirejs(['../src/WorldWind',
 
         var geoTiffImage = geotiffObject.readAsImage(function (image) {
             console.log("Geotiff object:");
+            console.log(geotiffObject);
             var surfaceGeoTiff = new WorldWind.SurfaceImage(
-                    geotiffObject.metadata.bbox,
+                geotiffObject.metadata.bbox,
                 new WorldWind.ImageSource(image)
             );
 
@@ -50,7 +50,7 @@ requirejs(['../src/WorldWind',
             geotiffLayer.addRenderable(surfaceGeoTiff);
             wwd.addLayer(geotiffLayer);
 
-            wwd.goTo(new WorldWind.Position(42.94, -122.11, 12000));
+            wwd.goTo(new WorldWind.Position(38.94, 15.14, 3138000));
 
             // Create a layer manager for controlling layer visibility.
             var layerManger = new LayerManager(wwd);
