@@ -412,9 +412,10 @@ define([
                         elevationArray = elevationArray.concat(strips[i]);
                     }
 
+
                     callback(this.createTypedElevationArray(
-                        this.metadata.bitsPerSample,
-                        this.metadata.sampleFormat,
+                        this.metadata.bitsPerSample[0],
+                        this.metadata.sampleFormat[0],
                         elevationArray
                     ));
                 }
