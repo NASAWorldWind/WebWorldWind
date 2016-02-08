@@ -16,18 +16,38 @@ define([
         var GeoTiffUtil = {
 
             // Get bytes from an arraybuffer depending on the size.
-            getBytes: function (geoTiffData, byteOffset, numOfBytes, isLittleEndian) {
+            getBytes: function (geoTiffData, byteOffset, numOfBytes, isLittleEndian, isSigned) {
                 if (numOfBytes <= 0) {
                     throw new ArgumentError(
                         Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "getBytes", "noBytesRequested"));
                 } else if (numOfBytes <= 1) {
-                    return geoTiffData.getUint8(byteOffset, isLittleEndian);
+                    if (isSigned){
+                        return geoTiffData.getInt8(byteOffset, isLittleEndian);
+                    }
+                    else{
+                        return geoTiffData.getUint8(byteOffset, isLittleEndian);
+                    }
                 } else if (numOfBytes <= 2) {
-                    return geoTiffData.getUint16(byteOffset, isLittleEndian);
+                    if (isSigned){
+                        return geoTiffData.getInt16(byteOffset, isLittleEndian);
+                    }
+                    else{
+                        return geoTiffData.getUint16(byteOffset, isLittleEndian);
+                    }
                 } else if (numOfBytes <= 3) {
-                    return geoTiffData.getUint32(byteOffset, isLittleEndian) >>> 8;
+                    if (isSigned){
+                        return geoTiffData.getInt32(byteOffset, isLittleEndian) >>> 8;
+                    }
+                    else{
+                        return geoTiffData.getUint32(byteOffset, isLittleEndian) >>> 8;
+                    }
                 } else if (numOfBytes <= 4) {
-                    return geoTiffData.getUint32(byteOffset, isLittleEndian);
+                    if (isSigned){
+                        return geoTiffData.getInt32(byteOffset, isLittleEndian);
+                    }
+                    else{
+                        return geoTiffData.getUint32(byteOffset, isLittleEndian);
+                    }
                 } else if (numOfBytes <= 8) {
                     return geoTiffData.getFloat64(byteOffset, isLittleEndian);
                 } else {
@@ -42,8 +62,10 @@ define([
 
                 switch (sampleFormat) {
                     case Tiff.SampleFormat.UNSIGNED:
+                        res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian, false);
+                        break;
                     case Tiff.SampleFormat.SIGNED:
-                        res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian);
+                        res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian, true);
                         break;
                     case Tiff.SampleFormat.IEEE_FLOAT:
                         if (numOfBytes == 3) {
@@ -57,7 +79,7 @@ define([
                         break;
                     case Tiff.SampleFormat.UNDEFINED:
                     default:
-                        res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian);
+                        res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian, false);
                         break;
                 }
 

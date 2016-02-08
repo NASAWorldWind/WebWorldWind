@@ -13,6 +13,7 @@ define([
         './GeoTiffMetadata',
         './GeoTiffUtil',
         '../../geom/Location',
+        '../../geom/Sector',
         '../../util/Logger',
         '../../util/proj4-src',
         './Tiff',
@@ -25,6 +26,7 @@ define([
               GeoTiffMetadata,
               GeoTiffUtil,
               Location,
+              Sector,
               Logger,
               Proj4,
               Tiff,
@@ -61,9 +63,6 @@ define([
 
             // Documented in defineProperties below.
             this._metadata = new GeoTiffMetadata();
-
-            // Documented in defineProperties below.
-            this._geoKeys = [];
         };
 
         Object.defineProperties(GeoTiffReader.prototype, {
@@ -119,24 +118,12 @@ define([
             /**
              * An objct containing all tiff and geotiff metadata of the geotiff file.
              * @memberof GeoTiffReader.prototype
-             * @type {Object}
+             * @type {GeoTiffMetadata}
              * @readonly
              */
             metadata: {
                 get: function () {
                     return this._metadata;
-                }
-            },
-
-            /**
-             * An array containing the GeoKeys of the geotiff file.
-             * @memberof GeoTiffReader.prototype
-             * @type {GeoTiffKeyEntry[]}
-             * @readonly
-             */
-            geoKeys: {
-                get: function () {
-                    return this._geoKeys;
                 }
             }
         });
@@ -189,13 +176,7 @@ define([
             this.parseImageFileDirectory(firstIFDOffset);
             this.getMetadataFromImageFileDirectory();
             this.parseGeoKeys();
-            this.getMetadataFromGeoKeys();
-            this.getBBox(this.metadata.tiff['IMAGE_LENGTH'], this.metadata.tiff['IMAGE_WIDTH']);
-
-            console.log("Is GeoTiff: " + this.isGeoTiff());
-
-            console.log("Metadata: ");
-            console.log(this.metadata);
+            this.setBBox();
         };
 
         // Get byte order of the geotiff file. Internal use only.
@@ -249,30 +230,30 @@ define([
          */
         GeoTiffReader.prototype.readAsImage = function (callback) {
             this.requestUrl(this.url, (function () {
-                var bitsPerSample = this.metadata.tiff['BITS_PER_SAMPLE'];
-                var samplesPerPixel = this.metadata.tiff['SAMPLES_PER_PIXEL'][0];
+                var bitsPerSample = this.metadata.bitsPerSample;
+                var samplesPerPixel = this.metadata.samplesPerPixel;
 
-                if (this.metadata.tiff['COLOR_MAP']){
-                    var colorMapValues = this.metadata.tiff['COLOR_MAP'];
+                if (this.metadata.colorMap){
+                    var colorMapValues = this.metadata.colorMap;
                     var colorMapSampleSize = Math.pow(2, bitsPerSample[0]);
                 }
 
-                if (this.metadata.tiff['STRIP_OFFSETS']){
+                if (this.metadata.stripOffsets){
                     var strips = this.parseStrips(false);
 
-                    var imageLength = this.metadata.tiff['IMAGE_LENGTH'][0];
-                    var imageWidth = this.metadata.tiff['IMAGE_WIDTH'][0];
-                    if (this.metadata.tiff['ROWS_PER_STRIP']) {
-                        var rowsPerStrip = this.metadata.tiff['ROWS_PER_STRIP'][0];
+                    var imageLength = this.metadata.imageLength;
+                    var imageWidth = this.metadata.imageWidth;
+                    if (this.metadata.rowsPerStrip) {
+                        var rowsPerStrip = this.metadata.rowsPerStrip;
                     } else {
                         var rowsPerStrip = imageLength;
                     }
 
-                    var photometricInterpretation = this.metadata.tiff['PHOTOMETRIC_INTERPRETATION'][0];
+                    var photometricInterpretation = this.metadata.photometricInterpretation;
 
                     var canvas = document.createElement('canvas');
-                    canvas.width = this.metadata.tiff['IMAGE_WIDTH'][0];
-                    canvas.height = this.metadata.tiff['IMAGE_LENGTH'][0];
+                    canvas.width = this.metadata.imageWidth;
+                    canvas.height = this.metadata.imageLength;
                     var ctx = canvas.getContext("2d");
 
                     var numOfStrips = strips.length;
@@ -300,22 +281,23 @@ define([
                                 var blue = 0.0;
                                 var opacity = 1.0;
 
+                                if (this.metadata.noData &&
+                                    pixelSamples[0] == this.metadata.noData ){
+                                    opacity = 0.0;
+                                }
+
                                 switch (photometricInterpretation){
                                     case Tiff.PhotometricInterpretation.WHITE_IS_ZERO:
-                                        //todo
-                                        console.log("Photometric interpretation: WHITE_IS_ZERO");
+                                        var invertValue = Math.pow(2, bitsPerSample) - 1;
+                                        pixelSamples[0] = invertValue - pixelSamples[0];
+                                        red = green = blue =  GeoTiffUtil.clampColorSample(
+                                            pixelSamples[0],
+                                            bitsPerSample[0]);
                                         break;
                                     case Tiff.PhotometricInterpretation.BLACK_IS_ZERO:
                                         red = green = blue =  GeoTiffUtil.clampColorSample(
                                             pixelSamples[0],
                                             bitsPerSample[0]);
-
-                                        if (this.metadata.tiff['MIN_SAMPLE_VALUE'][0] &&
-                                            this.metadata.tiff['MAX_SAMPLE_VALUE'][0] &&
-                                            (pixelSamples < this.metadata.tiff['MIN_SAMPLE_VALUE'][0] ||
-                                             pixelSamples > this.metadata.tiff['MAX_SAMPLE_VALUE'][0])){
-                                            opacity = 0;
-                                        }
                                         break;
                                     case Tiff.PhotometricInterpretation.RGB:
                                         red = GeoTiffUtil.clampColorSample(pixelSamples[0], bitsPerSample[0]);
@@ -325,7 +307,6 @@ define([
                                         if(samplesPerPixel === 4){
                                             var maxValue = Math.pow(2, bitsPerSample[3]);
                                             opacity = pixelSamples[3] / maxValue;
-                                            console.log(opacity);
                                         }
                                         break;
                                     case Tiff.PhotometricInterpretation.RGB_PALETTE:
@@ -372,9 +353,10 @@ define([
                     }
 
                     //callback(GeoTiffUtil.canvasToTiffImage(canvas));
+                    this._geoTiffData = null;
                     callback(canvas);
                 }
-                else if (this.metadata.tiff['TILES_OFFSETS']){
+                else if (this.metadata.tileOffests){
                     this.parseTiles();
                 }
             }).bind(this));
@@ -387,7 +369,7 @@ define([
                         return new Int8Array(untypedElevationArray);
                     }
                     else{
-                        return new UInt8Array(untypedElevationArray);
+                        return new Uint8Array(untypedElevationArray);
                     }
                     break
                 case 16:
@@ -395,7 +377,7 @@ define([
                         return new Int16Array(untypedElevationArray);
                     }
                     else{
-                        return new UInt16Array(untypedElevationArray);
+                        return new Uint16Array(untypedElevationArray);
                     }
                     break;
                 case 32:
@@ -421,7 +403,7 @@ define([
          */
         GeoTiffReader.prototype.readAsData = function (callback) {
             this.requestUrl(this.url, (function () {
-                if (this.metadata.tiff['STRIP_OFFSETS']) {
+                if (this.metadata.stripOffsets) {
                     var strips = this.parseStrips(true);
 
                     var elevationArray = [];
@@ -431,12 +413,12 @@ define([
                     }
 
                     callback(this.createTypedElevationArray(
-                        this.metadata.tiff['BITS_PER_SAMPLE'][0],
-                        this.metadata.tiff['SAMPLE_FORMAT'][0],
+                        this.metadata.bitsPerSample,
+                        this.metadata.sampleFormat,
                         elevationArray
                     ));
                 }
-                else if (this.metadata.tiff['TILES_OFFSETS']){
+                else if (this.metadata.tilesOffests){
                     this.parseTiles();
                 }
 
@@ -445,13 +427,13 @@ define([
 
         // Parse geotiff strips. Internal use only
         GeoTiffReader.prototype.parseStrips = function(isElevation){
-            var samplesPerPixel = this.metadata.tiff['SAMPLES_PER_PIXEL'][0];
-            var bitsPerSample = this.metadata.tiff['BITS_PER_SAMPLE'];
-            var stripOffsets = this.metadata.tiff['STRIP_OFFSETS'];
-            var stripByteCounts = this.metadata.tiff['STRIP_BYTE_COUNTS'];
-            var compression = this.metadata.tiff['COMPRESSION'][0];
-            if (this.metadata.tiff['SAMPLE_FORMAT']){
-                var sampleFormat = this.metadata.tiff['SAMPLE_FORMAT'];
+            var samplesPerPixel = this.metadata.samplesPerPixel;
+            var bitsPerSample = this.metadata.bitsPerSample;
+            var stripOffsets = this.metadata.stripOffsets;
+            var stripByteCounts = this.metadata.stripByteCounts;
+            var compression = this.metadata.compression;
+            if (this.metadata.sampleFormat){
+                var sampleFormat = this.metadata.sampleFormat;
             }
             else{
                 var sampleFormat = Tiff.SampleFormat.UNSIGNED;
@@ -564,7 +546,12 @@ define([
 
                                         if (numOfParsedSamples === samplesPerPixel)
                                         {
-                                            strips[i].push(pixel);
+                                            if (isElevation){
+                                                strips[i].push(pixel[0]);
+                                            }
+                                            else{
+                                                strips[i].push(pixel);
+                                            }
                                             pixel = [];
                                             numOfParsedSamples = 0;
                                         }
@@ -593,7 +580,7 @@ define([
             //todo
         }
 
-        // Translate a pixel/line coordinates to projection coordinate. Interna use only.
+        // Translate a pixel/line coordinates to projection coordinate. Internal use only.
         GeoTiffReader.prototype.geoTiffImageToPCS = function (xValue, yValue) {
             if (xValue === null || xValue === undefined) {
                 throw new ArgumentError(
@@ -606,9 +593,9 @@ define([
 
             var res = [xValue, yValue];
 
-            var tiePointValues = this.metadata.geotiff['MODEL_TIEPOINT'];
-            var modelPixelScaleValues = this.metadata.geotiff['MODEL_PIXEL_SCALE'];
-            var modelTransformationValues = this.metadata.geotiff['MODEL_TRANSFORMATION'];
+            var tiePointValues = this.metadata.modelTiepoint;
+            var modelPixelScaleValues = this.metadata.modelPixelScale;
+            var modelTransformationValues = this.metadata.modelTransformation;
 
             var tiePointCount = tiePointValues ? tiePointValues.length : 0;
             var modelPixelScaleCount = modelPixelScaleValues ? modelPixelScaleValues.length : 0;
@@ -650,61 +637,91 @@ define([
                 ]
             ]);
 
-            if (this.metadata.geotiff.geoKeys['ProjectedCSTypeGeoKey']){
-                res = Proj4('EPSG:' + this.metadata.geotiff.geoKeys['ProjectedCSTypeGeoKey'], 'EPSG:4326', res);
+            if (this.metadata.projectedCSType){
+                res = Proj4('EPSG:' + this.metadata.projectedCSType, 'EPSG:4326', res);
             }
 
             return new Location(res[1], res[0]);
         };
 
         /**
-         * Get the bounding box of the geotiff file.
-         *
-         * @return {Object} An object containing the bounding box having attributes: upperLeft, upperRight,
-         * lowerLeft, lowerRight.
-         * @param {Number} imageLength The length of the image in pixels.
-         * @param {Number} imageWidth The width of the image in pixels.
-         * @throws {ArgumentError} If the specified imageLength or  imageWidth are null or undefined.
+         * Set the bounding box of the geotiff file.
          */
-        GeoTiffReader.prototype.getBBox = function (imageLength, imageWidth) {
-            if (!imageLength) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "setBbox", "missingImageLength"));
-            }
+        GeoTiffReader.prototype.setBBox = function () {
+            var upperLeft = this.geoTiffImageToPCS(0, 0);
+            var upperRight = this.geoTiffImageToPCS(this.metadata.imageWidth, 0);
+            var lowerLeft = this.geoTiffImageToPCS(0, this.metadata.imageLength);
+            var lowerRight = this.geoTiffImageToPCS(
+                this.metadata.imageWidth, this.metadata.imageLength);
 
-            if (!imageWidth) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "setBbox", "missingImageWidth"));
-            }
-
-            this.metadata.geotiff.bbox.upperLeft = this.geoTiffImageToPCS(0, 0);
-            this.metadata.geotiff.bbox.upperRight = this.geoTiffImageToPCS(imageWidth, 0);
-            this.metadata.geotiff.bbox.lowerLeft = this.geoTiffImageToPCS(0, imageLength);
-            this.metadata.geotiff.bbox.lowerRight = this.geoTiffImageToPCS(imageWidth, imageLength);
+            this.metadata.bbox = new Sector(
+                lowerLeft.latitude,
+                upperLeft.latitude,
+                upperLeft.longitude,
+                upperRight.longitude
+            );
         }
 
         // Get metadata from image file directory. Internal use only.
         GeoTiffReader.prototype.getMetadataFromImageFileDirectory = function () {
             for (var i = 0; i < this.imageFileDirectories[0].length; i++) {
 
-                var tagAsString = GeoTiffUtil.getTagValueAsString(Tiff.Tag, this.imageFileDirectories[0][i].tag);
+                switch(this.imageFileDirectories[0][i].tag){
+                    case Tiff.Tag.BITS_PER_SAMPLE:
+                        this.metadata.bitsPerSample = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case Tiff.Tag.COLOR_MAP:
+                        this.metadata.colorMap = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case Tiff.Tag.COMPRESSION:
+                        this.metadata.compression = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
+                    case Tiff.Tag.IMAGE_LENGTH:
+                        this.metadata.imageLength = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
+                    case Tiff.Tag.IMAGE_WIDTH:
+                        this.metadata.imageWidth = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
+                    case Tiff.Tag.PHOTOMETRIC_INTERPRETATION:
+                        this.metadata.photometricInterpretation = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
+                    case Tiff.Tag.PLANAR_CONFIGURATION:
+                        this.metadata.planarConfiguration = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
+                    case Tiff.Tag.ROWS_PER_STRIP:
+                        this.metadata.rowsPerStrip = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
+                    case Tiff.Tag.SAMPLES_PER_PIXEL:
+                        this.metadata.samplesPerPixel = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
+                    case Tiff.Tag.SAMPLE_FORMAT:
+                        this.metadata.sampleFormat = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case Tiff.Tag.STRIP_BYTE_COUNTS:
+                        this.metadata.stripByteCounts = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case Tiff.Tag.STRIP_OFFSETS:
+                        this.metadata.stripOffsets = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
 
-                if (tagAsString){
-                    this._metadata.tiff[tagAsString] =
-                        this.imageFileDirectories[0][i].getIFDEntryValue();
-                }
-                else{
-                    tagAsString = GeoTiffUtil.getTagValueAsString(GeoTiff.Tag, this.imageFileDirectories[0][i].tag);
-                    if (tagAsString){
-                        this._metadata.geotiff[tagAsString] =
-                            this.imageFileDirectories[0][i].getIFDEntryValue();
-                    }
-                    else{
-                        console.log("Unknown GeoTiff tag: " + this.imageFileDirectories[0][i].tag);
-                        //throw new AbstractError(
-                            //Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader",
-                            // "getMetadataFromImageFileDirectory", "invalidGeoTiffTag"));
-                    }
+                    //geotiff
+                    case GeoTiff.Tag.GEO_ASCII_PARAMS:
+                        this.metadata.geoAsciiParams = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case GeoTiff.Tag.GEO_KEY_DIRECTORY:
+                        this.metadata.geoKeyDirectory = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case GeoTiff.Tag.MODEL_PIXEL_SCALE:
+                        this.metadata.modelPixelScale = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case GeoTiff.Tag.MODEL_TIEPOINT:
+                        this.metadata.modelTiepoint = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case GeoTiff.Tag.GDAL_NODATA:
+                        this.metadata.noData = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    default:
+                        console.log(this.imageFileDirectories[0][i].tag);
                 }
             }
         }
@@ -716,8 +733,8 @@ define([
 
                 if (keyAsString){
                     this._metadata.geotiff.geoKeys[keyAsString] = this.geoKeys[i].getGeoKeyValue(
-                        this.metadata.geotiff['GEO_DOUBLE_PARAMS'],
-                        this.metadata.geotiff['GEO_ASCII_PARAMS']);
+                        this.metadata.geoDoubleParams,
+                        this.metadata.geoAsciiParams);
                 }
                 else{
                     console.log("Unknown GeoTiff key: " + this.geoKeys[i].keyId);
@@ -735,7 +752,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "parse", "invalidGeoTiffFile"));
             }
 
-            var geoKeyDirectory = this.metadata.geotiff['GEO_KEY_DIRECTORY'];
+            var geoKeyDirectory = this.metadata.geoKeyDirectory;
             if (geoKeyDirectory){
                 var keyDirectoryVersion = geoKeyDirectory[0];
                 var keyRevision = geoKeyDirectory[1];
@@ -748,8 +765,17 @@ define([
                     var count = geoKeyDirectory[6 + i*4];
                     var valueOffset = geoKeyDirectory[7 + i*4];
 
-                    if (keyId){
-                        this._geoKeys.push(new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset));
+                    switch (keyId){
+                        case GeoTiff.Key.ProjectedCSTypeGeoKey:
+                            this.metadata.projectedCSType =
+                                new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
+                                    this.metadata.geoDoubleParams,
+                                    this.metadata.geoAsciiParams);
+                            break;
+                        default:
+                            console.log(keyId);
+                            break;
+
                     }
                 }
             }
