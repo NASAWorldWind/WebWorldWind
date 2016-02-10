@@ -8,12 +8,12 @@
 define([
         '../../error/AbstractError',
         '../../error/ArgumentError',
-        './GeoTiff',
+        './GeoTiffConstants',
         '../../util/Logger'
     ],
     function (AbstractError,
               ArgumentError,
-              GeoTiff,
+              GeoTiffConstants,
               Logger) {
         "use strict";
 
@@ -127,7 +127,7 @@ define([
             if (this.tiffTagLocation === 0){
                 keyValue = this.valueOffset
             }
-            else if (this.tiffTagLocation === GeoTiff.Tag.GEO_ASCII_PARAMS) {
+            else if (this.tiffTagLocation === GeoTiffConstants.Tag.GEO_ASCII_PARAMS) {
                 var retVal = "";
 
                 if (geoAsciiParamsValue){
@@ -141,7 +141,7 @@ define([
                     keyValue = retVal;
                 }
             }
-            else if (this.tiffTagLocation === GeoTiff.Tag.GEO_DOUBLE_PARAMS) {
+            else if (this.tiffTagLocation === GeoTiffConstants.Tag.GEO_DOUBLE_PARAMS) {
                 if (geoDoubleParamsValue){
                     keyValue = geoDoubleParamsValue[this.valueOffset];
                 }

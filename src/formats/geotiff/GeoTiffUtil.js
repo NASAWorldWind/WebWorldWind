@@ -7,10 +7,10 @@
  */
 define([
         '../../error/ArgumentError',
-        './Tiff'
+        './TiffConstants'
     ],
     function (ArgumentError,
-              Tiff) {
+              TiffConstants) {
         "use strict";
 
         var GeoTiffUtil = {
@@ -61,23 +61,24 @@ define([
                 var res;
 
                 switch (sampleFormat) {
-                    case Tiff.SampleFormat.UNSIGNED:
+                    case TiffConstants.SampleFormat.UNSIGNED:
                         res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian, false);
                         break;
-                    case Tiff.SampleFormat.SIGNED:
+                    case TiffConstants.SampleFormat.SIGNED:
                         res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian, true);
                         break;
-                    case Tiff.SampleFormat.IEEE_FLOAT:
+                    case TiffConstants.SampleFormat.IEEE_FLOAT:
                         if (numOfBytes == 3) {
                             res = geoTiffData.getFloat32(byteOffset, isLittleEndian) >>> 8;
                         } else if (numOfBytes == 4) {
                             res = geoTiffData.getFloat32(byteOffset, isLittleEndian);
                         }
                         else{
-                            console.log("Do not attempt to parse the data  not handled  : " + sampleFormat);
+                            Logger.log(Logger.LEVEL_WARNING, "Do not attempt to parse the data  not handled: " +
+                                sampleFormat);
                         }
                         break;
-                    case Tiff.SampleFormat.UNDEFINED:
+                    case TiffConstants.SampleFormat.UNDEFINED:
                     default:
                         res = this.getBytes(geoTiffData, byteOffset, numOfBytes, isLittleEndian, false);
                         break;
@@ -115,6 +116,12 @@ define([
             clampColorSample: function(colorSample, bitsPerSample) {
                 var multiplier = Math.pow(2, 8 - bitsPerSample);
                 return Math.floor((colorSample * multiplier) + (multiplier - 1));
+            },
+
+            // Clamp color sample from color sample value and number of bits per sample.
+            clampColorSampleForElevation: function(elevationSample, minElevation, maxElevation) {
+                var slope = 255 / (maxElevation - minElevation);
+                return Math.round(slope * (elevationSample - minElevation))
             }
         };
 

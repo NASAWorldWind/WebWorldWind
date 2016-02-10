@@ -11,11 +11,11 @@ define([],
 
         /**
          * Provides all of the TIFF tag and subtag constants.
-         * @alias Tiff
+         * @alias TiffConstants
          * @constructor
          * @classdesc Contains all of the TIFF tags that are used to store TIFF information of any type.
          */
-        var Tiff = {
+        var TiffConstants = {
             /**
              * An object containing all TIFF specific tags.
              * @memberof Tiff
@@ -200,6 +200,6 @@ define([],
             }
         };
 
-        return Tiff;
+        return TiffConstants;
     }
 );

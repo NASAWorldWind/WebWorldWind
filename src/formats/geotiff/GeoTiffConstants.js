@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @exports GeoTiff
+ * @exports GeoTiffConstants
  */
 define([],
     function () {
@@ -15,7 +15,7 @@ define([],
          * @constructor
          * @classdesc Contains all of the TIFF tags that are used to store GeoTIFF information of any type.
          */
-        var GeoTiff = {
+        var GeoTiffConstants = {
             /**
              * An object containing all GeoTiff specific tags.
              * @memberof GeoTiff
@@ -96,6 +96,6 @@ define([],
             }
         };
 
-        return GeoTiff;
+        return GeoTiffConstants;
     }
 );

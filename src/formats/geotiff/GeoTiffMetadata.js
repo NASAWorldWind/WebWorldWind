@@ -430,9 +430,7 @@ define([
                 set: function(value){
                     this._projectedCSType = value;
                 }
-            },
-
-
+            }
         });
 
         return GeoTiffMetadata;

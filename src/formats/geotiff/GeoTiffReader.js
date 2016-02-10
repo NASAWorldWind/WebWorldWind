@@ -8,7 +8,7 @@
 define([
         '../../error/AbstractError',
         '../../error/ArgumentError',
-        './GeoTiff',
+        './GeoTiffConstants',
         './GeoTiffKeyEntry',
         './GeoTiffMetadata',
         './GeoTiffUtil',
@@ -16,12 +16,12 @@ define([
         '../../geom/Sector',
         '../../util/Logger',
         '../../util/proj4-src',
-        './Tiff',
+        './TiffConstants',
         './TiffIFDEntry'
     ],
     function (AbstractError,
               ArgumentError,
-              GeoTiff,
+              GeoTiffConstants,
               GeoTiffKeyEntry,
               GeoTiffMetadata,
               GeoTiffUtil,
@@ -29,14 +29,14 @@ define([
               Sector,
               Logger,
               Proj4,
-              Tiff,
+              TiffConstants,
               TiffIFDEntry) {
         "use strict";
 
         /**
          * Constructs a geotiff reader object for a specified geotiff URL.
          * Call [readAsImage]{@link GeoTiffReader#readAsImage} to retrieve the image as a canvas or
-         * [readAsData]{@link GeoTiffReader#readAsData} to retrieve the elevaton as an array of elevation values.
+         * [readAsData]{@link GeoTiffReader#readAsData} to retrieve the elevations as an array of elevation values.
          * @alias GeoTiffReader
          * @constructor
          * @classdesc Parses a geotiff and creates an image or an elevation array representing its contents.
@@ -215,7 +215,7 @@ define([
          * @return {Boolean} True if this geotiff file is a geotiff file type.
          */
         GeoTiffReader.prototype.isGeoTiff = function () {
-            if (this.getIFDByTag(GeoTiff.Tag.GEO_KEY_DIRECTORY)) {
+            if (this.getIFDByTag(GeoTiffConstants.Tag.GEO_KEY_DIRECTORY)) {
                 return true;
             }
             else {
@@ -224,9 +224,10 @@ define([
         };
 
         /**
-         * Retrieve the image as a canvas from a geotiff file.
+         * Retrieves the GeoTiff file, parses it and creates a canvas of its content. The canvas is passed
+         * to the callback function as a parameter.
          *
-         * @return {Canvas} A canvas representing the geotiff image.
+         * @param {Function} callback A function called when GeoTiff parsing is complete.
          */
         GeoTiffReader.prototype.readAsImage = function (callback) {
             this.requestUrl(this.url, (function () {
@@ -287,19 +288,19 @@ define([
                                 }
 
                                 switch (photometricInterpretation){
-                                    case Tiff.PhotometricInterpretation.WHITE_IS_ZERO:
+                                    case TiffConstants.PhotometricInterpretation.WHITE_IS_ZERO:
                                         var invertValue = Math.pow(2, bitsPerSample) - 1;
                                         pixelSamples[0] = invertValue - pixelSamples[0];
                                         red = green = blue =  GeoTiffUtil.clampColorSample(
-                                            pixelSamples[0],
-                                            bitsPerSample[0]);
+                                                pixelSamples[0],
+                                                bitsPerSample[0]);
                                         break;
-                                    case Tiff.PhotometricInterpretation.BLACK_IS_ZERO:
+                                    case TiffConstants.PhotometricInterpretation.BLACK_IS_ZERO:
                                         red = green = blue =  GeoTiffUtil.clampColorSample(
-                                            pixelSamples[0],
-                                            bitsPerSample[0]);
+                                                pixelSamples[0],
+                                                bitsPerSample[0]);
                                         break;
-                                    case Tiff.PhotometricInterpretation.RGB:
+                                    case TiffConstants.PhotometricInterpretation.RGB:
                                         red = GeoTiffUtil.clampColorSample(pixelSamples[0], bitsPerSample[0]);
                                         green = GeoTiffUtil.clampColorSample(pixelSamples[1], bitsPerSample[1]);
                                         blue = GeoTiffUtil.clampColorSample(pixelSamples[2], bitsPerSample[2]);
@@ -309,37 +310,42 @@ define([
                                             opacity = pixelSamples[3] / maxValue;
                                         }
                                         break;
-                                    case Tiff.PhotometricInterpretation.RGB_PALETTE:
+                                    case TiffConstants.PhotometricInterpretation.RGB_PALETTE:
                                         if (colorMapValues){
                                             var colorMapIndex = pixelSamples[0];
 
-                                            red = GeoTiffUtil.clampColorSample(colorMapValues[colorMapIndex], 16);
+                                            red = GeoTiffUtil.clampColorSample(colorMapValues[colorMapIndex], bitsPerSample);
                                             green = GeoTiffUtil.clampColorSample(
                                                 colorMapValues[colorMapSampleSize + colorMapIndex],
-                                                16);
+                                                bitsPerSample);
                                             blue = GeoTiffUtil.clampColorSample(
                                                 colorMapValues[(2 * colorMapSampleSize) + colorMapIndex],
-                                                16);
+                                                bitsPerSample);
                                         }
                                         break;
-                                    case Tiff.PhotometricInterpretation.TRANSPARENCY_MASK:
+                                    case TiffConstants.PhotometricInterpretation.TRANSPARENCY_MASK:
                                         //todo
-                                        console.log("Photometric interpretation: TRANSPARENCY_MASK");
+                                        Logger.log(Logger.LEVEL_WARNING, "Photometric interpretation not yet " +
+                                            "implemented: TRANSPARENCY_MASK");
                                         break;
-                                    case Tiff.PhotometricInterpretation.CMYK:
+                                    case TiffConstants.PhotometricInterpretation.CMYK:
                                         //todo
-                                        console.log("Photometric interpretation: CMYK");
+                                        Logger.log(Logger.LEVEL_WARNING, "Photometric interpretation not yet " +
+                                            "implemented: CMYK");
                                         break;
-                                    case Tiff.PhotometricInterpretation.Y_Cb_Cr:
+                                    case TiffConstants.PhotometricInterpretation.Y_Cb_Cr:
                                         //todo
-                                        console.log("Photometric interpretation: Y_Cb_Cr");
+                                        Logger.log(Logger.LEVEL_WARNING, "Photometric interpretation not yet " +
+                                            "implemented: Y_Cb_Cr");
                                         break;
-                                    case Tiff.PhotometricInterpretation.CIE_LAB:
+                                    case TiffConstants.PhotometricInterpretation.CIE_LAB:
                                         //todo
-                                        console.log("Photometric interpretation: CIE_LAB");
+                                        Logger.log(Logger.LEVEL_WARNING, "Photometric interpretation not yet " +
+                                            "implemented: CIE_LAB");
                                         break;
                                     default:
-                                        console.log("Unknown photometric interpretation: " + photometricInterpretation);
+                                        Logger.log(Logger.LEVEL_WARNING, "Unknown photometric interpretation: " +
+                                            photometricInterpretation);
                                         break;
 
                                 }
@@ -365,7 +371,7 @@ define([
         GeoTiffReader.prototype.createTypedElevationArray = function(bitsPerSample, sampleFormat, untypedElevationArray){
             switch(bitsPerSample){
                 case 8:
-                    if (sampleFormat === Tiff.SampleFormat.SIGNED){
+                    if (sampleFormat === TiffConstants.SampleFormat.SIGNED){
                         return new Int8Array(untypedElevationArray);
                     }
                     else{
@@ -373,7 +379,7 @@ define([
                     }
                     break
                 case 16:
-                    if (sampleFormat === Tiff.SampleFormat.SIGNED){
+                    if (sampleFormat === TiffConstants.SampleFormat.SIGNED){
                         return new Int16Array(untypedElevationArray);
                     }
                     else{
@@ -381,10 +387,10 @@ define([
                     }
                     break;
                 case 32:
-                    if (sampleFormat === Tiff.SampleFormat.SIGNED){
+                    if (sampleFormat === TiffConstants.SampleFormat.SIGNED){
                         return new Int32Array(untypedElevationArray);
                     }
-                    else if (sampleFormat === Tiff.SampleFormat.IEEE_FLOAT){
+                    else if (sampleFormat === TiffConstants.SampleFormat.IEEE_FLOAT){
                         return new Float32Array(untypedElevationArray);
                     }
                     else {
@@ -397,9 +403,11 @@ define([
         }
 
         /**
-         * Retrieve the elevation data as an array of elevations.
+         * Retrieves the GeoTiff file, parses it and creates a typed array of its content. The array is passed
+         * to the callback function as a parameter.
          *
-         * @return {Number[]} An array containing geotiff's elevation data.
+         * @param {Function} callback A function called when GeoTiff parsing is complete. 
+         *
          */
         GeoTiffReader.prototype.readAsData = function (callback) {
             this.requestUrl(this.url, (function () {
@@ -437,7 +445,7 @@ define([
                 var sampleFormat = this.metadata.sampleFormat;
             }
             else{
-                var sampleFormat = Tiff.SampleFormat.UNSIGNED;
+                var sampleFormat = TiffConstants.SampleFormat.UNSIGNED;
             }
 
             var bitsPerPixel = samplesPerPixel * bitsPerSample[0];
@@ -451,7 +459,7 @@ define([
                 var stripByteCount = stripByteCounts[i];
 
                     switch (compression) {
-                        case Tiff.Compression.UNCOMPRESSED:
+                        case TiffConstants.Compression.UNCOMPRESSED:
                             // Loop through pixels.
                             for (var byteOffset = 0, increment = bytesPerPixel;
                                  byteOffset < stripByteCount; byteOffset += increment) {
@@ -475,27 +483,27 @@ define([
                                 }
                             }
                             break;
-                        case Tiff.Compression.CCITT_1D:
+                        case TiffConstants.Compression.CCITT_1D:
                             //todo
-                            console.log("Compression type: CCITT_1D");
+                            Logger.log(Logger.LEVEL_WARNING, "Compression type not yet implemented: CCITT_1D");
                             break;
-                        case Tiff.Compression.GROUP_3_FAX:
+                        case TiffConstants.Compression.GROUP_3_FAX:
                             //todo
-                            console.log("Compression type: GROUP_3_FAX");
+                            Logger.log(Logger.LEVEL_WARNING, "Compression type not yet implemented: GROUP_3_FAX");
                             break;
-                        case Tiff.Compression.GROUP_4_FAX:
+                        case TiffConstants.Compression.GROUP_4_FAX:
                             //todo
-                            console.log("Compression type: GROUP_4_FAX");
+                            Logger.log(Logger.LEVEL_WARNING, "Compression type not yet implemented: GROUP_4_FAX");
                             break;
-                        case Tiff.Compression.LZW:
+                        case TiffConstants.Compression.LZW:
                             //todo
-                            console.log("Compression type: LZW");
+                            Logger.log(Logger.LEVEL_WARNING, "Compression type not yet implemented: LZW");
                             break;
-                        case Tiff.Compression.JPEG:
+                        case TiffConstants.Compression.JPEG:
                             //todo
-                            console.log("Compression type: JPEG");
+                            Logger.log(Logger.LEVEL_WARNING, "Compression type not yet implemented: JPEG");
                             break;
-                        case Tiff.Compression.PACK_BITS:
+                        case TiffConstants.Compression.PACK_BITS:
                             //Loop until you get the number of unpacked bytes you are expecting:
                             //Read the next source byte into n.
                             //If n is between 0 and 127 inclusive, copy the next n+1 bytes literally.
@@ -571,7 +579,7 @@ define([
                             }
                             break;
                         default:
-                            console.log("Unknown compression type: " + compression);
+                            Logger.log(Logger.LEVEL_WARNING, "Unknown compression type: " + compression);
                             break;
                     }
             }
@@ -671,61 +679,61 @@ define([
             for (var i = 0; i < this.imageFileDirectories[0].length; i++) {
 
                 switch(this.imageFileDirectories[0][i].tag){
-                    case Tiff.Tag.BITS_PER_SAMPLE:
+                    case TiffConstants.Tag.BITS_PER_SAMPLE:
                         this.metadata.bitsPerSample = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case Tiff.Tag.COLOR_MAP:
+                    case TiffConstants.Tag.COLOR_MAP:
                         this.metadata.colorMap = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case Tiff.Tag.COMPRESSION:
+                    case TiffConstants.Tag.COMPRESSION:
                         this.metadata.compression = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
-                    case Tiff.Tag.IMAGE_LENGTH:
+                    case TiffConstants.Tag.IMAGE_LENGTH:
                         this.metadata.imageLength = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
-                    case Tiff.Tag.IMAGE_WIDTH:
+                    case TiffConstants.Tag.IMAGE_WIDTH:
                         this.metadata.imageWidth = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
-                    case Tiff.Tag.PHOTOMETRIC_INTERPRETATION:
+                    case TiffConstants.Tag.PHOTOMETRIC_INTERPRETATION:
                         this.metadata.photometricInterpretation = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
-                    case Tiff.Tag.PLANAR_CONFIGURATION:
+                    case TiffConstants.Tag.PLANAR_CONFIGURATION:
                         this.metadata.planarConfiguration = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
-                    case Tiff.Tag.ROWS_PER_STRIP:
+                    case TiffConstants.Tag.ROWS_PER_STRIP:
                         this.metadata.rowsPerStrip = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
-                    case Tiff.Tag.SAMPLES_PER_PIXEL:
+                    case TiffConstants.Tag.SAMPLES_PER_PIXEL:
                         this.metadata.samplesPerPixel = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
-                    case Tiff.Tag.SAMPLE_FORMAT:
+                    case TiffConstants.Tag.SAMPLE_FORMAT:
                         this.metadata.sampleFormat = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case Tiff.Tag.STRIP_BYTE_COUNTS:
+                    case TiffConstants.Tag.STRIP_BYTE_COUNTS:
                         this.metadata.stripByteCounts = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case Tiff.Tag.STRIP_OFFSETS:
+                    case TiffConstants.Tag.STRIP_OFFSETS:
                         this.metadata.stripOffsets = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
 
                     //geotiff
-                    case GeoTiff.Tag.GEO_ASCII_PARAMS:
+                    case GeoTiffConstants.Tag.GEO_ASCII_PARAMS:
                         this.metadata.geoAsciiParams = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case GeoTiff.Tag.GEO_KEY_DIRECTORY:
+                    case GeoTiffConstants.Tag.GEO_KEY_DIRECTORY:
                         this.metadata.geoKeyDirectory = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case GeoTiff.Tag.MODEL_PIXEL_SCALE:
+                    case GeoTiffConstants.Tag.MODEL_PIXEL_SCALE:
                         this.metadata.modelPixelScale = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case GeoTiff.Tag.MODEL_TIEPOINT:
+                    case GeoTiffConstants.Tag.MODEL_TIEPOINT:
                         this.metadata.modelTiepoint = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
-                    case GeoTiff.Tag.GDAL_NODATA:
+                    case GeoTiffConstants.Tag.GDAL_NODATA:
                         this.metadata.noData = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
                     default:
-                        console.log(this.imageFileDirectories[0][i].tag);
+                        Logger.log(Logger.LEVEL_WARNING, "Ignored GeoTiff tag: " + this.imageFileDirectories[0][i].tag);
                 }
             }
         }
@@ -733,7 +741,7 @@ define([
         // Get metadata from GeoKeys. Internal use only.
         GeoTiffReader.prototype.getMetadataFromGeoKeys = function () {
             for (var i = 0; i < this.geoKeys.length; i++) {
-                var keyAsString = GeoTiffUtil.getTagValueAsString(GeoTiff.Key, this.geoKeys[i].keyId);
+                var keyAsString = GeoTiffUtil.getTagValueAsString(GeoTiffConstants.Key, this.geoKeys[i].keyId);
 
                 if (keyAsString){
                     this._metadata.geotiff.geoKeys[keyAsString] = this.geoKeys[i].getGeoKeyValue(
@@ -741,10 +749,7 @@ define([
                         this.metadata.geoAsciiParams);
                 }
                 else{
-                    console.log("Unknown GeoTiff key: " + this.geoKeys[i].keyId);
-                    //throw new AbstractError(
-                    //            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader",
-                    // "getMetadataFromGeoKeys", "invalidGeoTiffKey"));
+                    Logger.log(Logger.LEVEL_WARNING, "Unknown GeoTiff key: " + this.geoKeys[i].keyId);
                 }
             }
         }
@@ -770,14 +775,14 @@ define([
                     var valueOffset = geoKeyDirectory[7 + i*4];
 
                     switch (keyId){
-                        case GeoTiff.Key.ProjectedCSTypeGeoKey:
+                        case GeoTiffConstants.Key.ProjectedCSTypeGeoKey:
                             this.metadata.projectedCSType =
                                 new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
                                     this.metadata.geoDoubleParams,
                                     this.metadata.geoAsciiParams);
                             break;
                         default:
-                            console.log(keyId);
+                            Logger.log(Logger.LEVEL_WARNING, "Ignored GeoTiff key: " + keyId);
                             break;
 
                     }

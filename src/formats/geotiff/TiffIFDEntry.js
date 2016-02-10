@@ -10,13 +10,13 @@ define([
         '../../error/ArgumentError',
         './GeoTiffUtil',
         '../../util/Logger',
-        './Tiff'
+        './TiffConstants'
     ],
     function (AbstractError,
               ArgumentError,
               GeoTiffUtil,
               Logger,
-              Tiff) {
+              TiffConstants) {
         "use strict";
 
         /**
@@ -167,21 +167,21 @@ define([
          */
         TiffIFDEntry.prototype.getIFDTypeLength = function () {
             switch(this.type){
-                case Tiff.Type.BYTE:
-                case Tiff.Type.ASCII:
-                case Tiff.Type.SBYTE:
-                case Tiff.Type.UNDEFINED:
+                case TiffConstants.Type.BYTE:
+                case TiffConstants.Type.ASCII:
+                case TiffConstants.Type.SBYTE:
+                case TiffConstants.Type.UNDEFINED:
                     return 1;
-                case Tiff.Type.SHORT:
-                case Tiff.Type.SSHORT:
+                case TiffConstants.Type.SHORT:
+                case TiffConstants.Type.SSHORT:
                     return 2;
-                case Tiff.Type.LONG:
-                case Tiff.Type.SLONG:
-                case Tiff.Type.FLOAT:
+                case TiffConstants.Type.LONG:
+                case TiffConstants.Type.SLONG:
+                case TiffConstants.Type.FLOAT:
                     return 4;
-                case Tiff.Type.RATIONAL:
-                case Tiff.Type.SRATIONAL:
-                case Tiff.Type.DOUBLE:
+                case TiffConstants.Type.RATIONAL:
+                case TiffConstants.Type.SRATIONAL:
+                case TiffConstants.Type.DOUBLE:
                     return 8;
                 default:
                     return -1;
@@ -210,14 +210,14 @@ define([
                     var indexOffset = ifdTypeLength * i;
 
                     if (ifdTypeLength >= 8) {
-                        if (this.type === Tiff.Type.RATIONAL || this.type === Tiff.Type.SRATIONAL) {
+                        if (this.type === TiffConstants.Type.RATIONAL || this.type === TiffConstants.Type.SRATIONAL) {
                             // Numerator
                             ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset, 4,
                                 this.isLittleEndian));
                             // Denominator
                             ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset + 4, 4,
                                 this.isLittleEndian));
-                        } else if (this.type === Tiff.Type.DOUBLE) {
+                        } else if (this.type === TiffConstants.Type.DOUBLE) {
                             ifdValues.push(GeoTiffUtil.getBytes(this.geoTiffData, this.valueOffset + indexOffset, 8,
                                 this.isLittleEndian));
                         } else {
@@ -231,7 +231,7 @@ define([
                 }
             }
 
-            if (this.type === Tiff.Type.ASCII) {
+            if (this.type === TiffConstants.Type.ASCII) {
                 ifdValues.forEach(function (element, index, array) {
                     if (element === 0){
                         array.splice(index, 1);
