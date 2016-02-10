@@ -19,19 +19,16 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
     var spanRotateY = $("#spanRotateY");
     var spanRotateZ = $("#spanRotateZ");
 
-    var computeBbox;
-
     sliderScale.slider({
         min: 0,
         max: 5000,
         value: 10,
         slide: function (event, ui) {
-            spanScale.html(ui.value);
-            modelScene.setScale(ui.value);
-            if (computeBbox) {
-                modelScene.computeBoundingBox();
+            if (modelScene) {
+                spanScale.html(ui.value);
+                modelScene.scale = ui.value;
+                wwd.redraw();
             }
-            wwd.redraw();
         }
     });
 
@@ -40,12 +37,11 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
         max: 360,
         value: 0,
         slide: function (event, ui) {
-            spanRotateX.html(ui.value);
-            modelScene.setRotationX(ui.value);
-            if (computeBbox) {
-                modelScene.computeBoundingBox();
+            if (modelScene) {
+                spanRotateX.html(ui.value);
+                modelScene.xRotation = ui.value;
+                wwd.redraw();
             }
-            wwd.redraw();
         }
     });
     sliderRotateY.slider({
@@ -53,12 +49,11 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
         max: 360,
         value: 0,
         slide: function (event, ui) {
-            spanRotateY.html(ui.value);
-            modelScene.setRotationY(ui.value);
-            if (computeBbox) {
-                modelScene.computeBoundingBox();
+            if (modelScene) {
+                spanRotateY.html(ui.value);
+                modelScene.yRotation = ui.value;
+                wwd.redraw();
             }
-            wwd.redraw();
         }
     });
     sliderRotateZ.slider({
@@ -66,12 +61,11 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
         max: 360,
         value: 0,
         slide: function (event, ui) {
-            spanRotateZ.html(ui.value);
-            modelScene.setRotationZ(ui.value);
-            if (computeBbox) {
-                modelScene.computeBoundingBox();
+            if (modelScene) {
+                spanRotateZ.html(ui.value);
+                modelScene.zRotation = ui.value;
+                wwd.redraw();
             }
-            wwd.redraw();
         }
     });
 
@@ -96,13 +90,13 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
         wwd.addLayer(layers[l].layer);
     }
 
-    // Create a layer manager for controlling layer visibility.
-    var layerManger = new LayerManager(wwd);
-
     var modelLayer = new WorldWind.RenderableLayer("model");
     wwd.addLayer(modelLayer);
+
     var position = new WorldWind.Position(45, -100, 1000e3);
-    var modelScene = new WorldWind.Scene(position);
+    var colladaLoader = new WorldWind.ColladaLoader(position);
+
+    var modelScene;
 
     var colladaModels = [
         {
@@ -117,22 +111,6 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
             displayName: 'boxWithoutIndices',
             fileName: 'boxWithoutIndices.dae',
             path: 'boxWithoutIndices',
-            initialScale: 500000,
-            maxScale: 1000000,
-            localTransform: true
-        },
-        {
-            displayName: 'boxTextured',
-            fileName: 'CesiumTexturedBoxTest.dae',
-            path: 'boxTextured',
-            initialScale: 500000,
-            maxScale: 1000000,
-            localTransform: true
-        },
-        {
-            displayName: 'boxSemantics',
-            fileName: 'boxSemantics.dae',
-            path: 'boxSemantics',
             initialScale: 500000,
             maxScale: 1000000,
             localTransform: true
@@ -178,14 +156,6 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
             localTransform: true
         },
         {
-            displayName: 'boxAnimated',
-            fileName: 'boxAnimated.dae',
-            path: 'boxAnimated',
-            initialScale: 500000,
-            maxScale: 1000000,
-            localTransform: true
-        },
-        {
             displayName: 'kmlBuilding',
             fileName: 'CU Macky.dae',
             path: 'kmlBuilding',
@@ -194,8 +164,6 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
             localTransform: true
         },
     ];
-
-    var colladaLoader = new WorldWind.ColladaLoader();
 
     createCombo();
 
@@ -221,15 +189,16 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
         var model = colladaModels[pos];
 
         colladaLoader.init({filePath: './collada_models/' + model.path + '/'});
-        colladaLoader.load(model.fileName, function (sceneData) {
+        colladaLoader.load(model.fileName, function (scene) {
 
-            console.log('sceneData', sceneData);
+            scene.scale = model.initialScale;
+            scene.localTransforms = model.localTransform;
+            scene.altitudeMode = WorldWind.ABSOLUTE;
 
-            modelScene.add(sceneData);
-            modelScene.setScale(model.initialScale);
-            modelScene.useLocalTransforms(model.localTransform);
+            modelLayer.removeAllRenderables();
+            modelLayer.addRenderable(scene);
 
-            modelLayer.addRenderable(modelScene);
+            modelScene = scene;
 
             sliderScale.slider("option", "max", model.maxScale);
             sliderScale.slider("option", "value", model.initialScale);

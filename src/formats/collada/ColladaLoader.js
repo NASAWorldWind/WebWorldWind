@@ -6,8 +6,26 @@
  * @exports ColladaLoader
  */
 
-define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh', './ColladaNode', './ColladaUtils'],
-    function (ColladaAsset, ColladaImage, ColladaMaterial, ColladaMesh, ColladaNode, ColladaUtils) {
+define([
+        '../../error/ArgumentError',
+        './ColladaAsset',
+        './ColladaImage',
+        './ColladaMaterial',
+        './ColladaMesh',
+        './ColladaNode',
+        './ColladaScene',
+        './ColladaUtils',
+        '../../util/Logger'
+    ],
+    function (ArgumentError,
+              ColladaAsset,
+              ColladaImage,
+              ColladaMaterial,
+              ColladaMesh,
+              ColladaNode,
+              ColladaScene,
+              ColladaUtils,
+              Logger) {
         "use strict";
 
         /**
@@ -16,12 +34,20 @@ define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh'
          * @constructor
          * @classdesc Represents a Collada Loader. Fetches and parses a collada document and returns the
          * necessary information to render the collada model.
+         * @param {Position} position The model's geographic position.
          * @param {Object} config Configuration options for the loader.
          * <ul>
          *  <li>filePath - the path to the collada file</li>
          * </ul>
          */
-        var ColladaLoader = function (config) {
+        var ColladaLoader = function (position, config) {
+
+            if (!position) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ColladaLoader", "constructor", "missingPosition"));
+            }
+
+            this.position = position;
 
             this.filePath = '/';
 
@@ -57,6 +83,7 @@ define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh'
          * Fetches and parses a collada file
          * @param {String} url The url to the collada .dae file.
          * @param {Function} cb A callback function to call with the result when the parsing is done.
+         * @returns {ColladaScene} A renderable shape.
          */
         ColladaLoader.prototype.load = function (url, cb) {
 
@@ -67,23 +94,20 @@ define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh'
             ColladaUtils.fetchFile(url, function (data) {
 
                 if (!data) {
-                    var scene = null;
+                    var colladaScene = null;
                 }
                 else {
 
                     try {
-                        var startTime = Date.now();
-                        scene = this.parse(data);
-                        var endTime = Date.now();
-                        scene.parsedTime = endTime - startTime;
+                        colladaScene = this.parse(data);
                     }
                     catch (e) {
-                        scene = null;
-                        console.error('error parsing collada file', e);
+                        colladaScene = null;
+                        Logger.log(Logger.LEVEL_SEVERE, "error parsing collada file: " + e);
                     }
                 }
 
-                cb(scene);
+                cb(colladaScene);
 
             }.bind(this));
         };
@@ -91,6 +115,7 @@ define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh'
         /**
          * Parses a collada file
          * @param {XML} data The raw XML data of the collada file.
+         * @returns {ColladaScene} A renderable shape.
          */
         ColladaLoader.prototype.parse = function (data) {
 
@@ -110,7 +135,7 @@ define(['./ColladaAsset', './ColladaImage', './ColladaMaterial', './ColladaMesh'
 
             this.xmlDoc = null;
 
-            return this.scene;
+            return new ColladaScene(this.position, this.scene);
         };
 
         /**

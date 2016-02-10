@@ -149,7 +149,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/RestTiledImageLayer',
         './gesture/RotationRecognizer',
         './formats/kml/util/Scale',
-        './shapes/Scene',
         './formats/kml/util/Schema',
         './shapes/ScreenImage',
         './shapes/ScreenText',
@@ -350,7 +349,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               RestTiledImageLayer,
               RotationRecognizer,
               Scale,
-              Scene,
               Schema,
               ScreenImage,
               ScreenText,
@@ -710,7 +708,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['RenderableLayer'] = RenderableLayer;
         WorldWind['RestTiledImageLayer'] = RestTiledImageLayer;
         WorldWind['RotationRecognizer'] = RotationRecognizer;
-        WorldWind['Scene'] = Scene;
         WorldWind['ScreenText'] = ScreenText;
         WorldWind['ScreenImage'] = ScreenImage;
         WorldWind['Sector'] = Sector;

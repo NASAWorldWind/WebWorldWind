@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
-define([], function () {
+define(['../../util/Logger'], function (Logger) {
     "use strict";
 
     /**
@@ -188,13 +188,13 @@ define([], function () {
                     cb(this.response);
                 }
                 else {
-                    console.error('sever error:', this.status);
+                    Logger.log(Logger.LEVEL_SEVERE, "sever error: " + this.status);
                     cb(null);
                 }
             };
 
-            request.onerror = function () {
-                console.error('connection error');
+            request.onerror = function (e) {
+                Logger.log(Logger.LEVEL_SEVERE, "connection error: " + e);
                 cb(null);
             };
 
