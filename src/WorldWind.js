@@ -45,6 +45,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './projections/GeographicProjection',
         './shapes/GeographicText',
 		'./formats/geojson/GeoJSONParser',
+		'./formats/geotiff/GeoTiffReader',
         './gesture/GestureRecognizer',
         './globe/Globe',
         './globe/Globe2D',
@@ -244,6 +245,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicProjection,
               GeographicText,
 			  GeoJSONParser,
+              GeoTiffReader,
               GestureRecognizer,
               Globe,
               Globe2D,
@@ -652,6 +654,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
 		WorldWind['GeoJSONParser'] = GeoJSONParser;
+		WorldWind['GeoTiffReader'] = GeoTiffReader;
         WorldWind['GestureRecognizer'] = GestureRecognizer;
         WorldWind['Globe'] = Globe;
         WorldWind['Globe2D'] = Globe2D;
