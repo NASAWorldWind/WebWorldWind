@@ -27,7 +27,7 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        var resourcesUrl = "http://wo2.terrasigna.com/geotiff-support/examples/geotiff_data/black_sea_rgb.tif";
+        var resourcesUrl = "http://worldwindserver.net/webworldwind/data/black_sea_rgb.tif";
 
         var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
 
