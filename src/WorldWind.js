@@ -23,6 +23,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGOneImageLayer',
         './geom/BoundingBox',
         './gesture/ClickRecognizer',
+        './formats/collada/ColladaLoader',
         './util/Color',
         './shapes/Compass',
         './layer/CompassLayer',
@@ -44,8 +45,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
-		'./formats/geojson/GeoJSONParser',
-		'./formats/geotiff/GeoTiffReader',
+        './formats/geojson/GeoJSONParser',
+        './formats/geotiff/GeoTiffReader',
         './gesture/GestureRecognizer',
         './globe/Globe',
         './globe/Globe2D',
@@ -223,6 +224,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGOneImageLayer,
               BoundingBox,
               ClickRecognizer,
+              ColladaLoader,
               Color,
               Compass,
               CompassLayer,
@@ -244,7 +246,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
-			  GeoJSONParser,
+              GeoJSONParser,
               GeoTiffReader,
               GestureRecognizer,
               Globe,
@@ -632,6 +634,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BoundingBox'] = BoundingBox;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
+        WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
@@ -653,8 +656,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
-		WorldWind['GeoJSONParser'] = GeoJSONParser;
-		WorldWind['GeoTiffReader'] = GeoTiffReader;
+        WorldWind['GeoJSONParser'] = GeoJSONParser;
+        WorldWind['GeoTiffReader'] = GeoTiffReader;
         WorldWind['GestureRecognizer'] = GestureRecognizer;
         WorldWind['Globe'] = Globe;
         WorldWind['Globe2D'] = Globe2D;
