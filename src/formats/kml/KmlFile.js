@@ -9,7 +9,9 @@
 define([
     '../../error/ArgumentError',
     '../../util/jszip',
+    './KmlElements',
     './KmlFileCache',
+    './KmlObject',
     './styles/KmlStyle',
     './styles/KmlStyleMap',
     './KmlTimeSpan',
@@ -17,12 +19,12 @@ define([
     '../../util/Logger',
     '../../util/Promise',
     './util/Remote',
-    '../../util/XmlDocument',
-    './KmlElements',
-    './KmlObject'
+    '../../util/XmlDocument'
 ], function (ArgumentError,
              JsZip,
+             KmlElements,
              KmlFileCache,
+             KmlObject,
              KmlStyle,
              KmlStyleMap,
              KmlTimeSpan,
@@ -30,9 +32,7 @@ define([
              Logger,
              Promise,
              Remote,
-             XmlDocument,
-             KmlElements,
-             KmlObject) {
+             XmlDocument) {
     "use strict";
 
     /**
@@ -40,67 +40,54 @@ define([
      * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
      * rendered in one Layer.
      * @constructor
-     * @param document {String} String representing the document if it is local.
      * @param url {String} Url of the remote document.
-     * @param local {Boolean} True if the document is local.
      * @param controls {KmlControls[]} List of controls applied to this File.
      * @alias KmlFile
      * @classdesc Support for Kml File parsing and display.
+     * @augments KmlObject
      */
-    var KmlFile = function (url, controls, document, local) {
-        var options = {
-            document: document,
-            url: url,
-            local: local,
-            controls: controls
-        };
+    var KmlFile = function (url, controls) {
         var self = this;
-        if (!options || (!options.document && !options.url)) {
+        if (!url) {
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "constructor", "invalidDocumentPassed")
             );
         }
 
         // Default values.
-        this._controls = options.controls || null;
+        this._controls = controls || null;
 
         var filePromise;
-        if (options.local) {
-            this._document = new XmlDocument(options.document).dom();
-            filePromise = new Promise(function (resolve) {
+        // Load the document
+        filePromise = new Promise(function (resolve) {
+            var promise = self.requestUrl(url, options);
+            promise.then(function (loadedDocument) {
+                var rootDocument;
+                if (url.indexOf('.kmz') == -1) {
+                    rootDocument = loadedDocument;
+                } else {
+                    var kmzFile = new JsZip();
+                    kmzFile.load(loadedDocument);
+                    kmzFile.files.forEach(function (file) {
+                        if (file.endsWith(".kml") && rootDocument == null) {
+                            rootDocument = file.asText();
+                        }
+                    });
+                }
+
+                self._document = new XmlDocument(rootDocument).dom();
+                KmlObject.call(self, {node: self._document.documentElement});
+
                 window.setTimeout(function () {
                     resolve(self);
                 }, 0);
             });
-            KmlFileCache.add('', filePromise);
-            return filePromise;
-        } else {
-            // Load the document
-            filePromise = new Promise(function (resolve) {
-                var promise = self.requestUrl(options.url, options);
-                promise.then(function (loadedDocument) {
-                    var rootDocument;
-                    if (options.url.indexOf('.kmz') == -1) {
-                        rootDocument = loadedDocument;
-                    } else {
-                        var kmzFile = new JsZip();
-                        kmzFile.load(loadedDocument);
-                        kmzFile.files.forEach(function (file) {
-                            if (file.endsWith(".kml") && rootDocument == null) {
-                                rootDocument = file.asText();
-                            }
-                        });
-                    }
-                    self._document = new XmlDocument(rootDocument).dom();
-                    window.setTimeout(function () {
-                        resolve(self);
-                    }, 0);
-                });
-            });
-            KmlFileCache.add(options.url, filePromise);
-            return filePromise;
-        }
+        });
+        KmlFileCache.add(url, filePromise);
+        return filePromise;
     };
+
+    KmlFile.prototype = Object.create(KmlObject.prototype);
 
     Object.defineProperties(KmlFile.prototype, {
         /**
@@ -134,25 +121,8 @@ define([
      * @see KmlObject.prototype.parse
      */
     KmlFile.prototype.parseDocument = function () {
-        return KmlObject.prototype.parse.call(this);
+        return this.parse({node: this._node});
     };
-
-    /**
-     * It understands the name of the node and based on this name returns correct shape, which must be instantiated.
-     * @param name
-     * @returns {KmlObject} Descendant of KmlObject or null if none with given name exists.
-     */
-    KmlFile.prototype.retrieveElementForNode = KmlObject.prototype.retrieveElementForNode;
-
-    KmlFile.prototype.doesAttributeExist = KmlObject.prototype.doesAttributeExist;
-
-    KmlFile.prototype.getValueOfAttribute = KmlObject.prototype.getValueOfAttribute;
-
-    KmlFile.prototype.retrieveFromCache = KmlObject.prototype.retrieveFromCache;
-
-    KmlFile.prototype.parseOneNode = KmlObject.prototype.parseOneNode;
-
-    KmlFile.prototype.instantiateDescendant = KmlObject.prototype.instantiateDescendant;
 
     /**
      * It renders all shapes, which are associated with current file.
