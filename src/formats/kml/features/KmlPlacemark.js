@@ -55,7 +55,7 @@ define([
                 // TODO: Show Placemarks without geometry.
                 return;
             }
-            self._renderable = new Placemark(self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
+            self._renderables.push(new Placemark(self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal)));
             self.moveValidProperties();
         });
     };

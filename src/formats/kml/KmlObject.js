@@ -46,10 +46,10 @@ define([
             );
         }
         this._node = options.objectNode;
-        this._shape = null;
         this._cache = {};
 
         this._controls = options.controls || [];
+        this._renderables = [];
 
         this.hook(this._controls, options);
     };
@@ -451,7 +451,12 @@ define([
      * @inheritDoc
      */
     KmlObject.prototype.render = function(dc) {
-
+        // Default unless overriden is to render associated renderable.
+        if(this._renderables) {
+            this._renderables.forEach(function(renderable){
+                renderable.render(dc);
+            });
+        }
     };
 
     /**

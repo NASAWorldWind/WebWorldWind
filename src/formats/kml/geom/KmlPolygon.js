@@ -150,7 +150,7 @@ define([
      */
     KmlPolygon.prototype.createPolygon = function(styles) {
         if(!this.initialized) {
-            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this._renderables.push(new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal)));
             this.moveValidProperties();
             this.initialized = true;
         }
