@@ -60,7 +60,7 @@ define([
         var filePromise;
         // Load the document
         filePromise = new Promise(function (resolve) {
-            var promise = self.requestUrl(url, options);
+            var promise = self.requestRemote(url);
             promise.then(function (loadedDocument) {
                 var rootDocument;
                 if (url.indexOf('.kmz') == -1) {
@@ -99,30 +99,10 @@ define([
          */
         shapes: {
             get: function () {
-                return this.parseDocument();
-            }
-        },
-
-        /**
-         * Root node of current document associated with this file.
-         * @type {Node}
-         * @memberof KmlFile.prototype
-         * @readonly
-         */
-        node: {
-            get: function () {
-                return this._document.getElementsByTagName("kml")[0];
+                return this.parse({node: this.node});
             }
         }
     });
-
-    /**
-     * Calling method from KmlObject on current KmlFile.
-     * @see KmlObject.prototype.parse
-     */
-    KmlFile.prototype.parseDocument = function () {
-        return this.parse({node: this._node});
-    };
 
     /**
      * It renders all shapes, which are associated with current file.
@@ -144,7 +124,14 @@ define([
         });
     };
 
-    KmlFile.prototype.requestUrl = function (url, options) {
+    /**
+     * FOR INTERNAL USE ONLY.
+     * Based on the information from the URL, return correct Remote object.
+     * @param url {String} Url of the document to retrieve.
+     * @returns {Promise} Promise of Remote.
+     */
+    KmlFile.prototype.requestRemote = function (url) {
+        var options = {};
         options.url = url;
         if ((url.endsWith && url.endsWith(".kmz")) || (url.indexOf(".kmz") != -1)) {
             options.zip = true;
