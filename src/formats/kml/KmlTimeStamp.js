@@ -31,23 +31,25 @@ define([
     var KmlTimeStamp = function (options) {
         //noinspection JSUndefinedPropertyAssignment
         options.isTimeStamp = true;
-        Object.defineProperties(this, {
-            /**
-             * This property specifies when exactly the event happen.
-             * @memberof KmlTimeStamp.prototype
-             * @type {Date}
-             * @readonly
-             */
-            kmlWhen: {
-                get: function () {
-                    return this.retrieve({name: 'when', transformer: WWUtil.date});
-                }
-            }
-        });
         KmlTimePrimitive.call(this, options);
-
-        extend(this, KmlTimeStamp.prototype);
     };
+
+    KmlTimeStamp.prototype = Object.create(KmlTimePrimitive.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * This property specifies when exactly the event happen.
+         * @memberof KmlTimeStamp.prototype
+         * @type {Date}
+         * @readonly
+         */
+        kmlWhen: {
+            get: function () {
+                return this.retrieve({name: 'when', transformer: WWUtil.date});
+            }
+        }
+    });
+
 
     /**
      * @inheritDoc

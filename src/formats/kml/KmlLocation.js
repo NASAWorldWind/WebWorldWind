@@ -27,47 +27,47 @@ define([
      */
     var KmlLocation = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Longitude of the location.
-             * @memberof KmlLocation.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlLongitude: {
-                get: function() {
-                    return this.retrieve({name: 'longitude'});
-                }
-            },
-
-            /**
-             * Latitude of the location.
-             * @memberof KmlLocation.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlLatitude: {
-                get: function() {
-                    return this.retrieve({name: 'latitude'});
-                }
-            },
-
-            /**
-             * Altitude of the location.
-             * @memberof KmlLocation.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlAltitude: {
-                get: function() {
-                    return this.retrieve({name: 'altitude'});
-                }
-            }
-        });
-
-        extend(this, KmlLocation.prototype);
     };
+
+    KmlLocation.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Longitude of the location.
+         * @memberof KmlLocation.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlLongitude: {
+            get: function() {
+                return this.retrieve({name: 'longitude'});
+            }
+        },
+
+        /**
+         * Latitude of the location.
+         * @memberof KmlLocation.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlLatitude: {
+            get: function() {
+                return this.retrieve({name: 'latitude'});
+            }
+        },
+
+        /**
+         * Altitude of the location.
+         * @memberof KmlLocation.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlAltitude: {
+            get: function() {
+                return this.retrieve({name: 'altitude'});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

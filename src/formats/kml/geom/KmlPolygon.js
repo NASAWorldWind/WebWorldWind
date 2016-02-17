@@ -52,98 +52,96 @@ define([
             self.createPolygon();
         }
         this._layer = null;
-
-        Object.defineProperties(this, {
-            /**
-             * In case that the polygon is above ground, this property decides whether there is going to be a line to
-             * the ground.
-             * @memberof KmlPolygon.prototype
-             * @type {Boolean}
-             * @readonly
-             */
-            kmlExtrude: {
-                get: function () {
-                    return this.retrieve({name: 'extrude', transformer: WWUtil.transformToBoolean});
-                }
-            },
-
-            /**
-             * Whether tessellation should be used for current node.
-             * @memberof KmlPolygon.prototype
-             * @readonly
-             * @type {Boolean}
-             */
-            kmlTessellate: {
-                get: function () {
-                    return this.retrieve({name: 'tessellate', transformer: WWUtil.transformToBoolean});
-                }
-            },
-
-            /**
-             * It explains how we should treat the altitude of the polygon. Possible choices are explained in:
-             * https://developers.google.com/kml/documentation/kmlreference#point
-             * @memberof KmlPolygon.prototype
-             * @type {String}
-             * @readonly
-             */
-            kmlAltitudeMode: {
-                get: function () {
-                    return this.retrieve({name: 'altitudeMode'});
-                }
-            },
-
-            /**
-             * Outer boundary of this polygon represented as a LinearRing.
-             * @memberof KmlPolygon.prototype
-             * @type {KmlLinearRing}
-             * @readonly
-             */
-            kmlOuterBoundary: {
-                get: function () {
-                    var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
-                    return new KmlLinearRing({
-                        objectNode: parentNode.getElementsByTagName("LinearRing")[0],
-                        style: this.getStyle()
-                    });
-                }
-            },
-
-            /**
-             * Inner boundary of this polygon represented as a LinearRing. Optional property
-             * @memberof KmlPolygon.prototype.
-             * @type {KmlLinearRing}
-             * @readonly
-             */
-            kmlInnerBoundary: {
-                get: function () {
-                    var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
-                    if (parentNode == null) {
-                        return null;
-                    }
-                    return new KmlLinearRing({
-                        objectNode: parentNode.getElementsByTagName("LinearRing")[0],
-                        style: this.getStyle()
-                    });
-                }
-            },
-
-            /**
-             * It returns center of outer boundaries of the polygon.
-             * @memberof KmlPolygon.prototype
-             * @readonly
-             * @type {Position}
-             */
-            kmlCenter: {
-                get: function () {
-                    return this.kmlOuterBoundary.kmlCenter;
-                }
-            }
-        });
-
-        extend(this, KmlPolygon.prototype);
     };
 
-    KmlPolygon.prototype = Object.create(Polygon.prototype);
+    KmlPolygon.prototype = Object.create(KmlGeometry.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * In case that the polygon is above ground, this property decides whether there is going to be a line to
+         * the ground.
+         * @memberof KmlPolygon.prototype
+         * @type {Boolean}
+         * @readonly
+         */
+        kmlExtrude: {
+            get: function () {
+                return this.retrieve({name: 'extrude', transformer: WWUtil.transformToBoolean});
+            }
+        },
+
+        /**
+         * Whether tessellation should be used for current node.
+         * @memberof KmlPolygon.prototype
+         * @readonly
+         * @type {Boolean}
+         */
+        kmlTessellate: {
+            get: function () {
+                return this.retrieve({name: 'tessellate', transformer: WWUtil.transformToBoolean});
+            }
+        },
+
+        /**
+         * It explains how we should treat the altitude of the polygon. Possible choices are explained in:
+         * https://developers.google.com/kml/documentation/kmlreference#point
+         * @memberof KmlPolygon.prototype
+         * @type {String}
+         * @readonly
+         */
+        kmlAltitudeMode: {
+            get: function () {
+                return this.retrieve({name: 'altitudeMode'});
+            }
+        },
+
+        /**
+         * Outer boundary of this polygon represented as a LinearRing.
+         * @memberof KmlPolygon.prototype
+         * @type {KmlLinearRing}
+         * @readonly
+         */
+        kmlOuterBoundary: {
+            get: function () {
+                var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
+                return new KmlLinearRing({
+                    objectNode: parentNode.getElementsByTagName("LinearRing")[0],
+                    style: this.getStyle()
+                });
+            }
+        },
+
+        /**
+         * Inner boundary of this polygon represented as a LinearRing. Optional property
+         * @memberof KmlPolygon.prototype.
+         * @type {KmlLinearRing}
+         * @readonly
+         */
+        kmlInnerBoundary: {
+            get: function () {
+                var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
+                if (parentNode == null) {
+                    return null;
+                }
+                return new KmlLinearRing({
+                    objectNode: parentNode.getElementsByTagName("LinearRing")[0],
+                    style: this.getStyle()
+                });
+            }
+        },
+
+        /**
+         * It returns center of outer boundaries of the polygon.
+         * @memberof KmlPolygon.prototype
+         * @readonly
+         * @type {Position}
+         */
+        kmlCenter: {
+            get: function () {
+                return this.kmlOuterBoundary.kmlCenter;
+            }
+        }
+    });
 
     /**
      * Internal use only. Once create the instance of actual polygon.

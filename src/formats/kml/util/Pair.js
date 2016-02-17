@@ -33,49 +33,49 @@ define([
      */
     var Pair = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Identifies the key
-             * @memberof Pair.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlKey: {
-                get: function() {
-                    return this.retrieve({name: 'key'});
-                }
-            },
-
-            /**
-             * References the style using Url. If part of the same document start with the prefix #
-             * @memberof Pair.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlStyleUrl: {
-                get: function() {
-                    return this.retrieve({name: 'styleUrl'});
-                }
-            },
-
-            /**
-             * Definition of styles applied to this Pair.
-             * @memberof Pair.prototype
-             * @readonly
-             * @type {KmlStyle}
-             */
-            kmlStyleSelector: {
-                get: function() {
-                    return this.createChildElement({
-                        name: KmlStyleSelector.prototype.getTagNames()
-                    });
-                }
-            }
-        });
-
-        extend(this, Pair.prototype);
     };
+
+    Pair.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Identifies the key
+         * @memberof Pair.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlKey: {
+            get: function() {
+                return this.retrieve({name: 'key'});
+            }
+        },
+
+        /**
+         * References the style using Url. If part of the same document start with the prefix #
+         * @memberof Pair.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlStyleUrl: {
+            get: function() {
+                return this.retrieve({name: 'styleUrl'});
+            }
+        },
+
+        /**
+         * Definition of styles applied to this Pair.
+         * @memberof Pair.prototype
+         * @readonly
+         * @type {KmlStyle}
+         */
+        kmlStyleSelector: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlStyleSelector.prototype.getTagNames()
+                });
+            }
+        }
+    });
 
     /**
      * @inheritDoc

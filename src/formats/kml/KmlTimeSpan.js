@@ -32,36 +32,37 @@ define([
     var KmlTimeSpan = function (options) {
         //noinspection JSUndefinedPropertyAssignment
         options.isTimeSpan = true;
-        Object.defineProperties(this, {
-            /**
-             * Time from which is the event valid.
-             * @memberof KmlTimeSpan.prototype
-             * @type {Date}
-             * @readonly
-             */
-            kmlBegin: {
-                get: function() {
-                    return this.retrieve({name: 'begin', transformer: WWUtil.date});
-                }
-            },
-
-            /**
-             * Time to which is the event valid.
-             * @memberof KmlTimeSpan.prototype
-             * @type {Date}
-             * @readonly
-             */
-            kmlEnd: {
-                get: function() {
-                    return this.retrieve({name: 'end', transformer: WWUtil.date});
-                }
-            }
-        });
 
         KmlTimePrimitive.call(this, options);
-
-        extend(this, KmlTimeSpan.prototype);
     };
+
+    KmlTimeSpan.prototype = Object.create(KmlTimePrimitive.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Time from which is the event valid.
+         * @memberof KmlTimeSpan.prototype
+         * @type {Date}
+         * @readonly
+         */
+        kmlBegin: {
+            get: function() {
+                return this.retrieve({name: 'begin', transformer: WWUtil.date});
+            }
+        },
+
+        /**
+         * Time to which is the event valid.
+         * @memberof KmlTimeSpan.prototype
+         * @type {Date}
+         * @readonly
+         */
+        kmlEnd: {
+            get: function() {
+                return this.retrieve({name: 'end', transformer: WWUtil.date});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

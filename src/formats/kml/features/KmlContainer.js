@@ -22,9 +22,9 @@ define([
      */
     var KmlContainer = function (options) {
         KmlFeature.call(this, options);
-
-        extend(this, KmlContainer.prototype);
     };
+
+    KmlContainer.prototype = Object.create(KmlFeature.prototype);
 
     /**
      * @inheritDoc

@@ -25,9 +25,9 @@ define([
      */
     var KmlTour = function (options) {
         KmlFeature.call(this, options);
-
-        extend(this, KmlTour.prototype);
     };
+
+    KmlTour.prototype = Object.create(KmlFeature.prototype);
 
     /**
      * @inheritDoc

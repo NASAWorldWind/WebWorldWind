@@ -55,31 +55,29 @@ define([
                 // TODO: Show Placemarks without geometry.
                 return;
             }
-            Placemark.call(self, self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
+            self._renderable = new Placemark(self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
             self.moveValidProperties();
         });
         this._layer = null;
-
-        Object.defineProperties(this, {
-            /**
-             * It contains geometry associated with this placemark. The geometry is cached.
-             * @memberof KmlPlacemark.prototype
-             * @type {KmlGeometry}
-             * @readonly
-             */
-            kmlGeometry: {
-                get: function () {
-                    return this.createChildElement({
-                        name: KmlGeometry.prototype.getTagNames()
-                    });
-                }
-            }
-        });
-
-        extend(this, KmlPlacemark.prototype);
     };
 
-    KmlPlacemark.prototype = Object.create(Placemark.prototype);
+    KmlPlacemark.prototype = Object.create(KmlFeature.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * It contains geometry associated with this placemark. The geometry is cached.
+         * @memberof KmlPlacemark.prototype
+         * @type {KmlGeometry}
+         * @readonly
+         */
+        kmlGeometry: {
+            get: function () {
+                return this.createChildElement({
+                    name: KmlGeometry.prototype.getTagNames()
+                });
+            }
+        }
+    });
 
     /**
      * @inheritDoc
@@ -99,7 +97,7 @@ define([
         // TODO Solve movement of the hierarchy into another layer
         if(this._layer == null) {
             this._layer = options.layer;
-            this._layer.addRenderable(this);
+            this._layer.addRenderable(this._renderable);
         }
 
         return true;

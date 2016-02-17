@@ -24,8 +24,6 @@ define([
      */
     var KmlLinearRing = function (options) {
         KmlLineString.call(this, options);
-
-        extend(this, KmlLinearRing.prototype);
     };
 
     KmlLinearRing.prototype = Object.create(KmlLineString.prototype);

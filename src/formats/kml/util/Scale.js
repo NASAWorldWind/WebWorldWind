@@ -27,47 +27,47 @@ define([
      */
     var Scale = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Scales model along x axis
-             * @memberof Scale.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlX: {
-                get: function() {
-                    return this.retrieve({name: 'x'});
-                }
-            },
-
-            /**
-             * Scales model along y axis
-             * @memberof Scale.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlY: {
-                get: function() {
-                    return this.retrieve({name: 'y'});
-                }
-            },
-
-            /**
-             * Scales model along z axis
-             * @memberof Scale.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlZ: {
-                get: function() {
-                    return this.retrieve({name: 'z'});
-                }
-            }
-        });
-
-        extend(this, Scale.prototype);
     };
+
+    Scale.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Scales model along x axis
+         * @memberof Scale.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlX: {
+            get: function() {
+                return this.retrieve({name: 'x'});
+            }
+        },
+
+        /**
+         * Scales model along y axis
+         * @memberof Scale.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlY: {
+            get: function() {
+                return this.retrieve({name: 'y'});
+            }
+        },
+
+        /**
+         * Scales model along z axis
+         * @memberof Scale.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlZ: {
+            get: function() {
+                return this.retrieve({name: 'z'});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

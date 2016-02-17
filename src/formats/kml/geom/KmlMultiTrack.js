@@ -25,9 +25,9 @@ define([
      */
     var KmlMultiTrack = function (options) {
         KmlGeometry.call(this, options);
-
-        extend(this, KmlMultiTrack.prototype);
     };
+
+    KmlMultiTrack.prototype = Object.create(KmlGeometry.prototype);
 
     /**
      * @inheritDoc

@@ -25,9 +25,9 @@ define([
      */
     var KmlGeometry = function (options) {
         KmlObject.call(this, options);
-
-        extend(this, KmlGeometry.prototype);
     };
+
+    KmlGeometry.prototype = Object.create(KmlObject.prototype);
 
     /**
      * It returns actually applied style valid for current geometry.

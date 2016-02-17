@@ -23,9 +23,9 @@ define([
      */
     var KmlSubStyle = function (options) {
         KmlObject.call(this, options);
-
-        extend(this, KmlSubStyle.prototype);
     };
+
+    KmlSubStyle.prototype = Object.create(KmlObject.prototype);
 
     /**
      * @inheritDoc

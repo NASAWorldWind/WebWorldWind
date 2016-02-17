@@ -26,24 +26,24 @@ define([
      */
     var KmlFolder = function (options) {
         KmlContainer.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Specifies any amount of features, which are part of this document.
-             * @memberof KmlFolder.prototype
-             * @readonly
-             * @type {KmlObject[]}
-             * @see {KmlFeature}
-             */
-            kmlShapes: {
-                get: function(){
-                    return this.parse();
-                }
-            }
-        });
-
-        extend(this, KmlFolder.prototype);
     };
+
+    KmlFolder.prototype = Object.create(KmlContainer.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Specifies any amount of features, which are part of this document.
+         * @memberof KmlFolder.prototype
+         * @readonly
+         * @type {KmlObject[]}
+         * @see {KmlFeature}
+         */
+        kmlShapes: {
+            get: function(){
+                return this.parse();
+            }
+        }
+    });
 
     /**
      * Instead of standard update processing for the element only pass the processing on descendants.

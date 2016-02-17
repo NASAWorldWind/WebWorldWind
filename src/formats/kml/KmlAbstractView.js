@@ -29,25 +29,25 @@ define([
      */
     var KmlAbstractView = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Time associated with current view. It shouldn't be displayed outside of this time frame.
-             * @memberof KmlAbstractView.prototype
-             * @readonly
-             * @type {KmlTimePrimitive}
-             */
-            kmlTimePrimitive: {
-                get: function() {
-                    return this.createChildElement({
-                        name: KmlTimePrimitive.prototype.getTagNames()
-                    });
-                }
-            }
-        });
-
-        extend(this, KmlAbstractView.prototype);
     };
+
+    KmlAbstractView.prototype = Object.create(KmlObject);
+
+    Object.defineProperties(KmlAbstractView.prototype, {
+        /**
+         * Time associated with current view. It shouldn't be displayed outside of this time frame.
+         * @memberof KmlAbstractView.prototype
+         * @readonly
+         * @type {KmlTimePrimitive}
+         */
+        kmlTimePrimitive: {
+            get: function() {
+                return this.createChildElement({
+                    name: KmlTimePrimitive.prototype.getTagNames()
+                });
+            }
+        }
+    });
 
     /**
      * @inheritDoc

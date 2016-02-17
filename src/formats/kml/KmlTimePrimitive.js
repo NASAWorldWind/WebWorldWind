@@ -24,9 +24,9 @@ define([
      */
     var KmlTimePrimitive = function (options) {
         KmlObject.call(this, options);
-
-        extend(this, KmlTimePrimitive.prototype);
     };
+
+    KmlTimePrimitive.prototype = Object.create(KmlObject.prototype);
 
     /**
      * It returns range applicable to current time.

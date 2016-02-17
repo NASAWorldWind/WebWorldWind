@@ -30,45 +30,45 @@ define([
      */
     var KmlDocument = function (options) {
         KmlContainer.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Specifies any amount of features, which are part of this document.
-             * @memberof KmlDocument.prototype
-             * @readonly
-             * @type {Node[]}
-             * @see {KmlFeature}
-             */
-            kmlShapes: {
-                get: function(){
-                    var allElements = this.parse();
-                    return allElements.filter(function (element) {
-                        return element.isFeature;
-                    });
-                }
-            },
-
-            /**
-             * Specifies a custom KML schema that is used to add custom data to KML Features. The "id" attribute is
-             * required and must be unique within the KML file. &lt;Schema&gt; is always a child of &lt;Document&gt;.
-             * This is array of all Schemas in current document
-             * @memberof KmlDocument.prototype
-             * @readonly
-             * @type {Schema[]}
-             * @see {Schema}
-             */
-            kmlSchemas: {
-                get: function(){
-                    var allElements = this.parse();
-                    return allElements.filter(function (element) {
-                        return element instanceof Schema;
-                    });
-                }
-            }
-        });
-
-        extend(this, KmlDocument.prototype);
     };
+
+    KmlDocument.prototype = Object.create(KmlContainer.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Specifies any amount of features, which are part of this document.
+         * @memberof KmlDocument.prototype
+         * @readonly
+         * @type {Node[]}
+         * @see {KmlFeature}
+         */
+        kmlShapes: {
+            get: function(){
+                var allElements = this.parse();
+                return allElements.filter(function (element) {
+                    return element.isFeature;
+                });
+            }
+        },
+
+        /**
+         * Specifies a custom KML schema that is used to add custom data to KML Features. The "id" attribute is
+         * required and must be unique within the KML file. &lt;Schema&gt; is always a child of &lt;Document&gt;.
+         * This is array of all Schemas in current document
+         * @memberof KmlDocument.prototype
+         * @readonly
+         * @type {Schema[]}
+         * @see {Schema}
+         */
+        kmlSchemas: {
+            get: function(){
+                var allElements = this.parse();
+                return allElements.filter(function (element) {
+                    return element instanceof Schema;
+                });
+            }
+        }
+    });
 
     /**
      * Instead of standard update lifecycle only call update on contained elements.

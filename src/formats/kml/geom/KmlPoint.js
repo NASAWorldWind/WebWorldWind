@@ -43,62 +43,63 @@ define([
         KmlGeometry.call(this, options);
 
         this._shape = null;
-
-        Object.defineProperties(this, {
-            /**
-             * Position of the whole geometry.
-             * @memberof KmlPoint.prototype
-             * @type {Position}
-             * @readonly
-             */
-            kmlPosition: {
-                get: function() {
-                    var coordinates = this.retrieve({name: 'coordinates'}).split(',');
-                    return new Position(coordinates[1], coordinates[0], coordinates[2] || 0);
-                }
-            },
-
-            /**
-             * In case that the point is above ground, this property decides whether there is going to be a line to the
-             * ground.
-             * @memberof KmlPoint.prototype
-             * @type {Boolean}
-             * @readonly
-             */
-            kmlExtrude: {
-                get: function() {
-                    return this.retrieve({name: 'extrude', transformer: Boolean});
-                }
-            },
-
-            /**
-             * It explains how we should treat the altitude of the point. Possible choices are explained in:
-             * https://developers.google.com/kml/documentation/kmlreference#point
-             * @memberof KmlPoint.prototype
-             * @type {String}
-             * @readonly
-             */
-            kmlAltitudeMode: {
-                get: function() {
-                    return this.retrieve({name: 'altitudeMode'});
-                }
-            },
-
-            /**
-             * It returns center of the point. In case of point it means the position of the point.
-             * @memberof KmlPoint.prototype
-             * @type {Position}
-             * @readonly
-             */
-            kmlCenter: {
-                get: function() {
-                    return this.kmlPosition;
-                }
-            }
-        });
-
-        extend(this, KmlPoint.prototype);
     };
+
+    KmlPoint.prototype = Object.create(KmlGeometry.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Position of the whole geometry.
+         * @memberof KmlPoint.prototype
+         * @type {Position}
+         * @readonly
+         */
+        kmlPosition: {
+            get: function() {
+                var coordinates = this.retrieve({name: 'coordinates'}).split(',');
+                return new Position(coordinates[1], coordinates[0], coordinates[2] || 0);
+            }
+        },
+
+        /**
+         * In case that the point is above ground, this property decides whether there is going to be a line to the
+         * ground.
+         * @memberof KmlPoint.prototype
+         * @type {Boolean}
+         * @readonly
+         */
+        kmlExtrude: {
+            get: function() {
+                return this.retrieve({name: 'extrude', transformer: Boolean});
+            }
+        },
+
+        /**
+         * It explains how we should treat the altitude of the point. Possible choices are explained in:
+         * https://developers.google.com/kml/documentation/kmlreference#point
+         * @memberof KmlPoint.prototype
+         * @type {String}
+         * @readonly
+         */
+        kmlAltitudeMode: {
+            get: function() {
+                return this.retrieve({name: 'altitudeMode'});
+            }
+        },
+
+        /**
+         * It returns center of the point. In case of point it means the position of the point.
+         * @memberof KmlPoint.prototype
+         * @type {Position}
+         * @readonly
+         */
+        kmlCenter: {
+            get: function() {
+                return this.kmlPosition;
+            }
+        }
+    });
+
 
     // TODO: Fix Point and create it meaningfully.
     /**

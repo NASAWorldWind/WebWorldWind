@@ -24,74 +24,74 @@ define([
      */
     var ViewVolume = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Angle, in degrees, between the camera's viewing direction and the left side of the view volume.
-             * @memberof ViewVolume.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlLeftFov: {
-                get: function () {
-                    return this.retrieve({name: 'leftFov', transformer: Number});
-                }
-            },
-
-            /**
-             * Angle, in degrees, between the camera's viewing direction and the right side of the view volume.
-             * @memberof ViewVolume.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlRightFov: {
-                get: function () {
-                    return this.retrieve({name: 'rightFov', transformer: Number});
-                }
-            },
-
-            /**
-             * Angle, in degrees, between the camera's viewing direction and the bottom side of the view volume.
-             * @memberof ViewVolume.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlBottomFov: {
-                get: function () {
-                    return this.retrieve({name: 'bottomFov', transformer: Number});
-                }
-            },
-
-            /**
-             * Angle, in degrees, between the camera's viewing direction and the top side of the view volume.
-             * @memberof ViewVolume.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlTopFov: {
-                get: function () {
-                    return this.retrieve({name: 'topFov', transformer: Number});
-                }
-            },
-
-            /**
-             * Measurement in meters along the viewing direction from the camera viewpoint to the PhotoOverlay shape.
-             * The field of view for a PhotoOverlay is defined by four planes, each of which is specified by an angle
-             * relative to the view vector. These four planes define the top, bottom, left, and right sides of the field
-             *  of view, which has the shape of a truncated pyramid, as shown here:
-             * @memberof ViewVolume.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlNear: {
-                get: function () {
-                    return this.retrieve({name: 'near'});
-                }
-            }
-        });
-
-        extend(this, ViewVolume.prototype);
     };
+
+    ViewVolume.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Angle, in degrees, between the camera's viewing direction and the left side of the view volume.
+         * @memberof ViewVolume.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlLeftFov: {
+            get: function () {
+                return this.retrieve({name: 'leftFov', transformer: Number});
+            }
+        },
+
+        /**
+         * Angle, in degrees, between the camera's viewing direction and the right side of the view volume.
+         * @memberof ViewVolume.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlRightFov: {
+            get: function () {
+                return this.retrieve({name: 'rightFov', transformer: Number});
+            }
+        },
+
+        /**
+         * Angle, in degrees, between the camera's viewing direction and the bottom side of the view volume.
+         * @memberof ViewVolume.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlBottomFov: {
+            get: function () {
+                return this.retrieve({name: 'bottomFov', transformer: Number});
+            }
+        },
+
+        /**
+         * Angle, in degrees, between the camera's viewing direction and the top side of the view volume.
+         * @memberof ViewVolume.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlTopFov: {
+            get: function () {
+                return this.retrieve({name: 'topFov', transformer: Number});
+            }
+        },
+
+        /**
+         * Measurement in meters along the viewing direction from the camera viewpoint to the PhotoOverlay shape.
+         * The field of view for a PhotoOverlay is defined by four planes, each of which is specified by an angle
+         * relative to the view vector. These four planes define the top, bottom, left, and right sides of the field
+         *  of view, which has the shape of a truncated pyramid, as shown here:
+         * @memberof ViewVolume.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlNear: {
+            get: function () {
+                return this.retrieve({name: 'near'});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

@@ -27,103 +27,103 @@ define([
      */
     var KmlIconStyle = function (options) {
         KmlColorStyle.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Scale in which to resize the icon.
-             * @memberof KmlIconStyle.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlScale: {
-                get: function () {
-                    return this.retrieve({name: 'scale', transformer: Number});
-                }
-            },
-
-            /**
-             * Direction in degrees of the icon.
-             * @memberof KmlIconStyle.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlHeading: {
-                get: function () {
-                    return this.retrieve({name: 'heading', transformer: Number});
-                }
-            },
-
-            /**
-             * Custom Icon. If the icon is part of the IconStyle, only href is allowed for the icon.
-             * @memberof KmlIconStyle.prototype
-             * @readonly
-             * @type {KmlIcon}
-             */
-            kmlIcon: {
-                get: function () {
-                    return this.createChildElement({
-                        name: KmlIcon.prototype.getTagNames()
-                    });
-                }
-            },
-
-            /**
-             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the x
-             * component of a point on the icon.
-             * @memberof KmlIconStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlHotSpotX: {
-                get: function () {
-                    return this.retrieveAttribute({name: 'hotSpot', attributeName: 'x'});
-                }
-            },
-
-            /**
-             * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the y
-             * component of a point on the icon.
-             * @memberof KmlIconStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlHotSpotY: {
-                get: function () {
-                    return this.retrieveAttribute({name: 'hotSpot', attributeName: 'y'});
-                }
-            },
-
-            /**
-             * Units in which the x value is specified. A value of fraction indicates the x value is a fraction of the
-             * icon. A value of pixels indicates the x value in pixels. A value of insetPixels indicates the indent from
-             * the right edge of the icon.
-             * @memberof KmlIconStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlHotSpotXUnits: {
-                get: function () {
-                    return this.retrieveAttribute({name: 'hotSpot', attributeName: 'xunits'});
-                }
-            },
-
-            /**
-             * Units in which the y value is specified. A value of fraction indicates the y value is a fraction of the
-             * icon. A value of pixels indicates the y value in pixels. A value of insetPixels indicates the indent from
-             * the top edge of the icon.
-             * @memberof KmlIconStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlHotSpotYUnits: {
-                get: function () {
-                    return this.retrieveAttribute({name: 'hotSpot', attributeName: 'yunits'});
-                }
-            }
-        });
-
-        extend(this, KmlIconStyle);
     };
+
+    KmlIconStyle.prototype = Object.create(KmlColorStyle.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Scale in which to resize the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlScale: {
+            get: function () {
+                return this.retrieve({name: 'scale', transformer: Number});
+            }
+        },
+
+        /**
+         * Direction in degrees of the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlHeading: {
+            get: function () {
+                return this.retrieve({name: 'heading', transformer: Number});
+            }
+        },
+
+        /**
+         * Custom Icon. If the icon is part of the IconStyle, only href is allowed for the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {KmlIcon}
+         */
+        kmlIcon: {
+            get: function () {
+                return this.createChildElement({
+                    name: KmlIcon.prototype.getTagNames()
+                });
+            }
+        },
+
+        /**
+         * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the x
+         * component of a point on the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlHotSpotX: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'x'});
+            }
+        },
+
+        /**
+         * Either the number of pixels, a fractional component of the icon, or a pixel inset indicating the y
+         * component of a point on the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlHotSpotY: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'y'});
+            }
+        },
+
+        /**
+         * Units in which the x value is specified. A value of fraction indicates the x value is a fraction of the
+         * icon. A value of pixels indicates the x value in pixels. A value of insetPixels indicates the indent from
+         * the right edge of the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlHotSpotXUnits: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'xunits'});
+            }
+        },
+
+        /**
+         * Units in which the y value is specified. A value of fraction indicates the y value is a fraction of the
+         * icon. A value of pixels indicates the y value in pixels. A value of insetPixels indicates the indent from
+         * the top edge of the icon.
+         * @memberof KmlIconStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlHotSpotYUnits: {
+            get: function () {
+                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'yunits'});
+            }
+        }
+    });
 
     KmlIconStyle.update = function(style, options) {
         style = style || {};

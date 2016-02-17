@@ -22,9 +22,9 @@ define([
      */
     var KmlStyleSelector = function (options) {
         KmlObject.call(this, options);
-
-        extend(this, KmlStyleSelector.prototype);
     };
+
+    KmlStyleSelector.prototype = Object.create(KmlObject.prototype);
 
     /**
      * @inheritDoc

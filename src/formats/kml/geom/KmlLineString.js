@@ -48,94 +48,92 @@ define([
             });
             this._style = options.style;
             this._layer = null;
-
-            Object.defineProperties(this, {
-                /**
-                 * Whether current shape should be extruded.
-                 * @memberof KmlLineString.prototype
-                 * @readonly
-                 * @type {Boolean}
-                 */
-                kmlExtrude: {
-                    get: function () {
-                        return this.retrieve({name: 'extrude', transformer: Boolean}) || false;
-                    }
-                },
-
-                /**
-                 * Whether tessellation should be used for current node.
-                 * @memberof KmlLineString.prototype
-                 * @readonly
-                 * @type {Boolean}
-                 */
-                kmlTessellate: {
-                    get: function () {
-                        return this.retrieve({name: 'tessellate', transformer: Boolean}) || false;
-                    }
-                },
-
-                /**
-                 * It represents different modes to count absolute altitude. Possible choices are explained in:
-                 * https://developers.google.com/kml/documentation/kmlreference#point
-                 * @memberof KmlLineString.prototype
-                 * @readonly
-                 * @type {String}
-                 */
-                kmlAltitudeMode: {
-                    get: function () {
-                        return this.retrieve({name: 'altitudeMode'}) || WorldWind.ABSOLUTE;
-                    }
-                },
-
-                /**
-                 * Positions representing points used by the LineString.
-                 * @memberof KmlLineString.prototype
-                 * @readonly
-                 * @type {Position[]}
-                 */
-                kmlPositions: {
-                    get: function() {
-                        var positions = [];
-                        var coordinates = this.retrieve({name: 'coordinates'}).trim().replace(/\s+/g, ' ').split(' ');
-                        coordinates.forEach(function(pCoordinates){
-                            pCoordinates = pCoordinates.split(',');
-                            positions.push(new Position(Number(pCoordinates[1]), Number(pCoordinates[0]), Number(pCoordinates[2] || 0)));
-                        });
-                        return positions;
-                    }
-                },
-
-                /**
-                 * Returns average of the positions, which are part of the LineString. It averages also the altitudes.
-                 * @memberof KmlLineString.prototype
-                 * @readonly
-                 * @type {Position}
-                 */
-                kmlCenter: {
-                    get: function () {
-                        // TODO choose better approximation than just plain average.
-                        var positions = this.kmlPositions;
-                        var midLatitude = 0;
-                        var midLongitude = 0;
-                        var midAltitude = 0;
-                        positions.forEach(function (position) {
-                            midLatitude += position.latitude;
-                            midLongitude += position.longitude;
-                            midAltitude += position.altitude;
-                        });
-                        return new Position(
-                            midLatitude / this.kmlPositions.length,
-                            midLongitude / this.kmlPositions.length,
-                            midAltitude / this.kmlPositions.length
-                        );
-                    }
-                }
-            });
-
-            extend(this, KmlLineString.prototype);
         };
 
-        KmlLineString.prototype = Object.create(Path.prototype);
+        KmlLineString.prototype = Object.create(KmlGeometry.prototype);
+
+        Object.defineProperties(this, {
+            /**
+             * Whether current shape should be extruded.
+             * @memberof KmlLineString.prototype
+             * @readonly
+             * @type {Boolean}
+             */
+            kmlExtrude: {
+                get: function () {
+                    return this.retrieve({name: 'extrude', transformer: Boolean}) || false;
+                }
+            },
+
+            /**
+             * Whether tessellation should be used for current node.
+             * @memberof KmlLineString.prototype
+             * @readonly
+             * @type {Boolean}
+             */
+            kmlTessellate: {
+                get: function () {
+                    return this.retrieve({name: 'tessellate', transformer: Boolean}) || false;
+                }
+            },
+
+            /**
+             * It represents different modes to count absolute altitude. Possible choices are explained in:
+             * https://developers.google.com/kml/documentation/kmlreference#point
+             * @memberof KmlLineString.prototype
+             * @readonly
+             * @type {String}
+             */
+            kmlAltitudeMode: {
+                get: function () {
+                    return this.retrieve({name: 'altitudeMode'}) || WorldWind.ABSOLUTE;
+                }
+            },
+
+            /**
+             * Positions representing points used by the LineString.
+             * @memberof KmlLineString.prototype
+             * @readonly
+             * @type {Position[]}
+             */
+            kmlPositions: {
+                get: function() {
+                    var positions = [];
+                    var coordinates = this.retrieve({name: 'coordinates'}).trim().replace(/\s+/g, ' ').split(' ');
+                    coordinates.forEach(function(pCoordinates){
+                        pCoordinates = pCoordinates.split(',');
+                        positions.push(new Position(Number(pCoordinates[1]), Number(pCoordinates[0]), Number(pCoordinates[2] || 0)));
+                    });
+                    return positions;
+                }
+            },
+
+            /**
+             * Returns average of the positions, which are part of the LineString. It averages also the altitudes.
+             * @memberof KmlLineString.prototype
+             * @readonly
+             * @type {Position}
+             */
+            kmlCenter: {
+                get: function () {
+                    // TODO choose better approximation than just plain average.
+                    var positions = this.kmlPositions;
+                    var midLatitude = 0;
+                    var midLongitude = 0;
+                    var midAltitude = 0;
+                    positions.forEach(function (position) {
+                        midLatitude += position.latitude;
+                        midLongitude += position.longitude;
+                        midAltitude += position.altitude;
+                    });
+                    return new Position(
+                        midLatitude / this.kmlPositions.length,
+                        midLongitude / this.kmlPositions.length,
+                        midAltitude / this.kmlPositions.length
+                    );
+                }
+            }
+        });
 
         /**
          * It creates Path representing this LineString unless already initialized.

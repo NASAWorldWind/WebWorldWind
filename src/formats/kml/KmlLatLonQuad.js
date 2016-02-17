@@ -25,28 +25,29 @@ define([
      */
     var KmlLatLonQuad = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Specifies the coordinates of the four corner points of a quadrilateral defining the overlay area.
-             * Exactly
-             * four coordinate tuples have to be provided, each consisting of floating point values for longitude and
-             * latitude. Insert a space between tuples. Do not include spaces within a tuple. The coordinates must be
-             * specified in counter-clockwise order with the first coordinate corresponding to the lower-left corner of
-             * the overlayed image. The shape described by these corners must be convex.
-             * @memberof KmlLatLonQuad.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlCoordinates: {
-                get: function () {
-                    return this.retrieve({name: 'coordinates'});
-                }
-            }
-        });
-
-        extend(this, KmlLatLonQuad.prototype);
     };
+
+    KmlLatLonQuad.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Specifies the coordinates of the four corner points of a quadrilateral defining the overlay area.
+         * Exactly
+         * four coordinate tuples have to be provided, each consisting of floating point values for longitude and
+         * latitude. Insert a space between tuples. Do not include spaces within a tuple. The coordinates must be
+         * specified in counter-clockwise order with the first coordinate corresponding to the lower-left corner of
+         * the overlayed image. The shape described by these corners must be convex.
+         * @memberof KmlLatLonQuad.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlCoordinates: {
+            get: function () {
+                return this.retrieve({name: 'coordinates'});
+            }
+        }
+    });
+
 
     /**
      * @inheritDoc

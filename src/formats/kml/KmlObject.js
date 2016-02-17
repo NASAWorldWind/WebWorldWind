@@ -51,43 +51,41 @@ define([
 
         this._controls = options.controls || [];
 
-        Object.defineProperties(this, {
-            /**
-             * Every object, which is part of the KML document has its identity. We will use it for changes in the
-             * document for binding.
-             * @memberof KmlObject.prototype
-             * @type {String}
-             * @readonly
-             */
-            id: {
-                get: function () {
-                    return this.retrieve({
-                        name: 'id',
-                        isAttribute: true
-                    });
-                }
-            },
-
-            /**
-             * Node of this object. It may be overridden by other users of some functions like parse.
-             * @memberof KmlObject.prototype
-             * @type {Node}
-             * @readonly
-             */
-            node: {
-                get: function () {
-                    //noinspection JSPotentiallyInvalidUsageOfThis
-                    return this._node;
-                }
-            }
-        });
-
-        extend(this, KmlObject.prototype);
-
         this.hook(this._controls, options);
     };
 
     KmlObject.prototype = Object.create(Renderable.prototype);
+
+    Object.defineProperties(KmlObject.prototype, {
+        /**
+         * Every object, which is part of the KML document has its identity. We will use it for changes in the
+         * document for binding.
+         * @memberof KmlObject.prototype
+         * @type {String}
+         * @readonly
+         */
+        id: {
+            get: function () {
+                return this.retrieve({
+                    name: 'id',
+                    isAttribute: true
+                });
+            }
+        },
+
+        /**
+         * Node of this object. It may be overridden by other users of some functions like parse.
+         * @memberof KmlObject.prototype
+         * @type {Node}
+         * @readonly
+         */
+        node: {
+            get: function () {
+                //noinspection JSPotentiallyInvalidUsageOfThis
+                return this._node;
+            }
+        }
+    });
 
     /**
      * It returns last node found with given name. It accepts array of possible node names

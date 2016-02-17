@@ -28,50 +28,50 @@ define([
     var KmlMultiGeometry = function (options) {
         KmlGeometry.call(this, options);
         this._style = options.style;
-
-        Object.defineProperties(this, {
-            /**
-             * It returns all shapes currently present in this node.
-             * @memberof KmlMultiGeometry.prototype
-             * @type {KmlObject[]}
-             * @readonly
-             */
-            kmlShapes: {
-                get: function () {
-                    return this.parse();
-                }
-            },
-
-            /**
-             * Center of all the geometries implemented as average of centers of all shapes.
-             * @memberof KmlMultiGeometry.prototype
-             * @type {Position}
-             * @readonly
-             */
-            kmlCenter: {
-                get: function () {
-                    var positions = this.kmlShapes.map(function (shape) {
-                        return shape.kmlCenter;
-                    });
-                    var midLatitude = 0;
-                    var midLongitude = 0;
-                    var midAltitude = 0;
-                    positions.forEach(function (position) {
-                        midLatitude += position.latitude;
-                        midLongitude += position.longitude;
-                        midAltitude += position.altitude;
-                    });
-                    return new Position(
-                        midLatitude / positions.length,
-                        midLongitude / positions.length,
-                        midAltitude / positions.length
-                    );
-                }
-            }
-        });
-
-        extend(this, KmlMultiGeometry.prototype);
     };
+
+    KmlMultiGeometry.prototype = Object.create(KmlGeometry.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * It returns all shapes currently present in this node.
+         * @memberof KmlMultiGeometry.prototype
+         * @type {KmlObject[]}
+         * @readonly
+         */
+        kmlShapes: {
+            get: function () {
+                return this.parse();
+            }
+        },
+
+        /**
+         * Center of all the geometries implemented as average of centers of all shapes.
+         * @memberof KmlMultiGeometry.prototype
+         * @type {Position}
+         * @readonly
+         */
+        kmlCenter: {
+            get: function () {
+                var positions = this.kmlShapes.map(function (shape) {
+                    return shape.kmlCenter;
+                });
+                var midLatitude = 0;
+                var midLongitude = 0;
+                var midAltitude = 0;
+                positions.forEach(function (position) {
+                    midLatitude += position.latitude;
+                    midLongitude += position.longitude;
+                    midAltitude += position.altitude;
+                });
+                return new Position(
+                    midLatitude / positions.length,
+                    midLongitude / positions.length,
+                    midAltitude / positions.length
+                );
+            }
+        }
+    });
 
     /**
      * @inheritDoc

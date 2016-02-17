@@ -25,9 +25,9 @@ define([
      */
     var Schema = function (options) {
         KmlObject.call(this, options);
-
-        extend(this, Schema.prototype);
     };
+
+    Schema.prototype = Object.create(KmlObject.prototype);
 
     /**
      * @inheritDoc

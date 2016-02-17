@@ -25,63 +25,63 @@ define([
      */
     var ImagePyramid = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Size of the tiles, in pixels. Tiles must be square, and &lt;tileSize&gt; must be a power of 2. A tile size of
-             * 256
-             * (the default) or 512 is recommended. The original image is divided into tiles of this size, at varying
-             * resolutions.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlTileSize: {
-                get: function () {
-                    return this.retrieve({name: 'tileSize', transformer: Number});
-                }
-            },
-
-            /**
-             * Width in pixels of the original image.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlMaxWidth: {
-                get: function () {
-                    return this.retrieve({name: 'maxWidth', transformer: Number});
-                }
-            },
-
-            /**
-             * Height in pixels of the original image.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlMaxHeight: {
-                get: function () {
-                    return this.retrieve({name: 'maxHeight', transformer: Number});
-                }
-            },
-
-            /**
-             * Specifies where to begin numbering the tiles in each layer of the pyramid. A value of lowerLeft specifies
-             * that row 1, column 1 of each layer is in the bottom left corner of the grid.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlGridOrigin: {
-                get: function () {
-                    return this.retrieve({name: 'gridOrigin'});
-                }
-            }
-        });
-
-        extend(this, ImagePyramid.prototype);
     };
+
+    ImagePyramid.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Size of the tiles, in pixels. Tiles must be square, and &lt;tileSize&gt; must be a power of 2. A tile size of
+         * 256
+         * (the default) or 512 is recommended. The original image is divided into tiles of this size, at varying
+         * resolutions.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlTileSize: {
+            get: function () {
+                return this.retrieve({name: 'tileSize', transformer: Number});
+            }
+        },
+
+        /**
+         * Width in pixels of the original image.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlMaxWidth: {
+            get: function () {
+                return this.retrieve({name: 'maxWidth', transformer: Number});
+            }
+        },
+
+        /**
+         * Height in pixels of the original image.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlMaxHeight: {
+            get: function () {
+                return this.retrieve({name: 'maxHeight', transformer: Number});
+            }
+        },
+
+        /**
+         * Specifies where to begin numbering the tiles in each layer of the pyramid. A value of lowerLeft specifies
+         * that row 1, column 1 of each layer is in the bottom left corner of the grid.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlGridOrigin: {
+            get: function () {
+                return this.retrieve({name: 'gridOrigin'});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

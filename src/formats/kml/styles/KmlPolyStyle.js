@@ -31,35 +31,36 @@ define([
      */
     var KmlPolyStyle = function (options) {
         KmlColorStyle.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * If true the polygon's surface will be filled with color
-             * @memberof KmlPolyStyle.prototype
-             * @readonly
-             * @type {Boolean}
-             */
-            kmlFill: {
-                get: function(){
-                    return this.retrieve({name: 'fill', transformer: WWUtil.transformToBoolean});
-                }
-            },
-
-            /**
-             * Specifies whether outline polygon. Outline style is defined by line style if present.
-             * @memberof KmlPolyStyle.prototype
-             * @readonly
-             * @type {Boolean}
-             */
-            kmlOutline: {
-                get: function(){
-                    return this.retrieve({name: 'outline', transformer: WWUtil.transformToBoolean});
-                }
-            }
-        });
-
-        extend(this, KmlPolyStyle.prototype);
     };
+
+    KmlPolyStyle.prototype = Object.create(KmlColorStyle.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * If true the polygon's surface will be filled with color
+         * @memberof KmlPolyStyle.prototype
+         * @readonly
+         * @type {Boolean}
+         */
+        kmlFill: {
+            get: function(){
+                return this.retrieve({name: 'fill', transformer: WWUtil.transformToBoolean});
+            }
+        },
+
+        /**
+         * Specifies whether outline polygon. Outline style is defined by line style if present.
+         * @memberof KmlPolyStyle.prototype
+         * @readonly
+         * @type {Boolean}
+         */
+        kmlOutline: {
+            get: function(){
+                return this.retrieve({name: 'outline', transformer: WWUtil.transformToBoolean});
+            }
+        }
+    });
+
 
     KmlPolyStyle.update = function (style, options) {
         style = style || {};

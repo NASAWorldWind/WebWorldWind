@@ -25,72 +25,72 @@ define([
      */
     var KmlLatLonBox = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to +-90.
-             * @memberof KmlLatLonBox.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlNorth: {
-                get: function () {
-                    return this.retrieve({name: 'north', transformer: Number});
-                }
-            },
-
-            /**
-             * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to +-90.
-             * @memberof KmlLatLonBox.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlSouth: {
-                get: function () {
-                    return this.retrieve({name: 'south', transformer: Number});
-                }
-            },
-
-            /**
-             * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to +-180.
-             * @memberof KmlLatLonBox.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlEast: {
-                get: function () {
-                    return this.retrieve({name: 'east', transformer: Number});
-                }
-            },
-
-            /**
-             * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to +-180.
-             * @memberof KmlLatLonBox.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlWest: {
-                get: function () {
-                    return this.retrieve({name: 'west', transformer: Number});
-                }
-            },
-
-            /**
-             * Specifies a rotation of the overlay about its center, in degrees. Values can be +-180. The default is 0
-             * (north). Rotations are specified in a counterclockwise direction.
-             * @memberof KmlLatLonBox.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlRotation: {
-                get: function () {
-                    return this.retrieve({name: 'rotation'});
-                }
-            }
-        });
-
-        extend(this, KmlLatLonBox.prototype);
     };
+
+    KmlLatLonBox.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to +-90.
+         * @memberof KmlLatLonBox.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlNorth: {
+            get: function () {
+                return this.retrieve({name: 'north', transformer: Number});
+            }
+        },
+
+        /**
+         * Specifies the latitude of the south edge of the bounding box, in decimal degrees from 0 to +-90.
+         * @memberof KmlLatLonBox.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlSouth: {
+            get: function () {
+                return this.retrieve({name: 'south', transformer: Number});
+            }
+        },
+
+        /**
+         * Specifies the longitude of the east edge of the bounding box, in decimal degrees from 0 to +-180.
+         * @memberof KmlLatLonBox.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlEast: {
+            get: function () {
+                return this.retrieve({name: 'east', transformer: Number});
+            }
+        },
+
+        /**
+         * Specifies the longitude of the west edge of the bounding box, in decimal degrees from 0 to +-180.
+         * @memberof KmlLatLonBox.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlWest: {
+            get: function () {
+                return this.retrieve({name: 'west', transformer: Number});
+            }
+        },
+
+        /**
+         * Specifies a rotation of the overlay about its center, in degrees. Values can be +-180. The default is 0
+         * (north). Rotations are specified in a counterclockwise direction.
+         * @memberof KmlLatLonBox.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlRotation: {
+            get: function () {
+                return this.retrieve({name: 'rotation'});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

@@ -26,59 +26,59 @@ define([
      */
     var KmlBalloonStyle = function (options) {
         KmlSubStyle.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Represents background color of the balloon. It expects hexadecimal notation without #.
-             * @memberof KmlBalloonStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlBgColor: {
-                get: function(){
-                    return this.retrieve({name: 'bgColor'});
-                }
-            },
-
-            /**
-             * Represents color of the text in the balloon. It expects hexadecimal notation without #.
-             * @memberof KmlBalloonStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlTextColor: {
-                get: function() {
-                    return this.retrieve({name: 'textColor'});
-                }
-            },
-
-            /**
-             * Text which should be displayed in the balloon, otherwise feature name and description is displayed.
-             * @memberof KmlBalloonStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlText: {
-                get: function(){
-                    return this.retrieve({name: 'text'});
-                }
-            },
-
-            /**
-             * Either display or hide. When hide don't show the balloon at all.
-             * @memberof KmlBalloonStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlDisplayMode: {
-                get: function() {
-                    return this.retrieve({name: 'displayMode'});
-                }
-            }
-        });
-
-        extend(this, KmlBalloonStyle.prototype);
     };
+
+    KmlBalloonStyle.prototype = Object.create(KmlSubStyle.prototype);
+
+    Object.defineProperties(this, {
+        /**
+         * Represents background color of the balloon. It expects hexadecimal notation without #.
+         * @memberof KmlBalloonStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlBgColor: {
+            get: function(){
+                return this.retrieve({name: 'bgColor'});
+            }
+        },
+
+        /**
+         * Represents color of the text in the balloon. It expects hexadecimal notation without #.
+         * @memberof KmlBalloonStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlTextColor: {
+            get: function() {
+                return this.retrieve({name: 'textColor'});
+            }
+        },
+
+        /**
+         * Text which should be displayed in the balloon, otherwise feature name and description is displayed.
+         * @memberof KmlBalloonStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlText: {
+            get: function(){
+                return this.retrieve({name: 'text'});
+            }
+        },
+
+        /**
+         * Either display or hide. When hide don't show the balloon at all.
+         * @memberof KmlBalloonStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlDisplayMode: {
+            get: function() {
+                return this.retrieve({name: 'displayMode'});
+            }
+        }
+    });
 
     KmlBalloonStyle.update = function(){
 
