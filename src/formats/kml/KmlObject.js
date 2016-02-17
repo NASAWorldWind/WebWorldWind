@@ -11,12 +11,14 @@ define([
     './KmlElements',
     '../../util/Logger',
     '../../util/Promise',
+    '../../render/Renderable',
     '../../util/WWUtil'
 ], function (ArgumentError,
              extend,
              KmlElements,
              Logger,
              Promise,
+             Renderable,
              WWUtil) {
     "use strict";
 
@@ -31,9 +33,12 @@ define([
      * @param options.controls {KmlControls[]} Controls associated with current Node
      * @constructor
      * @throws {ArgumentError} If either node is null or id isn't present on the object.
+     * @augments Renderable
      * @see https://developers.google.com/kml/documentation/kmlreference#object
      */
     var KmlObject = function (options) {
+        Renderable.call(this);
+
         options = options || {};
         if (!options.objectNode) {
             throw new ArgumentError(
@@ -82,6 +87,7 @@ define([
         this.hook(this._controls, options);
     };
 
+    KmlObject.prototype = Object.create(Renderable.prototype);
 
     /**
      * It returns last node found with given name. It accepts array of possible node names
@@ -441,6 +447,13 @@ define([
     KmlObject.prototype.getStyle = function () {
         Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.getTagNames()[0] + " doesn't override  " +
             "getStyle.");
+    };
+
+    /**
+     * @inheritDoc
+     */
+    KmlObject.prototype.render = function(dc) {
+
     };
 
     /**
