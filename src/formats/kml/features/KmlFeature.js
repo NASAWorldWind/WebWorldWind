@@ -259,14 +259,6 @@ define([
     /**
      * @inheritDoc
      */
-    KmlFeature.prototype.getTagNames = function () {
-        return ['NetworkLink', 'Placemark', 'PhotoOverlay', 'ScreenOverlay', 'GroundOverlay', 'Folder',
-            'Document'];
-    };
-
-    /**
-     * @inheritDoc
-     */
     KmlFeature.prototype.getStyle = function () {
         var self = this;
         if (this._pStyle) {
@@ -279,6 +271,14 @@ define([
         });
         // Use also styleUrl if valid and StyleSelector.
         return this._pStyle;
+    };
+
+    /**
+     * @inheritDoc
+     */
+    KmlFeature.prototype.getTagNames = function () {
+        return ['NetworkLink', 'Placemark', 'PhotoOverlay', 'ScreenOverlay', 'GroundOverlay', 'Folder',
+            'Document'];
     };
 
     return KmlFeature;

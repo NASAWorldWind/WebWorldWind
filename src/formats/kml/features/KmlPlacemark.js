@@ -58,7 +58,6 @@ define([
             self._renderable = new Placemark(self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
             self.moveValidProperties();
         });
-        this._layer = null;
     };
 
     KmlPlacemark.prototype = Object.create(KmlFeature.prototype);
@@ -84,23 +83,6 @@ define([
      */
     KmlPlacemark.prototype.getAppliedStyle = function() {
         return this._style;
-    };
-
-    /**
-     * First call the predecessor and then take care of moving the feature to different layer.
-     * @inheritDoc
-     */
-    KmlPlacemark.prototype.beforeStyleResolution = function(options) {
-        KmlFeature.prototype.beforeStyleResolution.call(this, options);
-
-        // Add to the layer.
-        // TODO Solve movement of the hierarchy into another layer
-        if(this._layer == null) {
-            this._layer = options.layer;
-            this._layer.addRenderable(this._renderable);
-        }
-
-        return true;
     };
 
     /**

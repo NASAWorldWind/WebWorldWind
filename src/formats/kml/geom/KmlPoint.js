@@ -100,46 +100,6 @@ define([
         }
     });
 
-
-    // TODO: Fix Point and create it meaningfully.
-    /**
-     * It renders KmlPoint as Polygon.
-     * @param options {Object}
-     * @param options.layer {Layer} Layer to put Point into.
-     */
-    KmlPoint.prototype.update = function (options) {
-        // TODO Fix the update to work with the current status of the information.
-        options = WWUtil.clone(options);
-        var attributes = new ShapeAttributes(null);
-        attributes.outlineColor = Color.WHITE;
-        attributes.interiorColor = Color.WHITE;
-        attributes.drawVerticals = false;
-
-        this._shape = new Polygon(this.createRectangleFromPosition(this.kmlPosition), attributes);
-
-        this._shape.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
-        this._shape.extrude = this.kmlExtrude;
-        if(options.layer) {
-            options.layer.addRenderable(this._shape);
-        }
-    };
-
-    // For internal use only. Intentionally left undocumented.
-    KmlPoint.prototype.createRectangleFromPosition = function (position) {
-        var rectangle = [];
-
-        var latitude = Number(position.latitude),
-            longitude = Number(position.longitude),
-            altitude = Number(position.altitude);
-
-        rectangle.push(position);
-        rectangle.push(new Position(latitude + 0.000009, longitude, altitude));
-        rectangle.push(new Position(latitude + 0.000009, longitude + 0.000009, altitude));
-        rectangle.push(new Position(latitude, longitude + 0.000009, altitude));
-
-        return rectangle;
-    };
-
     /**
      * @inheritDoc
      */

@@ -46,12 +46,8 @@ define([
             this._style = options.style;
         }
 
+        // TODO: Prepare locations should be hook.
         this.locations = this.prepareLocations();
-
-        if(!this._layer && options.layer) {
-            options.layer.addRenderable(this);
-            this._layer = options.layer;
-        }
 
         return true;
     };

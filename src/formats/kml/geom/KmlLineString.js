@@ -47,7 +47,6 @@ define([
                 self.createPath(styles);
             });
             this._style = options.style;
-            this._layer = null;
         };
 
         KmlLineString.prototype = Object.create(KmlGeometry.prototype);
@@ -143,7 +142,7 @@ define([
          */
         KmlLineString.prototype.createPath = function(styles) {
             if(!this.initialized) {
-                Path.call(this, this.prepareLocations(), this.prepareAttributes(styles.normal));
+                this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
                 this.moveValidProperties();
                 this.initialized = true;
             }

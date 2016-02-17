@@ -51,7 +51,6 @@ define([
         } else {
             self.createPolygon();
         }
-        this._layer = null;
     };
 
     KmlPolygon.prototype = Object.create(KmlGeometry.prototype);
@@ -151,7 +150,7 @@ define([
      */
     KmlPolygon.prototype.createPolygon = function(styles) {
         if(!this.initialized) {
-            Polygon.call(this, this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
             this.moveValidProperties();
             this.initialized = true;
         }
