@@ -107,17 +107,10 @@ define([
     /**
      * It renders all shapes, which are associated with current file.
      * @param options {Object}
-     * @param options.layer {Layer} Layer into which the objects should be rendered.
      * @param options.controls {KmlControls[]} Controls to be notified when the file is updated.
      * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
      */
     KmlFile.prototype.update = function (options) {
-        if (!options.layer) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "update", "Layer must be defined in order to update document.")
-            );
-        }
-
         options.controls = this._controls;
         this.shapes.forEach(function (shape) {
             shape.update(options);
