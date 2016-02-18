@@ -224,6 +224,8 @@ define([
      */
     KmlFeature.prototype.beforeStyleResolution = function (options) {
         this.solveTimeVisibility(options);
+
+        return true;
     };
 
     /**

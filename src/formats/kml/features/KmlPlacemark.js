@@ -55,7 +55,7 @@ define([
                 // TODO: Show Placemarks without geometry.
                 return;
             }
-            self._renderables.push(new Placemark(self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal)));
+            self._renderable = new Placemark(self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
             self.moveValidProperties();
         });
     };
@@ -92,7 +92,8 @@ define([
     KmlPlacemark.prototype.afterStyleResolution = function(options) {
         this.position = this.kmlGeometry.kmlCenter;
 
-        this.kmlGeometry.render(options);
+        this._renderable.render(options.dc, options);
+        this.kmlGeometry.render(options.dc, options);
     };
 
     /**

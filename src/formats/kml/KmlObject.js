@@ -368,6 +368,11 @@ define([
     };
 
     /**
+     * Hook to be used in relevant subclasses.
+     */
+    KmlObject.prototype.moveValidProperties = function() {};
+
+    /**
      * It decides whether current shape should be enabled and therefore visible on the map. If any of the ancestors
      * in the document is disabled all their descendants also are. If it isn't and there is information about
      * visibility as a part of this Element respect it, otherwise it is visible.
