@@ -31,7 +31,7 @@ define([
         KmlObject.call(this, options);
     };
 
-    KmlAbstractView.prototype = Object.create(KmlObject);
+    KmlAbstractView.prototype = Object.create(KmlObject.prototype);
 
     Object.defineProperties(KmlAbstractView.prototype, {
         /**
