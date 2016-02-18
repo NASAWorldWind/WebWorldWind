@@ -105,15 +105,14 @@ define([
     });
 
     /**
-     * It renders all shapes, which are associated with current file.
-     * @param options {Object}
-     * @param options.controls {KmlControls[]} Controls to be notified when the file is updated.
-     * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
+     * @inheritDoc
      */
-    KmlFile.prototype.update = function (options) {
+    KmlFile.prototype.render = function (dc, options) {
+        options = options || {};
+
         options.controls = this._controls;
         this.shapes.forEach(function (shape) {
-            shape.update(options);
+            shape.render(dc, options);
         });
     };
 

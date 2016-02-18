@@ -76,7 +76,7 @@ define([
      */
     KmlDocument.prototype.beforeStyleResolution = function(options) {
         this.kmlShapes.forEach(function(shape) {
-            shape.update(options);
+            shape.render(options.dc, options);
         });
 
         return false;

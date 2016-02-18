@@ -36,9 +36,10 @@ requirejs(['../src/WorldWind',
         var kmlFilePromise = new KmlFile('data/KML_Samples.kml', [new KmlTreeVisibility('treeControls', wwd)]);
         kmlFilePromise.then(function (kmlFile) {
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
-            wwd.addLayer(renderableLayer);
+            renderableLayer.addRenderable(kmlFile);
 
-            kmlFile.update({layer:renderableLayer});
+            wwd.addLayer(renderableLayer);
+            wwd.redraw();
         });
 
         // Create a layer manager for controlling layer visibility.

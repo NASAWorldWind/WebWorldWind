@@ -343,7 +343,8 @@ define([
      * @param pOptions {Object} Options to be applied to the updating process. It will be cloned.
      */
     KmlObject.prototype.render = function (dc, pOptions) {
-        var options = WWUtil.clone(pOptions);
+        var options = WWUtil.clone(pOptions || {});
+        options.dc = dc;
 
         if (!this.beforeStyleResolution(options)) {
             return;
@@ -362,7 +363,6 @@ define([
             self.moveValidProperties();
 
             options.style = self.getStyle();
-            options.dc = dc;
             self.afterStyleResolution(options);
         });
     };

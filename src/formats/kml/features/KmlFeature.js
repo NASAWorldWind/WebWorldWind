@@ -48,12 +48,6 @@ define([
         KmlObject.call(this, options);
 
         this._style = options.style;
-
-        // Make sure that time is parsed.
-        function getKmlTimePrimitive () {
-            return this.kmlTimePrimitive;
-        }
-        getKmlTimePrimitive();
     };
 
     KmlFeature.prototype = Object.create(KmlObject.prototype);
@@ -186,7 +180,11 @@ define([
          * @readonly
          */
         kmlTimePrimitive: {
-            get: getKmlTimePrimitive
+            get: function(){
+                return this.createChildElement({
+                    name: KmlTimePrimitive.prototype.getTagNames()
+                });
+            }
         },
 
         /**
