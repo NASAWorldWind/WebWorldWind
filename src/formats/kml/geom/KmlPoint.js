@@ -47,7 +47,7 @@ define([
 
     KmlPoint.prototype = Object.create(KmlGeometry.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlPoint.prototype, {
         /**
          * Position of the whole geometry.
          * @memberof KmlPoint.prototype

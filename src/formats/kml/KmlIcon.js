@@ -30,7 +30,7 @@ define([
 
     KmlIcon.prototype = Object.create(KmlLink.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlIcon.prototype, {
         /**
          * The href can contain a pallet of icons. In this case this is offset from left border.
          * @memberof KmlIcon.prototype

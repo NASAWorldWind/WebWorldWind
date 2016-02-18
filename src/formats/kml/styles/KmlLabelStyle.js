@@ -30,7 +30,7 @@ define([
 
     KmlLabelStyle.prototype = Object.create(KmlColorStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlLabelStyle.prototype, {
         /**
          * Scale in which to resize the icon.
          * @memberof KmlLabelStyle.prototype

@@ -51,7 +51,7 @@ define([
 
         KmlLineString.prototype = Object.create(KmlGeometry.prototype);
 
-        Object.defineProperties(this, {
+        Object.defineProperties(KmlLineString.prototype, {
             /**
              * Whether current shape should be extruded.
              * @memberof KmlLineString.prototype

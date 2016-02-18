@@ -32,7 +32,7 @@ define([
 
     KmlMultiGeometry.prototype = Object.create(KmlGeometry.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlMultiGeometry.prototype, {
         /**
          * It returns all shapes currently present in this node.
          * @memberof KmlMultiGeometry.prototype

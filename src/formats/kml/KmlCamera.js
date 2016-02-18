@@ -29,7 +29,7 @@ define([
 
     KmlCamera.prototype = Object.create(KmlAbstractView.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlCamera.prototype, {
         /**
          * Longitude of the virtual camera (eye point). Angular distance in degrees, relative to the Prime Meridian.
          * Values west of the Meridian range from +-180 to 0 degrees. Values east of the Meridian range from 0

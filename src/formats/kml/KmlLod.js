@@ -29,7 +29,7 @@ define([
 
     KmlLod.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlLod.prototype, {
         /**
          * Defines a square in screen space, with sides of the specified value in pixels. For example, 128 defines
          * a

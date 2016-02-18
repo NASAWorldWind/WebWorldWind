@@ -30,7 +30,7 @@ define([
 
     KmlFolder.prototype = Object.create(KmlContainer.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlFolder.prototype, {
         /**
          * Specifies any amount of features, which are part of this document.
          * @memberof KmlFolder.prototype

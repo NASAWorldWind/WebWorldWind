@@ -28,7 +28,7 @@ define([
 
     KmlColorStyle.prototype = Object.create(KmlSubStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlColorStyle.prototype, {
         /**
          * Color, which should be used. Shapes supporting colored styles must correctly apply the
          * color.

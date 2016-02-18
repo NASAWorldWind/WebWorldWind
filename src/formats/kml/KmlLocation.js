@@ -31,7 +31,7 @@ define([
 
     KmlLocation.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlLocation.prototype, {
         /**
          * Longitude of the location.
          * @memberof KmlLocation.prototype

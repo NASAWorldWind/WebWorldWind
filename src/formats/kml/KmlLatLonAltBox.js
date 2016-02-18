@@ -29,7 +29,7 @@ define([
 
     KmlLatLonAltBox.prototype = Object.create(KmlObject);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlLatLonAltBox.prototype, {
         /**
          * Specifies the latitude of the north edge of the bounding box, in decimal degrees from 0 to +-90.
          * @memberof KmlLatLonAltBox.prototype

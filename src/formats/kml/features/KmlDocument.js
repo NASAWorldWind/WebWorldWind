@@ -34,7 +34,7 @@ define([
 
     KmlDocument.prototype = Object.create(KmlContainer.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlDocument.prototype, {
         /**
          * Specifies any amount of features, which are part of this document.
          * @memberof KmlDocument.prototype

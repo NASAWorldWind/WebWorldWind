@@ -31,7 +31,7 @@ define([
 
     KmlIconStyle.prototype = Object.create(KmlColorStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlIconStyle.prototype, {
         /**
          * Scale in which to resize the icon.
          * @memberof KmlIconStyle.prototype

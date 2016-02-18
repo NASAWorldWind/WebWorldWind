@@ -30,7 +30,7 @@ define([
 
     KmlListStyle.prototype = Object.create(KmlSubStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlListStyle.prototype, {
         /**
          * Background color for the Snippet. Color and opacity values are expressed in hexadecimal notation. The
          * range of values for any one color is 0 to 255 (00 to ff). For alpha, 00 is fully transparent and ff is

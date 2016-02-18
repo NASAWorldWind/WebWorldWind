@@ -35,7 +35,7 @@ define([
 
     KmlPolyStyle.prototype = Object.create(KmlColorStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlPolyStyle.prototype, {
         /**
          * If true the polygon's surface will be filled with color
          * @memberof KmlPolyStyle.prototype

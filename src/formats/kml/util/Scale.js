@@ -31,7 +31,7 @@ define([
 
     Scale.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(Scale.prototype, {
         /**
          * Scales model along x axis
          * @memberof Scale.prototype

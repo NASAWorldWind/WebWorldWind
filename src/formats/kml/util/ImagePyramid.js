@@ -29,7 +29,7 @@ define([
 
     ImagePyramid.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(ImagePyramid.prototype, {
         /**
          * Size of the tiles, in pixels. Tiles must be square, and &lt;tileSize&gt; must be a power of 2. A tile size of
          * 256

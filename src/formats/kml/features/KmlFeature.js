@@ -58,7 +58,7 @@ define([
 
     KmlFeature.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlFeature.prototype, {
         /**
          * Name of this feature. Every feature should have name.
          * @memberof KmlFeature.prototype

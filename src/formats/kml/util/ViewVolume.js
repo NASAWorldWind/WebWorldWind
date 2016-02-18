@@ -28,7 +28,7 @@ define([
 
     ViewVolume.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(ViewVolume.prototype, {
         /**
          * Angle, in degrees, between the camera's viewing direction and the left side of the view volume.
          * @memberof ViewVolume.prototype

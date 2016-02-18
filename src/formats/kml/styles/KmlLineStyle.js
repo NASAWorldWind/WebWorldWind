@@ -32,7 +32,7 @@ define([
 
     KmlLineStyle.prototype = Object.create(KmlColorStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlLineStyle.prototype, {
         /**
          * Width of the line in pixels.
          * @memberof KmlLineStyle.prototype

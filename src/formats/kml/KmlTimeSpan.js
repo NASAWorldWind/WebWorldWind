@@ -38,7 +38,7 @@ define([
 
     KmlTimeSpan.prototype = Object.create(KmlTimePrimitive.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlTimeSpan.prototype, {
         /**
          * Time from which is the event valid.
          * @memberof KmlTimeSpan.prototype

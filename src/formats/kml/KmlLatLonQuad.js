@@ -29,7 +29,7 @@ define([
 
     KmlLatLonQuad.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlLatLonQuad.prototype, {
         /**
          * Specifies the coordinates of the four corner points of a quadrilateral defining the overlay area.
          * Exactly

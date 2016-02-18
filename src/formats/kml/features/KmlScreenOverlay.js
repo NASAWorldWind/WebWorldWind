@@ -29,7 +29,7 @@ define([
 
     KmlScreenOverlay.prototype = Object.create(KmlOverlay.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlScreenOverlay.prototype, {
         /**
          * Indicates the angle of rotation of the parent object. A value of 0 means no rotation. The value is an
          * angle in degrees counterclockwise starting from north. Use +-180 to indicate the rotation of the parent

@@ -29,7 +29,7 @@ define([
 
     KmlLink.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlLink.prototype, {
         /**
          * A URL (either an HTTP address or a local file specification). When the parent of &lt;Link&gt; is a
          * NetworkLink,

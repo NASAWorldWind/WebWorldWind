@@ -36,7 +36,7 @@ define([
 
     KmlTimeStamp.prototype = Object.create(KmlTimePrimitive.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlTimeStamp.prototype, {
         /**
          * This property specifies when exactly the event happen.
          * @memberof KmlTimeStamp.prototype

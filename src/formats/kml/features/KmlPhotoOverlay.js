@@ -35,7 +35,7 @@ define([
 
     KmlPhotoOverlay.prototype = Object.create(KmlOverlay.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlPhotoOverlay.prototype, {
         /**
          * Adjusts how the photo is placed inside the field of view. This element is useful if your photo has been
          * rotated and deviates slightly from a desired horizontal view.

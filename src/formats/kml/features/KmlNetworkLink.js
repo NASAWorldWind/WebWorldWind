@@ -33,7 +33,7 @@ define([
 
     KmlNetworkLink.prototype = Object.create(KmlFeature.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlNetworkLink.prototype, {
         /**
          * Boolean value. A value of 0 leaves the visibility of features within the control of the Google Earth
          * user. Set the value to 1 to reset the visibility of features each time the NetworkLink is refreshed. For

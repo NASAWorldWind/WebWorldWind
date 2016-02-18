@@ -35,7 +35,7 @@ define([
 
     KmlGroundOverlay.prototype = Object.create(KmlOverlay.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlGroundOverlay.prototype, {
         /**
          * Specifies the distance above the earth's surface, in meters, and is interpreted according to the altitude
          * mode.

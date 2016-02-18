@@ -30,7 +30,7 @@ define([
 
     KmlBalloonStyle.prototype = Object.create(KmlSubStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlBalloonStyle.prototype, {
         /**
          * Represents background color of the balloon. It expects hexadecimal notation without #.
          * @memberof KmlBalloonStyle.prototype

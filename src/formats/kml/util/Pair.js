@@ -37,7 +37,7 @@ define([
 
     Pair.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(Pair.prototype, {
         /**
          * Identifies the key
          * @memberof Pair.prototype

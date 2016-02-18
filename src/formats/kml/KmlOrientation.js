@@ -29,7 +29,7 @@ define([
 
     KmlOrientation.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlOrientation.prototype, {
         /**
          * Rotation about the z axis (normal to the Earth's surface). A value of 0 (the default) equals North. A
          * positive rotation is clockwise around the z axis and specified in degrees from 0 to 360.

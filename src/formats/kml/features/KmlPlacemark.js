@@ -62,7 +62,7 @@ define([
 
     KmlPlacemark.prototype = Object.create(KmlFeature.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlPlacemark.prototype, {
         /**
          * It contains geometry associated with this placemark. The geometry is cached.
          * @memberof KmlPlacemark.prototype

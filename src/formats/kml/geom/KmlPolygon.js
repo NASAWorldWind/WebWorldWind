@@ -55,7 +55,7 @@ define([
 
     KmlPolygon.prototype = Object.create(KmlGeometry.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlPolygon.prototype, {
         /**
          * In case that the polygon is above ground, this property decides whether there is going to be a line to
          * the ground.

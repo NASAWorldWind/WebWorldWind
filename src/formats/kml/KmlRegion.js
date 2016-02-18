@@ -32,7 +32,7 @@ define([
 
     KmlRegion.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlRegion.prototype, {
         /**
          * A bounding box that describes an area of interest defined by geographic coordinates and altitudes.
          * Default values and required fields are as follows:

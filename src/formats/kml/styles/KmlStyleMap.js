@@ -31,7 +31,7 @@ define([
 
     KmlStyleMap.prototype = Object.create(KmlSubStyle.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlStyleMap.prototype, {
         /**
          * Defines a key/value pair that maps a mode (normal or highlight) to the predefined &lt;styleUrl&gt;.
          * &lt;Pair&gt;

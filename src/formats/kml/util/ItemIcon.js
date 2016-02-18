@@ -29,7 +29,7 @@ define([
 
     ItemIcon.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(ItemIcon.prototype, {
         /**
          * Specifies the current state of the NetworkLink or Folder. Possible values are open, closed, error,
          * fetching0, fetching1, and fetching2. These values can be combined by inserting a space between two values

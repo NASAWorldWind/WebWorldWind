@@ -57,7 +57,7 @@ define([
 
     KmlStyle.prototype = Object.create(KmlStyleSelector.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlStyle.prototype, {
         /**
          * Style used for icons in current node and all children nodes.
          * @memberof KmlStyle.prototype

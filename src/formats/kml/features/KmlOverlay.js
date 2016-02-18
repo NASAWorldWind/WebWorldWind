@@ -29,7 +29,7 @@ define([
 
     KmlOverlay.prototype = Object.create(KmlFeature.prototype);
 
-    Object.defineProperties(this, {
+    Object.defineProperties(KmlOverlay.prototype, {
         /**
          * Color values are expressed in hexadecimal notation, including opacity (alpha) values. The order of
          * expression is alpha, blue, green, red (aabbggrr). The range of values for any one color is 0 to 255 (00
