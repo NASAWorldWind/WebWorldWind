@@ -92,7 +92,7 @@ define([
     KmlPlacemark.prototype.afterStyleResolution = function(options) {
         this.position = this.kmlGeometry.kmlCenter;
 
-        this.kmlGeometry.update(options);
+        this.kmlGeometry.render(options);
     };
 
     /**

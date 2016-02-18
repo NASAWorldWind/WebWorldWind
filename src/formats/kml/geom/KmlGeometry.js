@@ -25,6 +25,8 @@ define([
      */
     var KmlGeometry = function (options) {
         KmlObject.call(this, options);
+
+        this._renderable = null;
     };
 
     KmlGeometry.prototype = Object.create(KmlObject.prototype);
@@ -36,6 +38,11 @@ define([
     KmlGeometry.prototype.getAppliedStyle = function() {
         return this._style;
     };
+
+    /**
+     * Hook to be overridden by the descendants.
+     */
+    KmlGeometry.prototype.prepareLocations = function() {return null;};
 
     /**
      * Added prepareLocations hook.
@@ -50,6 +57,15 @@ define([
         this.locations = this.prepareLocations();
 
         return true;
+    };
+
+    /**
+     * @inheritDoc
+     */
+    KmlGeometry.prototype.afterStyleResolution = function(options) {
+        if(this._renderable) {
+            this._renderable.render(options.dc);
+        }
     };
 
     /**

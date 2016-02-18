@@ -141,10 +141,9 @@ define([
          * @param styles.highlight {KmlStyle} Style applied when item is highlighted
          */
         KmlLineString.prototype.createPath = function(styles) {
-            if(!this.initialized) {
-                this._renderables.push(new Path(this.prepareLocations(), this.prepareAttributes(styles.normal)));
+            if(!this._renderable) {
+                this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
                 this.moveValidProperties();
-                this.initialized = true;
             }
         };
 

@@ -149,10 +149,9 @@ define([
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
     KmlPolygon.prototype.createPolygon = function(styles) {
-        if(!this.initialized) {
-            this._renderables.push(new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal)));
+        if(!this._renderable) {
+            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
             this.moveValidProperties();
-            this.initialized = true;
         }
     };
 
@@ -185,7 +184,9 @@ define([
         return new ShapeAttributes(KmlStyle.shapeAttributes(shapeOptions));
     };
 
-    // For internal use only. Intentionally left undocumented.
+    /**
+     * @inheritDoc
+     */
     KmlPolygon.prototype.prepareLocations = function () {
         var locations = [];
         if (this.kmlInnerBoundary != null) {

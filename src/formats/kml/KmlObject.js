@@ -49,7 +49,6 @@ define([
         this._cache = {};
 
         this._controls = options.controls || [];
-        this._renderables = [];
 
         this.hook(this._controls, options);
     };
@@ -329,8 +328,8 @@ define([
     };
 
     /**
-     * This function solves update. It offers some hooks, which may be overridden in subclasses.
-     * What does this method do, when there are no renderables to speak about?
+     * @inheritDoc
+     *
      * Available hooks:
      * - getAppliedStyle
 
@@ -343,7 +342,7 @@ define([
      *
      * @param pOptions {Object} Options to be applied to the updating process. It will be cloned.
      */
-    KmlObject.prototype.update = function (pOptions) {
+    KmlObject.prototype.render = function (dc, pOptions) {
         var options = WWUtil.clone(pOptions);
 
         if (!this.beforeStyleResolution(options)) {
@@ -363,6 +362,7 @@ define([
             self.moveValidProperties();
 
             options.style = self.getStyle();
+            options.dc = dc;
             self.afterStyleResolution(options);
         });
     };
@@ -445,18 +445,6 @@ define([
     KmlObject.prototype.getStyle = function () {
         Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.getTagNames()[0] + " doesn't override  " +
             "getStyle.");
-    };
-
-    /**
-     * @inheritDoc
-     */
-    KmlObject.prototype.render = function(dc) {
-        // Default unless overriden is to render associated renderable.
-        if(this._renderables) {
-            this._renderables.forEach(function(renderable){
-                renderable.render(dc);
-            });
-        }
     };
 
     /**
