@@ -7,9 +7,11 @@
  */
 define([
         '../../error/ArgumentError',
+        '../../util/Logger',
         './TiffConstants'
     ],
     function (ArgumentError,
+              Logger,
               TiffConstants) {
         "use strict";
 
@@ -21,31 +23,31 @@ define([
                     throw new ArgumentError(
                         Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "getBytes", "noBytesRequested"));
                 } else if (numOfBytes <= 1) {
-                    if (isSigned){
+                    if (isSigned) {
                         return geoTiffData.getInt8(byteOffset, isLittleEndian);
                     }
-                    else{
+                    else {
                         return geoTiffData.getUint8(byteOffset, isLittleEndian);
                     }
                 } else if (numOfBytes <= 2) {
-                    if (isSigned){
+                    if (isSigned) {
                         return geoTiffData.getInt16(byteOffset, isLittleEndian);
                     }
-                    else{
+                    else {
                         return geoTiffData.getUint16(byteOffset, isLittleEndian);
                     }
                 } else if (numOfBytes <= 3) {
-                    if (isSigned){
+                    if (isSigned) {
                         return geoTiffData.getInt32(byteOffset, isLittleEndian) >>> 8;
                     }
-                    else{
+                    else {
                         return geoTiffData.getUint32(byteOffset, isLittleEndian) >>> 8;
                     }
                 } else if (numOfBytes <= 4) {
-                    if (isSigned){
+                    if (isSigned) {
                         return geoTiffData.getInt32(byteOffset, isLittleEndian);
                     }
-                    else{
+                    else {
                         return geoTiffData.getUint32(byteOffset, isLittleEndian);
                     }
                 } else if (numOfBytes <= 8) {
@@ -72,10 +74,12 @@ define([
                             res = geoTiffData.getFloat32(byteOffset, isLittleEndian) >>> 8;
                         } else if (numOfBytes == 4) {
                             res = geoTiffData.getFloat32(byteOffset, isLittleEndian);
+                        } else if (numOfBytes == 8) {
+                            res = geoTiffData.getFloat64(byteOffset, isLittleEndian);
                         }
-                        else{
+                        else {
                             Logger.log(Logger.LEVEL_WARNING, "Do not attempt to parse the data  not handled: " +
-                                sampleFormat);
+                                numOfBytes);
                         }
                         break;
                     case TiffConstants.SampleFormat.UNDEFINED:
@@ -95,8 +99,8 @@ define([
             },
 
             // Get RGBA fill style for a canvas context as a string.
-            getRGBAFillValue: function(r, g, b, a) {
-                if(typeof a === 'undefined') {
+            getRGBAFillValue: function (r, g, b, a) {
+                if (typeof a === 'undefined') {
                     a = 1.0;
                 }
                 return "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
@@ -113,15 +117,38 @@ define([
             },
 
             // Clamp color sample from color sample value and number of bits per sample.
-            clampColorSample: function(colorSample, bitsPerSample) {
+            clampColorSample: function (colorSample, bitsPerSample) {
                 var multiplier = Math.pow(2, 8 - bitsPerSample);
                 return Math.floor((colorSample * multiplier) + (multiplier - 1));
             },
 
-            // Clamp color sample from color sample value and number of bits per sample.
-            clampColorSampleForElevation: function(elevationSample, minElevation, maxElevation) {
+            // Clamp color sample for elevation data from elevation sample values.
+            clampColorSampleForElevation: function (elevationSample, minElevation, maxElevation) {
                 var slope = 255 / (maxElevation - minElevation);
                 return Math.round(slope * (elevationSample - minElevation))
+            },
+
+            // Get min and max geotiff sample values.
+            getMinMaxGeotiffSamples: function (geotiffSampleArray, noDataValue) {
+                var min = Infinity;
+                var max = -Infinity;
+                for (var i = 0; i < geotiffSampleArray.length; i++) {
+                    for (var j = 0; j < geotiffSampleArray[i].length; j++) {
+                        for (var k = 0; k < geotiffSampleArray[i][j].length; k++) {
+                            if (geotiffSampleArray[i][j][k] == noDataValue)
+                                continue;
+
+                            if (geotiffSampleArray[i][j][k] > max) {
+                                max = geotiffSampleArray[i][j][k];
+                            }
+                            if (geotiffSampleArray[i][j][k] < min) {
+                                min = geotiffSampleArray[i][j][k];
+                            }
+                        }
+                    }
+                }
+
+                return {max: max, min: min};
             }
         };
 
