@@ -552,6 +552,7 @@ define([
             return strips;
         }
 
+        // Parse geotiff block. A block may be a strip or a tile. Internal use only.
         GeoTiffReader.prototype.parseBlock = function (returnElevation, compression, bytesPerPixel, blockByteCount,
                                                        blockOffset, samplesPerPixel, bitsPerSample, sampleFormat) {
             var block = [];
@@ -791,7 +792,7 @@ define([
         };
 
         /**
-         * Set the bounding box of the geotiff file.
+         * Set the bounding box of the geotiff file. Internal use only.
          */
         GeoTiffReader.prototype.setBBox = function () {
             var upperLeft = this.geoTiffImageToPCS(0, 0);
