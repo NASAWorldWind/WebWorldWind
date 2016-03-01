@@ -228,9 +228,8 @@ define([
          * to the callback function as a parameter.
          *
          * @param {Function} callback A function called when GeoTiff parsing is complete.
-         * @param {Boolean} containsElevationData Indicates whether the geotiff file contains elevation data.
          */
-        GeoTiffReader.prototype.readAsImage = function (callback, containsElevationData) {
+        GeoTiffReader.prototype.readAsImage = function (callback) {
             this.requestUrl(this.url, (function () {
                 var bitsPerSample = this.metadata.bitsPerSample;
                 var samplesPerPixel = this.metadata.samplesPerPixel;
@@ -250,14 +249,6 @@ define([
 
                 if (this.metadata.stripOffsets) {
                     var strips = this.parseStrips(false);
-
-                    if (containsElevationData) {
-                        var minMaxObject = GeoTiffUtil.getMinMaxGeotiffSamples(
-                            strips,
-                            this.metadata.noData
-                        );
-                    }
-
                     if (this.metadata.rowsPerStrip) {
                         var rowsPerStrip = this.metadata.rowsPerStrip;
                     } else {
@@ -288,9 +279,7 @@ define([
                                     bitsPerSample,
                                     samplesPerPixel,
                                     colorMapValues,
-                                    colorMapSampleSize,
-                                    containsElevationData,
-                                    minMaxObject
+                                    colorMapSampleSize
                                 );
                                 ctx.fillRect(x, yPadding + y, 1, 1);
                             }
@@ -300,14 +289,6 @@ define([
                 }
                 else if (this.metadata.tileOffsets) {
                     var tiles = this.parseTiles(false);
-
-                    if (containsElevationData) {
-                        var minMaxObject = GeoTiffUtil.getMinMaxGeotiffSamples(
-                            tiles,
-                            this.metadata.noData
-                        );
-                    }
-
                     var tileWidth = this.metadata.tileWidth;
                     var tileLength = this.metadata.tileLength;
                     var tilesAcross = Math.ceil(imageWidth / tileWidth);
@@ -327,9 +308,7 @@ define([
                                 bitsPerSample,
                                 samplesPerPixel,
                                 colorMapValues,
-                                colorMapSampleSize,
-                                containsElevationData,
-                                minMaxObject
+                                colorMapSampleSize
                             );
                             ctx.fillRect(x, y, 1, 1);
                         }
@@ -342,9 +321,8 @@ define([
         };
 
         // Get pixel fill style. Internal use only.
-        GeoTiffReader.prototype.getFillStyle = function (pixelSamples, photometricInterpretation,
-                                                         bitsPerSample, samplesPerPixel, colorMapValues,
-                                                         colorMapSampleSize, containsElevationData, minMaxObject) {
+        GeoTiffReader.prototype.getFillStyle = function (pixelSamples, photometricInterpretation, bitsPerSample,
+                                                         samplesPerPixel, colorMapValues, colorMapSampleSize) {
             var red = 0.0;
             var green = 0.0;
             var blue = 0.0;
@@ -359,21 +337,9 @@ define([
                     var invertValue = Math.pow(2, bitsPerSample) - 1;
                     pixelSamples[0] = invertValue - pixelSamples[0];
                 case TiffConstants.PhotometricInterpretation.BLACK_IS_ZERO:
-                    if (containsElevationData) {
-                        red = green = blue = GeoTiffUtil.clampColorSampleForElevation(
-                            pixelSamples[0],
-                            minMaxObject.min,
-                            minMaxObject.max);
-                        //red = green = blue = GeoTiffUtil.clampColorSampleForElevation(
-                        //    pixelSamples[0],
-                        //    this.metadata.minSampleValue,
-                        //    this.metadata.maxSampleValue);
-                    }
-                    else {
-                        red = green = blue = GeoTiffUtil.clampColorSample(
-                            pixelSamples[0],
-                            bitsPerSample[0]);
-                    }
+                    red = green = blue = GeoTiffUtil.clampColorSample(
+                        pixelSamples[0],
+                        bitsPerSample[0]);
                     break;
                 case TiffConstants.PhotometricInterpretation.RGB:
                     red = GeoTiffUtil.clampColorSample(pixelSamples[0], bitsPerSample[0]);
