@@ -769,6 +769,20 @@ define([
                     WWMath.clamp(latRadians * Angle.RADIANS_TO_DEGREES, -90, 90),
                     WWMath.clamp(lonRadians * Angle.RADIANS_TO_DEGREES, -180, 180)
                 ];
+            },
+
+            /**
+             * Calculates the next highest power of two for a given value.
+             * @param {Number} value The value.
+             * @returns {Number} The next highest power of two if the value is a non pow of two, otherwise returns
+             * the same value.
+             */
+            nextHighestPowerOfTwo: function (value){
+                --value;
+                for (var i = 1; i < 32; i <<= 1) {
+                    value = value | value >> i;
+                }
+                return value + 1;
             }
         };
 

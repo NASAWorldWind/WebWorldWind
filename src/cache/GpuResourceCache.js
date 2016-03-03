@@ -202,13 +202,13 @@ define([
          * @returns {Texture} The {@link Texture} created for the image if the specified image source is an
          * {@link ImageSource}, otherwise null.
          */
-        GpuResourceCache.prototype.retrieveTexture = function (gl, imageSource) {
+        GpuResourceCache.prototype.retrieveTexture = function (gl, imageSource, isClamp) {
             if (!imageSource) {
                 return null;
             }
 
             if (imageSource instanceof ImageSource) {
-                var t = new Texture(gl, imageSource.image);
+                var t = new Texture(gl, imageSource.image, isClamp);
                 this.putResource(imageSource.key, t, t.size);
                 return t;
             }
@@ -223,7 +223,7 @@ define([
             image.onload = function () {
                 Logger.log(Logger.LEVEL_INFO, "Image retrieval succeeded: " + imageSource);
 
-                var texture = new Texture(gl, image);
+                var texture = new Texture(gl, image, isClamp);
 
                 cache.putResource(imageSource, texture, texture.size);
 

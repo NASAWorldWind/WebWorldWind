@@ -23,9 +23,11 @@ define([
          * @classdesc Represents a WebGL texture. Applications typically do not interact with this class.
          * @param {WebGLRenderingContext} gl The current WebGL rendering context.
          * @param {Image} image The texture's image.
+         * @param {Boolean} isClamp Indicates the texture's wrap method.
          * @throws {ArgumentError} If the specified WebGL context or image is null or undefined.
          */
-        var Texture = function (gl, image) {
+        var Texture = function (gl, image, isClamp) {
+
             if (!gl) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Texture", "constructor",
                     "missingGlContext"));
@@ -39,27 +41,34 @@ define([
             var textureId = gl.createTexture(),
                 isPowerOfTwo = (WWMath.isPowerOfTwo(image.width) && WWMath.isPowerOfTwo(image.height));
 
+            this.originalImageWidth = image.width;
+            this.originalImageHeight = image.height;
+
+            if (isClamp === false && !isPowerOfTwo) {
+                image = this.resizeImage(image);
+                isPowerOfTwo = true;
+            }
+
             this.imageWidth = image.width;
             this.imageHeight = image.height;
             this.size = image.width * image.height * 4;
-            this.originalImageWidth = this.imageWidth;
-            this.originalImageHeight = this.imageHeight;
 
             gl.bindTexture(gl.TEXTURE_2D, textureId);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
                 isPowerOfTwo ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER,
                 gl.LINEAR);
+
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,
-                gl.CLAMP_TO_EDGE);
+                isClamp === false ? gl.REPEAT : gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,
-                gl.CLAMP_TO_EDGE);
+                isClamp === false ? gl.REPEAT : gl.CLAMP_TO_EDGE);
 
             // Setup 4x anisotropic texture filtering when this feature is available.
             // https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotropic
             var ext = (
-                gl.getExtension("EXT_texture_filter_anisotropic") ||
-                gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic"));
+            gl.getExtension("EXT_texture_filter_anisotropic") ||
+            gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic"));
             if (ext) {
                 gl.texParameteri(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 4);
             }
@@ -100,6 +109,20 @@ define([
             dc.frameStatistics.incrementTextureLoadCount(1);
             return true;
         };
+
+        /**
+         * Resizes an image to a power of two.
+         * @param {Image} image The image to resize.
+         */
+        Texture.prototype.resizeImage = function (image) {
+            var canvas = document.createElement("canvas");
+            canvas.width = WWMath.nextHighestPowerOfTwo(image.width);
+            canvas.height = WWMath.nextHighestPowerOfTwo(image.height);
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            return canvas;
+        };
+
 
         return Texture;
     });
