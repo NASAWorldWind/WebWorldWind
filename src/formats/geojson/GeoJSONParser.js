@@ -218,15 +218,19 @@ define(['../../error/ArgumentError',
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
          */
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer) {
+        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer, rawData) {
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
             }
 
             this._layer = layer || new RenderableLayer();
-
+        
+        if (rawData) {
+            this.parse(this.url);
+            } else {
             this.requestUrl(this.url);
+            }
         };
 
         /**
