@@ -99,31 +99,6 @@ require({
             assertEquals(2, createdElements.length);
             assertTrue(createdElements[0] instanceof KmlLineString);
             assertTrue(createdElements[1] instanceof KmlLineString);
-        }),
-
-        testCachingElementsWhenAllAsked: CatchTest(function(){
-            var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("7")});
-            var createdElements = factory.all(currentMultiGeometry);
-            var createdElementsFromCache = factory.all(currentMultiGeometry);
-
-            assertTrue(createdElements[0] === createdElementsFromCache[0]);
-            assertTrue(createdElements[1] === createdElementsFromCache[1]);
-        }),
-
-        testCachingElementsWhenAnyAsked: CatchTest(function () {
-            var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("11")});
-            var createdElement = factory.any(currentMultiGeometry, {name: KmlGeometry.getTagNames()});
-            var createdElementFromCache = factory.any(currentMultiGeometry, {name: KmlGeometry.getTagNames()});
-
-            assertTrue(createdElement === createdElementFromCache);
-        }),
-
-        testCachingElementsWhenSpecificAsked: CatchTest(function () {
-            var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("11")});
-            var createdElement = factory.specific(currentMultiGeometry, {name: "Point", transformer: KmlElementsFactory.kmlObject});
-            var createdElementFromCache = factory.specific(currentMultiGeometry, {name: "Point", transformer: KmlElementsFactory.kmlObject});
-
-            assertTrue(createdElement === createdElementFromCache);
         })
     })
 });

@@ -24,8 +24,6 @@ define([
         this.cache = new TreeKeyValueCache();
     };
 
-    // There are two different things one of them are primitive values
-    // Second thing are elements.
     /**
      *
      * @param element {KmlObject}
@@ -37,17 +35,10 @@ define([
      */
     KmlElementsFactory.prototype.specific = function (element, options) {
         var parentNode = element.node;
-        var child = this.cache.value(this.cacheKey(parentNode), options.name);
-        if (child) {
-            return child;
-        }
-
-        var self = this;
         var result = null;
         [].forEach.call(parentNode.childNodes, function (node) {
             if (node.nodeName == options.name) {
                 result = options.transformer(node);
-                self.cache.add(self.cacheKey(parentNode), self.cacheKey(node), result);
             }
         });
         return result;
@@ -61,6 +52,7 @@ define([
      */
     KmlElementsFactory.prototype.any = function (element, options) {
         var parentNode = element.node;
+
         var result = null;
         [].forEach.call(parentNode.childNodes, function (node) {
             if (options.name.indexOf(node.nodeName) != -1) {
@@ -76,36 +68,15 @@ define([
      */
     KmlElementsFactory.prototype.all = function (element) {
         var parentNode = element.node;
-        var children = this.cache.level(this.cacheKey(parentNode));
-        if (children) {
-            var results = [];
-            for(var key in children) {
-                if(children.hasOwnProperty(key)) {
-                    results.push(children[key]);
-                }
-            }
-            return results;
-        }
-
-        // Go through children and if encountered the one with specific information store it in the cache and return.
-        var self = this;
+        
         var results = [];
         [].forEach.call(parentNode.childNodes, function (node) {
             var element = KmlElementsFactory.kmlObject(node);
             if (element) {
-                self.cache.add(self.cacheKey(parentNode), self.cacheKey(node), element);
                 results.push(element);
             }
         });
         return results;
-    };
-
-    KmlElementsFactory.prototype.cacheKey = function(node) {
-        var idAttribute = new Attribute(node, "id");
-        if (!idAttribute.exists()) {
-            idAttribute.save(WWUtil.guid());
-        }
-        return node.nodeName + "#" + idAttribute.value();
     };
 
     var applicationWide = new KmlElementsFactory();
@@ -125,16 +96,6 @@ define([
     KmlElementsFactory.boolean = function (node) {
         return WWUtil.transformToBoolean(getTextOfNode(node));
     };
-    // End of primitive transformers
-
-    KmlElementsFactory.kmlObject = function (node) {
-        var nameOfElement = node.nodeName;
-        var constructor = KmlElements.getKey(nameOfElement);
-        if (!constructor) {
-            return null;
-        }
-        return new constructor({objectNode: node});
-    };
 
     function getTextOfNode(node) {
         var result;
@@ -145,6 +106,16 @@ define([
         }
         return result;
     }
+    // End of primitive transformers
+
+    KmlElementsFactory.kmlObject = function (node) {
+        var nameOfElement = node.nodeName;
+        var constructor = KmlElements.getKey(nameOfElement);
+        if (!constructor) {
+            return null;
+        }
+        return new constructor({objectNode: node});
+    };
 
     return KmlElementsFactory;
 });
