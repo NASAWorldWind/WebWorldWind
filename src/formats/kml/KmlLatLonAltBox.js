@@ -27,7 +27,7 @@ define([
         KmlObject.call(this, options);
     };
 
-    KmlLatLonAltBox.prototype = Object.create(KmlObject);
+    KmlLatLonAltBox.prototype = Object.create(KmlObject.prototype);
 
     Object.defineProperties(KmlLatLonAltBox.prototype, {
         /**

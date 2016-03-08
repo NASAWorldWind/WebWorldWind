@@ -71,7 +71,7 @@ define([
     /**
      * @inheritDoc
      */
-    KmlGeometry.prototype.getTagNames = function () {
+    KmlGeometry.prototype.getTagNames = KmlGeometry.getTagNames = function () {
         return ['Point', 'LinearRing', 'LineString', 'MultiGeometry', 'Polygon'];
     };
 

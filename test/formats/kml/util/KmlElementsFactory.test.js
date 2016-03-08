@@ -7,12 +7,18 @@ require({
 }, [
     'test/CatchTest',
     'src/formats/kml/util/KmlElementsFactory',
+    'src/formats/kml/geom/KmlGeometry',
     'src/formats/kml/geom/KmlLineString',
+    'src/formats/kml/geom/KmlMultiGeometry',
+    'src/formats/kml/geom/KmlPoint',
     'src/util/XmlDocument'
 ], function (
     CatchTest,
     KmlElementsFactory,
+    KmlGeometry,
     KmlLineString,
+    KmlMultiGeometry,
+    KmlPoint,
     XmlDocument
 ) {
     "use strict";
@@ -27,6 +33,11 @@ require({
         "       <extrude>0</extrude>" +
         "   </LineString>" +
         "</MultiGeometry>" +
+        "<Placemark id=\"11\">" +
+        "   <Point id=\"13\">" +
+        "       <extrude>0</extrude>" +
+        "   </Point>" +
+        "</Placemark>" +
         "<Icon id=\"10\">" +
         "   <x>10</x>" +
         "</Icon>" +
@@ -60,22 +71,34 @@ require({
 
         testCreationOfSinglePrimitive: CatchTest(function () {
             var currentLineString = new KmlLineString({objectNode: document.getElementById("8")});
-            // style needs to be moved elsewhere. Probably StyleResolver?
             var retrievedValue = factory.specific(currentLineString, {name: 'coordinates', transformer: KmlElementsFactory.string});
 
             assertEquals("10,10,0 20,10,0", retrievedValue);
         }),
 
         testCreationOfSingleNonPrimitive: CatchTest(function(){
+            var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("7")});
+            var retrievedValue = factory.specific(
+                currentMultiGeometry, {name: 'LineString', transformer: KmlElementsFactory.kmlObject}
+            );
 
+            assertTrue(retrievedValue instanceof KmlLineString);
         }),
 
-        testAttributeRetrieval: CatchTest(function(){
+        testCreationOfAnyTypeOfElement: CatchTest(function(){
+            var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("11")});
+            var createdElement = factory.any(currentMultiGeometry, {name: KmlGeometry.getTagNames()});
 
+            assertTrue(createdElement instanceof KmlPoint);
         }),
 
         testCreationOfAllElementsInLayer: CatchTest(function(){
+            var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("7")});
+            var createdElements = factory.all(currentMultiGeometry);
 
+            assertEquals(2, createdElements.length);
+            assertTrue(createdElements[0] instanceof KmlLineString);
+            assertTrue(createdElements[1] instanceof KmlLineString);
         })
     })
 });

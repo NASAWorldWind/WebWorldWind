@@ -27,7 +27,7 @@ define([
     // There are two different things one of them are primitive values
     // Second thing are elements.
     /**
-     * 
+     *
      * @param element {KmlObject}
      * @param options {Object}
      * @param options.name {String} Name of the element to retrieve from the element
@@ -40,14 +40,14 @@ define([
         // parentNode, which brings second level of cache, where you can retrieve the correct value by the type.
         var parentNode = element.node;
         var child = this.fromCache(parentNode, options.name);
-        if(child) {
+        if (child) {
             return child;
         }
 
         // Go through children and if encountered the one with specific information store it in the cache and return.
         var result = null;
-        [].forEach.call(parentNode.childNodes, function(node){
-            if(node.nodeName == options.name) {
+        [].forEach.call(parentNode.childNodes, function (node) {
+            if (node.nodeName == options.name) {
                 result = options.transformer(node);
             }
         });
@@ -58,13 +58,42 @@ define([
      *
      * @param element
      * @param options
+     * @param options.name {String[]} All names which are accepted to return.
      */
-    KmlElementsFactory.prototype.all = function (element, options) {
-
+    KmlElementsFactory.prototype.any = function (element, options) {
+        var parentNode = element.node;
+        var result = null;
+        [].forEach.call(parentNode.childNodes, function (node) {
+            if (options.name.indexOf(node.nodeName) != -1) {
+                result = KmlElementsFactory.kmlObject(node);
+            }
+        });
+        return result;
     };
 
+    /**
+     * It returns all children, which it is possible to map on the KmlObject.
+     * @param element Element whose children we want to retrieve.
+     */
+    KmlElementsFactory.prototype.all = function (element) {
+        var parentNode = element.node;
+        var children = this.cache.level(parentNode.nodeName + "#" + new Attribute(parentNode, "id").value());
+        if (children) {
+            return children;
+        }
 
-    KmlElementsFactory.prototype.fromCache = function(node, name) {
+        // Go through children and if encountered the one with specific information store it in the cache and return.
+        var results = [];
+        [].forEach.call(parentNode.childNodes, function (node) {
+            var element = KmlElementsFactory.kmlObject(node);
+            if (element) {
+                results.push(element);
+            }
+        });
+        return results;
+    };
+
+    KmlElementsFactory.prototype.fromCache = function (node, name) {
         var idAttribute = new Attribute(node, "id");
         if (!idAttribute.exists()) {
             idAttribute.save(WWUtil.guid());
@@ -79,26 +108,29 @@ define([
     };
 
     // Primitives
-    KmlElementsFactory.string = function(node) {
+    KmlElementsFactory.string = function (node) {
         return String(getTextOfNode(node));
     };
 
-    KmlElementsFactory.number = function(node) {
+    KmlElementsFactory.number = function (node) {
         return Number(getTextOfNode(node));
     };
 
-    KmlElementsFactory.boolean = function(node) {
+    KmlElementsFactory.boolean = function (node) {
         return WWUtil.transformToBoolean(getTextOfNode(node));
     };
     // End of primitive transformers
 
-    KmlElementsFactory.kmlObject = function(node) {
+    KmlElementsFactory.kmlObject = function (node) {
         var nameOfElement = node.nodeName;
         var constructor = KmlElements.getKey(nameOfElement);
+        if (!constructor) {
+            return null;
+        }
         return new constructor({objectNode: node});
     };
 
-    function getTextOfNode(node){
+    function getTextOfNode(node) {
         var result;
         if (node != null && node.childNodes[0]) {
             result = node.childNodes[0].nodeValue;
