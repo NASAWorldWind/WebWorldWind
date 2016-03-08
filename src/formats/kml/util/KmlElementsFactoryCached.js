@@ -16,7 +16,8 @@ define([
     "use strict";
 
     /**
-     *
+     * More complex factory, which retrieves the values from cache and in case the value isn't present there it
+     * stores the value in cache.
      * @constructor
      */
     var KmlElementsFactoryCached = function() {
@@ -24,6 +25,12 @@ define([
         this.cache = new TreeKeyValueCache();
     };
 
+    /**
+     * It adds caching functionality on top of the KmlElementsFactory all method.
+     * @param element {KmlObject} Element whose children are considered
+     * @returns {KmlObject[]} All objects among the elements children
+     * @see KmlElementsFactory.prototype.all
+     */
     KmlElementsFactoryCached.prototype.all = function(element){
         var parentNode = element.node;
         var children = this.cache.level(this.cacheKey(element.node));
@@ -46,6 +53,16 @@ define([
         return elements;
     };
 
+    /**
+     * It adds caching functionality on top of the KmlElementsFactory specific method.
+     * @param element {KmlObject} Element whose children are considered
+     * @param options {Object}
+     * @param options.name {String} Name of the element to retrieve from the element
+     * @param options.transformer {Function} Function returning correct value. It accepts the node and returns value.
+     *  This mechanism can be used for the attributes as well.
+     * @returns Relevant value.
+     * @see KmlElementsFactory.prototype.specific
+     */
     KmlElementsFactoryCached.prototype.specific = function(element, options){
         var parentNode = element.node;
         var child = this.cache.value(this.cacheKey(parentNode), options.name);
@@ -59,6 +76,14 @@ define([
         return result;
     };
 
+    /**
+     * It adds caching functionality on top of the KmlElementsFactory any method.
+     * @param element {KmlObject} Element whose children are considered
+     * @param options {Object}
+     * @param options.name {String[]} Array of the names among which should be the one we are looking for.
+     * @returns {KmlObject|null} KmlObject if there is one with the passed in name.
+     * @see KmlElementsFactory.prototype.any
+     */
     KmlElementsFactoryCached.prototype.any = function(element, options){
         var parentNode = element.node;
 
@@ -81,6 +106,12 @@ define([
         return result;
     };
 
+    /**
+     * It creates cache key based on the node. In case the node doesn't have any id, it also creates id for this
+     * element. This id is used for storing the value in the cache.
+     * @param node {Node} Node for which generate the key.
+     * @returns {String} Value representing the key.
+     */
     KmlElementsFactoryCached.prototype.cacheKey = function(node) {
         var idAttribute = new Attribute(node, "id");
         if (!idAttribute.exists()) {
@@ -90,6 +121,10 @@ define([
     };
 
     var applicationWide = new KmlElementsFactoryCached();
+    /**
+     * It returns application wide instance of the factory.
+     * @returns {KmlElementsFactoryCached} Singleton instance of factory for Application.
+     */
     KmlElementsFactoryCached.applicationWide = function(){
         return applicationWide;
     };
