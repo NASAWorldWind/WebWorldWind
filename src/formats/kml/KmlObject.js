@@ -9,6 +9,7 @@ define([
     '../../error/ArgumentError',
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactoryCached',
     '../../util/Logger',
     '../../util/Promise',
     '../../render/Renderable',
@@ -16,6 +17,7 @@ define([
 ], function (ArgumentError,
              extend,
              KmlElements,
+             KmlElementsFactoryCached,
              Logger,
              Promise,
              Renderable,
@@ -47,6 +49,7 @@ define([
         }
         this._node = options.objectNode;
         this._cache = {};
+        this._factory = new KmlElementsFactoryCached();
 
         this._controls = options.controls || [];
 

@@ -46,10 +46,12 @@ define([
 
         var elements = this.internalFactory.all(element);
 
-        var self = this;
-        elements.forEach(function(element){
-            self.cache.add(self.cacheKey(parentNode), self.cacheKey(element.node), element);
-        });
+        if(elements && elements.length) {
+            var self = this;
+            elements.forEach(function (element) {
+                self.cache.add(self.cacheKey(parentNode), self.cacheKey(element.node), element);
+            });
+        }
         return elements;
     };
 
@@ -71,8 +73,11 @@ define([
         }
 
         var result = this.internalFactory.specific(element, options);
-        
-        this.cache.add(this.cacheKey(parentNode), this.cacheKey(result.node), result);
+        if(result && result.node) {
+            this.cache.add(this.cacheKey(parentNode), this.cacheKey(result.node), result);
+        } else if(result) {
+            this.cache.add(this.cacheKey(parentNode), options.name, result);
+        }
         return result;
     };
 
@@ -102,7 +107,9 @@ define([
 
         var result = this.internalFactory.any(element, options);
 
-        this.cache.add(self.cacheKey(parentNode), self.cacheKey(result.node), result);
+        if(result) {
+            this.cache.add(self.cacheKey(parentNode), self.cacheKey(result.node), result);
+        }
         return result;
     };
 
