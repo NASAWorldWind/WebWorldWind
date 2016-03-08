@@ -32,7 +32,6 @@ define([
          * {@link KmlFile}. KmlLineString represents one line string.
          * @param options {Object}
          * @param options.objectNode {Node} Node representing LineString.
-         * @param options.style {Promise} Promise of style to be applied to current geometry
          * @constructor
          * @alias KmlLineString
          * @classdesc Class representing LineString element of KmlFile
@@ -42,11 +41,7 @@ define([
         var KmlLineString = function (options) {
             KmlGeometry.call(this, options);
 
-            var self = this;
-            options.style.then(function(styles){
-                self.createPath(styles);
-            });
-            this._style = options.style;
+            this._style = null;
         };
 
         KmlLineString.prototype = Object.create(KmlGeometry.prototype);

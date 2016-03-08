@@ -93,11 +93,18 @@ define([
      * @returns {Node} Retrieved node or null, if none such node is found.
      */
     KmlObject.prototype.retrieveNode = function (options) {
+        var currentCache = this.getCache();
         var nodes = this.retrieveNodes(options);
         if (nodes.length == 0) {
             return null;
         } else {
             return nodes[0];
+        }
+    };
+
+    KmlObject.prototype.getCache = function() {
+        if(!this.nodeCache){
+
         }
     };
 
@@ -191,9 +198,6 @@ define([
     KmlObject.prototype.parse = function (options) {
         // Implement internal cache.
         var self = this;
-        if (!self._cache) {
-            self._cache = {};
-        }
         var node = options && options.node || self.node;
         var shapes = [];
         [].forEach.call(node.childNodes, function (childNode) {
@@ -277,6 +281,8 @@ define([
      * @returns {KmlObject|null}
      */
     KmlObject.prototype.createChildElement = function (options) {
+        // TODO: By default cache the retrieved objects. Somehow cleanse this part.
+
         var node = this.retrieveNode(options);
         if (node == null) {
             return null;
