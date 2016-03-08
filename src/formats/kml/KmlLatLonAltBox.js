@@ -5,9 +5,11 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlObject'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlObject) {
     "use strict";
 
@@ -38,7 +40,7 @@ define([
          */
         kmlNorth: {
             get: function () {
-                return this.retrieve({name: 'north', transformer: Number});
+                return this._factory.specific(this, {name: 'north', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -50,7 +52,7 @@ define([
          */
         kmlSouth: {
             get: function () {
-                return this.retrieve({name: 'south', transformer: Number});
+                return this._factory.specific(this, {name: 'south', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -62,7 +64,7 @@ define([
          */
         kmlEast: {
             get: function () {
-                return this.retrieve({name: 'east', transformer: Number});
+                return this._factory.specific(this, {name: 'east', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -74,7 +76,7 @@ define([
          */
         kmlWest: {
             get: function () {
-                return this.retrieve({name: 'west', transformer: Number});
+                return this._factory.specific(this, {name: 'west', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -86,7 +88,7 @@ define([
          */
         kmlMinAltitude: {
             get: function () {
-                return this.retrieve({name: 'minAltitude'});
+                return this._factory.specific(this, {name: 'minAltitude', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -98,7 +100,7 @@ define([
          */
         kmlMaxAltitude: {
             get: function () {
-                return this.retrieve({name: 'maxAltitude'});
+                return this._factory.specific(this, {name: 'maxAltitude', transformer: KmlElementsFactory.number});
             }
         }
     });

@@ -5,9 +5,11 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlObject'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlObject) {
     "use strict";
 
@@ -44,7 +46,7 @@ define([
          */
         kmlMinLodPixels: {
             get: function () {
-                return this.retrieve({name: 'minLodPixels', transformer: Number});
+                return this._factory.specific(this, {name: 'minLodPixels', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -57,7 +59,7 @@ define([
          */
         kmlMaxLodPixels: {
             get: function () {
-                return this.retrieve({name: 'maxLodPixels', transformer: Number});
+                return this._factory.specific(this, {name: 'maxLodPixels', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -70,7 +72,7 @@ define([
          */
         kmlMinFadeExtent: {
             get: function () {
-                return this.retrieve({name: 'minFadeExtent', transformer: Number});
+                return this._factory.specific(this, {name: 'minFadeExtent', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -83,7 +85,7 @@ define([
          */
         kmlMaxFadeExtent: {
             get: function () {
-                return this.retrieve({name: 'maxFadeExtent', transformer: Number});
+                return this._factory.specific(this, {name: 'maxFadeExtent', transformer: KmlElementsFactory.number});
             }
         }
     });

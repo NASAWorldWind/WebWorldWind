@@ -5,9 +5,11 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlObject'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlObject) {
     "use strict";
 
@@ -39,7 +41,7 @@ define([
          */
         kmlHeading: {
             get: function () {
-                return this.retrieve({name: 'heading', transformer: Number});
+                return this._factory.specific(this, {name: 'heading', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -52,7 +54,7 @@ define([
          */
         kmlTilt: {
             get: function () {
-                return this.retrieve({name: 'tilt', transformer: Number});
+                return this._factory.specific(this, {name: 'tilt', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -65,7 +67,7 @@ define([
          */
         kmlRoll: {
             get: function () {
-                return this.retrieve({name: 'roll', transformer: Number});
+                return this._factory.specific(this, {name: 'roll', transformer: KmlElementsFactory.number});
             }
         }
     });

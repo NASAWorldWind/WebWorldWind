@@ -115,6 +115,15 @@ define([
     };
 
     /**
+     * Transform node to the date
+     * @param node {Node} Node to transform
+     * @returns {Date} Date representing current node. 
+     */
+    KmlElementsFactory.date = function(node) {
+        return WWUtil.date(getTextOfNode(node));
+    };
+
+    /**
      * This function retrieves the current value for node.
      * @param node {Node} Node for which we want to retrieve the value.
      * @returns {String} Text value of the node.

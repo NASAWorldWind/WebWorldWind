@@ -4,10 +4,12 @@
  */
 define([
     '../../util/extend',
+    './util/KmlElementsFactory',
     './KmlLink',
     './KmlElements'
 ], function (
     extend,
+    KmlElementsFactory,
     KmlLink,
     KmlElements
 ) {
@@ -39,7 +41,7 @@ define([
          */
         kmlX: {
             get: function(){
-                return this.retrieve({name: 'gx:x', transformer: Number});
+                return this._factory.specific(this, {name: 'gx:x', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -51,7 +53,7 @@ define([
          */
         kmlY: {
             get: function() {
-                return this.retrieve({name: 'gx:y', transformer: Number});
+                return this._factory.specific(this, {name: 'gx:y', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -63,7 +65,7 @@ define([
          */
         kmlW: {
             get: function() {
-                return this.retrieve({name: 'gx:w'});
+                return this._factory.specific(this, {name: 'gx:w', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -75,7 +77,7 @@ define([
          */
         kmlH: {
             get: function() {
-                return this.retrieve({name: 'gx:h'});
+                return this._factory.specific(this, {name: 'gx:h', transformer: KmlElementsFactory.number});
             }
         }
     });

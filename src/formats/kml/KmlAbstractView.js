@@ -42,7 +42,7 @@ define([
          */
         kmlTimePrimitive: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlTimePrimitive.prototype.getTagNames()
                 });
             }

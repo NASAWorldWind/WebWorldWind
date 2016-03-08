@@ -5,9 +5,11 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlObject'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlObject) {
     "use strict";
 
@@ -43,7 +45,7 @@ define([
          */
         kmlCoordinates: {
             get: function () {
-                return this.retrieve({name: 'coordinates'});
+                return this._factory.specific(this, {name: 'coordinates', transformer: KmlElementsFactory.string});
             }
         }
     });

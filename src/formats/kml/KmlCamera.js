@@ -55,7 +55,7 @@ define([
          */
         kmlLatitude: {
             get: function () {
-                return this.retrieve({name: 'latitude'});
+                return this._factory.specific(this, {name: 'latitude', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -68,7 +68,7 @@ define([
          */
         kmlAltitude: {
             get: function () {
-                return this.retrieve({name: 'altitude'});
+                return this._factory.specific(this, {name: 'altitude', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -81,7 +81,7 @@ define([
          */
         kmlHeading: {
             get: function () {
-                return this.retrieve({name: 'heading'});
+                return this._factory.specific(this, {name: 'heading', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -97,7 +97,7 @@ define([
          */
         kmlTilt: {
             get: function () {
-                return this.retrieve({name: 'tilt'});
+                return this._factory.specific(this, {name: 'tilt', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -109,7 +109,7 @@ define([
          */
         kmlRoll: {
             get: function () {
-                return this.retrieve({name: 'roll'});
+                return this._factory.specific(this, {name: 'roll', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -129,7 +129,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function () {
-                return this.retrieve({name: 'altitudeMode'});
+                return this._factory.specific(this, {name: 'altitudeMode', transformer: KmlElementsFactory.string});
             }
         }
     });

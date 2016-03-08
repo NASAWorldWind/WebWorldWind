@@ -5,10 +5,12 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlObject'
 ], function (
     extend,
     KmlElements,
+    KmlElementsFactory,
     KmlObject
 ) {
     "use strict";
@@ -40,7 +42,7 @@ define([
          */
         kmlLongitude: {
             get: function() {
-                return this.retrieve({name: 'longitude'});
+                return this._factory.specific(this, {name: 'longitude', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -52,7 +54,7 @@ define([
          */
         kmlLatitude: {
             get: function() {
-                return this.retrieve({name: 'latitude'});
+                return this._factory.specific(this, {name: 'latitude', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -64,7 +66,7 @@ define([
          */
         kmlAltitude: {
             get: function() {
-                return this.retrieve({name: 'altitude'});
+                return this._factory.specific(this, {name: 'altitude', transformer: KmlElementsFactory.string});
             }
         }
     });

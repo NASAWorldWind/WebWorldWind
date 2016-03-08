@@ -5,9 +5,11 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlObject'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlObject) {
     "use strict";
 
@@ -43,7 +45,7 @@ define([
          */
         kmlHref: {
             get: function () {
-                return this.retrieve({name: 'href'});
+                return this._factory.specific(this, {name: 'href', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -62,7 +64,7 @@ define([
          */
         kmlRefreshMode: {
             get: function () {
-                return this.retrieve({name: 'refreshMode'});
+                return this._factory.specific(this, {name: 'refreshMode', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -74,7 +76,7 @@ define([
          */
         kmlRefreshInterval: {
             get: function () {
-                return this.retrieve({name: 'refreshInterval', transformer: Number});
+                return this._factory.specific(this, {name: 'refreshInterval', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -92,7 +94,7 @@ define([
          */
         kmlViewRefreshMode: {
             get: function () {
-                return this.retrieve({name: 'viewRefreshMode'});
+                return this._factory.specific(this, {name: 'viewRefreshMode', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -105,7 +107,7 @@ define([
          */
         kmlViewRefreshTime: {
             get: function () {
-                return this.retrieve({name: 'viewRefreshTime', transformer: Number});
+                return this._factory.specific(this, {name: 'viewRefreshTime', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -119,7 +121,7 @@ define([
          */
         kmlViewBoundScale: {
             get: function () {
-                return this.retrieve({name: 'viewBoundScale', transformer: Number});
+                return this._factory.specific(this, {name: 'viewBoundScale', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -150,7 +152,7 @@ define([
          */
         kmlViewFormat: {
             get: function () {
-                return this.retrieve({name: 'viewFormat'});
+                return this._factory.specific(this, {name: 'viewFormat', transformer: KmlElementsFactory.string});
             }
         },
 
@@ -169,7 +171,7 @@ define([
          */
         kmlHttpQuery: {
             get: function () {
-                return this.retrieve({name: 'httpQuery'});
+                return this._factory.specific(this, {name: 'httpQuery', transformer: KmlElementsFactory.string});
             }
         }
     });

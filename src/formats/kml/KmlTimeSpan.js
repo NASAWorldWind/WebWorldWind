@@ -9,11 +9,13 @@ define([
     '../../util/extend',
     './KmlTimePrimitive',
     './KmlElements',
+    './util/KmlElementsFactory',
     '../../util/WWUtil'
 ], function(
     extend,
     KmlTimePrimitive,
     KmlElements,
+    KmlElementsFactory,
     WWUtil
 ){
     "use strict";

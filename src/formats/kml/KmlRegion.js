@@ -5,11 +5,13 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlLatLonAltBox',
     './KmlLod',
     './KmlObject'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlLatLonAltBox,
              KmlLod,
              KmlObject) {
@@ -42,9 +44,7 @@ define([
          */
         kmlLatLonAltBox: {
             get: function () {
-                return this.createChildElement({
-                    name: KmlLatLonAltBox.prototype.getTagNames()
-                });
+                return this._factory.specific(this, {name: KmlLatLonAltBox.prototype.getTagNames(), transformer: KmlElementsFactory.kmlObject});
             }
         },
 
@@ -59,9 +59,7 @@ define([
          */
         kmlLod: {
             get: function () {
-                return this.createChildElement({
-                    name: KmlLod.prototype.getTagNames()
-                });
+                return this._factory.specific(this, {name: KmlLod.prototype.getTagNames(), transformer: KmlElementsFactory.kmlObject});
             }
         }
     });

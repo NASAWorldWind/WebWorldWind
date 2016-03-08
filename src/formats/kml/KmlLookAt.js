@@ -5,10 +5,12 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlAbstractView',
     '../../geom/Position'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlAbstractView,
              Position
 ) {
@@ -43,7 +45,7 @@ define([
          */
         kmlLongitude: {
             get: function () {
-                return this.retrieve({name: 'longitude', transformer: Number});
+                return this._factory.specific(this, {name: 'longitude', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -56,7 +58,7 @@ define([
          */
         kmlLatitude: {
             get: function () {
-                return this.retrieve({name: 'latitude', transformer: Number});
+                return this._factory.specific(this, {name: 'latitude', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -68,7 +70,7 @@ define([
          */
         kmlAltitude: {
             get: function () {
-                return this.retrieve({name: 'altitude', transformer: Number});
+                return this._factory.specific(this, {name: 'altitude', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -81,7 +83,7 @@ define([
          */
         kmlHeading: {
             get: function () {
-                return this.retrieve({name: 'heading', transformer: Number});
+                return this._factory.specific(this, {name: 'heading', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -96,7 +98,7 @@ define([
          */
         kmlTilt: {
             get: function () {
-                return this.retrieve({name: 'tilt', transformer: Number});
+                return this._factory.specific(this, {name: 'tilt', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -109,7 +111,7 @@ define([
          */
         kmlRange: {
             get: function () {
-                return this.retrieve({name: 'range', transformer: Number});
+                return this._factory.specific(this, {name: 'range', transformer: KmlElementsFactory.number});
             }
         },
 
@@ -124,7 +126,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function () {
-                return this.retrieve({name: 'altitudeMode'});
+                return this._factory.specific(this, {name: 'altitudeMode', transformer: KmlElementsFactory.string});
             }
         }
     });
