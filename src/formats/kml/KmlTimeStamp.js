@@ -8,10 +8,12 @@
 define([
     '../../util/extend',
     './KmlElements',
+    './util/KmlElementsFactory',
     './KmlTimePrimitive',
     '../../util/WWUtil'
 ], function (extend,
              KmlElements,
+             KmlElementsFactory,
              KmlTimePrimitive,
              WWUtil) {
     "use strict";
@@ -45,7 +47,7 @@ define([
          */
         kmlWhen: {
             get: function () {
-                return this.retrieve({name: 'when', transformer: WWUtil.date});
+                return this._factory.specific(this, {name: 'when', transformer: KmlElementsFactory.date});
             }
         }
     });

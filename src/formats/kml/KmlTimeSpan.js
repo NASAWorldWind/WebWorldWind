@@ -49,7 +49,7 @@ define([
          */
         kmlBegin: {
             get: function() {
-                return this.retrieve({name: 'begin', transformer: WWUtil.date});
+                return this._factory.specific(this, {name: 'begin', transformer: KmlElementsFactory.date});
             }
         },
 
@@ -61,7 +61,7 @@ define([
          */
         kmlEnd: {
             get: function() {
-                return this.retrieve({name: 'end', transformer: WWUtil.date});
+                return this._factory.specific(this, {name: 'end', transformer: KmlElementsFactory.date});
             }
         }
     });
