@@ -60,7 +60,7 @@ define([
                 if (typeof Math.cbrt == 'function') {
                     return Math.cbrt(x);
                 } else {
-                    return Math.pow(x, 1/3);
+                    return Math.pow(x, 1 / 3);
                 }
             },
 
@@ -772,17 +772,13 @@ define([
             },
 
             /**
-             * Calculates the next highest power of two for a given value.
-             * @param {Number} value The value.
-             * @returns {Number} The next highest power of two if the value is a non pow of two, otherwise returns
-             * the same value.
+             * Returns the value that is the nearest power of 2 less than or equal to the given value.
+             * @param {Number} value the reference value. The power of 2 returned is less than or equal to this value.
+             * @returns {Number} the value that is the nearest power of 2 less than or equal to the reference value
              */
-            nextHighestPowerOfTwo: function (value){
-                --value;
-                for (var i = 1; i < 32; i <<= 1) {
-                    value = value | value >> i;
-                }
-                return value + 1;
+            powerOfTwoFloor: function (value) {
+                var power = Math.floor(Math.log(value) / Math.log(2));
+                return Math.pow(2, power);
             }
         };
 

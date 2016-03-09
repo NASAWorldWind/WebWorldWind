@@ -609,7 +609,8 @@ define([
 
             var textureBound, vboId,
                 gl = dc.currentGlContext,
-                program = dc.currentProgram;
+                program = dc.currentProgram,
+                wrapMode;
 
             if (material.textures.diffuse) {
                 var imageKey = material.textures.diffuse.mapId;
@@ -622,7 +623,8 @@ define([
 
             buffers.activeTexture = dc.gpuResourceCache.resourceForKey(this.dirPath + image + "");
             if (!buffers.activeTexture) {
-                buffers.activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", buffers.isClamp);
+                wrapMode = buffers.isClamp ? gl.CLAMP_TO_EDGE : gl.REPEAT;
+                buffers.activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", wrapMode);
             }
 
             textureBound = buffers.activeTexture && buffers.activeTexture.bind(dc);

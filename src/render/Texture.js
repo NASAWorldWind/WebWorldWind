@@ -23,10 +23,10 @@ define([
          * @classdesc Represents a WebGL texture. Applications typically do not interact with this class.
          * @param {WebGLRenderingContext} gl The current WebGL rendering context.
          * @param {Image} image The texture's image.
-         * @param {Boolean} isClamp Indicates the texture's wrap method.
+         * @param {GL.enum} wrapMode Optional. Specifies the wrap mode of the texture. Defaults to gl.CLAMP_TO_EDGE
          * @throws {ArgumentError} If the specified WebGL context or image is null or undefined.
          */
-        var Texture = function (gl, image, isClamp) {
+        var Texture = function (gl, image, wrapMode) {
 
             if (!gl) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Texture", "constructor",
@@ -38,13 +38,17 @@ define([
                     "missingImage"));
             }
 
+            if (!wrapMode) {
+                wrapMode = gl.CLAMP_TO_EDGE;
+            }
+
             var textureId = gl.createTexture(),
                 isPowerOfTwo = (WWMath.isPowerOfTwo(image.width) && WWMath.isPowerOfTwo(image.height));
 
             this.originalImageWidth = image.width;
             this.originalImageHeight = image.height;
 
-            if (isClamp === false && !isPowerOfTwo) {
+            if (wrapMode === gl.REPEAT && !isPowerOfTwo) {
                 image = this.resizeImage(image);
                 isPowerOfTwo = true;
             }
@@ -59,10 +63,8 @@ define([
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER,
                 gl.LINEAR);
 
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S,
-                isClamp === false ? gl.REPEAT : gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T,
-                isClamp === false ? gl.REPEAT : gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMode);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapMode);
 
             // Setup 4x anisotropic texture filtering when this feature is available.
             // https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotropic
@@ -116,8 +118,8 @@ define([
          */
         Texture.prototype.resizeImage = function (image) {
             var canvas = document.createElement("canvas");
-            canvas.width = WWMath.nextHighestPowerOfTwo(image.width);
-            canvas.height = WWMath.nextHighestPowerOfTwo(image.height);
+            canvas.width = WWMath.powerOfTwoFloor(image.width);
+            canvas.height = WWMath.powerOfTwoFloor(image.height);
             var ctx = canvas.getContext("2d");
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
             return canvas;
