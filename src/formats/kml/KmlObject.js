@@ -7,6 +7,7 @@
  */
 define([
     '../../error/ArgumentError',
+    './util/Attribute',
     './KmlElements',
     './util/KmlElementsFactoryCached',
     '../../util/Logger',
@@ -14,6 +15,7 @@ define([
     '../../render/Renderable',
     '../../util/WWUtil'
 ], function (ArgumentError,
+             Attribute,
              KmlElements,
              KmlElementsFactoryCached,
              Logger,
@@ -66,10 +68,7 @@ define([
          */
         id: {
             get: function () {
-                return this.retrieve({
-                    name: 'id',
-                    isAttribute: true
-                });
+                return new Attribute(this.node, "id").value();
             }
         },
 
@@ -86,241 +85,6 @@ define([
             }
         }
     });
-
-    /**
-     * It returns last node found with given name. It accepts array of possible node names
-     * for the node.
-     * @param options {Object} name: ['name', 'name2']
-     * @returns {Node} Retrieved node or null, if none such node is found.
-     */
-    KmlObject.prototype.retrieveNode = function (options) {
-        var currentCache = this.getCache();
-        var nodes = this.retrieveNodes(options);
-        if (nodes.length == 0) {
-            return null;
-        } else {
-            return nodes[0];
-        }
-    };
-
-    KmlObject.prototype.getCache = function() {
-        if(!this.nodeCache){
-
-        }
-    };
-
-    /**
-     * It allows retrieval of attributes from any child node. If kml node contains another node, where the values
-     * are given as attributes, this is way to go. It can retrieve the node and find the correct attribute on it.
-     * @param options {Object}
-     * @param options.name {String} Name of the node to retrieve.
-     * @param options.attributeName {String} Name of the attribute to retrieve from given Node
-     * @returns {String | null} Either found value or null if such value doesn't exist.
-     */
-    KmlObject.prototype.retrieveAttribute = function (options) {
-        if (!options.name || !options.attributeName) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "retrieveAttribute", "name and attributeName" +
-                    " must be specified. Name: " + options.name + " Attribute Name: " + options.attributeName)
-            );
-        }
-        var validNode = this.retrieveNode(options);
-        if (this.doesAttributeExist(validNode, options.attributeName)) {
-            return this.getValueOfAttribute(validNode, options.attributeName);
-        }
-        return null;
-    };
-
-    // Intentionally undocumented. Internal use only.
-    KmlObject.prototype.doesAttributeExist = function (node, attribute) {
-        return node.attributes && node.attributes && node.attributes.getNamedItem(attribute) &&
-            node.attributes.getNamedItem(attribute).value;
-    };
-
-    // Intentionally undocumented. Internal use only.
-    KmlObject.prototype.getValueOfAttribute = function (node, attributeName) {
-        return node.attributes.getNamedItem(attributeName).value;
-    };
-
-    /**
-     * It retrieves value based on the options. It support retrieving top level attribute as well as value of node.
-     * @param options {Object}
-     * @param options.isAttribute {Boolean} Whether it is attribute or Node.
-     * @param options.name {String} Name of either the Node or the attribute
-     * @returns {String} Retrieved value of either node or attribute. If the node doesn't exist return null.
-     */
-    KmlObject.prototype.retrieve = function (options) {
-        var self = this;
-        var result = null;
-        if (options.isAttribute && self.doesAttributeExist(self.node, options.name)) {
-            result = self.getValueOfAttribute(self.node, options.name);
-        } else {
-            options.name = [options.name];
-            result = self.retrieveNode(options);
-            if (result != null && result.childNodes[0]) {
-                result = result.childNodes[0].nodeValue;
-            } else if (result != null) {
-                result = "";
-            }
-        }
-
-        if (options.transformer && result != null) {
-            result = options.transformer(result);
-        }
-
-        return result;
-    };
-
-    /**
-     * It retrieves all nodes with names in the options.name
-     * @param options {Object}
-     * @param options.name {String[]} Names representing childNodes to be retrieved.
-     * @returns {Node[]} Array of nodes with given names. If there is no such node empty array is returned.
-     */
-    KmlObject.prototype.retrieveNodes = function (options) {
-        var self = this;
-        var result = [];
-        [].forEach.call(self.node.childNodes, function (node) {
-            if (options.name.indexOf(node.nodeName) != -1) {
-                result.push(node);
-            }
-        });
-
-        return result;
-    };
-
-    /**
-     * Retrieve all shapes, which are children of current node. It fails if there is some element for which there is no
-     * adequate internal representation.
-     * @param options {Object}
-     * @param options.node {Node} Node to parse.
-     * @returns {KmlObject[]} Array of retrieved shapes.
-     */
-    KmlObject.prototype.parse = function (options) {
-        // Implement internal cache.
-        var self = this;
-        var node = options && options.node || self.node;
-        var shapes = [];
-        [].forEach.call(node.childNodes, function (childNode) {
-            if (childNode.nodeType != 1) {
-                return;
-            }
-
-            self.parseOneNode(childNode, shapes);
-        });
-
-        return shapes;
-    };
-
-    /**
-     * It parses one node and create valid object based on this information.
-     * @param childNode {Node} Node which is being parsed into the element.
-     * @param shapes {KmlObject[]} Array of returned shapes it is in as well as out parameter.
-     */
-    KmlObject.prototype.parseOneNode = function (childNode, shapes) {
-        var cached = this.retrieveFromCache(childNode);
-        if (cached.element) {
-            shapes.push(cached.element);
-            return;
-        }
-
-        var self = this;
-        var style = new Promise(function (resolve) {
-            if (self.getStyle) {
-                resolve(self.getStyle());
-            } else {
-                // Maybe reject. We will see later.
-                resolve(null);
-            }
-        });
-
-        var shape = this.instantiateDescendant(childNode.nodeName, childNode, style);
-        if (!shape) {
-            return;
-        }
-        this._cache[cached.id] = shape;
-        shapes.push(shape);
-    };
-
-    /**
-     * Looks into the internal cache. If the node was already parsed it is stored in the cache associated with the
-     * current node. If the cache doesn't exist so far, create one.
-     * @param node {Node} node to be retrieved from cache.
-     * @returns {*}
-     */
-    KmlObject.prototype.retrieveFromCache = function (node) {
-        var id;
-        if (this.doesAttributeExist(node, "id")) {
-            id = this.getValueOfAttribute(node, "id");
-        } else {
-            id = WWUtil.guid();
-            var idAttr = node.ownerDocument.createAttribute("id");
-            idAttr.value = id;
-            node.setAttributeNode(idAttr);
-        }
-
-        if (this._cache[id]) {
-            return {id: id, element: this._cache[id]};
-        } else {
-            return {id: id, element: null};
-        }
-    };
-
-    /**
-     * It returns either associated shape for given element or null, if no such node exist.
-     * @param name {String} Name of the element.
-     * @returns {KmlObject|null}
-     */
-    KmlObject.prototype.retrieveElementForNode = function (name) {
-        return KmlElements.getKey(name) || null;
-    };
-
-    /**
-     * Create correct child element for node retrieve by the options.
-     * @param options {Object}
-     * @param options.name {String[]} Names of children to retrieve.
-     * @returns {KmlObject|null}
-     */
-    KmlObject.prototype.createChildElement = function (options) {
-        // TODO: By default cache the retrieved objects. Somehow cleanse this part.
-
-        var node = this.retrieveNode(options);
-        if (node == null) {
-            return null;
-        }
-
-        // Take cache into account.
-        var cached = this.retrieveFromCache(node);
-        if (cached.element) {
-            return cached.element;
-        }
-
-        var element = this.instantiateDescendant(node.nodeName, node, this.getStyle());
-        this._cache[cached.id] = element;
-        return element;
-    };
-
-    /**
-     * It finds correct element and then it retrieves
-     * @param name {String} Name of the node.
-     * @param node {Node} Node which is represented by this Kml Element
-     * @param style {Promise} Promise of the style to be delivered.
-     * @returns {KmlObject} Descendant of the KmlObject.
-     */
-    KmlObject.prototype.instantiateDescendant = function (name, node, style) {
-        var constructor = this.retrieveElementForNode(name);
-        if (constructor == null) {
-            Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "parse", "Element, which doesn't have internal " +
-                "representation. Node name: " + name);
-            return null;
-        }
-
-        return new constructor({
-            objectNode: node,
-            style: style,
-            controls: this._controls
-        });
-    };
 
     /**
      * It calls all controls associated with current KmlFile with the link to this.

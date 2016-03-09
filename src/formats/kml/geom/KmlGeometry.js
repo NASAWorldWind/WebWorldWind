@@ -6,7 +6,7 @@
  * @exports KmlGeometry
  */
 define([
-    './../KmlObject'
+    '../KmlObject'
 ], function (KmlObject) {
     "use strict";
     /**

@@ -6,11 +6,13 @@ require({
     baseUrl: '/test/'
 }, [
     'test/CatchTest',
+    'src/formats/kml/geom/KmlLinearRing',
     'src/formats/kml/geom/KmlLineString',
     'src/formats/kml/util/NodeTransformers',
     'src/util/XmlDocument'
 ], function (
     CatchTest,
+    KmlLinearRing,
     KmlLineString,
     NodeTransformers,
     XmlDocument
@@ -25,6 +27,9 @@ require({
         "   <LineString id=\"9\">" +
         "       <extrude>0</extrude>" +
         "   </LineString>" +
+        "   <LinearRing id=\"16\">" +
+        "       <coordinates>10,10,0 20,10,0</coordinates>" +
+        "   </LinearRing>" +
         "</MultiGeometry>" +
         "<Placemark id=\"11\">" +
         "   <Point id=\"13\">" +
@@ -72,6 +77,12 @@ require({
             var node = document.getElementById("8");
             var result = NodeTransformers.positions(node.childNodes[1]);
             assertEquals(result.length, 2);
+        }),
+
+        testLinearRingCorrectlyReturnsLinearRing: CatchTest(function(){
+            var node = document.getElementById("16");
+            var result = NodeTransformers.linearRing(node);
+            assertTrue(result instanceof KmlLinearRing);
         })
     })
 });

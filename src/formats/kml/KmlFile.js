@@ -99,7 +99,7 @@ define([
          */
         shapes: {
             get: function () {
-                return this.parse({node: this.node});
+                return this._factory.all(this);
             }
         }
     });

@@ -5,14 +5,13 @@
 define([
     '../../../util/Color',
     '../KmlElements',
-    '../util/KmlElementsFactory',
     './KmlGeometry',
     './KmlLinearRing',
     '../styles/KmlStyle',
     '../../../geom/Location',
+    '../util/NodeTransformers',
     '../../../shapes/Polygon',
-    '../../../shapes/ShapeAttributes',
-    '../../../util/WWUtil'
+    '../../../shapes/ShapeAttributes'
 ], function (Color,
              KmlElements,
              KmlElementsFactory,
@@ -20,9 +19,9 @@ define([
              KmlLinearRing,
              KmlStyle,
              Location,
+             NodeTransformers,
              Polygon,
-             ShapeAttributes,
-             WWUtil) {
+             ShapeAttributes) {
     "use strict";
     /**
      * Constructs an KmlPolygon. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -102,12 +101,7 @@ define([
          */
         kmlOuterBoundary: {
             get: function () {
-                // TODO: Solve the mismatch between name and type. Create KmlLinearRing Transformer.
-                var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
-                return new KmlLinearRing({
-                    objectNode: parentNode.getElementsByTagName("LinearRing")[0],
-                    style: this.getStyle()
-                });
+                this._factory.specific(this, {name: 'outerBoundaryIs', transformer: NodeTransformers.linearRing});
             }
         },
 
@@ -119,15 +113,7 @@ define([
          */
         kmlInnerBoundary: {
             get: function () {
-                // TODO: Solve the mismatch between name and type. Create KmlLinearRing Transformer.
-                var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
-                if (parentNode == null) {
-                    return null;
-                }
-                return new KmlLinearRing({
-                    objectNode: parentNode.getElementsByTagName("LinearRing")[0],
-                    style: this.getStyle()
-                });
+                this._factory.specific(this, {name: 'innerBoundaryIs', transformer: NodeTransformers.linearRing});
             }
         },
 

@@ -10,10 +10,6 @@ define([
             KmlElements,
             Position,
             WWUtil){
-    /**
-     *
-     * @constructor
-     */
     var NodeTransformers = function(){};
 
     // Primitives
@@ -78,6 +74,20 @@ define([
     NodeTransformers.kmlObject = function (node) {
         var nameOfElement = node.nodeName;
         var constructor = KmlElements.getKey(nameOfElement);
+        if (!constructor) {
+            return null;
+        }
+        return new constructor({objectNode: node});
+    };
+
+    /**
+     * It takes the node and transforms it to the LinearRing this was created to solve the mismatch between name of the
+     * element and type of the element.
+     * @param node {Node} Node to transform
+     * @returns {KmlLinearRing} Transformed Linear Ring.
+     */
+    NodeTransformers.linearRing = function(node) {
+        var constructor = KmlElements.getKey("LinearRing");
         if (!constructor) {
             return null;
         }
