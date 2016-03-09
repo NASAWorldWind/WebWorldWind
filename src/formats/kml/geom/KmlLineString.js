@@ -86,15 +86,7 @@ define([
          */
         kmlPositions: {
             get: function () {
-                var positions = [];
-                // TODO: Write transformer to position. 
-                var coordinates = this._factory.specific(this, {name: 'coordinates', transformer: NodeTransformers.string})
-                    .trim().replace(/\s+/g, ' ').split(' ');
-                coordinates.forEach(function (pCoordinates) {
-                    pCoordinates = pCoordinates.split(',');
-                    positions.push(new Position(Number(pCoordinates[1]), Number(pCoordinates[0]), Number(pCoordinates[2] || 0)));
-                });
-                return positions;
+                return this._factory.specific(this, {name: 'coordinates', transformer: NodeTransformers.positions});
             }
         },
 

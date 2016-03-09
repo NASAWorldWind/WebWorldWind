@@ -66,6 +66,12 @@ require({
             var node = document.getElementById("11");
             var result = NodeTransformers.attribute("id")(node);
             assertEquals("11", result);
+        }),
+
+        testPositionsCorrectlyRetrievesThePositions: CatchTest(function(){
+            var node = document.getElementById("8");
+            var result = NodeTransformers.positions(node.childNodes[1]);
+            assertEquals(result.length, 2);
         })
     })
 });

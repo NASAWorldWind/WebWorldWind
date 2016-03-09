@@ -4,10 +4,16 @@
 define([
     './Attribute',
     '../KmlElements',
+    '../../../geom/Position',
     '../../../util/WWUtil'
 ], function(Attribute,
             KmlElements,
+            Position,
             WWUtil){
+    /**
+     *
+     * @constructor
+     */
     var NodeTransformers = function(){};
 
     // Primitives
@@ -76,6 +82,21 @@ define([
             return null;
         }
         return new constructor({objectNode: node});
+    };
+
+    /**
+     * It takes the node and returns al positions included in it.
+     * @param node {Node} Node to transform
+     * @returns {Position[]} All included positions. Positions are separated by space.
+     */
+    NodeTransformers.positions = function(node) {
+        var positions = [];
+        var coordinates = getTextOfNode(node).trim().replace(/\s+/g, ' ').split(' ');
+        coordinates.forEach(function (pCoordinates) {
+            pCoordinates = pCoordinates.split(',');
+            positions.push(new Position(Number(pCoordinates[1]), Number(pCoordinates[0]), Number(pCoordinates[2] || 0)));
+        });
+        return positions;
     };
 
     /**
