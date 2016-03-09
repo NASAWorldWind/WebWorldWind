@@ -3,15 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
-    './util/KmlElementsFactory',
     './KmlLink',
-    './KmlElements'
+    './KmlElements',
+    './util/NodeTransformers'
 ], function (
-    extend,
-    KmlElementsFactory,
     KmlLink,
-    KmlElements
+    KmlElements,
+    NodeTransformers
 ) {
     "use strict";
     /**
@@ -41,7 +39,7 @@ define([
          */
         kmlX: {
             get: function(){
-                return this._factory.specific(this, {name: 'gx:x', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'gx:x', transformer: NodeTransformers.number});
             }
         },
 
@@ -53,7 +51,7 @@ define([
          */
         kmlY: {
             get: function() {
-                return this._factory.specific(this, {name: 'gx:y', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'gx:y', transformer: NodeTransformers.number});
             }
         },
 
@@ -65,7 +63,7 @@ define([
          */
         kmlW: {
             get: function() {
-                return this._factory.specific(this, {name: 'gx:w', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'gx:w', transformer: NodeTransformers.number});
             }
         },
 
@@ -77,7 +75,7 @@ define([
          */
         kmlH: {
             get: function() {
-                return this._factory.specific(this, {name: 'gx:h', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'gx:h', transformer: NodeTransformers.number});
             }
         }
     });

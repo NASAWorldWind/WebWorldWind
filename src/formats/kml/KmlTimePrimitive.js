@@ -6,10 +6,8 @@
  * @exports KmlTimePrimitive
  */
 define([
-    '../../util/extend',
     './KmlObject'
-], function (extend,
-             KmlObject) {
+], function (KmlObject) {
     "use strict";
     /**
      * Constructs an KmlTimePrimitive. Applications usually don't call this constructor. It is called by {@link KmlFile}

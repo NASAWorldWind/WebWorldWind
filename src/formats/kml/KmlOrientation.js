@@ -3,14 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
-    './KmlObject'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
-             KmlObject) {
+    './KmlObject',
+    './util/NodeTransformers'
+], function (KmlElements,
+             KmlObject,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -41,7 +39,7 @@ define([
          */
         kmlHeading: {
             get: function () {
-                return this._factory.specific(this, {name: 'heading', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'heading', transformer: NodeTransformers.number});
             }
         },
 
@@ -54,7 +52,7 @@ define([
          */
         kmlTilt: {
             get: function () {
-                return this._factory.specific(this, {name: 'tilt', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'tilt', transformer: NodeTransformers.number});
             }
         },
 
@@ -67,7 +65,7 @@ define([
          */
         kmlRoll: {
             get: function () {
-                return this._factory.specific(this, {name: 'roll', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'roll', transformer: NodeTransformers.number});
             }
         }
     });

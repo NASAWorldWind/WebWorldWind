@@ -6,16 +6,12 @@
  * @exports KmlTimeStamp
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
     './KmlTimePrimitive',
-    '../../util/WWUtil'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
+    './util/NodeTransformers'
+], function (KmlElements,
              KmlTimePrimitive,
-             WWUtil) {
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -47,7 +43,7 @@ define([
          */
         kmlWhen: {
             get: function () {
-                return this._factory.specific(this, {name: 'when', transformer: KmlElementsFactory.date});
+                return this._factory.specific(this, {name: 'when', transformer: NodeTransformers.date});
             }
         }
     });

@@ -3,11 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     './KmlGeometry'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlGeometry) {
     "use strict";
 

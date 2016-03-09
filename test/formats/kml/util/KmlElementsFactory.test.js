@@ -11,6 +11,7 @@ require({
     'src/formats/kml/geom/KmlLineString',
     'src/formats/kml/geom/KmlMultiGeometry',
     'src/formats/kml/geom/KmlPoint',
+    'src/formats/kml/util/NodeTransformers',
     'src/util/XmlDocument'
 ], function (
     CatchTest,
@@ -19,6 +20,7 @@ require({
     KmlLineString,
     KmlMultiGeometry,
     KmlPoint,
+    NodeTransformers,
     XmlDocument
 ) {
     "use strict";
@@ -45,33 +47,9 @@ require({
     var document = new XmlDocument(exampleDocument).dom();
 
     TestCase("KmlElementsFactory", {
-        testStringCorrectlyRetrievesTheValueOfTheNode: CatchTest(function(){
-            var node = document.getElementById("8");
-            var result = KmlElementsFactory.string(node.childNodes[1]);
-            assertEquals("10,10,0 20,10,0", result);
-        }),
-
-        testNumberCorrectlyRetrievesTheValueOfTheNode: CatchTest(function() {
-            var node = document.getElementById("10");
-            var result = KmlElementsFactory.number(node.childNodes[1]);
-            assertEquals(10, result);
-        }),
-
-        testBooleanCorrectlyRetrievesTheValueOfTheNode: CatchTest(function(){
-            var node = document.getElementById("9");
-            var result = KmlElementsFactory.boolean(node.childNodes[1]);
-            assertEquals(false, result);
-        }),
-
-        testKmlObjectRetrievesCorrectlyTheAssociatedElement: CatchTest(function(){
-            var node = document.getElementById("8");
-            var result = KmlElementsFactory.kmlObject(node);
-            assertTrue(result instanceof KmlLineString);
-        }),
-
         testCreationOfSinglePrimitive: CatchTest(function () {
             var currentLineString = new KmlLineString({objectNode: document.getElementById("8")});
-            var retrievedValue = factory.specific(currentLineString, {name: 'coordinates', transformer: KmlElementsFactory.string});
+            var retrievedValue = factory.specific(currentLineString, {name: 'coordinates', transformer: NodeTransformers.string});
 
             assertEquals("10,10,0 20,10,0", retrievedValue);
         }),
@@ -79,7 +57,7 @@ require({
         testCreationOfSingleNonPrimitive: CatchTest(function(){
             var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("7")});
             var retrievedValue = factory.specific(
-                currentMultiGeometry, {name: 'LineString', transformer: KmlElementsFactory.kmlObject}
+                currentMultiGeometry, {name: 'LineString', transformer: NodeTransformers.kmlObject}
             );
 
             assertTrue(retrievedValue instanceof KmlLineString);

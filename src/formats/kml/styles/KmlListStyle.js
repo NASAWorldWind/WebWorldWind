@@ -3,14 +3,14 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     '../util/ItemIcon',
+    '../KmlElements',
     './KmlSubStyle',
-    '../KmlElements'
-], function (extend,
-             ItemIcon,
-             KmlSubStyle,
-             KmlElements) {
+    '../util/NodeTransformers'
+], function (ItemIcon,
+             KmlElements,
+             KmlSubStyle, 
+             NodeTransformers) {
     "use strict";
     /**
      * Constructs an KmlListStyle. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -44,7 +44,7 @@ define([
          */
         kmlBgColor: {
             get: function () {
-                return this.retrieve({name: 'bgColor'});
+                return this._factory.specific(this, {name: 'bgColor', transformer: NodeTransformers.string});
             }
         },
 
@@ -65,7 +65,7 @@ define([
          */
         kmlListItemType: {
             get: function () {
-                return this.retrieve({name: 'listItemType'});
+                return this._factory.specific(this, {name: 'listItemType', transformer: NodeTransformers.string});
             }
         },
 
@@ -79,7 +79,7 @@ define([
          */
         kmlItemIcon: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: ItemIcon.prototype.getTagNames()
                 });
             }

@@ -3,13 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     '../KmlElements',
     './KmlSubStyle',
     '../util/Pair',
     '../../../util/Promise'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlSubStyle,
              Pair,
              Promise) {
@@ -46,7 +44,7 @@ define([
          */
         kmlPairs: {
             get: function () {
-                return this.parse();
+                return this._factory.all(this);
             }
         },
 

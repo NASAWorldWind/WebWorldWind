@@ -3,14 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
-    './KmlObject'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
-             KmlObject) {
+    './KmlObject',
+    './util/NodeTransformers'
+], function (KmlElements,
+             KmlObject, 
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -46,7 +44,7 @@ define([
          */
         kmlMinLodPixels: {
             get: function () {
-                return this._factory.specific(this, {name: 'minLodPixels', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'minLodPixels', transformer: NodeTransformers.number});
             }
         },
 
@@ -59,7 +57,7 @@ define([
          */
         kmlMaxLodPixels: {
             get: function () {
-                return this._factory.specific(this, {name: 'maxLodPixels', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'maxLodPixels', transformer: NodeTransformers.number});
             }
         },
 
@@ -72,7 +70,7 @@ define([
          */
         kmlMinFadeExtent: {
             get: function () {
-                return this._factory.specific(this, {name: 'minFadeExtent', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'minFadeExtent', transformer: NodeTransformers.number});
             }
         },
 
@@ -85,7 +83,7 @@ define([
          */
         kmlMaxFadeExtent: {
             get: function () {
-                return this._factory.specific(this, {name: 'maxFadeExtent', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'maxFadeExtent', transformer: NodeTransformers.number});
             }
         }
     });

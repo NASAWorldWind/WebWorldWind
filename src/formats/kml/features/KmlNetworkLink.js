@@ -3,16 +3,14 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     './KmlFeature',
     '../KmlLink',
-    '../../../util/WWUtil'
-], function (extend,
-             KmlElements,
+    '../util/NodeTransformers'
+], function (KmlElements,
              KmlFeature,
              KmlLink,
-             WWUtil) {
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -48,7 +46,7 @@ define([
          */
         kmlRefreshVisibility: {
             get: function () {
-                return this.retrieve({name: 'refreshVisibility', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'refreshVisibility', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -65,7 +63,7 @@ define([
          */
         kmlFlyToView: {
             get: function () {
-                return this.retrieve({name: 'flyToView', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'flyToView', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -77,7 +75,7 @@ define([
          */
         kmlLink: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlLink.prototype.getTagNames()
                 });
             }

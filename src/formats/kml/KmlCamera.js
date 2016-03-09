@@ -3,14 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
-    './KmlAbstractView'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
-             KmlAbstractView) {
+    './KmlAbstractView',
+    './util/NodeTransformers'
+], function (KmlElements,
+             KmlAbstractView,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -42,7 +40,7 @@ define([
          */
         kmlLongitude: {
             get: function () {
-                return this._factory.specific(this, {name: 'longitude', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'longitude', transformer: NodeTransformers.string});
             }
         },
 
@@ -55,7 +53,7 @@ define([
          */
         kmlLatitude: {
             get: function () {
-                return this._factory.specific(this, {name: 'latitude', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'latitude', transformer: NodeTransformers.string});
             }
         },
 
@@ -68,7 +66,7 @@ define([
          */
         kmlAltitude: {
             get: function () {
-                return this._factory.specific(this, {name: 'altitude', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'altitude', transformer: NodeTransformers.string});
             }
         },
 
@@ -81,7 +79,7 @@ define([
          */
         kmlHeading: {
             get: function () {
-                return this._factory.specific(this, {name: 'heading', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'heading', transformer: NodeTransformers.string});
             }
         },
 
@@ -97,7 +95,7 @@ define([
          */
         kmlTilt: {
             get: function () {
-                return this._factory.specific(this, {name: 'tilt', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'tilt', transformer: NodeTransformers.string});
             }
         },
 
@@ -109,7 +107,7 @@ define([
          */
         kmlRoll: {
             get: function () {
-                return this._factory.specific(this, {name: 'roll', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'roll', transformer: NodeTransformers.string});
             }
         },
 
@@ -129,7 +127,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function () {
-                return this._factory.specific(this, {name: 'altitudeMode', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'altitudeMode', transformer: NodeTransformers.string});
             }
         }
     });

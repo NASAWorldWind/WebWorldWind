@@ -3,10 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlObject'
-], function (extend,
-             KmlObject) {
+], function (KmlObject) {
     "use strict";
 
     /**

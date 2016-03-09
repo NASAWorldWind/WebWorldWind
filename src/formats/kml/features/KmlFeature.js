@@ -3,7 +3,6 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlObject',
     '../KmlAbstractView',
     '../KmlFile',
@@ -12,11 +11,10 @@ define([
     '../styles/KmlStyleSelector',
     '../KmlRegion',
     '../KmlTimePrimitive',
+    '../util/NodeTransformers',
     '../../../util/Promise',
-    '../util/StyleResolver',
-    '../../../util/WWUtil'
-], function (extend,
-             KmlObject,
+    '../util/StyleResolver'
+], function (KmlObject,
              KmlAbstractView,
              KmlFile,
              KmlFileCache,
@@ -24,9 +22,9 @@ define([
              KmlStyleSelector,
              KmlRegion,
              KmlTimePrimitive,
+             NodeTransformers,
              Promise,
-             StyleResolver,
-             WWUtil) {
+             StyleResolver) {
     "use strict";
     /**
      * Constructs an KmlFeature. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -61,7 +59,7 @@ define([
          */
         kmlName: {
             get: function () {
-                return this.retrieve({name: 'name'});
+                return this._factory.specific(this, {name: 'name', transformer: NodeTransformers.string});
             }
         },
 
@@ -73,7 +71,7 @@ define([
          */
         kmlVisibility: {
             get: function () {
-                return this.retrieve({name: 'visibility', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'visibility', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -86,7 +84,7 @@ define([
          */
         kmlOpen: {
             get: function () {
-                return this.retrieve({name: 'open', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'open', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -98,7 +96,7 @@ define([
          */
         kmlAddress: {
             get: function () {
-                return this.retrieve({name: 'address'});
+                return this._factory.specific(this, {name: 'address', transformer: NodeTransformers.string});
             }
         },
 
@@ -110,7 +108,7 @@ define([
          */
         kmlPhoneNumber: {
             get: function () {
-                return this.retrieve({name: 'phoneNumber'});
+                return this._factory.specific(this, {name: 'phoneNumber', transformer: NodeTransformers.string});
             }
         },
 
@@ -122,7 +120,7 @@ define([
          */
         kmlDescription: {
             get: function () {
-                return this.retrieve({name: 'description'});
+                return this._factory.specific(this, {name: 'description', transformer: NodeTransformers.string});
             }
         },
 
@@ -136,7 +134,7 @@ define([
          */
         kmlStyleUrl: {
             get: function () {
-                return this.retrieve({name: 'styleUrl'});
+                return this._factory.specific(this, {name: 'styleUrl', transformer: NodeTransformers.string});
             }
         },
 
@@ -153,7 +151,7 @@ define([
          */
         kmlSnippet: {
             get: function () {
-                return this.retrieve({name: 'Snippet'});
+                return this._factory.specific(this, {name: 'Snippet', transformer: NodeTransformers.string});
             }
         },
 
@@ -166,9 +164,7 @@ define([
          */
         kmlAbstractView: {
             get: function () {
-                return this.createChildElement({
-                    name: KmlAbstractView.prototype.getTagNames()
-                });
+                return this._factory.any(this, {name: KmlAbstractView.prototype.getTagNames()});
             }
         },
 
@@ -180,8 +176,8 @@ define([
          * @readonly
          */
         kmlTimePrimitive: {
-            get: function(){
-                return this.createChildElement({
+            get: function () {
+                return this._factory.any(this, {
                     name: KmlTimePrimitive.prototype.getTagNames()
                 });
             }
@@ -195,7 +191,7 @@ define([
          */
         kmlStyleSelector: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlStyleSelector.prototype.getTagNames()
                 });
             }
@@ -210,7 +206,7 @@ define([
          */
         kmlRegion: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlRegion.prototype.getTagNames()
                 });
             }

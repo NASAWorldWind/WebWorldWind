@@ -4,16 +4,14 @@
  */
 define([
     '../../../util/Color',
-    '../../../util/extend',
     './KmlColorStyle',
     './../KmlElements',
-    '../../../util/WWUtil'
+    '../util/NodeTransformers'
 ], function (
     Color,
-    extend,
     KmlColorStyle,
     KmlElements,
-    WWUtil
+    NodeTransformers
 ) {
     "use strict";
 
@@ -44,7 +42,7 @@ define([
          */
         kmlFill: {
             get: function(){
-                return this.retrieve({name: 'fill', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'fill', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -56,7 +54,7 @@ define([
          */
         kmlOutline: {
             get: function(){
-                return this.retrieve({name: 'outline', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'outline', transformer: NodeTransformers.boolean});
             }
         }
     });

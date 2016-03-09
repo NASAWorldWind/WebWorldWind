@@ -3,13 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     '../KmlElements',
-    '../KmlObject'
-], function (extend,
-             KmlElements,
-             KmlObject) {
-    // TODO KmlSchema isn't actually descendant of the KmlObject. The relevant logic should be applied differently.
+    '../KmlObject',
+    '../util/NodeTransformers'
+], function (KmlElements,
+             KmlObject,
+             NodeTransformers) {
     "use strict";
     /**
      * Constructs an ImagePyramid. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -41,7 +40,7 @@ define([
          */
         kmlTileSize: {
             get: function () {
-                return this.retrieve({name: 'tileSize', transformer: Number});
+                return this._factory.specific(this, {name: 'tileSize', transformer: NodeTransformers.number});
             }
         },
 
@@ -53,7 +52,7 @@ define([
          */
         kmlMaxWidth: {
             get: function () {
-                return this.retrieve({name: 'maxWidth', transformer: Number});
+                return this._factory.specific(this, {name: 'maxWidth', transformer: NodeTransformers.number});
             }
         },
 
@@ -65,7 +64,7 @@ define([
          */
         kmlMaxHeight: {
             get: function () {
-                return this.retrieve({name: 'maxHeight', transformer: Number});
+                return this._factory.specific(this, {name: 'maxHeight', transformer: NodeTransformers.number});
             }
         },
 
@@ -78,7 +77,7 @@ define([
          */
         kmlGridOrigin: {
             get: function () {
-                return this.retrieve({name: 'gridOrigin'});
+                return this._factory.specific(this, {name: 'gridOrigin', transformer: NodeTransformers.string});
             }
         }
     });

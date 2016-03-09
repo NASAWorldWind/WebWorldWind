@@ -4,8 +4,8 @@
  */
 define([
     '../../../util/Color',
-    '../../../util/extend',
     '../KmlElements',
+    '../util/KmlElementsFactory',
     './KmlGeometry',
     './KmlLinearRing',
     '../styles/KmlStyle',
@@ -14,8 +14,8 @@ define([
     '../../../shapes/ShapeAttributes',
     '../../../util/WWUtil'
 ], function (Color,
-             extend,
              KmlElements,
+             KmlElementsFactory,
              KmlGeometry,
              KmlLinearRing,
              KmlStyle,
@@ -65,7 +65,7 @@ define([
          */
         kmlExtrude: {
             get: function () {
-                return this.retrieve({name: 'extrude', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'extrude', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -77,7 +77,7 @@ define([
          */
         kmlTessellate: {
             get: function () {
-                return this.retrieve({name: 'tessellate', transformer: WWUtil.transformToBoolean});
+                return this._factory.specific(this, {name: 'tessellate', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -90,7 +90,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function () {
-                return this.retrieve({name: 'altitudeMode'});
+                return this._factory.specific(this, {name: 'altitudeMode', transformer: NodeTransformers.string});
             }
         },
 
@@ -102,6 +102,7 @@ define([
          */
         kmlOuterBoundary: {
             get: function () {
+                // TODO: Solve the mismatch between name and type. Create KmlLinearRing Transformer.
                 var parentNode = this.retrieveNode({name: 'outerBoundaryIs'});
                 return new KmlLinearRing({
                     objectNode: parentNode.getElementsByTagName("LinearRing")[0],
@@ -118,6 +119,7 @@ define([
          */
         kmlInnerBoundary: {
             get: function () {
+                // TODO: Solve the mismatch between name and type. Create KmlLinearRing Transformer.
                 var parentNode = this.retrieveNode({name: 'innerBoundaryIs'});
                 if (parentNode == null) {
                     return null;

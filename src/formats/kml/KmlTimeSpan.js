@@ -6,17 +6,13 @@
  * @exports KmlTimeSpan
  */
 define([
-    '../../util/extend',
-    './KmlTimePrimitive',
     './KmlElements',
-    './util/KmlElementsFactory',
-    '../../util/WWUtil'
+    './KmlTimePrimitive',
+    './util/NodeTransformers'
 ], function(
-    extend,
-    KmlTimePrimitive,
     KmlElements,
-    KmlElementsFactory,
-    WWUtil
+    KmlTimePrimitive,
+    NodeTransformers
 ){
     "use strict";
     /**
@@ -49,7 +45,7 @@ define([
          */
         kmlBegin: {
             get: function() {
-                return this._factory.specific(this, {name: 'begin', transformer: KmlElementsFactory.date});
+                return this._factory.specific(this, {name: 'begin', transformer: NodeTransformers.date});
             }
         },
 
@@ -61,7 +57,7 @@ define([
          */
         kmlEnd: {
             get: function() {
-                return this._factory.specific(this, {name: 'end', transformer: KmlElementsFactory.date});
+                return this._factory.specific(this, {name: 'end', transformer: NodeTransformers.date});
             }
         }
     });

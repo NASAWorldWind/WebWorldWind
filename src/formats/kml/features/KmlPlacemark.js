@@ -6,7 +6,6 @@
  * @export KmlPlacemark
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     './KmlFeature',
     '../geom/KmlGeometry',
@@ -19,8 +18,7 @@ define([
     '../../../shapes/ShapeAttributes',
     '../../../shapes/TextAttributes',
     '../../../util/Offset'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlFeature,
              KmlGeometry,
              KmlStyle,
@@ -71,7 +69,7 @@ define([
          */
         kmlGeometry: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlGeometry.prototype.getTagNames()
                 });
             }

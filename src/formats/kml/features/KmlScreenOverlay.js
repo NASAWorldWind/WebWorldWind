@@ -3,12 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
-    './KmlOverlay'
-], function (extend,
-             KmlElements,
-             KmlOverlay) {
+    './KmlOverlay',
+    '../util/NodeTransformers'
+], function (KmlElements,
+             KmlOverlay,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -41,7 +41,7 @@ define([
          */
         kmlRotation: {
             get: function () {
-                return this.retrieve({name: 'rotation', transformer: Number});
+                return this._factory.specific(this, {name: 'rotation', transformer: NodeTransformers.number});
             }
         },
 
@@ -54,7 +54,7 @@ define([
          */
         kmlOverlayXYx: {
             get: function () {
-                return this.retrieveAttribute({name: 'overlayXY', attributeName: 'x'});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('x')});
             }
         },
 
@@ -67,7 +67,7 @@ define([
          */
         kmlOverlayXYy: {
             get: function () {
-                return this.retrieveAttribute({name: 'overlayXY', attributeName: 'y'});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('y')});
             }
         },
 
@@ -81,7 +81,7 @@ define([
          */
         kmlOverlayXYxunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'overlayXY', attributeName: 'xunits'});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('xunits')});
             }
         },
 
@@ -95,7 +95,7 @@ define([
          */
         kmlOverlayXYyunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'overlayXY', attributeName: 'yunits'});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('yunits')});
             }
         },
 
@@ -108,7 +108,7 @@ define([
          */
         kmlScreenXYx: {
             get: function () {
-                return this.retrieveAttribute({name: 'screenXY', attributeName: 'x'});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('x')});
             }
         },
 
@@ -121,7 +121,7 @@ define([
          */
         kmlScreenXYy: {
             get: function () {
-                return this.retrieveAttribute({name: 'screenXY', attributeName: 'y'});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('y')});
             }
         },
 
@@ -136,7 +136,7 @@ define([
          */
         kmlScreenXYxunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'screenXY', attributeName: 'xunits'});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('xunits')});
             }
         },
 
@@ -150,7 +150,7 @@ define([
          */
         kmlScreenXYyunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'screenXY', attributeName: 'yunits'});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('yunits')});
             }
         },
 
@@ -162,7 +162,7 @@ define([
          */
         kmlRotationXYx: {
             get: function () {
-                return this.retrieveAttribute({name: 'rotationXY', attributeName: 'x'});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('x')});
             }
         },
 
@@ -174,7 +174,7 @@ define([
          */
         kmlRotationXYy: {
             get: function () {
-                return this.retrieveAttribute({name: 'rotationXY', attributeName: 'y'});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('y')});
             }
         },
 
@@ -189,7 +189,7 @@ define([
          */
         kmlRotationXYxunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'rotationXY', attributeName: 'xunits'});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('xunits')});
             }
         },
 
@@ -203,7 +203,7 @@ define([
          */
         kmlRotationXYyunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'rotationXY', attributeName: 'yunits'});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('yunits')});
             }
         },
 
@@ -217,7 +217,7 @@ define([
          */
         kmlSizex: {
             get: function () {
-                return this.retrieveAttribute({name: 'size', attributeName: 'x'});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('x')});
             }
         },
 
@@ -231,7 +231,7 @@ define([
          */
         kmlSizey: {
             get: function () {
-                return this.retrieveAttribute({name: 'size', attributeName: 'y'});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('y')});
             }
         },
 
@@ -246,7 +246,7 @@ define([
          */
         kmlSizexunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'size', attributeName: 'xunits'});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('xunits')});
             }
         },
 
@@ -260,7 +260,7 @@ define([
          */
         kmlSizeyunits: {
             get: function () {
-                return this.retrieveAttribute({name: 'size', attributeName: 'yunits'});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('yunits')});
             }
         }
     });

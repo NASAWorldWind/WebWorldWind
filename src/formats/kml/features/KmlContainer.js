@@ -3,10 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlFeature'
-], function (extend,
-             KmlFeature) {
+], function (KmlFeature) {
     "use strict";
     /**
      * Constructs an KmlContainer. Applications usually don't call this constructor. It is called by {@link KmlFile} as

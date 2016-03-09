@@ -3,17 +3,17 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     '../util/ImagePyramid',
     './../KmlElements',
     './KmlOverlay',
     '../geom/KmlPoint',
+    '../util/NodeTransformers',
     '../util/ViewVolume'
-], function (extend,
-             ImagePyramid,
+], function (ImagePyramid,
              KmlElements,
              KmlOverlay,
              KmlPoint,
+             NodeTransformers,
              ViewVolume) {
     "use strict";
 
@@ -45,7 +45,7 @@ define([
          */
         kmlRotation: {
             get: function () {
-                return this.retrieve({name: 'rotation'});
+                return this._factory.specific(this, {name: 'rotation', transformer: NodeTransformers.string});
             }
         },
 
@@ -58,7 +58,7 @@ define([
          */
         kmlShape: {
             get: function () {
-                return this.retrieve({name: 'shape'});
+                return this._factory.specific(this, {name: 'shape', transformer: NodeTransformers.string});
             }
         },
 
@@ -73,7 +73,7 @@ define([
          */
         kmlPoint: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlPoint.prototype.getTagNames()
                 });
             }
@@ -90,7 +90,7 @@ define([
          */
         kmlViewVolume: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: ViewVolume.prototype.getTagNames()
                 });
             }
@@ -113,7 +113,7 @@ define([
          */
         kmlImagePyramid: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: ImagePyramid.prototype.getTagNames()
                 });
             }

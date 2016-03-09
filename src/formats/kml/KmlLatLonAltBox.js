@@ -3,14 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
-    './KmlObject'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
-             KmlObject) {
+    './KmlObject',
+    './util/NodeTransformers'
+], function (KmlElements,
+             KmlObject, 
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -40,7 +38,7 @@ define([
          */
         kmlNorth: {
             get: function () {
-                return this._factory.specific(this, {name: 'north', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'north', transformer: NodeTransformers.number});
             }
         },
 
@@ -52,7 +50,7 @@ define([
          */
         kmlSouth: {
             get: function () {
-                return this._factory.specific(this, {name: 'south', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'south', transformer: NodeTransformers.number});
             }
         },
 
@@ -64,7 +62,7 @@ define([
          */
         kmlEast: {
             get: function () {
-                return this._factory.specific(this, {name: 'east', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'east', transformer: NodeTransformers.number});
             }
         },
 
@@ -76,7 +74,7 @@ define([
          */
         kmlWest: {
             get: function () {
-                return this._factory.specific(this, {name: 'west', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'west', transformer: NodeTransformers.number});
             }
         },
 
@@ -88,7 +86,7 @@ define([
          */
         kmlMinAltitude: {
             get: function () {
-                return this._factory.specific(this, {name: 'minAltitude', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'minAltitude', transformer: NodeTransformers.number});
             }
         },
 
@@ -100,7 +98,7 @@ define([
          */
         kmlMaxAltitude: {
             get: function () {
-                return this._factory.specific(this, {name: 'maxAltitude', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'maxAltitude', transformer: NodeTransformers.number});
             }
         }
     });

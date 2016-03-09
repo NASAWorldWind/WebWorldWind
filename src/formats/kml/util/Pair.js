@@ -3,17 +3,17 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     '../KmlObject',
     '../styles/KmlStyleSelector',
+    './NodeTransformers',
     '../../../util/Promise',
     '../util/StyleResolver'
 ], function (
-    extend,
     KmlElements,
     KmlObject,
     KmlStyleSelector,
+    NodeTransformers,
     Promise,
     StyleResolver
 ) {
@@ -46,7 +46,7 @@ define([
          */
         kmlKey: {
             get: function() {
-                return this.retrieve({name: 'key'});
+                return this._factory.specific(this, {name: 'key', transformer: NodeTransformers.string});
             }
         },
 
@@ -58,7 +58,7 @@ define([
          */
         kmlStyleUrl: {
             get: function() {
-                return this.retrieve({name: 'styleUrl'});
+                return this._factory.specific(this, {name: 'styleUrl', transformer: NodeTransformers.string});
             }
         },
 
@@ -70,7 +70,7 @@ define([
          */
         kmlStyleSelector: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlStyleSelector.prototype.getTagNames()
                 });
             }

@@ -3,14 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
-    './KmlObject'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
-             KmlObject) {
+    './KmlObject',
+    './util/NodeTransformers'
+], function (KmlElements,
+             KmlObject,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -45,7 +43,7 @@ define([
          */
         kmlHref: {
             get: function () {
-                return this._factory.specific(this, {name: 'href', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string});
             }
         },
 
@@ -64,7 +62,7 @@ define([
          */
         kmlRefreshMode: {
             get: function () {
-                return this._factory.specific(this, {name: 'refreshMode', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'refreshMode', transformer: NodeTransformers.string});
             }
         },
 
@@ -76,7 +74,7 @@ define([
          */
         kmlRefreshInterval: {
             get: function () {
-                return this._factory.specific(this, {name: 'refreshInterval', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'refreshInterval', transformer: NodeTransformers.number});
             }
         },
 
@@ -94,7 +92,7 @@ define([
          */
         kmlViewRefreshMode: {
             get: function () {
-                return this._factory.specific(this, {name: 'viewRefreshMode', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'viewRefreshMode', transformer: NodeTransformers.string});
             }
         },
 
@@ -107,7 +105,7 @@ define([
          */
         kmlViewRefreshTime: {
             get: function () {
-                return this._factory.specific(this, {name: 'viewRefreshTime', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'viewRefreshTime', transformer: NodeTransformers.number});
             }
         },
 
@@ -121,7 +119,7 @@ define([
          */
         kmlViewBoundScale: {
             get: function () {
-                return this._factory.specific(this, {name: 'viewBoundScale', transformer: KmlElementsFactory.number});
+                return this._factory.specific(this, {name: 'viewBoundScale', transformer: NodeTransformers.number});
             }
         },
 
@@ -152,7 +150,7 @@ define([
          */
         kmlViewFormat: {
             get: function () {
-                return this._factory.specific(this, {name: 'viewFormat', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'viewFormat', transformer: NodeTransformers.string});
             }
         },
 
@@ -171,7 +169,7 @@ define([
          */
         kmlHttpQuery: {
             get: function () {
-                return this._factory.specific(this, {name: 'httpQuery', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'httpQuery', transformer: NodeTransformers.string});
             }
         }
     });

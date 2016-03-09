@@ -3,14 +3,14 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlColorStyle',
     './../KmlElements',
-    '../KmlIcon'
-], function (extend,
-             KmlColorStyle,
+    '../KmlIcon',
+    '../util/NodeTransformers'
+], function (KmlColorStyle,
              KmlElements,
-             KmlIcon) {
+             KmlIcon,
+             NodeTransformers) {
     "use strict";
     /**
      * Constructs an KmlIconStyle. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -40,7 +40,7 @@ define([
          */
         kmlScale: {
             get: function () {
-                return this.retrieve({name: 'scale', transformer: Number});
+                return this._factory.specific(this, {name: 'scale', transformer: NodeTransformers.number});
             }
         },
 
@@ -52,7 +52,7 @@ define([
          */
         kmlHeading: {
             get: function () {
-                return this.retrieve({name: 'heading', transformer: Number});
+                return this._factory.specific(this, {name: 'heading', transformer: NodeTransformers.number});
             }
         },
 
@@ -64,7 +64,7 @@ define([
          */
         kmlIcon: {
             get: function () {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlIcon.prototype.getTagNames()
                 });
             }
@@ -79,7 +79,7 @@ define([
          */
         kmlHotSpotX: {
             get: function () {
-                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'x'});
+                return this._factory.specific(this, {name: 'hotSpot', transformer: NodeTransformers.attribute('x')});
             }
         },
 
@@ -92,7 +92,7 @@ define([
          */
         kmlHotSpotY: {
             get: function () {
-                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'y'});
+                return this._factory.specific(this, {name: 'hotSpot', transformer: NodeTransformers.attribute('y')});
             }
         },
 
@@ -106,7 +106,7 @@ define([
          */
         kmlHotSpotXUnits: {
             get: function () {
-                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'xunits'});
+                return this._factory.specific(this, {name: 'hotSpot', transformer: NodeTransformers.attribute('xunits')});
             }
         },
 
@@ -120,7 +120,7 @@ define([
          */
         kmlHotSpotYUnits: {
             get: function () {
-                return this.retrieveAttribute({name: 'hotSpot', attributeName: 'yunits'});
+                return this._factory.specific(this, {name: 'hotSpot', transformer: NodeTransformers.attribute('yunits')});
             }
         }
     });

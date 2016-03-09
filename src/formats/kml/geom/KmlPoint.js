@@ -7,24 +7,20 @@
  */
 define([
     '../../../util/Color',
-    '../../../util/extend',
+    '../KmlElements',
     './KmlGeometry',
     '../../../geom/Location',
-    '../../../geom/Position',
-    '../../../shapes/ShapeAttributes',
+    '../util/NodeTransformers',
     '../../../shapes/Polygon',
-    '../KmlElements',
-    '../../../util/WWUtil'
+    '../../../geom/Position'
 ], function(
     Color,
-    extend,
+    KmlElements,
     KmlGeometry,
     Location,
-    Position,
-    ShapeAttributes,
+    NodeTransformers,
     Polygon,
-    KmlElements,
-    WWUtil
+    Position
 ){
     "use strict";
     /**
@@ -56,7 +52,8 @@ define([
          */
         kmlPosition: {
             get: function() {
-                var coordinates = this.retrieve({name: 'coordinates'}).split(',');
+                // TODO Add Position transformer.
+                var coordinates = this._factory.specific(this, {name: 'coordinates', transformer: NodeTransformers.string}).split(',');
                 return new Position(coordinates[1], coordinates[0], coordinates[2] || 0);
             }
         },
@@ -70,7 +67,7 @@ define([
          */
         kmlExtrude: {
             get: function() {
-                return this.retrieve({name: 'extrude', transformer: Boolean});
+                return this._factory.specific(this, {name: 'extrude', transformer: NodeTransformers.boolean});
             }
         },
 
@@ -83,7 +80,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function() {
-                return this.retrieve({name: 'altitudeMode'});
+                return this._factory.specific(this, {name: 'altitudeMode', transformer: NodeTransformers.string});
             }
         },
 

@@ -4,14 +4,14 @@
  */
 define([
     '../../../util/Color',
-    '../../../util/extend',
     './KmlColorStyle',
-    './../KmlElements'
+    './../KmlElements',
+    '../util/NodeTransformers'
 ], function (
     Color,
-    extend,
     KmlColorStyle,
-    KmlElements
+    KmlElements,
+    NodeTransformers
 ) {
     "use strict";
 
@@ -41,7 +41,7 @@ define([
          */
         kmlWidth: {
             get: function() {
-                return this.retrieve({name: 'width', transformer: Number});
+                return this._factory.specific(this, {name: 'width', transformer: NodeTransformers.number});
             }
         },
 
@@ -53,7 +53,7 @@ define([
          */
         kmlOuterColor: {
             get: function() {
-                return this.retrieve({name: 'gx:outerColor'});
+                return this._factory.specific(this, {name: 'gx:outerColor', transformer: NodeTransformers.string});
             }
         },
 
@@ -66,7 +66,7 @@ define([
          */
         kmlOuterWidth: {
             get: function() {
-                return this.retrieve({name: 'gx:outerWidth'});
+                return this._factory.specific(this, {name: 'gx:outerWidth', transformer: NodeTransformers.number});
             }
         },
 
@@ -78,7 +78,7 @@ define([
          */
         kmlPhysicalWidth: {
             get: function() {
-                return this.retrieve({name: 'gx:physicalWidth'});
+                return this._factory.specific(this, {name: 'gx:physicalWidth', transformer: NodeTransformers.number});
             }
         },
 
@@ -92,7 +92,7 @@ define([
          */
         kmlLabelVisibility: {
             get: function() {
-                return this.retrieve({name: 'gx:labelVisibility'});
+                return this._factory.specific(this, {name: 'gx:labelVisibility', transformer: NodeTransformers.boolean});
             }
         }
     });

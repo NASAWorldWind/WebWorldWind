@@ -3,17 +3,17 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     '../KmlLatLonBox',
     '../KmlLatLonQuad',
-    './KmlOverlay'
+    './KmlOverlay',
+    '../util/NodeTransformers'
 ], function (
-    extend,
     KmlElements,
     KmlLatLonBox,
     KmlLatLonQuad,
-    KmlOverlay
+    KmlOverlay,
+    NodeTransformers
 ) {
     "use strict";
 
@@ -45,7 +45,7 @@ define([
          */
         kmlAltitude: {
             get: function() {
-                return this.retrieve({name: 'altitude'});
+                return this._factory.specific(this, {name: 'altitude', transformer: NodeTransformers.string});
             }
         },
 
@@ -57,7 +57,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function() {
-                return this.retrieve({name: 'altitudeMode'});
+                return this._factory.specific(this, {name: 'altitudeMode', transformer: NodeTransformers.string});
             }
         },
 
@@ -70,7 +70,7 @@ define([
          */
         kmlLatLonBox: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlLatLonBox.prototype.getTagNames()
                 });
             }
@@ -84,7 +84,7 @@ define([
          */
         kmlLatLonQuad: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlLatLonQuad.prototype.getTagNames()
                 });
             }

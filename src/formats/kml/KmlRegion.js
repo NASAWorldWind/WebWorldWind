@@ -3,18 +3,16 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
     './KmlLatLonAltBox',
     './KmlLod',
-    './KmlObject'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
+    './KmlObject',
+    './util/NodeTransformers'
+], function (KmlElements,
              KmlLatLonAltBox,
              KmlLod,
-             KmlObject) {
+             KmlObject,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -44,7 +42,7 @@ define([
          */
         kmlLatLonAltBox: {
             get: function () {
-                return this._factory.specific(this, {name: KmlLatLonAltBox.prototype.getTagNames(), transformer: KmlElementsFactory.kmlObject});
+                return this._factory.specific(this, {name: KmlLatLonAltBox.prototype.getTagNames(), transformer: NodeTransformers.kmlObject});
             }
         },
 
@@ -59,7 +57,7 @@ define([
          */
         kmlLod: {
             get: function () {
-                return this._factory.specific(this, {name: KmlLod.prototype.getTagNames(), transformer: KmlElementsFactory.kmlObject});
+                return this._factory.specific(this, {name: KmlLod.prototype.getTagNames(), transformer: NodeTransformers.kmlObject});
             }
         }
     });

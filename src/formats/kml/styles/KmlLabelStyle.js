@@ -3,13 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlColorStyle',
-    '../KmlElements'
+    '../KmlElements',
+    '../util/NodeTransformers'
 ], function (
-    extend,
     KmlColorStyle,
-    KmlElements
+    KmlElements,
+    NodeTransformers
 ) {
     "use strict";
     /**
@@ -39,7 +39,7 @@ define([
          */
         kmlScale: {
             get: function() {
-                return this.retrieve({name: 'scale', transformer: Number});
+                return this._factory.specific(this, {name: 'scale', transformer: NodeTransformers.number});
             }
         }
     });

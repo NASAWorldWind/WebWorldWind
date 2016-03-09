@@ -4,7 +4,6 @@
  */
 define([
     '../../../util/Color',
-    '../../../util/extend',
     '../../../util/Font',
     './KmlStyleSelector',
     './../KmlElements',
@@ -20,7 +19,6 @@ define([
     '../../../shapes/TextAttributes'
 ], function (
     Color,
-    extend,
     Font,
     KmlStyleSelector,
     KmlElements,
@@ -66,7 +64,7 @@ define([
          */
         kmlIconStyle: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlIconStyle.prototype.getTagNames()
                 });
             }
@@ -80,7 +78,7 @@ define([
          */
         kmlLabelStyle: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlLabelStyle.prototype.getTagNames()
                 });
             }
@@ -94,7 +92,7 @@ define([
          */
         kmlLineStyle: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlLineStyle.prototype.getTagNames()
                 });
             }
@@ -108,7 +106,7 @@ define([
          */
         kmlPolyStyle: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlPolyStyle.prototype.getTagNames()
                 });
             }
@@ -122,7 +120,7 @@ define([
          */
         kmlBalloonStyle: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlBalloonStyle.prototype.getTagNames()
                 });
             }
@@ -136,7 +134,7 @@ define([
          */
         kmlListStyle: {
             get: function() {
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlListStyle.prototype.getTagNames()
                 });
             }

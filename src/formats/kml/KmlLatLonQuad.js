@@ -3,14 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './util/KmlElementsFactory',
-    './KmlObject'
-], function (extend,
-             KmlElements,
-             KmlElementsFactory,
-             KmlObject) {
+    './KmlObject',
+    './util/NodeTransformers'
+], function (KmlElements,
+             KmlObject,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -45,7 +43,7 @@ define([
          */
         kmlCoordinates: {
             get: function () {
-                return this._factory.specific(this, {name: 'coordinates', transformer: KmlElementsFactory.string});
+                return this._factory.specific(this, {name: 'coordinates', transformer: NodeTransformers.string});
             }
         }
     });

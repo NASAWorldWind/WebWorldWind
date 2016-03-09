@@ -7,7 +7,6 @@
  */
 define([
     '../../error/ArgumentError',
-    '../../util/extend',
     './KmlElements',
     './util/KmlElementsFactoryCached',
     '../../util/Logger',
@@ -15,7 +14,6 @@ define([
     '../../render/Renderable',
     '../../util/WWUtil'
 ], function (ArgumentError,
-             extend,
              KmlElements,
              KmlElementsFactoryCached,
              Logger,

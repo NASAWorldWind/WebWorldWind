@@ -11,33 +11,6 @@ require({
              KmlFile) {
     "use strict";
     AsyncTestCase("KmlFile", {
-        "testSimpleKml": CatchTest(function (queue) {
-            var kmlFileXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-                "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
-                "<Point id=\"1\">" +
-                "   <extrude>true</extrude>" +
-                "   <altitudeMode>clampToGround</altitudeMode>" +
-                "   <coordinates>-122.0822035425683,37.42228990140251,0</coordinates>" +
-                "</Point>" +
-                "</kml>";
-
-            var loadedFile = null;
-            queue.call('Load the file remotely', function (callbacks) {
-                // callback is called when loaded.
-                var callback = callbacks.add(function (loaded) {
-                    // This means we are at the end.
-                    loadedFile = loaded;
-                });
-                var kmlFile = new KmlFile('', null, kmlFileXml, true);
-                kmlFile.then(callback);
-            });
-
-            queue.call('File was loaded.', function () {
-                assertTrue(loadedFile != null);
-                assertEquals(loadedFile.shapes.length, 1);
-            });
-        }),
-
         "testLoadingKmlFromRelativeRemote": CatchTest(function (queue) {
             var kmlLocation = "/test/test/testFile.kml";
             var loadedFile = null;

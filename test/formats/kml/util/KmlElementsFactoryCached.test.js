@@ -6,21 +6,21 @@ require({
     baseUrl: '/test/'
 }, [
     'test/CatchTest',
-    'src/formats/kml/util/KmlElementsFactory',
     'src/formats/kml/util/KmlElementsFactoryCached',
     'src/formats/kml/geom/KmlGeometry',
     'src/formats/kml/geom/KmlLineString',
     'src/formats/kml/geom/KmlMultiGeometry',
     'src/formats/kml/geom/KmlPoint',
+    'src/formats/kml/util/NodeTransformers',
     'src/util/XmlDocument'
 ], function (
     CatchTest,
-    KmlElementsFactory,
     KmlElementsFactoryCached,
     KmlGeometry,
     KmlLineString,
     KmlMultiGeometry,
     KmlPoint,
+    NodeTransformers,
     XmlDocument
 ) {
     "use strict";
@@ -29,6 +29,7 @@ require({
         "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
         "<MultiGeometry id=\"7\">" +
         "   <LineString id=\"8\">" +
+        "       <coordinatesSpecific>20,10,0 20,10,0</coordinatesSpecific>" +
         "       <coordinates>10,10,0 20,10,0</coordinates>" +
         "   </LineString>" +
         "   <LineString id=\"9\">" +
@@ -66,10 +67,26 @@ require({
 
         testCachingElementsWhenSpecificAsked: CatchTest(function () {
             var currentMultiGeometry = new KmlMultiGeometry({objectNode: document.getElementById("11")});
-            var createdElement = factory.specific(currentMultiGeometry, {name: "Point", transformer: KmlElementsFactory.kmlObject});
-            var createdElementFromCache = factory.specific(currentMultiGeometry, {name: "Point", transformer: KmlElementsFactory.kmlObject});
+            var createdElement = factory.specific(currentMultiGeometry, {name: "Point", transformer: NodeTransformers.kmlObject});
+            var createdElementFromCache = factory.specific(currentMultiGeometry, {name: "Point", transformer: NodeTransformers.kmlObject});
 
             assertTrue(createdElement === createdElementFromCache);
+        }),
+
+        testCreationOfSinglePrimitiveWhenTheStartIsTheSame: CatchTest(function () {
+            var currentLineString = new KmlLineString({objectNode: document.getElementById("8")});
+            factory.specific(currentLineString, {name: 'coordinates', transformer: NodeTransformers.string});
+            var retrievedValue = factory.specific(currentLineString, {name: 'coordinatesSpecific', transformer: NodeTransformers.string});
+
+            assertEquals("20,10,0 20,10,0", retrievedValue);
+        }),
+
+        testCreationOfSinglePrimitiveWhenTheStartIsTheSameStartsWithLonger: CatchTest(function () {
+            var currentLineString = new KmlLineString({objectNode: document.getElementById("8")});
+            factory.specific(currentLineString, {name: 'coordinatesSpecific', transformer: NodeTransformers.string});
+            var retrievedValue = factory.specific(currentLineString, {name: 'coordinates', transformer: NodeTransformers.string});
+
+            assertEquals("10,10,0 20,10,0", retrievedValue);
         })
     });
 });

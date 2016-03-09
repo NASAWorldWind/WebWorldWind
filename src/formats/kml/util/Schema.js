@@ -3,13 +3,10 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     '../KmlObject'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlObject) {
-    // TODO KmlSchema isn't actually descendant of the KmlObject. The relevant logic should be applied differently.
     "use strict";
     /**
      * Constructs an Schema. Application usually don't call this constructor. It is called by {@link KmlFile} as

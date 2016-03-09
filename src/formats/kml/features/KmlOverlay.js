@@ -3,12 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlFeature',
-    './../KmlIcon'
-], function (extend,
-             KmlFeature,
-             KmlIcon) {
+    './../KmlIcon',
+    '../util/NodeTransformers'
+], function (KmlFeature,
+             KmlIcon,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -42,7 +42,7 @@ define([
          */
         kmlColor: {
             get: function() {
-                return this.retrieve({name: 'color'});
+                return this._factory.specific(this, {name: 'color', transformer: NodeTransformers.string});
             }
         },
 
@@ -55,7 +55,7 @@ define([
          */
         kmlDrawOrder: {
             get: function() {
-                return this.retrieve({name: 'drawOrder', transformer: Number});
+                return this._factory.specific(this, {name: 'drawOrder', transformer: NodeTransformers.string});
             }
         },
 
@@ -71,7 +71,7 @@ define([
          */
         kmlIcon: {
             get: function(){
-                return this.createChildElement({
+                return this._factory.any(this, {
                     name: KmlIcon.prototype.getTagNames()
                 });
             }

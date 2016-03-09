@@ -6,10 +6,8 @@
  * @exports KmlGeometry
  */
 define([
-    '../../../util/extend',
     './../KmlObject'
-], function (extend,
-             KmlObject) {
+], function (KmlObject) {
     "use strict";
     /**
      * Constructs an KmlGeometry. Application usually don't call this constructor. It is called by {@link KmlFile} as

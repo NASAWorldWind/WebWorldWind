@@ -3,12 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     '../KmlElements',
-    '../KmlObject'
-], function (extend,
-             KmlElements,
-             KmlObject) {
+    '../KmlObject',
+    './NodeTransformers'
+], function (KmlElements,
+             KmlObject,
+             NodeTransformers) {
     "use strict";
     /**
      * Constructs a ViewVolume. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -37,7 +37,7 @@ define([
          */
         kmlLeftFov: {
             get: function () {
-                return this.retrieve({name: 'leftFov', transformer: Number});
+                return this._factory.specific(this, {name: 'leftFov', transformer: NodeTransformers.number});
             }
         },
 
@@ -49,7 +49,7 @@ define([
          */
         kmlRightFov: {
             get: function () {
-                return this.retrieve({name: 'rightFov', transformer: Number});
+                return this._factory.specific(this, {name: 'rightFov', transformer: NodeTransformers.number});
             }
         },
 
@@ -61,7 +61,7 @@ define([
          */
         kmlBottomFov: {
             get: function () {
-                return this.retrieve({name: 'bottomFov', transformer: Number});
+                return this._factory.specific(this, {name: 'bottomFov', transformer: NodeTransformers.number});
             }
         },
 
@@ -73,7 +73,7 @@ define([
          */
         kmlTopFov: {
             get: function () {
-                return this.retrieve({name: 'topFov', transformer: Number});
+                return this._factory.specific(this, {name: 'topFov', transformer: NodeTransformers.number});
             }
         },
 
@@ -88,7 +88,7 @@ define([
          */
         kmlNear: {
             get: function () {
-                return this.retrieve({name: 'near'});
+                return this._factory.specific(this, {name: 'near', transformer: NodeTransformers.string});
             }
         }
     });
