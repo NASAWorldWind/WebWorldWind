@@ -1,5 +1,6 @@
-/**
- * Created by jbalhar on 9. 3. 2016.
+/*
+ * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
     './Attribute',
@@ -69,29 +70,31 @@ define([
      * This function retrieves relevant KmlObject to the Node. If there is such element it returns created element,
      * otherwise it returns null
      * @param node {Node} Node to transform
+     * @param parent {KmlObject} Parent to current node.
      * @returns {KmlObject|null} KmlObject representation for the node.
      */
-    NodeTransformers.kmlObject = function (node) {
+    NodeTransformers.kmlObject = function (node, parent) {
         var nameOfElement = node.nodeName;
         var constructor = KmlElements.getKey(nameOfElement);
         if (!constructor) {
             return null;
         }
-        return new constructor({objectNode: node});
+        return new constructor({objectNode: node, parent: parent});
     };
 
     /**
      * It takes the node and transforms it to the LinearRing this was created to solve the mismatch between name of the
      * element and type of the element.
      * @param node {Node} Node to transform
+     * @param parent {KmlObject} Parent to current node.
      * @returns {KmlLinearRing} Transformed Linear Ring.
      */
-    NodeTransformers.linearRing = function(node) {
+    NodeTransformers.linearRing = function(node, parent) {
         var constructor = KmlElements.getKey("LinearRing");
         if (!constructor) {
             return null;
         }
-        return new constructor({objectNode: node});
+        return new constructor({objectNode: node, parent: parent});
     };
 
     /**

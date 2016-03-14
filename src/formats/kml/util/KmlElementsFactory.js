@@ -29,7 +29,7 @@ define([
         var result = null;
         [].forEach.call(parentNode.childNodes, function (node) {
             if (node.nodeName == options.name) {
-                result = options.transformer(node);
+                result = options.transformer(node, element);
             }
         });
         return result;
@@ -48,7 +48,7 @@ define([
         var result = null;
         [].forEach.call(parentNode.childNodes, function (node) {
             if (options.name.indexOf(node.nodeName) != -1) {
-                result = NodeTransformers.kmlObject(node);
+                result = NodeTransformers.kmlObject(node, element);
             }
         });
         return result;
@@ -63,7 +63,7 @@ define([
         
         var results = [];
         [].forEach.call(parentNode.childNodes, function (node) {
-            var element = NodeTransformers.kmlObject(node);
+            var element = NodeTransformers.kmlObject(node, element);
             if (element) {
                 results.push(element);
             }
