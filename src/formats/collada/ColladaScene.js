@@ -610,7 +610,7 @@ define([
             var textureBound, vboId,
                 gl = dc.currentGlContext,
                 program = dc.currentProgram,
-                wrapMode;
+                wrapMode, activeTexture;
 
             if (material.textures.diffuse) {
                 var imageKey = material.textures.diffuse.mapId;
@@ -621,13 +621,13 @@ define([
 
             var image = this.useTexturePaths ? this.images[imageKey].path : this.images[imageKey].filename;
 
-            buffers.activeTexture = dc.gpuResourceCache.resourceForKey(this.dirPath + image + "");
-            if (!buffers.activeTexture) {
+            activeTexture = dc.gpuResourceCache.resourceForKey(this.dirPath + image + "");
+            if (!activeTexture) {
                 wrapMode = buffers.isClamp ? gl.CLAMP_TO_EDGE : gl.REPEAT;
-                buffers.activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", wrapMode);
+                activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", wrapMode);
             }
+            textureBound = activeTexture && activeTexture.bind(dc);
 
-            textureBound = buffers.activeTexture && buffers.activeTexture.bind(dc);
             if (textureBound) {
                 if (!buffers.texCoordsVboCacheKey) {
                     buffers.texCoordsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
