@@ -218,19 +218,17 @@ define(['../../error/ArgumentError',
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
          */
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer, rawData) {
+        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer, callback) {
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
             }
 
             this._layer = layer || new RenderableLayer();
-        
-        if (rawData) {
-            this.parse(this.url);
-            } else {
+            
+            this.callback=callback;
+
             this.requestUrl(this.url);
-            }
         };
 
         /**
@@ -279,6 +277,7 @@ define(['../../error/ArgumentError',
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         this.parse(xhr.response);
+                        
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -326,6 +325,13 @@ define(['../../error/ArgumentError',
                 }
             }
         };
+    
+     GeoJSONParser.prototype.callbackFunction = function () {
+       this.callback();
+         
+         
+        };
+       
 
         // Set GeoJSON CRS object.
         // If no crs member can be so acquired, the default CRS shall apply to the GeoJSON object.
@@ -348,6 +354,9 @@ define(['../../error/ArgumentError',
                 // If no CRS, consider default one
                 this.addRenderablesForGeoJSON(this.layer);
             }
+            
+            this.callbackFunction();
+            
         };
 
         /**
@@ -503,6 +512,7 @@ define(['../../error/ArgumentError',
                 default:
                     break;
             }
+           
         }
 
         /**
