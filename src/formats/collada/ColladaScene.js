@@ -90,6 +90,10 @@ define([
             // Documented in defineProperties below.
             this._normalMatrix = Matrix.fromIdentity();
 
+            this._texCoordMatrix = Matrix.fromIdentity().setToUnitYFlip();
+
+            this._activeTexture = null;
+
         };
 
         ColladaScene.prototype = Object.create(Renderable.prototype);
@@ -521,7 +525,7 @@ define([
 
             this.applyColor(dc, material);
 
-            var hasTexture = (material && material.textures != null && buffers.uvs && buffers.uvs.length);
+            var hasTexture = (material && material.textures != null && buffers.uvs && buffers.uvs.length > 0);
             if (hasTexture) {
                 this.applyTexture(dc, buffers, material);
             }
@@ -531,7 +535,7 @@ define([
                 this.applyLighting(dc, buffers);
             }
 
-            this.applyMatrix(dc, hasLighting, nodeWorldMatrix, nodeNormalMatrix);
+            this.applyMatrix(dc, hasLighting, hasTexture , nodeWorldMatrix, nodeNormalMatrix);
 
             this.applyIndices(dc, buffers);
 
@@ -610,7 +614,7 @@ define([
             var textureBound, vboId,
                 gl = dc.currentGlContext,
                 program = dc.currentProgram,
-                wrapMode, activeTexture;
+                wrapMode;
 
             if (material.textures.diffuse) {
                 var imageKey = material.textures.diffuse.mapId;
@@ -621,12 +625,12 @@ define([
 
             var image = this.useTexturePaths ? this.images[imageKey].path : this.images[imageKey].filename;
 
-            activeTexture = dc.gpuResourceCache.resourceForKey(this.dirPath + image + "");
-            if (!activeTexture) {
+            this._activeTexture = dc.gpuResourceCache.resourceForKey(this.dirPath + image + "");
+            if (!this._activeTexture) {
                 wrapMode = buffers.isClamp ? gl.CLAMP_TO_EDGE : gl.REPEAT;
-                activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", wrapMode);
+                this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", wrapMode);
             }
-            textureBound = activeTexture && activeTexture.bind(dc);
+            textureBound = this._activeTexture && this._activeTexture.bind(dc);
 
             if (textureBound) {
                 if (!buffers.texCoordsVboCacheKey) {
@@ -686,7 +690,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        ColladaScene.prototype.applyMatrix = function (dc, hasLighting, nodeWorldMatrix, nodeNormalMatrix) {
+        ColladaScene.prototype.applyMatrix = function (dc, hasLighting, hasTexture, nodeWorldMatrix, nodeNormalMatrix) {
 
             var mvpMatrix = Matrix.fromIdentity();
 
@@ -711,6 +715,11 @@ define([
                 }
 
                 dc.currentProgram.loadModelviewInverse(dc.currentGlContext, normalMatrix);
+            }
+
+            if (hasTexture && this._activeTexture){
+                dc.currentProgram.loadTextureMatrix(dc.currentGlContext, this._texCoordMatrix);
+                this._activeTexture = null;
             }
 
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, mvpMatrix);
