@@ -59,8 +59,8 @@ define(['../../error/ArgumentError',
         "use strict";
 
         /**
-         * Constructs a GeoJSON object for a specified GeoJSON URL. Call [load]{@link GeoJSONParser#load} to retrieve the
-         * GeoJSON and create shapes for it.
+         * Constructs a GeoJSON object for a specified GeoJSON data source. Call [load]{@link GeoJSONParser#load} to
+         * retrieve the GeoJSON and create shapes for it.
          * @alias GeoJSONParser
          * @constructor
          * @classdesc Parses a GeoJSON and creates shapes representing its contents. Points and MultiPoints in
@@ -72,17 +72,17 @@ define(['../../error/ArgumentError',
          * This function enables the application to assign independent attributes to each
          * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
          * feature.
-         * @param {String} url The location of the GeoJSON.
-         * @throws {ArgumentError} If the specified URL is null or undefined.
+         * @param {String} dataSource The data source of the GeoJSON.
+         * @throws {ArgumentError} If the specified data source is null or undefined.
          */
-        var GeoJSONParser = function (url) {
-            if (!url) {
+        var GeoJSONParser = function (dataSource) {
+            if (!dataSource) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "constructor", "missingUrl"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "constructor", "missingDataSource"));
             }
 
             // Documented in defineProperties below.
-            this._url = url;
+            this._dataSource = dataSource;
 
             // Documented in defineProperties below.
             this._geoJSONObject = null;
@@ -108,14 +108,14 @@ define(['../../error/ArgumentError',
 
         Object.defineProperties(GeoJSONParser.prototype, {
             /**
-             * The GeoJSON URL as specified to this GeoJSON's constructor.
+             * The GeoJSON data source as specified to this GeoJSON's constructor.
              * @memberof GeoJSONParser.prototype
              * @type {String}
              * @readonly
              */
-            url: {
+            dataSource: {
                 get: function () {
-                    return this._url;
+                    return this._dataSource;
                 }
             },
 
@@ -217,8 +217,10 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer A {@link RenderableLayer} to hold the shapes created for each GeoJSON
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
+         * @param {Boolean} isUrl A flag indicating if the GeoJSON data source is an URL.
          */
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer) {
+
+        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer, isUrl) {
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
@@ -226,7 +228,12 @@ define(['../../error/ArgumentError',
 
             this._layer = layer || new RenderableLayer();
 
-            this.requestUrl(this.url);
+            if (isUrl){
+                this.requestUrl(this.dataSource);
+            }
+            else {
+               this.parse(this.dataSource);
+            }
         };
 
         /**
