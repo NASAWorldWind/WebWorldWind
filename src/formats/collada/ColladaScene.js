@@ -398,6 +398,10 @@ define([
 
             var orderedScene;
 
+            if (!this.enabled) {
+                return;
+            }
+
             if (this.lastFrameTime !== dc.timestamp) {
                 orderedScene = this.makeOrderedRenderable(dc);
             }
