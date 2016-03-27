@@ -72,7 +72,7 @@ define(['../../error/ArgumentError',
          * This function enables the application to assign independent attributes to each
          * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
          * feature.
-         * @param {String} dataSource The data source of the GeoJSON.
+         * @param {String} dataSource The data source of the GeoJSON. Can be a string or an URL to a GeoJSON.
          * @throws {ArgumentError} If the specified data source is null or undefined.
          */
         var GeoJSONParser = function (dataSource) {
@@ -217,10 +217,9 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer A {@link RenderableLayer} to hold the shapes created for each GeoJSON
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
-         * @param {Boolean} isUrl A flag indicating if the GeoJSON data source is an URL.
          */
 
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer, isUrl) {
+        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer) {
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
@@ -228,11 +227,11 @@ define(['../../error/ArgumentError',
 
             this._layer = layer || new RenderableLayer();
 
-            if (isUrl){
-                this.requestUrl(this.dataSource);
+            if (this.isDataSourceJson()){
+                this.parse(this.dataSource);
             }
             else {
-               this.parse(this.dataSource);
+                this.requestUrl(this.dataSource);
             }
         };
 
@@ -307,7 +306,8 @@ define(['../../error/ArgumentError',
                 this._geoJSONObject = JSON.parse(geoJSONString);
             }
             catch (e) {
-                console.log(e);
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
+                    "invalidGeoJSONObject")
             }
             finally {
                 if (this.geoJSONObject){
@@ -987,7 +987,6 @@ define(['../../error/ArgumentError',
             }
 
             if (!longitude && longitude !== 0.0) {
-                console.log(longitude);
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "getReprojectedIfRequired",
                         "missingLongitude"));
@@ -1015,6 +1014,19 @@ define(['../../error/ArgumentError',
                 ]
             ]);
         };
+
+        /**
+        * Indicate whether the data source is of a JSON type.
+        * @returns {Boolean} True if the data source is of JSON type.
+        */
+        GeoJSONParser.prototype.isDataSourceJson = function() {
+            try {
+                JSON.parse(this.dataSource);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
 
         return GeoJSONParser;
     }
