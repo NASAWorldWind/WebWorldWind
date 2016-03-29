@@ -100,127 +100,18 @@ define([
 
     /**
      * @inheritDoc
-     *
-     * Available hooks:
-     * - getAppliedStyle
-
-     * - beforeStyleResolution - If false is returned, nothing else happens.
-     * - styleResolutionStarted - Style is passed in as a parameter.
-     * - afterStyleResolution
-     *
-     * - prepareAttributes: REQUIRED
-     * - moveValidProperties
-     *
-     * @param pOptions {Object} Options to be applied to the updating process. It will be cloned.
      */
-    KmlObject.prototype.render = function (dc, pOptions) {
-        var options = WWUtil.clone(pOptions || {});
-        options.dc = dc;
-
-        if (!this.beforeStyleResolution(options)) {
-            return;
-        }
-
-        this.solveEnabled(options);
-
-        var self = this;
-        self.getAppliedStyle().then(function (styles) {
-            self.styleResolutionStarted(styles);
-            var normal = styles.normal;
-            var highlight = styles.highlight;
-
-            self.attributes = self.prepareAttributes(normal);
-            self.highlightAttributes = highlight ? self.prepareAttributes(highlight) : null;
-            self.moveValidProperties();
-
-            options.style = self.getStyle();
-            self.afterStyleResolution(options);
-        });
-    };
-
-    /**
-     * Hook to be used in relevant subclasses.
-     */
-    KmlObject.prototype.moveValidProperties = function() {};
-
-    /**
-     * It decides whether current shape should be enabled and therefore visible on the map. If any of the ancestors
-     * in the document is disabled all their descendants also are. If it isn't and there is information about
-     * visibility as a part of this Element respect it, otherwise it is visible.
-     * @param options {Object}
-     * @param options.enabled {Boolean} Whether this object is enabled or not.
-     */
-    KmlObject.prototype.solveEnabled = function (options) {
-        if (options.enabled == null || typeof options.enabled == 'undefined') {
-            if (this.kmlVisibility) {
-                this.enabled = options.enabled = this.kmlVisibility;
-            }
-            else {
-                this.enabled = options.enabled = true;
+    KmlObject.prototype.render = function (dc) {
+        if(!dc.kmlOptions) {
+            dc.kmlOptions = {
+                lastStyle: null,
+                lastVisibility: null,
+                currentTimeInterval: null
             }
         } else {
-            this.enabled = options.enabled;
+            // Potential leakage. Have to be carefull.
+            dc.kmlOptions = WWUtil.clone(dc.kmlOptions);
         }
-    };
-
-    /**
-     * This method is called during the update lifecycle to retrieve a promise of style.
-     * @returns {Promise} Promise of styles used further in the processing.
-     */
-    KmlObject.prototype.getAppliedStyle = function () {
-        return new Promise(function (resolve, reject) {});
-    };
-
-    // The parameters are used in the descendants.
-    /**
-     * This method is called once the style was already resolved but before any further processing goes on.
-     * @param styles {Object}
-     * @param styles.normal {KmlStyle|null} Style representing the visuals in standard state
-     * @param styles.highlight {KmlStyle|null} Style representing the visuals in highlighted state
-     */
-    KmlObject.prototype.styleResolutionStarted = function (styles) {
-    };
-
-    // The parameters are used in the descendants.
-    /**
-     * This method is called once the style was resolved and all general processing of the style is finished.
-     * @param options {Object} Object with options passed into the update.
-     */
-    KmlObject.prototype.afterStyleResolution = function (options) {
-    };
-
-    // The parameters are used in the descendants.
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * This method is called as a first thing in the lifecycle of the update method. It is possible to stop further
-     * processing if this method returns false.
-     * @param options {Object} Object with options which was passed into the update.
-     * @returns {boolean} True continue with the processing. False leave the processing be.
-     */
-    KmlObject.prototype.beforeStyleResolution = function (options) {
-        return true;
-    };
-
-    // The parameters are used in the descendants.
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * This method is called during the processing of the update function. It is required and should therefore be
-     * overridden. It prepares attributes changing how different attributes are visualized.
-     * @param style {KmlStyle} Style to use when preparing different types of attributes.
-     */
-    KmlObject.prototype.prepareAttributes = function (style) {
-        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "prepareAttributes", this.getTagNames()[0] + " doesn't override  " +
-            "prepareAttributes.");
-        return {};
-    };
-
-    /**
-     * This is function, which is called to decide which style should be applied.
-     * @return {Promise} Promise of the style to be delivered
-     */
-    KmlObject.prototype.getStyle = function () {
-        Logger.logMessage(Logger.LEVEL_WARNING, "KmlObject", "getStyle", this.getTagNames()[0] + " doesn't override  " +
-            "getStyle.");
     };
 
     /**

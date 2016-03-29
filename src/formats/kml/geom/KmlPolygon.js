@@ -14,7 +14,6 @@ define([
     '../../../shapes/ShapeAttributes'
 ], function (Color,
              KmlElements,
-             KmlElementsFactory,
              KmlGeometry,
              KmlLinearRing,
              KmlStyle,
@@ -40,16 +39,6 @@ define([
         KmlGeometry.call(this, options);
 
         this.initialized = false;
-        var self = this;
-        // Default locations and attributes. Invisible unless called otherwise.
-        if (options.style) {
-            options.style.then(function (styles) {
-                self.createPolygon(styles);
-            });
-            this._style = options.style;
-        } else {
-            self.createPolygon();
-        }
     };
 
     KmlPolygon.prototype = Object.create(KmlGeometry.prototype);
@@ -101,7 +90,7 @@ define([
          */
         kmlOuterBoundary: {
             get: function () {
-                this._factory.specific(this, {name: 'outerBoundaryIs', transformer: NodeTransformers.linearRing});
+                return this._factory.specific(this, {name: 'outerBoundaryIs', transformer: NodeTransformers.linearRing});
             }
         },
 
@@ -113,7 +102,7 @@ define([
          */
         kmlInnerBoundary: {
             get: function () {
-                this._factory.specific(this, {name: 'innerBoundaryIs', transformer: NodeTransformers.linearRing});
+                return this._factory.specific(this, {name: 'innerBoundaryIs', transformer: NodeTransformers.linearRing});
             }
         },
 
@@ -132,28 +121,33 @@ define([
 
     /**
      * Internal use only. Once create the instance of actual polygon.
-     * @param styles {Object}
+     * @param styles {Object|null}
      * @param styles.normal {KmlStyle} Style to apply when not highlighted
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
-    KmlPolygon.prototype.createPolygon = function(styles) {
+    KmlPolygon.prototype.createPolygon = function(dc, styles) {
         if(!this._renderable) {
             this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
             this.moveValidProperties();
+            dc.currentLayer.addRenderable(this._renderable);
         }
     };
 
-    /**
+	/**
      * @inheritDoc
      */
-    KmlPolygon.prototype.styleResolutionStarted = function (styles) {
-        this.createPolygon(styles);
+    KmlPolygon.prototype.render = function(dc) {
+        KmlGeometry.prototype.render.call(this, dc);
+
+        if(dc.kmlOptions.lastStyle) {
+            this.createPolygon(dc, dc.kmlOptions.lastStyle);
+        }
     };
 
     // For internal use only. Intentionally left undocumented.
     KmlPolygon.prototype.moveValidProperties = function () {
-        this.extrude = this.kmlExtrude || true;
-        this.altitudeMode = this.kmlAltitudeMode || WorldWind.CLAMP_TO_GROUND;
+        this._renderable.extrude = this.kmlExtrude || true;
+        this._renderable.altitudeMode = this.kmlAltitudeMode || WorldWind.CLAMP_TO_GROUND;
     };
 
     /**

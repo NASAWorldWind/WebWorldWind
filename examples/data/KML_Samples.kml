@@ -167,69 +167,6 @@
             </Placemark>
         </Folder>
         <Folder>
-            <name>Styles and Markup</name>
-            <visibility>1</visibility>
-            <description>With KML it is easy to create rich, descriptive markup to
-                annotate and enrich your placemarks
-            </description>
-            <LookAt>
-                <longitude>-122.0845787422371</longitude>
-                <latitude>37.42215078726837</latitude>
-                <altitude>0</altitude>
-                <heading>-148.4126777488172</heading>
-                <tilt>40.55750733930874</tilt>
-                <range>365.2646826292919</range>
-            </LookAt>
-            <styleUrl>#noDrivingDirections</styleUrl>
-            <Document>
-                <name>Highlighted Icon</name>
-                <visibility>1</visibility>
-                <description>Place your mouse over the icon to see it display the new
-                    icon
-                </description>
-                <LookAt>
-                    <longitude>-122.0856552124024</longitude>
-                    <latitude>37.4224281311035</latitude>
-                    <altitude>0</altitude>
-                    <heading>0</heading>
-                    <tilt>0</tilt>
-                    <range>265.8520424250024</range>
-                </LookAt>
-                <Style id="highlightPlacemark">
-                    <IconStyle>
-                        <Icon>
-                            <href>http://maps.google.com/mapfiles/kml/paddle/red-stars.png</href>
-                        </Icon>
-                    </IconStyle>
-                </Style>
-                <Style id="normalPlacemark">
-                    <IconStyle>
-                        <Icon>
-                            <href>http://maps.google.com/mapfiles/kml/paddle/wht-blank.png</href>
-                        </Icon>
-                    </IconStyle>
-                </Style>
-                <StyleMap id="exampleStyleMap">
-                    <Pair>
-                        <key>normal</key>
-                        <styleUrl>#normalPlacemark</styleUrl>
-                    </Pair>
-                    <Pair>
-                        <key>highlight</key>
-                        <styleUrl>#highlightPlacemark</styleUrl>
-                    </Pair>
-                </StyleMap>
-                <Placemark>
-                    <name>Roll over this icon</name>
-                    <visibility>1</visibility>
-                    <styleUrl>#exampleStyleMap</styleUrl>
-                    <Point>
-                        <coordinates>-122.0856545755255,37.42243077405461,0</coordinates>
-                    </Point>
-                </Placemark>
-            </Document>
-        </Folder>
-        <Folder>
             <name>Paths</name>
             <visibility>1</visibility>
             <description>Examples of paths. Note that the tessellate tag is by default

@@ -45,17 +45,6 @@ define([
      */
     var KmlPlacemark = function (options) {
         KmlFeature.call(this, options);
-
-        var self = this;
-        this._style = this.getStyle();
-        this._style.then(function (styles) {
-            if (!self.kmlGeometry) {
-                // TODO: Show Placemarks without geometry.
-                return;
-            }
-            self._renderable = new Placemark(self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
-            self.moveValidProperties();
-        });
     };
 
     KmlPlacemark.prototype = Object.create(KmlFeature.prototype);
@@ -76,22 +65,26 @@ define([
         }
     });
 
-    /**
-     * @inheritDoc
-     */
-    KmlPlacemark.prototype.getAppliedStyle = function() {
-        return this._style;
-    };
+    KmlPlacemark.prototype.render = function(dc) {
+        KmlFeature.prototype.render.call(this, dc);
 
-    /**
-     * After style was resolved update the geometry for this placemark.
-     * @inheritDoc
-     */
-    KmlPlacemark.prototype.afterStyleResolution = function(options) {
-        this.position = this.kmlGeometry.kmlCenter;
+        if(dc.kmlOptions.lastStyle) {
+            // TODO: render placemarks without geometry.
+            if (this.kmlGeometry) {
+                this.kmlGeometry.render(dc);
 
-        this._renderable.render(options.dc, options);
-        this.kmlGeometry.render(options.dc, options);
+                if(!this._renderable) {
+                    this._renderable = new Placemark(
+                        this.kmlGeometry.kmlCenter,
+                        false,
+                        this.prepareAttributes(dc.kmlOptions.lastStyle.normal)
+                    );
+                    this.moveValidProperties();
+                    dc.currentLayer.addRenderable(this._renderable);
+                    dc.redrawRequested = true;
+                }
+            }
+        }
     };
 
     /**
@@ -125,9 +118,9 @@ define([
      * It takes properties from the KML definition and move them into the internal objects.
      */
     KmlPlacemark.prototype.moveValidProperties = function () {
-        this.label = this.kmlName || '';
-        this.altitudeMode = this.kmlAltitudeMode || WorldWind.RELATIVE_TO_GROUND;
-        this.enableLeaderLinePicking = true;
+        this._renderable.label = this.kmlName || '';
+        this._renderable.altitudeMode = this.kmlAltitudeMode || WorldWind.RELATIVE_TO_GROUND;
+        this._renderable.enableLeaderLinePicking = true;
     };
 
     /**

@@ -94,7 +94,13 @@ define([
         if (!constructor) {
             return null;
         }
-        return new constructor({objectNode: node, parent: parent});
+        var linearRingNode = null;
+        Array.prototype.forEach.call(node.childNodes, function(node){
+            if(node.nodeName == "LinearRing") {
+                linearRingNode = node;
+            }
+        });
+        return new constructor({objectNode: linearRingNode, parent: parent});
     };
 
     /**

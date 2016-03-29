@@ -34,22 +34,6 @@ define([
 
     Object.defineProperties(KmlDocument.prototype, {
         /**
-         * Specifies any amount of features, which are part of this document.
-         * @memberof KmlDocument.prototype
-         * @readonly
-         * @type {Node[]}
-         * @see {KmlFeature}
-         */
-        kmlShapes: {
-            get: function(){
-                var allElements = this._factory.all(this);
-                return allElements.filter(function (element) {
-                    return element.isFeature;
-                });
-            }
-        },
-
-        /**
          * Specifies a custom KML schema that is used to add custom data to KML Features. The "id" attribute is
          * required and must be unique within the KML file. &lt;Schema&gt; is always a child of &lt;Document&gt;.
          * This is array of all Schemas in current document
@@ -67,18 +51,6 @@ define([
             }
         }
     });
-
-    /**
-     * Instead of standard update lifecycle only call update on contained elements.
-     * @inheritDoc
-     */
-    KmlDocument.prototype.beforeStyleResolution = function(options) {
-        this.kmlShapes.forEach(function(shape) {
-            shape.render(options.dc, options);
-        });
-
-        return false;
-    };
 
     /**
      * @inheritDoc

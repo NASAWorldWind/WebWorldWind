@@ -23,6 +23,8 @@ define([], function () {
     };
 
     TreeKeyValueCache.prototype.add = function(level, key, value){
+        //console.log("Add to cache " + level + " key: " + value);
+        //console.log(value);
         if(!this.map[level]) {
             this.map[level] = {};
         }
@@ -30,6 +32,7 @@ define([], function () {
     };
 
     TreeKeyValueCache.prototype.value = function(level, key) {
+        //console.log("Retrieve from Cache: " + level + " key: " + key);
         if(!this.map[level]){
             return null;
         }

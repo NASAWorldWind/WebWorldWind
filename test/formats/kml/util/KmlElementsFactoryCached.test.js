@@ -53,8 +53,8 @@ require({
             var createdElements = factory.all(currentMultiGeometry);
             var createdElementsFromCache = factory.all(currentMultiGeometry);
 
-            assertTrue(createdElements[0] === createdElementsFromCache[0]);
-            assertTrue(createdElements[1] === createdElementsFromCache[1]);
+            assertTrue(createdElements[0] && createdElements[0] === createdElementsFromCache[0]);
+            assertTrue(createdElements[1] && createdElements[1] === createdElementsFromCache[1]);
         }),
 
         testCachingElementsWhenAnyAsked: CatchTest(function () {

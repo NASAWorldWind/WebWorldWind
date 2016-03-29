@@ -33,7 +33,6 @@ define([
      * @classdesc Contains the data associated with KmlFeature.
      * @param options {Object}
      * @param options.objectNode {Node} Node representing the Feature
-     * @param options.style {Promise} Promise of the style to be applied to current Feature.
      * @constructor
      * @throws {ArgumentError} If the node is null.
      * @see https://developers.google.com/kml/documentation/kmlreference#feature
@@ -45,12 +44,21 @@ define([
 
         KmlObject.call(this, options);
 
-        this._style = options.style;
+        this._pStyle = null;
     };
 
     KmlFeature.prototype = Object.create(KmlObject.prototype);
 
     Object.defineProperties(KmlFeature.prototype, {
+		/**
+         * Style of this feature. Every feature should have a style. If there is no Style, null is returned.
+         */
+        style: {
+            get: function() {
+                return this._pStyle;
+            }
+        },
+
         /**
          * Name of this feature. Every feature should have name.
          * @memberof KmlFeature.prototype
@@ -213,29 +221,50 @@ define([
         }
     });
 
-
-    /**
-     * For Features take time into the account.
-     * @inheritDoc
+	/**
+	 * @inheritDoc
      */
-    KmlFeature.prototype.beforeStyleResolution = function (options) {
-        this.solveTimeVisibility(options);
+    KmlFeature.prototype.render = function(dc) {
+        KmlObject.prototype.render.call(this, dc);
 
-        return true;
+        this.solveStyle(dc);
+        this.solveVisibility(dc);
+    };
+
+    KmlFeature.prototype.solveStyle = function(dc) {
+        this.getStyle(dc);
+        if(this.style != null) {
+            dc.kmlOptions.lastStyle = this.style;
+        } else {
+            dc.redrawRequested = true;
+        }
+    };
+
+    KmlFeature.prototype.solveVisibility = function(dc) {
+        if(dc.kmlOptions.lastVisibility === false) {
+            this.enabled = false;
+        } else {
+            if(this.kmlVisibility === false) {
+                dc.kmlOptions.lastVisibility = false;
+                this.enabled = false;
+            } else {
+                if(!this.solveTimeVisibility(dc)) {
+                    dc.kmlOptions.lastVisibility = false;
+                    this.enabled = false;
+                }
+            }
+        }
     };
 
     /**
      * Internal function for solving the time visibility. The element is visible when its whole range is inside the
      * time range chosen by user.
-     * @param options {Object} In this function we care only about enabled property, which we sets in case the
-     * feature shouldn't be visible.
-     * @returns {boolean} Whether current feature should be visible.
      */
-    KmlFeature.prototype.solveTimeVisibility = function (options) {
-        if (options.timeInterval) {
+    KmlFeature.prototype.solveTimeVisibility = function (dc) {
+        if (dc.currentTimeInterval) {
             var timeRangeOfFeature = this.kmlTimePrimitive && this.kmlTimePrimitive.timeRange();
-            var from = options.timeInterval[0];
-            var to = options.timeInterval[1];
+            var from = dc.currentTimeInterval[0];
+            var to = dc.currentTimeInterval[1];
 
             if (
                 timeRangeOfFeature &&
@@ -245,9 +274,7 @@ define([
                     timeRangeOfFeature.to > to
                 )
             ) {
-                this.enabled = options.enabled = false;
-            } else {
-                this.enabled = (options.enabled !== false);
+                return false;
             }
         }
     };
@@ -255,18 +282,21 @@ define([
     /**
      * @inheritDoc
      */
-    KmlFeature.prototype.getStyle = function () {
-        var self = this;
-        if (this._pStyle) {
-            return this._pStyle;
+    KmlFeature.prototype.getStyle = function (dc) {
+        if (this._pStyle || (!this.kmlStyleUrl && !this.kmlStyleSelector)) {
+            return;
         }
-        this._pStyle = new Promise(function (resolve, reject) {
+
+        var self = this;
+        new Promise(function (resolve, reject) {
             window.setTimeout(function () {
+                // TODO: Refactor handle Remote Style.
                 StyleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
             }, 0);
+        }).then(function(styles){
+            self._pStyle = styles;
+            dc.redrawRequested = true;
         });
-        // Use also styleUrl if valid and StyleSelector.
-        return this._pStyle;
     };
 
     /**

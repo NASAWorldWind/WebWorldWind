@@ -29,40 +29,11 @@ define([
 
     KmlGeometry.prototype = Object.create(KmlObject.prototype);
 
-    /**
-     * It returns actually applied style valid for current geometry.
-     * @returns {KmlStyleSelector}
-     */
-    KmlGeometry.prototype.getAppliedStyle = function() {
-        return this._style;
-    };
+    KmlGeometry.prototype.render = function(dc) {
+        KmlObject.prototype.render.call(this, dc);
 
-    /**
-     * Hook to be overridden by the descendants.
-     */
-    KmlGeometry.prototype.prepareLocations = function() {return null;};
-
-    /**
-     * Added prepareLocations hook.
-     * @inheritDoc
-     */
-    KmlGeometry.prototype.beforeStyleResolution = function(options) {
-        if(options.style) {
-            this._style = options.style;
-        }
-
-        // TODO: Prepare locations should be hook.
-        this.locations = this.prepareLocations();
-
-        return true;
-    };
-
-    /**
-     * @inheritDoc
-     */
-    KmlGeometry.prototype.afterStyleResolution = function(options) {
-        if(this._renderable) {
-            this._renderable.render(options.dc);
+        if(dc.kmlOptions.lastVisibility === false) {
+            this.enabled = false;
         }
     };
 

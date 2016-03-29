@@ -24,6 +24,34 @@ define([
 
     KmlContainer.prototype = Object.create(KmlFeature.prototype);
 
+    Object.defineProperties(KmlContainer.prototype, {
+        /**
+         * Specifies any amount of features, which are part of this document.
+         * @memberof KmlDocument.prototype
+         * @readonly
+         * @type {Node[]}
+         * @see {KmlFeature}
+         */
+        kmlShapes: {
+            get: function(){
+                var allElements = this._factory.all(this);
+                return allElements.filter(function (element) {
+                    // For now display only features.
+                    return element.isFeature;
+                });
+            }
+        }
+    });
+
+    KmlContainer.prototype.render = function(dc) {
+        KmlFeature.prototype.render.call(this, dc);
+
+        this.kmlShapes.forEach(function(shape) {
+            shape.render(dc);
+        });
+    };
+
+
     /**
      * @inheritDoc
      */

@@ -22,7 +22,7 @@ define([
      */
     var KmlElementsFactoryCached = function() {
         this.internalFactory = new KmlElementsFactory();
-        this.cache = new TreeKeyValueCache();
+        this.cache = TreeKeyValueCache.applicationLevelCache();
     };
 
     /**
@@ -66,18 +66,7 @@ define([
      * @see KmlElementsFactory.prototype.specific
      */
     KmlElementsFactoryCached.prototype.specific = function(element, options){
-        var parentNode = element.node;
-        var child = this.cache.value(this.cacheKey(parentNode), options.name);
-        if (child) {
-            return child;
-        }
-
         var result = this.internalFactory.specific(element, options);
-        if(result && result.node) {
-            this.cache.add(this.cacheKey(parentNode), this.cacheKey(result.node), result);
-        } else if(result) {
-            this.cache.add(this.cacheKey(parentNode), options.name, result);
-        }
         return result;
     };
 
@@ -90,26 +79,7 @@ define([
      * @see KmlElementsFactory.prototype.any
      */
     KmlElementsFactoryCached.prototype.any = function(element, options){
-        var parentNode = element.node;
-
-        var self = this;
-        var child = null;
-        var potentialChild;
-        options.name.forEach(function(name){
-            potentialChild = self.cache.value(self.cacheKey(parentNode), name);
-            if(potentialChild) {
-                child = potentialChild;
-            }
-        });
-        if (child) {
-            return child;
-        }
-
         var result = this.internalFactory.any(element, options);
-
-        if(result) {
-            this.cache.add(self.cacheKey(parentNode), self.cacheKey(result.node), result);
-        }
         return result;
     };
 

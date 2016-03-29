@@ -71,30 +71,22 @@ define([
         }
     });
 
+	/**
+     * @inheritDoc
+     */
+    KmlMultiGeometry.prototype.render = function(dc) {
+        KmlGeometry.prototype.render.call(this, dc);
+
+        this.kmlShapes.forEach(function(shape) {
+            shape.render(dc);
+        });
+    };
+
     /**
      * @inheritDoc
      */
     KmlMultiGeometry.prototype.getTagNames = function () {
         return ["MultiGeometry"];
-    };
-
-    /**
-     * Instead of standard processing only delegate the processing to the descendants.
-     * @inheritDoc
-     */
-    KmlMultiGeometry.prototype.beforeStyleResolution = function (options) {
-        this.kmlShapes.forEach(function (shape) {
-            shape.update(options);
-        });
-
-        return false;
-    };
-
-    /**
-     * @inheritDoc
-     */
-    KmlMultiGeometry.prototype.getStyle = function () {
-        return this._style;
     };
 
     KmlElements.addKey(KmlMultiGeometry.prototype.getTagNames()[0], KmlMultiGeometry);

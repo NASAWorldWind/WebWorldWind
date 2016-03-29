@@ -28,33 +28,6 @@ define([
 
     KmlFolder.prototype = Object.create(KmlContainer.prototype);
 
-    Object.defineProperties(KmlFolder.prototype, {
-        /**
-         * Specifies any amount of features, which are part of this document.
-         * @memberof KmlFolder.prototype
-         * @readonly
-         * @type {KmlObject[]}
-         * @see {KmlFeature}
-         */
-        kmlShapes: {
-            get: function(){
-                return this._factory.all(this);
-            }
-        }
-    });
-
-    /**
-     * Instead of standard update processing for the element only pass the processing on descendants.
-     * @inheritDoc
-     */
-    KmlFolder.prototype.beforeStyleResolution = function(options) {
-        this.kmlShapes.forEach(function(shape) {
-            shape.render(options.dc, options);
-        });
-
-        return false;
-    };
-
     /**
      * @inheritDoc
      */

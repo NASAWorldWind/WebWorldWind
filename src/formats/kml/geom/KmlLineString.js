@@ -119,22 +119,24 @@ define([
 
     /**
      * It creates Path representing this LineString unless already initialized.
-     * @param styles {Object}
+     * @param styles {Object|null}
      * @param styles.normal {KmlStyle} Style applied when item not highlighted
      * @param styles.highlight {KmlStyle} Style applied when item is highlighted
      */
-    KmlLineString.prototype.createPath = function (styles) {
+    KmlLineString.prototype.createPath = function (dc, styles) {
         if (!this._renderable) {
             this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
             this.moveValidProperties();
+            dc.currentLayer.addRenderable(this._renderable);
         }
     };
 
-    /**
-     * @inheritDoc
-     */
-    KmlLineString.prototype.styleResolutionStarted = function (styles) {
-        this.createPath(styles);
+    KmlLineString.prototype.render = function(dc) {
+        KmlGeometry.prototype.render.call(this, dc);
+
+        if(dc.kmlOptions.lastStyle) {
+            this.createPath(dc, dc.kmlOptions.lastStyle);
+        }
     };
 
     /**
@@ -166,10 +168,10 @@ define([
      * Moves KML properties from current object into the internal shape representation.
      */
     KmlLineString.prototype.moveValidProperties = function () {
-        this.extrude = this.kmlExtrude || false;
-        this.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
+        this._renderable.extrude = this.kmlExtrude || false;
+        this._renderable.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
         //noinspection JSUnusedGlobalSymbols
-        this.tesselate = this.kmlTesselate || false;
+        this._renderable.tesselate = this.kmlTesselate || false;
     };
 
     /**
