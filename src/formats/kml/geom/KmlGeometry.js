@@ -32,12 +32,8 @@ define([
     KmlGeometry.prototype.render = function(dc, kmlOptions) {
         KmlObject.prototype.render.call(this, dc, kmlOptions);
 
-        if(kmlOptions.lastVisibility === false || kmlOptions.regionInvisible == false) {
+        if(kmlOptions.lastVisibility === false || kmlOptions.regionInvisible === false) {
             this.enabled = false;
-        }
-
-        if(this._renderable) {
-            this._renderable.enabled = this.enabled;
         }
     };
 

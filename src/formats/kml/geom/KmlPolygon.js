@@ -142,6 +142,7 @@ define([
         }
 
         if(this._renderable) {
+            this._renderable.enabled = this.enabled;
             this._renderable.render(dc);
         }
     };
