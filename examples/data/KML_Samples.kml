@@ -341,7 +341,15 @@
             <visibility>1</visibility>
             <description>Examples of polygon shapes</description>
             <Region>
-
+                <LatLonAltBox>
+                    <north>50</north>                            <!-- required; kml:angle90 -->
+                    <south>48</south>                            <!-- required; kml:angle90 -->
+                    <east>70</east>                              <!-- required; kml:angle180 -->
+                    <west>72</west>                              <!-- required; kml:angle180 -->
+                    <minAltitude>0</minAltitude>               <!-- float -->
+                    <maxAltitude>100000</maxAltitude>               <!-- float -->
+                    <altitudeMode>clampToGround</altitudeMode>
+                </LatLonAltBox>
             </Region>
             <Folder>
                 <name>Google Campus</name>

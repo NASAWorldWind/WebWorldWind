@@ -4,6 +4,7 @@
  */
 define([
     '../../geom/BoundingBox',
+    '../../util/Color',
     './KmlElements',
     './KmlLatLonAltBox',
     './KmlLod',
@@ -11,8 +12,10 @@ define([
     './styles/KmlStyle',
     './util/NodeTransformers',
     '../../shapes/Polygon',
-    '../../geom/Position'
+    '../../geom/Position',
+    '../../shapes/ShapeAttributes'
 ], function (BoundingBox,
+             Color,
              KmlElements,
              KmlLatLonAltBox,
              KmlLod,
@@ -20,7 +23,8 @@ define([
              KmlStyle,
              NodeTransformers,
              Polygon,
-             Position) {
+             Position,
+             ShapeAttributes) {
     "use strict";
 
     /**
@@ -76,22 +80,34 @@ define([
      */
     KmlRegion.prototype.intersectsVisible = function(dc) {
         // Create a Polygon and see whether it intersects the current frustum.
-        if(!this._polygonRepresentation) {
-            var positions = [
-                new Position(48, 70, 2000),
-                new Position(50, 70, 2000),
-                new Position(50, 72, 2000),
-                new Position(48, 72, 2000)
+        if(!this._polygonRepresentationMin || !this._polygonRepresentationMax) {
+            var box = this.kmlLatLonAltBox;
+            var minPositions = [
+                new Position(box.kmlSouth, box.kmlEast, box.kmlMinAltitude),
+                new Position(box.kmlNorth, box.kmlEast, box.kmlMinAltitude),
+                new Position(box.kmlNorth, box.kmlWest, box.kmlMinAltitude),
+                new Position(box.kmlSouth, box.kmlWest, box.kmlMinAltitude)
             ];
-            this._polygonRepresentation = new Polygon(positions);
+            var maxPositions = [
+                new Position(box.kmlSouth, box.kmlEast, box.kmlMaxAltitude),
+                new Position(box.kmlNorth, box.kmlEast, box.kmlMaxAltitude),
+                new Position(box.kmlNorth, box.kmlWest, box.kmlMaxAltitude),
+                new Position(box.kmlSouth, box.kmlWest, box.kmlMaxAltitude)
+            ];
+            var shapeAttributes = new ShapeAttributes(null);
 
+            shapeAttributes.outlineColor = new Color(0, 0, 0, 0);
+            shapeAttributes.outlineWidth = 0;
+            shapeAttributes.drawInterior = false;
+
+            this._polygonRepresentationMin = new Polygon(minPositions, shapeAttributes);
+            this._polygonRepresentationMax = new Polygon(maxPositions, shapeAttributes);
         }
 
-        this._polygonRepresentation.render(dc);
-        var isVisible = this._polygonRepresentation.intersectsFrustum(dc);
-        this._polygonRepresentation.enabled = false;
-        this._polygonRepresentation.render(dc);
-        return isVisible;
+        this._polygonRepresentationMin.render(dc);
+        this._polygonRepresentationMax.render(dc);
+        return this._polygonRepresentationMin.intersectsFrustum(dc) &&
+                this._polygonRepresentationMax.intersectsFrustum(dc);
     };
 
     /**
