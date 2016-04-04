@@ -125,12 +125,9 @@ define([
      * @param styles.normal {KmlStyle} Style to apply when not highlighted
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
-    KmlPolygon.prototype.createPolygon = function(dc, styles) {
-        if(!this._renderable) {
-            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
-            this.moveValidProperties();
-            dc.currentLayer.addRenderable(this._renderable);
-        }
+    KmlPolygon.prototype.createPolygon = function(styles) {
+        this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        this.moveValidProperties();
     };
 
 	/**
@@ -139,8 +136,13 @@ define([
     KmlPolygon.prototype.render = function(dc) {
         KmlGeometry.prototype.render.call(this, dc);
 
-        if(dc.kmlOptions.lastStyle) {
-            this.createPolygon(dc, dc.kmlOptions.lastStyle);
+        if(dc.kmlOptions.lastStyle && !this._renderable) {
+            this.createPolygon(dc.kmlOptions.lastStyle);
+            dc.redrawRequested = true;
+        }
+
+        if(this._renderable) {
+            this._renderable.render(dc);
         }
     };
 

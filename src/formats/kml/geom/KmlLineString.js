@@ -123,19 +123,21 @@ define([
      * @param styles.normal {KmlStyle} Style applied when item not highlighted
      * @param styles.highlight {KmlStyle} Style applied when item is highlighted
      */
-    KmlLineString.prototype.createPath = function (dc, styles) {
-        if (!this._renderable) {
-            this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
-            this.moveValidProperties();
-            dc.currentLayer.addRenderable(this._renderable);
-        }
+    KmlLineString.prototype.createPath = function (styles) {
+        this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        this.moveValidProperties();
     };
 
     KmlLineString.prototype.render = function(dc) {
         KmlGeometry.prototype.render.call(this, dc);
 
-        if(dc.kmlOptions.lastStyle) {
-            this.createPath(dc, dc.kmlOptions.lastStyle);
+        if(dc.kmlOptions.lastStyle && !this._renderable) {
+            this.createPath(dc.kmlOptions.lastStyle);
+            dc.redrawRequested = true;
+        }
+
+        if(this._renderable) {
+            this._renderable.render(dc);
         }
     };
 

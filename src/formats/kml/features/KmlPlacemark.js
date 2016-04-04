@@ -68,7 +68,7 @@ define([
     KmlPlacemark.prototype.render = function(dc) {
         KmlFeature.prototype.render.call(this, dc);
 
-        if(dc.kmlOptions.lastStyle) {
+        if(dc.kmlOptions.lastStyle && !this._renderable) {
             // TODO: render placemarks without geometry.
             if (this.kmlGeometry) {
                 this.kmlGeometry.render(dc);
@@ -80,9 +80,15 @@ define([
                         this.prepareAttributes(dc.kmlOptions.lastStyle.normal)
                     );
                     this.moveValidProperties();
-                    dc.currentLayer.addRenderable(this._renderable);
                     dc.redrawRequested = true;
                 }
+            }
+        }
+        
+        if(this._renderable) {
+            if (this.kmlGeometry) {
+                this.kmlGeometry.render(dc);
+                this._renderable.render(dc);
             }
         }
     };
