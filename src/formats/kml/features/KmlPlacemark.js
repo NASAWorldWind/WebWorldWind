@@ -17,7 +17,8 @@ define([
     '../../../util/Color',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/TextAttributes',
-    '../../../util/Offset'
+    '../../../util/Offset',
+    '../../../util/WWUtil'
 ], function (KmlElements,
              KmlFeature,
              KmlGeometry,
@@ -29,7 +30,8 @@ define([
              Color,
              ShapeAttributes,
              TextAttributes,
-             Offset) {
+             Offset,
+             WWUtil) {
     "use strict";
     /**
      * Constructs an KmlPlacemark. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -65,19 +67,19 @@ define([
         }
     });
 
-    KmlPlacemark.prototype.render = function(dc) {
-        KmlFeature.prototype.render.call(this, dc);
+    KmlPlacemark.prototype.render = function(dc, kmlOptions) {
+        KmlFeature.prototype.render.call(this, dc, kmlOptions);
 
-        if(dc.kmlOptions.lastStyle && !this._renderable) {
+        kmlOptions = WWUtil.clone(kmlOptions);
+
+        if(kmlOptions.lastStyle && !this._renderable) {
             // TODO: render placemarks without geometry.
             if (this.kmlGeometry) {
-                this.kmlGeometry.render(dc);
-
                 if(!this._renderable) {
                     this._renderable = new Placemark(
                         this.kmlGeometry.kmlCenter,
                         false,
-                        this.prepareAttributes(dc.kmlOptions.lastStyle.normal)
+                        this.prepareAttributes(kmlOptions.lastStyle.normal)
                     );
                     this.moveValidProperties();
                     dc.redrawRequested = true;
@@ -87,7 +89,7 @@ define([
         
         if(this._renderable) {
             if (this.kmlGeometry) {
-                this.kmlGeometry.render(dc);
+                this.kmlGeometry.render(dc, kmlOptions);
                 this._renderable.render(dc);
             }
         }

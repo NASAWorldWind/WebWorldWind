@@ -224,41 +224,39 @@ define([
 	/**
 	 * @inheritDoc
      */
-    KmlFeature.prototype.render = function(dc) {
-        KmlObject.prototype.render.call(this, dc);
+    KmlFeature.prototype.render = function(dc, kmlOptions) {
+        KmlObject.prototype.render.call(this, dc, kmlOptions);
 
-        this.solveRegion(dc);
-        this.solveStyle(dc);
-        this.solveVisibility(dc);
+        this.solveRegion(dc, kmlOptions);
+        this.solveStyle(dc, kmlOptions);
+        this.solveVisibility(dc, kmlOptions);
     };
 
-    KmlFeature.prototype.solveStyle = function(dc) {
+    KmlFeature.prototype.solveStyle = function(dc, kmlOptions) {
         this.getStyle(dc);
         if(this.style != null) {
-            dc.kmlOptions.lastStyle = this.style;
+            kmlOptions.lastStyle = this.style;
         } else {
             dc.redrawRequested = true;
         }
     };
 
-    KmlFeature.prototype.solveRegion = function(dc) {
+    KmlFeature.prototype.solveRegion = function(dc, kmlOptions) {
         if(this.kmlRegion && !this.kmlRegion.intersectsVisible(dc.navigatorState.frustumInModelCoordinates)) {
-            dc.kmlOptions.regionInvisible = false;
-        } else {
-            dc.kmlOptions.regionInvisible = null;
+            kmlOptions.regionInvisible = false;
         }
     };
 
-    KmlFeature.prototype.solveVisibility = function(dc) {
-        if(dc.kmlOptions.lastVisibility === false || dc.kmlOptions.regionInvisible === false) {
+    KmlFeature.prototype.solveVisibility = function(dc, kmlOptions) {
+        if(kmlOptions.lastVisibility === false || kmlOptions.regionInvisible === false) {
             this.enabled = false;
         } else {
             if(this.kmlVisibility === false) {
-                dc.kmlOptions.lastVisibility = false;
+                kmlOptions.lastVisibility = false;
                 this.enabled = false;
             } else {
                 if(!this.solveTimeVisibility(dc)) {
-                    dc.kmlOptions.lastVisibility = false;
+                    kmlOptions.lastVisibility = false;
                     this.enabled = false;
                 }
             }

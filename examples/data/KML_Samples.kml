@@ -340,6 +340,9 @@
             <name>Polygons</name>
             <visibility>1</visibility>
             <description>Examples of polygon shapes</description>
+            <Region>
+
+            </Region>
             <Folder>
                 <name>Google Campus</name>
                 <visibility>1</visibility>
@@ -515,9 +518,6 @@
                         <tilt>48.09646074797388</tilt>
                         <range>742.0552506670548</range>
                     </LookAt>
-                    <Region>
-
-                    </Region>
                     <Polygon>
                         <extrude>1</extrude>
                         <altitudeMode>relativeToGround</altitudeMode>

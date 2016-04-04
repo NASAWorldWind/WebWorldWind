@@ -133,11 +133,11 @@ define([
 	/**
      * @inheritDoc
      */
-    KmlPolygon.prototype.render = function(dc) {
-        KmlGeometry.prototype.render.call(this, dc);
+    KmlPolygon.prototype.render = function(dc, kmlOptions) {
+        KmlGeometry.prototype.render.call(this, dc, kmlOptions);
 
-        if(dc.kmlOptions.lastStyle && !this._renderable) {
-            this.createPolygon(dc.kmlOptions.lastStyle);
+        if(kmlOptions.lastStyle && !this._renderable) {
+            this.createPolygon(kmlOptions.lastStyle);
             dc.redrawRequested = true;
         }
 

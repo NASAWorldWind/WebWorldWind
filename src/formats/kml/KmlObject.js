@@ -102,17 +102,6 @@ define([
      * @inheritDoc
      */
     KmlObject.prototype.render = function (dc) {
-        if(!dc.kmlOptions) {
-            dc.kmlOptions = {
-                lastStyle: null,
-                lastVisibility: null,
-                currentTimeInterval: null,
-                regionInvisible: null
-            }
-        } else {
-            // Potential leakage. Have to be carefull.
-            dc.kmlOptions = WWUtil.clone(dc.kmlOptions);
-        }
     };
 
     /**

@@ -29,10 +29,10 @@ define([
 
     KmlGeometry.prototype = Object.create(KmlObject.prototype);
 
-    KmlGeometry.prototype.render = function(dc) {
-        KmlObject.prototype.render.call(this, dc);
+    KmlGeometry.prototype.render = function(dc, kmlOptions) {
+        KmlObject.prototype.render.call(this, dc, kmlOptions);
 
-        if(dc.kmlOptions.lastVisibility === false || dc.kmlOptions.regionInvisible == false) {
+        if(kmlOptions.lastVisibility === false || kmlOptions.regionInvisible == false) {
             this.enabled = false;
         }
 
