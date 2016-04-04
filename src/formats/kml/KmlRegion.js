@@ -3,16 +3,24 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../geom/BoundingBox',
     './KmlElements',
     './KmlLatLonAltBox',
     './KmlLod',
     './KmlObject',
-    './util/NodeTransformers'
-], function (KmlElements,
+    './styles/KmlStyle',
+    './util/NodeTransformers',
+    '../../shapes/Polygon',
+    '../../geom/Position'
+], function (BoundingBox,
+             KmlElements,
              KmlLatLonAltBox,
              KmlLod,
              KmlObject,
-             NodeTransformers) {
+             KmlStyle,
+             NodeTransformers,
+             Polygon,
+             Position) {
     "use strict";
 
     /**
@@ -64,10 +72,26 @@ define([
 
 	/**
 	 * It tests whether the region intersects the visible area.
-     * @param frustum {Frustum} Frustum to test for intersection.
+     * @param dc {DrawContext} Frustum to test for intersection.
      */
-    KmlRegion.prototype.intersectsVisible = function(frustum) {
-        return false;
+    KmlRegion.prototype.intersectsVisible = function(dc) {
+        // Create a Polygon and see whether it intersects the current frustum.
+        if(!this._polygonRepresentation) {
+            var positions = [
+                new Position(48, 70, 2000),
+                new Position(50, 70, 2000),
+                new Position(50, 72, 2000),
+                new Position(48, 72, 2000)
+            ];
+            this._polygonRepresentation = new Polygon(positions);
+
+        }
+
+        this._polygonRepresentation.render(dc);
+        var isVisible = this._polygonRepresentation.intersectsFrustum(dc);
+        this._polygonRepresentation.enabled = false;
+        this._polygonRepresentation.render(dc);
+        return isVisible;
     };
 
     /**

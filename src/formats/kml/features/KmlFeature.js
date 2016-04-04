@@ -227,7 +227,6 @@ define([
     KmlFeature.prototype.render = function(dc, kmlOptions) {
         KmlObject.prototype.render.call(this, dc, kmlOptions);
 
-        this.solveRegion(dc, kmlOptions);
         this.solveStyle(dc, kmlOptions);
         this.solveVisibility(dc, kmlOptions);
     };
@@ -241,27 +240,23 @@ define([
         }
     };
 
-    KmlFeature.prototype.solveRegion = function(dc, kmlOptions) {
-        if(this.kmlRegion && !this.kmlRegion.intersectsVisible(dc.navigatorState.frustumInModelCoordinates)) {
-            kmlOptions.regionInvisible = false;
+    KmlFeature.prototype.solveRegion = function(dc) {
+        if(this.kmlRegion) {
+            return this.kmlRegion.intersectsVisible(dc);
+        } else {
+            return true;
         }
     };
 
     KmlFeature.prototype.solveVisibility = function(dc, kmlOptions) {
-        if(kmlOptions.lastVisibility === false || kmlOptions.regionInvisible === false) {
-            this.enabled = false;
-        } else {
-            if(this.kmlVisibility === false) {
-                kmlOptions.lastVisibility = false;
-                this.enabled = false;
-            } else {
-                if(!this.solveTimeVisibility(dc)) {
-                    kmlOptions.lastVisibility = false;
-                    this.enabled = false;
-                }
-            }
-        }
+        var parentVisibility = kmlOptions.lastVisibility;
+        var timeBasedVisibility = this.solveTimeVisibility(dc);
+        var regionVisibility = this.solveRegion(dc);
+        var myVisibility = this.kmlVisibility;
 
+        this.enabled = parentVisibility !== false && timeBasedVisibility && regionVisibility && myVisibility;
+
+        kmlOptions.lastVisibility = this.enabled;
         if(this._renderable) {
             this._renderable.enabled = this.enabled;
         }
