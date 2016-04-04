@@ -60,7 +60,7 @@ define([
                 if (typeof Math.cbrt == 'function') {
                     return Math.cbrt(x);
                 } else {
-                    return Math.pow(x, 1/3);
+                    return Math.pow(x, 1 / 3);
                 }
             },
 
@@ -769,6 +769,16 @@ define([
                     WWMath.clamp(latRadians * Angle.RADIANS_TO_DEGREES, -90, 90),
                     WWMath.clamp(lonRadians * Angle.RADIANS_TO_DEGREES, -180, 180)
                 ];
+            },
+
+            /**
+             * Returns the value that is the nearest power of 2 less than or equal to the given value.
+             * @param {Number} value the reference value. The power of 2 returned is less than or equal to this value.
+             * @returns {Number} the value that is the nearest power of 2 less than or equal to the reference value
+             */
+            powerOfTwoFloor: function (value) {
+                var power = Math.floor(Math.log(value) / Math.log(2));
+                return Math.pow(2, power);
             }
         };
 

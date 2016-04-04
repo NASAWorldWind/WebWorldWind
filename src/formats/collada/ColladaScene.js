@@ -56,7 +56,7 @@ define([
             this._materials = {};
             this._images = {};
             this._upAxis = '';
-            this._filePath = '';
+            this._dirPath = '';
 
             // Documented in defineProperties below.
             this._xRotation = 0;
@@ -72,6 +72,13 @@ define([
             // Documented in defineProperties below.
             this._localTransforms = true;
 
+            // Documented in defineProperties below.
+            this._useTexturePaths = true;
+
+            // Documented in defineProperties below.
+            this._nodesToHide = [];
+            this._hideNodes = false;
+
             this.setSceneData(sceneData);
 
             // Documented in defineProperties below.
@@ -82,6 +89,10 @@ define([
 
             // Documented in defineProperties below.
             this._normalMatrix = Matrix.fromIdentity();
+
+            this._texCoordMatrix = Matrix.fromIdentity().setToUnitYFlip();
+
+            this._activeTexture = null;
 
         };
 
@@ -175,16 +186,16 @@ define([
             },
 
             /**
-             * The path to the collada file.
+             * The path to the directory of the collada file.
              * @memberof ColladaScene.prototype
              * @type {String}
              */
-            filePath: {
+            dirPath: {
                 get: function () {
-                    return this._filePath;
+                    return this._dirPath;
                 },
                 set: function (value) {
-                    this._filePath = value;
+                    this._dirPath = value;
                 }
             },
 
@@ -307,7 +318,9 @@ define([
             },
 
             /**
-             * Force the use of the nodes transformation info
+             * Force the use of the nodes transformation info. Some 3d software may break the transformations when
+             * importing/exporting models to collada format. Set to false to ignore the the nodes transformation.
+             * Only use this option if the model does not render properly.
              * @memberof ColladaScene.prototype
              * @default true
              * @type {Boolean}
@@ -318,6 +331,51 @@ define([
                 },
                 set: function (value) {
                     this._localTransforms = value;
+                }
+            },
+
+            /**
+             * Force the use of the texture path specified in the collada file. Set to false to ignore the paths of the
+             * textures in the collada file and instead get the textures from the same dir as the collada file.
+             * @memberof ColladaScene.prototype
+             * @default true
+             * @type {Boolean}
+             */
+            useTexturePaths: {
+                get: function () {
+                    return this._useTexturePaths;
+                },
+                set: function (value) {
+                    this._useTexturePaths = value;
+                }
+            },
+
+            /**
+             * An array of node id's to not render.
+             * @memberof ColladaScene.prototype
+             * @type {String[]}
+             */
+            nodesToHide: {
+                get: function () {
+                    return this._nodesToHide;
+                },
+                set: function (value) {
+                    this._nodesToHide = value;
+                }
+            },
+
+            /**
+             * Set to true to force the renderer to not draw the nodes passed to the nodesToHide list.
+             * @memberof ColladaScene.prototype
+             * @default false
+             * @type {Boolean}
+             */
+            hideNodes: {
+                get: function () {
+                    return this._hideNodes;
+                },
+                set: function (value) {
+                    this._hideNodes = value;
                 }
             }
 
@@ -331,7 +389,7 @@ define([
                 this.materials = sceneData.materials;
                 this.images = sceneData.images;
                 this.upAxis = sceneData.metadata.up_axis;
-                this.filePath = sceneData.filePath;
+                this.dirPath = sceneData.dirPath;
             }
         };
 
@@ -339,6 +397,10 @@ define([
         ColladaScene.prototype.render = function (dc) {
 
             var orderedScene;
+
+            if (!this.enabled) {
+                return;
+            }
 
             if (this.lastFrameTime !== dc.timestamp) {
                 orderedScene = this.makeOrderedRenderable(dc);
@@ -422,29 +484,34 @@ define([
         // Internal. Intentionally not documented.
         ColladaScene.prototype.traverseNodeTree = function (dc, node) {
 
-            if (node.mesh) {
-                var meshKey = node.mesh;
-                var buffers = this.meshes[meshKey].buffers;
+            var renderNode = this.mustRenderNode(node.id);
 
-                for (var i = 0, bufLen = buffers.length; i < bufLen; i++) {
+            if (renderNode) {
 
-                    var materialBuf = buffers[i].material;
+                if (node.mesh) {
+                    var meshKey = node.mesh;
+                    var buffers = this.meshes[meshKey].buffers;
 
-                    for (var j = 0; j < node.materials.length; j++) {
-                        if (materialBuf === node.materials[j].symbol) {
-                            var materialKey = node.materials[j].id;
-                            break;
+                    for (var i = 0, bufLen = buffers.length; i < bufLen; i++) {
+
+                        var materialBuf = buffers[i].material;
+
+                        for (var j = 0; j < node.materials.length; j++) {
+                            if (materialBuf === node.materials[j].symbol) {
+                                var materialKey = node.materials[j].id;
+                                break;
+                            }
                         }
+
+                        var material = this.materials[materialKey];
+
+                        this.draw(dc, buffers[i], material, node.worldMatrix, node.normalMatrix);
                     }
-
-                    var material = this.materials[materialKey];
-
-                    this.draw(dc, buffers[i], material, node.worldMatrix, node.normalMatrix);
                 }
-            }
 
-            for (var k = 0; k < node.children.length; k++) {
-                this.traverseNodeTree(dc, node.children[k]);
+                for (var k = 0; k < node.children.length; k++) {
+                    this.traverseNodeTree(dc, node.children[k]);
+                }
             }
 
         };
@@ -462,7 +529,7 @@ define([
 
             this.applyColor(dc, material);
 
-            var hasTexture = (material && material.textures != null && buffers.uvs && buffers.uvs.length);
+            var hasTexture = (material && material.textures != null && buffers.uvs && buffers.uvs.length > 0);
             if (hasTexture) {
                 this.applyTexture(dc, buffers, material);
             }
@@ -472,7 +539,7 @@ define([
                 this.applyLighting(dc, buffers);
             }
 
-            this.applyMatrix(dc, hasLighting, nodeWorldMatrix, nodeNormalMatrix);
+            this.applyMatrix(dc, hasLighting, hasTexture , nodeWorldMatrix, nodeNormalMatrix);
 
             this.applyIndices(dc, buffers);
 
@@ -550,7 +617,8 @@ define([
 
             var textureBound, vboId,
                 gl = dc.currentGlContext,
-                program = dc.currentProgram;
+                program = dc.currentProgram,
+                wrapMode;
 
             if (material.textures.diffuse) {
                 var imageKey = material.textures.diffuse.mapId;
@@ -559,14 +627,15 @@ define([
                 imageKey = material.textures.reflective.mapId;
             }
 
-            var image = this.images[imageKey].filename || this.images[imageKey].path;
+            var image = this.useTexturePaths ? this.images[imageKey].path : this.images[imageKey].filename;
 
-            buffers.activeTexture = dc.gpuResourceCache.resourceForKey(this.filePath + image + "");
-            if (!buffers.activeTexture) {
-                buffers.activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.filePath + image + "");
+            this._activeTexture = dc.gpuResourceCache.resourceForKey(this.dirPath + image + "");
+            if (!this._activeTexture) {
+                wrapMode = buffers.isClamp ? gl.CLAMP_TO_EDGE : gl.REPEAT;
+                this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", wrapMode);
             }
+            textureBound = this._activeTexture && this._activeTexture.bind(dc);
 
-            textureBound = buffers.activeTexture && buffers.activeTexture.bind(dc);
             if (textureBound) {
                 if (!buffers.texCoordsVboCacheKey) {
                     buffers.texCoordsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
@@ -584,16 +653,6 @@ define([
                     gl.bufferData(gl.ARRAY_BUFFER, buffers.uvs, gl.STATIC_DRAW);
                     dc.frameStatistics.incrementVboLoadCount(1);
                     buffers.refreshTexCoordBuffer = false;
-                }
-
-                if (buffers.isClamp) {
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-                }
-                else {
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
                 }
 
                 program.loadTextureEnabled(gl, true);
@@ -635,7 +694,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        ColladaScene.prototype.applyMatrix = function (dc, hasLighting, nodeWorldMatrix, nodeNormalMatrix) {
+        ColladaScene.prototype.applyMatrix = function (dc, hasLighting, hasTexture, nodeWorldMatrix, nodeNormalMatrix) {
 
             var mvpMatrix = Matrix.fromIdentity();
 
@@ -660,6 +719,11 @@ define([
                 }
 
                 dc.currentProgram.loadModelviewInverse(dc.currentGlContext, normalMatrix);
+            }
+
+            if (hasTexture && this._activeTexture){
+                dc.currentProgram.loadTextureMatrix(dc.currentGlContext, this._texCoordMatrix);
+                this._activeTexture = null;
             }
 
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, mvpMatrix);
@@ -716,29 +780,15 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        ColladaScene.prototype.computeRotationMatrix = function () {
-
-            this.rotationMatrix = Matrix.fromIdentity();
-
-            this.rotationMatrix.multiplyByRotation(1, 0, 0, this.xRotation);
-            this.rotationMatrix.multiplyByRotation(0, 1, 0, this.yRotation);
-            this.rotationMatrix.multiplyByRotation(0, 0, 1, this.zRotation);
-        };
-
-        // Internal. Intentionally not documented.
         ColladaScene.prototype.computeTransformationMatrix = function (globe) {
 
             this.transformationMatrix = Matrix.fromIdentity();
-
-            //this.computeRotationMatrix();
 
             this.transformationMatrix.multiplyByLocalCoordinateTransform(this.placePoint, globe);
 
             this.transformationMatrix.multiplyByRotation(1, 0, 0, this.xRotation);
             this.transformationMatrix.multiplyByRotation(0, 1, 0, this.yRotation);
             this.transformationMatrix.multiplyByRotation(0, 0, 1, this.zRotation);
-
-            //this.transformationMatrix.multiplyMatrix(this.rotationMatrix);
 
             this.transformationMatrix.multiplyByScale(this.scale, this.scale, this.scale);
 
@@ -758,6 +808,16 @@ define([
             this.normalMatrix.multiplyByRotation(-1, 0, 0, rotAngles[0]);
             this.normalMatrix.multiplyByRotation(0, -1, 0, rotAngles[1]);
             this.normalMatrix.multiplyByRotation(0, 0, -1, rotAngles[2]);
+        };
+
+        // Internal. Intentionally not documented.
+        ColladaScene.prototype.mustRenderNode = function (nodeId) {
+            var draw = true;
+            if (this.hideNodes) {
+                var pos = this.nodesToHide.indexOf(nodeId);
+                draw = (pos === -1);
+            }
+            return draw;
         };
 
         return ColladaScene;
