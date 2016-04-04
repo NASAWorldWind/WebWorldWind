@@ -227,6 +227,7 @@ define([
     KmlFeature.prototype.render = function(dc) {
         KmlObject.prototype.render.call(this, dc);
 
+        this.solveRegion(dc);
         this.solveStyle(dc);
         this.solveVisibility(dc);
     };
@@ -240,8 +241,16 @@ define([
         }
     };
 
+    KmlFeature.prototype.solveRegion = function(dc) {
+        if(this.kmlRegion && !this.kmlRegion.intersectsVisible(dc.navigatorState.frustumInModelCoordinates)) {
+            dc.kmlOptions.regionInvisible = false;
+        } else {
+            dc.kmlOptions.regionInvisible = null;
+        }
+    };
+
     KmlFeature.prototype.solveVisibility = function(dc) {
-        if(dc.kmlOptions.lastVisibility === false) {
+        if(dc.kmlOptions.lastVisibility === false || dc.kmlOptions.regionInvisible === false) {
             this.enabled = false;
         } else {
             if(this.kmlVisibility === false) {
@@ -253,6 +262,10 @@ define([
                     this.enabled = false;
                 }
             }
+        }
+
+        if(this._renderable) {
+            this._renderable.enabled = this.enabled;
         }
     };
 
@@ -277,6 +290,8 @@ define([
                 return false;
             }
         }
+
+        return true;
     };
 
     /**

@@ -106,7 +106,8 @@ define([
             dc.kmlOptions = {
                 lastStyle: null,
                 lastVisibility: null,
-                currentTimeInterval: null
+                currentTimeInterval: null,
+                regionInvisible: null
             }
         } else {
             // Potential leakage. Have to be carefull.

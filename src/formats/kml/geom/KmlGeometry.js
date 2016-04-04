@@ -32,8 +32,12 @@ define([
     KmlGeometry.prototype.render = function(dc) {
         KmlObject.prototype.render.call(this, dc);
 
-        if(dc.kmlOptions.lastVisibility === false) {
+        if(dc.kmlOptions.lastVisibility === false || dc.kmlOptions.regionInvisible == false) {
             this.enabled = false;
+        }
+
+        if(this._renderable) {
+            this._renderable.enabled = this.enabled;
         }
     };
 

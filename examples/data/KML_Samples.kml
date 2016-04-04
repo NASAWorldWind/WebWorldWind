@@ -515,6 +515,9 @@
                         <tilt>48.09646074797388</tilt>
                         <range>742.0552506670548</range>
                     </LookAt>
+                    <Region>
+
+                    </Region>
                     <Polygon>
                         <extrude>1</extrude>
                         <altitudeMode>relativeToGround</altitudeMode>

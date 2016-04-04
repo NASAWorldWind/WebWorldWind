@@ -62,6 +62,14 @@ define([
         }
     });
 
+	/**
+	 * It tests whether the region intersects the visible area.
+     * @param frustum {Frustum} Frustum to test for intersection.
+     */
+    KmlRegion.prototype.intersectsVisible = function(frustum) {
+        return false;
+    };
+
     /**
      * @inheritDoc
      */
