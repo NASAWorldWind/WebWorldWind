@@ -4,11 +4,19 @@
  */
 define([
     './../KmlElements',
+    './KmlFeature',
     './KmlOverlay',
-    '../util/NodeTransformers'
+    '../util/NodeTransformers',
+    '../../../util/Offset',
+    '../../../shapes/ScreenImage',
+    '../../../util/WWUtil'
 ], function (KmlElements,
+             KmlFeature,
              KmlOverlay,
-             NodeTransformers) {
+             NodeTransformers,
+             Offset,
+             ScreenImage,
+             WWUtil) {
     "use strict";
 
     /**
@@ -54,7 +62,7 @@ define([
          */
         kmlOverlayXYx: {
             get: function () {
-                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('x')});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('x'), attribute: 'kmlOverlayXYx'});
             }
         },
 
@@ -67,7 +75,7 @@ define([
          */
         kmlOverlayXYy: {
             get: function () {
-                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('y')});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('y'), attribute: 'kmlOverlayXYy'});
             }
         },
 
@@ -81,7 +89,7 @@ define([
          */
         kmlOverlayXYxunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('xunits')});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('xunits'), attribute: 'kmlOverlayXYxunits'});
             }
         },
 
@@ -95,7 +103,7 @@ define([
          */
         kmlOverlayXYyunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('yunits')});
+                return this._factory.specific(this, {name: 'overlayXY', transformer: NodeTransformers.attribute('yunits'), attribute: 'kmlOverlayXYyunits'});
             }
         },
 
@@ -108,7 +116,7 @@ define([
          */
         kmlScreenXYx: {
             get: function () {
-                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('x')});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('x'), attribute: 'kmlScreenXYx'});
             }
         },
 
@@ -121,7 +129,7 @@ define([
          */
         kmlScreenXYy: {
             get: function () {
-                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('y')});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('y'), attribute: 'kmlScreenXYy'});
             }
         },
 
@@ -136,7 +144,7 @@ define([
          */
         kmlScreenXYxunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('xunits')});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('xunits'), attribute: 'kmlScreenXYxunits'});
             }
         },
 
@@ -150,7 +158,7 @@ define([
          */
         kmlScreenXYyunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('yunits')});
+                return this._factory.specific(this, {name: 'screenXY', transformer: NodeTransformers.attribute('yunits'), attribute: 'kmlScreenXYyunits'});
             }
         },
 
@@ -162,7 +170,7 @@ define([
          */
         kmlRotationXYx: {
             get: function () {
-                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('x')});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('x'), attribute: 'kmlRotationXYx'});
             }
         },
 
@@ -174,7 +182,7 @@ define([
          */
         kmlRotationXYy: {
             get: function () {
-                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('y')});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('y'), attribute: 'kmlRotationXYy'});
             }
         },
 
@@ -189,7 +197,7 @@ define([
          */
         kmlRotationXYxunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('xunits')});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('xunits'), attribute: 'kmlRotationXYxunits'});
             }
         },
 
@@ -203,7 +211,7 @@ define([
          */
         kmlRotationXYyunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('yunits')});
+                return this._factory.specific(this, {name: 'rotationXY', transformer: NodeTransformers.attribute('yunits'), attribute: 'kmlRotationXYyunits'});
             }
         },
 
@@ -217,7 +225,7 @@ define([
          */
         kmlSizex: {
             get: function () {
-                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('x')});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('x'), attribute: 'kmlSizex'});
             }
         },
 
@@ -231,7 +239,7 @@ define([
          */
         kmlSizey: {
             get: function () {
-                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('y')});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('y'), attribute: 'kmlSizey'});
             }
         },
 
@@ -246,7 +254,7 @@ define([
          */
         kmlSizexunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('xunits')});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('xunits'), attribute: 'kmlSizexunits'});
             }
         },
 
@@ -260,14 +268,40 @@ define([
          */
         kmlSizeyunits: {
             get: function () {
-                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('yunits')});
+                return this._factory.specific(this, {name: 'size', transformer: NodeTransformers.attribute('yunits'), attribute: 'kmlSizeyunits'});
             }
         }
     });
 
-    // TODO: Make sure that caching works correctly.
     KmlScreenOverlay.prototype.render = function(dc, kmlOptions) {
-        // Creates the ScreenImage.
+        KmlFeature.prototype.render.call(this, dc, kmlOptions);
+
+        kmlOptions = WWUtil.clone(kmlOptions);
+
+        if(kmlOptions.lastStyle && !this._renderable) {
+            if(this.kmlIcon) {
+                this._renderable = new ScreenImage(
+                    new Offset(
+                        this.kmlScreenXYxunits,
+                        this.kmlScreenXYx,
+                        this.kmlScreenXYyunits,
+                        this.kmlScreenXYy
+                    ),
+                    this.kmlIcon.kmlHref
+                );
+                this._renderable.imageOffset = new Offset(
+                    this.kmlOverlayXYxunits,
+                    this.kmlOverlayXYx,
+                    this.kmlOverlayXYyunits,
+                    this.kmlOverlayXYy
+                );
+                dc.redrawRequested = true;
+            }
+        }
+
+        if(this._renderable) {
+            this._renderable.render(dc);
+        }
     };
 
     /**

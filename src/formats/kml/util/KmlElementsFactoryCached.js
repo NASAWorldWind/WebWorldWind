@@ -67,7 +67,11 @@ define([
      */
     KmlElementsFactoryCached.prototype.specific = function(element, options){
         var parentNode = element.node;
-        var child = this.cache.value(this.cacheKey(parentNode), options.name);
+        var name = options.name;
+        if(options.attribute) {
+            name = options.attribute + name;
+        }
+        var child = this.cache.value(this.cacheKey(parentNode), name);
         if (child) {
             return child;
         }
@@ -76,7 +80,7 @@ define([
         if(result && result.node) {
             this.cache.add(this.cacheKey(parentNode), this.cacheKey(result.node), result);
         } else if(result) {
-            this.cache.add(this.cacheKey(parentNode), options.name, result);
+            this.cache.add(this.cacheKey(parentNode), name, result);
         }
         return result;
     };

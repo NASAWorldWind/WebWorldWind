@@ -361,7 +361,7 @@
             <ScreenOverlay>
                 <name>Absolute Positioning: Top left</name>
                 <Icon>
-                    <href>http://developers.google.com/kml/documentation/images/top_left.jpg</href>
+                    <href>data/top_left.jpg</href>
                 </Icon>
                 <overlayXY x="0" y="1" xunits="fraction" yunits="fraction"/>
                 <screenXY x="0" y="1" xunits="fraction" yunits="fraction"/>
