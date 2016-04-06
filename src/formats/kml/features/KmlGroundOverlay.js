@@ -4,16 +4,24 @@
  */
 define([
     './../KmlElements',
+    './KmlFeature',
     '../KmlLatLonBox',
     '../KmlLatLonQuad',
     './KmlOverlay',
-    '../util/NodeTransformers'
+    '../util/NodeTransformers',
+    '../../../geom/Sector',
+    '../../../shapes/SurfaceImage',
+    '../../../util/WWUtil'
 ], function (
     KmlElements,
+    KmlFeature,
     KmlLatLonBox,
     KmlLatLonQuad,
     KmlOverlay,
-    NodeTransformers
+    NodeTransformers,
+    Sector,
+    SurfaceImage,
+    WWUtil
 ) {
     "use strict";
 
@@ -90,6 +98,32 @@ define([
             }
         }
     });
+
+    // More or less just representation of SurfaceImage. This should simply display icon.
+    KmlGroundOverlay.prototype.render = function(dc, kmlOptions) {
+        KmlFeature.prototype.render.call(this, dc, kmlOptions);
+
+        kmlOptions = WWUtil.clone(kmlOptions);
+        
+        if(kmlOptions.lastStyle && !this._renderable) {
+            if(this.kmlIcon && this.kmlLatLonBox) {
+                this._renderable = new SurfaceImage(
+                    new Sector(
+                        this.kmlLatLonBox.kmlSouth,
+                        this.kmlLatLonBox.kmlNorth,
+                        this.kmlLatLonBox.kmlWest,
+                        this.kmlLatLonBox.kmlEast
+                    ),
+                    this.kmlIcon.kmlHref
+                );
+                dc.redrawRequested = true;
+            }
+        }
+        
+        if(this._renderable) {
+            this._renderable.render(dc);
+        }
+    };
 
     /**
      * @inheritDoc

@@ -33,7 +33,7 @@ define([
      */
     KmlElementsFactoryCached.prototype.all = function(element){
         var parentNode = element.node;
-        var children = this.cache.level(this.cacheKey(element.node));
+        var children = this.cache.level(this.cacheKey(element.node, "All"));
         if (children) {
             var results = [];
             for(var key in children) {
@@ -49,7 +49,7 @@ define([
         if(elements && elements.length) {
             var self = this;
             elements.forEach(function (element) {
-                self.cache.add(self.cacheKey(parentNode), self.cacheKey(element.node), element);
+                self.cache.add(self.cacheKey(parentNode, "All"), self.cacheKey(element.node), element);
             });
         }
         return elements;
@@ -66,7 +66,18 @@ define([
      * @see KmlElementsFactory.prototype.specific
      */
     KmlElementsFactoryCached.prototype.specific = function(element, options){
+        var parentNode = element.node;
+        var child = this.cache.value(this.cacheKey(parentNode), options.name);
+        if (child) {
+            return child;
+        }
+
         var result = this.internalFactory.specific(element, options);
+        if(result && result.node) {
+            this.cache.add(this.cacheKey(parentNode), this.cacheKey(result.node), result);
+        } else if(result) {
+            this.cache.add(this.cacheKey(parentNode), options.name, result);
+        }
         return result;
     };
 
@@ -79,7 +90,26 @@ define([
      * @see KmlElementsFactory.prototype.any
      */
     KmlElementsFactoryCached.prototype.any = function(element, options){
+        var parentNode = element.node;
+
+        var self = this;
+        var child = null;
+        var potentialChild;
+        options.name.forEach(function(name){
+            potentialChild = self.cache.value(self.cacheKey(parentNode), name);
+            if(potentialChild) {
+                child = potentialChild;
+            }
+        });
+        if (child) {
+            return child;
+        }
+
         var result = this.internalFactory.any(element, options);
+
+        if(result) {
+            this.cache.add(self.cacheKey(parentNode), self.cacheKey(result.node), result);
+        }
         return result;
     };
 
@@ -87,14 +117,19 @@ define([
      * It creates cache key based on the node. In case the node doesn't have any id, it also creates id for this
      * element. This id is used for storing the value in the cache.
      * @param node {Node} Node for which generate the key.
+     * @param prefix {String|undefined} Prefix for the level
      * @returns {String} Value representing the key.
      */
-    KmlElementsFactoryCached.prototype.cacheKey = function(node) {
+    KmlElementsFactoryCached.prototype.cacheKey = function(node, prefix) {
         var idAttribute = new Attribute(node, "id");
         if (!idAttribute.exists()) {
             idAttribute.save(WWUtil.guid());
         }
-        return node.nodeName + "#" + idAttribute.value();
+        var result = node.nodeName + "#" + idAttribute.value();
+        if(prefix) {
+            result = prefix + result;
+        }
+        return result;
     };
 
     var applicationWide = new KmlElementsFactoryCached();

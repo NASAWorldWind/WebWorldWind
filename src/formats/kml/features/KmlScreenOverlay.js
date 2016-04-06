@@ -265,6 +265,11 @@ define([
         }
     });
 
+    // TODO: Make sure that caching works correctly.
+    KmlScreenOverlay.prototype.render = function(dc, kmlOptions) {
+        // Creates the ScreenImage.
+    };
+
     /**
      * @inheritDoc
      */

@@ -249,10 +249,10 @@ define([
     };
 
     KmlFeature.prototype.solveVisibility = function(dc, kmlOptions) {
-        var parentVisibility = kmlOptions.lastVisibility;
+        var parentVisibility = kmlOptions.lastVisibility !== false;
         var timeBasedVisibility = this.solveTimeVisibility(dc);
         var regionVisibility = this.solveRegion(dc);
-        var myVisibility = this.kmlVisibility;
+        var myVisibility = this.kmlVisibility !== false;
 
         this.enabled = parentVisibility !== false && timeBasedVisibility && regionVisibility && myVisibility;
 

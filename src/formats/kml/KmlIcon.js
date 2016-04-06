@@ -80,6 +80,9 @@ define([
         }
     });
 
+    KmlIcon.prototype.render = function(dc) {
+        
+    };
 
     /**
      * @inheritDoc

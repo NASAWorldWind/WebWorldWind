@@ -337,6 +337,39 @@
             </Placemark>
         </Folder>
         <Folder>
+            <name>Ground Overlays</name>
+            <description>Examples of ground overlays</description>
+            <GroundOverlay>
+                <name>Large-scale overlay on terrain</name>
+                <description>Overlay shows Mount Etna erupting
+                    on July 13th, 2001.</description>
+                <Icon>
+                    <href>data/etna.jpg</href>
+                </Icon>
+                <LatLonBox>
+                    <north>37.91904192681665</north>
+                    <south>37.46543388598137</south>
+                    <east>15.35832653742206</east>
+                    <west>14.60128369746704</west>
+                    <rotation>-0.1556640799496235</rotation>
+                </LatLonBox>
+            </GroundOverlay>
+        </Folder>
+        <Folder>
+            <name>Screen Overlays</name>
+            <description>Examples of screen overlays</description>
+            <ScreenOverlay>
+                <name>Absolute Positioning: Top left</name>
+                <Icon>
+                    <href>http://developers.google.com/kml/documentation/images/top_left.jpg</href>
+                </Icon>
+                <overlayXY x="0" y="1" xunits="fraction" yunits="fraction"/>
+                <screenXY x="0" y="1" xunits="fraction" yunits="fraction"/>
+                <rotationXY x="0" y="0" xunits="fraction" yunits="fraction"/>
+                <size x="0" y="0" xunits="fraction" yunits="fraction"/>
+            </ScreenOverlay>
+        </Folder>
+        <Folder>
             <name>Polygons</name>
             <visibility>1</visibility>
             <description>Examples of polygon shapes</description>

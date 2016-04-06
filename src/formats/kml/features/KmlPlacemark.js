@@ -75,15 +75,13 @@ define([
         if(kmlOptions.lastStyle && !this._renderable) {
             // TODO: render placemarks without geometry.
             if (this.kmlGeometry) {
-                if(!this._renderable) {
-                    this._renderable = new Placemark(
-                        this.kmlGeometry.kmlCenter,
-                        false,
-                        this.prepareAttributes(kmlOptions.lastStyle.normal)
-                    );
-                    this.moveValidProperties();
-                    dc.redrawRequested = true;
-                }
+                this._renderable = new Placemark(
+                    this.kmlGeometry.kmlCenter,
+                    false,
+                    this.prepareAttributes(kmlOptions.lastStyle.normal)
+                );
+                this.moveValidProperties();
+                dc.redrawRequested = true;
             }
         }
         
