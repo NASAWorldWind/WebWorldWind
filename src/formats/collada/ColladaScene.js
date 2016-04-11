@@ -64,6 +64,11 @@ define([
             this._zRotation = 0;
 
             // Documented in defineProperties below.
+            this._xTranslation = 0;
+            this._yTranslation = 0;
+            this._zTranslation = 0;
+
+            // Documented in defineProperties below.
             this._scale = 1;
 
             // Documented in defineProperties below.
@@ -238,6 +243,48 @@ define([
                 },
                 set: function (value) {
                     this._zRotation = value;
+                }
+            },
+
+            /**
+             * The scene's translation for the x axis.
+             * @memberof ColladaScene.prototype
+             * @type {Number}
+             */
+            xTranslation: {
+                get: function () {
+                    return this._xTranslation;
+                },
+                set: function (value) {
+                    this._xTranslation = value;
+                }
+            },
+
+            /**
+             * The scene's translation for the y axis.
+             * @memberof ColladaScene.prototype
+             * @type {Number}
+             */
+            yTranslation: {
+                get: function () {
+                    return this._yTranslation;
+                },
+                set: function (value) {
+                    this._yTranslation = value;
+                }
+            },
+
+            /**
+             * The scene's translation for the z axis.
+             * @memberof ColladaScene.prototype
+             * @type {Number}
+             */
+            zTranslation: {
+                get: function () {
+                    return this._zTranslation;
+                },
+                set: function (value) {
+                    this._zTranslation = value;
                 }
             },
 
@@ -791,6 +838,8 @@ define([
             this.transformationMatrix.multiplyByRotation(0, 0, 1, this.zRotation);
 
             this.transformationMatrix.multiplyByScale(this.scale, this.scale, this.scale);
+
+            this.transformationMatrix.multiplyByTranslation(this.xTranslation, this.yTranslation, this.zTranslation);
 
             this.computeNormalMatrix();
 
