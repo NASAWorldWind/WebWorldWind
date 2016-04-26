@@ -356,12 +356,80 @@
             </GroundOverlay>
         </Folder>
         <Folder>
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T32UQB.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>51.41589769585037</north>
+                    <south>50.382122249780146</south>
+                    <east>13.450589698980341</east>
+                    <west>11.815510113549237</west>
+                </LatLonBox>
+            </GroundOverlay>
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UUS.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>51.44399790754169</north>
+                    <south>50.429712991163605</south>
+                    <east>13.729300891802168</east>
+                    <west>12.123708231717927</west>
+                </LatLonBox>
+            </GroundOverlay>
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UVS.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>51.451117795210315</north>
+                    <south>50.45526533911891</south>
+                    <east>15.140457957690417</east>
+                    <west>13.560547850100555</west>
+                </LatLonBox>
+            </GroundOverlay>
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150810T100716_A000691_T33UVP.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>48.75295443777926</north>
+                    <south>47.7574035312523</south>
+                    <east>15.132782609969988</east>
+                    <west>13.639176802255028</west>
+                </LatLonBox>
+            </GroundOverlay>
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQA.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>50.518113702963866</north>
+                    <south>49.48562029122995</south>
+                    <east>13.365742763475753</east>
+                    <west>11.763545147584727</west>
+                </LatLonBox>
+            </GroundOverlay>
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQV.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>49.619610113671506</north>
+                    <south>48.58834878003898</south>
+                    <east>13.285045642949315</east>
+                    <west>11.714086657726819</west>
+                </LatLonBox>
+            </GroundOverlay>
+        </Folder>
+        <Folder>
             <name>Screen Overlays</name>
             <description>Examples of screen overlays</description>
             <ScreenOverlay>
                 <name>Absolute Positioning: Top left</name>
                 <Icon>
-                    <href>data/top_left.jpg</href>
+                    <href>data/esa_logo_min.png</href>
                 </Icon>
                 <overlayXY x="0" y="1" xunits="fraction" yunits="fraction"/>
                 <screenXY x="0" y="1" xunits="fraction" yunits="fraction"/>

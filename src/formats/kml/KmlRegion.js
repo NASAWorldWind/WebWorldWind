@@ -79,6 +79,10 @@ define([
      * @param dc {DrawContext} Frustum to test for intersection.
      */
     KmlRegion.prototype.intersectsVisible = function(dc) {
+        // Use BoundingBox and frustum in NavigatorState.
+        // BoundingBox.prototype.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)
+        // dc.navigatorState.frustumInModelCoordinates
+
         // Create a Polygon and see whether it intersects the current frustum.
         if(!this._polygonRepresentationMin || !this._polygonRepresentationMax) {
             var box = this.kmlLatLonAltBox;
