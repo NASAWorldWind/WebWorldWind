@@ -12,16 +12,14 @@ define([
     './util/KmlElementsFactoryCached',
     '../../util/Logger',
     '../../util/Promise',
-    '../../render/Renderable',
-    '../../util/WWUtil'
+    '../../render/Renderable'
 ], function (ArgumentError,
              Attribute,
              KmlElements,
              KmlElementsFactoryCached,
              Logger,
              Promise,
-             Renderable,
-             WWUtil) {
+             Renderable) {
     "use strict";
 
     /**
