@@ -87,14 +87,14 @@ define([
         var box = this.kmlLatLonAltBox;
         if(!this._polygonRepresentationMin) {
             var minPositions = [
-                new Position(box.kmlSouth, box.kmlEast, 10000),
-                new Position(box.kmlNorth, box.kmlEast, 10000),
-                new Position(box.kmlNorth, box.kmlWest, 10000),
-                new Position(box.kmlSouth, box.kmlWest, 10000)
+                new Position(box.kmlSouth, box.kmlEast, 5000),
+                new Position(box.kmlNorth, box.kmlEast, 5000),
+                new Position(box.kmlNorth, box.kmlWest, 5000),
+                new Position(box.kmlSouth, box.kmlWest, 5000)
             ];
             var shapeAttributes = new ShapeAttributes(null);
 
-            shapeAttributes.outlineColor = Color.RED; //new Color(0, 0, 0, 0);
+            shapeAttributes.outlineColor = new Color(0, 0, 0, 0);
             shapeAttributes.outlineWidth = 0;
             shapeAttributes.drawInterior = false;
 
