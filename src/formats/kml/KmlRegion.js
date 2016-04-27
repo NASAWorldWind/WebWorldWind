@@ -84,34 +84,27 @@ define([
         // dc.navigatorState.frustumInModelCoordinates
 
         // Create a Polygon and see whether it intersects the current frustum.
-        if(!this._polygonRepresentationMin || !this._polygonRepresentationMax) {
-            var box = this.kmlLatLonAltBox;
+        var box = this.kmlLatLonAltBox;
+        if(!this._polygonRepresentationMin) {
             var minPositions = [
-                new Position(box.kmlSouth, box.kmlEast, box.kmlMinAltitude),
-                new Position(box.kmlNorth, box.kmlEast, box.kmlMinAltitude),
-                new Position(box.kmlNorth, box.kmlWest, box.kmlMinAltitude),
-                new Position(box.kmlSouth, box.kmlWest, box.kmlMinAltitude)
-            ];
-            var maxPositions = [
-                new Position(box.kmlSouth, box.kmlEast, box.kmlMaxAltitude),
-                new Position(box.kmlNorth, box.kmlEast, box.kmlMaxAltitude),
-                new Position(box.kmlNorth, box.kmlWest, box.kmlMaxAltitude),
-                new Position(box.kmlSouth, box.kmlWest, box.kmlMaxAltitude)
+                new Position(box.kmlSouth, box.kmlEast, 10000),
+                new Position(box.kmlNorth, box.kmlEast, 10000),
+                new Position(box.kmlNorth, box.kmlWest, 10000),
+                new Position(box.kmlSouth, box.kmlWest, 10000)
             ];
             var shapeAttributes = new ShapeAttributes(null);
 
-            shapeAttributes.outlineColor = new Color(0, 0, 0, 0);
+            shapeAttributes.outlineColor = Color.RED; //new Color(0, 0, 0, 0);
             shapeAttributes.outlineWidth = 0;
             shapeAttributes.drawInterior = false;
 
             this._polygonRepresentationMin = new Polygon(minPositions, shapeAttributes);
-            this._polygonRepresentationMax = new Polygon(maxPositions, shapeAttributes);
         }
 
         this._polygonRepresentationMin.render(dc);
-        this._polygonRepresentationMax.render(dc);
         return this._polygonRepresentationMin.intersectsFrustum(dc) &&
-                this._polygonRepresentationMax.intersectsFrustum(dc);
+                (!box.kmlMinAltitude || dc.eyePosition.altitude > box.kmlMinAltitude) &&
+                (!box.kmlMaxAltitude || dc.eyePosition.altitude < box.kmlMaxAltitude);
     };
 
     /**
