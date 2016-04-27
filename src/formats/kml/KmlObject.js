@@ -50,7 +50,7 @@ define([
         
         this._controls = options.controls || [];
         this._factory = new KmlElementsFactoryCached({controls: this._controls});
-
+        
         this.hook(this._controls, options);
     };
 

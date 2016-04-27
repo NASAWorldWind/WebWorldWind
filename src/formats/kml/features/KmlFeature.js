@@ -269,10 +269,11 @@ define([
      * time range chosen by user.
      */
     KmlFeature.prototype.solveTimeVisibility = function (dc) {
-        if (dc.currentTimeInterval) {
-            var timeRangeOfFeature = this.kmlTimePrimitive && this.kmlTimePrimitive.timeRange();
-            var from = dc.currentTimeInterval[0];
-            var to = dc.currentTimeInterval[1];
+        var timeRangeOfFeature = this.kmlTimePrimitive && this.kmlTimePrimitive.timeRange();
+
+        if (dc.currentLayer.currentTimeInterval) {
+            var from = dc.currentLayer.currentTimeInterval[0];
+            var to = dc.currentLayer.currentTimeInterval[1];
 
             if (
                 timeRangeOfFeature &&
