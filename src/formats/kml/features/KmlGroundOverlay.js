@@ -108,7 +108,6 @@ define([
 
         if(!this._renderable) {
             if(this.kmlIcon && this.kmlLatLonBox) {
-                console.log("Create Surface Image");
                 this._renderable = new SurfaceImage(
                     new Sector(
                         this.kmlLatLonBox.kmlSouth,

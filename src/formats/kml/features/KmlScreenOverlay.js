@@ -280,7 +280,6 @@ define([
 
         if(!this._renderable) {
             if(this.kmlIcon) {
-                console.log("Create Screen Image");
                 this._renderable = new ScreenImage(
                     new Offset(
                         this.kmlScreenXYxunits,
