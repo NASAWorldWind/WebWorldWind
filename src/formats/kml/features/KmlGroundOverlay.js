@@ -39,6 +39,8 @@ define([
      */
     var KmlGroundOverlay = function (options) {
         KmlOverlay.call(this, options);
+        
+        console.log("Create Ground Overlay", this);
     };
 
     KmlGroundOverlay.prototype = Object.create(KmlOverlay.prototype);
@@ -100,13 +102,13 @@ define([
     });
 
     // More or less just representation of SurfaceImage. This should simply display icon.
+    // It doesn't work without style at all.
     KmlGroundOverlay.prototype.render = function(dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 
-        kmlOptions = WWUtil.clone(kmlOptions);
-        
-        if(kmlOptions.lastStyle && !this._renderable) {
+        if(!this._renderable) {
             if(this.kmlIcon && this.kmlLatLonBox) {
+                console.log("Create Surface Image");
                 this._renderable = new SurfaceImage(
                     new Sector(
                         this.kmlLatLonBox.kmlSouth,

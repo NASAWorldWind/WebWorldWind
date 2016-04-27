@@ -33,6 +33,8 @@ define([
      */
     var KmlScreenOverlay = function (options) {
         KmlOverlay.call(this, options);
+
+        console.log("Create Screen Overlay", this);
     };
 
     KmlScreenOverlay.prototype = Object.create(KmlOverlay.prototype);
@@ -276,10 +278,9 @@ define([
     KmlScreenOverlay.prototype.render = function(dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 
-        kmlOptions = WWUtil.clone(kmlOptions);
-
-        if(kmlOptions.lastStyle && !this._renderable) {
+        if(!this._renderable) {
             if(this.kmlIcon) {
+                console.log("Create Screen Image");
                 this._renderable = new ScreenImage(
                     new Offset(
                         this.kmlScreenXYxunits,
