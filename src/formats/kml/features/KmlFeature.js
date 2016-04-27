@@ -45,6 +45,7 @@ define([
         KmlObject.call(this, options);
 
         this._pStyle = null;
+        this.controlledVisibility = null;
     };
 
     KmlFeature.prototype = Object.create(KmlObject.prototype);
@@ -253,8 +254,9 @@ define([
         var timeBasedVisibility = this.solveTimeVisibility(dc);
         var regionVisibility = this.solveRegion(dc);
         var myVisibility = this.kmlVisibility !== false;
+        var controlledVisibility = this.controlledVisibility !== false;
 
-        this.enabled = parentVisibility !== false && timeBasedVisibility && regionVisibility && myVisibility;
+        this.enabled = parentVisibility !== false && timeBasedVisibility && regionVisibility && myVisibility && controlledVisibility;
 
         kmlOptions.lastVisibility = this.enabled;
         if(this._renderable) {

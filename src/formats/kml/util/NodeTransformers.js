@@ -73,13 +73,13 @@ define([
      * @param parent {KmlObject} Parent to current node.
      * @returns {KmlObject|null} KmlObject representation for the node.
      */
-    NodeTransformers.kmlObject = function (node, parent) {
+    NodeTransformers.kmlObject = function (node, parent, controls) {
         var nameOfElement = node.nodeName;
         var constructor = KmlElements.getKey(nameOfElement);
         if (!constructor) {
             return null;
         }
-        return new constructor({objectNode: node, parent: parent});
+        return new constructor({objectNode: node, parent: parent, controls: controls});
     };
 
     /**
@@ -89,7 +89,7 @@ define([
      * @param parent {KmlObject} Parent to current node.
      * @returns {KmlLinearRing} Transformed Linear Ring.
      */
-    NodeTransformers.linearRing = function(node, parent) {
+    NodeTransformers.linearRing = function(node, parent, controls) {
         var constructor = KmlElements.getKey("LinearRing");
         if (!constructor) {
             return null;
@@ -100,7 +100,7 @@ define([
                 linearRingNode = node;
             }
         });
-        return new constructor({objectNode: linearRingNode, parent: parent});
+        return new constructor({objectNode: linearRingNode, parent: parent, controls: controls});
     };
 
     /**

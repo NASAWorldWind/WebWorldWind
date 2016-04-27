@@ -76,7 +76,7 @@ define([
                 }
 
                 self._document = new XmlDocument(rootDocument).dom();
-                KmlObject.call(self, {objectNode: self._document.documentElement});
+                KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
 
                 window.setTimeout(function () {
                     resolve(self);

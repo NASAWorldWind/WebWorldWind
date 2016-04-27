@@ -49,9 +49,9 @@ define([
         }
         this._node = options.objectNode;
         this._cache = {};
-        this._factory = new KmlElementsFactoryCached();
-
+        
         this._controls = options.controls || [];
+        this._factory = new KmlElementsFactoryCached({controls: this._controls});
 
         this.hook(this._controls, options);
     };

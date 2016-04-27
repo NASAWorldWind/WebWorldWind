@@ -20,8 +20,8 @@ define([
      * stores the value in cache.
      * @constructor
      */
-    var KmlElementsFactoryCached = function() {
-        this.internalFactory = new KmlElementsFactory();
+    var KmlElementsFactoryCached = function(options) {
+        this.internalFactory = new KmlElementsFactory(options);
         this.cache = TreeKeyValueCache.applicationLevelCache();
     };
 

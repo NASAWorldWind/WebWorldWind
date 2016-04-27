@@ -78,7 +78,8 @@ define([
 
     // Internal use only. Updates all descendants of given Feature.
     KmlTreeVisibility.prototype.updateDescendants = function (node, enabled) {
-        node.update({enabled: enabled});
+        node.controlledVisibility = enabled;
+        this._wwd.redraw();
     };
 
     return KmlTreeVisibility;

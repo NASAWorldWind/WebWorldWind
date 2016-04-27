@@ -11,7 +11,8 @@ define([
      * Simple factory, which understands the mapping between the XML and the internal Elements.
      * @constructor
      */
-    var KmlElementsFactory = function () {
+    var KmlElementsFactory = function (options) {
+        this.options = options;
     };
 
     /**
@@ -27,9 +28,10 @@ define([
     KmlElementsFactory.prototype.specific = function (element, options) {
         var parentNode = element.node;
         var result = null;
+        var self = this;
         [].forEach.call(parentNode.childNodes, function (node) {
             if (node.nodeName == options.name) {
-                result = options.transformer(node, element);
+                result = options.transformer(node, element, self.options.controls);
             }
         });
         return result;
@@ -46,9 +48,10 @@ define([
         var parentNode = element.node;
 
         var result = null;
+        var self = this;
         [].forEach.call(parentNode.childNodes, function (node) {
             if (options.name.indexOf(node.nodeName) != -1) {
-                result = NodeTransformers.kmlObject(node, element);
+                result = NodeTransformers.kmlObject(node, element, self.options.controls);
             }
         });
         return result;
@@ -62,8 +65,9 @@ define([
         var parentNode = element.node;
         
         var results = [];
+        var self = this;
         [].forEach.call(parentNode.childNodes, function (node) {
-            var element = NodeTransformers.kmlObject(node, element);
+            var element = NodeTransformers.kmlObject(node, element, self.options.controls);
             if (element) {
                 results.push(element);
             }
