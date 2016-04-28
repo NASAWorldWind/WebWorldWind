@@ -36,6 +36,10 @@ requirejs(['../src/WorldWind',
         var kmlFilePromise = new KmlFile('data/KML_Samples.kml', [new KmlTreeVisibility('treeControls', wwd)]);
         kmlFilePromise.then(function (kmlFile) {
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
+            renderableLayer.currentTimeInterval = [
+                new Date("Mon Aug 09 2015 12:10:10 GMT+0200 (Střední Evropa (letní čas))").valueOf(),
+                new Date("Mon Aug 11 2015 12:10:10 GMT+0200 (Střední Evropa (letní čas))").valueOf()
+            ];
             renderableLayer.addRenderable(kmlFile);
 
             wwd.addLayer(renderableLayer);

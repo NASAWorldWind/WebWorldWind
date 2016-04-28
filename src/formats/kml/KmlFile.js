@@ -108,15 +108,13 @@ define([
      * @inheritDoc
      */
     KmlFile.prototype.render = function (dc) {
-        var kmlOptions = {
-            lastStyle: null,
-            lastVisibility: null,
-            currentTimeInterval: null,
-            regionInvisible: null
-        };
-
         this.shapes.forEach(function (shape) {
-            shape.render(dc, kmlOptions);
+            shape.render(dc, {
+                lastStyle: null,
+                lastVisibility: null,
+                currentTimeInterval: null,
+                regionInvisible: null
+            });
         });
     };
 

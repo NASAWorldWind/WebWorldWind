@@ -94,7 +94,7 @@ define([
             ];
             var shapeAttributes = new ShapeAttributes(null);
 
-            shapeAttributes.outlineColor = new Color(0, 0, 0, 0);
+            shapeAttributes.outlineColor = Color.RED; //new Color(0, 0, 0, 0);
             shapeAttributes.outlineWidth = 0;
             shapeAttributes.drawInterior = false;
 
@@ -102,6 +102,7 @@ define([
         }
 
         this._polygonRepresentationMin.render(dc);
+
         return this._polygonRepresentationMin.intersectsFrustum(dc) &&
                 (!box.kmlMinAltitude || dc.eyePosition.altitude > box.kmlMinAltitude) &&
                 (!box.kmlMaxAltitude || dc.eyePosition.altitude < box.kmlMaxAltitude);

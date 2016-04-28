@@ -48,10 +48,14 @@ define([
     KmlContainer.prototype.render = function(dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 
-        kmlOptions = WWUtil.clone(kmlOptions);
-
+        var self = this;
         this.kmlShapes.forEach(function(shape) {
-            shape.render(dc, kmlOptions);
+            shape.render(dc, {
+                lastStyle: kmlOptions.lastStyle,
+                lastVisibility: self.enabled,
+                currentTimeInterval: kmlOptions.currentTimeInterval,
+                regionInvisible: kmlOptions.regionInvisible
+            });
         });
     };
 

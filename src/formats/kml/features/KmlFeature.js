@@ -13,7 +13,8 @@ define([
     '../KmlTimePrimitive',
     '../util/NodeTransformers',
     '../../../util/Promise',
-    '../util/StyleResolver'
+    '../util/StyleResolver',
+    '../../../util/WWUtil'
 ], function (KmlObject,
              KmlAbstractView,
              KmlFile,
@@ -24,7 +25,8 @@ define([
              KmlTimePrimitive,
              NodeTransformers,
              Promise,
-             StyleResolver) {
+             StyleResolver,
+             WWUtil) {
     "use strict";
     /**
      * Constructs an KmlFeature. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -256,7 +258,7 @@ define([
         var myVisibility = this.kmlVisibility !== false;
         var controlledVisibility = this.controlledVisibility !== false;
 
-        this.enabled = parentVisibility !== false && timeBasedVisibility && regionVisibility && myVisibility && controlledVisibility;
+        this.enabled = parentVisibility && timeBasedVisibility && regionVisibility && myVisibility && controlledVisibility;
 
         kmlOptions.lastVisibility = this.enabled;
         if(this._renderable) {
@@ -271,7 +273,7 @@ define([
     KmlFeature.prototype.solveTimeVisibility = function (dc) {
         var timeRangeOfFeature = this.kmlTimePrimitive && this.kmlTimePrimitive.timeRange();
 
-        if (dc.currentLayer.currentTimeInterval) {
+        if (dc.currentLayer.currentTimeInterval && timeRangeOfFeature) {
             var from = dc.currentLayer.currentTimeInterval[0];
             var to = dc.currentLayer.currentTimeInterval[1];
 

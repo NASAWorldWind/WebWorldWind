@@ -38,9 +38,9 @@ define([
      * @augments KmlOverlay
      */
     var KmlGroundOverlay = function (options) {
+        this.isGroundOverlay = true;
+
         KmlOverlay.call(this, options);
-        
-        console.log("Create Ground Overlay", this);
     };
 
     KmlGroundOverlay.prototype = Object.create(KmlOverlay.prototype);
@@ -106,7 +106,7 @@ define([
     KmlGroundOverlay.prototype.render = function(dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 
-        if(!this._renderable) {
+        if(!this._renderable && this.enabled) {
             if(this.kmlIcon && this.kmlLatLonBox) {
                 this._renderable = new SurfaceImage(
                     new Sector(
