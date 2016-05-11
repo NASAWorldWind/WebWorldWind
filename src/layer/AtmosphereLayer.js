@@ -11,6 +11,7 @@ define([
         '../util/ImageSource',
         '../layer/Layer',
         '../util/Logger',
+        '../geom/Matrix',
         '../geom/Sector',
         '../shaders/SkyProgram',
         '../geom/Vec3'
@@ -20,6 +21,7 @@ define([
               ImageSource,
               Layer,
               Logger,
+              Matrix,
               Sector,
               SkyProgram,
               Vec3) {
@@ -55,9 +57,10 @@ define([
         // Documented in superclass.
         AtmosphereLayer.prototype.doRender = function (dc) {
             //console.log(this._imageSource);
+            this.drawGround(dc);
             this.drawSky(dc);
 
-            this.drawGround(dc);
+
         };
 
         AtmosphereLayer.prototype.drawSky = function(dc) {
@@ -142,7 +145,9 @@ define([
 
             // Get the draw context's tessellated terrain and modelview projection matrix.
             var terrain = dc.terrain;
-            var modelviewProjection = dc.navigatorState.modelviewProjection;
+            //var modelviewProjection = dc.navigatorState.modelviewProjection;
+            var modelviewProjection = Matrix.fromIdentity();
+            modelviewProjection.copy(dc.navigatorState.modelviewProjection);
 
             // Set up to use the shared tile tex coord attributes.
             //gl.enableVertexAttribArray(program.vertexPointLocation);
@@ -156,7 +161,7 @@ define([
                 program.loadVertexOrigin(gl, terrainOrigin);
 
                 // Use the draw context's modelview projection matrix, transformed to the tile's local coordinates.
-                modelviewProjection.multiplyByTranslation(terrainOrigin.x, terrainOrigin.y, terrainOrigin.z);
+                modelviewProjection.multiplyByTranslation(terrainOrigin[0], terrainOrigin[1], terrainOrigin[2]);
                 program.loadModelviewProjection(gl, modelviewProjection);
 
                 // Use the texture's transform matrix.
