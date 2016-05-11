@@ -57,10 +57,8 @@ define([
         // Documented in superclass.
         AtmosphereLayer.prototype.doRender = function (dc) {
             //console.log(this._imageSource);
-            this.drawGround(dc);
             this.drawSky(dc);
-
-
+            this.drawGround(dc);
         };
 
         AtmosphereLayer.prototype.drawSky = function(dc) {
@@ -77,7 +75,7 @@ define([
 
             program.loadFragMode(gl, program.FRAGMODE_SKY);
 
-            program.loadLightDirection(gl, dc.navigatorState.eyePoint.normalize());
+            //program.loadLightDirection(gl, lightDirection.normalize());
 
             gl.uniform1f(program.scaleLocation, 1 / program.getAltitude());
 
