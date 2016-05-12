@@ -63,7 +63,11 @@ define([
 
         AtmosphereLayer.prototype.drawSky = function(dc) {
             var gl = dc.currentGlContext,
-                program = dc.findAndBindProgram(SkyProgram);
+                program = dc.findAndBindProgram(SkyProgram),
+                eyePoint = new Vec3(
+                    dc.navigatorState.eyePoint[0],
+                    dc.navigatorState.eyePoint[1],
+                    dc.navigatorState.eyePoint[2]);
 
             program.loadGlobe(gl, dc.globe);
 
@@ -75,7 +79,7 @@ define([
 
             program.loadFragMode(gl, program.FRAGMODE_SKY);
 
-            //program.loadLightDirection(gl, lightDirection.normalize());
+            program.loadLightDirection(gl, eyePoint.normalize());
 
             gl.uniform1f(program.scaleLocation, 1 / program.getAltitude());
 
@@ -113,13 +117,17 @@ define([
         AtmosphereLayer.prototype.drawGround = function(dc) {
 
             var gl = dc.currentGlContext,
-                program = dc.findAndBindProgram(GroundProgram);
+                program = dc.findAndBindProgram(GroundProgram),
+                eyePoint = new Vec3(
+                    dc.navigatorState.eyePoint[0],
+                    dc.navigatorState.eyePoint[1],
+                    dc.navigatorState.eyePoint[2]);
 
             program.loadGlobe(gl, dc.globe);
 
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
-            program.loadLightDirection(gl, dc.navigatorState.eyePoint.normalize());
+            program.loadLightDirection(gl, eyePoint.normalize());
 
             gl.uniform1f(program.scaleLocation, 1 / program.getAltitude());
 
