@@ -217,14 +217,19 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer A {@link RenderableLayer} to hold the shapes created for each GeoJSON
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
+         *  @param {Fcuntion} callbackFunction An optional function that will be executed when the GeoJSON is fully
+         *  parsed and all the renderables have been added to the layer. It will pass, as parameter, the layer to which
+         *  the callback belongs to.
          */
 
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer) {
+        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer, callbackFunction) {
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
             }
-
+            if (callbackFunction) {
+                this._callbackFunction = callbackFunction;
+            }
             this._layer = layer || new RenderableLayer();
 
             if (this.isDataSourceJson()){
@@ -325,6 +330,10 @@ define(['../../error/ArgumentError',
                         throw new ArgumentError(
                             Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
                                 "missingGeoJSONType"));
+                    }
+
+                    if (this._callbackFunction && typeof this._callbackFunction === "function") {
+                        this._callbackFunction(this.layer);
                     }
                 }
             }

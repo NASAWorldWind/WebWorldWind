@@ -79,6 +79,10 @@ requirejs(['../src/WorldWind',
         return configuration;
         };
 
+        var callbackFunction = function(layer) {
+            wwd.addLayer(layer);
+        };
+
         var resourcesUrl = "http://worldwindserver.net/webworldwind/data/geojson-data/";
 
         // Polygon test
@@ -118,11 +122,11 @@ requirejs(['../src/WorldWind',
         multiLineStringGeoJSON.load(shapeConfigurationCallback, multiLineStringLayer);
         wwd.addLayer(multiLineStringLayer);
 
-        // GeometryCollection test
+        // GeometryCollection test with a callback function
         var geometryCollectionLayer = new WorldWind.RenderableLayer("GeometryCollection");
         var geometryCollectionGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "GeometryCollectionFeatureTest.geojson");
-        geometryCollectionGeoJSON.load(shapeConfigurationCallback, geometryCollectionLayer);
-        wwd.addLayer(geometryCollectionLayer);
+        geometryCollectionGeoJSON.load(shapeConfigurationCallback, geometryCollectionLayer, callbackFunction);
+
 
         // Feature test
         var featureLayer = new WorldWind.RenderableLayer("Feature - USA");
