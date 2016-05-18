@@ -273,7 +273,19 @@ define(function () {
                 //}
                 //timeSequence.reset();
 
-            } else {
+            }
+            else if (config.timeSequences &&
+                (config.timeSequences[config.timeSequences.length - 1] instanceof Date)) {
+                timeSequence = config.timeSequences[config.timeSequences.length - 1];
+                config.levelZeroDelta = new WorldWind.Location(180, 180);
+                layer = new WorldWind.WmsTimeDimensionedLayer(config);
+                layer.opacity = 0.8;
+                layer.time = config.timeSequences[0];
+                this.timeSeriesPlayer.timeSequence = new WorldWind.BasicTimeSequence(config.timeSequences);
+                this.timeSeriesPlayer.layer = layer;
+                layer.timeSequence = timeSequence;
+            }
+            else {
                 layer = new WorldWind.WmsLayer(config, null);
                 this.timeSeriesPlayer.timeSequence = null;
                 this.timeSeriesPlayer.layer = null;
