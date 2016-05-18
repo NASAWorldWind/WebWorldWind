@@ -17,12 +17,10 @@ define([
          * Constructs a time sequence from an array of Dates.
          * @alias BasicTimeSequence
          * @constructor
-         * @classdesc Represents a time sequence described as an ISO 8601 time-format string as required by WMS.
-         * The string must be in the form start/end/period, where start and end are ISO 8601 time values and
-         * period is an ISO 8601 period specification. This class provides iteration over the sequence in steps
+         * @classdesc Represents a time sequence described as an array of Date objects as required by WMS.
+         * This class provides iteration over the sequence in steps
          * specified by the period. If the start and end dates are different, iteration will start at the start
-         * date and end at the end date. If the start and end dates are the same, iteration will start at the
-         * specified date and will never end.
+         * date and end at the end date.
          * @param {Date[]} dates An array of Date objects.
          * @throws {ArgumentError} If the specified dates array is null, undefined or has a length less than two.
          */
