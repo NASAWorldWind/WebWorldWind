@@ -37,7 +37,7 @@ define([
          * @param {Position} position The model's geographic position.
          * @param {Object} config Configuration options for the loader.
          * <ul>
-         *  <li>filePath - the path to the collada file</li>
+         *  <li>dirPath - the path to the directory where the collada file is located</li>
          * </ul>
          */
         var ColladaLoader = function (position, config) {
@@ -49,7 +49,7 @@ define([
 
             this.position = position;
 
-            this.filePath = '/';
+            this.dirPath = '/';
 
             this.init(config);
         };
@@ -58,17 +58,17 @@ define([
          * Initialization of the ColladaLoader
          * @param {Object} config Configuration options for the loader.
          * <ul>
-         *  <li>filePath - the path to the collada file</li>
+         *  <li>dirPath - the path to the directory where the collada file is located</li>
          * </ul>
          */
         ColladaLoader.prototype.init = function (config) {
             if (config) {
-                this.filePath = config.filePath || '/';
+                this.dirPath = config.dirPath || '/';
             }
 
             this.scene = {
                 type: "SceneTree",
-                filePath: this.filePath,
+                dirPath: this.dirPath,
                 images: {},
                 metadata: {},
                 materials: {},
@@ -88,7 +88,7 @@ define([
         ColladaLoader.prototype.load = function (url, cb) {
 
             if (url.indexOf("://") === -1) {
-                url = this.filePath + url;
+                url = this.dirPath + url;
             }
 
             ColladaUtils.fetchFile(url, function (data) {

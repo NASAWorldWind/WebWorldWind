@@ -411,6 +411,10 @@ define([
 
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.render = function(dc) {
+            if (!this.enabled) {
+                return;
+            }
+
             this.layer = dc.currentLayer;
 
             this.prepareBoundaries(dc);

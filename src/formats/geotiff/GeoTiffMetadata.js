@@ -28,10 +28,22 @@ define([
             this._compression = null;
 
             // Documented in defineProperties below.
+            this._extraSamples = null;
+
+            // Documented in defineProperties below.
             this._imageLength = null;
 
             // Documented in defineProperties below.
             this._imageWidth = null;
+
+            // Documented in defineProperties below.
+            this._maxSampleValue = null;
+
+            // Documented in defineProperties below.
+            this._minSampleValue = null;
+
+            // Documented in defineProperties below.
+            this._orientation = 0;
 
             // Documented in defineProperties below.
             this._photometricInterpretation = null;
@@ -49,13 +61,25 @@ define([
             this._sampleFormat = null;
 
             // Documented in defineProperties below.
+            this._software = null;
+
+            // Documented in defineProperties below.
             this._stripByteCounts = null;
 
             // Documented in defineProperties below.
             this._stripOffsets = null;
 
             // Documented in defineProperties below.
-            this._tileOffests = null;
+            this._tileByteCounts = null;
+
+            // Documented in defineProperties below.
+            this._tileOffsets = null;
+
+            // Documented in defineProperties below.
+            this._tileLength = null;
+
+            // Documented in defineProperties below.
+            this._tileWidth = null;
 
             // Documented in defineProperties below.
             this._geoAsciiParams = null;
@@ -80,6 +104,21 @@ define([
 
             // Documented in defineProperties below.
             this._bbox = null;
+
+            // Documented in defineProperties below.
+            this._gtModelTypeGeoKey = null;
+
+            // Documented in defineProperties below.
+            this._gtRasterTypeGeoKey = null;
+
+            // Documented in defineProperties below.
+            this._gtCitationGeoKey = null;
+
+            // Documented in defineProperties below.
+            this._geographicTypeGeoKey = null;
+
+            // Documented in defineProperties below.
+            this._geogCitationGeoKey = null;
 
             // Documented in defineProperties below.
             this._projectedCSType = null;
@@ -135,6 +174,21 @@ define([
             },
 
             /**
+             * Contains the description of extra components.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number[]}
+             */
+            extraSamples: {
+                get: function () {
+                    return this._extraSamples;
+                },
+
+                set: function(value){
+                    this._extraSamples = value;
+                }
+            },
+
+            /**
              * Contains the number of rows in the image.
              * @memberof GeoTiffMetadata.prototype
              * @type {Number}
@@ -161,6 +215,51 @@ define([
 
                 set: function(value){
                     this._imageWidth = value;
+                }
+            },
+
+            /**
+             * Contains the maximum component value used.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            maxSampleValue: {
+                get: function () {
+                    return this._maxSampleValue;
+                },
+
+                set: function(value){
+                    this._maxSampleValue = value;
+                }
+            },
+
+            /**
+             * Contains the minimum component value used.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            minSampleValue: {
+                get: function () {
+                    return this._minSampleValue;
+                },
+
+                set: function(value){
+                    this._minSampleValue = value;
+                }
+            },
+
+            /**
+             * Contains the orientation of the image with respect to the rows and columns.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            orientation: {
+                get: function () {
+                    return this._orientation;
+                },
+
+                set: function(value){
+                    this._orientation = value;
                 }
             },
 
@@ -245,6 +344,16 @@ define([
                 }
             },
 
+            software: {
+                get: function () {
+                    return this._software;
+                },
+
+                set: function(value){
+                    this._software = value;
+                }
+            },
+
             /**
              * Contains the number of bytes in that strip after any compression, for each strip.
              * @memberof GeoTiffMetadata.prototype
@@ -275,18 +384,48 @@ define([
                 }
             },
 
+            tileByteCounts: {
+                get: function () {
+                    return this._tileByteCounts;
+                },
+
+                set: function(value){
+                    this._tileByteCounts = value;
+                }
+            },
+
             /**
              * Contains the byte offset of that tile, for each tile.
              * @memberof GeoTiffMetadata.prototype
              * @type {Number[]}
              */
-            tileOffests: {
+            tileOffsets: {
                 get: function () {
-                    return this._tileOffests;
+                    return this._tileOffsets;
                 },
 
                 set: function(value){
-                    this._tileOffests = value;
+                    this._tileOffsets = value;
+                }
+            },
+
+            tileLength: {
+                get: function () {
+                    return this._tileLength;
+                },
+
+                set: function(value){
+                    this._tileLength = value;
+                }
+            },
+
+            tileWidth: {
+                get: function () {
+                    return this._tileWidth;
+                },
+
+                set: function(value){
+                    this._tileWidth = value;
                 }
             },
 
@@ -313,11 +452,11 @@ define([
              */
             geoDoubleParams: {
                 get: function () {
-                    return this._geoAsciiParams;
+                    return this._geoDoubleParams;
                 },
 
-                set: function(value){
-                    this._geoAsciiParams = value;
+                    set: function(value){
+                        this._geoDoubleParams = value;
                 }
             },
 
@@ -417,6 +556,83 @@ define([
             },
 
             //geokeys
+            /**
+             * Contains an ID defining the crs model.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            gtModelTypeGeoKey: {
+                get: function () {
+                    return this._gtModelTypeGeoKey;
+                },
+
+                set: function(value){
+                    this._gtModelTypeGeoKey = value;
+                }
+            },
+
+            /**
+             * Contains an ID defining the raster sample type.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            gtRasterTypeGeoKey: {
+                get: function () {
+                    return this._gtRasterTypeGeoKey;
+                },
+
+                set: function(value){
+                    this._gtRasterTypeGeoKey = value;
+                }
+            },
+
+            /**
+             * Contains an ASCII reference to the overall configuration of the geotiff file.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {String}
+             */
+            gtCitationGeoKey: {
+                get: function () {
+                    return this._gtCitationGeoKey;
+                },
+
+                set: function(value){
+                    this._gtCitationGeoKey = value;
+                }
+            },
+
+            /**
+             * Contains a value to specify the code for geographic coordinate system used to map lat-long to a specific
+             * ellipsoid over the earth
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            geographicTypeGeoKey: {
+                get: function () {
+                    return this._geographicTypeGeoKey;
+                },
+
+                set: function(value){
+                    this._geographicTypeGeoKey = value;
+                }
+            },
+
+            /**
+             * Contains a value to specify the code for geographic coordinate system used to map lat-long to a specific
+             * ellipsoid over the earth
+             * @memberof GeoTiffMetadata.prototype
+             * @type {String}
+             */
+            geogCitationGeoKey: {
+                get: function () {
+                    return this._geogCitationGeoKey;
+                },
+
+                set: function(value){
+                    this._geogCitationGeoKey = value;
+                }
+            },
+
             /**
              * Contains the EPSG code of the geotiff.
              * @memberof GeoTiffMetadata.prototype

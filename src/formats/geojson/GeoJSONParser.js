@@ -31,36 +31,36 @@ define(['../../error/ArgumentError',
         '../../shapes/SurfacePolygon',
         '../../shapes/SurfacePolyline'
     ],
-    function(ArgumentError,
-        Color,
-        GeoJSONConstants,
-        GeoJSONCRS,
-        GeoJSONFeature,
-        GeoJSONFeatureCollection,
-        GeoJSONGeometry,
-        GeoJSONGeometryCollection,
-        GeoJSONGeometryLineString,
-        GeoJSONGeometryMultiLineString,
-        GeoJSONGeometryMultiPoint,
-        GeoJSONGeometryMultiPolygon,
-        GeoJSONGeometryPoint,
-        GeoJSONGeometryPolygon,
-        Location,
-        Logger,
-        Placemark,
-        PlacemarkAttributes,
-        Polygon,
-        Position,
-        Proj4,
-        RenderableLayer,
-        ShapeAttributes,
-        SurfacePolygon,
-        SurfacePolyline) {
+    function (ArgumentError,
+              Color,
+              GeoJSONConstants,
+              GeoJSONCRS,
+              GeoJSONFeature,
+              GeoJSONFeatureCollection,
+              GeoJSONGeometry,
+              GeoJSONGeometryCollection,
+              GeoJSONGeometryLineString,
+              GeoJSONGeometryMultiLineString,
+              GeoJSONGeometryMultiPoint,
+              GeoJSONGeometryMultiPolygon,
+              GeoJSONGeometryPoint,
+              GeoJSONGeometryPolygon,
+              Location,
+              Logger,
+              Placemark,
+              PlacemarkAttributes,
+              Polygon,
+              Position,
+              Proj4,
+              RenderableLayer,
+              ShapeAttributes,
+              SurfacePolygon,
+              SurfacePolyline) {
         "use strict";
 
         /**
-         * Constructs a GeoJSON object for a specified GeoJSON URL. Call [load]{@link GeoJSONParser#load} to retrieve the
-         * GeoJSON and create shapes for it.
+         * Constructs a GeoJSON object for a specified GeoJSON data source. Call [load]{@link GeoJSONParser#load} to
+         * retrieve the GeoJSON and create shapes for it.
          * @alias GeoJSONParser
          * @constructor
          * @classdesc Parses a GeoJSON and creates shapes representing its contents. Points and MultiPoints in
@@ -72,17 +72,17 @@ define(['../../error/ArgumentError',
          * This function enables the application to assign independent attributes to each
          * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
          * feature.
-         * @param {String} url The location of the GeoJSON.
-         * @throws {ArgumentError} If the specified URL is null or undefined.
+         * @param {String} dataSource The data source of the GeoJSON. Can be a string or an URL to a GeoJSON.
+         * @throws {ArgumentError} If the specified data source is null or undefined.
          */
-        var GeoJSONParser = function(url) {
-            if (!url) {
+        var GeoJSONParser = function (dataSource) {
+            if (!dataSource) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "constructor", "missingUrl"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "constructor", "missingDataSource"));
             }
 
             // Documented in defineProperties below.
-            this._url = url;
+            this._dataSource = dataSource;
 
             // Documented in defineProperties below.
             this._geoJSONObject = null;
@@ -108,14 +108,14 @@ define(['../../error/ArgumentError',
 
         Object.defineProperties(GeoJSONParser.prototype, {
             /**
-             * The GeoJSON URL as specified to this GeoJSON's constructor.
+             * The GeoJSON data source as specified to this GeoJSON's constructor.
              * @memberof GeoJSONParser.prototype
              * @type {String}
              * @readonly
              */
-            url: {
-                get: function() {
-                    return this._url;
+            dataSource: {
+                get: function () {
+                    return this._dataSource;
                 }
             },
 
@@ -126,7 +126,7 @@ define(['../../error/ArgumentError',
              * @readonly
              */
             geoJSONObject: {
-                get: function() {
+                get: function () {
                     return this._geoJSONObject;
                 }
             },
@@ -150,7 +150,7 @@ define(['../../error/ArgumentError',
              * @readonly
              */
             geoJSONType: {
-                get: function() {
+                get: function () {
                     return this._geoJSONType;
                 }
             },
@@ -159,7 +159,7 @@ define(['../../error/ArgumentError',
              *
              */
             crs: {
-                get: function() {
+                get: function () {
                     return this._crs;
                 }
             },
@@ -172,7 +172,7 @@ define(['../../error/ArgumentError',
              * @readonly
              */
             layer: {
-                get: function() {
+                get: function () {
                     return this._layer;
                 }
             },
@@ -186,7 +186,7 @@ define(['../../error/ArgumentError',
              * @readonly
              */
             shapeConfigurationCallback: {
-                get: function() {
+                get: function () {
                     return this._shapeConfigurationCallback;
                 }
             }
@@ -218,7 +218,8 @@ define(['../../error/ArgumentError',
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
          */
-        GeoJSONParser.prototype.load = function(shapeConfigurationCallback, layer, callback) {
+
+        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer) {
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
@@ -226,9 +227,12 @@ define(['../../error/ArgumentError',
 
             this._layer = layer || new RenderableLayer();
 
-            this.callback = callback;
-
-            this.requestUrl(this.url);
+            if (this.isDataSourceJson()){
+                this.parse(this.dataSource);
+            }
+            else {
+                this.requestUrl(this.dataSource);
+            }
         };
 
         /**
@@ -248,7 +252,7 @@ define(['../../error/ArgumentError',
          * properties member.
          * @returns {Object} An object with properties as described above.
          */
-        GeoJSONParser.prototype.defaultShapeConfigurationCallback = function(geometry, properties) {
+        GeoJSONParser.prototype.defaultShapeConfigurationCallback = function (geometry, properties) {
             var configuration = {};
 
             var name = properties.name || properties.Name || properties.NAME;
@@ -268,27 +272,28 @@ define(['../../error/ArgumentError',
         };
 
         // Get GeoJSON string using XMLHttpRequest. Internal use only.
-        GeoJSONParser.prototype.requestUrl = function(url) {
+        GeoJSONParser.prototype.requestUrl = function (url) {
             var xhr = new XMLHttpRequest();
 
             xhr.open("GET", url, true);
             xhr.responseType = 'text';
-            xhr.onreadystatechange = (function() {
+            xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         this.parse(xhr.response);
-                    } else {
+                    }
+                    else {
                         Logger.log(Logger.LEVEL_WARNING,
                             "GeoJSON retrieval failed (" + xhr.statusText + "): " + url);
                     }
                 }
             }).bind(this);
 
-            xhr.onerror = function() {
+            xhr.onerror = function () {
                 Logger.log(Logger.LEVEL_WARNING, "GeoJSON retrieval failed: " + url);
             };
 
-            xhr.ontimeout = function() {
+            xhr.ontimeout = function () {
                 Logger.log(Logger.LEVEL_WARNING, "GeoJSON retrieval timed out: " + url);
             };
 
@@ -296,13 +301,16 @@ define(['../../error/ArgumentError',
         };
 
         // Parse GeoJSON string using built in method JSON.parse(). Internal use only.
-        GeoJSONParser.prototype.parse = function(geoJSONString) {
+        GeoJSONParser.prototype.parse = function (geoJSONString) {
             try {
                 this._geoJSONObject = JSON.parse(geoJSONString);
-            } catch (e) {
-                console.log(e);
-            } finally {
-                if (this.geoJSONObject) {
+            }
+            catch (e) {
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
+                    "invalidGeoJSONObject")
+            }
+            finally {
+                if (this.geoJSONObject){
                     if (Object.prototype.toString.call(this.geoJSONObject) === '[object Array]') {
                         throw new ArgumentError(
                             Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
@@ -312,7 +320,8 @@ define(['../../error/ArgumentError',
                     if (this.geoJSONObject.hasOwnProperty(GeoJSONConstants.FIELD_TYPE)) {
                         this.setGeoJSONType();
                         this.setGeoJSONCRS();
-                    } else {
+                    }
+                    else{
                         throw new ArgumentError(
                             Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
                                 "missingGeoJSONType"));
@@ -321,22 +330,14 @@ define(['../../error/ArgumentError',
             }
         };
 
-        GeoJSONParser.prototype.callbackFunction = function() {
-            if (this.callback && typeof this.callback === "function") {
-                this.callback();
-            }
-
-        };
-
-
         // Set GeoJSON CRS object.
         // If no crs member can be so acquired, the default CRS shall apply to the GeoJSON object.
         // The crs member should be on the top-level GeoJSON object in a hierarchy (in feature collection, feature,
         // geometry order) and should not be repeated or overridden on children or grandchildren of the object.
         // Internal use only.
-        GeoJSONParser.prototype.setGeoJSONCRS = function() {
-            if (this.geoJSONObject[GeoJSONConstants.FIELD_CRS]) {
-                this._crs = new GeoJSONCRS(
+        GeoJSONParser.prototype.setGeoJSONCRS = function () {
+            if (this.geoJSONObject[GeoJSONConstants.FIELD_CRS]){
+                this._crs = new GeoJSONCRS (
                     this.geoJSONObject[GeoJSONConstants.FIELD_CRS][GeoJSONConstants.FIELD_TYPE],
                     this.geoJSONObject[GeoJSONConstants.FIELD_CRS][GeoJSONConstants.FIELD_PROPERTIES]);
 
@@ -345,13 +346,11 @@ define(['../../error/ArgumentError',
                 }).bind(this);
 
                 this.crs.setCRSString(crsCallback);
-            } else {
+            }
+            else{
                 // If no CRS, consider default one
                 this.addRenderablesForGeoJSON(this.layer);
             }
-
-            this.callbackFunction();
-
         };
 
         /**
@@ -367,15 +366,15 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
          * @throws {ArgumentError} If the specified layer is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForGeoJSON = function(layer) {
+        GeoJSONParser.prototype.addRenderablesForGeoJSON = function (layer) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeoJSON", "missingLayer"));
             }
 
-            switch (this.geoJSONType) {
+            switch(this.geoJSONType) {
                 case GeoJSONConstants.TYPE_FEATURE:
-                    var feature = new GeoJSONFeature(
+                    var feature = new  GeoJSONFeature(
                         this.geoJSONObject[GeoJSONConstants.FIELD_GEOMETRY],
                         this.geoJSONObject[GeoJSONConstants.FIELD_PROPERTIES],
                         this.geoJSONObject[GeoJSONConstants.FIELD_ID],
@@ -431,7 +430,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the geometry is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForGeometry = function(layer, geometry, properties) {
+        GeoJSONParser.prototype.addRenderablesForGeometry = function (layer, geometry, properties){
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometry", "missingLayer"));
@@ -442,7 +441,7 @@ define(['../../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometry", "missingGeometry"));
             }
 
-            switch (geometry[GeoJSONConstants.FIELD_TYPE]) {
+            switch(geometry[GeoJSONConstants.FIELD_TYPE]){
                 case GeoJSONConstants.TYPE_POINT:
                     var pointGeometry = new GeoJSONGeometryPoint(
                         geometry[GeoJSONConstants.FIELD_COORDINATES],
@@ -507,7 +506,6 @@ define(['../../error/ArgumentError',
                 default:
                     break;
             }
-
         }
 
         /**
@@ -523,7 +521,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified geometry is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForPoint = function(layer, geometry, properties) {
+        GeoJSONParser.prototype.addRenderablesForPoint = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForPoint", "missingLayer"));
@@ -539,7 +537,7 @@ define(['../../error/ArgumentError',
             if (!this.crs || this.crs.isCRSSupported()) {
                 var longitude = geometry.coordinates[0],
                     latitude = geometry.coordinates[1],
-                    altitude = geometry.coordinates[2] ? geometry.coordinates[2] : 0;
+                    altitude = geometry.coordinates[2] ?  geometry.coordinates[2] : 0;
 
                 var reprojectedCoordinate = this.getReprojectedIfRequired(
                     latitude,
@@ -552,7 +550,7 @@ define(['../../error/ArgumentError',
                     configuration && configuration.attributes ? configuration.attributes : null);
 
                 placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
-                if (configuration && configuration.name) {
+                if (configuration && configuration.name){
                     placemark.label = configuration.name;
                 }
                 layer.addRenderable(placemark);
@@ -572,7 +570,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified geometry is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForMultiPoint = function(layer, geometry, properties) {
+        GeoJSONParser.prototype.addRenderablesForMultiPoint = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPoint",
@@ -588,10 +586,10 @@ define(['../../error/ArgumentError',
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
             if (!this.crs || this.crs.isCRSSupported()) {
-                for (var pointIndex = 0, points = geometry.coordinates.length; pointIndex < points; pointIndex += 1) {
+                for (var pointIndex = 0, points = geometry.coordinates.length; pointIndex < points; pointIndex += 1){
                     var longitude = geometry.coordinates[pointIndex][0],
                         latitude = geometry.coordinates[pointIndex][1],
-                        altitude = geometry.coordinates[pointIndex][2] ? geometry.coordinates[pointIndex][2] : 0;
+                        altitude = geometry.coordinates[pointIndex][2] ?  geometry.coordinates[pointIndex][2] : 0;
 
                     var reprojectedCoordinate = this.getReprojectedIfRequired(
                         latitude,
@@ -603,7 +601,7 @@ define(['../../error/ArgumentError',
                         false,
                         configuration && configuration.attributes ? configuration.attributes : null);
                     placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
-                    if (configuration && configuration.name) {
+                    if (configuration && configuration.name){
                         placemark.label = configuration.name;
                     }
                     layer.addRenderable(placemark);
@@ -624,7 +622,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified geometry is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForLineString = function(layer, geometry, properties) {
+        GeoJSONParser.prototype.addRenderablesForLineString = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForLineString",
@@ -674,7 +672,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified geometry is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForMultiLineString = function(layer, geometry, properties) {
+        GeoJSONParser.prototype.addRenderablesForMultiLineString = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiLineString",
@@ -693,7 +691,8 @@ define(['../../error/ArgumentError',
                 for (var linesIndex = 0, lines = geometry.coordinates; linesIndex < lines.length; linesIndex++) {
                     var positions = [];
 
-                    for (var positionIndex = 0, points = lines[linesIndex]; positionIndex < points.length; positionIndex++) {
+                    for (var positionIndex = 0, points = lines[linesIndex]; positionIndex < points.length;
+                         positionIndex++) {
                         var longitude = points[positionIndex][0],
                             latitude = points[positionIndex][1];
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
@@ -727,7 +726,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified geometry is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForPolygon = function(layer, geometry, properties) {
+        GeoJSONParser.prototype.addRenderablesForPolygon = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForPolygon", "missingLayer"));
@@ -741,10 +740,12 @@ define(['../../error/ArgumentError',
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
             if (!this.crs || this.crs.isCRSSupported()) {
-                for (var boundariesIndex = 0, boundaries = geometry.coordinates; boundariesIndex < boundaries.length; boundariesIndex++) {
+                for (var boundariesIndex = 0, boundaries = geometry.coordinates;
+                     boundariesIndex < boundaries.length; boundariesIndex++) {
                     var positions = [];
 
-                    for (var positionIndex = 0, points = boundaries[boundariesIndex]; positionIndex < points.length; positionIndex++) {
+                    for (var positionIndex = 0, points = boundaries[boundariesIndex];
+                         positionIndex < points.length; positionIndex++) {
                         var longitude = points[positionIndex][0],
                             latitude = points[positionIndex][1];
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
@@ -778,7 +779,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified geometry is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForMultiPolygon = function(layer, geometry, properties) {
+        GeoJSONParser.prototype.addRenderablesForMultiPolygon = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForMultiPolygon",
@@ -794,11 +795,13 @@ define(['../../error/ArgumentError',
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
             if (!this.crs || this.crs.isCRSSupported()) {
-                for (var polygonsIndex = 0, polygons = geometry.coordinates; polygonsIndex < polygons.length; polygonsIndex++) {
+                for (var polygonsIndex = 0, polygons = geometry.coordinates;
+                     polygonsIndex < polygons.length; polygonsIndex++) {
                     var boundaries = [];
                     for (var boundariesIndex = 0; boundariesIndex < polygons[polygonsIndex].length; boundariesIndex++) {
                         var positions = [];
-                        for (var positionIndex = 0, points = polygons[polygonsIndex][boundariesIndex]; positionIndex < points.length; positionIndex++) {
+                        for (var positionIndex = 0, points = polygons[polygonsIndex][boundariesIndex];
+                             positionIndex < points.length; positionIndex++) {
                             var longitude = points[positionIndex][0],
                                 latitude = points[positionIndex][1];
                             //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,;
@@ -831,7 +834,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified featureCollection is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForGeometryCollection = function(layer, geometryCollection, properties) {
+        GeoJSONParser.prototype.addRenderablesForGeometryCollection = function (layer, geometryCollection, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForGeometryCollection",
@@ -845,8 +848,9 @@ define(['../../error/ArgumentError',
             }
 
 
-            for (var geometryIndex = 0, geometries = geometryCollection.geometries; geometryIndex < geometries.length; geometryIndex++) {
-                if (geometries[geometryIndex].hasOwnProperty(GeoJSONConstants.FIELD_TYPE)) {
+            for (var geometryIndex = 0, geometries = geometryCollection.geometries;
+                 geometryIndex < geometries.length; geometryIndex++) {
+                if(geometries[geometryIndex].hasOwnProperty(GeoJSONConstants.FIELD_TYPE)){
                     this.addRenderablesForGeometry(layer, geometries[geometryIndex], properties);
                 }
             }
@@ -863,7 +867,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified feature is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForFeature = function(layer, feature) {
+        GeoJSONParser.prototype.addRenderablesForFeature = function (layer, feature) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForFeature", "missingLayer"));
@@ -882,7 +886,8 @@ define(['../../error/ArgumentError',
                     layer,
                     geometryCollection,
                     feature.properties);
-            } else {
+            }
+            else {
                 this.addRenderablesForGeometry(
                     layer,
                     feature.geometry,
@@ -900,7 +905,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the specified featureCollection is null or undefined.
          */
-        GeoJSONParser.prototype.addRenderablesForFeatureCollection = function(layer, featureCollection) {
+        GeoJSONParser.prototype.addRenderablesForFeatureCollection = function (layer, featureCollection) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "addRenderablesForFeatureCollection",
@@ -928,7 +933,7 @@ define(['../../error/ArgumentError',
         };
 
         // Set type of GeoJSON object. Internal use ony.
-        GeoJSONParser.prototype.setGeoJSONType = function() {
+        GeoJSONParser.prototype.setGeoJSONType = function () {
             switch (this.geoJSONObject[GeoJSONConstants.FIELD_TYPE]) {
                 case GeoJSONConstants.TYPE_POINT:
                     this._geoJSONType = GeoJSONConstants.TYPE_POINT;
@@ -974,7 +979,7 @@ define(['../../error/ArgumentError',
          * @throws {ArgumentError} If the specified longitude is null or undefined.
          * @throws {ArgumentError} If the specified crsObject is null or undefined.
          */
-        GeoJSONParser.prototype.getReprojectedIfRequired = function(latitude, longitude, crsObject) {
+        GeoJSONParser.prototype.getReprojectedIfRequired = function (latitude, longitude, crsObject) {
             if (!latitude && latitude !== 0.0) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "getReprojectedIfRequired",
@@ -982,21 +987,21 @@ define(['../../error/ArgumentError',
             }
 
             if (!longitude && longitude !== 0.0) {
-                console.log(longitude);
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "getReprojectedIfRequired",
                         "missingLongitude"));
             }
 
-            if (!crsObject || crsObject.isDefault()) {
+            if (!crsObject || crsObject.isDefault()){
                 return [longitude, latitude];
-            } else {
+            }
+            else{
                 return Proj4(crsObject.projectionString, GeoJSONConstants.EPSG4326_CRS, [longitude, latitude]);
             }
         };
 
         // Use this function to add aliases for some projection strings that proj4js doesn't recognize.
-        GeoJSONParser.prototype.setProj4jsAliases = function() {
+        GeoJSONParser.prototype.setProj4jsAliases = function () {
             Proj4.defs([
                 [
                     'urn:ogc:def:crs:OGC:1.3:CRS84',
@@ -1009,6 +1014,19 @@ define(['../../error/ArgumentError',
                 ]
             ]);
         };
+
+        /**
+        * Indicate whether the data source is of a JSON type.
+        * @returns {Boolean} True if the data source is of JSON type.
+        */
+        GeoJSONParser.prototype.isDataSourceJson = function() {
+            try {
+                JSON.parse(this.dataSource);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
 
         return GeoJSONParser;
     }
