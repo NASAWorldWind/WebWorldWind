@@ -3,10 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    './KmlFeature',
-    '../../../util/WWUtil'
-], function (KmlFeature,
-             WWUtil) {
+    './KmlFeature'
+], function (KmlFeature) {
     "use strict";
     /**
      * Constructs an KmlContainer. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -54,7 +52,9 @@ define([
                 lastStyle: kmlOptions.lastStyle,
                 lastVisibility: self.enabled,
                 currentTimeInterval: kmlOptions.currentTimeInterval,
-                regionInvisible: kmlOptions.regionInvisible
+                regionInvisible: kmlOptions.regionInvisible,
+                fileCache: kmlOptions.fileCache,
+                styleResolver: kmlOptions.styleResolver
             });
         });
     };

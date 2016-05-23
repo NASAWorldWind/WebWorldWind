@@ -6,7 +6,6 @@ define([
     './../KmlObject',
     '../KmlAbstractView',
     '../KmlFile',
-    '../KmlFileCache',
     '../styles/KmlStyleMap',
     '../styles/KmlStyleSelector',
     '../KmlRegion',
@@ -18,7 +17,6 @@ define([
 ], function (KmlObject,
              KmlAbstractView,
              KmlFile,
-             KmlFileCache,
              KmlStyleMap,
              KmlStyleSelector,
              KmlRegion,
@@ -235,7 +233,7 @@ define([
     };
 
     KmlFeature.prototype.solveStyle = function(dc, kmlOptions) {
-        this.getStyle(dc);
+        this.getStyle(dc, kmlOptions);
         if(this.style != null) {
             kmlOptions.lastStyle = this.style;
         } else {
@@ -295,7 +293,7 @@ define([
     /**
      * @inheritDoc
      */
-    KmlFeature.prototype.getStyle = function (dc) {
+    KmlFeature.prototype.getStyle = function (dc, kmlOptions) {
         if (this._pStyle || (!this.kmlStyleUrl && !this.kmlStyleSelector)) {
             return;
         }
@@ -304,7 +302,7 @@ define([
         new Promise(function (resolve, reject) {
             window.setTimeout(function () {
                 // TODO: Refactor handle Remote Style.
-                StyleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
+                kmlOptions.styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
             }, 0);
         }).then(function(styles){
             self._pStyle = styles;

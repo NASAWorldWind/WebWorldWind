@@ -4,10 +4,8 @@
  */
 define([
     '../KmlFile',
-    '../KmlFileCache',
     '../../../util/Logger'
 ], function (KmlFile,
-             KmlFileCache,
              Logger) {
     "use strict";
 
@@ -15,7 +13,8 @@ define([
      * Provide functions for handling styles.
      * @exports StyleResolver
      */
-    var StyleResolver = function () {
+    var StyleResolver = function (fileCache) {
+        this._fileCache = fileCache;
     };
 
     /**
@@ -26,19 +25,19 @@ define([
      * @param reject {function} Function for rejecting dependant promise
      * @param filePromise {Promise} Promise of the file. It is applied in the case of style url.
      */
-    StyleResolver.handleRemoteStyle = function (styleUrl, styleSelector, resolve, reject, filePromise) {
+    StyleResolver.prototype.handleRemoteStyle = function (styleUrl, styleSelector, resolve, reject, filePromise) {
         if (styleUrl) {
-            StyleResolver.handleStyleUrl(styleUrl, resolve, reject, filePromise);
+            this.handleStyleUrl(styleUrl, resolve, reject, filePromise);
         } else if (styleSelector) {
-            StyleResolver.handleStyleSelector(styleSelector, resolve, reject);
+            this.handleStyleSelector(styleSelector, resolve, reject);
         } else {
             Logger.logMessage(Logger.LEVEL_WARNING, "StyleResolver", "handleRemoteStyle", "Style was null.");
         }
     };
 
     // Intentionally undocumented. For internal use only
-    StyleResolver.handleStyleUrl = function (styleUrl, resolve, reject, filePromise) {
-        filePromise = StyleResolver.handlePromiseOfFile(styleUrl, filePromise);
+    StyleResolver.prototype.handleStyleUrl = function (styleUrl, resolve, reject, filePromise) {
+        filePromise = this.handlePromiseOfFile(styleUrl, filePromise);
         filePromise.then(function (kmlFile) {
             kmlFile.resolveStyle(styleUrl).then(function (style) {
                 if (style.isMap) {
@@ -51,20 +50,20 @@ define([
     };
 
     // Intentionally undocumented. For internal use only
-    StyleResolver.handlePromiseOfFile = function (styleUrl, filePromise) {
+    StyleResolver.prototype.handlePromiseOfFile = function (styleUrl, filePromise) {
         if (!filePromise) {
-            filePromise = KmlFileCache.retrieve(styleUrl);
+            filePromise = this._fileCache.retrieve(styleUrl);
             if (!filePromise) {
                 // This is an issue of circular dependency again.
                 filePromise = new WorldWind.KmlFile({url: styleUrl});
-                KmlFileCache.add(filePromise);
+                this._fileCache.add(filePromise);
             }
         }
         return filePromise;
     };
 
     // Intentionally undocumented. For internal use only
-    StyleResolver.handleStyleSelector = function (styleSelector, resolve, reject) {
+    StyleResolver.prototype.handleStyleSelector = function (styleSelector, resolve, reject) {
         if (styleSelector.isMap) {
             styleSelector.resolve(resolve, reject);
         } else {

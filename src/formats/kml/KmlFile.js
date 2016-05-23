@@ -19,6 +19,7 @@ define([
     '../../util/Logger',
     '../../util/Promise',
     './util/Remote',
+    './util/StyleResolver',
     '../../util/XmlDocument'
 ], function (ArgumentError,
              JsZip,
@@ -32,6 +33,7 @@ define([
              Logger,
              Promise,
              Remote,
+             StyleResolver,
              XmlDocument) {
     "use strict";
 
@@ -56,7 +58,9 @@ define([
 
         // Default values.
         this._controls = controls || null;
-
+        this._fileCache = new KmlFileCache();
+        this._styleResolver = new StyleResolver(this._fileCache);
+        
         var filePromise;
         // Load the document
         filePromise = new Promise(function (resolve) {
@@ -83,7 +87,7 @@ define([
                 }, 0);
             });
         });
-        KmlFileCache.add(url, filePromise);
+        this._fileCache.add(url, filePromise);
         return filePromise;
     };
 
@@ -108,12 +112,15 @@ define([
      * @inheritDoc
      */
     KmlFile.prototype.render = function (dc) {
+        var self = this;
         this.shapes.forEach(function (shape) {
             shape.render(dc, {
                 lastStyle: null,
                 lastVisibility: null,
                 currentTimeInterval: null,
-                regionInvisible: null
+                regionInvisible: null,
+                fileCache: self._fileCache,
+                styleResolver: self._styleResolver
             });
         });
     };
