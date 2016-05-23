@@ -116,14 +116,14 @@ define([
                     '    vec3 frontColor = vec3(0.0, 0.0, 0.0);\n' +
                     '    for(int i=0; i<SAMPLE_COUNT; i++)\n' +
                     '    {\n' +
-                    '        float height = length(samplePoint);\n' +
-                    '        float depth = exp(scaleOverScaleDepth * (globeRadius - height));\n' +
-                    '        float lightAngle = dot(lightDirection, samplePoint) / height;\n' +
-                    '        float cameraAngle = dot(ray, samplePoint) / height;\n' +
-                    '        float scatter = (startOffset + depth*(scaleFunc(lightAngle) - scaleFunc(cameraAngle)));\n' +
-                    '        vec3 attenuate = exp(-scatter * (invWavelength * Kr4PI + Km4PI));\n' +
-                    '        frontColor += attenuate * (depth * scaledLength);\n' +
-                    '        samplePoint += sampleRay;\n' +
+                    '       float height = length(samplePoint);\n' +
+                    '       float depth = exp(scaleOverScaleDepth * (globeRadius - height));\n' +
+                    '       float lightAngle = dot(lightDirection, samplePoint) / height;\n' +
+                    '       float cameraAngle = dot(ray, samplePoint) / height;\n' +
+                    '       float scatter = (startOffset + depth*(scaleFunc(lightAngle) - scaleFunc(cameraAngle)));\n'+
+                    '       vec3 attenuate = exp(-scatter * (invWavelength * Kr4PI + Km4PI));\n' +
+                    '       frontColor += attenuate * (depth * scaledLength);\n' +
+                    '       samplePoint += sampleRay;\n' +
                     '    }\n' +
 
                         /* Finally, scale the Mie and Rayleigh colors and set up the varying variables for the fragment
@@ -163,7 +163,8 @@ define([
                     '    if (fragMode == FRAGMODE_SKY) {\n' +
                     '        float cos = dot(lightDirection, direction) / length(direction);\n' +
                     '        float rayleighPhase = 0.75 * (1.0 + cos * cos);\n' +
-                    '        float miePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + cos*cos) / pow(1.0 + g2 - 2.0*g*cos, 1.5);\n' +
+                    '        float miePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + cos*cos) / ' +
+                    '            pow(1.0 + g2 - 2.0*g*cos, 1.5);\n' +
                     '        const float exposure = 2.0;\n' +
                     '        vec3 color = primaryColor * rayleighPhase + secondaryColor * miePhase;\n' +
                     '        color = vec3(1.0) - exp(-exposure * color);\n' +

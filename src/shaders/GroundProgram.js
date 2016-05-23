@@ -61,7 +61,8 @@ define([
                     'uniform float atmosphereRadius2;\n' +    /* atmosphereRadius^2 */
                     'uniform float globeRadius;\n' +	    /* The inner (planetary) radius */
                     'uniform float scale;\n' +			    /* 1 / (atmosphereRadius - globeRadius) */
-                    'uniform float scaleDepth;\n' +		    /* The scale depth (i.e. the altitude at which the atmosphere's average density is found) */
+                    'uniform float scaleDepth;\n' +		    /* The scale depth (i.e. the altitude at which
+                    the atmosphere's average density is found) */
                     'uniform float scaleOverScaleDepth;\n' +	/* fScale / fScaleDepth */
 
                     'attribute vec4 vertexPoint;\n' +

@@ -199,7 +199,8 @@ define([
         AtmosphereProgram.prototype.loadModelviewProjection = function (gl, matrix) {
             if (!matrix) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "AtmosphereProgram", "loadModelviewProjection", "missingMatrix"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "AtmosphereProgram", "loadModelviewProjection",
+                        "missingMatrix"));
             }
 
             this.loadUniformMatrix(gl, matrix, this.mvpMatrixLocation);

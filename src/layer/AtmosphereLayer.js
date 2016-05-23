@@ -219,7 +219,7 @@ define([
 
             gl.depthMask(true);
             gl.frontFace(gl.CCW);
-        }
+        };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.drawGround = function (dc) {
@@ -279,7 +279,7 @@ define([
             // Restore the default World Wind OpenGL state.
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             gl.disableVertexAttribArray(program.vertexPointLocation);
-        }
+        };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.setSkyPoints = function (dc, altitude) {
@@ -297,7 +297,7 @@ define([
                     Vec3.ZERO,
                     this._skyPoints);
             }
-        }
+        };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.setSkyTrianglesIndices = function () {
@@ -305,7 +305,7 @@ define([
             if (this._skyTriStrip == null) {
                 this._skyTriStrip = this.assembleTriStripIndices(this.skyWidth, this.skyHeight);
             }
-        }
+        };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.assembleTriStripIndices = function (numLat, numLon) {
@@ -338,7 +338,7 @@ define([
             }
 
             return result;
-        }
+        };
 
         return AtmosphereLayer;
     });
