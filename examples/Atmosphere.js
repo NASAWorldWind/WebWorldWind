@@ -18,7 +18,7 @@ requirejs(['../src/WorldWind',
             {layer: new WorldWind.CompassLayer(), enabled: false},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: false},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: false},
-            {layer: new WorldWind.AtmosphereLayer(wwd), enabled: true}
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {

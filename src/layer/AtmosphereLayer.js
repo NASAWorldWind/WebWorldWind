@@ -27,41 +27,164 @@ define([
               Vec3) {
         "use strict";
 
-        var AtmosphereLayer = function (worldWindow) {
-            if (!worldWindow) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ViewControlsLayer", "constructor", "missingWorldWindow"));
-            }
+        /**
+         * Constructs a layer showing the Earth's atmosphere.
+         * @alias AtmosphereLayer
+         * @constructor
+         * @classdesc Provides a layer showing the Earth's atmosphere.
+         * @augments Layer
+         */
+        var AtmosphereLayer = function () {
 
             Layer.call(this, "Atmosphere");
 
-            this.wwd = worldWindow;
-
             this.pickEnabled = false;
 
-            this._fullSphereSector = Sector.FULL_SPHERE;
+            // Internal use only. Intentionally not documented.
+            this.skyData = {};
 
+            // Documented in defineProperties below.
             this._skyWidth = 128;
 
+            // Documented in defineProperties below.
             this._skyHeight = 128;
 
+            // Documented in defineProperties below.
             this._skyPoints = null;
 
+            // Documented in defineProperties below.
             this._skyTriStrip = null;
-
-            this._imageSource = new ImageSource('../../images/dnb_land_ocean_ice_2012.png');
         };
 
         AtmosphereLayer.prototype = Object.create(Layer.prototype);
 
+        Object.defineProperties(AtmosphereLayer.prototype, {
+
+            /**
+             * The number of longitudinal points in the grid.
+             * @memberof AtmosphereLayer.prototype
+             * @type {Number}
+             */
+            skyWidth: {
+                get: function () {
+                    return this._skyWidth;
+                },
+                set: function (value) {
+                    this._skyWidth = value;
+                }
+            },
+
+            /**
+             * The number of latitudinal points in the grid.
+             * @memberof AtmosphereLayer.prototype
+             * @type {Number}
+             */
+            skyHeight: {
+                get: function () {
+                    return this._skyHeight;
+                },
+                set: function (value) {
+                    this._skyHeight = value;
+                }
+            },
+
+            /**
+             * The grid of sky Cartesian points.
+             * @memberof AtmosphereLayer.prototype
+             * @type {Float32Array}
+             */
+            skyPoints: {
+                get: function () {
+                    return this._skyPoints;
+                },
+                set: function (value) {
+                    this._skyPoints = value;
+                }
+            },
+
+            /**
+             * The triangle strip sky indices.
+             * @memberof AtmosphereLayer.prototype
+             * @type {Number[]}
+             */
+            skyTriStrip: {
+                get: function () {
+                    return this._skyTriStrip;
+                },
+                set: function (value) {
+                    this._skyTriStrip = value;
+                }
+            }
+        });
+
         // Documented in superclass.
         AtmosphereLayer.prototype.doRender = function (dc) {
-            //console.log(this._imageSource);
+
             this.drawSky(dc);
             this.drawGround(dc);
         };
 
-        AtmosphereLayer.prototype.drawSky = function(dc) {
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.applySkyVertices = function (dc) {
+
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram,
+                skyData = this.skyData,
+                vboId;
+
+            if (!skyData.verticesVboCacheKey) {
+                skyData.verticesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
+            }
+
+            vboId = dc.gpuResourceCache.resourceForKey(skyData.verticesVboCacheKey);
+            if (!vboId) {
+                vboId = gl.createBuffer();
+                dc.gpuResourceCache.putResource(skyData.verticesVboCacheKey, vboId,
+                    this.skyPoints.length * 4);
+                skyData.refreshVertexBuffer = true;
+            }
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+            if (skyData.refreshVertexBuffer) {
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.skyPoints), gl.STATIC_DRAW);
+                dc.frameStatistics.incrementVboLoadCount(1);
+                skyData.refreshVertexBuffer = false;
+            }
+
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(program.vertexPointLocation);
+        };
+
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.applySkyIndices = function (dc) {
+
+            var gl = dc.currentGlContext,
+                skyData = this.skyData,
+                vboId;
+
+            if (!skyData.indicesVboCacheKey) {
+                skyData.indicesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
+            }
+
+            vboId = dc.gpuResourceCache.resourceForKey(skyData.indicesVboCacheKey);
+            if (!vboId) {
+                vboId = gl.createBuffer();
+                dc.gpuResourceCache.putResource(skyData.indicesVboCacheKey, vboId, this._skyTriStrip.length * 2);
+                skyData.refreshIndicesBuffer = true;
+            }
+
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
+            if (skyData.refreshIndicesBuffer) {
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
+                    new Uint16Array(this._skyTriStrip), gl.STATIC_DRAW);
+                dc.frameStatistics.incrementVboLoadCount(1);
+                skyData.refreshIndicesBuffer = false;
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.drawSky = function (dc) {
+
             var gl = dc.currentGlContext,
                 program = dc.findAndBindProgram(SkyProgram),
                 eyePoint = new Vec3(
@@ -69,7 +192,7 @@ define([
                     dc.navigatorState.eyePoint[1],
                     dc.navigatorState.eyePoint[2]);
 
-            program.loadGlobe(gl, dc.globe);
+            program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
@@ -81,40 +204,25 @@ define([
 
             program.loadLightDirection(gl, eyePoint.normalize());
 
-            gl.uniform1f(program.scaleLocation, 1 / program.getAltitude());
-
-            gl.uniform1f(program.scaleDepthLocation, program.getScaleDepth());
-
-            gl.uniform1f(program.scaleOverScaleDepthLocation, (1 / program.getAltitude()) / program.getScaleDepth());
+            program.setScale(gl);
 
             gl.depthMask(false);
             gl.frontFace(gl.CW);
 
             this.setSkyPoints(dc, program.getAltitude());
             this.setSkyTrianglesIndices();
-            var triangleVertices = this._skyPoints;
-            var triangleIndices = this._skyTriStrip;
 
-            var vertexBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW);
+            this.applySkyVertices(dc);
+            this.applySkyIndices(dc);
 
-            var indexBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,
-                new Uint16Array(triangleIndices), gl.STATIC_DRAW);
-
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(program.vertexPointLocation);
-
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-            gl.drawElements(gl.TRIANGLE_STRIP, triangleIndices.length, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLE_STRIP, this._skyTriStrip.length, gl.UNSIGNED_SHORT, 0);
 
             gl.depthMask(true);
             gl.frontFace(gl.CCW);
         }
 
-        AtmosphereLayer.prototype.drawGround = function(dc) {
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.drawGround = function (dc) {
 
             var gl = dc.currentGlContext,
                 program = dc.findAndBindProgram(GroundProgram),
@@ -123,44 +231,20 @@ define([
                     dc.navigatorState.eyePoint[1],
                     dc.navigatorState.eyePoint[2]);
 
-            program.loadGlobe(gl, dc.globe);
+            program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
             program.loadLightDirection(gl, eyePoint.normalize());
 
-            gl.uniform1f(program.scaleLocation, 1 / program.getAltitude());
-
-            gl.uniform1f(program.scaleDepthLocation, program.getScaleDepth());
-
-            gl.uniform1f(program.scaleOverScaleDepthLocation, (1 / program.getAltitude()) / program.getScaleDepth());
-
-            //GpuTexture texture = null;
-            //boolean textureBound = false;
-            //
-            //// Use this layer's night image when the light location is different than the eye location.
-            //if (this.nightImageSource != null && this.lightLocation != null) {
-            //
-            //    texture = (GpuTexture) dc.getGpuObjectCache().get(this.nightImageSource);
-            //    if (texture == null) {
-            //        texture = new GpuTexture(dc, this.nightImageSource);
-            //    }
-            //
-            //    textureBound = texture.bindTexture(dc, GLES20.GL_TEXTURE0);
-            //}
+            program.setScale(gl);
 
             // Get the draw context's tessellated terrain and modelview projection matrix.
             var terrain = dc.terrain;
-            //var modelviewProjection = dc.navigatorState.modelviewProjection;
             var modelviewProjection = Matrix.fromIdentity();
             modelviewProjection.copy(dc.navigatorState.modelviewProjection);
 
-            // Set up to use the shared tile tex coord attributes.
-            //gl.enableVertexAttribArray(program.vertexPointLocation);
-            //terrain.useVertexTexCoordAttrib(dc, 1);
-
             for (var idx = 0, len = terrain.tessellator.currentTiles.length; idx < len; idx++) {
-
                 var currentTile = terrain.tessellator.currentTiles.tileArray[idx];
                 // Use the vertex origin for the terrain tile.
                 var terrainOrigin = currentTile.referencePoint;
@@ -170,16 +254,7 @@ define([
                 modelviewProjection.multiplyByTranslation(terrainOrigin[0], terrainOrigin[1], terrainOrigin[2]);
                 program.loadModelviewProjection(gl, modelviewProjection);
 
-                // Use the texture's transform matrix.
-                //if (textureBound) {
-                //this.texCoordMatrix.setToIdentity();
-                //texture.applyTexCoordTransform(this.texCoordMatrix);
-                //terrain.applyTexCoordTransform(idx, this.fullSphereSector, this.texCoordMatrix);
-                //program.loadTexCoordMatrix(this.texCoordMatrix);
-                //}
-
                 // Use the tile's vertex point attribute.
-                //terrain.useVertexPointAttrib(dc, idx, 0);
                 gl.enableVertexAttribArray(program.vertexPointLocation);
 
                 // Draw the tile, multiplying the current fragment color by the program's secondary color.
@@ -190,12 +265,10 @@ define([
                 terrain.renderTile(dc, currentTile);
                 terrain.endRenderingTile(dc, currentTile);
                 terrain.tessellator.endRendering(dc);
-                //terrain.renderTile(dc, currentTile);
 
                 // Draw the tile, adding the current fragment color to the program's primary color.
                 program.loadFragMode(gl, program.FRAGMODE_GROUND_PRIMARY);
                 gl.blendFunc(gl.ONE, gl.ONE);
-                //terrain.renderTile(dc, currentTile);
                 terrain.tessellator.beginRendering(dc);
                 terrain.beginRenderingTile(dc, currentTile);
                 terrain.renderTile(dc, currentTile);
@@ -208,29 +281,35 @@ define([
             gl.disableVertexAttribArray(program.vertexPointLocation);
         }
 
-        AtmosphereLayer.prototype.setSkyPoints = function(dc, altitude) {
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.setSkyPoints = function (dc, altitude) {
+
             if (this._skyPoints == null) {
-                var count = this._skyWidth * this._skyHeight;
+                var count = this.skyWidth * this.skyHeight;
                 var array = Array(count).fill(altitude);
                 this._skyPoints = new Float64Array(3 * array.length);
 
                 dc.globe.computePointsForGrid(
-                    this._fullSphereSector,
-                    this._skyWidth,
-                    this._skyHeight,
+                    Sector.FULL_SPHERE,
+                    this.skyHeight,
+                    this.skyWidth,
                     array,
                     Vec3.ZERO,
                     this._skyPoints);
             }
         }
 
-        AtmosphereLayer.prototype.setSkyTrianglesIndices = function() {
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.setSkyTrianglesIndices = function () {
+
             if (this._skyTriStrip == null) {
-                this._skyTriStrip = this.assembleTriStripIndices(this._skyWidth, this._skyHeight);
+                this._skyTriStrip = this.assembleTriStripIndices(this.skyWidth, this.skyHeight);
             }
         }
 
-        AtmosphereLayer.prototype.assembleTriStripIndices = function(numLat, numLon) {
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.assembleTriStripIndices = function (numLat, numLon) {
+
             var result = [];
             var index = [];
             var vertex = 0;
@@ -242,7 +321,7 @@ define([
                 for (var lonIndex = 0; lonIndex < numLon; lonIndex++) {
                     vertex = lonIndex + latIndex * numLon;
                     index[0] = (vertex + numLon);
-                    index[1] =  vertex;
+                    index[1] = vertex;
                     result.push(index[0]);
                     result.push(index[1]);
                 }

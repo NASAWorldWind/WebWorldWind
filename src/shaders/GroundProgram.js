@@ -11,8 +11,23 @@ define([
     function (AtmosphereProgram) {
         "use strict";
 
+        /**
+         * Constructs a new program.
+         * Initializes, compiles and links this GLSL program with the source code for its vertex and fragment shaders.
+         * <p>
+         * This method creates WebGL shaders for the program's shader sources and attaches them to a new GLSL program.
+         * This method then compiles the shaders and then links the program if compilation is successful. Use the bind
+         * method to make the program current during rendering.
+         *
+         * @alias GroundProgram
+         * @constructor
+         * @augments AtmosphereProgram
+         * @classdesc GroundProgram is a GLSL program that draws the ground component of the atmosphere.
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @throws {ArgumentError} If the shaders cannot be compiled, or linking of
+         * the compiled shaders into a program fails.
+         */
         var  GroundProgram = function (gl) {
-
             var vertexShaderSource =
                     'precision mediump float;\n' +
                     'precision mediump int;\n' +
@@ -37,7 +52,6 @@ define([
 
                     'uniform int fragMode;\n' +
                     'uniform mat4 mvpMatrix;\n' +
-                    'uniform mat3 texCoordMatrix;\n' +
                     'uniform vec3 vertexOrigin;\n' +
                     'uniform vec3 eyePoint;\n' +
                     'uniform float eyeMagnitude;\n' +	        /* The eye point's magnitude */
@@ -51,12 +65,10 @@ define([
                     'uniform float scaleOverScaleDepth;\n' +	/* fScale / fScaleDepth */
 
                     'attribute vec4 vertexPoint;\n' +
-                    'attribute vec2 vertexTexCoord;\n' +
 
                     'varying vec3 primaryColor;\n' +
                     'varying vec3 secondaryColor;\n' +
                     'varying vec3 direction;\n' +
-                    'varying vec2 texCoord;\n' +
 
                     'float scaleFunc(float cos) {\n' +
                     '    float x = 1.0 - cos;\n' +
@@ -121,14 +133,8 @@ define([
                     'void main()\n ' +
                     '{\n' +
                     '    sampleGround();\n' +
-
                         /* Transform the vertex point by the modelview-projection matrix */
                     '    gl_Position = mvpMatrix * vertexPoint;\n' +
-
-                    '    if (fragMode == FRAGMODE_GROUND_PRIMARY_TEX_BLEND) {\n' +
-                        /* Transform the vertex texture coordinate by the tex coord matrix */
-                    '        texCoord = (texCoordMatrix * vec3(vertexTexCoord, 1.0)).st;\n' +
-                    '    }\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
@@ -137,19 +143,16 @@ define([
                     'const int FRAGMODE_SKY = 1;\n' +
                     'const int FRAGMODE_GROUND_PRIMARY = 2;\n' +
                     'const int FRAGMODE_GROUND_SECONDARY = 3;\n' +
-                    'const int FRAGMODE_GROUND_PRIMARY_TEX_BLEND = 4;\n' +
 
                     'const float g = -0.95;\n' +
                     'const float g2 = g * g;\n' +
 
                     'uniform int fragMode;\n' +
-                    'uniform sampler2D texSampler;\n' +
                     'uniform vec3 lightDirection;\n' +
 
                     'varying vec3 primaryColor;\n' +
                     'varying vec3 secondaryColor;\n' +
                     'varying vec3 direction;\n' +
-                    'varying vec2 texCoord;\n' +
 
                     'void main (void)\n' +
                     '{\n' +
@@ -165,20 +168,23 @@ define([
                     '        gl_FragColor = vec4(primaryColor, 1.0);\n' +
                     '    } else if (fragMode == FRAGMODE_GROUND_SECONDARY) {\n' +
                     '        gl_FragColor = vec4(secondaryColor, 1.0);\n' +
-                    '    } else if (fragMode == FRAGMODE_GROUND_PRIMARY_TEX_BLEND) {\n' +
-                    '        vec4 texColor = texture2D(texSampler, texCoord);\n' +
-                    '        gl_FragColor = vec4(primaryColor + texColor.rgb * (1.0 - secondaryColor), 1.0);\n' +
                     '    } else {\n' +
                     'gl_FragColor = vec4(1.0);\n' +
                     '}\n' +
                     '}';
 
             // Call to the superclass, which performs shader program compiling and linking.
-            AtmosphereProgram.call(this, gl, vertexShaderSource, fragmentShaderSource, ["vertexPoint", "vertexTexCoord"]);
+            AtmosphereProgram.call(this, gl, vertexShaderSource, fragmentShaderSource, ["vertexPoint"]);
         };
 
+        /**
+         * A string that uniquely identifies this program.
+         * @type {string}
+         * @readonly
+         */
         GroundProgram.key = "WorldWindGroundProgram";
 
+        // Inherit from AtmosphereProgram.
         GroundProgram.prototype = Object.create(AtmosphereProgram.prototype);
 
         return GroundProgram;
