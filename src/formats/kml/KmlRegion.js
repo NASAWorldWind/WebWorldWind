@@ -11,9 +11,7 @@ define([
     './KmlObject',
     './styles/KmlStyle',
     './util/NodeTransformers',
-    '../../shapes/Polygon',
-    '../../geom/Position',
-    '../../shapes/ShapeAttributes'
+    '../../geom/Sector'
 ], function (BoundingBox,
              Color,
              KmlElements,
@@ -22,9 +20,7 @@ define([
              KmlObject,
              KmlStyle,
              NodeTransformers,
-             Polygon,
-             Position,
-             ShapeAttributes) {
+             Sector) {
     "use strict";
 
     /**
@@ -79,33 +75,14 @@ define([
      * @param dc {DrawContext} Frustum to test for intersection.
      */
     KmlRegion.prototype.intersectsVisible = function(dc) {
-        // Use BoundingBox and frustum in NavigatorState.
-        // BoundingBox.prototype.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)
-        // dc.navigatorState.frustumInModelCoordinates
-
-        // Create a Polygon and see whether it intersects the current frustum.
         var box = this.kmlLatLonAltBox;
-        if(!this._polygonRepresentationMin) {
-            var minPositions = [
-                new Position(box.kmlSouth, box.kmlEast, 5000),
-                new Position(box.kmlNorth, box.kmlEast, 5000),
-                new Position(box.kmlNorth, box.kmlWest, 5000),
-                new Position(box.kmlSouth, box.kmlWest, 5000)
-            ];
-            var shapeAttributes = new ShapeAttributes(null);
 
-            shapeAttributes.outlineColor = new Color(0, 0, 0, 0);
-            shapeAttributes.outlineWidth = 0;
-            shapeAttributes.drawInterior = false;
+        var boundingBoxForRegion = new BoundingBox();
+        boundingBoxForRegion.setToSector(new Sector(box.kmlSouth, box.kmlNorth, box.kmlWest, box.kmlEast), dc.globe, box.kmlMinAltitude, box.kmlMaxAltitude);
 
-            this._polygonRepresentationMin = new Polygon(minPositions, shapeAttributes);
-        }
-
-        this._polygonRepresentationMin.render(dc);
-
-        return this._polygonRepresentationMin.intersectsFrustum(dc) &&
-                (!box.kmlMinAltitude || dc.eyePosition.altitude > box.kmlMinAltitude) &&
-                (!box.kmlMaxAltitude || dc.eyePosition.altitude < box.kmlMaxAltitude);
+        return boundingBoxForRegion.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)&&
+            (!box.kmlMinAltitude || dc.eyePosition.altitude > box.kmlMinAltitude) &&
+            (!box.kmlMaxAltitude || dc.eyePosition.altitude < box.kmlMaxAltitude);
     };
 
     /**
