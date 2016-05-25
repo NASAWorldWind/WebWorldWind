@@ -12,8 +12,10 @@ define([
         '../layer/Layer',
         '../util/Logger',
         '../geom/Matrix',
+        '../geom/Matrix3',
         '../geom/Sector',
         '../shaders/SkyProgram',
+        '../util/sun',
         '../geom/Vec3'
     ],
     function (ArgumentError,
@@ -22,8 +24,10 @@ define([
               Layer,
               Logger,
               Matrix,
+              Matrix3,
               Sector,
               SkyProgram,
+              sun,
               Vec3) {
         "use strict";
 
@@ -32,14 +36,30 @@ define([
          * @alias AtmosphereLayer
          * @constructor
          * @classdesc Provides a layer showing the Earth's atmosphere.
+         * @param {URL} imageSource optional url for the night texture.
          * @augments Layer
          */
-        var AtmosphereLayer = function () {
+        var AtmosphereLayer = function (imageSource) {
 
             Layer.call(this, "Atmosphere");
 
+            //the night texture
+            this._activeTexture = null;
+            
+            //image for the night texture
+            this.imageSource = imageSource || '../images/dnb_land_ocean_ice_2012.png';
+            
+            //timestamp for the last sun calculation
+            this._lastSunRequest = 0;
+            
+            this._lightDirection = new Vec3(0, 0, 0);
+
             this.pickEnabled = false;
 
+            this._fullSphereSector = Sector.FULL_SPHERE;
+            
+            this._scratchVector = new Vec3(0, 0, 0);
+            
             // Internal use only. Intentionally not documented.
             this.skyData = {};
 
@@ -54,6 +74,12 @@ define([
 
             // Documented in defineProperties below.
             this._skyTriStrip = null;
+
+            //texture coordinate matrix used for the night texture
+            this._texMatrix = Matrix3.fromIdentity();
+
+            //modelViewProjection matrix
+            this._mvpMatrix = Matrix.fromIdentity();
         };
 
         AtmosphereLayer.prototype = Object.create(Layer.prototype);
@@ -119,7 +145,7 @@ define([
 
         // Documented in superclass.
         AtmosphereLayer.prototype.doRender = function (dc) {
-
+            this.computeLightDirection(dc);
             this.drawSky(dc);
             this.drawGround(dc);
         };
@@ -186,11 +212,7 @@ define([
         AtmosphereLayer.prototype.drawSky = function (dc) {
 
             var gl = dc.currentGlContext,
-                program = dc.findAndBindProgram(SkyProgram),
-                eyePoint = new Vec3(
-                    dc.navigatorState.eyePoint[0],
-                    dc.navigatorState.eyePoint[1],
-                    dc.navigatorState.eyePoint[2]);
+                program = dc.findAndBindProgram(SkyProgram);
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
@@ -202,7 +224,7 @@ define([
 
             program.loadFragMode(gl, program.FRAGMODE_SKY);
 
-            program.loadLightDirection(gl, eyePoint.normalize());
+            program.loadLightDirection(gl, this._lightDirection);
 
             program.setScale(gl);
 
@@ -225,24 +247,27 @@ define([
         AtmosphereLayer.prototype.drawGround = function (dc) {
 
             var gl = dc.currentGlContext,
-                program = dc.findAndBindProgram(GroundProgram),
-                eyePoint = new Vec3(
-                    dc.navigatorState.eyePoint[0],
-                    dc.navigatorState.eyePoint[1],
-                    dc.navigatorState.eyePoint[2]);
+                program = dc.findAndBindProgram(GroundProgram);
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
-            program.loadLightDirection(gl, eyePoint.normalize());
+            program.loadLightDirection(gl, this._lightDirection);
 
             program.setScale(gl);
 
             // Get the draw context's tessellated terrain and modelview projection matrix.
             var terrain = dc.terrain;
-            var modelviewProjection = Matrix.fromIdentity();
-            modelviewProjection.copy(dc.navigatorState.modelviewProjection);
+
+            var textureBound;
+            if (this.imageSource) {
+                this._activeTexture = dc.gpuResourceCache.resourceForKey(this.imageSource);
+                if (!this._activeTexture) {
+                    this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.imageSource);
+                }
+                textureBound = this._activeTexture && this._activeTexture.bind(dc);
+            }
 
             for (var idx = 0, len = terrain.tessellator.currentTiles.length; idx < len; idx++) {
                 var currentTile = terrain.tessellator.currentTiles.tileArray[idx];
@@ -251,8 +276,16 @@ define([
                 program.loadVertexOrigin(gl, terrainOrigin);
 
                 // Use the draw context's modelview projection matrix, transformed to the tile's local coordinates.
-                modelviewProjection.multiplyByTranslation(terrainOrigin[0], terrainOrigin[1], terrainOrigin[2]);
-                program.loadModelviewProjection(gl, modelviewProjection);
+                this._mvpMatrix.copy(dc.navigatorState.modelviewProjection);
+                this._mvpMatrix.multiplyByTranslation(terrainOrigin[0], terrainOrigin[1], terrainOrigin[2]);
+                program.loadModelviewProjection(gl, this._mvpMatrix);
+
+                // Use a tex coord matrix that registers the night texture correctly on each terrain.
+                if (textureBound) {
+                    this._texMatrix.setToUnitYFlip();
+                    this._texMatrix.multiplyByTileTransform(currentTile.sector, this._fullSphereSector);
+                    program.loadTexMatrix(gl, this._texMatrix);
+                }
 
                 // Use the tile's vertex point attribute.
                 gl.enableVertexAttribArray(program.vertexPointLocation);
@@ -266,8 +299,10 @@ define([
                 terrain.endRenderingTile(dc, currentTile);
                 terrain.tessellator.endRendering(dc);
 
-                // Draw the tile, adding the current fragment color to the program's primary color.
-                program.loadFragMode(gl, program.FRAGMODE_GROUND_PRIMARY);
+                // Draw the terrain as triangles, adding the current fragment color to the program's primary color.
+                var fragMode = textureBound ?
+                    program.FRAGMODE_GROUND_PRIMARY_TEX_BLEND : program.FRAGMODE_GROUND_PRIMARY;
+                program.loadFragMode(gl, fragMode);
                 gl.blendFunc(gl.ONE, gl.ONE);
                 terrain.tessellator.beginRendering(dc);
                 terrain.beginRenderingTile(dc, currentTile);
@@ -290,7 +325,7 @@ define([
                 this._skyPoints = new Float64Array(3 * array.length);
 
                 dc.globe.computePointsForGrid(
-                    Sector.FULL_SPHERE,
+                    this._fullSphereSector,
                     this.skyHeight,
                     this.skyWidth,
                     array,
@@ -338,6 +373,18 @@ define([
             }
 
             return result;
+        };
+
+        // Internal. Intentionally not documented.
+        AtmosphereLayer.prototype.computeLightDirection = function (dc) {
+            var date = new Date();
+            var ms = date.getTime();
+            if (ms - this._lastSunRequest > 5 * 60 * 1000) {
+                var sunPosition = sun(date);
+                this._lastSunRequest = ms;
+                dc.globe.computePointFromLocation(sunPosition.latitude, sunPosition.longitude, this._scratchVector);
+                this._lightDirection = this._scratchVector.normalize();
+            }
         };
 
         return AtmosphereLayer;

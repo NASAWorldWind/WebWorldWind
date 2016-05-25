@@ -40,6 +40,7 @@ define([
             this.FRAGMODE_SKY = 1;
             this.FRAGMODE_GROUND_PRIMARY = 2;
             this.FRAGMODE_GROUND_SECONDARY = 3;
+            this.FRAGMODE_GROUND_PRIMARY_TEX_BLEND = 4;
 
             /**
              * The globe's atmosphere altitude.
@@ -68,6 +69,13 @@ define([
              * @readonly
              */
             this.mvpMatrixLocation = this.uniformLocation(gl, "mvpMatrix");
+
+            /**
+             * The WebGL location for this program's 'texCoordMatrix' uniform.
+             * @type {WebGLUniformLocation}
+             * @readonly
+             */
+            this.texCoordMatrixLocation = this.uniformLocation(gl, "texCoordMatrix");
 
             /**
              * The WebGL location for this program's 'vertexOrigin' uniform.
@@ -145,6 +153,8 @@ define([
              * @readonly
              */
             this.scaleOverScaleDepthLocation = this.uniformLocation(gl, "scaleOverScaleDepth");
+            
+            this.scratchArray9 = new Float32Array(9);
         };
 
         /**
@@ -290,6 +300,16 @@ define([
             gl.uniform1f(this.scaleLocation, 1 / this.getAltitude());
             gl.uniform1f(this.scaleDepthLocation, this.getScaleDepth());
             gl.uniform1f(this.scaleOverScaleDepthLocation, (1 / this.getAltitude()) / this.getScaleDepth());
+        };
+
+        /**
+         * Loads the specified matrix as the value of this program's 'texCoordMatrix' uniform variable.
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @param {Matrix3} matrix The texture coordinate matrix.
+         */
+        AtmosphereProgram.prototype.loadTexMatrix = function(gl, matrix){
+            matrix.columnMajorComponents(this.scratchArray9);
+            gl.uniformMatrix3fv(this.texCoordMatrixLocation, false, this.scratchArray9);
         };
 
         return AtmosphereProgram;

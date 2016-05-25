@@ -112,7 +112,12 @@ define([
             // modelview matrix and before computing the near clip distance. The far clip distance depends on the
             // modelview matrix, and the near clip distance depends on the far clip distance.
             this.farDistance = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude);
-            this.farDistance *= 20.0; //Servet test
+
+            //Set the far distance a bit further so that the atmosphere doesn't get clipped when tilting the globe.
+            //High values have undesirable effects such as placemarks are visible through the globe.
+            //1450000 seems to be ok.
+            this.farDistance += 1450000;
+
             if (this.farDistance < 1e3)
                 this.farDistance = 1e3;
 
