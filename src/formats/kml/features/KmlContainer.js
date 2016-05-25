@@ -43,6 +43,9 @@ define([
         }
     });
 
+	/**
+     * @inheritDoc
+     */
     KmlContainer.prototype.render = function(dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 

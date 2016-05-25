@@ -29,6 +29,9 @@ define([
 
     KmlGeometry.prototype = Object.create(KmlObject.prototype);
 
+	/**
+     * @inheritDoc
+     */
     KmlGeometry.prototype.render = function(dc, kmlOptions) {
         KmlObject.prototype.render.call(this, dc, kmlOptions);
 

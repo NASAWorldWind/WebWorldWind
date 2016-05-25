@@ -275,6 +275,9 @@ define([
         }
     });
 
+	/**
+     * @inheritDoc
+     */
     KmlScreenOverlay.prototype.render = function(dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 

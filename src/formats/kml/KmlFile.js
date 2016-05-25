@@ -143,6 +143,10 @@ define([
         return new Remote(options);
     };
 
+	/**
+     * It finds the style in the document.
+     * @param pId {String} Id of the style.
+     */
     KmlFile.prototype.resolveStyle = function (pId) {
         var self = this;
         var id = pId.substring(pId.indexOf('#') + 1, pId.length);

@@ -11,9 +11,7 @@ define([
     '../KmlRegion',
     '../KmlTimePrimitive',
     '../util/NodeTransformers',
-    '../../../util/Promise',
-    '../util/StyleResolver',
-    '../../../util/WWUtil'
+    '../../../util/Promise'
 ], function (KmlObject,
              KmlAbstractView,
              KmlFile,
@@ -22,9 +20,7 @@ define([
              KmlRegion,
              KmlTimePrimitive,
              NodeTransformers,
-             Promise,
-             StyleResolver,
-             WWUtil) {
+             Promise) {
     "use strict";
     /**
      * Constructs an KmlFeature. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -232,6 +228,13 @@ define([
         this.solveVisibility(dc, kmlOptions);
     };
 
+	/**
+     * Internal use only
+     * It solves style which should be applied to current feature.
+     * @param dc {DrawContext} DrawContext associated with current processing.
+     * @param kmlOptions {Object}
+     * @param kmlOptions.lastStyle {KmlStyle} Style representing the one to apply to current information.
+     */
     KmlFeature.prototype.solveStyle = function(dc, kmlOptions) {
         this.getStyle(dc, kmlOptions);
         if(this.style != null) {
@@ -241,6 +244,12 @@ define([
         }
     };
 
+	/**
+     * Internal use only
+     * It solves whether the feature should be visible based on the Region.
+     * @param dc {DrawContext} Draw context associated with current processing.
+     * @returns {boolean} true if there is no region or the feature is in the region.
+     */
     KmlFeature.prototype.solveRegion = function(dc) {
         if(this.kmlRegion) {
             return this.kmlRegion.intersectsVisible(dc);
@@ -249,6 +258,12 @@ define([
         }
     };
 
+	/**
+     * Internal use only
+     * It solves whether current feature should be visible. It takes into account the visibility of parent elements, Time constraints, region, visibility.
+     * @param dc {DrawContext} Draw context associated with current processing.
+     * @param kmlOptions {Object}
+     */
     KmlFeature.prototype.solveVisibility = function(dc, kmlOptions) {
         var parentVisibility = kmlOptions.lastVisibility !== false;
         var timeBasedVisibility = this.solveTimeVisibility(dc);

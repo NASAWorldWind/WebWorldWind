@@ -10,8 +10,7 @@ define([
     './KmlOverlay',
     '../util/NodeTransformers',
     '../../../geom/Sector',
-    '../../../shapes/SurfaceImage',
-    '../../../util/WWUtil'
+    '../../../shapes/SurfaceImage'
 ], function (
     KmlElements,
     KmlFeature,
@@ -20,8 +19,7 @@ define([
     KmlOverlay,
     NodeTransformers,
     Sector,
-    SurfaceImage,
-    WWUtil
+    SurfaceImage
 ) {
     "use strict";
 
@@ -101,8 +99,9 @@ define([
         }
     });
 
-    // More or less just representation of SurfaceImage. This should simply display icon.
-    // It doesn't work without style at all.
+	/**
+     * @inheritDoc
+     */
     KmlGroundOverlay.prototype.render = function(dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 

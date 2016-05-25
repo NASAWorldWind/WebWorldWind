@@ -13,6 +13,7 @@ define([], function () {
         var position = 0;
         return str.substr(position, searchString.length) === searchString;
     };
+
     /**
      * Cache working on a basic principle of storing the data as a pair of key, value. Currently the values are
      * never invalidated.
@@ -22,17 +23,26 @@ define([], function () {
         this.map = {};
     };
 
+	/**
+     * Adds new element to the cache. It accepts level, key and value in order
+     * @param level {Object} Anything that can be used as a key in JavaScript object
+     * @param key {Object} Anything that can be used as a key in JavaScript object
+     * @param value {Object} The value to be stored in the cache on given level and value. Value must started with #
+     */
     TreeKeyValueCache.prototype.add = function(level, key, value){
-        //console.log("Add to cache " + level + " key: " + value);
-        //console.log(value);
         if(!this.map[level]) {
             this.map[level] = {};
         }
         this.map[level][key] = value;
     };
 
+	/**
+     * It returns value for key stored at certain level. If there is no such level, it returns null. If there is such leave then the key starting with # gets treated a bit differently.
+     * @param level {Object} Anything that can be used as a key in JavaScript object
+     * @param key {Object} Anything that can be used as a key in JavaScript object
+     * @returns {Object|null}
+     */
     TreeKeyValueCache.prototype.value = function(level, key) {
-        //console.log("Retrieve from Cache: " + level + " key: " + key);
         if(!this.map[level]){
             return null;
         }
@@ -51,10 +61,20 @@ define([], function () {
         return this.map[level][key];
     };
 
+	/**
+     * It returns the whole level of the data. If there is none then undefined is returned.
+     * @param level {Object} Anything that can be used as a key in JavaScript object
+     * @returns {Object|null}
+     */
     TreeKeyValueCache.prototype.level = function(level) {
         return this.map[level];
     };
 
+	/**
+     * It removes the data from the map if such data exists.
+     * @param level {Object} Anything that can be used as a key in JavaScript object
+     * @param key {Object} Anything that can be used as a key in JavaScript object
+     */
     TreeKeyValueCache.prototype.remove = function(level, key) {
         delete this.map[level][key];
     };
