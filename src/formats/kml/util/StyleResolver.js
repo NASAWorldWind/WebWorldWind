@@ -4,7 +4,8 @@
  */
 define(['../KmlFile',
         '../KmlFileCache',
-        '../../../util/Logger'],
+        '../../../util/Logger'
+        ],
     function (KmlFile,
               KmlFileCache,
               Logger) {

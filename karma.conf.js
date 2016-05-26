@@ -16,7 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test-main.js',
-      {pattern: 'test-jasmine/**/*.test.js', included: false},
+      {pattern: 'test/karma-tests/**/*.test.js', included: false},
       {pattern: 'src/**/*.js', included: false}
     ],
 
@@ -39,7 +39,7 @@ module.exports = function(config) {
 
 
     // web server port
-    port: 9876,
+    port: 9879,
 
 
     // enable / disable colors in the output (reporters and logs)
@@ -57,7 +57,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['PhantomJS','Chrome'],
 
 
     // Continuous Integration mode
