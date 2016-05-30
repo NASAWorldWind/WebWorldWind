@@ -90,7 +90,7 @@ define([
         Matrix3.prototype.multiplyMatrix = function (matrix) {
             if (!matrix) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "multiplyMatrix", "missingMatrix"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix3", "multiplyMatrix", "missingMatrix"));
             }
 
             var ma = this,
@@ -195,7 +195,7 @@ define([
         Matrix3.prototype.columnMajorComponents = function (result) {
             if (!result) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "columnMajorComponents", "missingResult"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix3", "columnMajorComponents", "missingResult"));
             }
 
             // Column 1

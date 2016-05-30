@@ -1,6 +1,7 @@
 /**
  * @source Henning Umland, http://www.celnav.de/longterm.htm
- * @exports sun
+ * @link http://www.celnav.de/longterm.htm
+ * @module sun
  */
 
 define([
@@ -10,9 +11,14 @@ define([
         "use strict";
 
         /**
-         * Calculates the the sun position on the globe for a given date
+         * @function sun
+         * @description Calculates the the sun position on the globe for a given date.
+         * Inspired by Henning Umland, http://www.celnav.de/longterm.htm
+         * @link http://www.celnav.de/longterm.htm
          * @param {Date} date
-         * @returns {Object} The latitude and longitude of the sun.
+         * @returns {Object} The latitude and longitude of the sun
+         * @returns {Number} Object.latitude
+         * @returns {Number} Object.longitude
          */
         function sun(date) {
 
@@ -325,7 +331,7 @@ define([
             return {
                 latitude: DECsun,
                 longitude: 360 - GHAsun
-            }
+            };
 
         }
 
@@ -546,8 +552,10 @@ define([
                 fF = (+nut[x].substring(4, 6));
                 fD = (+nut[x].substring(6, 8));
                 f_omega = (+nut[x].substring(8, 10));
-                dp += ((+nut[x].substring(10, 17)) + TE * (+nut[x].substring(17, 23))) * sind(fD * D + fM * M + fMm * Mm + fF * F + f_omega * omega);
-                de += ((+nut[x].substring(23, 29)) + TE * (+nut[x].substring(29, 33))) * cosd(fD * D + fM * M + fMm * Mm + fF * F + f_omega * omega);
+                dp += ((+nut[x].substring(10, 17)) + TE * (+nut[x].substring(17, 23))) *
+                    sind(fD * D + fM * M + fMm * Mm + fF * F + f_omega * omega);
+                de += ((+nut[x].substring(23, 29)) + TE * (+nut[x].substring(29, 33))) *
+                    cosd(fD * D + fM * M + fMm * Mm + fF * F + f_omega * omega);
             }
 
             //Corrections (Herring, 1987)
@@ -585,7 +593,7 @@ define([
             return {
                 delta_psi: delta_psi,
                 eps: eps
-            }
+            };
         }
 
         /**
@@ -595,7 +603,7 @@ define([
          * @param {Number} T3 Julian centuries (GMT) since 2000 January 0.5
          * @param {Number} delta_psi Nutation in longitude
          * @param {Number} eps True obliquity of the ecliptic
-         * @returns {Object} Julian date, century, and millennium.
+         * @returns {Number} True GHA Aries.
          */
         function aries(JD, T2, T3, delta_psi, eps) {
             //Mean GHA Aries
