@@ -165,7 +165,7 @@ define([
         },
 
         /**
-         *
+         * It decides by how much will be the screen overlay rotated in x direction
          * @memberof KmlScreenOverlay.prototype
          * @readonly
          * @type {String}
@@ -177,7 +177,7 @@ define([
         },
 
         /**
-         *
+         * It decides by how much will be the screen overlay rotated in y direction
          * @memberof KmlScreenOverlay.prototype
          * @readonly
          * @type {String}

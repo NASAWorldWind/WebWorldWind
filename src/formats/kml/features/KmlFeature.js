@@ -306,7 +306,11 @@ define([
     };
 
     /**
-     * @inheritDoc
+     * It retrieves the style for current element, regardless of whether it is local or remote.
+     * @params dc {DrawContext} All contextual information for rendering.
+     * @params kmlOptions {Object}
+     * @params kmlOptions.styleResolver {StyleResolver} Instance of StyleResolver used in this file.
+     * @return {Promise|undefined} Promise of the file to deliver
      */
     KmlFeature.prototype.getStyle = function (dc, kmlOptions) {
         if (this._pStyle || (!this.kmlStyleUrl && !this.kmlStyleSelector)) {

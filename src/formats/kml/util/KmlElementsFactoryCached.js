@@ -19,6 +19,7 @@ define([
      * More complex factory, which retrieves the values from cache and in case the value isn't present there it
      * stores the value in cache.
      * @constructor
+     * @alias KmlElementsFactoryCached
      */
     var KmlElementsFactoryCached = function(options) {
         this.internalFactory = new KmlElementsFactory(options);
@@ -48,8 +49,8 @@ define([
 
         if(elements && elements.length) {
             var self = this;
-            elements.forEach(function (element) {
-                self.cache.add(self.cacheKey(parentNode, "All"), self.cacheKey(element.node), element);
+            elements.forEach(function (pElement) {
+                self.cache.add(self.cacheKey(parentNode, "All"), self.cacheKey(pElement.node), pElement);
             });
         }
         return elements;

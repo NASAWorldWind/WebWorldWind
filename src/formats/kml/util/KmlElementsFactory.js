@@ -10,6 +10,7 @@ define([
     /**
      * Simple factory, which understands the mapping between the XML and the internal Elements.
      * @constructor
+     * @alias KmlElementsFactory
      */
     var KmlElementsFactory = function (options) {
         this.options = options;
@@ -59,15 +60,15 @@ define([
 
     /**
      * It returns all children, which it is possible to map on the KmlObject.
-     * @param element Element whose children we want to retrieve.
+     * @param pElement Element whose children we want to retrieve.
      */
-    KmlElementsFactory.prototype.all = function (element) {
-        var parentNode = element.node;
+    KmlElementsFactory.prototype.all = function (pElement) {
+        var parentNode = pElement.node;
         
         var results = [];
         var self = this;
         [].forEach.call(parentNode.childNodes, function (node) {
-            var element = NodeTransformers.kmlObject(node, element, self.options.controls);
+            var element = NodeTransformers.kmlObject(node, pElement, self.options.controls);
             if (element) {
                 results.push(element);
             }

@@ -17,7 +17,9 @@ define([], function () {
     /**
      * Cache working on a basic principle of storing the data as a pair of key, value. Currently the values are
      * never invalidated.
+     * @alias TreeKeyValueCache
      * @constructor
+     * @classdesc Represents internally used cache which stores data in a tree like structure.
      */
     var TreeKeyValueCache = function() {
         this.map = {};

@@ -11,6 +11,10 @@ define([
             KmlElements,
             Position,
             WWUtil){
+    /**
+     * Provides ways for transforming xml nodes to KML objects.
+     * @exports NodeTransformers
+     */
     var NodeTransformers = function(){};
 
     // Primitives
@@ -71,6 +75,7 @@ define([
      * otherwise it returns null
      * @param node {Node} Node to transform
      * @param parent {KmlObject} Parent to current node.
+     * @param controls {Array} Array of controls.
      * @returns {KmlObject|null} KmlObject representation for the node.
      */
     NodeTransformers.kmlObject = function (node, parent, controls) {
@@ -87,6 +92,7 @@ define([
      * element and type of the element.
      * @param node {Node} Node to transform
      * @param parent {KmlObject} Parent to current node.
+     * @param controls {Array} Array of controls.
      * @returns {KmlLinearRing} Transformed Linear Ring.
      */
     NodeTransformers.linearRing = function(node, parent, controls) {
@@ -95,9 +101,9 @@ define([
             return null;
         }
         var linearRingNode = null;
-        Array.prototype.forEach.call(node.childNodes, function(node){
-            if(node.nodeName == "LinearRing") {
-                linearRingNode = node;
+        Array.prototype.forEach.call(node.childNodes, function(pNode){
+            if(pNode.nodeName == "LinearRing") {
+                linearRingNode = pNode;
             }
         });
         return new constructor({objectNode: linearRingNode, parent: parent, controls: controls});

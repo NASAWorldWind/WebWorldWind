@@ -8,6 +8,7 @@ define([], function () {
     /**
      * This class represents abstraction for Attribute. It is possible to test its existence, retrieve value and set
      * value.
+     * @alias Attribute
      * @param node {Node} Node on which the attribute exists
      * @param name {String} Name of the attribute
      * @constructor
