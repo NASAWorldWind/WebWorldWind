@@ -5,10 +5,12 @@
 define([
     './../KmlElements',
     './KmlFeature',
+    '../KmlFile',
     '../KmlLink',
     '../util/NodeTransformers'
 ], function (KmlElements,
              KmlFeature,
+             KmlFile,
              KmlLink,
              NodeTransformers) {
     "use strict";
@@ -27,6 +29,9 @@ define([
      */
     var KmlNetworkLink = function (options) {
         KmlFeature.call(this, options);
+
+        this.resolvedFile = null;
+        this.displayed = false;
     };
 
     KmlNetworkLink.prototype = Object.create(KmlFeature.prototype);
@@ -89,8 +94,25 @@ define([
         return ['NetworkLink'];
     };
 
+	/**
+     * @inheritDoc
+     */
     KmlNetworkLink.prototype.render = function(dc, kmlOptions) {
-        
+        // Not visible and wasn't displayed yet.
+        if(!kmlOptions.lastVisibility && !this.displayed) {
+            return;
+        }
+
+        var self = this;
+        new KmlFile(this.kmlLink.kmlHref).then(function(kmlFile){
+            self.resolvedFile = kmlFile;
+        });
+
+        if(this.resolvedFile && !this.displayed) {
+            this.displayed = true;
+
+            dc.currentLayer.addRenderable(this.resolvedFile);
+        }
     };
 
     return KmlNetworkLink;
