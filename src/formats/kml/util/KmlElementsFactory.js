@@ -44,6 +44,7 @@ define([
      * @param element {KmlObject} Element whose children are scanned.
      * @param options {Object}
      * @param options.name {String[]} All names which are accepted to return.
+     * @return {KmlObject} Kml representation of given node
      */
     KmlElementsFactory.prototype.any = function (element, options) {
         var parentNode = element.node;
@@ -60,17 +61,18 @@ define([
 
     /**
      * It returns all children, which it is possible to map on the KmlObject.
-     * @param pElement Element whose children we want to retrieve.
+     * @param element {KmlObject} Element whose children we want to retrieve.
+     * @return {KmlObject[]} All KmlObjects present in given node.
      */
-    KmlElementsFactory.prototype.all = function (pElement) {
-        var parentNode = pElement.node;
+    KmlElementsFactory.prototype.all = function (element) {
+        var parentNode = element.node;
         
         var results = [];
         var self = this;
         [].forEach.call(parentNode.childNodes, function (node) {
-            var element = NodeTransformers.kmlObject(node, pElement, self.options.controls);
-            if (element) {
-                results.push(element);
+            var createdElement = NodeTransformers.kmlObject(node, element, self.options.controls);
+            if (createdElement) {
+                results.push(createdElement);
             }
         });
         return results;
