@@ -89,5 +89,9 @@ define([
         return ['NetworkLink'];
     };
 
+    KmlNetworkLink.prototype.render = function(dc, kmlOptions) {
+        
+    };
+
     return KmlNetworkLink;
 });
