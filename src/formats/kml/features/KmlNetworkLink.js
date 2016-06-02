@@ -30,6 +30,8 @@ define([
     var KmlNetworkLink = function (options) {
         KmlFeature.call(this, options);
 
+        this.isFeature = true;
+
         this.resolvedFile = null;
         this.displayed = false;
     };
@@ -114,6 +116,8 @@ define([
             dc.currentLayer.addRenderable(this.resolvedFile);
         }
     };
+
+    KmlElements.addKey(KmlNetworkLink.prototype.getTagNames()[0], KmlNetworkLink);
 
     return KmlNetworkLink;
 });
