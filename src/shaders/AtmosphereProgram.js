@@ -308,6 +308,12 @@ define([
          * @param {Matrix3} matrix The texture coordinate matrix.
          */
         AtmosphereProgram.prototype.loadTexMatrix = function(gl, matrix){
+            if (!matrix) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "AtmosphereProgram", "loadTexMatrix",
+                        "missingMatrix"));
+            }
+
             matrix.columnMajorComponents(this.scratchArray9);
             gl.uniformMatrix3fv(this.texCoordMatrixLocation, false, this.scratchArray9);
         };

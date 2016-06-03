@@ -8,26 +8,22 @@
 define([
         '../error/ArgumentError',
         '../shaders/GroundProgram',
-        '../util/ImageSource',
         '../layer/Layer',
         '../util/Logger',
         '../geom/Matrix',
         '../geom/Matrix3',
         '../geom/Sector',
         '../shaders/SkyProgram',
-        '../util/sun',
         '../geom/Vec3'
     ],
     function (ArgumentError,
               GroundProgram,
-              ImageSource,
               Layer,
               Logger,
               Matrix,
               Matrix3,
               Sector,
               SkyProgram,
-              sun,
               Vec3) {
         "use strict";
 
@@ -36,30 +32,26 @@ define([
          * @alias AtmosphereLayer
          * @constructor
          * @classdesc Provides a layer showing the Earth's atmosphere.
-         * @param {URL} imageSource optional url for the night texture.
+         * @param {URL} nightImageSource optional url for the night texture.
          * @augments Layer
          */
-        var AtmosphereLayer = function (imageSource) {
+        var AtmosphereLayer = function (nightImageSource) {
 
             Layer.call(this, "Atmosphere");
 
-            //the night texture
-            this._activeTexture = null;
-            
             //image for the night texture
-            this.imageSource = imageSource || '../images/dnb_land_ocean_ice_2012.png';
-            
-            //timestamp for the last sun calculation
-            this._lastSunRequest = 0;
-            
-            this._lightDirection = new Vec3(0, 0, 0);
+            this._nightImageSource = nightImageSource || '../images/dnb_land_ocean_ice_2012.png';
+
+            // Documented in defineProperties below.
+            this._lightLocation = null;
+
+            //the light direction in cartesian space, computed form the lightLocation or defaults to the eyePoint
+            this.activeLightDirection = new Vec3(0, 0, 0);
 
             this.pickEnabled = false;
 
             this._fullSphereSector = Sector.FULL_SPHERE;
-            
-            this._scratchVector = new Vec3(0, 0, 0);
-            
+
             // Internal use only. Intentionally not documented.
             this.skyData = {};
 
@@ -80,11 +72,42 @@ define([
 
             //modelViewProjection matrix
             this._mvpMatrix = Matrix.fromIdentity();
+
+            //the night texture
+            this._activeTexture = null;
         };
 
         AtmosphereLayer.prototype = Object.create(Layer.prototype);
 
         Object.defineProperties(AtmosphereLayer.prototype, {
+
+            /**
+             * The geographic location of the light (sun).
+             * @memberof AtmosphereLayer.prototype
+             * @type {Position}
+             */
+            lightLocation: {
+                get: function () {
+                    return this._lightLocation;
+                },
+                set: function (value) {
+                    this._lightLocation = value;
+                }
+            },
+
+            /**
+             * Url for the night texture.
+             * @memberof AtmosphereLayer.prototype
+             * @type {URL}
+             */
+            nightImageSource: {
+                get: function () {
+                    return this._nightImageSource;
+                },
+                set: function (value) {
+                    this._nightImageSource = value;
+                }
+            },
 
             /**
              * The number of longitudinal points in the grid.
@@ -145,7 +168,12 @@ define([
 
         // Documented in superclass.
         AtmosphereLayer.prototype.doRender = function (dc) {
-            this.computeLightDirection(dc);
+
+            if (dc.globe.is2D()) {
+                return;
+            }
+
+            this.determineLightDirection(dc);
             this.drawSky(dc);
             this.drawGround(dc);
         };
@@ -222,9 +250,7 @@ define([
 
             program.loadModelviewProjection(gl, dc.navigatorState.modelviewProjection);
 
-            program.loadFragMode(gl, program.FRAGMODE_SKY);
-
-            program.loadLightDirection(gl, this._lightDirection);
+            program.loadLightDirection(gl, this.activeLightDirection);
 
             program.setScale(gl);
 
@@ -247,24 +273,23 @@ define([
         AtmosphereLayer.prototype.drawGround = function (dc) {
 
             var gl = dc.currentGlContext,
-                program = dc.findAndBindProgram(GroundProgram);
+                program = dc.findAndBindProgram(GroundProgram),
+                terrain = dc.terrain,
+                textureBound;
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
-            program.loadLightDirection(gl, this._lightDirection);
+            program.loadLightDirection(gl, this.activeLightDirection);
 
             program.setScale(gl);
 
-            // Get the draw context's tessellated terrain and modelview projection matrix.
-            var terrain = dc.terrain;
-
-            var textureBound;
-            if (this.imageSource) {
-                this._activeTexture = dc.gpuResourceCache.resourceForKey(this.imageSource);
+            // Use this layer's night image when the light location is different than the eye location.
+            if (this.nightImageSource && this.lightLocation) {
+                this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
                 if (!this._activeTexture) {
-                    this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.imageSource);
+                    this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.nightImageSource);
                 }
                 textureBound = this._activeTexture && this._activeTexture.bind(dc);
             }
@@ -286,9 +311,6 @@ define([
                     this._texMatrix.multiplyByTileTransform(currentTile.sector, this._fullSphereSector);
                     program.loadTexMatrix(gl, this._texMatrix);
                 }
-
-                // Use the tile's vertex point attribute.
-                gl.enableVertexAttribArray(program.vertexPointLocation);
 
                 // Draw the tile, multiplying the current fragment color by the program's secondary color.
                 program.loadFragMode(gl, program.FRAGMODE_GROUND_SECONDARY);
@@ -314,6 +336,7 @@ define([
             // Restore the default World Wind OpenGL state.
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             gl.disableVertexAttribArray(program.vertexPointLocation);
+            gl.disableVertexAttribArray(program.vertexTexCoordLocation);
         };
 
         // Internal. Intentionally not documented.
@@ -376,15 +399,15 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        AtmosphereLayer.prototype.computeLightDirection = function (dc) {
-            var date = new Date();
-            var ms = date.getTime();
-            if (ms - this._lastSunRequest > 5 * 60 * 1000) {
-                var sunPosition = sun(date);
-                this._lastSunRequest = ms;
-                dc.globe.computePointFromLocation(sunPosition.latitude, sunPosition.longitude, this._scratchVector);
-                this._lightDirection = this._scratchVector.normalize();
+        AtmosphereLayer.prototype.determineLightDirection = function (dc) {
+            if (this.lightLocation != null) {
+                dc.globe.computePointFromLocation(this.lightLocation.latitude, this.lightLocation.longitude,
+                    this.activeLightDirection);
             }
+            else {
+                this.activeLightDirection.copy(dc.navigatorState.eyePoint);
+            }
+            this.activeLightDirection.normalize();
         };
 
         return AtmosphereLayer;

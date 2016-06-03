@@ -29,12 +29,8 @@ define([
          */
         var GroundProgram = function (gl) {
             var vertexShaderSource =
-                    'precision mediump float;\n' +
                     'precision mediump int;\n' +
 
-                    'const int FRAGMODE_SKY = 1;\n' +
-                    'const int FRAGMODE_GROUND_PRIMARY = 2;\n' +
-                    'const int FRAGMODE_GROUND_SECONDARY = 3;\n' +
                     'const int FRAGMODE_GROUND_PRIMARY_TEX_BLEND = 4;\n' +
                     'const int SAMPLE_COUNT = 2;\n' +
                     'const float SAMPLES = 2.0;\n' +
@@ -71,7 +67,6 @@ define([
 
                     'varying vec3 primaryColor;\n' +
                     'varying vec3 secondaryColor;\n' +
-                    'varying vec3 direction;\n' +
                     'varying vec2 texCoord;\n' +
 
                     'float scaleFunc(float cos) {\n' +
@@ -147,43 +142,27 @@ define([
                 fragmentShaderSource =
                     'precision mediump float;\n' +
                     'precision mediump int;\n' +
-
-                    'const int FRAGMODE_SKY = 1;\n' +
+                        
                     'const int FRAGMODE_GROUND_PRIMARY = 2;\n' +
                     'const int FRAGMODE_GROUND_SECONDARY = 3;\n' +
                     'const int FRAGMODE_GROUND_PRIMARY_TEX_BLEND = 4;\n' +
 
-                    'const float g = -0.95;\n' +
-                    'const float g2 = g * g;\n' +
-
                     'uniform int fragMode;\n' +
                     'uniform sampler2D texSampler;\n' +
-                    'uniform vec3 lightDirection;\n' +
 
                     'varying vec3 primaryColor;\n' +
                     'varying vec3 secondaryColor;\n' +
-                    'varying vec3 direction;\n' +
                     'varying vec2 texCoord;\n' +
 
                     'void main (void)\n' +
                     '{\n' +
-                    '    if (fragMode == FRAGMODE_SKY) {\n' +
-                    '        float cos = dot(lightDirection, direction) / length(direction);\n' +
-                    '        float rayleighPhase = 0.75 * (1.0 + cos * cos);\n' +
-                    '        float miePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + cos*cos) / pow(1.0 + g2 - 2.0*g*cos, 1.5);\n' +
-                    '        const float exposure = 2.0;\n' +
-                    '        vec3 color = primaryColor * rayleighPhase + secondaryColor * miePhase;\n' +
-                    '        color = vec3(1.0) - exp(-exposure * color);\n' +
-                    '        gl_FragColor = vec4(color, color.b);\n' +
-                    '    } else if (fragMode == FRAGMODE_GROUND_PRIMARY) {\n' +
+                    '    if (fragMode == FRAGMODE_GROUND_PRIMARY) {\n' +
                     '        gl_FragColor = vec4(primaryColor, 1.0);\n' +
                     '    } else if (fragMode == FRAGMODE_GROUND_SECONDARY) {\n' +
                     '        gl_FragColor = vec4(secondaryColor, 1.0);\n' +
                     '    } else if (fragMode == FRAGMODE_GROUND_PRIMARY_TEX_BLEND) {\n' +
                     '        vec4 texColor = texture2D(texSampler, texCoord);\n' +
                     '        gl_FragColor = vec4(primaryColor + texColor.rgb * (1.0 - secondaryColor), 1.0);\n' +
-                    '    } else {\n' +
-                    '        gl_FragColor = vec4(1.0);\n' +
                     '    }\n' +
                     '}';
 

@@ -8,7 +8,7 @@ requirejs(['../src/WorldWind',
     function (ww,
               LayerManager) {
         "use strict";
-
+        
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
@@ -17,8 +17,7 @@ requirejs(['../src/WorldWind',
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: false},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: false},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: false},
-            {layer: new WorldWind.AtmosphereLayer(), enabled: true}
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: false}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -26,8 +25,37 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
+        var nightImageSource = '../images/dnb_land_ocean_ice_2012.png';
+        var lightLocation = new WorldWind.Position(19, 20, 0);
+        var atmosphereLayer = new WorldWind.AtmosphereLayer(nightImageSource);
+        wwd.addLayer(atmosphereLayer);
+
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
+
+        var sunSimulationCheckBox = document.getElementById('sun-simulation');
+        var sunInterval = 0;
+        sunSimulationCheckBox.addEventListener('change', onSunCheckBoxClick, false);
+
+        function onSunCheckBoxClick() {
+            if (this.checked) {
+                runSunSimulation();
+            }
+            else {
+                atmosphereLayer.lightLocation = null;
+                clearInterval(sunInterval);
+                wwd.redraw();
+            }
+        }
+
+        function runSunSimulation() {
+            sunInterval = setInterval(function () {
+                atmosphereLayer.lightLocation = lightLocation;
+                lightLocation.longitude += 3;
+                wwd.redraw();
+            }, 64);
+        }
+
     });
 
 
