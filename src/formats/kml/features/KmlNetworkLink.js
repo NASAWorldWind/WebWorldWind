@@ -34,6 +34,7 @@ define([
 
         this.resolvedFile = null;
         this.displayed = false;
+        this.isDownloading = false;
     };
 
     KmlNetworkLink.prototype = Object.create(KmlFeature.prototype);
@@ -105,10 +106,12 @@ define([
             return;
         }
 
-        var self = this;
-        new KmlFile(this.kmlLink.kmlHref).then(function(kmlFile){
-            self.resolvedFile = kmlFile;
-        });
+        if(!this.isDownloading && !this.resolvedFile) {
+            var self = this;
+            new KmlFile(this.kmlLink.kmlHref).then(function (kmlFile) {
+                self.resolvedFile = kmlFile;
+            });
+        }
 
         if(this.resolvedFile && !this.displayed) {
             this.displayed = true;
