@@ -101,15 +101,19 @@ define([
      * @inheritDoc
      */
     KmlNetworkLink.prototype.render = function(dc, kmlOptions) {
+        KmlFeature.prototype.render.call(this, dc, kmlOptions);
+
         // Not visible and wasn't displayed yet.
         if(!kmlOptions.lastVisibility && !this.displayed) {
             return;
         }
 
         if(!this.isDownloading && !this.resolvedFile) {
+            this.isDownloading = true;
             var self = this;
             new KmlFile(this.kmlLink.kmlHref).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
+                self.isDownloading = false;
             });
         }
 
