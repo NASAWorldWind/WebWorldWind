@@ -108,6 +108,18 @@ define([
             return;
         }
 
+        if(this.kmlLink.kmlRefreshMode == "onChange") {
+            
+        }
+
+        if(this.kmlLink.kmlRefreshMode == "onInterval") {
+            // Important part is to cleanse this one. 
+        }
+
+        if(this.kmlLink.kmlRefreshMode == "onExpire") {
+
+        }
+
         if(!this.isDownloading && !this.resolvedFile) {
             this.isDownloading = true;
             var self = this;
