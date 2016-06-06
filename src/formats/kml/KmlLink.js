@@ -25,6 +25,8 @@ define([
      */
     var KmlLink = function (options) {
         KmlObject.call(this, options);
+
+        this.onChangeListeners = [];
     };
 
     KmlLink.prototype = Object.create(KmlObject.prototype);
