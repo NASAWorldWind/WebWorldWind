@@ -108,22 +108,11 @@ define([
             return;
         }
 
-        if(this.kmlLink.kmlRefreshMode == "onChange") {
-            
-        }
-
-        if(this.kmlLink.kmlRefreshMode == "onInterval") {
-            // Important part is to cleanse this one. 
-        }
-
-        if(this.kmlLink.kmlRefreshMode == "onExpire") {
-
-        }
-
         if(!this.isDownloading && !this.resolvedFile) {
             this.isDownloading = true;
             var self = this;
-            new KmlFile(this.kmlLink.kmlHref).then(function (kmlFile) {
+
+            new KmlFile(self.buildUrl(dc)).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
                 self.isDownloading = false;
             });
@@ -133,6 +122,40 @@ define([
             this.displayed = true;
 
             dc.currentLayer.addRenderable(this.resolvedFile);
+        }
+    };
+
+    KmlNetworkLink.prototype.buildUrl = function(dc) {
+        return this.kmlLink.kmlHref + "?" + this.additionalParameters(dc);
+    };
+
+    // One possible solution is to track the extent in a similar ways as in TiledLayers by creating tiles of some size and then deciding whether they are visible.
+    // Basically create sectors of some size and based on them pass the bbox value. Not sure if this is a very efficient solution though.
+    KmlNetworkLink.prototype.additionalParameters = function(dc) {
+        var queryFormatToAdd = this.kmlLink.kmlHttpQuery;
+
+        var defaultQueryParams = "BBOX=[bboxWest],[bboxSouth],[bboxEast],[bboxNorth]";
+        defaultQueryParams = defaultQueryParams
+            .replace('[bboxWest]', '')
+            .replace('[bboxSouth]', '')
+            .replace('[bboxEast]', '')
+            .replace('[bboxNorth]', '');
+
+        // If the parameters are passed it means that I will create WMS like tiles, which will be injected into the document as separate KMLs.
+        return "";
+    };
+
+    KmlNetworkLink.prototype.handleRefresh = function() {
+        if(this.kmlLink.kmlRefreshMode == "onChange") {
+
+        }
+
+        if(this.kmlLink.kmlRefreshMode == "onInterval") {
+            // Important part is to cleanse this one.
+        }
+
+        if(this.kmlLink.kmlRefreshMode == "onExpire") {
+
         }
     };
 
