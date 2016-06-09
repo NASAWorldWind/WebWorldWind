@@ -107,7 +107,8 @@ requirejs(['../src/WorldWind',
 
         //LineString test
         var lineStringLayer = new WorldWind.RenderableLayer("LineString");
-        var lineStringGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "LineStringTest.geojson");
+        var lineStringDataSource = '{ "type": "LineString", "coordinates": [[28.609974323244046, 44.202662372914631] , [ 26.098000795350401, 44.435317663494573]] }';
+        var lineStringGeoJSON = new WorldWind.GeoJSONParser(lineStringDataSource);
         lineStringGeoJSON.load(shapeConfigurationCallback, lineStringLayer);
         wwd.addLayer(lineStringLayer);
 
