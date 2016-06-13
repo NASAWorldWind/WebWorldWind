@@ -118,10 +118,9 @@ define([
             });
         }
 
-        if(this.resolvedFile && !this.displayed) {
-            this.displayed = true;
 
-            dc.currentLayer.addRenderable(this.resolvedFile);
+        if(this.resolvedFile && !this.displayed) {
+            this.resolvedFile.render(dc, kmlOptions);
         }
     };
 
@@ -133,6 +132,13 @@ define([
     // Basically create sectors of some size and based on them pass the bbox value. Not sure if this is a very efficient solution though.
     KmlNetworkLink.prototype.additionalParameters = function(dc) {
         var queryFormatToAdd = this.kmlLink.kmlHttpQuery;
+
+        var visibleArea = new VisibleArea({
+            viewport: function() { return dc.worldWindow.viewport },
+            eyeGeoCoord: function() { return dc.navigatorState.lookAtLocation },
+            range: function() { return dc.navigatorState.range },
+            wwd: dc.worldWindow
+        });
 
         var defaultQueryParams = "BBOX=[bboxWest],[bboxSouth],[bboxEast],[bboxNorth]";
         defaultQueryParams = defaultQueryParams

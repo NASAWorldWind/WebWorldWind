@@ -37,6 +37,7 @@ define([
              XmlDocument) {
     "use strict";
 
+    // TODO: Make sure that the KmlFile is also rendered as a part of this hierarchy and not added to the layer.
     /**
      * Constructs an object for Kml file. Applications usually don't call this constructor.
      * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
@@ -111,14 +112,15 @@ define([
     /**
      * @inheritDoc
      */
-    KmlFile.prototype.render = function (dc) {
+    KmlFile.prototype.render = function (dc, kmlOptions) {
         var self = this;
+        kmlOptions = kmlOptions || {};
         this.shapes.forEach(function (shape) {
             shape.render(dc, {
-                lastStyle: null,
-                lastVisibility: null,
-                currentTimeInterval: null,
-                regionInvisible: null,
+                lastStyle: kmlOptions.lastStyle || null,
+                lastVisibility: kmlOptions.lastVisibility || null,
+                currentTimeInterval: kmlOptions.currentTimeInterval || null,
+                regionInvisible: kmlOptions.regionInvisible || null,
                 fileCache: self._fileCache,
                 styleResolver: self._styleResolver
             });
