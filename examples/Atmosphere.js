@@ -24,10 +24,9 @@ requirejs(['../src/WorldWind',
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
-
-        var nightImageSource = '../images/dnb_land_ocean_ice_2012.png';
+        
         var lightLocation = new WorldWind.Position(19, 20, 0);
-        var atmosphereLayer = new WorldWind.AtmosphereLayer(nightImageSource);
+        var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(atmosphereLayer);
 
         // Create a layer manager for controlling layer visibility.

@@ -142,7 +142,7 @@ define([
                 fragmentShaderSource =
                     'precision mediump float;\n' +
                     'precision mediump int;\n' +
-                        
+
                     'const int FRAGMODE_GROUND_PRIMARY = 2;\n' +
                     'const int FRAGMODE_GROUND_SECONDARY = 3;\n' +
                     'const int FRAGMODE_GROUND_PRIMARY_TEX_BLEND = 4;\n' +
@@ -167,7 +167,7 @@ define([
                     '}';
 
             // Call to the superclass, which performs shader program compiling and linking.
-            AtmosphereProgram.call(this, gl, vertexShaderSource, fragmentShaderSource, ["vertexPoint"]);
+            AtmosphereProgram.call(this, gl, vertexShaderSource, fragmentShaderSource, ["vertexPoint", "vertexTexCoord"]);
         };
 
         /**
