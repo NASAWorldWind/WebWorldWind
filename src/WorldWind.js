@@ -11,6 +11,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Annotation',
         './shapes/AnnotationAttributes',
         './error/ArgumentError',
+        './layer/AtmosphereLayer',
+        './shaders/AtmosphereProgram',
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './layer/BingAerialLayer',
@@ -54,6 +56,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GpuProgram',
         './cache/GpuResourceCache',
         './shaders/GpuShader',
+        './shaders/GroundProgram',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
@@ -157,6 +160,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/ShapeAttributes',
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
+        './shaders/SkyProgram',
         './shapes/SurfaceImage',
         './shapes/SurfaceCircle',
         './shapes/SurfaceEllipse',
@@ -212,6 +216,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Annotation,
               AnnotationAttributes,
               ArgumentError,
+              AtmosphereLayer,
+              AtmosphereProgram,
               BasicProgram,
               BasicTextureProgram,
               BingAerialLayer,
@@ -255,6 +261,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuProgram,
               GpuResourceCache,
               GpuShader,
+              GroundProgram,
               HighlightController,
               ImagePyramid,
               ImageSource,
@@ -358,6 +365,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ShapeAttributes,
               Shapefile,
               ShowTessellationLayer,
+              SkyProgram,
               SurfaceImage,
               SurfaceCircle,
               SurfaceEllipse,
@@ -622,6 +630,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Annotation'] = Annotation;
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
         WorldWind['ArgumentError'] = ArgumentError;
+        WorldWind['AtmosphereLayer'] = AtmosphereLayer;
+        WorldWind['AtmosphereProgram'] = AtmosphereProgram;
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
@@ -665,6 +675,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuProgram'] = GpuProgram;
         WorldWind['GpuResourceCache'] = GpuResourceCache;
         WorldWind['GpuShader'] = GpuShader;
+        WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
@@ -717,6 +728,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ShapeAttributes'] = ShapeAttributes;
         WorldWind['Shapefile'] = Shapefile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
+        WorldWind['SkyProgram'] = SkyProgram;
         WorldWind['SurfaceImage'] = SurfaceImage;
         WorldWind['SurfaceCircle'] = SurfaceCircle;
         WorldWind['SurfaceEllipse'] = SurfaceEllipse;
