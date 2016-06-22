@@ -18,6 +18,7 @@ define([
     './KmlTimeStamp',
     '../../util/Logger',
     '../../util/Promise',
+    './util/RefreshListener',
     './util/Remote',
     './util/StyleResolver',
     '../../util/XmlDocument'
@@ -32,6 +33,7 @@ define([
              KmlTimeStamp,
              Logger,
              Promise,
+             RefreshListener,
              Remote,
              StyleResolver,
              XmlDocument) {
@@ -61,6 +63,7 @@ define([
         this._controls = controls || null;
         this._fileCache = new KmlFileCache();
         this._styleResolver = new StyleResolver(this._fileCache);
+        this._listener = new RefreshListener();
         
         var filePromise;
         // Load the document
@@ -122,7 +125,9 @@ define([
                 currentTimeInterval: kmlOptions.currentTimeInterval || null,
                 regionInvisible: kmlOptions.regionInvisible || null,
                 fileCache: self._fileCache,
-                styleResolver: self._styleResolver
+                styleResolver: self._styleResolver,
+                listener: self._listener,
+                activeEvents: self._listener.getActiveEvents()
             });
         });
     };

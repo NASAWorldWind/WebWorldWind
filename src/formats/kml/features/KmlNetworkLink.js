@@ -112,7 +112,7 @@ define([
             this.isDownloading = true;
             var self = this;
 
-            new KmlFile(self.buildUrl(dc)).then(function (kmlFile) {
+            new KmlFile(self.buildUrl()).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
                 self.isDownloading = false;
             });
@@ -121,37 +121,16 @@ define([
 
         if(this.resolvedFile && !this.displayed) {
             this.resolvedFile.render(dc, kmlOptions);
+
+            this.handleRefresh(dc);
         }
     };
 
-    KmlNetworkLink.prototype.buildUrl = function(dc) {
-        return this.kmlLink.kmlHref + "?" + this.additionalParameters(dc);
+    KmlNetworkLink.prototype.buildUrl = function() {
+        return this.kmlLink.kmlHref;
     };
 
-    // One possible solution is to track the extent in a similar ways as in TiledLayers by creating tiles of some size and then deciding whether they are visible.
-    // Basically create sectors of some size and based on them pass the bbox value. Not sure if this is a very efficient solution though.
-    KmlNetworkLink.prototype.additionalParameters = function(dc) {
-        var queryFormatToAdd = this.kmlLink.kmlHttpQuery;
-
-        var visibleArea = new VisibleArea({
-            viewport: function() { return dc.worldWindow.viewport },
-            eyeGeoCoord: function() { return dc.navigatorState.lookAtLocation },
-            range: function() { return dc.navigatorState.range },
-            wwd: dc.worldWindow
-        });
-
-        var defaultQueryParams = "BBOX=[bboxWest],[bboxSouth],[bboxEast],[bboxNorth]";
-        defaultQueryParams = defaultQueryParams
-            .replace('[bboxWest]', '')
-            .replace('[bboxSouth]', '')
-            .replace('[bboxEast]', '')
-            .replace('[bboxNorth]', '');
-
-        // If the parameters are passed it means that I will create WMS like tiles, which will be injected into the document as separate KMLs.
-        return "";
-    };
-
-    KmlNetworkLink.prototype.handleRefresh = function() {
+    KmlNetworkLink.prototype.handleRefresh = function(dc) {
         if(this.kmlLink.kmlRefreshMode == "onChange") {
 
         }
