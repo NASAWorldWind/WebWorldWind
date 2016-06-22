@@ -29,7 +29,12 @@ define(['./ColladaUtils'], function (ColladaUtils) {
      */
     ColladaMesh.prototype.parse = function (element) {
 
-        var sources = {}, meshData = {};
+        var sources = {},
+            meshData = {},
+            verticesInputs = {
+                id: '',
+                inputs: []
+            };
 
         for (var i = 0; i < element.childNodes.length; i++) {
 
@@ -59,23 +64,21 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                     break;
 
                 case 'vertices':
-                    var vertices = child.querySelector("input");
-                    var verticesSource = sources[vertices.getAttribute("source").substr(1)];
-                    sources[child.getAttribute("id")] = verticesSource;
+                    this.parseVertices(child, verticesInputs);
                     break;
 
                 case 'triangles':
-                    meshData = this.parsePolygons(child, sources, 3);
+                    meshData = this.parsePolygons(child, sources, verticesInputs, 3);
                     this.buffers.push(meshData);
                     break;
 
                 case 'polygons':
-                    meshData = this.parsePolygons(child, sources, 4);
+                    meshData = this.parsePolygons(child, sources, verticesInputs, 4);
                     this.buffers.push(meshData);
                     break;
 
                 case 'polylist':
-                    meshData = this.parsePolygons(child, sources, null);
+                    meshData = this.parsePolygons(child, sources, verticesInputs, null);
                     this.buffers.push(meshData);
                     break;
 
@@ -91,13 +94,40 @@ define(['./ColladaUtils'], function (ColladaUtils) {
     };
 
     /**
+     * Parses the vertices tag of a mesh.
+     * Internal. Applications should not call this function.
+     * @param {Node} element The node containing the primitives and inputs.
+     * @param {Object} verticesInputs An object in which to save the inputs of the vertices tag.
+     */
+    ColladaMesh.prototype.parseVertices = function (element, verticesInputs) {
+
+        verticesInputs.id = element.getAttribute("id");
+        var inputs = element.querySelectorAll("input");
+
+        for (var i = 0; i < inputs.length; i++) {
+
+            var input = inputs[i];
+            var source = input.getAttribute("source").substr(1);
+            var semantic = input.getAttribute("semantic").toUpperCase();
+
+            verticesInputs.inputs.push({
+                semantic: semantic,
+                source: source
+            });
+
+        }
+
+    };
+
+    /**
      * Parses the polygons primitive and computes the indices and vertices.
      * Internal. Applications should not call this function.
      * @param {Node} element The node containing the primitives and inputs.
      * @param {Object} sources An object containing the inputs for vertices, normals and uvs.
+     * @param {Object} verticesInputs An object containing the inputs links.
      * @param {Number} vCount Optional parameter, specifies the the vertex count for a polygon
      */
-    ColladaMesh.prototype.parsePolygons = function (element, sources, vCount) {
+    ColladaMesh.prototype.parsePolygons = function (element, sources, verticesInputs, vCount) {
 
         var arrVCount = [];
         if (vCount == null) {
@@ -108,7 +138,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var count = parseInt(element.getAttribute("count"));
         var material = element.getAttribute("material");
 
-        var inputData = this.parseInputs(element, sources);
+        var inputData = this.parseInputs(element, sources, verticesInputs);
         var inputs = inputData.inputs;
         var maxOffset = inputData.maxOffset;
 
@@ -199,8 +229,9 @@ define(['./ColladaUtils'], function (ColladaUtils) {
      * Internal. Applications should not call this function.
      * @param {Node} element The node containing the primitives and inputs.
      * @param {Object} sources An object containing the vertices source and stride.
+     * @param {Object} verticesInputs An object containing the inputs links.
      */
-    ColladaMesh.prototype.parseInputs = function (element, sources) {
+    ColladaMesh.prototype.parseInputs = function (element, sources, verticesInputs) {
 
         var inputs = [], maxOffset = 0;
 
@@ -213,8 +244,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             }
 
             var semantic = xmlInput.getAttribute("semantic").toUpperCase();
-            var sourceUrl = xmlInput.getAttribute("source");
-            var source = sources[sourceUrl.substr(1)];
+            var sourceUrl = xmlInput.getAttribute("source").substr(1);
             var offset = parseInt(xmlInput.getAttribute("offset"));
 
             maxOffset = ( maxOffset < offset + 1 ) ? offset + 1 : maxOffset;
@@ -226,7 +256,20 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                 dataSet = parseInt(xmlInput.getAttribute("set"));
             }
 
-            inputs.push([semantic, [], source.stride, source.data, offset, dataSet]);
+            if (verticesInputs.id === sourceUrl) {
+                var vInputs = verticesInputs.inputs;
+                for (var j = 0; j < vInputs.length; j++) {
+                    var source = sources[vInputs[j].source];
+                    if (source) {
+                        inputs.push([vInputs[j].semantic, [], source.stride, source.data, offset, dataSet]);
+                    }
+                }
+            }
+            else {
+                source = sources[sourceUrl];
+                inputs.push([semantic, [], source.stride, source.data, offset, dataSet]);
+            }
+
         }
 
         return {inputs: inputs, maxOffset: maxOffset};
