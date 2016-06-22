@@ -36,8 +36,10 @@ define([
          * @augments Layer
          */
         var AtmosphereLayer = function (nightImageSource) {
-
             Layer.call(this, "Atmosphere");
+
+            // The atmosphere layer is not pickable.
+            this.pickEnabled = false;
 
             //Documented in defineProperties below.
             this._nightImageSource = nightImageSource ||
@@ -45,8 +47,6 @@ define([
 
             //Documented in defineProperties below.
             this._lightLocation = null;
-
-            this.pickEnabled = false;
 
             //Internal use only.
             //The light direction in cartesian space, computed form the lightLocation or defaults to the eyePoint.
@@ -109,7 +109,6 @@ define([
 
         // Documented in superclass.
         AtmosphereLayer.prototype.doRender = function (dc) {
-
             if (dc.globe.is2D()) {
                 return;
             }
@@ -121,7 +120,6 @@ define([
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.applySkyVertices = function (dc) {
-
             var gl = dc.currentGlContext,
                 program = dc.currentProgram,
                 skyData = this._skyData,
@@ -134,7 +132,7 @@ define([
             vboId = dc.gpuResourceCache.resourceForKey(skyData.verticesVboCacheKey);
             
             if (!vboId) {
-                skyPoints = this.setSkyPoints(dc, program.getAltitude());
+                skyPoints = this.assembleVertexPoints(dc, this._skyHeight, this._skyWidth, program.getAltitude());
                 
                 vboId = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
@@ -154,7 +152,6 @@ define([
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.applySkyIndices = function (dc) {
-
             var gl = dc.currentGlContext,
                 skyData = this._skyData,
                 skyIndices, vboId;
@@ -183,7 +180,6 @@ define([
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.drawSky = function (dc) {
-
             var gl = dc.currentGlContext,
                 program = dc.findAndBindProgram(SkyProgram);
 
@@ -199,13 +195,12 @@ define([
 
             program.setScale(gl);
 
-            gl.depthMask(false);
-            gl.frontFace(gl.CW);
-            gl.enableVertexAttribArray(0);
-
             this.applySkyVertices(dc);
             this.applySkyIndices(dc);
 
+            gl.depthMask(false);
+            gl.frontFace(gl.CW);
+            gl.enableVertexAttribArray(0);
             gl.drawElements(gl.TRIANGLE_STRIP, this._numIndices, gl.UNSIGNED_SHORT, 0);
 
             gl.depthMask(true);
@@ -215,7 +210,6 @@ define([
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.drawGround = function (dc) {
-
             var gl = dc.currentGlContext,
                 program = dc.findAndBindProgram(GroundProgram),
                 terrain = dc.terrain,
@@ -277,28 +271,22 @@ define([
             // Restore the default World Wind OpenGL state.
             terrain.endRendering(dc);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+
+            // Clear references to Gpu resources.
+            this._activeTexture = null;
         };
 
         // Internal. Intentionally not documented.
-        AtmosphereLayer.prototype.setSkyPoints = function (dc, altitude) {
+        AtmosphereLayer.prototype.assembleVertexPoints = function (dc, numLat, numLon, altitude) {
+            var count = numLat * numLon;
+            var altitudes = new Array(count).fill(altitude);
+            var result = new Float32Array(count * 3);
 
-            var count = this._skyWidth * this._skyHeight;
-            var array = Array(count).fill(altitude);
-            var result = new Float32Array(3 * array.length);
-
-            return dc.globe.computePointsForGrid(
-                this._fullSphereSector,
-                this._skyHeight,
-                this._skyWidth,
-                array,
-                Vec3.ZERO,
-                result);
-
+            return dc.globe.computePointsForGrid(this._fullSphereSector, numLat, numLon, altitudes, Vec3.ZERO, result);
         };
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.assembleTriStripIndices = function (numLat, numLon) {
-
             var result = [];
             var vertex = 0;
 
