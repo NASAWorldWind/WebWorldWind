@@ -19,7 +19,7 @@ define([
     '../../util/Logger',
     '../../util/Promise',
     './util/RefreshListener',
-    './util/Remote',
+    './util/RemoteFile',
     './util/StyleResolver',
     '../../util/XmlDocument'
 ], function (ArgumentError,
@@ -34,7 +34,7 @@ define([
              Logger,
              Promise,
              RefreshListener,
-             Remote,
+             RemoteFile,
              StyleResolver,
              XmlDocument) {
     "use strict";
@@ -147,7 +147,7 @@ define([
             options.ajax = true;
         }
 
-        return new Remote(options);
+        return new RemoteFile(options).get();
     };
 
 	/**
