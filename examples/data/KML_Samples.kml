@@ -342,6 +342,8 @@
             <NetworkLink>
                 <Link>
                     <href>data/etnaOverlay.kml</href>
+                    <refreshMode>onInterval</refreshMode>
+                    <refreshInterval>10</refreshInterval>
                 </Link>
                 <Region>
                     <LatLonAltBox>
