@@ -7,13 +7,17 @@ define([
     './KmlFeature',
     '../KmlFile',
     '../KmlLink',
-    '../util/NodeTransformers'
+    '../util/NodeTransformers',
+    '../util/RefreshListener'
 ], function (KmlElements,
              KmlFeature,
              KmlFile,
              KmlLink,
-             NodeTransformers) {
+             NodeTransformers,
+             RefreshListener) {
     "use strict";
+
+    var REFRESH_NETWORK_LINK_EVENT = "refreshNetworkLinkEvent";
 
     /**
      * Constructs an KmlNetworkLink. Applications usually don't call this constructor. It is called by {@link KmlFile}
@@ -115,6 +119,8 @@ define([
             new KmlFile(self.buildUrl()).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
                 self.isDownloading = false;
+
+                self.fireEvent(kmlOptions);
             });
         }
 
@@ -122,7 +128,7 @@ define([
         if(this.resolvedFile && !this.displayed) {
             this.resolvedFile.render(dc, kmlOptions);
 
-            this.handleRefresh(dc);
+            this.handleRefresh(kmlOptions); // This one happens always
         }
     };
 
@@ -130,18 +136,48 @@ define([
         return this.kmlLink.kmlHref;
     };
 
-    KmlNetworkLink.prototype.handleRefresh = function(dc) {
-        if(this.kmlLink.kmlRefreshMode == "onChange") {
+	/**
+     * It handles refreshing strategy of the NetworkLink.
+     * @param kmlOptions {Object}
+     * @param kmlOptions.activeEvents {RefreshListener.Event[]} Events which should be processed in this round of render.
+     */
+    KmlNetworkLink.prototype.handleRefresh = function(kmlOptions) {
+        var activeEvents = kmlOptions.activeEvents;
+        activeEvents = activeEvents.filter(function(event){
+            return event.type == REFRESH_NETWORK_LINK_EVENT;
+        });
+        if(activeEvents.length > 0) {
+            var self = this;
+            new KmlFile(self.buildUrl()).then(function (kmlFile) {
+                self.resolvedFile = kmlFile;
 
+                self.fireEvent(kmlOptions);
+            });
         }
+    };
 
+	/**
+     * It fires event when the kmlLink refreshMode contains refreshMode.
+     * @param kmlOptions {Object}
+     * @param kmlOptions.listener {RefreshListener} Object which allows you to schedule events, which will be triggered at some point in future. It doesn't have to be exactly that time.
+     */
+    KmlNetworkLink.prototype.fireEvent = function(kmlOptions) {
+        var time = 0;
         if(this.kmlLink.kmlRefreshMode == "onInterval") {
-            // Important part is to cleanse this one.
+            time = this.kmlLink.kmlRefreshInterval * 1000;
+        } else if(this.kmlLink.kmlRefreshMode == "onExpire") {
+            // Test whether the file is expired
+            if(!this.resolvedFile) {
+                return;
+            } else {
+                time = this.resolvedFile.getExpired();
+            }
+        } else {
+            // No refresh mode was selected, therefore ignore this method;
+            return;
         }
 
-        if(this.kmlLink.kmlRefreshMode == "onExpire") {
-
-        }
+        kmlOptions.listener.addEvent(new RefreshListener.Event(REFRESH_NETWORK_LINK_EVENT, time, null));
     };
 
     KmlElements.addKey(KmlNetworkLink.prototype.getTagNames()[0], KmlNetworkLink);

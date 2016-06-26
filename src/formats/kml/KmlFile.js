@@ -64,13 +64,16 @@ define([
         this._fileCache = new KmlFileCache();
         this._styleResolver = new StyleResolver(this._fileCache);
         this._listener = new RefreshListener();
+        this._headers = null;
         
         var filePromise;
         // Load the document
         filePromise = new Promise(function (resolve) {
             var promise = self.requestRemote(url);
-            promise.then(function (loadedDocument) {
+            promise.then(function (options) {
                 var rootDocument;
+                var loadedDocument = options.text;
+                self._headers = options.headers;
                 if (url.indexOf('.kmz') == -1) {
                     rootDocument = loadedDocument;
                 } else {
@@ -178,6 +181,16 @@ define([
                     " Style node or StyleMap node.");
             }
         });
+    };
+
+	/**
+     * This function returns expire time of this file in miliseconds.
+     * @returns {Number} miliseconds for this file to expire.
+     */
+    KmlFile.prototype.getExpired = function() {
+        var expireDate = new Date(this._headers.getRequestHeader("Expires"));
+        var currentDate = new Date();
+        return currentDate.getTime - expireDate.getTime();
     };
 
     return KmlFile;
