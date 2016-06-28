@@ -3,11 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     './KmlGeometry'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlGeometry) {
     "use strict";
 
@@ -25,9 +23,9 @@ define([
      */
     var KmlMultiTrack = function (options) {
         KmlGeometry.call(this, options);
-
-        extend(this, KmlMultiTrack.prototype);
     };
+
+    KmlMultiTrack.prototype = Object.create(KmlGeometry.prototype);
 
     /**
      * @inheritDoc

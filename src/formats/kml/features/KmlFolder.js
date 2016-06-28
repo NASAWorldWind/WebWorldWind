@@ -3,11 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlContainer',
     './../KmlElements'
 ], function (
-    extend,
     KmlContainer,
     KmlElements
 ) {
@@ -26,36 +24,9 @@ define([
      */
     var KmlFolder = function (options) {
         KmlContainer.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Specifies any amount of features, which are part of this document.
-             * @memberof KmlFolder.prototype
-             * @readonly
-             * @type {KmlObject[]}
-             * @see {KmlFeature}
-             */
-            kmlShapes: {
-                get: function(){
-                    return this.parse();
-                }
-            }
-        });
-
-        extend(this, KmlFolder.prototype);
     };
 
-    /**
-     * Instead of standard update processing for the element only pass the processing on descendants.
-     * @inheritDoc
-     */
-    KmlFolder.prototype.beforeStyleResolution = function(options) {
-        this.kmlShapes.forEach(function(shape) {
-            shape.update(options);
-        });
-
-        return false;
-    };
+    KmlFolder.prototype = Object.create(KmlContainer.prototype);
 
     /**
      * @inheritDoc

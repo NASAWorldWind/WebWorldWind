@@ -3,13 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     '../KmlElements',
     './KmlSubStyle',
     '../util/Pair',
     '../../../util/Promise'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlSubStyle,
              Pair,
              Promise) {
@@ -27,35 +25,35 @@ define([
      */
     var KmlStyleMap = function (node) {
         KmlSubStyle.call(this, node);
-
-        Object.defineProperties(this, {
-            /**
-             * Defines a key/value pair that maps a mode (normal or highlight) to the predefined &lt;styleUrl&gt;.
-             * &lt;Pair&gt;
-             * contains two elements (both are required):
-             * &lt;key&gt;, which identifies the key
-             * &lt;styleUrl&gt; or &lt;Style&gt;, which references the style. In &lt;styleUrl&gt;, for referenced style elements that are
-             *  local to the KML document, a simple # referencing is used. For styles that are contained in external
-             * files, use a full URL along with # referencing.
-             * @memberof KmlStyleMap.prototype
-             * @readonly
-             * @type {Pair[]}
-             */
-            kmlPairs: {
-                get: function () {
-                    return this.parse();
-                }
-            },
-
-            isMap: {
-                get: function() {
-                    return true;
-                }
-            }
-        });
-
-        extend(this, KmlStyleMap.prototype);
     };
+
+    KmlStyleMap.prototype = Object.create(KmlSubStyle.prototype);
+
+    Object.defineProperties(KmlStyleMap.prototype, {
+        /**
+         * Defines a key/value pair that maps a mode (normal or highlight) to the predefined &lt;styleUrl&gt;.
+         * &lt;Pair&gt;
+         * contains two elements (both are required):
+         * &lt;key&gt;, which identifies the key
+         * &lt;styleUrl&gt; or &lt;Style&gt;, which references the style. In &lt;styleUrl&gt;, for referenced style elements that are
+         *  local to the KML document, a simple # referencing is used. For styles that are contained in external
+         * files, use a full URL along with # referencing.
+         * @memberof KmlStyleMap.prototype
+         * @readonly
+         * @type {Pair[]}
+         */
+        kmlPairs: {
+            get: function () {
+                return this._factory.all(this);
+            }
+        },
+
+        isMap: {
+            get: function() {
+                return true;
+            }
+        }
+    });
 
     /**
      * Resolve the information from style map and create the options with normal and highlight.

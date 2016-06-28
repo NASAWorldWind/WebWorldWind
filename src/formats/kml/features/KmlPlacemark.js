@@ -6,7 +6,6 @@
  * @export KmlPlacemark
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     './KmlFeature',
     '../geom/KmlGeometry',
@@ -18,9 +17,9 @@ define([
     '../../../util/Color',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/TextAttributes',
-    '../../../util/Offset'
-], function (extend,
-             KmlElements,
+    '../../../util/Offset',
+    '../../../util/WWUtil'
+], function (KmlElements,
              KmlFeature,
              KmlGeometry,
              KmlStyle,
@@ -31,7 +30,8 @@ define([
              Color,
              ShapeAttributes,
              TextAttributes,
-             Offset) {
+             Offset,
+             WWUtil) {
     "use strict";
     /**
      * Constructs an KmlPlacemark. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -47,72 +47,50 @@ define([
      */
     var KmlPlacemark = function (options) {
         KmlFeature.call(this, options);
-
-        var self = this;
-        this._style = this.getStyle();
-        this._style.then(function (styles) {
-            if (!self.kmlGeometry) {
-                // TODO: Show Placemarks without geometry.
-                return;
-            }
-            Placemark.call(self, self.kmlGeometry.kmlCenter, false, self.prepareAttributes(styles.normal));
-            self.moveValidProperties();
-        });
-        this._layer = null;
-
-        Object.defineProperties(this, {
-            /**
-             * It contains geometry associated with this placemark. The geometry is cached.
-             * @memberof KmlPlacemark.prototype
-             * @type {KmlGeometry}
-             * @readonly
-             */
-            kmlGeometry: {
-                get: function () {
-                    return this.createChildElement({
-                        name: KmlGeometry.prototype.getTagNames()
-                    });
-                }
-            }
-        });
-
-        extend(this, KmlPlacemark.prototype);
     };
 
-    KmlPlacemark.prototype = Object.create(Placemark.prototype);
+    KmlPlacemark.prototype = Object.create(KmlFeature.prototype);
 
-    /**
-     * @inheritDoc
-     */
-    KmlPlacemark.prototype.getAppliedStyle = function() {
-        return this._style;
-    };
-
-    /**
-     * First call the predecessor and then take care of moving the feature to different layer.
-     * @inheritDoc
-     */
-    KmlPlacemark.prototype.beforeStyleResolution = function(options) {
-        KmlFeature.prototype.beforeStyleResolution.call(this, options);
-
-        // Add to the layer.
-        // TODO Solve movement of the hierarchy into another layer
-        if(this._layer == null) {
-            this._layer = options.layer;
-            this._layer.addRenderable(this);
+    Object.defineProperties(KmlPlacemark.prototype, {
+        /**
+         * It contains geometry associated with this placemark. The geometry is cached.
+         * @memberof KmlPlacemark.prototype
+         * @type {KmlGeometry}
+         * @readonly
+         */
+        kmlGeometry: {
+            get: function () {
+                return this._factory.any(this, {
+                    name: KmlGeometry.prototype.getTagNames()
+                });
+            }
         }
+    });
 
-        return true;
-    };
+    KmlPlacemark.prototype.render = function(dc, kmlOptions) {
+        KmlFeature.prototype.render.call(this, dc, kmlOptions);
 
-    /**
-     * After style was resolved update the geometry for this placemark.
-     * @inheritDoc
-     */
-    KmlPlacemark.prototype.afterStyleResolution = function(options) {
-        this.position = this.kmlGeometry.kmlCenter;
+        kmlOptions = WWUtil.clone(kmlOptions);
 
-        this.kmlGeometry.update(options);
+        if(kmlOptions.lastStyle && !this._renderable) {
+            // TODO: render placemarks without geometry.
+            if (this.kmlGeometry) {
+                this._renderable = new Placemark(
+                    this.kmlGeometry.kmlCenter,
+                    false,
+                    this.prepareAttributes(kmlOptions.lastStyle.normal)
+                );
+                this.moveValidProperties();
+                dc.redrawRequested = true;
+            }
+        }
+        
+        if(this._renderable) {
+            if (this.kmlGeometry) {
+                this.kmlGeometry.render(dc, kmlOptions);
+                this._renderable.render(dc);
+            }
+        }
     };
 
     /**
@@ -146,9 +124,9 @@ define([
      * It takes properties from the KML definition and move them into the internal objects.
      */
     KmlPlacemark.prototype.moveValidProperties = function () {
-        this.label = this.kmlName || '';
-        this.altitudeMode = this.kmlAltitudeMode || WorldWind.RELATIVE_TO_GROUND;
-        this.enableLeaderLinePicking = true;
+        this._renderable.label = this.kmlName || '';
+        this._renderable.altitudeMode = this.kmlAltitudeMode || WorldWind.RELATIVE_TO_GROUND;
+        this._renderable.enableLeaderLinePicking = true;
     };
 
     /**

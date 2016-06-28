@@ -3,10 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlFeature'
-], function (extend,
-             KmlFeature) {
+], function (KmlFeature) {
     "use strict";
     /**
      * Constructs an KmlContainer. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -22,9 +20,48 @@ define([
      */
     var KmlContainer = function (options) {
         KmlFeature.call(this, options);
-
-        extend(this, KmlContainer.prototype);
     };
+
+    KmlContainer.prototype = Object.create(KmlFeature.prototype);
+
+    Object.defineProperties(KmlContainer.prototype, {
+        /**
+         * Specifies any amount of features, which are part of this document.
+         * @memberof KmlDocument.prototype
+         * @readonly
+         * @type {Node[]}
+         * @see {KmlFeature}
+         */
+        kmlShapes: {
+            get: function(){
+                var allElements = this._factory.all(this);
+                return allElements.filter(function (element) {
+                    // For now display only features.
+                    return element.isFeature;
+                });
+            }
+        }
+    });
+
+	/**
+     * @inheritDoc
+     */
+    KmlContainer.prototype.render = function(dc, kmlOptions) {
+        KmlFeature.prototype.render.call(this, dc, kmlOptions);
+
+        var self = this;
+        this.kmlShapes.forEach(function(shape) {
+            shape.render(dc, {
+                lastStyle: kmlOptions.lastStyle,
+                lastVisibility: self.enabled,
+                currentTimeInterval: kmlOptions.currentTimeInterval,
+                regionInvisible: kmlOptions.regionInvisible,
+                fileCache: kmlOptions.fileCache,
+                styleResolver: kmlOptions.styleResolver
+            });
+        });
+    };
+
 
     /**
      * @inheritDoc

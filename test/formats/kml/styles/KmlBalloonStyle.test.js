@@ -31,8 +31,8 @@ require({
                 kmlRepresentation.getElementsByTagName("BalloonStyle")[0]});
 
             assertEquals('ffffffff', balloonStyle.kmlBgColor);
-            assertEquals('ff000000', balloonStyle.kmlTextColor);
             assertEquals('TextToTest', balloonStyle.kmlText);
+            assertEquals('ff000000', balloonStyle.kmlTextColor);
             assertEquals('default', balloonStyle.kmlDisplayMode);
         })
     });

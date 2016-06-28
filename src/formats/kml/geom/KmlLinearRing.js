@@ -3,11 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlLineString',
     '../KmlElements'
-], function (extend,
-             KmlLineString,
+], function (KmlLineString,
              KmlElements) {
     "use strict";
     /**
@@ -24,8 +22,6 @@ define([
      */
     var KmlLinearRing = function (options) {
         KmlLineString.call(this, options);
-
-        extend(this, KmlLinearRing.prototype);
     };
 
     KmlLinearRing.prototype = Object.create(KmlLineString.prototype);

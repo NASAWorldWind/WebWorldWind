@@ -6,10 +6,8 @@
  * @exports KmlGeometry
  */
 define([
-    '../../../util/extend',
-    './../KmlObject'
-], function (extend,
-             KmlObject) {
+    '../KmlObject'
+], function (KmlObject) {
     "use strict";
     /**
      * Constructs an KmlGeometry. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -26,40 +24,24 @@ define([
     var KmlGeometry = function (options) {
         KmlObject.call(this, options);
 
-        extend(this, KmlGeometry.prototype);
+        this._renderable = null;
     };
 
-    /**
-     * It returns actually applied style valid for current geometry.
-     * @returns {KmlStyleSelector}
-     */
-    KmlGeometry.prototype.getAppliedStyle = function() {
-        return this._style;
-    };
+    KmlGeometry.prototype = Object.create(KmlObject.prototype);
 
-    /**
-     * Added prepareLocations hook.
+	/**
      * @inheritDoc
      */
-    KmlGeometry.prototype.beforeStyleResolution = function(options) {
-        if(options.style) {
-            this._style = options.style;
-        }
+    KmlGeometry.prototype.render = function(dc, kmlOptions) {
+        KmlObject.prototype.render.call(this, dc, kmlOptions);
 
-        this.locations = this.prepareLocations();
-
-        if(!this._layer && options.layer) {
-            options.layer.addRenderable(this);
-            this._layer = options.layer;
-        }
-
-        return true;
+        this.enabled = kmlOptions.lastVisibility;
     };
 
     /**
      * @inheritDoc
      */
-    KmlGeometry.prototype.getTagNames = function () {
+    KmlGeometry.prototype.getTagNames = KmlGeometry.getTagNames = function () {
         return ['Point', 'LinearRing', 'LineString', 'MultiGeometry', 'Polygon'];
     };
 

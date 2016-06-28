@@ -3,17 +3,23 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
+    './KmlFeature',
     '../KmlLatLonBox',
     '../KmlLatLonQuad',
-    './KmlOverlay'
+    './KmlOverlay',
+    '../util/NodeTransformers',
+    '../../../geom/Sector',
+    '../../../shapes/SurfaceImage'
 ], function (
-    extend,
     KmlElements,
+    KmlFeature,
     KmlLatLonBox,
     KmlLatLonQuad,
-    KmlOverlay
+    KmlOverlay,
+    NodeTransformers,
+    Sector,
+    SurfaceImage
 ) {
     "use strict";
 
@@ -30,65 +36,93 @@ define([
      * @augments KmlOverlay
      */
     var KmlGroundOverlay = function (options) {
+        this.isGroundOverlay = true;
+
         KmlOverlay.call(this, options);
+    };
 
-        Object.defineProperties(this, {
-            /**
-             * Specifies the distance above the earth's surface, in meters, and is interpreted according to the altitude
-             * mode.
-             * @memberof KmlGroundOverlay.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlAltitude: {
-                get: function() {
-                    return this.retrieve({name: 'altitude'});
-                }
-            },
+    KmlGroundOverlay.prototype = Object.create(KmlOverlay.prototype);
 
-            /**
-             * Specifies how the &lt;altitude&gt;is interpreted.
-             * @memberof KmlGroundOverlay.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlAltitudeMode: {
-                get: function() {
-                    return this.retrieve({name: 'altitudeMode'});
-                }
-            },
-
-            /**
-             * Specifies where the top, bottom, right, and left sides of a bounding box for the ground overlay are
-             * aligned.
-             * @memberof KmlGroundOverlay.prototype
-             * @readonly
-             * @type {KmlLatLonBox}
-             */
-            kmlLatLonBox: {
-                get: function() {
-                    return this.createChildElement({
-                        name: KmlLatLonBox.prototype.getTagNames()
-                    });
-                }
-            },
-
-            /**
-             * Used for nonrectangular quadrilateral ground overlays.
-             * @memberof KmlGroundOverlay.prototype
-             * @readonly
-             * @type {KmlLatLonQuad}
-             */
-            kmlLatLonQuad: {
-                get: function() {
-                    return this.createChildElement({
-                        name: KmlLatLonQuad.prototype.getTagNames()
-                    });
-                }
+    Object.defineProperties(KmlGroundOverlay.prototype, {
+        /**
+         * Specifies the distance above the earth's surface, in meters, and is interpreted according to the altitude
+         * mode.
+         * @memberof KmlGroundOverlay.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlAltitude: {
+            get: function() {
+                return this._factory.specific(this, {name: 'altitude', transformer: NodeTransformers.string});
             }
-        });
+        },
 
-        extend(this, KmlGroundOverlay.prototype);
+        /**
+         * Specifies how the &lt;altitude&gt;is interpreted.
+         * @memberof KmlGroundOverlay.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlAltitudeMode: {
+            get: function() {
+                return this._factory.specific(this, {name: 'altitudeMode', transformer: NodeTransformers.string});
+            }
+        },
+
+        /**
+         * Specifies where the top, bottom, right, and left sides of a bounding box for the ground overlay are
+         * aligned.
+         * @memberof KmlGroundOverlay.prototype
+         * @readonly
+         * @type {KmlLatLonBox}
+         */
+        kmlLatLonBox: {
+            get: function() {
+                return this._factory.any(this, {
+                    name: KmlLatLonBox.prototype.getTagNames()
+                });
+            }
+        },
+
+        /**
+         * Used for nonrectangular quadrilateral ground overlays.
+         * @memberof KmlGroundOverlay.prototype
+         * @readonly
+         * @type {KmlLatLonQuad}
+         */
+        kmlLatLonQuad: {
+            get: function() {
+                return this._factory.any(this, {
+                    name: KmlLatLonQuad.prototype.getTagNames()
+                });
+            }
+        }
+    });
+
+	/**
+     * @inheritDoc
+     */
+    KmlGroundOverlay.prototype.render = function(dc, kmlOptions) {
+        KmlFeature.prototype.render.call(this, dc, kmlOptions);
+
+        if(!this._renderable && this.enabled) {
+            if(this.kmlIcon && this.kmlLatLonBox) {
+                this._renderable = new SurfaceImage(
+                    new Sector(
+                        this.kmlLatLonBox.kmlSouth,
+                        this.kmlLatLonBox.kmlNorth,
+                        this.kmlLatLonBox.kmlWest,
+                        this.kmlLatLonBox.kmlEast
+                    ),
+                    this.kmlIcon.kmlHref
+                );
+                dc.redrawRequested = true;
+            }
+        }
+        
+        if(this._renderable) {
+            this._renderable.render(dc);
+        }
     };
 
     /**

@@ -22,7 +22,7 @@ require({
                 "   <north>48.25475939255556</north>" +
                 "   <south>48.25207367852141</south>" +
                 "   <east>-90.86591508839973</east>" +
-                "   <west>-90.8714285289695</west>" +
+                "   <west>-90.8714285289695</west>Kml" +
                 "   <minAltitude>10</minAltitude>" +
                 "   <maxAltitude>20</maxAltitude>" +
                 "</LatLonAltBox>" +

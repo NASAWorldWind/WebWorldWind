@@ -6,15 +6,13 @@
  * @exports KmlTimeSpan
  */
 define([
-    '../../util/extend',
-    './KmlTimePrimitive',
     './KmlElements',
-    '../../util/WWUtil'
+    './KmlTimePrimitive',
+    './util/NodeTransformers'
 ], function(
-    extend,
-    KmlTimePrimitive,
     KmlElements,
-    WWUtil
+    KmlTimePrimitive,
+    NodeTransformers
 ){
     "use strict";
     /**
@@ -32,36 +30,37 @@ define([
     var KmlTimeSpan = function (options) {
         //noinspection JSUndefinedPropertyAssignment
         options.isTimeSpan = true;
-        Object.defineProperties(this, {
-            /**
-             * Time from which is the event valid.
-             * @memberof KmlTimeSpan.prototype
-             * @type {Date}
-             * @readonly
-             */
-            kmlBegin: {
-                get: function() {
-                    return this.retrieve({name: 'begin', transformer: WWUtil.date});
-                }
-            },
-
-            /**
-             * Time to which is the event valid.
-             * @memberof KmlTimeSpan.prototype
-             * @type {Date}
-             * @readonly
-             */
-            kmlEnd: {
-                get: function() {
-                    return this.retrieve({name: 'end', transformer: WWUtil.date});
-                }
-            }
-        });
 
         KmlTimePrimitive.call(this, options);
-
-        extend(this, KmlTimeSpan.prototype);
     };
+
+    KmlTimeSpan.prototype = Object.create(KmlTimePrimitive.prototype);
+
+    Object.defineProperties(KmlTimeSpan.prototype, {
+        /**
+         * Time from which is the event valid.
+         * @memberof KmlTimeSpan.prototype
+         * @type {Date}
+         * @readonly
+         */
+        kmlBegin: {
+            get: function() {
+                return this._factory.specific(this, {name: 'begin', transformer: NodeTransformers.date});
+            }
+        },
+
+        /**
+         * Time to which is the event valid.
+         * @memberof KmlTimeSpan.prototype
+         * @type {Date}
+         * @readonly
+         */
+        kmlEnd: {
+            get: function() {
+                return this._factory.specific(this, {name: 'end', transformer: NodeTransformers.date});
+            }
+        }
+    });
 
     /**
      * @inheritDoc
