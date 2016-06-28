@@ -3,10 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlObject'
-], function (extend,
-             KmlObject) {
+], function (KmlObject) {
     "use strict";
 
     /**
@@ -23,9 +21,9 @@ define([
      */
     var KmlSubStyle = function (options) {
         KmlObject.call(this, options);
-
-        extend(this, KmlSubStyle.prototype);
     };
+
+    KmlSubStyle.prototype = Object.create(KmlObject.prototype);
 
     /**
      * @inheritDoc

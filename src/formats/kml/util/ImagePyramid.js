@@ -3,13 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     '../KmlElements',
-    '../KmlObject'
-], function (extend,
-             KmlElements,
-             KmlObject) {
-    // TODO KmlSchema isn't actually descendant of the KmlObject. The relevant logic should be applied differently.
+    '../KmlObject',
+    '../util/NodeTransformers'
+], function (KmlElements,
+             KmlObject,
+             NodeTransformers) {
     "use strict";
     /**
      * Constructs an ImagePyramid. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -25,63 +24,63 @@ define([
      */
     var ImagePyramid = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Size of the tiles, in pixels. Tiles must be square, and &lt;tileSize&gt; must be a power of 2. A tile size of
-             * 256
-             * (the default) or 512 is recommended. The original image is divided into tiles of this size, at varying
-             * resolutions.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlTileSize: {
-                get: function () {
-                    return this.retrieve({name: 'tileSize', transformer: Number});
-                }
-            },
-
-            /**
-             * Width in pixels of the original image.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlMaxWidth: {
-                get: function () {
-                    return this.retrieve({name: 'maxWidth', transformer: Number});
-                }
-            },
-
-            /**
-             * Height in pixels of the original image.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlMaxHeight: {
-                get: function () {
-                    return this.retrieve({name: 'maxHeight', transformer: Number});
-                }
-            },
-
-            /**
-             * Specifies where to begin numbering the tiles in each layer of the pyramid. A value of lowerLeft specifies
-             * that row 1, column 1 of each layer is in the bottom left corner of the grid.
-             * @memberof ImagePyramid.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlGridOrigin: {
-                get: function () {
-                    return this.retrieve({name: 'gridOrigin'});
-                }
-            }
-        });
-
-        extend(this, ImagePyramid.prototype);
     };
+
+    ImagePyramid.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(ImagePyramid.prototype, {
+        /**
+         * Size of the tiles, in pixels. Tiles must be square, and &lt;tileSize&gt; must be a power of 2. A tile size of
+         * 256
+         * (the default) or 512 is recommended. The original image is divided into tiles of this size, at varying
+         * resolutions.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlTileSize: {
+            get: function () {
+                return this._factory.specific(this, {name: 'tileSize', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * Width in pixels of the original image.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlMaxWidth: {
+            get: function () {
+                return this._factory.specific(this, {name: 'maxWidth', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * Height in pixels of the original image.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlMaxHeight: {
+            get: function () {
+                return this._factory.specific(this, {name: 'maxHeight', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * Specifies where to begin numbering the tiles in each layer of the pyramid. A value of lowerLeft specifies
+         * that row 1, column 1 of each layer is in the bottom left corner of the grid.
+         * @memberof ImagePyramid.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlGridOrigin: {
+            get: function () {
+                return this._factory.specific(this, {name: 'gridOrigin', transformer: NodeTransformers.string});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

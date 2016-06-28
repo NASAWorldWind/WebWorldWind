@@ -167,69 +167,6 @@
             </Placemark>
         </Folder>
         <Folder>
-            <name>Styles and Markup</name>
-            <visibility>1</visibility>
-            <description>With KML it is easy to create rich, descriptive markup to
-                annotate and enrich your placemarks
-            </description>
-            <LookAt>
-                <longitude>-122.0845787422371</longitude>
-                <latitude>37.42215078726837</latitude>
-                <altitude>0</altitude>
-                <heading>-148.4126777488172</heading>
-                <tilt>40.55750733930874</tilt>
-                <range>365.2646826292919</range>
-            </LookAt>
-            <styleUrl>#noDrivingDirections</styleUrl>
-            <Document>
-                <name>Highlighted Icon</name>
-                <visibility>1</visibility>
-                <description>Place your mouse over the icon to see it display the new
-                    icon
-                </description>
-                <LookAt>
-                    <longitude>-122.0856552124024</longitude>
-                    <latitude>37.4224281311035</latitude>
-                    <altitude>0</altitude>
-                    <heading>0</heading>
-                    <tilt>0</tilt>
-                    <range>265.8520424250024</range>
-                </LookAt>
-                <Style id="highlightPlacemark">
-                    <IconStyle>
-                        <Icon>
-                            <href>http://maps.google.com/mapfiles/kml/paddle/red-stars.png</href>
-                        </Icon>
-                    </IconStyle>
-                </Style>
-                <Style id="normalPlacemark">
-                    <IconStyle>
-                        <Icon>
-                            <href>http://maps.google.com/mapfiles/kml/paddle/wht-blank.png</href>
-                        </Icon>
-                    </IconStyle>
-                </Style>
-                <StyleMap id="exampleStyleMap">
-                    <Pair>
-                        <key>normal</key>
-                        <styleUrl>#normalPlacemark</styleUrl>
-                    </Pair>
-                    <Pair>
-                        <key>highlight</key>
-                        <styleUrl>#highlightPlacemark</styleUrl>
-                    </Pair>
-                </StyleMap>
-                <Placemark>
-                    <name>Roll over this icon</name>
-                    <visibility>1</visibility>
-                    <styleUrl>#exampleStyleMap</styleUrl>
-                    <Point>
-                        <coordinates>-122.0856545755255,37.42243077405461,0</coordinates>
-                    </Point>
-                </Placemark>
-            </Document>
-        </Folder>
-        <Folder>
             <name>Paths</name>
             <visibility>1</visibility>
             <description>Examples of paths. Note that the tessellate tag is by default
@@ -398,6 +335,197 @@
                     </coordinates>
                 </LineString>
             </Placemark>
+        </Folder>
+        <Folder>
+            <name>Ground Overlays</name>
+            <description>Examples of ground overlays</description>
+            <GroundOverlay>
+                <name>Large-scale overlay on terrain</name>
+                <description>Overlay shows Mount Etna erupting
+                    on July 13th, 2001.
+                </description>
+                <Icon>
+                    <href>data/etna.jpg</href>
+                </Icon>
+                <LatLonBox>
+                    <north>37.91904192681665</north>
+                    <south>37.46543388598137</south>
+                    <east>15.35832653742206</east>
+                    <west>14.60128369746704</west>
+                    <rotation>-0.1556640799496235</rotation>
+                </LatLonBox>
+            </GroundOverlay>
+        </Folder>
+        <Folder>
+
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T32UQB.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>51.41589769585037</north>
+                    <south>50.382122249780146</south>
+                    <east>13.450589698980341</east>
+                    <west>11.815510113549237</west>
+                </LatLonBox>
+                <TimeStamp>
+                    <when>2015-08-03T10:10:10</when>
+                </TimeStamp>
+                <Region>
+                    <LatLonAltBox>
+                        <north>51.41589769585037</north>
+                        <south>50.382122249780146</south>
+                        <east>13.450589698980341</east>
+                        <west>11.815510113549237</west>
+                        <minAltitude>0</minAltitude>
+                        <maxAltitude>1000000</maxAltitude>
+                        <altitudeMode>clampToGround</altitudeMode>
+                    </LatLonAltBox>
+                </Region>
+            </GroundOverlay>
+
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UUS.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>51.44399790754169</north>
+                    <south>50.429712991163605</south>
+                    <east>13.729300891802168</east>
+                    <west>12.123708231717927</west>
+                </LatLonBox>
+                <TimeStamp>
+                    <when>2015-08-03T10:10:10</when>
+                </TimeStamp>
+                <Region>
+                    <LatLonAltBox>
+                        <north>51.44399790754169</north>
+                        <south>50.429712991163605</south>
+                        <east>13.729300891802168</east>
+                        <west>12.123708231717927</west>
+                        <minAltitude>0</minAltitude>
+                        <maxAltitude>1000000</maxAltitude>
+                        <altitudeMode>clampToGround</altitudeMode>
+                    </LatLonAltBox>
+                </Region>
+            </GroundOverlay>
+
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UVS.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>51.451117795210315</north>
+                    <south>50.45526533911891</south>
+                    <east>15.140457957690417</east>
+                    <west>13.560547850100555</west>
+                </LatLonBox>
+                <TimeStamp>
+                    <when>2015-08-03T10:10:10</when>
+                </TimeStamp>
+                <Region>
+                    <LatLonAltBox>
+                        <north>51.451117795210315</north>
+                        <south>50.45526533911891</south>
+                        <east>15.140457957690417</east>
+                        <west>13.560547850100555</west>
+                        <minAltitude>0</minAltitude>
+                        <maxAltitude>1000000</maxAltitude>
+                        <altitudeMode>clampToGround</altitudeMode>
+                    </LatLonAltBox>
+                </Region>
+            </GroundOverlay>
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150810T100716_A000691_T33UVP.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>48.75295443777926</north>
+                    <south>47.7574035312523</south>
+                    <east>15.132782609969988</east>
+                    <west>13.639176802255028</west>
+                </LatLonBox>
+                <TimeStamp>
+                    <when>2015-08-10T10:07:16</when>
+                </TimeStamp>
+                <Region>
+                    <LatLonAltBox>
+                        <north>48.75295443777926</north>
+                        <south>47.7574035312523</south>
+                        <east>15.132782609969988</east>
+                        <west>13.639176802255028</west>
+                        <minAltitude>0</minAltitude>
+                        <maxAltitude>1000000</maxAltitude>
+                        <altitudeMode>clampToGround</altitudeMode>
+                    </LatLonAltBox>
+                </Region>
+            </GroundOverlay>
+
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQA.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>50.518113702963866</north>
+                    <south>49.48562029122995</south>
+                    <east>13.365742763475753</east>
+                    <west>11.763545147584727</west>
+                </LatLonBox>
+                <TimeStamp>
+                    <when>2015-08-13T10:16:57</when>
+                </TimeStamp>
+                <Region>
+                    <LatLonAltBox>
+                        <north>50.518113702963866</north>
+                        <south>49.48562029122995</south>
+                        <east>13.365742763475753</east>
+                        <west>11.763545147584727</west>
+                        <minAltitude>0</minAltitude>
+                        <maxAltitude>1000000</maxAltitude>
+                        <altitudeMode>clampToGround</altitudeMode>
+                    </LatLonAltBox>
+                </Region>
+            </GroundOverlay>
+
+            <GroundOverlay>
+                <Icon>
+                    <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQV.tif.png</href>
+                </Icon>
+                <LatLonBox>
+                    <north>49.619610113671506</north>
+                    <south>48.58834878003898</south>
+                    <east>13.285045642949315</east>
+                    <west>11.714086657726819</west>
+                </LatLonBox>
+                <TimeStamp>
+                    <when>2015-08-13T10:16:57</when>
+                </TimeStamp>
+                <Region>
+                    <LatLonAltBox>
+                        <north>49.619610113671506</north>
+                        <south>48.58834878003898</south>
+                        <east>13.285045642949315</east>
+                        <west>11.714086657726819</west>
+                        <minAltitude>0</minAltitude>
+                        <maxAltitude>1000000</maxAltitude>
+                        <altitudeMode>clampToGround</altitudeMode>
+                    </LatLonAltBox>
+                </Region>
+            </GroundOverlay>
+        </Folder>
+        <Folder>
+            <name>Screen Overlays</name>
+            <description>Examples of screen overlays</description>
+            <ScreenOverlay>
+                <name>Absolute Positioning: Top left</name>
+                <Icon>
+                    <href>data/esa_logo_min.png</href>
+                </Icon>
+                <overlayXY x="0" y="1" xunits="fraction" yunits="fraction"/>
+                <screenXY x="0" y="1" xunits="fraction" yunits="fraction"/>
+                <rotationXY x="0" y="0" xunits="fraction" yunits="fraction"/>
+                <size x="0" y="0" xunits="fraction" yunits="fraction"/>
+            </ScreenOverlay>
         </Folder>
         <Folder>
             <name>Polygons</name>
@@ -578,6 +706,17 @@
                         <tilt>48.09646074797388</tilt>
                         <range>742.0552506670548</range>
                     </LookAt>
+                    <Region>
+                        <LatLonAltBox>
+                            <north>39</north>                            <!-- required; kml:angle90 -->
+                            <south>38.6</south>                            <!-- required; kml:angle90 -->
+                            <east>-76.8</east>                              <!-- required; kml:angle180 -->
+                            <west>-77.2</west>                              <!-- required; kml:angle180 -->
+                            <minAltitude>0</minAltitude>               <!-- float -->
+                            <maxAltitude>1000000</maxAltitude>               <!-- float -->
+                            <altitudeMode>clampToGround</altitudeMode>
+                        </LatLonAltBox>
+                    </Region>
                     <Polygon>
                         <extrude>1</extrude>
                         <altitudeMode>relativeToGround</altitudeMode>

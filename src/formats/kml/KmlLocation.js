@@ -3,13 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlElements',
-    './KmlObject'
+    './KmlObject',
+    './util/NodeTransformers'
 ], function (
-    extend,
     KmlElements,
-    KmlObject
+    KmlObject, 
+    NodeTransformers
 ) {
     "use strict";
 
@@ -27,47 +27,47 @@ define([
      */
     var KmlLocation = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Longitude of the location.
-             * @memberof KmlLocation.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlLongitude: {
-                get: function() {
-                    return this.retrieve({name: 'longitude'});
-                }
-            },
-
-            /**
-             * Latitude of the location.
-             * @memberof KmlLocation.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlLatitude: {
-                get: function() {
-                    return this.retrieve({name: 'latitude'});
-                }
-            },
-
-            /**
-             * Altitude of the location.
-             * @memberof KmlLocation.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlAltitude: {
-                get: function() {
-                    return this.retrieve({name: 'altitude'});
-                }
-            }
-        });
-
-        extend(this, KmlLocation.prototype);
     };
+
+    KmlLocation.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(KmlLocation.prototype, {
+        /**
+         * Longitude of the location.
+         * @memberof KmlLocation.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlLongitude: {
+            get: function() {
+                return this._factory.specific(this, {name: 'longitude', transformer: NodeTransformers.string});
+            }
+        },
+
+        /**
+         * Latitude of the location.
+         * @memberof KmlLocation.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlLatitude: {
+            get: function() {
+                return this._factory.specific(this, {name: 'latitude', transformer: NodeTransformers.string});
+            }
+        },
+
+        /**
+         * Altitude of the location.
+         * @memberof KmlLocation.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlAltitude: {
+            get: function() {
+                return this._factory.specific(this, {name: 'altitude', transformer: NodeTransformers.string});
+            }
+        }
+    });
 
     /**
      * @inheritDoc
