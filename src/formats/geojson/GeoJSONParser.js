@@ -99,6 +99,8 @@ define(['../../error/ArgumentError',
             // Documented in defineProperties below.
             this._shapeConfigurationCallback = this.defaultShapeConfigurationCallback;
 
+            this._parserCompletionCallback = null;
+
             this.defaultPlacemarkAttributes = new PlacemarkAttributes(null);
 
             this.defaultShapeAttributes = new ShapeAttributes(null);
@@ -189,6 +191,18 @@ define(['../../error/ArgumentError',
                 get: function () {
                     return this._shapeConfigurationCallback;
                 }
+            },
+            /** The completion callback specified to [load]{@link GeoJSONParser#load}. An optional function called when
+             * the JSON shapefiles loading is complete and
+             * all the shapes have been added to the layer.
+             * @memberof GeoJSONParser.prototype
+             * @type {Function}
+             * @readonly
+             */
+            parserCompletionCallback: {
+                get: function () {
+                    return this._parserCompletionCallback;
+                }
             }
         });
 
@@ -217,18 +231,18 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer A {@link RenderableLayer} to hold the shapes created for each GeoJSON
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
-         *  @param {Fcuntion} callbackFunction An optional function that will be executed when the GeoJSON is fully
-         *  parsed and all the renderables have been added to the layer. It will pass, as parameter, the layer to which
-         *  the callback belongs to.
+         * @param {Function} parserCompletionCallback An optional function called when the JSON shapefiles loading is
+         * complete and
+         * all the shapes have been added to the layer.
          */
 
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer, callbackFunction) {
+        GeoJSONParser.prototype.load = function (shapeConfigurationCallback, layer, parserCompletionCallback) {
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
             }
-            if (callbackFunction) {
-                this._callbackFunction = callbackFunction;
+            if (parserCompletionCallback) {
+                this._parserCompletionCallback = parserCompletionCallback;
             }
             this._layer = layer || new RenderableLayer();
 
@@ -332,8 +346,8 @@ define(['../../error/ArgumentError',
                                 "missingGeoJSONType"));
                     }
 
-                    if (this._callbackFunction && typeof this._callbackFunction === "function") {
-                        this._callbackFunction(this.layer);
+                    if (this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
+                        this._parserCompletionCallback(this.layer);
                     }
                 }
             }
