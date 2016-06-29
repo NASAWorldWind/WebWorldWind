@@ -206,6 +206,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/WmtsCapabilities',
         './layer/WmtsLayer',
         './ogc/WmtsLayerCapabilities',
+	'./ogc/WmtsLayerCaps',
         './WorldWindow',
         './util/WWMath',
         './util/WWMessage',
@@ -412,6 +413,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsCapabilities,
               WmtsLayer,
               WmtsLayerCapabilities,
+	      WmtsLayerCaps,
               WorldWindow,
               WWMath,
               WWMessage,
@@ -775,6 +777,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WmtsCapabilities'] = WmtsCapabilities;
         WorldWind['WmtsLayer'] = WmtsLayer;
         WorldWind['WmtsLayerCapabilities'] = WmtsLayerCapabilities;
+        WorldWind['WmtsLayerCaps'] = WmtsLayerCaps;
         WorldWind['WWMath'] = WWMath;
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;

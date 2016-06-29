@@ -44,13 +44,16 @@ define([
          * @augments Layer
          * @classdesc Displays a WMTS image layer.
          * @param {WmtsLayerCapabilities} layerCaps The WMTS layer capabilities describing this layer.
+         * @param {String} tileMatrixSet The tileMatrixSet to use for this layer. Must be one of those listed in the
+         * accompanying layer capabilities. May be null, in which case the first tileMatrixSet recognized is used.
          * @param {String} styleIdentifier The style to use for this layer. Must be one of those listed in the accompanying
          * layer capabilities. May be null, in which case the WMTS server's default style is used.
          * @param {String} timeString The time parameter passed to the WMTS server when imagery is requested. May be
          * null, in which case no time parameter is passed to the server.
          * @throws {ArgumentError} If the specified layer capabilities reference is null or undefined.
          */
-        var WmtsLayer = function (layerCaps, styleIdentifier, timeString) {
+        //TODO
+        var WmtsLayer = function (layerCaps, tileMatrixSet, styleIdentifier, timeString) {
             if (!layerCaps) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
@@ -101,7 +104,7 @@ define([
                         "Layer does not provide a supported image format."));
             }
 
-            if (layerCaps.resourceUrl && (layerCaps.resourceUrl.length > 1)) {
+            if (layerCaps.resourceUrl && (layerCaps.resourceUrl.length >= 1)) {
                 for (var i = 0; i < layerCaps.resourceUrl.length; i++) {
                     if (this.imageFormat === layerCaps.resourceUrl[i].format) {
                         this.resourceUrl = layerCaps.resourceUrl[i].template;
@@ -109,7 +112,19 @@ define([
                     }
                 }
             } else { // resource-oriented interface not supported, so use KVP interface
-                this.serviceUrl = layerCaps.capabilities.getGetTileKvpAddress();
+                this.serviceUrl = null;
+
+                // TODO : getGetTileKvpAddress code is here for hardcoded layers
+                for (var i = 0; i < layerCaps.capabilities.operationsMetadata.operation.length; i++) {
+                    var operation = layerCaps.capabilities.operationsMetadata.operation[i];
+
+                    if (operation.name === "GetTile") {
+                        this.serviceUrl = operation.dcp[0].http.get[0].href;
+                    }
+                }
+
+
+
                 if (this.serviceUrl) {
                     this.serviceUrl = WmsUrlBuilder.fixGetMapString(this.serviceUrl);
                 }
@@ -152,29 +167,82 @@ define([
                     "No default style available. A style will not be specified in tile requests.");
             }
 
-            // Find the tile matrix set we want to use. Prefer EPSG:4326, then EPSG:3857.
-            var tms, tms4326 = null, tms3857 = null;
-            for (i = 0; i < layerCaps.tileMatrixSetLink.length; i++) {
-                tms = layerCaps.tileMatrixSetLink[i].tileMatrixSetRef;
+            /***************************************************************************************/
+            this.tileMatrixSet = tileMatrixSet;
 
-                if (WmtsLayer.isEpsg4326Crs(tms.supportedCRS)) {
-                    tms4326 = tms4326 || tms;
-                } else if (WmtsLayer.isEpsg3857Crs(tms.supportedCRS)) {
-                    tms3857 = tms3857 || tms;
+            // Validate that the specified style identifier exists, or determine one if not specified.
+            if (this.tileMatrixSet) {
+                var tileMatrixSetFound = false;
+                for (var i = 0; i < layerCaps.tileMatrixSetLink.length; i++) {
+                    if (layerCaps.tileMatrixSetLink[i].tileMatrixSetRef.identifier === this.tileMatrixSet) {
+                        tileMatrixSetFound = true;
+                        this.tileMatrixSet = layerCaps.tileMatrixSetLink[i].tileMatrixSetRef;
+                        break;
+                    }
+                }
+
+                if (!tileMatrixSetFound) {
+                    Logger.logMessage(Logger.LEVEL_WARNING, "WmtsLayer", "constructor",
+                        "The specified tileMatrixSet is not available. Another one will be used.");
+                    this.tileMatrixSet = null;
                 }
             }
 
-            this.tileMatrixSet = tms4326 || tms3857;
+            if (!this.tileMatrixSet) {
+                // Find the tile matrix set we want to use. Prefer EPSG:4326, then EPSG:3857.
+                var tms, tms4326 = null, tms3857 = null;
+                //TODO
+                var tmsCRS84 = null;
+
+                for (i = 0; i < layerCaps.tileMatrixSetLink.length; i++) {
+                    tms = layerCaps.tileMatrixSetLink[i].tileMatrixSetRef;
+
+                    if (WmtsLayer.isEpsg4326Crs(tms.supportedCRS)) {
+                        tms4326 = tms4326 || tms;
+                    } else if (WmtsLayer.isEpsg3857Crs(tms.supportedCRS)) {
+                        tms3857 = tms3857 || tms;
+                    }
+                    //TODO
+                    else if (WmtsLayer.isOGCCrs84(tms.supportedCRS)) {
+                        tmsCRS84 = tmsCRS84 || tms;
+                    }
+                }
+
+                //TODO
+                this.tileMatrixSet = tms4326 || tms3857 || tmsCRS84;
+            }
 
             if (!this.tileMatrixSet) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
                         "No supported Tile Matrix Set could be found."));
             }
+            /***************************************************************************************/
+
+
+
 
             // Determine the layer's sector if possible. Mandatory for EPSG:4326 tile matrix sets. (Others compute
             // it from tile Matrix Set metadata.)
-            if (layerCaps.wgs84BoundingBox) {
+            /*********************************************************************************************************/
+            // For MapCache layer[0,2,3] : BBOX defined in Matrix and not in Layer
+            if (!layerCaps.wgs84BoundingBox && !layerCaps.boundingBox) {
+                if (this.tileMatrixSet.boundingBox) {
+                    this.sector = new Sector(
+                        layerCaps.tileMatrixSetLink[0].tileMatrixSetRef.boundingBox.lowerCorner[1],
+                        layerCaps.tileMatrixSetLink[0].tileMatrixSetRef.boundingBox.upperCorner[1],
+                        layerCaps.tileMatrixSetLink[0].tileMatrixSetRef.boundingBox.lowerCorner[0],
+                        layerCaps.tileMatrixSetLink[0].tileMatrixSetRef.boundingBox.upperCorner[0]);
+                }
+                else {
+                    // Throw an exception if there is no bounding box.
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
+                            "No bounding box was specified in the layer or tile matrix set capabilities."));
+                }
+            }
+            /*********************************************************************************************************/
+            else if (layerCaps.wgs84BoundingBox) {
                 this.sector = new Sector(
                     layerCaps.wgs84BoundingBox.lowerCorner[1],
                     layerCaps.wgs84BoundingBox.upperCorner[1],
@@ -188,11 +256,14 @@ define([
                     this.tileMatrixSet.boundingBox.lowerCorner[0],
                     this.tileMatrixSet.boundingBox.upperCorner[0]);
             } else if (WmtsLayerCapabilities.isEpsg4326Crs(this.tileMatrixSet.supportedCRS)) {
+
                 // Throw an exception if there is no 4326 bounding box.
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
                         "No EPSG:4326 bounding box was specified in the layer or tile matrix set capabilities."));
             }
+
+
 
             // Form a unique string to identify cache entries.
             this.cachePath = (this.resourceUrl || this.serviceUrl) +
@@ -296,9 +367,8 @@ define([
                     ancestorTile = this.currentAncestorTile;
                     this.currentAncestorTile = tile;
                 }
-
                 var nextLevel = this.tileMatrixSet.tileMatrix[tile.tileMatrix.levelNumber + 1],
-                    subTiles = tile.subdivideToCache(nextLevel, this, this.tileCache);
+                subTiles = tile.subdivideToCache(nextLevel, this, this.tileCache);
 
                 for (var i = 0, len = subTiles.length; i < len; i++) {
                     var child = subTiles[i];
@@ -415,7 +485,7 @@ define([
                     replace("{TileCol}", tile.column).replace("{TileRow}", tile.row);
 
                 if (this.timeString) {
-                    url.replace("{Time}", this.timeString);
+                    url = url.replace("{Time}", this.timeString);
                 }
             } else {
                 url = this.serviceUrl + "service=WMTS&request=GetTile&version=1.0.0";
@@ -452,7 +522,6 @@ define([
             var tileMatrix = this.tileMatrixSet.tileMatrix[0];
 
             this.topLevelTiles = [];
-
             for (var j = 0; j < tileMatrix.matrixHeight; j++) {
                 for (var i = 0; i < tileMatrix.matrixWidth; i++) {
                     this.topLevelTiles.push(this.createTile(tileMatrix, j, i));
@@ -466,7 +535,28 @@ define([
             } else if (WmtsLayer.isEpsg3857Crs(this.tileMatrixSet.supportedCRS)) {
                 return this.createTile3857(tileMatrix, row, column);
             }
+            //TODO
+            else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
+                return this.createTileCrs84(tileMatrix, row, column);
+            }
+
         };
+
+
+        // TODO
+        WmtsLayer.prototype.createTileCrs84 = function (tileMatrix, row, column) {
+            var tileDeltaLat = this.sector.deltaLatitude() / tileMatrix.matrixHeight, // TODO: calculate from metadata
+                tileDeltaLon = this.sector.deltaLongitude() / tileMatrix.matrixWidth,
+                maxLat = tileMatrix.topLeftCorner[1] - row * tileDeltaLat,
+                minLat = maxLat - tileDeltaLat,
+                minLon = tileMatrix.topLeftCorner[0] + tileDeltaLon * column,
+                maxLon = minLon + tileDeltaLon;
+
+            var sector = new Sector(minLat, maxLat, minLon, maxLon);
+
+            return this.makeTile(sector, tileMatrix, row, column);
+        };
+
 
         WmtsLayer.prototype.createTile4326 = function (tileMatrix, row, column) {
             var tileDeltaLat = this.sector.deltaLatitude() / tileMatrix.matrixHeight, // TODO: calculate from metadata
@@ -527,7 +617,6 @@ define([
         WmtsLayer.prototype.makeTile = function (sector, tileMatrix, row, column) {
             var path = this.cachePath + "-layer/" + tileMatrix.identifier + "/" + row + "/" + column + "."
                 + WWUtil.suffixForMimeType(this.imageFormat);
-
             return new WmtsLayerTile(sector, tileMatrix, row, column, path);
         };
 
@@ -536,6 +625,10 @@ define([
                 return new Texture(dc.currentGlContext, image);
             } else if (WmtsLayer.isEpsg3857Crs(this.tileMatrixSet.supportedCRS)) {
                 return this.createTexture3857(dc, tile, image);
+            }
+            // TODO
+            else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
+                return new Texture(dc.currentGlContext, image);
             }
         };
 
@@ -593,12 +686,18 @@ define([
         };
 
         WmtsLayer.isEpsg4326Crs = function (crs) {
-            return (crs.indexOf("EPSG") >= 0) && (crs.indexOf("4326") >= 0);
+            return ((crs.indexOf("EPSG") >= 0) && (crs.indexOf("4326") >= 0));
         };
 
         WmtsLayer.isEpsg3857Crs = function (crs) {
             return (crs.indexOf("EPSG") >= 0)
                 && ((crs.indexOf("3857") >= 0) || (crs.indexOf("900913") >= 0)); // 900913 is google's 3857 alias
+        };
+
+
+        //TODO
+        WmtsLayer.isOGCCrs84 = function (crs) {
+            return (crs.indexOf("OGC") >= 0) && (crs.indexOf("CRS84") >= 0);
         };
 
         return WmtsLayer;

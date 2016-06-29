@@ -77,6 +77,44 @@ define([
                         "The specified tile factory is null or undefined."));
             }
 
+            var subRow,
+                subCol,
+                children = [];
+
+            // TODO
+            var subFactorLatCeil = Math.ceil(tileMatrix.matrixHeight / this.tileMatrix.matrixHeight);
+            var subFactorLonCeil = Math.ceil(tileMatrix.matrixWidth / this.tileMatrix.matrixWidth);
+            var subFactorLatFloor = Math.floor(tileMatrix.matrixHeight / this.tileMatrix.matrixHeight);
+            var subFactorLonFloor = Math.floor(tileMatrix.matrixWidth / this.tileMatrix.matrixWidth);
+
+
+            var indI = (this.row == (this.tileMatrix.matrixHeight-1)) ? subFactorLatFloor : subFactorLatCeil;
+            var indJ = (this.column == (this.tileMatrix.matrixWidth-1)) ? subFactorLonFloor : subFactorLonCeil;
+
+            for (var i = 0; i < indI ; i++) {
+                for (var j = 0; j < indJ ; j++) {
+                    subRow = subFactorLatCeil * this.row + i;
+                    subCol = subFactorLonCeil * this.column + j;
+                    children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
+                }
+            }
+
+            return children;
+        };
+
+        /*WmtsLayerTile.prototype.subdivide = function (tileMatrix, tileFactory) {
+            if (!tileMatrix) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerTile", "subdivide",
+                        "The specified tile matrix is null or undefined."));
+            }
+
+            if (!tileFactory) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerTile", "subdivide",
+                        "The specified tile factory is null or undefined."));
+            }
+
             var subFactorLat,
                 subFactorLon,
                 subRow,
@@ -103,7 +141,7 @@ define([
             children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
 
             return children;
-        };
+        };*/
 
         WmtsLayerTile.prototype.subdivideToCache = function (tileMatrix, tileFactory, cache) {
             if (!tileMatrix) {
@@ -198,6 +236,7 @@ define([
 
         WmtsLayerTile.prototype.bind = function (dc) {
             var texture = dc.gpuResourceCache.resourceForKey(this.gpuCacheKey);
+
 
             if (texture && texture.bind(dc)) {
                 return true;
