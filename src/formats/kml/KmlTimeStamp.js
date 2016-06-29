@@ -6,14 +6,12 @@
  * @exports KmlTimeStamp
  */
 define([
-    '../../util/extend',
     './KmlElements',
     './KmlTimePrimitive',
-    '../../util/WWUtil'
-], function (extend,
-             KmlElements,
+    './util/NodeTransformers'
+], function (KmlElements,
              KmlTimePrimitive,
-             WWUtil) {
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -31,23 +29,25 @@ define([
     var KmlTimeStamp = function (options) {
         //noinspection JSUndefinedPropertyAssignment
         options.isTimeStamp = true;
-        Object.defineProperties(this, {
-            /**
-             * This property specifies when exactly the event happen.
-             * @memberof KmlTimeStamp.prototype
-             * @type {Date}
-             * @readonly
-             */
-            kmlWhen: {
-                get: function () {
-                    return this.retrieve({name: 'when', transformer: WWUtil.date});
-                }
-            }
-        });
         KmlTimePrimitive.call(this, options);
-
-        extend(this, KmlTimeStamp.prototype);
     };
+
+    KmlTimeStamp.prototype = Object.create(KmlTimePrimitive.prototype);
+
+    Object.defineProperties(KmlTimeStamp.prototype, {
+        /**
+         * This property specifies when exactly the event happen.
+         * @memberof KmlTimeStamp.prototype
+         * @type {Date}
+         * @readonly
+         */
+        kmlWhen: {
+            get: function () {
+                return this._factory.specific(this, {name: 'when', transformer: NodeTransformers.date});
+            }
+        }
+    });
+
 
     /**
      * @inheritDoc

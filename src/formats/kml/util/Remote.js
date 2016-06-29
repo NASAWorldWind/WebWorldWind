@@ -19,6 +19,7 @@ define([
      * @param options.zip {Boolean} If we are downloading kmz
      * @param options.responseType {String} Optional responseType applied in specific circumstances for the kmz
      * @constructor
+     * @alias Remote
      */
     var Remote = function(options) {
         // Returns promise.

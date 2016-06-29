@@ -3,13 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../util/extend',
     './KmlLink',
-    './KmlElements'
+    './KmlElements',
+    './util/NodeTransformers'
 ], function (
-    extend,
     KmlLink,
-    KmlElements
+    KmlElements,
+    NodeTransformers
 ) {
     "use strict";
     /**
@@ -26,59 +26,59 @@ define([
      */
     var KmlIcon = function (options) {
         KmlLink.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * The href can contain a pallet of icons. In this case this is offset from left border.
-             * @memberof KmlIcon.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlX: {
-                get: function(){
-                    return this.retrieve({name: 'gx:x', transformer: Number});
-                }
-            },
-
-            /**
-             * The href can contain a pallet of icons. In this case this is offset from top border.
-             * @memberof KmlIcon.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlY: {
-                get: function() {
-                    return this.retrieve({name: 'gx:y', transformer: Number});
-                }
-            },
-
-            /**
-             * The href can contain a pallet of icons. In this case this is width of the icon on the pallete.
-             * @memberof KmlIcon.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlW: {
-                get: function() {
-                    return this.retrieve({name: 'gx:w'});
-                }
-            },
-
-            /**
-             * The href can contain a pallet of icons. In this case this is height of the icon on the palette.
-             * @memberof KmlIcon.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlH: {
-                get: function() {
-                    return this.retrieve({name: 'gx:h'});
-                }
-            }
-        });
-
-        extend(this, KmlIcon.prototype);
     };
+
+    KmlIcon.prototype = Object.create(KmlLink.prototype);
+
+    Object.defineProperties(KmlIcon.prototype, {
+        /**
+         * The href can contain a pallet of icons. In this case this is offset from left border.
+         * @memberof KmlIcon.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlX: {
+            get: function(){
+                return this._factory.specific(this, {name: 'gx:x', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * The href can contain a pallet of icons. In this case this is offset from top border.
+         * @memberof KmlIcon.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlY: {
+            get: function() {
+                return this._factory.specific(this, {name: 'gx:y', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * The href can contain a pallet of icons. In this case this is width of the icon on the pallete.
+         * @memberof KmlIcon.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlW: {
+            get: function() {
+                return this._factory.specific(this, {name: 'gx:w', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * The href can contain a pallet of icons. In this case this is height of the icon on the palette.
+         * @memberof KmlIcon.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlH: {
+            get: function() {
+                return this._factory.specific(this, {name: 'gx:h', transformer: NodeTransformers.number});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

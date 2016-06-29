@@ -3,12 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
-    '../KmlObject'
-], function (extend,
-             KmlElements,
-             KmlObject) {
+    '../KmlObject',
+    './NodeTransformers'
+], function (KmlElements,
+             KmlObject,
+             NodeTransformers) {
     "use strict";
 
     /**
@@ -25,37 +25,37 @@ define([
      */
     var ItemIcon = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Specifies the current state of the NetworkLink or Folder. Possible values are open, closed, error,
-             * fetching0, fetching1, and fetching2. These values can be combined by inserting a space between two values
-             * (no comma).
-             * @memberof ItemIcon.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlState: {
-                get: function () {
-                    return this.retrieve({name: 'state'});
-                }
-            },
-
-            /**
-             * Specifies the URI of the image used in the List View for the Feature.
-             * @memberof ItemIcon.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlHref: {
-                get: function () {
-                    return this.retrieve({name: 'href'});
-                }
-            }
-        });
-
-        extend(this, ItemIcon.prototype);
     };
+
+    ItemIcon.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(ItemIcon.prototype, {
+        /**
+         * Specifies the current state of the NetworkLink or Folder. Possible values are open, closed, error,
+         * fetching0, fetching1, and fetching2. These values can be combined by inserting a space between two values
+         * (no comma).
+         * @memberof ItemIcon.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlState: {
+            get: function () {
+                return this._factory.specific(this, {name: 'state', transformer: NodeTransformers.string});
+            }
+        },
+
+        /**
+         * Specifies the URI of the image used in the List View for the Feature.
+         * @memberof ItemIcon.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlHref: {
+            get: function () {
+                return this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

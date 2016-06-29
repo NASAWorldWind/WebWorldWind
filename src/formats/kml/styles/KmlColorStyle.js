@@ -3,11 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
-    './KmlSubStyle'
+    './KmlSubStyle',
+    '../util/NodeTransformers'
 ], function (
-    extend,
-    KmlSubStyle
+    KmlSubStyle,
+    NodeTransformers
 ) {
     "use strict";
     /**
@@ -24,37 +24,37 @@ define([
      */
     var KmlColorStyle = function (options) {
         KmlSubStyle.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Color, which should be used. Shapes supporting colored styles must correctly apply the
-             * color.
-             * @memberof KmlColorStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlColor: {
-                get: function() {
-                    return this.retrieve({name: 'color'});
-                }
-            },
-
-            /**
-             * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based
-             * on the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
-             * @memberof KmlColorStyle.prototype
-             * @readonly
-             * @type {String}
-             */
-            kmlColorMode: {
-                get: function() {
-                    return this.retrieve({name: 'colorMode'});
-                }
-            }
-        });
-
-        extend(this, KmlColorStyle.prototype);
     };
+
+    KmlColorStyle.prototype = Object.create(KmlSubStyle.prototype);
+
+    Object.defineProperties(KmlColorStyle.prototype, {
+        /**
+         * Color, which should be used. Shapes supporting colored styles must correctly apply the
+         * color.
+         * @memberof KmlColorStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlColor: {
+            get: function() {
+                return this._factory.specific(this, {name: 'color', transformer: NodeTransformers.string});
+            }
+        },
+
+        /**
+         * Either normal or random. Normal means applying of the color as stated. Random applies linear scale based
+         * on the color. More on https://developers.google.com/kml/documentation/kmlreference#colorstyle
+         * @memberof KmlColorStyle.prototype
+         * @readonly
+         * @type {String}
+         */
+        kmlColorMode: {
+            get: function() {
+                return this._factory.specific(this, {name: 'colorMode', transformer: NodeTransformers.string});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

@@ -3,10 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlObject'
-], function (extend,
-             KmlObject) {
+], function (KmlObject) {
     "use strict";
     /**
      * Constructs an KmlStyleSelector. Application usually don't call this constructor. It is called by {@link KmlFile}
@@ -22,9 +20,9 @@ define([
      */
     var KmlStyleSelector = function (options) {
         KmlObject.call(this, options);
-
-        extend(this, KmlStyleSelector.prototype);
     };
+
+    KmlStyleSelector.prototype = Object.create(KmlObject.prototype);
 
     /**
      * @inheritDoc
