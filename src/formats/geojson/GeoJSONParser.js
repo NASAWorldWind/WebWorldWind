@@ -193,7 +193,7 @@ define(['../../error/ArgumentError',
                 }
             },
             /** The completion callback specified to [load]{@link GeoJSONParser#load}. An optional function called when
-             * the JSON shapefiles loading is complete and
+             * the GeoJSON loading is complete and
              * all the shapes have been added to the layer.
              * @memberof GeoJSONParser.prototype
              * @type {Function}
@@ -231,7 +231,7 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer A {@link RenderableLayer} to hold the shapes created for each GeoJSON
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
-         * @param {Function} parserCompletionCallback An optional function called when the JSON shapefiles loading is
+         * @param {Function} parserCompletionCallback An optional function called when the GeoJSON loading is
          * complete and
          * all the shapes have been added to the layer.
          */
