@@ -225,7 +225,7 @@ define([
             // Determine the layer's sector if possible. Mandatory for EPSG:4326 tile matrix sets. (Others compute
             // it from tile Matrix Set metadata.)
             /*********************************************************************************************************/
-            // For MapCache layer[0,2,3] : BBOX defined in Matrix and not in Layer
+            // Sometimes BBOX defined in Matrix and not in Layer
             if (!layerCaps.wgs84BoundingBox && !layerCaps.boundingBox) {
                 if (this.tileMatrixSet.boundingBox) {
                     this.sector = new Sector(
