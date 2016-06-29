@@ -239,8 +239,6 @@ define([
         this.getStyle(dc, kmlOptions);
         if(this.style != null) {
             kmlOptions.lastStyle = this.style;
-        } else {
-            dc.redrawRequested = true;
         }
     };
 

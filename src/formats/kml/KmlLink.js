@@ -25,6 +25,8 @@ define([
      */
     var KmlLink = function (options) {
         KmlObject.call(this, options);
+
+        this.onChangeListeners = [];
     };
 
     KmlLink.prototype = Object.create(KmlObject.prototype);
@@ -84,8 +86,8 @@ define([
          * never (default) - Ignore changes in the view. Also ignore &lt;viewFormat&gt; parameters, if any.
          * onStop - Refresh the file n seconds after movement stops, where n is specified in &lt;viewRefreshTime&gt;.
          * onRequest - Refresh the file only when the user explicitly requests it. (For example, in Google Earth,
-         * the user right-clicks and selects Refresh in the Context menu.) onRegion - Refresh the file when the
-         * Region becomes active. See &lt;Region&gt;.
+         * the user right-clicks and selects Refresh in the Context menu.)
+         * onRegion - Refresh the file when the Region becomes active. See &lt;Region&gt;.
          * @memberof KmlLink.prototype
          * @readonly
          * @type {String}
@@ -181,7 +183,7 @@ define([
         return ['Link'];
     };
 
-    KmlElements.addKey(KmlLink.prototype.getTagNames()[0], KmlLink);
+	KmlElements.addKey(KmlLink.prototype.getTagNames()[0], KmlLink);
 
     return KmlLink;
 });
