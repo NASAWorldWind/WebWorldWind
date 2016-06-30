@@ -97,9 +97,11 @@ define(['../../error/ArgumentError',
             this._layer = null;
 
             // Documented in defineProperties below.
+            this._parserCompletionCallback = null;
+
+            // Documented in defineProperties below.
             this._shapeConfigurationCallback = this.defaultShapeConfigurationCallback;
 
-            this._parserCompletionCallback = null;
 
             this.defaultPlacemarkAttributes = new PlacemarkAttributes(null);
 
@@ -179,6 +181,19 @@ define(['../../error/ArgumentError',
                 }
             },
 
+            /** The completion callback specified to [load]{@link GeoJSONParser#load}. An optional function called when
+             * the GeoJSON loading is complete and
+             * all the shapes have been added to the layer.
+             * @memberof GeoJSONParser.prototype
+             * @type {Function}
+             * @readonly
+             */
+            parserCompletionCallback: {
+                get: function () {
+                    return this._parserCompletionCallback;
+                }
+            },
+
             /**
              * The attribute callback specified to [load]{@link GeoJSONParser#load}.
              * See that method's description for details.
@@ -191,18 +206,6 @@ define(['../../error/ArgumentError',
                 get: function () {
                     return this._shapeConfigurationCallback;
                 }
-            },
-            /** The completion callback specified to [load]{@link GeoJSONParser#load}. An optional function called when
-             * the GeoJSON loading is complete and
-             * all the shapes have been added to the layer.
-             * @memberof GeoJSONParser.prototype
-             * @type {Function}
-             * @readonly
-             */
-            parserCompletionCallback: {
-                get: function () {
-                    return this._parserCompletionCallback;
-                }
             }
         });
 
@@ -210,6 +213,8 @@ define(['../../error/ArgumentError',
          * Retrieves the GeoJSON, parses it and creates shapes representing its contents. The result is a layer
          * containing the created shapes. A function can also be specified to be called for each GeoJSON geometry so
          * that the attributes and other properties of the shape created for it can be assigned.
+         * @param {Function} parserCompletionCallback An optional function called when the GeoJSON loading is
+         * complete and all the shapes have been added to the layer.
          * @param {Function} shapeConfigurationCallback An optional function called by the addRenderablesFor*
          * methods just prior to creating a shape for the indicated GeoJSON geometry. This function
          * can be used to assign attributes to newly created shapes. The callback function's first argument is the
@@ -231,19 +236,17 @@ define(['../../error/ArgumentError',
          * @param {RenderableLayer} layer A {@link RenderableLayer} to hold the shapes created for each GeoJSON
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
-         * @param {Function} parserCompletionCallback An optional function called when the GeoJSON loading is
-         * complete and
-         * all the shapes have been added to the layer.
          */
 
-        GeoJSONParser.prototype.load = function (shapeConfigurationCallback, layer, parserCompletionCallback) {
+        GeoJSONParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
+            if (parserCompletionCallback) {
+                this._parserCompletionCallback = parserCompletionCallback;
+            }
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
             }
-            if (parserCompletionCallback) {
-                this._parserCompletionCallback = parserCompletionCallback;
-            }
+
             this._layer = layer || new RenderableLayer();
 
             if (this.isDataSourceJson()){
@@ -346,7 +349,7 @@ define(['../../error/ArgumentError',
                                 "missingGeoJSONType"));
                     }
 
-                    if (this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
+                    if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
                         this._parserCompletionCallback(this.layer);
                     }
                 }
