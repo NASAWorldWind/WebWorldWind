@@ -19,33 +19,33 @@ define(['../error/ArgumentError',
          * @constructor
          * @augments Layer capabilities
          * @classdesc Create a WMTS layer capabilities.
-         * @param {String} layerName The WMTS layer name to get.
-         * @param {String} title The layer name to display. May be null, in which case the layerName is used.
-         * @param {String} format The tile picture format.
-         * @param {String} url The url to reach the server.
-         * @param {String} style The style to use for this layer. Must be one of those listed in the accompanying
-         * layer capabilities. May be null, in which case the WMTS server's default style is used.
-         * @param {String} matrixSet The name of the matrix to use for this layer.
-         * @param {Boolean} prefix It represents if the identifier of the matrix must be prefixed by the matrix name.
-         * @param {String} projection The projection used for this layer.
-         * @param {{}} options The options to create the tileMatrixSet : must contain the topLeftCorner, the extent, a
+         * @param {{}} layerCaps The layerCaps to create the tileMatrixSet : must contain the topLeftCorner, the extent, a
          * resolution array and the tileSize
-         * @throws {ArgumentError} If the specified layerName is null or undefined.
-         * @throws {ArgumentError} If the specified format is null or undefined.
-         * @throws {ArgumentError} If the specified url is null or undefined.
-         * @throws {ArgumentError} If the specified matrixSet is null or undefined.
-         * @throws {ArgumentError} If the specified prefix is null or undefined.
-         * @throws {ArgumentError} If the specified projection is null or undefined.
-         * @throws {ArgumentError} If the specified options.extent is null or undefined.
-         * @throws {ArgumentError} If the specified options.resolutions is null or undefined.
-         * @throws {ArgumentError} If the specified options.tileSize is null or undefined.
-         * @throws {ArgumentError} If the specified options.topLeftCorner is null or undefined.
+         * @throws {ArgumentError} If the specified layerCaps.layerName is null or undefined. It is the WMTS layer name to get
+         * @throws {ArgumentError} If the specified layerCaps.format is null or undefined. It is the tile picture format
+         * @throws {ArgumentError} If the specified layerCaps.url is null or undefined. The server url.
+         * @throws {ArgumentError} If the specified layerCaps.matrixSet is null or undefined. The name of the matrix to
+         * use for this layer.
+         * @throws {ArgumentError} If the specified layerCaps.prefix is null or undefined. It represents if the
+         * identifier of the matrix must be prefixed by the matrix name
+         * @throws {ArgumentError} If the specified layerCaps.projection is null or undefined.
+         * @throws {ArgumentError} If the specified layerCaps.extent is null or undefined.
+         * @throws {ArgumentError} If the specified layerCaps.resolutions is null or undefined.
+         * @throws {ArgumentError} If the specified layerCaps.tileSize is null or undefined.
+         * @throws {ArgumentError} If the specified layerCaps.topLeftCorner is null or undefined.
          */
-        var WmtsLayerCaps = function (layerName, title, format, url, style, matrixSet, prefix, projection, options) {
+        var WmtsLayerCaps = function (layerCaps) {
 
-            // Layer name & title
-            this.identifier = layerName;
-            this.title = title ? [{value : title}] : [{value : layerName}];
+            if (!layerCaps) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
+                        "No layer configuration specified."));
+            }
+
+            // Layer name & title to display
+            // Title may be null, in which case the layerName is used.
+            this.identifier = layerCaps.layerName;
+            this.title = layerCaps.title ? [{value : layerCaps.title}] : [{value : layerCaps.layerName}];
             if (!this.identifier) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
@@ -53,7 +53,7 @@ define(['../error/ArgumentError',
             }
 
             // Format
-            this.format = [format];
+            this.format = [layerCaps.format];
             if (!this.format) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
@@ -61,7 +61,7 @@ define(['../error/ArgumentError',
             }
 
             // URL
-            if (!url) {
+            if (!layerCaps.url) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "No url provided."));
@@ -73,7 +73,7 @@ define(['../error/ArgumentError',
                         dcp : [{
                             http : {
                                 get : [{
-                                    href : url
+                                    href : layerCaps.url
                                 }]
                             }
                         }]
@@ -81,22 +81,23 @@ define(['../error/ArgumentError',
                 }
             };
 
-            // Style
-            var styleName = (!style) ? "default" : style;
-            this.style = (!style) ? [] : [{identifier:styleName, isDefault:"true"}];
+            // Style : The style to use for this layer. Must be one of those listed in the accompanying
+            // layer capabilities. May be null, in which case the WMTS server's default style is used.
+            var styleName = (!layerCaps.style) ? "default" : layerCaps.style;
+            this.style = (!layerCaps.style) ? [] : [{identifier:styleName, isDefault:"true"}];
 
             // TileMatrixSet
-            if (!matrixSet) { // matrixSet
+            if (!layerCaps.matrixSet) { // matrixSet
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "No matrixSet provided."));
             }
-            if (!projection) { // projection
+            if (!layerCaps.projection) { // projection
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "No projection provided."));
             }
-            if (!options.extent || options.extent.length != 4) { // extent
+            if (!layerCaps.extent || layerCaps.extent.length != 4) { // extent
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "No extent provided."));
@@ -104,40 +105,40 @@ define(['../error/ArgumentError',
 
             // Define the boundingBox
             var boundingBox = {
-                lowerCorner : [options.extent[0], options.extent[1]],
-                upperCorner : [options.extent[2], options.extent[3]]
+                lowerCorner : [layerCaps.extent[0], layerCaps.extent[1]],
+                upperCorner : [layerCaps.extent[2], layerCaps.extent[3]]
             };
 
             // Resolutions
-            if (!options.resolutions) {
+            if (!layerCaps.resolutions) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "No resolutions provided."));
             }
 
             // Tile size
-            if (!options.tileSize) {
+            if (!layerCaps.tileSize) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "No tile size provided."));
             }
 
             // Top left corner
-            if (!options.topLeftCorner || options.topLeftCorner.length != 2) {
+            if (!layerCaps.topLeftCorner || layerCaps.topLeftCorner.length != 2) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "No extent provided."));
             }
 
             // Prefix
-            if (prefix == undefined) {
+            if (layerCaps.prefix == undefined) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "Prefix not provided."));
             }
 
             // Check if the projection is supported
-            if (!(WmtsLayer.isEpsg4326Crs(projection) || WmtsLayer.isOGCCrs84(projection) || WmtsLayer.isEpsg3857Crs(projection))) {
+            if (!(WmtsLayer.isEpsg4326Crs(layerCaps.projection) || WmtsLayer.isOGCCrs84(layerCaps.projection) || WmtsLayer.isEpsg3857Crs(layerCaps.projection))) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCaps", "constructor",
                         "Projection provided not supported."));
@@ -147,29 +148,29 @@ define(['../error/ArgumentError',
                 scale;
 
             // Construct the tileMatrixSet
-            for (var i = 0; i < options.resolutions.length; i++) {
+            for (var i = 0; i < layerCaps.resolutions.length; i++) {
                 // Compute the scaleDenominator
-                if (WmtsLayer.isEpsg4326Crs(projection) || WmtsLayer.isOGCCrs84(projection)) {
-                    scale = options.resolutions[i] * 6378137.0 * 2.0 * Math.PI / 360 / 0.00028;
-                } else if (WmtsLayer.isEpsg3857Crs(projection)) {
-                    scale = options.resolutions[i] / 0.00028;
+                if (WmtsLayer.isEpsg4326Crs(layerCaps.projection) || WmtsLayer.isOGCCrs84(layerCaps.projection)) {
+                    scale = layerCaps.resolutions[i] * 6378137.0 * 2.0 * Math.PI / 360 / 0.00028;
+                } else if (WmtsLayer.isEpsg3857Crs(layerCaps.projection)) {
+                    scale = layerCaps.resolutions[i] / 0.00028;
                 }
 
                 // Compute the matrix width / height
-                var unitWidth = options.tileSize * options.resolutions[i];
-                var unitHeight = options.tileSize * options.resolutions[i];
-                var matrixWidth = Math.ceil((options.extent[2]-options.extent[0]-0.01*unitWidth)/unitWidth);
-                var matrixHeight = Math.ceil((options.extent[3]-options.extent[1]-0.01*unitHeight)/unitHeight);
+                var unitWidth = layerCaps.tileSize * layerCaps.resolutions[i];
+                var unitHeight = layerCaps.tileSize * layerCaps.resolutions[i];
+                var matrixWidth = Math.ceil((layerCaps.extent[2]-layerCaps.extent[0]-0.01*unitWidth)/unitWidth);
+                var matrixHeight = Math.ceil((layerCaps.extent[3]-layerCaps.extent[1]-0.01*unitHeight)/unitHeight);
 
                 // Define the tile matrix
                 var tileMatrix = {
-                    identifier : prefix ? matrixSet+":"+i : i,
+                    identifier : layerCaps.prefix ? layerCaps.matrixSet+":"+i : i,
                     levelNumber : i,
                     matrixHeight : matrixHeight,
                     matrixWidth : matrixWidth,
-                    tileHeight : options.tileSize,
-                    tileWidth : options.tileSize,
-                    topLeftCorner : options.topLeftCorner,
+                    tileHeight : layerCaps.tileSize,
+                    tileWidth : layerCaps.tileSize,
+                    topLeftCorner : layerCaps.topLeftCorner,
                     scaleDenominator : scale
                 };
                 
@@ -178,15 +179,15 @@ define(['../error/ArgumentError',
 
             // Define the tileMatrixSetRef
             var tileMatrixSetRef = {
-                identifier:matrixSet,
-                supportedCRS:projection,
+                identifier:layerCaps.matrixSet,
+                supportedCRS:layerCaps.projection,
                 boundingBox : boundingBox,
                 tileMatrix : tileMatrixSet
             };
 
             // Define the tileMatrixSetLink
             this.tileMatrixSetLink = [{
-                tileMatrixSet : matrixSet,
+                tileMatrixSet : layerCaps.matrixSet,
                 tileMatrixSetRef:tileMatrixSetRef
             }];
         };
