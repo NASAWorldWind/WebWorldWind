@@ -512,7 +512,7 @@ define([
                 var stripByteCount = stripByteCounts[i];
 
                 strips[i] = this.parseBlock(returnElevation, compression, bytesPerPixel, stripByteCount, stripOffset,
-                    samplesPerPixel, bitsPerSample, sampleFormat);
+                    bitsPerSample, sampleFormat);
             }
 
             return strips;
@@ -520,7 +520,7 @@ define([
 
         // Parse geotiff block. A block may be a strip or a tile. Internal use only.
         GeoTiffReader.prototype.parseBlock = function (returnElevation, compression, bytesPerPixel, blockByteCount,
-                                                       blockOffset, samplesPerPixel, bitsPerSample, sampleFormat) {
+                                                       blockOffset, bitsPerSample, sampleFormat) {
             var block = [];
             switch (compression) {
                 case TiffConstants.Compression.UNCOMPRESSED:
@@ -528,7 +528,7 @@ define([
                     for (var byteOffset = 0, increment = bytesPerPixel;
                          byteOffset < blockByteCount; byteOffset += increment) {
                         // Loop through samples (sub-pixels).
-                        for (var m = 0, pixel = []; m < samplesPerPixel; m++) {
+                        for (var m = 0, pixel = []; m < bitsPerSample.length; m++) {
                             var bytesPerSample = bitsPerSample[m] / 8;
                             var sampleOffset = m * bytesPerSample;
 
@@ -631,7 +631,7 @@ define([
                     for (var byteOffset = 0, increment = bytesPerPixel;
                          byteOffset < arrayBuffer.byteLength; byteOffset += increment) {
                         // Loop through samples (sub-pixels).
-                        for (var m = 0, pixel = []; m < samplesPerPixel; m++) {
+                        for (var m = 0, pixel = []; m < bitsPerSample.length; m++) {
                             var bytesPerSample = bitsPerSample[m] / 8;
                             var sampleOffset = m * bytesPerSample;
 
@@ -686,7 +686,7 @@ define([
                     var tileOffset = tileOffsets[index];
                     var tileByteCount = tileByteCounts[index];
                     tiles[index] = this.parseBlock(returnElevation, compression, bytesPerPixel, tileByteCount,
-                        tileOffset, samplesPerPixel, bitsPerSample, sampleFormat);
+                        tileOffset, bitsPerSample, sampleFormat);
                 }
             }
 
