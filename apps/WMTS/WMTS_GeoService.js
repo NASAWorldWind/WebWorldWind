@@ -6,11 +6,13 @@
  * @version $Id: WMTS_GeoService.js 2016-06-09 rsirac $
  */
 
-requirejs(['../src/WorldWind',
-        './LayerManager'],
+requirejs(['../../src/WorldWind',
+        '../../examples/LayerManager'],
     function (ww,
               LayerManager) {
         "use strict";
+
+        ww.configuration.baseUrl += "../";
 
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -35,14 +37,13 @@ requirejs(['../src/WorldWind',
         })
             .done(function () {
 
-
                 var layers = [
                     // WMTS layers
-                    {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesGeoService1), enabled: true},
-                    {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesGeoService2), enabled: false},
-                    {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesGeoService3), enabled: false},
-                    {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesGeoService4), enabled: false},
-                    {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesGeoService5), enabled: false},
+                    {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesGeoService1)), enabled: true},
+                    {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesGeoService2)), enabled: false},
+                    {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesGeoService3)), enabled: false},
+                    {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesGeoService4)), enabled: false},
+                    {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesGeoService5)), enabled: false},
 
                     // Internal layers
                     {layer: new WorldWind.CompassLayer(), enabled: true},

@@ -6,11 +6,14 @@
  * @version $Id: WMTS_ESRI.js 2016-06-09 rsirac $
  */
 
-requirejs(['../src/WorldWind',
-        './LayerManager'],
+requirejs(['../../src/WorldWind',
+        '../../examples/LayerManager'],
     function (ww,
               LayerManager) {
         "use strict";
+
+        ww.configuration.baseUrl += "../";
+
 
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -47,9 +50,9 @@ requirejs(['../src/WorldWind',
                                         var layers = [
 
                                             // WMTS layers
-                                            {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesWorldImagery), enabled: false},
-                                            {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesWorldStreetMap), enabled: false},
-                                            {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesWorldTopoMap), enabled: false},
+                                            {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesWorldImagery)), enabled: true},
+                                            {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesWorldStreetMap)), enabled: false},
+                                            {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesWorldTopoMap)), enabled: false},
 
                                             // Internal layers
                                             {layer: new WorldWind.CompassLayer(), enabled: true},

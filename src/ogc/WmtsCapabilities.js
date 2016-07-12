@@ -196,7 +196,6 @@ define([
             }
         };
 
-        // TODO : Useless because this code is now in WmtsLayer
         WmtsCapabilities.prototype.getGetTileKvpAddress = function () {
             for (var i = 0; i < this.operationsMetadata.operation.length; i++) {
                 var operation = this.operationsMetadata.operation[i];

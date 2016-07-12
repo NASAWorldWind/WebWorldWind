@@ -6,11 +6,13 @@
  * @version $Id: WMTS_ESA.js 2016-06-28 rsirac $
  */
 
-requirejs(['../src/WorldWind',
-        './MyLayerManager'],
+requirejs(['../../src/WorldWind',
+        '../../examples/MyLayerManager'],
     function (ww,
               LayerManager) {
         "use strict";
+
+        ww.configuration.baseUrl += "../";
 
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -35,9 +37,9 @@ requirejs(['../src/WorldWind',
                 // ESA layers
                 for (var i = 0 ; i < wmtsCapabilities.contents.layer.length ; i++ ) {
                     if ([20, 21, 26, 41, 42, 43].indexOf(i) > -1) {
-                        layers.push({layer: new WorldWind.WmtsLayer(wmtsCapabilities.contents.layer[i], "", "", "2016-06-08"), enabled : false, selected: true});
+                        layers.push({layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilities.contents.layer[i]), "2016-06-08"), enabled : false, selected: true});
                     } else {
-                        layers.push({layer: new WorldWind.WmtsLayer(wmtsCapabilities.contents.layer[i], "", "", "2016-06-08"), enabled: false, selected: false});
+                        layers.push({layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilities.contents.layer[i]), "2016-06-08"), enabled: false, selected: false});
                     }
                 }
 

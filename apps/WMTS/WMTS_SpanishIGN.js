@@ -6,8 +6,8 @@
  * @version $Id: WMTS_SpanishIGN.js 2016-06-09 rsirac $
  */
 
-requirejs(['../src/WorldWind',
-        './LayerManager'],
+requirejs(['../../src/WorldWind',
+        '../../examples/LayerManager'],
     function (ww,
               LayerManager) {
         "use strict";
@@ -29,12 +29,12 @@ requirejs(['../src/WorldWind',
             .done(function () {
 
                 var layers = [
-
                     // Internal layer
                     {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: true},
 
+
                     // WMTS layers
-                    {layer: new WorldWind.WmtsLayer(wmtsCapabilitiesIGN1, "GoogleMapsCompatible"), enabled: true},
+                    {layer: new WorldWind.WmtsLayer(WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilitiesIGN1, "", "GoogleMapsCompatible")), enabled: true},
 
                     // Internal layers
                     {layer: new WorldWind.CompassLayer(), enabled: true},
