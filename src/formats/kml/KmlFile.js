@@ -18,7 +18,8 @@ define([
     './KmlTimeStamp',
     '../../util/Logger',
     '../../util/Promise',
-    './util/Remote',
+    './util/RefreshListener',
+    './util/RemoteFile',
     './util/StyleResolver',
     '../../util/XmlDocument'
 ], function (ArgumentError,
@@ -32,11 +33,13 @@ define([
              KmlTimeStamp,
              Logger,
              Promise,
-             Remote,
+             RefreshListener,
+             RemoteFile,
              StyleResolver,
              XmlDocument) {
     "use strict";
 
+    // TODO: Make sure that the KmlFile is also rendered as a part of this hierarchy and not added to the layer.
     /**
      * Constructs an object for Kml file. Applications usually don't call this constructor.
      * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
@@ -60,13 +63,17 @@ define([
         this._controls = controls || null;
         this._fileCache = new KmlFileCache();
         this._styleResolver = new StyleResolver(this._fileCache);
+        this._listener = new RefreshListener();
+        this._headers = null;
         
         var filePromise;
         // Load the document
         filePromise = new Promise(function (resolve) {
             var promise = self.requestRemote(url);
-            promise.then(function (loadedDocument) {
+            promise.then(function (options) {
                 var rootDocument;
+                var loadedDocument = options.text;
+                self._headers = options.headers;
                 if (url.indexOf('.kmz') == -1) {
                     rootDocument = loadedDocument;
                 } else {
@@ -111,16 +118,19 @@ define([
     /**
      * @inheritDoc
      */
-    KmlFile.prototype.render = function (dc) {
+    KmlFile.prototype.render = function (dc, kmlOptions) {
         var self = this;
+        kmlOptions = kmlOptions || {};
         this.shapes.forEach(function (shape) {
             shape.render(dc, {
-                lastStyle: null,
-                lastVisibility: null,
-                currentTimeInterval: null,
-                regionInvisible: null,
+                lastStyle: kmlOptions.lastStyle || null,
+                lastVisibility: kmlOptions.lastVisibility || null,
+                currentTimeInterval: kmlOptions.currentTimeInterval || null,
+                regionInvisible: kmlOptions.regionInvisible || null,
                 fileCache: self._fileCache,
-                styleResolver: self._styleResolver
+                styleResolver: self._styleResolver,
+                listener: self._listener,
+                activeEvents: self._listener.getActiveEvents()
             });
         });
     };
@@ -140,7 +150,7 @@ define([
             options.ajax = true;
         }
 
-        return new Remote(options);
+        return new RemoteFile(options).get();
     };
 
 	/**
@@ -171,6 +181,16 @@ define([
                     " Style node or StyleMap node.");
             }
         });
+    };
+
+	/**
+     * This function returns expire time of this file in miliseconds.
+     * @returns {Number} miliseconds for this file to expire.
+     */
+    KmlFile.prototype.getExpired = function() {
+        var expireDate = new Date(this._headers.getRequestHeader("Expires"));
+        var currentDate = new Date();
+        return currentDate.getTime - expireDate.getTime();
     };
 
     return KmlFile;

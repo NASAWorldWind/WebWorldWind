@@ -59,7 +59,7 @@ define([
             var newBoundaries = null;
 
             // Determine whether we've been passed a boundary or a boundary list.
-            if (boundaries.length > 0 && boundaries[0].latitude) {
+            if (boundaries.length > 0 && boundaries[0].latitude !== undefined) {
                 newBoundaries = boundaries.slice(0);
                 newBoundaries.push(boundaries[0]);
                 this._boundariesSpecifiedSimply = true;
