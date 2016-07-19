@@ -46,7 +46,7 @@ requirejs([
                     }
 
                     // Create tile matrix set
-                    var matrixset3 = WorldWind.WmtsLayer.createTileMatrixSet(
+                    var matrixset = WorldWind.WmtsLayer.createTileMatrixSet(
                         {
                             matrixSet: "EPSG:4326",
                             prefix: true,
@@ -64,7 +64,7 @@ requirejs([
                             identifier: "eoc:world_relief_bw",
                             url: "https://tiles.geoservice.dlr.de/service/wmts?",
                             format: "image/png",
-                            tileMatrixSet: matrixset3,
+                            tileMatrixSet: matrixset,
                             style: "default",
                             title: "World Relief (GeoService)"
                         }
