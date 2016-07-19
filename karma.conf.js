@@ -16,7 +16,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'test-main.js',
-      {pattern: 'test/jasmine/**/*.test.js', included: false},
+      {pattern: 'test/**/*.test.js', included: false},
       {pattern: 'src/**/*.js', included: false}
     ],
 
@@ -68,4 +68,4 @@ module.exports = function(config) {
     // how many browser should be started simultaneous
     concurrency: Infinity
   })
-}
+};

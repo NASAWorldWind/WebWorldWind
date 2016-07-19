@@ -11,7 +11,7 @@ module.exports = function (grunt) {
             dist: {
                 src: ['src'],
                 options: {
-                    destination: 'api-doc',
+                    destination: 'api-doc/Kml',
                     configure: 'config.json',
                     readme: 'README.md',
                     recurse: true
