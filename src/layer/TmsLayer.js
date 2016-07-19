@@ -23,9 +23,9 @@ define([
         "use strict";
 
 
-        var TmsLayer = function (layerCaps, displayName) {
+        var TmsLayer = function (config, displayName) {
 
-            if (!layerCaps) {
+            if (!config) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "constructor",
                         "No layer configuration specified."));
@@ -33,19 +33,19 @@ define([
 
             TiledImageLayer.call(
                 this,
-                new Sector(layerCaps.extent[1], layerCaps.extent[3], layerCaps.extent[0], layerCaps.extent[2]),
+                new Sector(config.extent[1], config.extent[3], config.extent[0], config.extent[2]),
                 new Location(36, 36), // TODO: How to determine best delta
                 18,
-                layerCaps.imageFormat,
-                layerCaps.cachePath,
-                layerCaps.tileSize,
-                layerCaps.tileSize
+                config.imageFormat,
+                config.cachePath,
+                config.tileSize,
+                config.tileSize
             );
 
-            this.displayName = displayName || layerCaps.layerName ||"TMS Layer";
-            
+            this.displayName = displayName || config.layerName ||"TMS Layer";
+
             // Determine image format
-            var format = WWUtil.suffixForMimeType(layerCaps.imageFormat);
+            var format = WWUtil.suffixForMimeType(config.imageFormat);
 
             if (!format) {
                 throw new ArgumentError(
@@ -53,31 +53,48 @@ define([
                         "No image format supported."));
             }
 
-            this.projection = layerCaps.projection;
+            this.projection = config.projection;
 
             this.urlBuilder = {
                 urlForTile: function (tile, imageFormat) {
-                        return layerCaps.url + layerCaps.layerName + "@" + layerCaps.matrixSet + "/" +
-                            (tile.level.levelNumber) + "/" + tile.column + "/" + (tile.row) + "." + format;
+                    return config.url + config.layerName + "@" + config.matrixSet + "/" +
+                        (tile.level.levelNumber) + "/" + tile.column + "/" + (tile.row) + "." + format;
                 }
             };
 
             this.detailControl = 0.5;
 
-            this.imageSize = layerCaps.tileSize;
-            this.origin = layerCaps.origin;
-            this.sector = new Sector(layerCaps.extent[1], layerCaps.extent[3], layerCaps.extent[0], layerCaps.extent[2]);
+            this.imageSize = config.tileSize;
+            this.origin = config.origin;
+            this.sector = new Sector(config.extent[1], config.extent[3], config.extent[0], config.extent[2]);
 
             // Compute the matrix width / height
             this.nbTilesWidth = [];
             this.nbTilesHeight = [];
-            for (var i = 0; i < layerCaps.resolutions.length ; i++) {
-                var unitWidth = layerCaps.tileSize * layerCaps.resolutions[i];
-                var unitHeight = layerCaps.tileSize * layerCaps.resolutions[i];
-                this.nbTilesWidth.push(Math.ceil((layerCaps.extent[2]-layerCaps.extent[0]-0.01*unitWidth)/unitWidth));
-                this.nbTilesHeight.push(Math.ceil((layerCaps.extent[3]-layerCaps.extent[1]-0.01*unitHeight)/unitHeight));
+            for (var i = 0; i < config.resolutions.length ; i++) {
+                var unitWidth = config.tileSize * config.resolutions[i];
+                var unitHeight = config.tileSize * config.resolutions[i];
+                this.nbTilesWidth.push(Math.ceil((config.extent[2]-config.extent[0]-0.01*unitWidth)/unitWidth));
+                this.nbTilesHeight.push(Math.ceil((config.extent[3]-config.extent[1]-0.01*unitHeight)/unitHeight));
             }
         };
+
+
+        /**
+         * Forms a configuration object for a specified {@link TmsCapabilities.tileMaps TODO} layer description. The
+         * configuration object created and returned is suitable for passing to the TmsLayer constructor.
+         * @param tmsLayerCapabilities {{TODO}} The TMS layer capabilities to create a configuration for.
+         * @param style {string} The style to apply for this layer.  May be null, in which case the first style recognized is used.
+         * @param matrixSet {string} The matrix to use for this layer.  May be null, in which case the first tileMatrixSet recognized is used.
+         * @param imageFormat {string} The image format to use with this layer.  May be null, in which case the first image format recognized is used.
+         * @returns {{}} A configuration object.
+         * @throws {ArgumentError} If the specified TMS layer capabilities is null or undefined.
+         */
+        TmsLayer.formLayerConfiguration = function (tmsLayerCapabilities, style, matrixSet, imageFormat) {
+
+        };
+
+
 
         TmsLayer.prototype = Object.create(TiledImageLayer.prototype);
 
@@ -91,11 +108,11 @@ define([
 
             this.topLevelTiles = [];
 
-                for (var j = 0; j < this.nbTilesHeight[0]; j++) {
-                    for (var i = 0; i < this.nbTilesWidth[0]; i++) {
-                        this.topLevelTiles.push(this.createTile(this.sector, this.levels.firstLevel(), j, i));
-                    }
+            for (var j = 0; j < this.nbTilesHeight[0]; j++) {
+                for (var i = 0; i < this.nbTilesWidth[0]; i++) {
+                    this.topLevelTiles.push(this.createTile(this.sector, this.levels.firstLevel(), j, i));
                 }
+            }
         };
 
         TmsLayer.isEpsg4326Crs = function (crs) {
@@ -154,7 +171,7 @@ define([
 
 
         TmsLayer.prototype.createTile3857 = function (sector, level, row, column) {
-            
+
             var mapSize = this.mapSizeForLevel(level.levelNumber),
                 swX = WWMath.clamp(column * this.imageSize, 0, mapSize),
                 //Todo
