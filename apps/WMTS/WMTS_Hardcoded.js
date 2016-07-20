@@ -41,7 +41,7 @@ requirejs(['../../src/WorldWind',
             var wmtsLayer = new WorldWind.WmtsLayer(
                 {
                         identifier : "AMSR2_Cloud_Liquid_Water_Day",
-                        url : "http://map1.vis.earthdata.nasa.gov/wmts-webmerc/wmts.cgi?",
+                        service : "http://map1.vis.earthdata.nasa.gov/wmts-webmerc/wmts.cgi?",
                         format : "image/png",
                         tileMatrixSet : matrixset,
                         style : "default",
@@ -63,7 +63,7 @@ requirejs(['../../src/WorldWind',
             var wmtsLayer2 = new WorldWind.WmtsLayer(
                 {
                         identifier : "World_Topo_Map",
-                        url : "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/WMTS?",
+                        service : "http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/WMTS?",
                         format : "image/jpeg",
                         tileMatrixSet : matrixset2,
                         style : "default",
@@ -94,7 +94,7 @@ requirejs(['../../src/WorldWind',
             var wmtsLayer3 = new WorldWind.WmtsLayer(
                 {
                         identifier : "eoc:world_relief_bw",
-                        url : "https://tiles.geoservice.dlr.de/service/wmts?",
+                        service : "https://tiles.geoservice.dlr.de/service/wmts?",
                         format : "image/png",
                         tileMatrixSet : matrixset3,
                         style : "default",

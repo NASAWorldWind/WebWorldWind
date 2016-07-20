@@ -47,7 +47,7 @@ define([
          * properties:
          * <ul>
          *     <li>identifier: {String} The layer name.</li>
-         *     <li>url: {String} The URL of the WMTS server</li>
+         *     <li>service: {String} The URL of the WMTS server</li>
          *     <li>format: {String} The mime type of the image format to request, e.g., image/png.</li>
          *     <li>tileMatrixSet: {{}} The tile matrix set to use for this layer.</li>
          *     <li>style: {String} The style to use for this layer.</li>
@@ -100,7 +100,7 @@ define([
              * @readonly
              */
             this.resourceUrl = config.resourceUrl;
-            this.serviceUrl = config.url;
+            this.serviceUrl = config.service;
 
             /**
              * The tileMatrixSet specified to this layer's constructor.
@@ -386,14 +386,14 @@ define([
                     }
                 }
             } else { // resource-oriented interface not supported, so use KVP interface
-                config.url = wmtsLayerCapabilities.capabilities.getGetTileKvpAddress();
+                config.service = wmtsLayerCapabilities.capabilities.getGetTileKvpAddress();
 
-                if (config.url) {
-                    config.url = WmsUrlBuilder.fixGetMapString(config.url);
+                if (config.service) {
+                    config.service = WmsUrlBuilder.fixGetMapString(config.service);
                 }
             }
 
-            if (!config.resourceUrl && !config.url) {
+            if (!config.resourceUrl && !config.service) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "formLayerConfiguration",
                         "No resource URL or KVP GetTile service URL specified in WMTS capabilities."));

@@ -62,7 +62,7 @@ requirejs([
                     var layer2 = new WorldWind.WmtsLayer(
                         {
                             identifier: "eoc:world_relief_bw",
-                            url: "https://tiles.geoservice.dlr.de/service/wmts?",
+                            service: "https://tiles.geoservice.dlr.de/service/wmts?",
                             format: "image/png",
                             tileMatrixSet: matrixset,
                             style: "default",
