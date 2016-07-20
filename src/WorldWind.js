@@ -193,7 +193,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/TiltRecognizer',
         './ogc/TmsCapabilities',
         './layer/TmsLayer',
-        './ogc/TmsLayerCaps',
         './gesture/Touch',
         './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
@@ -402,7 +401,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               TiltRecognizer,
               TmsCapabilities,
               TmsLayer,
-              TmsLayerCaps,
               Touch,
               TriangleMesh,
               UnsupportedOperationError,
@@ -769,7 +767,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['TiltRecognizer'] = TiltRecognizer;
         WorldWind['TmsCapabilities'] = TmsCapabilities;
         WorldWind['TmsLayer'] = TmsLayer;
-        WorldWind['TmsLayerCaps'] = TmsLayerCaps;
         WorldWind['Touch'] = Touch;
         WorldWind['TriangleMesh'] = TriangleMesh;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;

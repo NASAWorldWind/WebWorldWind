@@ -23,6 +23,31 @@ define([
         "use strict";
 
 
+        /**
+         * Constructs a TMS image layer.
+         * @alias TmsLayer
+         * @constructor
+         * @augments TiledImageLayer
+         * @classdesc Displays a TMS image layer.
+         * @param {{}} config Specifies configuration information for the layer. Must contain the following
+         * properties:
+         * <ul>
+         *     <li>extent: {Array} The extent of this layer.</li>
+         *     <li>resolutions: {Array} The resolutions array to use for this layer.</li>
+         *     <li>origin: {Array} The coordinates of the origin.</li>
+         *     <li>format: {String} The mime type of the image format to request, e.g., image/png.</li>
+         *     <li>size: {Number} The size in pixels of tiles for this layer.</li>
+         *     <li>coordinateSystem : {String} The coordinate system to use for this layer, e.g., EPSG:4326.</li>
+         *     <li>matrixSet : {String} The matrix name to use for this layer.</li>
+         *     <li>layerName : {String} The layer name (identifier).</li>
+         *     <li>service: {String} The URL of the TMS server.</li>
+         *     <li>title (optional): {String} The layer name to display.</li>
+         * </ul>
+ // * The function [TmsLayer.formLayerConfiguration]{@link TmsLayer#formLayerConfiguration} will create an
+ // * appropriate configuration object given a {@link WmsLayerCapabilities} object.
+         * @param {String} displayName The name to display for this layer, may be null.
+         * @throws {ArgumentError} If the specified configuration is null or undefined.
+         */
         var TmsLayer = function (config, displayName) {
 
             if (!config) {
@@ -31,21 +56,10 @@ define([
                         "No layer configuration specified."));
             }
 
-            TiledImageLayer.call(
-                this,
-                new Sector(config.extent[1], config.extent[3], config.extent[0], config.extent[2]),
-                new Location(36, 36), // TODO: How to determine best delta
-                18,
-                config.imageFormat,
-                config.cachePath,
-                config.tileSize,
-                config.tileSize
-            );
-
-            this.displayName = displayName || config.layerName ||"TMS Layer";
+            var cachePath =  config.service+config.layerName+"@"+config.matrixSet;
 
             // Determine image format
-            var format = WWUtil.suffixForMimeType(config.imageFormat);
+            var format = WWUtil.suffixForMimeType(config.format);
 
             if (!format) {
                 throw new ArgumentError(
@@ -53,18 +67,33 @@ define([
                         "No image format supported."));
             }
 
-            this.projection = config.projection;
+            TiledImageLayer.call(
+                this,
+                new Sector(config.extent[1], config.extent[3], config.extent[0], config.extent[2]),
+                new Location(36, 36), // TODO: How to determine best delta
+                18,
+                format,
+                cachePath,
+                config.size,
+                config.size
+            );
+
+            this.displayName = displayName || config.title ||"TMS Layer";
+
+
+
+            this.projection = config.coordinateSystem;
 
             this.urlBuilder = {
                 urlForTile: function (tile, imageFormat) {
-                    return config.url + config.layerName + "@" + config.matrixSet + "/" +
+                    return config.service + config.layerName + "@" + config.matrixSet + "/" +
                         (tile.level.levelNumber) + "/" + tile.column + "/" + (tile.row) + "." + format;
                 }
             };
 
             this.detailControl = 0.5;
 
-            this.imageSize = config.tileSize;
+            this.imageSize = config.size;
             this.origin = config.origin;
             this.sector = new Sector(config.extent[1], config.extent[3], config.extent[0], config.extent[2]);
 
@@ -72,8 +101,8 @@ define([
             this.nbTilesWidth = [];
             this.nbTilesHeight = [];
             for (var i = 0; i < config.resolutions.length ; i++) {
-                var unitWidth = config.tileSize * config.resolutions[i];
-                var unitHeight = config.tileSize * config.resolutions[i];
+                var unitWidth = config.size * config.resolutions[i];
+                var unitHeight = config.size * config.resolutions[i];
                 this.nbTilesWidth.push(Math.ceil((config.extent[2]-config.extent[0]-0.01*unitWidth)/unitWidth));
                 this.nbTilesHeight.push(Math.ceil((config.extent[3]-config.extent[1]-0.01*unitHeight)/unitHeight));
             }
@@ -84,14 +113,95 @@ define([
          * Forms a configuration object for a specified {@link TmsCapabilities.tileMaps TODO} layer description. The
          * configuration object created and returned is suitable for passing to the TmsLayer constructor.
          * @param tmsLayerCapabilities {{TODO}} The TMS layer capabilities to create a configuration for.
-         * @param style {string} The style to apply for this layer.  May be null, in which case the first style recognized is used.
-         * @param matrixSet {string} The matrix to use for this layer.  May be null, in which case the first tileMatrixSet recognized is used.
-         * @param imageFormat {string} The image format to use with this layer.  May be null, in which case the first image format recognized is used.
          * @returns {{}} A configuration object.
          * @throws {ArgumentError} If the specified TMS layer capabilities is null or undefined.
          */
-        TmsLayer.formLayerConfiguration = function (tmsLayerCapabilities, style, matrixSet, imageFormat) {
+        TmsLayer.formLayerConfiguration = function (tmsLayerCapabilities) {
 
+            var config = {};
+
+            // Define the extent / bounding box
+            if (!tmsLayerCapabilities.extent) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No extent provided in the capabilities."));
+            }
+            config.extent = tmsLayerCapabilities.extent;
+
+            // Resolutions array
+            if (!tmsLayerCapabilities.resolutions) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No resolutions provided in the capabilities."));
+            }
+            config.resolutions = tmsLayerCapabilities.resolutions;
+
+            // Origin
+            if (!tmsLayerCapabilities.origin) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No origin provided in the capabilities."));
+            }
+            config.origin = tmsLayerCapabilities.origin;
+
+            // Image format
+            if (!tmsLayerCapabilities.imageFormat) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No image format provided in the capabilities."));
+            }
+            config.format = tmsLayerCapabilities.imageFormat;
+
+            // Projection
+            if (!tmsLayerCapabilities.projection) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No coordinate system provided in the capabilities."));
+            }
+            config.coordinateSystem = tmsLayerCapabilities.projection;
+
+            // Tile size
+            if (!tmsLayerCapabilities.tileSize) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No tile size provided in the capabilities."));
+            }
+            config.size = tmsLayerCapabilities.tileSize;
+
+            // Matrix set
+            if (!tmsLayerCapabilities.matrixSet) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No matrixSet provided in the capabilities."));
+            }
+            config.matrixSet = tmsLayerCapabilities.matrixSet;
+
+            // Layer name
+            if (!tmsLayerCapabilities.layerName) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No layer name provided in the capabilities."));
+            }
+            config.layerName = tmsLayerCapabilities.layerName;
+
+            // Url
+            if (!tmsLayerCapabilities.url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TmsLayer", "formLayerConfiguration",
+                        "No url provided in the capabilities."));
+            }
+            config.service = tmsLayerCapabilities.url;
+
+            // Title
+            config.title = tmsLayerCapabilities.title;
+
+            // Profile
+            config.profile = tmsLayerCapabilities.profile;
+
+            // Abstract
+            config.abstract = tmsLayerCapabilities.abstract;
+
+            return config;
         };
 
 
