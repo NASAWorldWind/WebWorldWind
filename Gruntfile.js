@@ -67,7 +67,7 @@ module.exports = function (grunt) {
             }
         },
 
-    		karma: {
+        karma: {
             unit: {
                 configFile: 'karma.conf.js',
                 singleRun: true,
@@ -80,7 +80,7 @@ module.exports = function (grunt) {
                     outputFile: 'test-results/report.html',
                 },
             }
-    		}
+        }
     });
 
     grunt.loadNpmTasks('grunt-contrib-requirejs');
