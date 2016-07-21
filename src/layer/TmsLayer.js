@@ -43,8 +43,8 @@ define([
          *     <li>service: {String} The URL of the TMS server.</li>
          *     <li>title (optional): {String} The layer name to display.</li>
          * </ul>
- // * The function [TmsLayer.formLayerConfiguration]{@link TmsLayer#formLayerConfiguration} will create an
- // * appropriate configuration object given a {@link WmsLayerCapabilities} object.
+         * The function [TmsLayer.formLayerConfiguration]{@link TmsLayer#formLayerConfiguration} will create an
+         * appropriate configuration object given a {@link TmsLayerCapabilities} object.
          * @param {String} displayName The name to display for this layer, may be null.
          * @throws {ArgumentError} If the specified configuration is null or undefined.
          */
@@ -110,9 +110,9 @@ define([
 
 
         /**
-         * Forms a configuration object for a specified {@link TmsCapabilities.tileMaps TODO} layer description. The
+         * Forms a configuration object for a specified {@link TmsLayerCapabilities layer description. The
          * configuration object created and returned is suitable for passing to the TmsLayer constructor.
-         * @param tmsLayerCapabilities {{TODO}} The TMS layer capabilities to create a configuration for.
+         * @param tmsLayerCapabilities {TmsLayerCapabilities} The TMS layer capabilities to create a configuration for.
          * @returns {{}} A configuration object.
          * @throws {ArgumentError} If the specified TMS layer capabilities is null or undefined.
          */
