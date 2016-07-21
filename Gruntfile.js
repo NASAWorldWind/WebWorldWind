@@ -11,7 +11,7 @@ module.exports = function (grunt) {
             dist: {
                 src: ['src'],
                 options: {
-                    destination: 'api-doc/Kml',
+                    destination: 'api-doc',
                     configure: 'config.json',
                     readme: 'README.md',
                     recurse: true
@@ -68,18 +68,18 @@ module.exports = function (grunt) {
         },
 
     		karma: {
-    			unit: {
-    				configFile: 'karma.conf.js',
-    				singleRun: true,
-    				reporters: ['dots', 'junit', 'html'],
-    				junitReporter: {
-    					outputFile: 'test-results.xml',
-    					outputDir: 'test-results'
-    				},
-            htmlReporter: {
-              outputFile: 'test-results/report.html',
-            },
-    			}
+            unit: {
+                configFile: 'karma.conf.js',
+                singleRun: true,
+                reporters: ['dots', 'junit', 'html'],
+                junitReporter: {
+                    outputFile: 'test-results.xml',
+                    outputDir: 'test-results'
+                },
+                htmlReporter: {
+                    outputFile: 'test-results/report.html',
+                },
+            }
     		}
     });
 

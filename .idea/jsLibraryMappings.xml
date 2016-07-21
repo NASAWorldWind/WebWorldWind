@@ -2,6 +2,5 @@
 <project version="4">
   <component name="JavaScriptLibraryMappings">
     <file url="file://$PROJECT_DIR$" libraries="{WebWorldWind node_modules}" />
-    <file url="PROJECT" libraries="{bootstrap, jquery, require}" />
   </component>
 </project>
