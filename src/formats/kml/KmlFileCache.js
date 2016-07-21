@@ -50,9 +50,5 @@ define([], function () {
         }
     };
 
-    var cachedKmlFile;
-    if (!cachedKmlFile) {
-        cachedKmlFile = new KmlFileCache();
-    }
-    return cachedKmlFile; // Return actually object. This is singleton used throughout the whole application.
+    return KmlFileCache; // Return actually object. This is singleton used throughout the whole application.
 });

@@ -59,8 +59,8 @@ define(['../../error/ArgumentError',
         "use strict";
 
         /**
-         * Constructs a GeoJSON object for a specified GeoJSON URL. Call [load]{@link GeoJSONParser#load} to retrieve the
-         * GeoJSON and create shapes for it.
+         * Constructs a GeoJSON object for a specified GeoJSON data source. Call [load]{@link GeoJSONParser#load} to
+         * retrieve the GeoJSON and create shapes for it.
          * @alias GeoJSONParser
          * @constructor
          * @classdesc Parses a GeoJSON and creates shapes representing its contents. Points and MultiPoints in
@@ -72,17 +72,17 @@ define(['../../error/ArgumentError',
          * This function enables the application to assign independent attributes to each
          * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
          * feature.
-         * @param {String} url The location of the GeoJSON.
-         * @throws {ArgumentError} If the specified URL is null or undefined.
+         * @param {String} dataSource The data source of the GeoJSON. Can be a string or an URL to a GeoJSON.
+         * @throws {ArgumentError} If the specified data source is null or undefined.
          */
-        var GeoJSONParser = function (url) {
-            if (!url) {
+        var GeoJSONParser = function (dataSource) {
+            if (!dataSource) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "constructor", "missingUrl"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "constructor", "missingDataSource"));
             }
 
             // Documented in defineProperties below.
-            this._url = url;
+            this._dataSource = dataSource;
 
             // Documented in defineProperties below.
             this._geoJSONObject = null;
@@ -97,7 +97,11 @@ define(['../../error/ArgumentError',
             this._layer = null;
 
             // Documented in defineProperties below.
+            this._parserCompletionCallback = null;
+
+            // Documented in defineProperties below.
             this._shapeConfigurationCallback = this.defaultShapeConfigurationCallback;
+
 
             this.defaultPlacemarkAttributes = new PlacemarkAttributes(null);
 
@@ -108,14 +112,14 @@ define(['../../error/ArgumentError',
 
         Object.defineProperties(GeoJSONParser.prototype, {
             /**
-             * The GeoJSON URL as specified to this GeoJSON's constructor.
+             * The GeoJSON data source as specified to this GeoJSON's constructor.
              * @memberof GeoJSONParser.prototype
              * @type {String}
              * @readonly
              */
-            url: {
+            dataSource: {
                 get: function () {
-                    return this._url;
+                    return this._dataSource;
                 }
             },
 
@@ -177,6 +181,19 @@ define(['../../error/ArgumentError',
                 }
             },
 
+            /** The completion callback specified to [load]{@link GeoJSONParser#load}. An optional function called when
+             * the GeoJSON loading is complete and
+             * all the shapes have been added to the layer.
+             * @memberof GeoJSONParser.prototype
+             * @type {Function}
+             * @readonly
+             */
+            parserCompletionCallback: {
+                get: function () {
+                    return this._parserCompletionCallback;
+                }
+            },
+
             /**
              * The attribute callback specified to [load]{@link GeoJSONParser#load}.
              * See that method's description for details.
@@ -196,6 +213,8 @@ define(['../../error/ArgumentError',
          * Retrieves the GeoJSON, parses it and creates shapes representing its contents. The result is a layer
          * containing the created shapes. A function can also be specified to be called for each GeoJSON geometry so
          * that the attributes and other properties of the shape created for it can be assigned.
+         * @param {Function} parserCompletionCallback An optional function called when the GeoJSON loading is
+         * complete and all the shapes have been added to the layer.
          * @param {Function} shapeConfigurationCallback An optional function called by the addRenderablesFor*
          * methods just prior to creating a shape for the indicated GeoJSON geometry. This function
          * can be used to assign attributes to newly created shapes. The callback function's first argument is the
@@ -218,7 +237,11 @@ define(['../../error/ArgumentError',
          * geometry. If null, a new layer is created and assigned to this object's [layer]{@link GeoJSONParser#layer}
          * property.
          */
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer) {
+
+        GeoJSONParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
+            if (parserCompletionCallback) {
+                this._parserCompletionCallback = parserCompletionCallback;
+            }
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
@@ -226,7 +249,12 @@ define(['../../error/ArgumentError',
 
             this._layer = layer || new RenderableLayer();
 
-            this.requestUrl(this.url);
+            if (this.isDataSourceJson()){
+                this.parse(this.dataSource);
+            }
+            else {
+                this.requestUrl(this.dataSource);
+            }
         };
 
         /**
@@ -300,7 +328,8 @@ define(['../../error/ArgumentError',
                 this._geoJSONObject = JSON.parse(geoJSONString);
             }
             catch (e) {
-                console.log(e);
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
+                    "invalidGeoJSONObject")
             }
             finally {
                 if (this.geoJSONObject){
@@ -318,6 +347,10 @@ define(['../../error/ArgumentError',
                         throw new ArgumentError(
                             Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
                                 "missingGeoJSONType"));
+                    }
+
+                    if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
+                        this._parserCompletionCallback(this.layer);
                     }
                 }
             }
@@ -980,7 +1013,6 @@ define(['../../error/ArgumentError',
             }
 
             if (!longitude && longitude !== 0.0) {
-                console.log(longitude);
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "getReprojectedIfRequired",
                         "missingLongitude"));
@@ -1008,6 +1040,19 @@ define(['../../error/ArgumentError',
                 ]
             ]);
         };
+
+        /**
+        * Indicate whether the data source is of a JSON type.
+        * @returns {Boolean} True if the data source is of JSON type.
+        */
+        GeoJSONParser.prototype.isDataSourceJson = function() {
+            try {
+                JSON.parse(this.dataSource);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
 
         return GeoJSONParser;
     }

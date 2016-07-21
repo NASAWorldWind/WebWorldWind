@@ -3,13 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './KmlColorStyle',
-    '../KmlElements'
+    '../KmlElements',
+    '../util/NodeTransformers'
 ], function (
-    extend,
     KmlColorStyle,
-    KmlElements
+    KmlElements,
+    NodeTransformers
 ) {
     "use strict";
     /**
@@ -26,23 +26,24 @@ define([
      */
     var KmlLabelStyle = function (options) {
         KmlColorStyle.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Scale in which to resize the icon.
-             * @memberof KmlLabelStyle.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlScale: {
-                get: function() {
-                    return this.retrieve({name: 'scale', transformer: Number});
-                }
-            }
-        });
-
-        extend(this, KmlLabelStyle.prototype);
     };
+
+    KmlLabelStyle.prototype = Object.create(KmlColorStyle.prototype);
+
+    Object.defineProperties(KmlLabelStyle.prototype, {
+        /**
+         * Scale in which to resize the icon.
+         * @memberof KmlLabelStyle.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlScale: {
+            get: function() {
+                return this._factory.specific(this, {name: 'scale', transformer: NodeTransformers.number});
+            }
+        }
+    });
+
 
     KmlLabelStyle.update = function () {
 

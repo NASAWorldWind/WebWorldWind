@@ -7,206 +7,191 @@
  * @exports KmlParser
  */
 define([
-        '../../error/ArgumentError',
-        '../../util/jszip',
-        './KmlFileCache',
-        './styles/KmlStyle',
-        './styles/KmlStyleMap',
-        './KmlTimeSpan',
-        './KmlTimeStamp',
-        '../../util/Logger',
-        '../../util/Promise',
-        './util/Remote',
-        '../../util/XmlDocument',
-        './KmlElements',
-        './KmlObject'
-    ],
-    function (ArgumentError,
-              JsZip,
-              KmlFileCache,
-              KmlStyle,
-              KmlStyleMap,
-              KmlTimeSpan,
-              KmlTimeStamp,
-              Logger,
-              Promise,
-              Remote,
-              XmlDocument,
-              KmlElements,
-              KmlObject) {
-        "use strict";
+    '../../error/ArgumentError',
+    '../../util/jszip',
+    './KmlElements',
+    './KmlFileCache',
+    './KmlObject',
+    './styles/KmlStyle',
+    './styles/KmlStyleMap',
+    './KmlTimeSpan',
+    './KmlTimeStamp',
+    '../../util/Logger',
+    '../../util/Promise',
+    './util/RefreshListener',
+    './util/RemoteFile',
+    './util/StyleResolver',
+    '../../util/XmlDocument'
+], function (ArgumentError,
+             JsZip,
+             KmlElements,
+             KmlFileCache,
+             KmlObject,
+             KmlStyle,
+             KmlStyleMap,
+             KmlTimeSpan,
+             KmlTimeStamp,
+             Logger,
+             Promise,
+             RefreshListener,
+             RemoteFile,
+             StyleResolver,
+             XmlDocument) {
+    "use strict";
 
-        /**
-         * Constructs an object for Kml file. Applications usually don't call this constructor.
-         * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
-         * rendered in one Layer.
-         * @constructor
-         * @param options {Object}
-         * @param options.document {String} String representing the document if it is local.
-         * @param options.url {String} Url of the remote document.
-         * @param options.local {Boolean} True if the document is local.
-         * @param options.controls {KmlControls[]} List of controls applied to this File.
-         * @alias KmlFile
-         * @classdesc Support for Kml File parsing and display.
-         */
-        var KmlFile = function (options) {
-            var self = this;
-            if (!options || (!options.document && !options.url)) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "constructor", "invalidDocumentPassed")
-                );
-            }
+    // TODO: Make sure that the KmlFile is also rendered as a part of this hierarchy and not added to the layer.
+    /**
+     * Constructs an object for Kml file. Applications usually don't call this constructor.
+     * Parses associated KmlFile and allows user to draw the whole KmlFile in passed layer. The whole file is
+     * rendered in one Layer.
+     * @constructor
+     * @param url {String} Url of the remote document.
+     * @param controls {KmlControls[]} List of controls applied to this File.
+     * @alias KmlFile
+     * @classdesc Support for Kml File parsing and display.
+     * @augments KmlObject
+     */
+    var KmlFile = function (url, controls) {
+        var self = this;
+        if (!url) {
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "constructor", "invalidDocumentPassed")
+            );
+        }
 
-            // Default values.
-            options.local = options.local || false;
-            this._controls = options.controls || null;
-
-            var filePromise;
-            if (options.local) {
-                this._document = new XmlDocument(options.document).dom();
-                filePromise = new Promise(function (resolve) {
-                    window.setTimeout(function () {
-                        resolve(self);
-                    }, 0);
-                });
-                KmlFileCache.add('', filePromise);
-                return filePromise;
-            } else {
-                // Load the document
-                filePromise = new Promise(function (resolve) {
-                    var promise = self.requestUrl(options.url, options);
-                    promise.then(function (loadedDocument) {
-                        var rootDocument;
-                        if (options.url.indexOf('.kmz') == -1) {
-                            rootDocument = loadedDocument;
-                        } else {
-                            var kmzFile = new JsZip();
-                            kmzFile.load(loadedDocument);
-                            kmzFile.files.forEach(function (file) {
-                                if (file.endsWith(".kml") && rootDocument == null) {
-                                    rootDocument = file.asText();
-                                }
-                            });
+        // Default values.
+        this._controls = controls || null;
+        this._fileCache = new KmlFileCache();
+        this._styleResolver = new StyleResolver(this._fileCache);
+        this._listener = new RefreshListener();
+        this._headers = null;
+        
+        var filePromise;
+        // Load the document
+        filePromise = new Promise(function (resolve) {
+            var promise = self.requestRemote(url);
+            promise.then(function (options) {
+                var rootDocument;
+                var loadedDocument = options.text;
+                self._headers = options.headers;
+                if (url.indexOf('.kmz') == -1) {
+                    rootDocument = loadedDocument;
+                } else {
+                    var kmzFile = new JsZip();
+                    kmzFile.load(loadedDocument);
+                    kmzFile.files.forEach(function (file) {
+                        if (file.endsWith(".kml") && rootDocument == null) {
+                            rootDocument = file.asText();
                         }
-                        self._document = new XmlDocument(rootDocument).dom();
-                        window.setTimeout(function () {
-                            resolve(self);
-                        }, 0);
                     });
-                });
-                KmlFileCache.add(options.url, filePromise);
-                return filePromise;
+                }
+
+                self._document = new XmlDocument(rootDocument).dom();
+                KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
+
+                window.setTimeout(function () {
+                    resolve(self);
+                }, 0);
+            });
+        });
+        this._fileCache.add(url, filePromise);
+        return filePromise;
+    };
+
+    KmlFile.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(KmlFile.prototype, {
+        /**
+         * Contains shapes present in the document. Cache so that we don't need to parse the document every time
+         * it is passed through.
+         * @type {KmlObject[]}
+         * @memberof KmlFile.prototype
+         * @readonly
+         */
+        shapes: {
+            get: function () {
+                return this._factory.all(this);
             }
-        };
+        }
+    });
 
-        Object.defineProperties(KmlFile.prototype, {
-            /**
-             * Contains shapes present in the document. Cache so that we don't need to parse the document every time
-             * it is passed through.
-             * @type {KmlObject[]}
-             * @memberof KmlFile.prototype
-             * @readonly
-             */
-            shapes: {
-                get: function () {
-                    return this.parseDocument();
-                }
-            },
+    /**
+     * @inheritDoc
+     */
+    KmlFile.prototype.render = function (dc, kmlOptions) {
+        var self = this;
+        kmlOptions = kmlOptions || {};
+        this.shapes.forEach(function (shape) {
+            shape.render(dc, {
+                lastStyle: kmlOptions.lastStyle || null,
+                lastVisibility: kmlOptions.lastVisibility || null,
+                currentTimeInterval: kmlOptions.currentTimeInterval || null,
+                regionInvisible: kmlOptions.regionInvisible || null,
+                fileCache: self._fileCache,
+                styleResolver: self._styleResolver,
+                listener: self._listener,
+                activeEvents: self._listener.getActiveEvents()
+            });
+        });
+    };
 
-            /**
-             * Root node of current document associated with this file.
-             * @type {Node}
-             * @memberof KmlFile.prototype
-             * @readonly
-             */
-            node: {
-                get: function () {
-                    return this._document.getElementsByTagName("kml")[0];
-                }
+    /**
+     * FOR INTERNAL USE ONLY.
+     * Based on the information from the URL, return correct Remote object.
+     * @param url {String} Url of the document to retrieve.
+     * @returns {Promise} Promise of Remote.
+     */
+    KmlFile.prototype.requestRemote = function (url) {
+        var options = {};
+        options.url = url;
+        if ((url.endsWith && url.endsWith(".kmz")) || (url.indexOf(".kmz") != -1)) {
+            options.zip = true;
+        } else {
+            options.ajax = true;
+        }
+
+        return new RemoteFile(options).get();
+    };
+
+	/**
+     * It finds the style in the document.
+     * @param pId {String} Id of the style.
+     */
+    KmlFile.prototype.resolveStyle = function (pId) {
+        var self = this;
+        var id = pId.substring(pId.indexOf('#') + 1, pId.length);
+        // It returns promise of the Style.
+        return new Promise(function (resolve, reject) {
+            var style;
+            if (self._document.querySelector) {
+                style = self._document.querySelector("*[id='" + id + "']");
+            } else {
+                style = self._document.getElementById(id);
+            }
+            if (!style || style == null) {
+                reject();
+            }
+
+            if (style.nodeName == KmlStyle.prototype.getTagNames()[0]) {
+                resolve(new KmlStyle({objectNode: style}));
+            } else if (style.nodeName == KmlStyleMap.prototype.getTagNames()[0]) {
+                resolve(new KmlStyleMap({objectNode: style}));
+            } else {
+                Logger.logMessage(Logger.LEVEL_WARNING, "KmlFile", "resolveStyle", "Style must contain either" +
+                    " Style node or StyleMap node.");
             }
         });
+    };
 
-        /**
-         * Calling method from KmlObject on current KmlFile.
-         * @see KmlObject.prototype.parse
-         */
-        KmlFile.prototype.parseDocument = function () {
-            return KmlObject.prototype.parse.call(this);
-        };
+	/**
+     * This function returns expire time of this file in miliseconds.
+     * @returns {Number} miliseconds for this file to expire.
+     */
+    KmlFile.prototype.getExpired = function() {
+        var expireDate = new Date(this._headers.getRequestHeader("Expires"));
+        var currentDate = new Date();
+        return currentDate.getTime - expireDate.getTime();
+    };
 
-        /**
-         * It understands the name of the node and based on this name returns correct shape, which must be instantiated.
-         * @param name
-         * @returns {KmlObject} Descendant of KmlObject or null if none with given name exists.
-         */
-        KmlFile.prototype.retrieveElementForNode = KmlObject.prototype.retrieveElementForNode;
-
-        KmlFile.prototype.doesAttributeExist = KmlObject.prototype.doesAttributeExist;
-
-        KmlFile.prototype.getValueOfAttribute = KmlObject.prototype.getValueOfAttribute;
-
-        KmlFile.prototype.retrieveFromCache = KmlObject.prototype.retrieveFromCache;
-
-        KmlFile.prototype.parseOneNode = KmlObject.prototype.parseOneNode;
-
-        KmlFile.prototype.instantiateDescendant = KmlObject.prototype.instantiateDescendant;
-
-        /**
-         * It renders all shapes, which are associated with current file.
-         * @param options {Object}
-         * @param options.layer {Layer} Layer into which the objects should be rendered.
-         * @param options.controls {KmlControls[]} Controls to be notified when the file is updated.
-         * @throws {ArgumentError} In case the layer into which it should be rendered isn't supplied
-         */
-        KmlFile.prototype.update = function (options) {
-            if (!options.layer) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "KmlFile", "update", "Layer must be defined in order to update document.")
-                );
-            }
-
-            options.controls = this._controls;
-            this.shapes.forEach(function (shape) {
-                shape.update(options);
-            });
-        };
-
-        KmlFile.prototype.requestUrl = function (url, options) {
-            options.url = url;
-            if ((url.endsWith && url.endsWith(".kmz")) || (url.indexOf(".kmz") != -1)) {
-                options.zip = true;
-            } else {
-                options.ajax = true;
-            }
-
-            return new Remote(options);
-        };
-
-        KmlFile.prototype.resolveStyle = function (pId) {
-            var self = this;
-            var id = pId.substring(pId.indexOf('#') + 1, pId.length);
-            // It returns promise of the Style.
-            return new Promise(function (resolve, reject) {
-                var style;
-                if(self._document.querySelector) {
-                    style = self._document.querySelector("*[id='" + id + "']");
-                } else {
-                    style = self._document.getElementById(id);
-                }
-                if (!style || style == null) {
-                    reject();
-                }
-
-                if(style.nodeName == KmlStyle.prototype.getTagNames()[0]) {
-                    resolve(new KmlStyle({objectNode: style}));
-                } else if(style.nodeName == KmlStyleMap.prototype.getTagNames()[0]) {
-                    resolve(new KmlStyleMap({objectNode: style}));
-                } else {
-                    Logger.logMessage(Logger.LEVEL_WARNING, "KmlFile", "resolveStyle", "Style must contain either" +
-                        " Style node or StyleMap node.");
-                }
-            });
-        };
-
-        return KmlFile;
-    });
+    return KmlFile;
+});

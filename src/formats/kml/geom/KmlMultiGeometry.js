@@ -3,12 +3,10 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     './KmlGeometry',
     '../../../geom/Position'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlGeometry,
              Position) {
     "use strict";
@@ -28,49 +26,60 @@ define([
     var KmlMultiGeometry = function (options) {
         KmlGeometry.call(this, options);
         this._style = options.style;
+    };
 
-        Object.defineProperties(this, {
-            /**
-             * It returns all shapes currently present in this node.
-             * @memberof KmlMultiGeometry.prototype
-             * @type {KmlObject[]}
-             * @readonly
-             */
-            kmlShapes: {
-                get: function () {
-                    return this.parse();
-                }
-            },
+    KmlMultiGeometry.prototype = Object.create(KmlGeometry.prototype);
 
-            /**
-             * Center of all the geometries implemented as average of centers of all shapes.
-             * @memberof KmlMultiGeometry.prototype
-             * @type {Position}
-             * @readonly
-             */
-            kmlCenter: {
-                get: function () {
-                    var positions = this.kmlShapes.map(function (shape) {
-                        return shape.kmlCenter;
-                    });
-                    var midLatitude = 0;
-                    var midLongitude = 0;
-                    var midAltitude = 0;
-                    positions.forEach(function (position) {
-                        midLatitude += position.latitude;
-                        midLongitude += position.longitude;
-                        midAltitude += position.altitude;
-                    });
-                    return new Position(
-                        midLatitude / positions.length,
-                        midLongitude / positions.length,
-                        midAltitude / positions.length
-                    );
-                }
+    Object.defineProperties(KmlMultiGeometry.prototype, {
+        /**
+         * It returns all shapes currently present in this node.
+         * @memberof KmlMultiGeometry.prototype
+         * @type {KmlObject[]}
+         * @readonly
+         */
+        kmlShapes: {
+            get: function () {
+                return this._factory.all(this);
             }
-        });
+        },
 
-        extend(this, KmlMultiGeometry.prototype);
+        /**
+         * Center of all the geometries implemented as average of centers of all shapes.
+         * @memberof KmlMultiGeometry.prototype
+         * @type {Position}
+         * @readonly
+         */
+        kmlCenter: {
+            get: function () {
+                var positions = this.kmlShapes.map(function (shape) {
+                    return shape.kmlCenter;
+                });
+                var midLatitude = 0;
+                var midLongitude = 0;
+                var midAltitude = 0;
+                positions.forEach(function (position) {
+                    midLatitude += position.latitude;
+                    midLongitude += position.longitude;
+                    midAltitude += position.altitude;
+                });
+                return new Position(
+                    midLatitude / positions.length,
+                    midLongitude / positions.length,
+                    midAltitude / positions.length
+                );
+            }
+        }
+    });
+
+	/**
+     * @inheritDoc
+     */
+    KmlMultiGeometry.prototype.render = function(dc) {
+        KmlGeometry.prototype.render.call(this, dc);
+
+        this.kmlShapes.forEach(function(shape) {
+            shape.render(dc);
+        });
     };
 
     /**
@@ -78,25 +87,6 @@ define([
      */
     KmlMultiGeometry.prototype.getTagNames = function () {
         return ["MultiGeometry"];
-    };
-
-    /**
-     * Instead of standard processing only delegate the processing to the descendants.
-     * @inheritDoc
-     */
-    KmlMultiGeometry.prototype.beforeStyleResolution = function (options) {
-        this.kmlShapes.forEach(function (shape) {
-            shape.update(options);
-        });
-
-        return false;
-    };
-
-    /**
-     * @inheritDoc
-     */
-    KmlMultiGeometry.prototype.getStyle = function () {
-        return this._style;
     };
 
     KmlElements.addKey(KmlMultiGeometry.prototype.getTagNames()[0], KmlMultiGeometry);

@@ -3,13 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
-    '../KmlObject'
+    '../KmlObject',
+    './NodeTransformers'
 ], function (
-    extend,
     KmlElements,
-    KmlObject
+    KmlObject,
+    NodeTransformers
 ) {
     "use strict";
 
@@ -27,47 +27,47 @@ define([
      */
     var Scale = function (options) {
         KmlObject.call(this, options);
-
-        Object.defineProperties(this, {
-            /**
-             * Scales model along x axis
-             * @memberof Scale.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlX: {
-                get: function() {
-                    return this.retrieve({name: 'x'});
-                }
-            },
-
-            /**
-             * Scales model along y axis
-             * @memberof Scale.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlY: {
-                get: function() {
-                    return this.retrieve({name: 'y'});
-                }
-            },
-
-            /**
-             * Scales model along z axis
-             * @memberof Scale.prototype
-             * @readonly
-             * @type {Number}
-             */
-            kmlZ: {
-                get: function() {
-                    return this.retrieve({name: 'z'});
-                }
-            }
-        });
-
-        extend(this, Scale.prototype);
     };
+
+    Scale.prototype = Object.create(KmlObject.prototype);
+
+    Object.defineProperties(Scale.prototype, {
+        /**
+         * Scales model along x axis
+         * @memberof Scale.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlX: {
+            get: function() {
+                return this._factory.specific(this, {name: 'x', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * Scales model along y axis
+         * @memberof Scale.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlY: {
+            get: function() {
+                return this._factory.specific(this, {name: 'y', transformer: NodeTransformers.number});
+            }
+        },
+
+        /**
+         * Scales model along z axis
+         * @memberof Scale.prototype
+         * @readonly
+         * @type {Number}
+         */
+        kmlZ: {
+            get: function() {
+                return this._factory.specific(this, {name: 'z', transformer: NodeTransformers.number});
+            }
+        }
+    });
 
     /**
      * @inheritDoc

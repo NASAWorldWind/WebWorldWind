@@ -11,8 +11,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Annotation',
         './shapes/AnnotationAttributes',
         './error/ArgumentError',
+        './layer/AtmosphereLayer',
+        './shaders/AtmosphereProgram',
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
+        './util/BasicTimeSequence',
         './layer/BingAerialLayer',
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
@@ -23,6 +26,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGOneImageLayer',
         './geom/BoundingBox',
         './gesture/ClickRecognizer',
+        './formats/collada/ColladaLoader',
         './util/Color',
         './shapes/Compass',
         './layer/CompassLayer',
@@ -44,7 +48,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
-		'./formats/geojson/GeoJSONParser',
+        './formats/geojson/GeoJSONParser',
+        './formats/geotiff/GeoTiffReader',
         './gesture/GestureRecognizer',
         './globe/Globe',
         './globe/Globe2D',
@@ -52,6 +57,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GpuProgram',
         './cache/GpuResourceCache',
         './shaders/GpuShader',
+        './shaders/GroundProgram',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
@@ -155,6 +161,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/ShapeAttributes',
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
+        './shaders/SkyProgram',
         './shapes/SurfaceImage',
         './shapes/SurfaceCircle',
         './shapes/SurfaceEllipse',
@@ -210,8 +217,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Annotation,
               AnnotationAttributes,
               ArgumentError,
+              AtmosphereLayer,
+              AtmosphereProgram,
               BasicProgram,
               BasicTextureProgram,
+              BasicTimeSequence,
               BingAerialLayer,
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
@@ -222,6 +232,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGOneImageLayer,
               BoundingBox,
               ClickRecognizer,
+              ColladaLoader,
               Color,
               Compass,
               CompassLayer,
@@ -243,7 +254,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
-			  GeoJSONParser,
+              GeoJSONParser,
+              GeoTiffReader,
               GestureRecognizer,
               Globe,
               Globe2D,
@@ -251,6 +263,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuProgram,
               GpuResourceCache,
               GpuShader,
+              GroundProgram,
               HighlightController,
               ImagePyramid,
               ImageSource,
@@ -354,6 +367,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ShapeAttributes,
               Shapefile,
               ShowTessellationLayer,
+              SkyProgram,
               SurfaceImage,
               SurfaceCircle,
               SurfaceEllipse,
@@ -618,8 +632,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Annotation'] = Annotation;
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
         WorldWind['ArgumentError'] = ArgumentError;
+        WorldWind['AtmosphereLayer'] = AtmosphereLayer;
+        WorldWind['AtmosphereProgram'] = AtmosphereProgram;
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
+        WorldWind['BasicTimeSequence'] = BasicTimeSequence;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
@@ -630,6 +647,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BoundingBox'] = BoundingBox;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
+        WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
@@ -651,7 +669,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
-		WorldWind['GeoJSONParser'] = GeoJSONParser;
+        WorldWind['GeoJSONParser'] = GeoJSONParser;
+        WorldWind['GeoTiffReader'] = GeoTiffReader;
         WorldWind['GestureRecognizer'] = GestureRecognizer;
         WorldWind['Globe'] = Globe;
         WorldWind['Globe2D'] = Globe2D;
@@ -659,6 +678,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuProgram'] = GpuProgram;
         WorldWind['GpuResourceCache'] = GpuResourceCache;
         WorldWind['GpuShader'] = GpuShader;
+        WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
@@ -711,6 +731,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ShapeAttributes'] = ShapeAttributes;
         WorldWind['Shapefile'] = Shapefile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
+        WorldWind['SkyProgram'] = SkyProgram;
         WorldWind['SurfaceImage'] = SurfaceImage;
         WorldWind['SurfaceCircle'] = SurfaceCircle;
         WorldWind['SurfaceEllipse'] = SurfaceEllipse;

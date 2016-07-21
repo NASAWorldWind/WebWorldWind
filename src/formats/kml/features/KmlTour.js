@@ -3,11 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    '../../../util/extend',
     './../KmlElements',
     './KmlFeature'
-], function (extend,
-             KmlElements,
+], function (KmlElements,
              KmlFeature) {
     "use strict";
 
@@ -25,9 +23,9 @@ define([
      */
     var KmlTour = function (options) {
         KmlFeature.call(this, options);
-
-        extend(this, KmlTour.prototype);
     };
+
+    KmlTour.prototype = Object.create(KmlFeature.prototype);
 
     /**
      * @inheritDoc
