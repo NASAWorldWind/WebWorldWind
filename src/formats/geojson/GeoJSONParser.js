@@ -579,6 +579,12 @@ define(['../../error/ArgumentError',
                 if (configuration && configuration.name){
                     placemark.label = configuration.name;
                 }
+                if (configuration && configuration.pickDelegate) {
+                    placemark.pickDelegate = configuration.pickDelegate;
+                }
+                if (configuration && configuration.userProperties) {
+                    placemark.userProperties = configuration.userProperties;
+                }
                 layer.addRenderable(placemark);
             }
         };
@@ -629,6 +635,12 @@ define(['../../error/ArgumentError',
                     placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
                     if (configuration && configuration.name){
                         placemark.label = configuration.name;
+                    }
+                    if (configuration && configuration.pickDelegate) {
+                        placemark.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        placemark.userProperties = configuration.userProperties;
                     }
                     layer.addRenderable(placemark);
                 }
@@ -681,6 +693,12 @@ define(['../../error/ArgumentError',
                 shape = new SurfacePolyline(
                     positions,
                     configuration && configuration.attributes ? configuration.attributes : null);
+                if (configuration && configuration.pickDelegate) {
+                    shape.pickDelegate = configuration.pickDelegate;
+                }
+                if (configuration && configuration.userProperties) {
+                    shape.userProperties = configuration.userProperties;
+                }
                 layer.addRenderable(shape);
             }
         };
@@ -734,6 +752,12 @@ define(['../../error/ArgumentError',
                     shape = new SurfacePolyline(
                         positions,
                         configuration && configuration.attributes ? configuration.attributes : null);
+                    if (configuration && configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }
                     layer.addRenderable(shape);
                 }
             }
@@ -787,7 +811,12 @@ define(['../../error/ArgumentError',
                     shape = new SurfacePolygon(
                         positions,
                         configuration && configuration.attributes ? configuration.attributes : null);
-                    layer.addRenderable(shape);
+                    if (configuration && configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }                    layer.addRenderable(shape);
                 }
             }
         };
@@ -845,6 +874,12 @@ define(['../../error/ArgumentError',
                     shape = new SurfacePolygon(
                         boundaries,
                         configuration && configuration.attributes ? configuration.attributes : null);
+                    if (configuration && configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }
                     layer.addRenderable(shape);
                 }
             }
