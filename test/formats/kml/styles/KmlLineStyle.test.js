@@ -33,9 +33,9 @@ define([
             it("should have the Width, OuterColor, OuterWidth, PhysicalWidth and LabelVisibility properties", function(){
             expect(lineStyle.kmlWidth).toEqual(1);
             expect(lineStyle.kmlOuterColor).toEqual('ffffffff');
-            expect(lineStyle.kmlOuterWidth).toEqual('0.5');
-            expect(lineStyle.kmlPhysicalWidth).toEqual('0.4');
-            expect(lineStyle.kmlLabelVisibility).toEqual('0');
+            expect(lineStyle.kmlOuterWidth).toEqual(0.5);
+            expect(lineStyle.kmlPhysicalWidth).toEqual(0.4);
+            expect(lineStyle.kmlLabelVisibility).toEqual(false);
 
         });
 

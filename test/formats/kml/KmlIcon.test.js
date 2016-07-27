@@ -35,8 +35,8 @@ define([
         'ViewFormat and ViewScale properties', function(){
         expect(link.kmlX).toEqual(0);
         expect(link.kmlY).toEqual(0);
-        expect(link.kmlW).toEqual('-1');
-        expect(link.kmlH).toEqual('-1');
+        expect(link.kmlW).toEqual(-1);
+        expect(link.kmlH).toEqual(-1);
         expect(link.kmlHref).toEqual ('link');
         expect(link.kmlRefreshMode).toEqual('onChange');
         expect(link.kmlRefreshInterval).toEqual(4);

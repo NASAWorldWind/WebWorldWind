@@ -31,8 +31,8 @@ define([
             expect(lod.kmlSouth).toEqual(48.25207367852141);
             expect(lod.kmlEast).toEqual(-90.86591508839973);
             expect(lod.kmlWest).toEqual(-90.8714285289695);
-            expect(lod.kmlMinAltitude).toEqual('10');
-            expect(lod.kmlMaxAltitude).toEqual('20');
+            expect(lod.kmlMinAltitude).toEqual(10);
+            expect(lod.kmlMaxAltitude).toEqual(20);
         });
     });
 });

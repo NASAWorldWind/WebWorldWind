@@ -23,9 +23,9 @@ define([
             var scale = new Scale({objectNode:
                 kmlRepresentation.getElementsByTagName("Scale")[0]});
         it('should have the X, Y and Z properties',function(){
-            expect(scale.kmlX).toBe('1');
-            expect(scale.kmlY).toBe('1');
-            expect(scale.kmlZ).toBe('1');
+            expect(scale.kmlX).toBe(1);
+            expect(scale.kmlY).toBe(1);
+            expect(scale.kmlZ).toBe(1);
         });
 
 

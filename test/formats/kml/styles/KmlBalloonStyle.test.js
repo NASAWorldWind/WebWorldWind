@@ -28,8 +28,8 @@ define([
         it ('should have the BgColor, TextColor, Text and DisplayMode properties',function(){
 
             expect(balloonStyle.kmlBgColor).toEqual('ffffffff');
-            expect( balloonStyle.kmlTextColor).toEqual('ff000000');
-            expect( balloonStyle.kmlText).toEqual('TextToTest');
+            expect(balloonStyle.kmlText).toEqual('TextToTest');
+            expect(balloonStyle.kmlTextColor).toEqual('ff000000');
             expect(balloonStyle.kmlDisplayMode).toEqual('default');
         });
     });

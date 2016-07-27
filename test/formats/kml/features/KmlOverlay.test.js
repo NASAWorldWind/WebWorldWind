@@ -26,7 +26,7 @@ define([
                 kmlRepresentation.getElementsByTagName("Overlay")[0]});
             it("should have the Color and DrawOrder properties and have the prototype properties of KmlIcon", function(){
                 expect(overlay.kmlColor).toEqual('ffffffff');
-                expect(overlay.kmlDrawOrder).toEqual(1);
+                expect(overlay.kmlDrawOrder).toEqual('1');
                 expect(overlay.kmlIcon instanceof KmlIcon).toBeTruthy();
             });
 
