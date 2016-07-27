@@ -12,14 +12,16 @@ define([
         '../util/ImageSource',
         '../util/Logger',
         '../cache/MemoryCache',
-        '../render/Texture'
+        '../render/Texture',
+        '../render/TextureCubeMap'
     ],
     function (AbsentResourceList,
               ArgumentError,
               ImageSource,
               Logger,
               MemoryCache,
-              Texture) {
+              Texture,
+              TextureCubeMap) {
         "use strict";
 
         /**
@@ -246,6 +248,87 @@ define([
             this.currentRetrievals[imageSource] = imageSource;
             image.crossOrigin = 'anonymous';
             image.src = imageSource;
+
+            return null;
+        };
+
+        /**
+         * Retrieves the textures for a cube map and puts them in an array.
+         * The images are ordered [posX, negX, posY, negY, posZ, negZ].
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @param {Object} imageSources The image sources.
+         */
+        GpuResourceCache.prototype.retrieveCubeMapTextures = function (gl, imageSources) {
+            if (!imageSources) {
+                return null;
+            }
+
+            if (this.currentRetrievals[imageSources.posX] ||
+                this.absentResourceList.isResourceAbsent(imageSources.posX)) {
+                return null;
+            }
+
+            var self = this;
+            var images = [];
+            var count = 0;
+
+            this.retrieveCubeMapTexture(imageSources.posX, 0, images, textureLoaded);
+            this.retrieveCubeMapTexture(imageSources.negX, 1, images, textureLoaded);
+            this.retrieveCubeMapTexture(imageSources.posY, 2, images, textureLoaded);
+            this.retrieveCubeMapTexture(imageSources.negY, 3, images, textureLoaded);
+            this.retrieveCubeMapTexture(imageSources.posZ, 4, images, textureLoaded);
+            this.retrieveCubeMapTexture(imageSources.negZ, 5, images, textureLoaded);
+
+            function textureLoaded(images) {
+                count++;
+                if (count === 6) {
+                    var textureCube = new TextureCubeMap(gl, images);
+                    self.putResource(imageSources.posX, textureCube, textureCube.size);
+                    var e = document.createEvent('Event');
+                    e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                    window.dispatchEvent(e);
+                }
+            }
+
+            return null;
+        };
+
+        /**
+         * Retrieves one texture of a cube map.
+         * @param {URL} imageSource The url for the image.
+         * @param {Number} index The index where to put the image in the array.
+         * @param {Image[]} images Array of images.
+         * @param {Function} cb A callback function to call when the image is retrieved.
+         */
+        GpuResourceCache.prototype.retrieveCubeMapTexture = function (imageSource, index, images, cb) {
+            var self = this;
+            var image = new Image();
+
+            if (this.currentRetrievals[imageSource] || this.absentResourceList.isResourceAbsent(imageSource)) {
+                return null;
+            }
+
+            image.onload = function () {
+                Logger.log(Logger.LEVEL_INFO, "Image retrieval succeeded: " + imageSource);
+
+                delete self.currentRetrievals[imageSource];
+                self.absentResourceList.unmarkResourceAbsent(imageSource);
+
+                images[index] = image;
+                cb(images);
+            };
+
+            image.onerror = function () {
+                delete self.currentRetrievals[imageSource];
+                self.absentResourceList.markResourceAbsent(imageSource);
+                Logger.log(Logger.LEVEL_WARNING, "Image retrieval failed: " + imageSource);
+                images[index] = null;
+                cb(images);
+            };
+
+            image.crossOrigin = 'anonymous';
+            image.src = imageSource;
+            this.currentRetrievals[imageSource] = imageSource;
 
             return null;
         };
