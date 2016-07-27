@@ -191,8 +191,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/TiledImageLayer',
         './util/TileFactory',
         './gesture/TiltRecognizer',
-        './ogc/TmsCapabilities',
-        './layer/TmsLayer',
         './gesture/Touch',
         './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
@@ -399,8 +397,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               TiledImageLayer,
               TileFactory,
               TiltRecognizer,
-              TmsCapabilities,
-              TmsLayer,
               Touch,
               TriangleMesh,
               UnsupportedOperationError,
@@ -765,8 +761,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['TiledImageLayer'] = TiledImageLayer;
         WorldWind['TileFactory'] = TileFactory;
         WorldWind['TiltRecognizer'] = TiltRecognizer;
-        WorldWind['TmsCapabilities'] = TmsCapabilities;
-        WorldWind['TmsLayer'] = TmsLayer;
         WorldWind['Touch'] = Touch;
         WorldWind['TriangleMesh'] = TriangleMesh;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
