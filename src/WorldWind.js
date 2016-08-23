@@ -48,6 +48,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
+        './formats/geojson/GeoJSONGeometry',
+        './formats/geojson/GeoJSONGeometryCollection',
+        './formats/geojson/GeoJSONGeometryLineString',
+        './formats/geojson/GeoJSONGeometryMultiLineString',
+        './formats/geojson/GeoJSONGeometryMultiPoint',
+        './formats/geojson/GeoJSONGeometryMultiPolygon',
+        './formats/geojson/GeoJSONGeometryPoint',
+        './formats/geojson/GeoJSONGeometryPolygon',
         './formats/geojson/GeoJSONParser',
         './formats/geotiff/GeoTiffReader',
         './gesture/GestureRecognizer',
@@ -254,6 +262,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
+              GeoJSONGeometry,
+              GeoJSONGeometryCollection,
+              GeoJSONGeometryLineString,
+              GeoJSONGeometryMultiLineString,
+              GeoJSONGeometryMultiPoint,
+              GeoJSONGeometryMultiPolygon,
+              GeoJSONGeometryPoint,
+              GeoJSONGeometryPolygon,
               GeoJSONParser,
               GeoTiffReader,
               GestureRecognizer,
@@ -669,6 +685,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
+        WorldWind['GeoJSONGeometry'] = GeoJSONGeometry;
+        WorldWind['GeoJSONGeometryCollection'] = GeoJSONGeometryCollection;
+        WorldWind['GeoJSONGeometryLineString'] = GeoJSONGeometryLineString;
+        WorldWind['GeoJSONGeometryMultiLineString'] = GeoJSONGeometryMultiLineString;
+        WorldWind['GeoJSONGeometryMultiPoint'] = GeoJSONGeometryMultiPoint;
+        WorldWind['GeoJSONGeometryMultiPolygon'] = GeoJSONGeometryMultiPolygon;
+        WorldWind['GeoJSONGeometryPoint'] = GeoJSONGeometryPoint;
+        WorldWind['GeoJSONGeometryPolygon'] = GeoJSONGeometryPolygon;
         WorldWind['GeoJSONParser'] = GeoJSONParser;
         WorldWind['GeoTiffReader'] = GeoTiffReader;
         WorldWind['GestureRecognizer'] = GestureRecognizer;
