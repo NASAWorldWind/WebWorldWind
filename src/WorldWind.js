@@ -113,6 +113,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/geom/KmlTrack',
         './layer/LandsatRestLayer',
         './layer/Layer',
+        './util/measure/LengthMeasurer',
         './util/Level',
         './util/LevelRowColumnUrlBuilder',
         './util/LevelSet',
@@ -319,6 +320,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlTrack,
               LandsatRestLayer,
               Layer,
+              LengthMeasurer,
               Level,
               LevelRowColumnUrlBuilder,
               LevelSet,
@@ -686,6 +688,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['KmlFile'] = KmlFile;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
+        WorldWind['LengthMeasurer'] = LengthMeasurer;
         WorldWind['Level'] = Level;
         WorldWind['LevelRowColumnUrlBuilder'] = LevelRowColumnUrlBuilder;
         WorldWind['LevelSet'] = LevelSet;
