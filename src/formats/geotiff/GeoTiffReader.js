@@ -392,39 +392,76 @@ define([
             return GeoTiffUtil.getRGBAFillValue(red, green, blue, opacity);
         }
 
-        GeoTiffReader.prototype.createTypedElevationArray = function (bitsPerSample, sampleFormat, untypedElevationArray) {
-            var typedElevationArray;
+        GeoTiffReader.prototype.createTypedElevationArray = function () {
+            var elevationArray = [], typedElevationArray;
+            var bitsPerSample = this.metadata.bitsPerSample[0];
+
+            if (this.metadata.stripOffsets) {
+                var strips = this.parseStrips(true);
+
+                for (var i = 0; i < strips.length; i++) {
+                    elevationArray = elevationArray.concat(strips[i]);
+                }
+            }
+            else if (this.metadata.tileOffsets) {
+                var tiles = this.parseTiles(true);
+                var imageWidth = this.metadata.imageWidth;
+                var imageLength = this.metadata.imageLength;
+                var tileWidth = this.metadata.tileWidth;
+                var tileLength = this.metadata.tileLength;
+                var tilesAcross = Math.ceil(imageWidth / tileWidth);
+
+                for (var y = 0; y < imageLength; y++) {
+                    for (var x = 0; x < imageWidth; x++) {
+                        var tileAcross = Math.floor(x / tileWidth);
+                        var tileDown = Math.floor(y / tileLength);
+                        var tileIndex = tileDown * tilesAcross + tileAcross;
+                        var xInTile = x % tileWidth;
+                        var yInTile = y % tileLength;
+                        var sampleIndex = yInTile * tileWidth + xInTile;
+                        var pixelSamples = tiles[tileIndex][sampleIndex];
+                        elevationArray.push(pixelSamples);//todo de 0??? servet
+                    }
+                }
+            }
+
+            if (this.metadata.sampleFormat) {
+                var sampleFormat = this.metadata.sampleFormat[0];
+            }
+            else {
+                var sampleFormat = TiffConstants.SampleFormat.UNSIGNED;
+            }
 
             switch (bitsPerSample) {
                 case 8:
                     if (sampleFormat === TiffConstants.SampleFormat.SIGNED) {
-                        typedElevationArray = new Int8Array(untypedElevationArray);
+                        typedElevationArray = new Int8Array(elevationArray);
                     }
                     else {
-                        typedElevationArray = new Uint8Array(untypedElevationArray);
+                        typedElevationArray = new Uint8Array(elevationArray);
                     }
                     break
                 case 16:
                     if (sampleFormat === TiffConstants.SampleFormat.SIGNED) {
-                        typedElevationArray = new Int16Array(untypedElevationArray);
+                        typedElevationArray = new Int16Array(elevationArray);
                     }
                     else {
-                        typedElevationArray = new Uint16Array(untypedElevationArray);
+                        typedElevationArray = new Uint16Array(elevationArray);
                     }
                     break;
                 case 32:
                     if (sampleFormat === TiffConstants.SampleFormat.SIGNED) {
-                        typedElevationArray = new Int32Array(untypedElevationArray);
+                        typedElevationArray = new Int32Array(elevationArray);
                     }
                     else if (sampleFormat === TiffConstants.SampleFormat.IEEE_FLOAT) {
-                        typedElevationArray = new Float32Array(untypedElevationArray);
+                        typedElevationArray = new Float32Array(elevationArray);
                     }
                     else {
-                        typedElevationArray = new Uint32Array(untypedElevationArray);
+                        typedElevationArray = new Uint32Array(elevationArray);
                     }
                     break;
                 case 64:
-                    typedElevationArray = new Float64Array(untypedElevationArray);
+                    typedElevationArray = new Float64Array(elevationArray);
                     break;
                 default:
                     break;
@@ -438,53 +475,12 @@ define([
          * to the callback function as a parameter.
          *
          * @param {Function} callback A function called when GeoTiff parsing is complete.
-         *
          */
         GeoTiffReader.prototype.readAsData = function (callback) {
             this.requestUrl(this.url, (function () {
-                var elevationArray = [];
-
-                if (this.metadata.stripOffsets) {
-                    var strips = this.parseStrips(true);
-
-                    for (var i = 0; i < strips.length; i++) {
-                        elevationArray = elevationArray.concat(strips[i]);
-                    }
-                }
-                else if (this.metadata.tileOffsets) {
-                    var tiles = this.parseTiles(true);
-                    var imageWidth = this.metadata.imageWidth;
-                    var imageLength = this.metadata.imageLength;
-                    var tileWidth = this.metadata.tileWidth;
-                    var tileLength = this.metadata.tileLength;
-                    var tilesAcross = Math.ceil(imageWidth / tileWidth);
-
-                    for (var y = 0; y < imageLength; y++) {
-                        for (var x = 0; x < imageWidth; x++) {
-                            var tileAcross = Math.floor(x / tileWidth);
-                            var tileDown = Math.floor(y / tileLength);
-                            var tileIndex = tileDown * tilesAcross + tileAcross;
-                            var xInTile = x % tileWidth;
-                            var yInTile = y % tileLength;
-                            var sampleIndex = yInTile * tileWidth + xInTile;
-                            var pixelSamples = tiles[tileIndex][sampleIndex];
-                            elevationArray.push(pixelSamples);//todo de 0??? servet
-                        }
-                    }
-                }
-
-                if (this.metadata.sampleFormat) {
-                    var sampleFormat = this.metadata.sampleFormat;
-                }
-                else {
-                    var sampleFormat = TiffConstants.SampleFormat.UNSIGNED;
-                }
-
-                callback(this.createTypedElevationArray(
-                    this.metadata.bitsPerSample[0],
-                    sampleFormat[0],
-                    elevationArray
-                ));
+                callback(
+                    this.createTypedElevationArray()
+                );
             }).bind(this));
         };
 
@@ -816,6 +812,9 @@ define([
                     case TiffConstants.Tag.ROWS_PER_STRIP:
                         this.metadata.rowsPerStrip = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
+                    case TiffConstants.Tag.RESOLUTION_UNIT:
+                        this.metadata.resolutionUnit = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
                     case TiffConstants.Tag.SAMPLES_PER_PIXEL:
                         this.metadata.samplesPerPixel = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
@@ -841,6 +840,12 @@ define([
                         this.metadata.tileLength = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
                     case TiffConstants.Tag.TILE_WIDTH:
+                        this.metadata.tileWidth = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case TiffConstants.Tag.X_RESOLUTION:
+                        this.metadata.xResolution = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case TiffConstants.Tag.Y_RESOLUTION:
                         this.metadata.tileWidth = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
 
@@ -932,6 +937,30 @@ define([
                             break;
                         case GeoTiffConstants.Key.GeogCitationGeoKey:
                             this.metadata.geogCitationGeoKey =
+                                new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
+                                    this.metadata.geoDoubleParams,
+                                    this.metadata.geoAsciiParams);
+                            break;
+                        case GeoTiffConstants.Key.GeogAngularUnitsGeoKey:
+                            this.metadata.geogAngularUnitsGeoKey =
+                                new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
+                                    this.metadata.geoDoubleParams,
+                                    this.metadata.geoAsciiParams);
+                            break;
+                        case GeoTiffConstants.Key.GeogAngularUnitSizeGeoKey:
+                            this.metadata.geogAngularUnitSizeGeoKey =
+                                new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
+                                    this.metadata.geoDoubleParams,
+                                    this.metadata.geoAsciiParams);
+                            break;
+                        case GeoTiffConstants.Key.GeogSemiMajorAxisGeoKey:
+                            this.metadata.geogSemiMajorAxisGeoKey =
+                                new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
+                                    this.metadata.geoDoubleParams,
+                                    this.metadata.geoAsciiParams);
+                            break;
+                        case GeoTiffConstants.Key.GeogInvFlatteningGeoKey:
+                            this.metadata.geogInvFlatteningGeoKey =
                                 new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
                                     this.metadata.geoDoubleParams,
                                     this.metadata.geoAsciiParams);
