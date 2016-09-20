@@ -22,16 +22,5 @@ require([
 
             expect(resultingDom.childNodes.length).toEqual(1);
         });
-
-        it("testGettingDomOfInvalidXml", function() {
-            var invalidDocument = "RandomData";
-            var document = new XmlDocument(invalidDocument);
-            try {
-                var resultingDom = document.dom();
-                fail("Exception should have been thrown.");
-            } catch(e) {
-                expect("ArgumentError").toEqual(e.name);
-            }
-        });
     });
 });
