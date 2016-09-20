@@ -582,7 +582,7 @@ define([
             }
 
             var hasLighting = (buffers.normals != null && buffers.normals.length > 0);
-            if (hasLighting) {
+            if (hasLighting && !dc.pickingMode) {
                 this.applyLighting(dc, buffers);
             }
 
@@ -753,7 +753,7 @@ define([
                 mvpMatrix.multiplyMatrix(nodeWorldMatrix);
             }
 
-            if (hasLighting) {
+            if (hasLighting && !dc.pickingMode) {
 
                 var normalMatrix = Matrix.fromIdentity();
 
@@ -809,7 +809,7 @@ define([
             var gl = dc.currentGlContext,
                 program = dc.currentProgram;
 
-            if (hasLighting) {
+            if (hasLighting || dc.pickingMode) {
                 program.loadApplyLighting(gl, false);
                 gl.disableVertexAttribArray(program.normalVectorLocation);
             }
