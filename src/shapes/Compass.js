@@ -67,7 +67,7 @@ define([
 
             var t = this.getActiveTexture(dc);
             if (t) {
-                this.imageScale = 0.15 * dc.currentGlContext.drawingBufferWidth / t.imageWidth;
+                this.imageScale = this.size * dc.currentGlContext.drawingBufferWidth / t.imageWidth;
             }
 
             ScreenImage.prototype.render.call(this, dc);
