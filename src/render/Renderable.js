@@ -45,6 +45,14 @@ define([
              * @see  [PickedObject.userObject]{@link PickedObject#userObject}
              */
             this.pickDelegate = null;
+
+            /**
+             * An application defined object associated with this renderable. A typical use case is to associate
+             * application defined data with a picked renderable.
+             * @type {Object}
+             * @default An empty object
+             */
+            this.userProperties = {};
         };
 
         /**
