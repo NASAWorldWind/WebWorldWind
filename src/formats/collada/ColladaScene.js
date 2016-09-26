@@ -809,7 +809,7 @@ define([
             var gl = dc.currentGlContext,
                 program = dc.currentProgram;
 
-            if (hasLighting || dc.pickingMode) {
+            if (hasLighting && !dc.pickingMode) {
                 program.loadApplyLighting(gl, false);
                 gl.disableVertexAttribArray(program.normalVectorLocation);
             }
