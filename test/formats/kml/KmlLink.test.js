@@ -2,20 +2,15 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/KmlLink',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlLink,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlLinkTest", {
-        testValidKml: CatchTest(function () {
+    describe ("KmlLinkTest",function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Link>" +
@@ -32,15 +27,17 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var link = new KmlLink({objectNode:
                 kmlRepresentation.getElementsByTagName("Link")[0]});
+        it('should have the Href, RefreshMode,RefreshInterval,ViewRefreshMode,ViewRefreshTime, ViewBoundScale, ViewFormat,' +
+            'HttpQuery properties', function(){
 
-            assertEquals('link', link.kmlHref);
-            assertEquals('onChange', link.kmlRefreshMode);
-            assertEquals(4, link.kmlRefreshInterval);
-            assertEquals('never', link.kmlViewRefreshMode);
-            assertEquals(4, link.kmlViewRefreshTime);
-            assertEquals(1, link.kmlViewBoundScale);
-            assertEquals('BBOX=10,10,10,10', link.kmlViewFormat);
-            assertEquals('validQuery', link.kmlHttpQuery);
-        })
-    })
+            expect(link.kmlHref).toEqual('link');
+            expect(link.kmlRefreshMode).toEqual('onChange');
+            expect(link.kmlRefreshInterval).toEqual(4);
+            expect(link.kmlViewRefreshMode).toEqual('never');
+            expect(link.kmlViewRefreshTime).toEqual(4);
+            expect(link.kmlViewBoundScale).toEqual(1);
+            expect(link.kmlViewFormat).toEqual('BBOX=10,10,10,10');
+            expect(link.kmlHttpQuery).toEqual('validQuery');
+        });
+    });
 });

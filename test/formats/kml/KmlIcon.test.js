@@ -2,20 +2,15 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/KmlIcon',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlIcon,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlIconTest", {
-        testValidKml: CatchTest(function () {
+    describe ("KmlIconTest", function (){
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\">" +
                 "<Icon>" +
@@ -36,19 +31,20 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var link = new KmlIcon({objectNode:
                 kmlRepresentation.getElementsByTagName("Icon")[0]});
-
-            assertEquals(0, link.kmlX);
-            assertEquals(0, link.kmlY);
-            assertEquals(-1, link.kmlW);
-            assertEquals(-1, link.kmlH);
-            assertEquals('link', link.kmlHref);
-            assertEquals('onChange', link.kmlRefreshMode);
-            assertEquals(4, link.kmlRefreshInterval);
-            assertEquals('never', link.kmlViewRefreshMode);
-            assertEquals(4, link.kmlViewRefreshTime);
-            assertEquals(1, link.kmlViewBoundScale);
-            assertEquals('BBOX=10,10,10,10', link.kmlViewFormat);
-            assertEquals('validQuery', link.kmlHttpQuery);
-        })
-    })
+    it('should have the X, Y, W, H, Href, RefreshMode, RefreshInterval, ViewRefreshMode, ViewRefreshTime, ViewBoundScale,' +
+        'ViewFormat and ViewScale properties', function(){
+        expect(link.kmlX).toEqual(0);
+        expect(link.kmlY).toEqual(0);
+        expect(link.kmlW).toEqual(-1);
+        expect(link.kmlH).toEqual(-1);
+        expect(link.kmlHref).toEqual ('link');
+        expect(link.kmlRefreshMode).toEqual('onChange');
+        expect(link.kmlRefreshInterval).toEqual(4);
+        expect(link.kmlViewRefreshMode).toEqual('never');
+        expect(link.kmlViewRefreshTime).toEqual (4);
+        expect(link.kmlViewBoundScale).toEqual(1);
+        expect(link.kmlViewFormat).toEqual('BBOX=10,10,10,10');
+        expect(link.kmlHttpQuery).toEqual('validQuery');
+        });
+    });
 });

@@ -2,20 +2,15 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/util/Scale',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     Scale,
     XmlDocument
 ) {
     "use strict";
-    TestCase("ScaleTest", {
-        testValidKml: CatchTest(function () {
+    describe("ScaleTest", function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Scale>" +
@@ -27,10 +22,12 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var scale = new Scale({objectNode:
                 kmlRepresentation.getElementsByTagName("Scale")[0]});
+        it('should have the X, Y and Z properties',function(){
+            expect(scale.kmlX).toBe(1);
+            expect(scale.kmlY).toBe(1);
+            expect(scale.kmlZ).toBe(1);
+        });
 
-            assertEquals(1, scale.kmlX);
-            assertEquals(1, scale.kmlY);
-            assertEquals(1, scale.kmlZ);
-        })
-    })
-});
+
+        });
+    });

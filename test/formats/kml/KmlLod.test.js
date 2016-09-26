@@ -2,20 +2,15 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/KmlLod',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlLod,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlLodTest", {
-        testValidKml: CatchTest(function () {
+    describe("KmlLodTest", function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Lod>" +
@@ -28,11 +23,12 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var lod = new KmlLod({objectNode:
                 kmlRepresentation.getElementsByTagName("Lod")[0]});
+        it ('should have the MinLodPixels, MaxLodPixels,MinFadeExtent and MaxFadeExtent properties', function(){
 
-            assertEquals(256, lod.kmlMinLodPixels);
-            assertEquals(-1, lod.kmlMaxLodPixels);
-            assertEquals(0, lod.kmlMinFadeExtent);
-            assertEquals(0, lod.kmlMaxFadeExtent);
-        })
-    })
+            expect(lod.kmlMinLodPixels).toBe(256);
+            expect(lod.kmlMaxLodPixels).toBe(-1);
+            expect(lod.kmlMinFadeExtent).toBe(0);
+            expect(lod.kmlMaxFadeExtent).toBe(0);
+        });
+    });
 });

@@ -2,22 +2,17 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/KmlIcon',
     'src/formats/kml/features/KmlOverlay',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlIcon,
     KmlOverlay,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlOverlayTest", {
-        testValidKml: CatchTest(function () {
+    describe("KmlOverlayTest", function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Overlay>" +
@@ -29,11 +24,11 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var overlay = new KmlOverlay({objectNode:
                 kmlRepresentation.getElementsByTagName("Overlay")[0]});
+            it("should have the Color and DrawOrder properties and have the prototype properties of KmlIcon", function(){
+                expect(overlay.kmlColor).toEqual('ffffffff');
+                expect(overlay.kmlDrawOrder).toEqual('1');
+                expect(overlay.kmlIcon instanceof KmlIcon).toBeTruthy();
+            });
 
-            assertEquals('ffffffff', overlay.kmlColor);
-            assertEquals(1, overlay.kmlDrawOrder);
-
-            assertTrue(overlay.kmlIcon instanceof KmlIcon);
-        })
-    })
-});
+        });
+    });

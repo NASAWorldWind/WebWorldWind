@@ -2,17 +2,15 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-        baseUrl: '/test/'
-    },
+define(
     [
-        'test/CatchTest',
         'src/util/XmlDocument',
         'src/formats/kml/styles/KmlPolyStyle'
-    ], function (CatchTest,
-                 XmlDocument,
+    ], function (XmlDocument,
                  KmlPolyStyle) {
         "use strict";
+        describe ("KmlPolyStyle", function(){
+
         var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
             "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
             "<PolyStyle id=\"1\">" +
@@ -23,14 +21,15 @@ require({
             "</PolyStyle>" +
             "</kml>";
 
-        TestCase('KmlPolyStyle', {
-            testValidKml: function() {
+
                 var kmlRepresentation = new XmlDocument(validKml).dom();
                 var polyStyle = new KmlPolyStyle({objectNode:
                     kmlRepresentation.getElementsByTagName("PolyStyle")[0]});
+            it ("should have the Fill and Outline properties", function(){
+                expect(polyStyle.kmlFill).toEqual(true);
+                expect(polyStyle.kmlOutline).toEqual(false);
 
-                assertEquals(true, polyStyle.kmlFill);
-                assertEquals(false, polyStyle.kmlOutline);
-            }
+            });
+
         });
     });

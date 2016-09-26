@@ -60,7 +60,7 @@ define([], function () {
                 }
             }
         }
-        return this.map[level][key];
+        return this.map[level][key] || null;
     };
 
 	/**
