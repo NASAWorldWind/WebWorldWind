@@ -36,19 +36,13 @@ define([
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-            //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
             for (var i = 0; i < images.length; i++) {
                 var target = gl.TEXTURE_CUBE_MAP_POSITIVE_X + i;
                 var image = images[i];
-                if (image === null) {
-                    continue;
-                }
                 gl.texImage2D(target, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
                 this.size += (image.width * image.height * 4);
             }
 
-            //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
             gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
 
             this.creationTime = new Date();

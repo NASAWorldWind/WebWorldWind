@@ -271,6 +271,7 @@ define([
             var self = this;
             var images = [];
             var count = 0;
+            var retrieveError = false;
 
             this.retrieveCubeMapTexture(imageSources.posX, 0, images, textureLoaded);
             this.retrieveCubeMapTexture(imageSources.negX, 1, images, textureLoaded);
@@ -279,11 +280,15 @@ define([
             this.retrieveCubeMapTexture(imageSources.posZ, 4, images, textureLoaded);
             this.retrieveCubeMapTexture(imageSources.negZ, 5, images, textureLoaded);
 
-            function textureLoaded(images) {
+            function textureLoaded(err, images) {
+                if (err) {
+                    retrieveError = err;
+                }
                 count++;
-                if (count === 6) {
+                if (!retrieveError && count === 6) {
                     var textureCube = new TextureCubeMap(gl, images);
                     self.putResource(imageSources.posX, textureCube, textureCube.size);
+
                     var e = document.createEvent('Event');
                     e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
                     window.dispatchEvent(e);
@@ -315,15 +320,17 @@ define([
                 self.absentResourceList.unmarkResourceAbsent(imageSource);
 
                 images[index] = image;
-                cb(images);
+                cb(false, images);
             };
 
             image.onerror = function () {
+                Logger.log(Logger.LEVEL_WARNING, "Image retrieval failed: " + imageSource);
+
                 delete self.currentRetrievals[imageSource];
                 self.absentResourceList.markResourceAbsent(imageSource);
-                Logger.log(Logger.LEVEL_WARNING, "Image retrieval failed: " + imageSource);
+
                 images[index] = null;
-                cb(images);
+                cb(true, images);
             };
 
             image.crossOrigin = 'anonymous';

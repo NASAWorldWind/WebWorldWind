@@ -940,12 +940,12 @@ define([
 
             if (nearDistance === farDistance) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
-                        "Near and far distance are the same."));
+                    "Near and far distance are the same."));
             }
 
             if (nearDistance <= 0 || farDistance <= 0) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
-                        "Near or far distance is less than or equal to zero."));
+                    "Near or far distance is less than or equal to zero."));
             }
 
             // Compute the dimensions of the viewport rectangle at the near distance.
@@ -972,6 +972,78 @@ define([
             this[9] = 0;
             this[10] = -(farDistance + nearDistance) / (farDistance - nearDistance);
             this[11] = -2 * nearDistance * farDistance / (farDistance - nearDistance);
+            // Row 4
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = -1;
+            this[15] = 0;
+
+            return this;
+        };
+
+        /**
+         * Sets this matrix to an infinite perspective projection matrix for the specified viewport dimensions, vertical
+         * field of view and near clip distance.
+         * <p/>
+         * An infinite perspective projection matrix maps points in a manner similar to a standard projection matrix,
+         * but is not bounded by depth. Objects at any depth greater than or equal to the near distance may be rendered.
+         * In addition, this matrix interprets vertices with a w-coordinate of 0 as infinitely far from the camera in
+         * the direction indicated by the point's coordinates.
+         * <p/>
+         * The field of view must be positive and less than 180. The near distance must be positive.
+         *
+         * @param {Number} viewportWidth The viewport width, in screen coordinates.
+         * @param {Number} viewportHeight The viewport height, in screen coordinates.
+         * @param {Number} nearDistance The near clip plane distance, in model coordinates.
+         * @param {Number} farDistance The far clip plane distance, in model coordinates.
+         * @throws {ArgumentError} If the specified width or height is less than or equal to zero, if the near and far
+         * distances are equal, or if either the near or far distance are less than or equal to zero.
+         */
+        Matrix.prototype.setToInfiniteProjection = function (viewportWidth, viewportHeight, nearDistance, farDistance) {
+            if (viewportWidth <= 0) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "invalidWidth"));
+            }
+
+            if (viewportHeight <= 0) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "invalidHeight"));
+            }
+
+            if (nearDistance === farDistance) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "Near and far distance are the same."));
+            }
+
+            if (nearDistance <= 0 || farDistance <= 0) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "Near or far distance is less than or equal to zero."));
+            }
+
+            // Compute the dimensions of the viewport rectangle at the near distance.
+            var nearRect = WWMath.perspectiveFrustumRectangle(viewportWidth, viewportHeight, nearDistance),
+                left = nearRect.getMinX(),
+                right = nearRect.getMaxX(),
+                bottom = nearRect.getMinY(),
+                top = nearRect.getMaxY();
+
+            var epsilon = 0.000001;
+
+            // Row 1
+            this[0] = 2 * nearDistance / (right - left);
+            this[1] = 0;
+            this[2] = (right + left) / (right - left);
+            this[3] = 0;
+            // Row 2
+            this[4] = 0;
+            this[5] = 2 * nearDistance / (top - bottom);
+            this[6] = (top + bottom) / (top - bottom);
+            this[7] = 0;
+            // Row 3
+            this[8] = 0;
+            this[9] = 0;
+            this[10] = -1;
+            this[11] = -2 * nearDistance;
             // Row 4
             this[12] = 0;
             this[13] = 0;
@@ -1453,7 +1525,7 @@ define([
          * @param {Number[]} index Permutation vector of that LU factorization.
          * @param {Number[]} b Vector to be solved.
          */
-            // Method "lubksb" derived from "Numerical Recipes in C", Press et al., 1988
+        // Method "lubksb" derived from "Numerical Recipes in C", Press et al., 1988
         Matrix.lubksb = function (A, index, b) {
             var ii = -1,
                 i,
@@ -1649,8 +1721,8 @@ define([
             // Taken from Mathematics for 3D Game Programming and Computer Graphics, Second Edition, listing 14.6.
 
             var epsilon = 1.0e-10,
-            // Since the matrix is symmetric m12=m21, m13=m31 and m23=m32, therefore we can ignore the values m21,
-            // m32 and m32.
+                // Since the matrix is symmetric m12=m21, m13=m31 and m23=m32, therefore we can ignore the values m21,
+                // m32 and m32.
                 m11 = this[0],
                 m12 = this[1],
                 m13 = this[2],

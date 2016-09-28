@@ -23,23 +23,21 @@ define([
          * method then compiles the shaders and then links the program if compilation is successful. Use the bind method to make the
          * program current during rendering.
          *
-         * @alias SkyBoxProgram
+         * @alias SkyboxProgram
          * @constructor
          * @augments GpuProgram
-         * @classdesc SkyBoxProgram is a GLSL program that draws a skybox.
+         * @classdesc SkyboxProgram is a GLSL program that draws a skybox.
          * @param {WebGLRenderingContext} gl The current WebGL context.
          * @throws {ArgumentError} If the shaders cannot be compiled, or if linking of
          * the compiled shaders into a program fails.
          */
-        var SkyBoxProgram = function (gl) {
+        var SkyboxProgram = function (gl) {
             var vertexShaderSource =
                 'attribute vec3 vertexPoint;\n' +
-                'uniform  mat4 mvpMatrix;\n' +
+                'uniform mat4 mvpMatrix;\n' +
                 'varying vec3 texCoord;\n' +
                 'void main(){\n' +
                 '   gl_Position = mvpMatrix * vec4(vertexPoint, 1.0);\n' +
-                    //prevent the skybox from being clipped by the far plane
-                '   gl_Position.z = gl_Position.w - 0.00001;\n' +
                 '   texCoord = vertexPoint;\n' +
                 '}\n';
             var fragmentShaderSource =
@@ -84,10 +82,10 @@ define([
          * @type {string}
          * @readonly
          */
-        SkyBoxProgram.key = "WorldWindGpuSkyBoxProgram";
+        SkyboxProgram.key = "WorldWindGpuSkyboxProgram";
 
         // Inherit from GpuProgram.
-        SkyBoxProgram.prototype = Object.create(GpuProgram.prototype);
+        SkyboxProgram.prototype = Object.create(GpuProgram.prototype);
 
         /**
          * Loads the specified matrix as the value of this program's 'mvpMatrix' uniform variable.
@@ -96,10 +94,10 @@ define([
          * @param {Matrix} matrix The matrix to load.
          * @throws {ArgumentError} If the specified matrix is null or undefined.
          */
-        SkyBoxProgram.prototype.loadModelviewProjection = function (gl, matrix) {
+        SkyboxProgram.prototype.loadModelviewProjection = function (gl, matrix) {
             if (!matrix) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "SkyBoxProgram", "loadModelviewProjection", "missingMatrix"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "SkyboxProgram", "loadModelviewProjection", "missingMatrix"));
             }
 
             this.loadUniformMatrix(gl, matrix, this.mvpMatrixLocation);
@@ -110,13 +108,13 @@ define([
          * @param {WebGLRenderingContext} gl The current WebGL context.
          * @param {Number} unit The texture unit.
          */
-        SkyBoxProgram.prototype.loadTextureUnit = function (gl, unit) {
+        SkyboxProgram.prototype.loadTextureUnit = function (gl, unit) {
             if (this.localState.textureUnit !== unit) {
                 gl.uniform1i(this.textureUnitLocation, unit - gl.TEXTURE0);
                 this.localState.textureUnit = unit;
             }
         };
 
-        return SkyBoxProgram;
+        return SkyboxProgram;
 
     });
