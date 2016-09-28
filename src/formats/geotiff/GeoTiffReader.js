@@ -17,7 +17,8 @@ define([
         '../../util/Logger',
         '../../util/proj4-src',
         './TiffConstants',
-        './TiffIFDEntry'
+        './TiffIFDEntry',
+        '../../util/WWUtil'
     ],
     function (AbstractError,
               ArgumentError,
@@ -30,7 +31,8 @@ define([
               Logger,
               Proj4,
               TiffConstants,
-              TiffIFDEntry) {
+              TiffIFDEntry,
+              WWUtil) {
         "use strict";
 
         /**
@@ -660,7 +662,8 @@ define([
                 var sampleFormat = this.metadata.sampleFormat;
             }
             else {
-                var sampleFormat = Array(samplesPerPixel).fill(TiffConstants.SampleFormat.UNSIGNED);
+                var sampleFormat = new Array(samplesPerPixel);
+                WWUtil.fillArray(sampleFormat, TiffConstants.SampleFormat.UNSIGNED);
             }
             var bitsPerPixel = samplesPerPixel * bitsPerSample[0];
             var bytesPerPixel = bitsPerPixel / 8;
