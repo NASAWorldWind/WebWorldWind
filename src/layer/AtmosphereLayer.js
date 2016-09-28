@@ -14,7 +14,8 @@ define([
         '../geom/Matrix3',
         '../geom/Sector',
         '../shaders/SkyProgram',
-        '../geom/Vec3'
+        '../geom/Vec3',
+        '../util/WWUtil'
     ],
     function (ArgumentError,
               GroundProgram,
@@ -24,7 +25,8 @@ define([
               Matrix3,
               Sector,
               SkyProgram,
-              Vec3) {
+              Vec3,
+              WWUtil) {
         "use strict";
 
         /**
@@ -279,7 +281,8 @@ define([
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.assembleVertexPoints = function (dc, numLat, numLon, altitude) {
             var count = numLat * numLon;
-            var altitudes = new Array(count).fill(altitude);
+            var altitudes = new Array(count);
+            WWUtil.fillArray(altitudes, altitude);
             var result = new Float32Array(count * 3);
 
             return dc.globe.computePointsForGrid(this._fullSphereSector, numLat, numLon, altitudes, Vec3.ZERO, result);
