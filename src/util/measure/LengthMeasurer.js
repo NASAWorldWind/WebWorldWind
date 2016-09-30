@@ -7,31 +7,40 @@
  */
 
 define([
+        '../../error/ArgumentError',
         '../../geom/Location',
+        '../Logger',
         '../../geom/Position',
         '../../geom/Vec3'
     ],
-    function (Location,
+    function (ArgumentError,
+              Location,
+              Logger,
               Position,
               Vec3) {
 
         /**
-         * Utility class to measure length along a path on a globe. <p/> <p>The measurer must be provided a list of at least two
-         * positions to be able to compute a distance.</p> <p/> <p>Segments which are longer then the current maxSegmentLength
-         * will be subdivided along lines following the current pathType - WorldWind.LINEAR, WorldWind.RHUMB_LINE or
-         * WorldWind.GREAT_CIRCLE.</p> <p/> <p>For follow terrain, the computed length will account for
-         * terrain deformations as if someone was walking along that path. Otherwise the length is the sum of the cartesian
-         * distance between the positions.</p>
+         * Utility class to measure length along a path on a globe. <p/> <p>Segments which are longer then the current
+         * maxSegmentLength will be subdivided along lines following the current pathType - WorldWind.LINEAR,
+         * WorldWind.RHUMB_LINE or WorldWind.GREAT_CIRCLE.</p> <p/> <p>For follow terrain, the computed length will
+         * account for terrain deformations as if someone was walking along that path. Otherwise the length is the sum
+         * of the cartesian distance between the positions.</p>
          * <p/>
-         * <p>When following terrain the measurer will sample terrain elevations at regular intervals along the path. The
-         * minimum number of samples used for the whole length can be set with setLengthTerrainSamplingSteps(). However, the
-         * minimum sampling interval is 30 meters.
+         * <p>When following terrain the measurer will sample terrain elevations at regular intervals along the path.
+         * The minimum number of samples used for the whole length can be set with lengthTerrainSamplingSteps.
+         * However, the minimum sampling interval is 30 meters.
          * @alias LengthMeasurer
          * @constructor
-         * @param {WorldWindow} wwd
+         * @param {WorldWindow} wwd The World Window associated with LengthMeasurer.
+         * @throws {ArgumentError} If the specified world window is null or undefined.
          */
-
         var LengthMeasurer = function (wwd) {
+
+            if (!wwd) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "LengthMeasurer", "constructor", "missingWorldWindow"));
+            }
+
             this.wwd = wwd;
 
             // Private. The minimum length of a terrain following subdivision.
@@ -51,7 +60,7 @@ define([
             /**
              * The maximum length a segment can have before being subdivided along a line following the current pathType.
              * @type {Number}
-             * @memberof Path.prototype
+             * @memberof LengthMeasurer.prototype
              */
             maxSegmentLength: {
                 get: function () {
@@ -65,7 +74,7 @@ define([
             /**
              * The number of terrain elevation samples used along the path to approximate it's terrain following length.
              * @type {Number}
-             * @memberof Path.prototype
+             * @memberof LengthMeasurer.prototype
              */
             lengthTerrainSamplingSteps: {
                 get: function () {
@@ -96,9 +105,9 @@ define([
         };
 
         /**
-         * Get the path length in meter of a Path. <p/> <p>If the path's followTerrain is true, the computed length will account
-         * for terrain deformations as if someone was walking along that path. Otherwise the length is the sum of the
-         * cartesian distance between each positions.</p>
+         * Get the path length in meter of a Path. <p/> <p>If the path's followTerrain is true, the computed length
+         * will account for terrain deformations as if someone was walking along that path. Otherwise the length is the
+         * sum of the cartesian distance between each positions.</p>
          *
          * @param {Path} path
          *
@@ -108,6 +117,53 @@ define([
             var positions = this.clonePositions(path.positions);
             this.subdividedPositions = null;
             return this.computeLength(positions, path.followTerrain, path.pathType);
+        };
+
+        /**
+         * Get the great circle, rhumb or linear distance, in meter, of a Path or an array of Positions.
+         *
+         * @param {Path|Position[]} path A Path or an array of Positions
+         * @param {String} pathType Optional argument used when path is an array of Positions.
+         * Defaults to WorldWind.GREAT_CIRCLE.
+         * Recognized values are:
+         * <ul>
+         * <li>[WorldWind.GREAT_CIRCLE]{@link WorldWind#GREAT_CIRCLE}</li>
+         * <li>[WorldWind.RHUMB_LINE]{@link WorldWind#RHUMB_LINE}</li>
+         * <li>[WorldWind.LINEAR]{@link WorldWind#LINEAR}</li>
+         * </ul>
+         *
+         * @return {Number} the current path length or -1 if the position list is too short.
+         */
+        LengthMeasurer.prototype.getLocationDistance = function (path, pathType) {
+            if (path instanceof WorldWind.Path) {
+                var positions = path.positions;
+                var _pathType = path.pathType;
+            }
+            else if (Array.isArray(path)) {
+                positions = path;
+                _pathType = pathType || WorldWind.GREAT_CIRCLE;
+            }
+
+            if (!positions || positions.length < 2) {
+                return -1;
+            }
+
+            var fn = Location.greatCircleDistance;
+            if (_pathType === WorldWind.RHUMB_LINE) {
+                fn = Location.rhumbDistance;
+            }
+            else if (_pathType === WorldWind.LINEAR) {
+                fn = Location.linearDistance;
+            }
+
+            var distance = 0;
+            for (var i = 0, len = positions.length - 1; i < len; i++) {
+                var pos1 = positions[i];
+                var pos2 = positions[i + 1];
+                distance += fn(pos1, pos2);
+            }
+
+            return distance * this.wwd.globe.equatorialRadius;
         };
 
         /**
@@ -143,7 +199,7 @@ define([
             var p1 = new Vec3(0, 0, 0);
             var p2 = new Vec3(0, 0, 0);
             p1 = globe.computePointFromPosition(pos0.latitude, pos0.longitude, pos0.altitude, p1);
-            for (var i = 1; i < this.subdividedPositions.length; i++) {
+            for (var i = 1, len = this.subdividedPositions.length; i < len; i++) {
                 var pos = this.subdividedPositions[i];
                 p2 = globe.computePointFromPosition(pos.latitude, pos.longitude, pos.altitude, p2);
                 distance += p1.distanceTo(p2);
@@ -165,21 +221,24 @@ define([
          * @param {String} pathType
          * @param {Number} maxLength The maximum length for one segment.
          *
-         * @return a list of positions with no segment longer then maxLength and elevations following terrain or not.
+         * @return {Position[]} a list of positions with no segment longer then maxLength and elevations following
+         * terrain or not.
          */
         LengthMeasurer.prototype.subdividePositions = function (positions, followTerrain, pathType, maxLength) {
             var globe = this.wwd.globe;
             var subdividedPositions = [];
             var loc = new Location(0, 0);
+            var destLatLon = new Location(0, 0);
             var pos1 = positions[0];
+            var elevation;
 
             if (followTerrain) {
-                var elevation = globe.elevationAtLocation(pos1.latitude, pos1.longitude);
-                subdividedPositions.push(new Position(pos1.latitude, pos1.longitude, elevation));
+                elevation = globe.elevationAtLocation(pos1.latitude, pos1.longitude);
             }
             else {
-                subdividedPositions.push(new Position(pos1.latitude, pos1.longitude, pos1.altitude));
+                elevation = pos1.altitude;
             }
+            subdividedPositions.push(new Position(pos1.latitude, pos1.longitude, elevation));
 
             for (var i = 1; i < positions.length; i++) {
                 var pos2 = positions[i];
@@ -190,10 +249,9 @@ define([
                     // if necessary subdivide segment at regular intervals smaller then maxLength
                     var segmentAzimuth = null;
                     var segmentDistance = null;
-                    var steps = Math.ceil(arcLength / maxLength);
+                    var steps = Math.ceil(arcLength / maxLength); // number of intervals - at least two
                     for (var j = 1; j < steps; j++) {
                         var s = j / steps;
-                        var destLatLon = new Location(0, 0);
                         if (pathType === WorldWind.LINEAR) {
                             destLatLon = Location.interpolateLinear(s, pos1, pos2, destLatLon);
                         }
@@ -207,9 +265,10 @@ define([
                         else {
                             //GREAT_CIRCLE
                             if (segmentAzimuth == null) {
-                                segmentAzimuth = Location.greatCircleAzimuth(pos1, pos2);
-                                segmentDistance = Location.greatCircleDistance(pos1, pos2);
+                                segmentAzimuth = Location.greatCircleAzimuth(pos1, pos2); //degrees
+                                segmentDistance = Location.greatCircleDistance(pos1, pos2); //radians
                             }
+                            //Location, degrees, radians, Location
                             destLatLon = Location.greatCircleLocation(pos1, segmentAzimuth, s * segmentDistance, destLatLon);
                         }
 
@@ -228,14 +287,14 @@ define([
                 // Finally add the segment end position
                 if (followTerrain) {
                     elevation = globe.elevationAtLocation(pos2.latitude, pos2.longitude);
-                    subdividedPositions.push(new Position(pos2.latitude, pos2.longitude, elevation));
                 }
                 else {
-                    subdividedPositions.push(new Position(pos2.latitude, pos2.longitude, pos2.altitude));
+                    elevation = pos2.altitude;
                 }
+                subdividedPositions.push(new Position(pos2.latitude, pos2.longitude, elevation));
 
                 // Prepare for next segment
-                pos1.copy(pos2);
+                pos1 = pos2;
             }
 
             return subdividedPositions;
@@ -247,7 +306,7 @@ define([
          */
         LengthMeasurer.prototype.clonePositions = function (positions) {
             return positions.map(function (position) {
-                return new Position(position.longitude, position.latitude, position.altitude);
+                return new Position(position.latitude, position.longitude, position.altitude);
             });
         };
 

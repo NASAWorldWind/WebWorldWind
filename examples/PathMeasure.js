@@ -3,11 +3,16 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
-requirejs(['../src/WorldWind',
-        './LayerManager'],
-    function (ww,
-              LayerManager) {
+requirejs([
+        './LayerManager',
+        '../src/WorldWind'
+    ],
+    function (LayerManager,
+              WorldWind) {
         "use strict";
+
+        var calcBtn = document.getElementById('calc');
+        calcBtn.addEventListener('click', doCalc, false);
 
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -15,14 +20,17 @@ requirejs(['../src/WorldWind',
         window.wwd = wwd;
 
         var BNMGLayer = new WorldWind.BMNGLayer();
-        var pathLayer = new WorldWind.RenderableLayer('pathLayer');
+        var CoordinatesDisplayLayer = new WorldWind.CoordinatesDisplayLayer(wwd);
+        var pathLayer = new WorldWind.RenderableLayer('Path');
         wwd.addLayer(BNMGLayer);
+        wwd.addLayer(CoordinatesDisplayLayer);
         wwd.addLayer(pathLayer);
 
+        var altitude = 0;
         var pathPositions = [
-            new WorldWind.Position(40, -100, 1e4),
-            new WorldWind.Position(45, -110, 1e4),
-            new WorldWind.Position(46, -122, 1e4)
+            new WorldWind.Position(40, -100, altitude),
+            new WorldWind.Position(45, -110, altitude),
+            new WorldWind.Position(46, -122, altitude)
         ];
 
         var pathAttributes = new WorldWind.ShapeAttributes(null);
@@ -32,7 +40,7 @@ requirejs(['../src/WorldWind',
         var path = new WorldWind.Path(pathPositions, pathAttributes);
         path.altitudeMode = WorldWind.CLAMP_TO_GROUND;
         //path.pathType = WorldWind.RHUMB_LINE;
-        path.followTerrain = true;
+        path.followTerrain = false;
 
         pathLayer.addRenderable(path);
 
@@ -44,10 +52,14 @@ requirejs(['../src/WorldWind',
         var pathDist = lengthMeasurer.getPathLength(path);
         console.log('pathDistance', pathDist);
 
-        setTimeout(function () {
-            var topoDistance = lengthMeasurer.getPathLength(path);
-            console.log('topoDistance', topoDistance);
-        }, 30000);
+        var locationDistance = lengthMeasurer.getLocationDistance(path);
+        console.log('locationDistance', locationDistance);
+
+        function doCalc(){
+            var distance = lengthMeasurer.getPathLength(path);
+            console.log('distance', distance);
+            console.log('delta', locationDistance - distance);
+        }
 
         var layerManger = new LayerManager(wwd);
     });
