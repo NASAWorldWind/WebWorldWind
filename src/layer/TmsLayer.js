@@ -67,11 +67,21 @@ define([
                         "No image format supported."));
             }
 
+            // Compute the matrix width / height
+            this.nbTilesWidth = [];
+            this.nbTilesHeight = [];
+            for (var i = 0; i < config.resolutions.length ; i++) {
+                var unitWidth = config.size * config.resolutions[i];
+                var unitHeight = config.size * config.resolutions[i];
+                this.nbTilesWidth.push(Math.ceil((config.extent[2]-config.extent[0]-0.01*unitWidth)/unitWidth));
+                this.nbTilesHeight.push(Math.ceil((config.extent[3]-config.extent[1]-0.01*unitHeight)/unitHeight));
+            }
+
             TiledImageLayer.call(
                 this,
                 new Sector(config.extent[1], config.extent[3], config.extent[0], config.extent[2]),
-                new Location(36, 36), // TODO: How to determine best delta
-                18,
+                new Location(360/this.nbTilesHeight[0], 360/this.nbTilesWidth[0]),
+                config.resolutions.length,
                 format,
                 cachePath,
                 config.size,
@@ -91,21 +101,10 @@ define([
                 }
             };
 
-            this.detailControl = 0.5;
 
             this.imageSize = config.size;
             this.origin = config.origin;
             this.sector = new Sector(config.extent[1], config.extent[3], config.extent[0], config.extent[2]);
-
-            // Compute the matrix width / height
-            this.nbTilesWidth = [];
-            this.nbTilesHeight = [];
-            for (var i = 0; i < config.resolutions.length ; i++) {
-                var unitWidth = config.size * config.resolutions[i];
-                var unitHeight = config.size * config.resolutions[i];
-                this.nbTilesWidth.push(Math.ceil((config.extent[2]-config.extent[0]-0.01*unitWidth)/unitWidth));
-                this.nbTilesHeight.push(Math.ceil((config.extent[3]-config.extent[1]-0.01*unitHeight)/unitHeight));
-            }
         };
 
 
@@ -267,9 +266,7 @@ define([
             var tileDeltaLat = this.sector.deltaLatitude() / this.nbTilesHeight[level.levelNumber],
                 tileDeltaLon = this.sector.deltaLongitude() / this.nbTilesWidth[level.levelNumber],
 
-                //Todo
-                maxLat = this.sector.maxLatitude - (this.nbTilesHeight[level.levelNumber]-row-1) * tileDeltaLat, // Origin bottom left
-                // maxLat = this.sector.maxLatitude - row * tileDeltaLat, // Origin top left
+                maxLat = this.sector.maxLatitude - (this.nbTilesHeight[level.levelNumber]-row-1) * tileDeltaLat,
                 minLat = maxLat - tileDeltaLat,
                 minLon = this.origin[0] + tileDeltaLon * column,
                 maxLon = minLon + tileDeltaLon;
@@ -284,9 +281,7 @@ define([
 
             var mapSize = this.mapSizeForLevel(level.levelNumber),
                 swX = WWMath.clamp(column * this.imageSize, 0, mapSize),
-                //Todo
-                // neY = WWMath.clamp(row * this.imageSize, 0, mapSize), //Origin top left
-                neY = WWMath.clamp(mapSize - (row+1) * this.imageSize, 0, mapSize), //Origin bottom left
+                neY = WWMath.clamp(mapSize - (row+1) * this.imageSize, 0, mapSize),
                 neX = WWMath.clamp(swX + (this.imageSize), 0, mapSize),
                 swY = WWMath.clamp(neY + (this.imageSize), 0, mapSize),
                 x, y, swLat, swLon, neLat, neLon;
