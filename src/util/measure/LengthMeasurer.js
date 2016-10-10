@@ -10,12 +10,14 @@ define([
         '../../error/ArgumentError',
         '../../geom/Location',
         '../Logger',
+        './MeasurerUtils',
         '../../geom/Position',
         '../../geom/Vec3'
     ],
     function (ArgumentError,
               Location,
               Logger,
+              MeasurerUtils,
               Position,
               Vec3) {
 
@@ -134,7 +136,7 @@ define([
          *
          * @return {Number} the current path length or -1 if the position list is too short.
          */
-        LengthMeasurer.prototype.getLocationDistance = function (path, pathType) {
+        LengthMeasurer.prototype.getGeographicDistance = function (path, pathType) {
             if (path instanceof WorldWind.Path) {
                 var positions = path.positions;
                 var _pathType = path.pathType;
@@ -191,7 +193,8 @@ define([
                     maxLength = pathLength / this._lengthTerrainSamplingSteps;
                     maxLength = Math.min(Math.max(maxLength, this.DEFAULT_MIN_SEGMENT_LENGTH), this._maxSegmentLength);
                 }
-                this.subdividedPositions = this.subdividePositions(positions, followTerrain, pathType, maxLength);
+                this.subdividedPositions = MeasurerUtils.subdividePositions(globe, positions, followTerrain, pathType,
+                    maxLength);
             }
 
             var distance = 0;

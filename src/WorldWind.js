@@ -10,6 +10,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Angle',
         './shapes/Annotation',
         './shapes/AnnotationAttributes',
+        './util/measure/AreaMeasurer',
         './error/ArgumentError',
         './layer/AtmosphereLayer',
         './shaders/AtmosphereProgram',
@@ -122,6 +123,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/Logger',
         './navigate/LookAtNavigator',
         './geom/Matrix',
+        './util/measure/MeasurerUtils',
         './cache/MemoryCache',
         './cache/MemoryCacheListener',
         './layer/MercatorTiledImageLayer',
@@ -217,6 +219,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Angle,
               Annotation,
               AnnotationAttributes,
+              AreaMeasurer,
               ArgumentError,
               AtmosphereLayer,
               AtmosphereProgram,
@@ -329,6 +332,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Logger,
               LookAtNavigator,
               Matrix,
+              MeasurerUtils,
               MemoryCache,
               MemoryCacheListener,
               MercatorTiledImageLayer,
@@ -633,6 +637,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Angle'] = Angle;
         WorldWind['Annotation'] = Annotation;
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
+        WorldWind['AreaMeasurer'] = AreaMeasurer;
         WorldWind['ArgumentError'] = ArgumentError;
         WorldWind['AtmosphereLayer'] = AtmosphereLayer;
         WorldWind['AtmosphereProgram'] = AtmosphereProgram;
@@ -697,6 +702,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Logger'] = Logger;
         WorldWind['LookAtNavigator'] = LookAtNavigator;
         WorldWind['Matrix'] = Matrix;
+        WorldWind['MeasurerUtils'] = MeasurerUtils;
         WorldWind['MemoryCache'] = MemoryCache;
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
         WorldWind['MercatorTiledImageLayer'] = MercatorTiledImageLayer;
