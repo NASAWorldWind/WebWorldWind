@@ -137,13 +137,13 @@ define([
                     config.wgs84BoundingBox.lowerCorner[0],
                     config.wgs84BoundingBox.upperCorner[0]);
             } else if (this.tileMatrixSet.boundingBox &&
-                WmtsLayerCapabilities.isEpsg4326Crs(this.tileMatrixSet.boundingBox.crs)) {
+                WmtsLayer.isEpsg4326Crs(this.tileMatrixSet.boundingBox.crs)) {
                 this.sector = new Sector(
                     this.tileMatrixSet.boundingBox.lowerCorner[1],
                     this.tileMatrixSet.boundingBox.upperCorner[1],
                     this.tileMatrixSet.boundingBox.lowerCorner[0],
                     this.tileMatrixSet.boundingBox.upperCorner[0]);
-            } else if (WmtsLayerCapabilities.isEpsg4326Crs(this.tileMatrixSet.supportedCRS)) {
+            } else if (WmtsLayer.isEpsg4326Crs(this.tileMatrixSet.supportedCRS)) {
 
                 // Throw an exception if there is no 4326 bounding box.
                 throw new ArgumentError(
