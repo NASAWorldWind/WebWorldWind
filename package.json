@@ -14,6 +14,19 @@
     "grunt": "^0.4.5",
     "grunt-contrib-compress": "^0.13.0",
     "grunt-contrib-requirejs": "^0.4.4",
-    "grunt-jsdoc": "^0.6.3"
+    "grunt-jsdoc": "^0.6.3",
+    "grunt-karma": "^0.12.1",
+    "jasmine": "^2.4.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.22",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-cli": "^0.1.2",
+    "karma-htmlfile-reporter": "^0.2.2",
+    "karma-jasmine": "^0.3.7",
+    "karma-junit-reporter": "^0.3.8",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-requirejs": "^0.2.4",
+    "phantomjs-prebuilt": "^2.1.5",
+    "requirejs": "^2.1.22"
   }
 }

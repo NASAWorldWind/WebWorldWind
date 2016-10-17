@@ -2,17 +2,13 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define( [
     'src/formats/kml/util/ImagePyramid',
     'src/formats/kml/util/ViewVolume',
     'src/formats/kml/geom/KmlPoint',
     'src/formats/kml/features/KmlPhotoOverlay',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     ImagePyramid,
     ViewVolume,
     KmlPoint,
@@ -20,8 +16,7 @@ require({
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlPhotoOverlayTest", {
-        testValidKml: CatchTest(function () {
+    describe("KmlPhotoOverlayTest", function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<PhotoOverlay>" +
@@ -35,13 +30,18 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var photoOverlay = new KmlPhotoOverlay({objectNode:
                 kmlRepresentation.getElementsByTagName("PhotoOverlay")[0]});
+            it("should have the Rotation, Shape properties and have the prototype properties of ViewVolume,ImagePyramid," +
+                "KmlPoint", function(){
+                expect(photoOverlay.kmlRotation).toEqual('0');
+                expect(photoOverlay.kmlShape).toEqual('rectangle');
 
-            assertEquals(0, photoOverlay.kmlRotation);
-            assertEquals('rectangle', photoOverlay.kmlShape);
+                expect(photoOverlay.kmlViewVolume instanceof ViewVolume).toBeTruthy();
+                expect(photoOverlay.kmlImagePyramid instanceof ImagePyramid).toBeTruthy();
+                expect(photoOverlay.kmlPoint instanceof KmlPoint).toBeTruthy();
 
-            assertTrue(photoOverlay.kmlViewVolume instanceof ViewVolume);
-            assertTrue(photoOverlay.kmlImagePyramid instanceof ImagePyramid);
-            assertTrue(photoOverlay.kmlPoint instanceof KmlPoint);
-        })
-    })
-});
+            });
+
+
+
+        });
+    });

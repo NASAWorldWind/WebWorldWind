@@ -65,13 +65,28 @@ module.exports = function (grunt) {
                     ]}
                 ]
             }
-        }
+        },
 
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js',
+                singleRun: true,
+                reporters: ['dots', 'junit', 'html'],
+                junitReporter: {
+                    outputFile: 'test-results.xml',
+                    outputDir: 'test-results'
+                },
+                htmlReporter: {
+                    outputFile: 'test-results/report.html',
+                },
+            }
+        }
     });
 
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['jsdoc', 'requirejs', 'compress']);
+    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'compress']);
 };

@@ -32,7 +32,7 @@ define([
             if(DOMParser) {
                 var parser = new DOMParser();
                 var parsedDocument = parser.parseFromString(this._document, "text/xml");
-                if(parsedDocument.getElementsByTagName("parsererror").length) {
+                if(parsedDocument.getElementsByTagName("parsererror").length || !parsedDocument) {
                     throw new ArgumentError(
                         Logger.logMessage(Logger.LEVEL_SEVERE, "XmlDocument", "dom", "Invalid XML document. " +
                             parsedDocument.getElementsByTagName("parsererror")[0].innerHTML)

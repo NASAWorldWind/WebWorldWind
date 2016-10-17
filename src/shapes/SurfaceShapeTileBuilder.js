@@ -228,7 +228,7 @@ define([
                 var pickColor = dc.readPickColor(dc.pickPoint);
                 if (!!pickColor && shape.pickColor.equals(pickColor)) {
                     po = new PickedObject(shape.pickColor.clone(),
-                        shape._pickDelegate ? shape._pickDelegate : shape, null, shape.layer, false);
+                        shape.pickDelegate ? shape.pickDelegate : shape, null, shape.layer, false);
                     resolvablePickObjects.push(po);
                 }
             }

@@ -358,6 +358,8 @@ define([
          *     <li><i>name:</i> A String to assign as the created placemark's label.</li>
          *     <li><i>altitude:</i> A Number indicating the altitude of the created placemark.
          *     If not specified, the altitude of all created placemarks is 0.</li>
+         *     <li><i>pickDelegate:</i> An object returned as the userObject when this feature is picked.</li>
+         *     <li><i>userProperties:</i> An ad hoc object assigned to the renderable.</li>
          * </ul>
          * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
          * @throws {ArgumentError} If the specified layer is null or undefined.
@@ -392,7 +394,12 @@ define([
                         if (configuration.name) {
                             placemark.label = configuration.name;
                         }
-
+                        if (configuration.pickDelegate) {
+                            placemark.pickDelegate = configuration.pickDelegate;
+                        }
+                        if (configuration.userProperties) {
+                            placemark.userProperties = configuration.userProperties;
+                        }
                         layer.addRenderable(placemark);
                     }
                 }
@@ -422,6 +429,8 @@ define([
          *     <li><i>altitude:</i> A Number indicating the altitude of the created placemarks.
          *     If not specified, the altitude of all created placemarks is 0.</li>
          *     <li><i>name:</i> A String to assign as the created placemarks' label.</li>
+         *     <li><i>pickDelegate:</i> An object returned as the userObject when this feature is picked.</li>
+         *     <li><i>userProperties:</i> An ad hoc object assigned to the renderable.</li>
          * </ul>
          * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
          * @throws {ArgumentError} If the specified layer is null or undefined.
@@ -456,7 +465,12 @@ define([
                         if (configuration.name) {
                             placemark.label = configuration.name;
                         }
-
+                        if (configuration.pickDelegate) {
+                            placemark.pickDelegate = configuration.pickDelegate;
+                        }
+                        if (configuration.userProperties) {
+                            placemark.userProperties = configuration.userProperties;
+                        }
                         layer.addRenderable(placemark);
                     }
                 }
@@ -487,6 +501,8 @@ define([
          *     If unspecified or 0, a {@link SurfacePolyline} is created for the record, otherwise a
          *     {@link Path} is created.</li>
          *     <li><i>name:</i> A String to assign as the created shape's displayName property.</li>
+         *     <li><i>pickDelegate:</i> An object returned as the userObject when this feature is picked.</li>
+         *     <li><i>userProperties:</i> An ad hoc object assigned to the renderable.</li>
          * </ul>
          * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
          * @throws {ArgumentError} If the specified layer is null or undefined.
@@ -533,7 +549,12 @@ define([
                     if (configuration.name) {
                         shape.displayName = configuration.name;
                     }
-
+                    if (configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }
                     layer.addRenderable(shape);
                 }
             }
@@ -568,6 +589,8 @@ define([
          *     relative to ground and its [extrude]{@link Polygon#extrude} property set to true to create an
          *     extruded polygon. A height specified here overrides an altitude if both are specified.</li>
          *     <li><i>name:</i> A String to assign as the created shape's displayName property.</li>
+         *     <li><i>pickDelegate:</i> An object returned as the userObject when this feature is picked.</li>
+         *     <li><i>userProperties:</i> An ad hoc object assigned to the renderable.</li>
          * </ul>
          * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
          * @throws {ArgumentError} If the specified layer is null or undefined.
@@ -628,7 +651,12 @@ define([
                 if (configuration.name) {
                     shape.displayName = configuration.name;
                 }
-
+                if (configuration.pickDelegate) {
+                    shape.pickDelegate = configuration.pickDelegate;
+                }
+                if (configuration.userProperties) {
+                    shape.userProperties = configuration.userProperties;
+                }
                 layer.addRenderable(shape);
             }
         };

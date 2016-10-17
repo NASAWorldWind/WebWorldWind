@@ -52,6 +52,9 @@ define([
             this._planarConfiguration = null;
 
             // Documented in defineProperties below.
+            this._resolutionUnit = null;
+
+            // Documented in defineProperties below.
             this._rowsPerStrip = null;
 
             // Documented in defineProperties below.
@@ -80,6 +83,12 @@ define([
 
             // Documented in defineProperties below.
             this._tileWidth = null;
+
+            // Documented in defineProperties below.
+            this._xResolution = null;
+
+            // Documented in defineProperties below.
+            this._yResolution = null;
 
             // Documented in defineProperties below.
             this._geoAsciiParams = null;
@@ -121,8 +130,19 @@ define([
             this._geogCitationGeoKey = null;
 
             // Documented in defineProperties below.
-            this._projectedCSType = null;
+            this._geogAngularUnitsGeoKey = null;
 
+            // Documented in defineProperties below.
+            this._geogAngularUnitSizeGeoKey = null;
+
+            // Documented in defineProperties below.
+            this._geogSemiMajorAxisGeoKey = null;
+
+            // Documented in defineProperties below.
+            this._geogInvFlatteningGeoKey = null;
+
+            // Documented in defineProperties below.
+            this._projectedCSType = null;
         };
 
         Object.defineProperties(GeoTiffMetadata.prototype, {
@@ -294,6 +314,26 @@ define([
             },
 
             /**
+             * Contains the unit of measurement for XResolution and YResolution. The specified values are:
+             * <ul>
+             *     <li>1 = No absolute unit of measurement</li>
+             *     <li>2 = Inch</li>
+             *     <li>3 = Centimeter</li>
+             * </ul>
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            resolutionUnit: {
+                get: function () {
+                    return this._resolutionUnit;
+                },
+
+                set: function(value){
+                    this._resolutionUnit = value;
+                }
+            },
+
+            /**
              * Contains the number of rows per strip.
              * @memberof GeoTiffMetadata.prototype
              * @type {Number}
@@ -455,8 +495,8 @@ define([
                     return this._geoDoubleParams;
                 },
 
-                    set: function(value){
-                        this._geoDoubleParams = value;
+                set: function(value){
+                    this._geoDoubleParams = value;
                 }
             },
 
@@ -634,6 +674,66 @@ define([
             },
 
             /**
+             * Allows the definition of geocentric CS Linear units for used-defined GCS and for ellipsoids
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            geogAngularUnitsGeoKey: {
+                get: function () {
+                    return this._geogAngularUnitsGeoKey;
+                },
+
+                set: function(value){
+                    this._geogAngularUnitsGeoKey = value;
+                }
+            },
+
+            /**
+             * Allows the definition of user-defined angular geographic units, as measured in radians
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            geogAngularUnitSizeGeoKey: {
+                get: function () {
+                    return this._geogAngularUnitSizeGeoKey;
+                },
+
+                set: function(value){
+                    this._geogAngularUnitSizeGeoKey = value;
+                }
+            },
+
+            /**
+             * Allows the specification of user-defined Ellipsoidal Semi-Major Axis
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            geogSemiMajorAxisGeoKey: {
+                get: function () {
+                    return this._geogSemiMajorAxisGeoKey;
+                },
+
+                set: function(value){
+                    this._geogSemiMajorAxisGeoKey = value;
+                }
+            },
+
+            /**
+             * Allows the specification of the inverse of user-defined Ellipsoid's flattening parameter f.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            geogInvFlatteningGeoKey: {
+                get: function () {
+                    return this._geogInvFlatteningGeoKey;
+                },
+
+                set: function(value){
+                    this._geogInvFlatteningGeoKey = value;
+                }
+            },
+
+            /**
              * Contains the EPSG code of the geotiff.
              * @memberof GeoTiffMetadata.prototype
              * @type {Number}
@@ -645,6 +745,36 @@ define([
 
                 set: function(value){
                     this._projectedCSType = value;
+                }
+            },
+
+            /**
+             * Contains the number of pixels per resolution unit in the image width direction.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            xResolution: {
+                get: function () {
+                    return this._xResolution;
+                },
+
+                set: function(value){
+                    this._xResolution = value;
+                }
+            },
+
+            /**
+             * Contains the number of pixels per resolution unit in the image length direction.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            yResolution: {
+                get: function () {
+                    return this._yResolution;
+                },
+
+                set: function(value){
+                    this._yResolution = value;
                 }
             }
         });

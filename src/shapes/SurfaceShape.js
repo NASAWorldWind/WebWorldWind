@@ -936,7 +936,7 @@ define([
             }
 
             if (isPicking) {
-                var po = new PickedObject(this.pickColor.clone(), this._pickDelegate ? this._pickDelegate : this,
+                var po = new PickedObject(this.pickColor.clone(), this.pickDelegate ? this.pickDelegate : this,
                     null, this.layer, false);
                 dc.resolvePick(po);
             }

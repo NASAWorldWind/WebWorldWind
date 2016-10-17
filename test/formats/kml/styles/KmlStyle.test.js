@@ -2,10 +2,7 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/styles/KmlStyle',
     'src/formats/kml/styles/KmlIconStyle',
     'src/formats/kml/styles/KmlLabelStyle',
@@ -15,7 +12,6 @@ require({
     'src/formats/kml/styles/KmlListStyle',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlStyle,
     KmlIconStyle,
     KmlLabelStyle,
@@ -26,8 +22,8 @@ require({
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlStyleTest", {
-        testValidKml: CatchTest(function () {
+    describe("KmlStyleTest",function(){
+
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Style>" +
@@ -42,13 +38,16 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var style = new KmlStyle({objectNode:
                 kmlRepresentation.getElementsByTagName("Style")[0]});
+            it ("should have the prototype property of KmlIconStyle, KmlLabelStyle, KmlLineStyle, KmlPolyStyle, KmlBalloonStyle" +
+                " KmlBalloonStyle and KmlListStyle", function(){
+                expect(style.kmlIconStyle instanceof KmlIconStyle).toBeTruthy();
+                expect(style.kmlLabelStyle instanceof KmlLabelStyle).toBeTruthy();
+                expect(style.kmlLineStyle instanceof KmlLineStyle).toBeTruthy();
+                expect(style.kmlPolyStyle instanceof KmlPolyStyle).toBeTruthy();
+                expect(style.kmlBalloonStyle instanceof KmlBalloonStyle).toBeTruthy();
+                expect(style.kmlListStyle instanceof KmlListStyle).toBeTruthy();
 
-            assertTrue(style.kmlIconStyle instanceof KmlIconStyle);
-            assertTrue(style.kmlLabelStyle instanceof KmlLabelStyle);
-            assertTrue(style.kmlLineStyle instanceof KmlLineStyle);
-            assertTrue(style.kmlPolyStyle instanceof KmlPolyStyle);
-            assertTrue(style.kmlBalloonStyle instanceof KmlBalloonStyle);
-            assertTrue(style.kmlListStyle instanceof KmlListStyle);
-        })
-    })
-});
+            });
+
+        });
+    });

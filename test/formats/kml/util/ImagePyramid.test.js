@@ -2,20 +2,32 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/util/ImagePyramid',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     ImagePyramid,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlImagePyramidTest", {
-        testValidKml: CatchTest(function () {
+    describe("KmlImagePyramidTest", function () {
+        var index = 0;
+
+        beforeEach(function() {
+            this.index = index++;
+        });
+
+        afterEach(function() {
+            if (this.index > 0)
+            {   var failed = jsApiReporter.specResults(this.index -1, 1)[0].failedExpectations;
+                console.log('failed: ', failed);
+                if (failed.length > 0)
+                {
+                    console.log('After: ', this, failed[0].message);
+                    alert('ha');
+                }
+            }
+        });
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<ImagePyramid>" +
@@ -29,10 +41,13 @@ require({
             var imagePyramid = new ImagePyramid({objectNode:
                 kmlRepresentation.getElementsByTagName("ImagePyramid")[0]});
 
-            assertEquals(256, imagePyramid.kmlTileSize);
-            assertEquals(10, imagePyramid.kmlMaxWidth);
-            assertEquals(10, imagePyramid.kmlMaxHeight);
-            assertEquals("lowerLeft", imagePyramid.kmlGridOrigin);
-        })
-    })
-});
+        it('should have the TileSize, MaxWidth, MaxHeight and GridOrigin properties', function(){
+            expect(imagePyramid.kmlTileSize).toEqual(256);
+            expect(imagePyramid.kmlMaxWidth).toEqual(10);
+            expect(imagePyramid.kmlMaxHeight).toEqual(10);
+            expect(imagePyramid.kmlGridOrigin).toEqual("lowerLeft");
+        });
+
+
+        });
+    });

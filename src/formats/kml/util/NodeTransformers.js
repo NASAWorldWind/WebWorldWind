@@ -102,7 +102,7 @@ define([
         }
         var linearRingNode = null;
         Array.prototype.forEach.call(node.childNodes, function(pNode){
-            if(pNode.nodeName == "LinearRing") {
+            if(pNode.nodeName.toUpperCase() == "LinearRing".toUpperCase()) {
                 linearRingNode = pNode;
             }
         });

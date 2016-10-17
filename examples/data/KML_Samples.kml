@@ -339,22 +339,24 @@
         <Folder>
             <name>Ground Overlays</name>
             <description>Examples of ground overlays</description>
-            <GroundOverlay>
-                <name>Large-scale overlay on terrain</name>
-                <description>Overlay shows Mount Etna erupting
-                    on July 13th, 2001.
-                </description>
-                <Icon>
-                    <href>data/etna.jpg</href>
-                </Icon>
-                <LatLonBox>
-                    <north>37.91904192681665</north>
-                    <south>37.46543388598137</south>
-                    <east>15.35832653742206</east>
-                    <west>14.60128369746704</west>
-                    <rotation>-0.1556640799496235</rotation>
-                </LatLonBox>
-            </GroundOverlay>
+            <NetworkLink>
+                <Link>
+                    <href>data/etnaOverlay.kml</href>
+                    <refreshMode>onInterval</refreshMode>
+                    <refreshInterval>10</refreshInterval>
+                </Link>
+                <Region>
+                    <LatLonAltBox>
+                        <north>37.91904192681665</north>
+                        <south>37.46543388598137</south>
+                        <east>15.35832653742206</east>
+                        <west>14.60128369746704</west>
+                        <minAltitude>0</minAltitude>
+                        <maxAltitude>1000000</maxAltitude>
+                        <altitudeMode>clampToGround</altitudeMode>
+                    </LatLonAltBox>
+                </Region>
+            </NetworkLink>
         </Folder>
         <Folder>
 

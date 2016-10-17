@@ -11,9 +11,12 @@ define([
      * Simple factory, which understands the mapping between the XML and the internal Elements.
      * @constructor
      * @alias KmlElementsFactory
+     * @params options {Object}
+     * @params options.controls {Control[]} Defaults to empty array
      */
     var KmlElementsFactory = function (options) {
-        this.options = options;
+        this.options = options || {};
+        this.options.controls = this.options.controls || [];
     };
 
     /**
