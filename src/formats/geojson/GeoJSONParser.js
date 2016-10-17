@@ -97,7 +97,11 @@ define(['../../error/ArgumentError',
             this._layer = null;
 
             // Documented in defineProperties below.
+            this._parserCompletionCallback = null;
+
+            // Documented in defineProperties below.
             this._shapeConfigurationCallback = this.defaultShapeConfigurationCallback;
+
 
             this.defaultPlacemarkAttributes = new PlacemarkAttributes(null);
 
@@ -177,6 +181,19 @@ define(['../../error/ArgumentError',
                 }
             },
 
+            /** The completion callback specified to [load]{@link GeoJSONParser#load}. An optional function called when
+             * the GeoJSON loading is complete and
+             * all the shapes have been added to the layer.
+             * @memberof GeoJSONParser.prototype
+             * @type {Function}
+             * @readonly
+             */
+            parserCompletionCallback: {
+                get: function () {
+                    return this._parserCompletionCallback;
+                }
+            },
+
             /**
              * The attribute callback specified to [load]{@link GeoJSONParser#load}.
              * See that method's description for details.
@@ -196,6 +213,8 @@ define(['../../error/ArgumentError',
          * Retrieves the GeoJSON, parses it and creates shapes representing its contents. The result is a layer
          * containing the created shapes. A function can also be specified to be called for each GeoJSON geometry so
          * that the attributes and other properties of the shape created for it can be assigned.
+         * @param {Function} parserCompletionCallback An optional function called when the GeoJSON loading is
+         * complete and all the shapes have been added to the layer.
          * @param {Function} shapeConfigurationCallback An optional function called by the addRenderablesFor*
          * methods just prior to creating a shape for the indicated GeoJSON geometry. This function
          * can be used to assign attributes to newly created shapes. The callback function's first argument is the
@@ -219,7 +238,10 @@ define(['../../error/ArgumentError',
          * property.
          */
 
-        GeoJSONParser.prototype.load = function ( shapeConfigurationCallback, layer) {
+        GeoJSONParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
+            if (parserCompletionCallback) {
+                this._parserCompletionCallback = parserCompletionCallback;
+            }
 
             if (shapeConfigurationCallback) {
                 this._shapeConfigurationCallback = shapeConfigurationCallback;
@@ -325,6 +347,10 @@ define(['../../error/ArgumentError',
                         throw new ArgumentError(
                             Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
                                 "missingGeoJSONType"));
+                    }
+
+                    if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
+                        this._parserCompletionCallback(this.layer);
                     }
                 }
             }
@@ -553,6 +579,15 @@ define(['../../error/ArgumentError',
                 if (configuration && configuration.name){
                     placemark.label = configuration.name;
                 }
+                if (configuration.highlightAttributes) {
+                    placemark.highlightAttributes = configuration.highlightAttributes;
+                }
+                if (configuration && configuration.pickDelegate) {
+                    placemark.pickDelegate = configuration.pickDelegate;
+                }
+                if (configuration && configuration.userProperties) {
+                    placemark.userProperties = configuration.userProperties;
+                }
                 layer.addRenderable(placemark);
             }
         };
@@ -603,6 +638,15 @@ define(['../../error/ArgumentError',
                     placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
                     if (configuration && configuration.name){
                         placemark.label = configuration.name;
+                    }
+                    if (configuration.highlightAttributes) {
+                        placemark.highlightAttributes = configuration.highlightAttributes;
+                    }
+                    if (configuration && configuration.pickDelegate) {
+                        placemark.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        placemark.userProperties = configuration.userProperties;
                     }
                     layer.addRenderable(placemark);
                 }
@@ -655,6 +699,15 @@ define(['../../error/ArgumentError',
                 shape = new SurfacePolyline(
                     positions,
                     configuration && configuration.attributes ? configuration.attributes : null);
+                if (configuration.highlightAttributes) {
+                    shape.highlightAttributes = configuration.highlightAttributes;
+                }
+                if (configuration && configuration.pickDelegate) {
+                    shape.pickDelegate = configuration.pickDelegate;
+                }
+                if (configuration && configuration.userProperties) {
+                    shape.userProperties = configuration.userProperties;
+                }
                 layer.addRenderable(shape);
             }
         };
@@ -708,6 +761,15 @@ define(['../../error/ArgumentError',
                     shape = new SurfacePolyline(
                         positions,
                         configuration && configuration.attributes ? configuration.attributes : null);
+                    if (configuration.highlightAttributes) {
+                        shape.highlightAttributes = configuration.highlightAttributes;
+                    }
+                    if (configuration && configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }
                     layer.addRenderable(shape);
                 }
             }
@@ -761,7 +823,15 @@ define(['../../error/ArgumentError',
                     shape = new SurfacePolygon(
                         positions,
                         configuration && configuration.attributes ? configuration.attributes : null);
-                    layer.addRenderable(shape);
+                    if (configuration.highlightAttributes) {
+                        shape.highlightAttributes = configuration.highlightAttributes;
+                    }
+                    if (configuration && configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }                    layer.addRenderable(shape);
                 }
             }
         };
@@ -819,6 +889,15 @@ define(['../../error/ArgumentError',
                     shape = new SurfacePolygon(
                         boundaries,
                         configuration && configuration.attributes ? configuration.attributes : null);
+                    if (configuration.highlightAttributes) {
+                        shape.highlightAttributes = configuration.highlightAttributes;
+                    }
+                    if (configuration && configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration && configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }
                     layer.addRenderable(shape);
                 }
             }

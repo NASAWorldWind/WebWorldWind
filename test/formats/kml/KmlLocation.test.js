@@ -2,20 +2,15 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/KmlLocation',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlLocation,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlLocationTest", {
-        testValidKml: CatchTest(function () {
+    describe("KmlLocationTest", function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Location>" +
@@ -27,10 +22,11 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var location = new KmlLocation({objectNode:
                 kmlRepresentation.getElementsByTagName("Location")[0]});
+        it('should have the Longitude, Latitude and Altitude properties', function(){
 
-            assertEquals(45.0, location.kmlLongitude);
-            assertEquals(10.0, location.kmlLatitude);
-            assertEquals(0.0, location.kmlAltitude);
-        })
-    })
+            expect(location.kmlLongitude).toBe('45.0');
+            expect(location.kmlLatitude).toBe('10.0');
+            expect(location.kmlAltitude).toBe('0.0');
+        });
+    });
 });

@@ -2,62 +2,58 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-},[
-    'test/CatchTest',
+require([
     'src/util/WWUtil'
 ], function (
-    CatchTest,
     WWUtil
 ) {
     "use strict";
-    TestCase("WWUtil-arrayEquals", {
-        testEqualArrays: CatchTest(function(){
+    describe("WWUtil-arrayEquals", function() {
+        if("testEqualArrays", function() {
             var array1 = [1,2,3];
             var array2 = [1,2,3];
 
             assertTrue(WWUtil.arrayEquals(array1, array2));
-        }),
+        });
 
-        testDifferentArraysDifferentLength: CatchTest(function(){
+        if("testDifferentArraysDifferentLength", function() {
             var array1 = [1,2,3];
             var array2 = [1,2,3,4];
 
             assertFalse(WWUtil.arrayEquals(array1, array2));
-        }),
+        });
 
-        testDifferentArraysSameLength: CatchTest(function(){
+        if("testDifferentArraysSameLength", function() {
             var array1 = [1,2,3];
             var array2 = [1,5,3];
 
             assertFalse(WWUtil.arrayEquals(array1, array2));
-        }),
+        });
 
-        testObjectsWithEquals: CatchTest(function(){
+        if("testObjectsWithEquals", function() {
             var array1 = [{equals: function(){return true}}];
             var array2 = [1];
 
             assertTrue(WWUtil.arrayEquals(array1, array2));
-        })
+        });
     });
 
-    TestCase("WWUtil-transformToBoolean", {
-        testTransformToBoolean0: CatchTest(function(){
-            assertFalse(WWUtil.transformToBoolean(0));
-            assertFalse(WWUtil.transformToBoolean("0"));
-        }),
+    describe("WWUtil-transformToBoolean", function() {
+        if("testTransformToBoolean0", function() {
+            expect(WWUtil.transformToBoolean(0)).toBe(false);
+            expect(WWUtil.transformToBoolean("0")).toBe(false);
+        });
 
-        testTransformToBooleanFalse: CatchTest(function(){
-            assertFalse(WWUtil.transformToBoolean("false"));
-            assertFalse(WWUtil.transformToBoolean(false));
-        }),
+        if("testTransformToBooleanFalse", function() {
+            expect(WWUtil.transformToBoolean("false")).toBe(false);
+            expect(WWUtil.transformToBoolean(false)).toBe(false);
+        });
 
-        testTransformToBooleanTrue: CatchTest(function(){
-            assertTrue(WWUtil.transformToBoolean(true));
-            assertTrue(WWUtil.transformToBoolean("true"));
-            assertTrue(WWUtil.transformToBoolean("1"));
-            assertTrue(WWUtil.transformToBoolean(1));
-        })
+        if("testTransformToBooleanTrue", function() {
+            expect(WWUtil.transformToBoolean(true)).toBe(true);
+            expect(WWUtil.transformToBoolean("true")).toBe(true);
+            expect(WWUtil.transformToBoolean("1")).toBe(true);
+            expect(WWUtil.transformToBoolean(1)).toBe(true);
+        });
     });
 });

@@ -107,46 +107,49 @@ define([
             this.texCoordVboCacheKey = 'global_tex_coords';
 
             this.indices = null;
-            this.numIndices = null;
             this.indicesVboCacheKey = 'global_indices';
 
+            this.baseIndices = null;
+            this.baseIndicesOffset = null;
+            this.numBaseIndices = null;
+
             this.indicesNorth = null;
+            this.indicesNorthOffset = null;
             this.numIndicesNorth = null;
-            this.indicesNorthVboCacheKey = 'global_north_indices';
 
             this.indicesSouth = null;
+            this.indicesSouthOffset = null;
             this.numIndicesSouth = null;
-            this.indicesSouthVboCacheKey = 'global_south_indices';
 
             this.indicesWest = null;
+            this.indicesWestOffset = null;
             this.numIndicesWest = null;
-            this.indicesWestVboCacheKey = 'global_west_indices';
 
             this.indicesEast = null;
+            this.indicesEastOffset = null;
             this.numIndicesEast = null;
-            this.indicesEastVboCacheKey = 'global_east_indices';
 
             this.indicesLoresNorth = null;
+            this.indicesLoresNorthOffset = null;
             this.numIndicesLoresNorth = null;
-            this.indicesLoresNorthVboCacheKey = 'global_lores_north_indices';
 
             this.indicesLoresSouth = null;
+            this.indicesLoresSouthOffset = null;
             this.numIndicesLoresSouth = null;
-            this.indicesLoresSouthVboCacheKey = 'global_lores_south_indices';
 
             this.indicesLoresWest = null;
+            this.indicesLoresWestOffset = null;
             this.numIndicesLoresWest = null;
-            this.indicesLoresWestVboCacheKey = 'global_lores_west_indices';
 
             this.indicesLoresEast = null;
+            this.indicesLoresEastOffset = null;
             this.numIndicesLoresEast = null;
-            this.indicesLoresEastVboCacheKey = 'global_lores_east_indices';
 
-            this.outlineIndices = null;
-            this.outlineIndicesVboCacheKey = 'global_outline_indices';
+            this.outlineIndicesOffset = null;
+            this.numOutlineIndices = null;
 
-            this.wireframeIndices = null;
-            this.wireframeIndicesVboCacheKey = 'global_wireframe_indices';
+            this.wireframeIndicesOffset = null;
+            this.numWireframeIndices = null;
 
             this.scratchMatrix = Matrix.fromIdentity();
             this.scratchElevations = null;
@@ -263,6 +266,10 @@ define([
                 gl.vertexAttribPointer(this.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(this.vertexTexCoordLocation);
             }
+
+            var indicesVbo = gpuResourceCache.resourceForKey(this.indicesVboCacheKey);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesVbo);
+
         };
 
         /**
@@ -349,107 +356,98 @@ define([
             }
 
             var gl = dc.currentGlContext,
-                gpuResourceCache = dc.gpuResourceCache,
                 prim = gl.TRIANGLE_STRIP; // replace TRIANGLE_STRIP with LINE_STRIP to debug borders
 
-            var indicesVbo = gpuResourceCache.resourceForKey(this.indicesVboCacheKey);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesVbo);
+            /*
+             * Indices order in the buffer:
+             *
+             * base indices
+             *
+             * north border
+             * south border
+             * west border
+             * east border
+             *
+             * north lores
+             * south lores
+             * west lores
+             * east lores
+             *
+             * wireframe
+             * outline
+             */
 
             gl.drawElements(
                 prim,
-                this.numIndices,
+                this.numBaseIndices,
                 gl.UNSIGNED_SHORT,
-                0);
+                this.baseIndicesOffset * 2);
 
             var level = terrainTile.level,
                 neighborLevel;
 
             neighborLevel = terrainTile.neighborLevel(WorldWind.NORTH);
             if (neighborLevel && neighborLevel.compare(level) < 0) {
-                var indicesLoresNorthVbo = gpuResourceCache.resourceForKey(this.indicesLoresNorthVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresNorthVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesLoresNorth,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesLoresNorthOffset * 2);
             }
             else {
-                var indicesNorthVbo = gpuResourceCache.resourceForKey(this.indicesNorthVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesNorthVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesNorth,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesNorthOffset * 2);
             }
 
             neighborLevel = terrainTile.neighborLevel(WorldWind.SOUTH);
             if (neighborLevel && neighborLevel.compare(level) < 0) {
-                var indicesLoresSouthVbo = gpuResourceCache.resourceForKey(this.indicesLoresSouthVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresSouthVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesLoresSouth,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesLoresSouthOffset * 2);
             }
             else {
-                var indicesSouthVbo = gpuResourceCache.resourceForKey(this.indicesSouthVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesSouthVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesSouth,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesSouthOffset * 2);
             }
 
             neighborLevel = terrainTile.neighborLevel(WorldWind.WEST);
             if (neighborLevel && neighborLevel.compare(level) < 0) {
-                var indicesLoresWestVbo = gpuResourceCache.resourceForKey(this.indicesLoresWestVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresWestVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesLoresWest,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesLoresWestOffset * 2);
             }
             else {
-                var indicesWestVbo = gpuResourceCache.resourceForKey(this.indicesWestVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesWestVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesWest,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesWestOffset * 2);
             }
 
             neighborLevel = terrainTile.neighborLevel(WorldWind.EAST);
             if (neighborLevel && neighborLevel.compare(level) < 0) {
-                var indicesLoresEastVbo = gpuResourceCache.resourceForKey(this.indicesLoresEastVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresEastVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesLoresEast,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesLoresEastOffset * 2);
             }
             else {
-                var indicesEastVbo = gpuResourceCache.resourceForKey(this.indicesEastVboCacheKey);
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesEastVbo);
-
                 gl.drawElements(
                     prim,
                     this.numIndicesEast,
                     gl.UNSIGNED_SHORT,
-                    0);
+                    this.indicesEastOffset * 2);
             }
         };
 
@@ -465,22 +463,18 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "renderWireframeTile", "missingTile"));
             }
 
-            var gl = dc.currentGlContext,
-                gpuResourceCache = dc.gpuResourceCache;
+            var gl = dc.currentGlContext;
 
             // Must turn off texture coordinates, which were turned on in beginRendering.
             if (this.vertexTexCoordLocation >= 0) {
                 gl.disableVertexAttribArray(this.vertexTexCoordLocation);
             }
 
-            var wireframeIndicesVbo = gpuResourceCache.resourceForKey(this.wireframeIndicesVboCacheKey);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, wireframeIndicesVbo);
-
             gl.drawElements(
                 gl.LINES,
-                this.wireframeIndices.length,
+                this.numWireframeIndices,
                 gl.UNSIGNED_SHORT,
-                0);
+                this.wireframeIndicesOffset * 2);
         };
 
         /**
@@ -495,22 +489,18 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "renderTileOutline", "missingTile"));
             }
 
-            var gl = dc.currentGlContext,
-                gpuResourceCache = dc.gpuResourceCache;
+            var gl = dc.currentGlContext;
 
             // Must turn off texture coordinates, which were turned on in beginRendering.
             if (this.vertexTexCoordLocation >= 0) {
                 gl.disableVertexAttribArray(this.vertexTexCoordLocation);
             }
 
-            var outlineIndicesVbo = gpuResourceCache.resourceForKey(this.outlineIndicesVboCacheKey);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, outlineIndicesVbo);
-
             gl.drawElements(
                 gl.LINE_LOOP,
-                this.outlineIndices.length,
+                this.numOutlineIndices,
                 gl.UNSIGNED_SHORT,
-                0);
+                this.outlineIndicesOffset * 2);
         };
 
         /**
@@ -629,8 +619,8 @@ define([
             // Assemble the shared tile index geometry. This initializes the index properties used below.
             this.buildSharedGeometry(tile);
 
-            // Compute any intersections with the tile's interior triangles.
-            elements = this.indices;
+            // Compute any intersections with the tile's interior triangles..
+            elements = this.baseIndices;
             WWMath.computeTriStripIntersections(line, points, elements, results);
 
             // Compute any intersections with the tile's south border triangles.
@@ -1097,14 +1087,6 @@ define([
             if (!this.indices) {
                 this.buildIndices(tileWidth, tileHeight);
             }
-
-            if (!this.wireframeIndices) {
-                this.buildWireframeIndices(tileWidth, tileHeight);
-            }
-
-            if (!this.outlineIndices) {
-                this.buildOutlineIndices(tileWidth, tileHeight);
-            }
         };
 
         Tessellator.prototype.buildTexCoords = function (tileWidth, tileHeight) {
@@ -1146,7 +1128,7 @@ define([
             // There are tileHeight rows.
             // There are tileHeight + 2 columns
             var numIndices = 2 * (numLatVertices - 3) * (numLonVertices - 2) + 2 * (numLatVertices - 3);
-            var indices = new Int16Array(numIndices);
+            var indices = [];
 
             // Inset core by one round of sub-tiles. Full grid is numLatVertices x numLonVertices. This must be used
             // to address vertices in the core as well.
@@ -1170,9 +1152,9 @@ define([
                 indices[index++] = vertexIndex;
             }
 
-            // assert(index == numIndices);
-            this.indices = indices;
-            this.numIndices = numIndices;
+            this.baseIndicesOffset = indices.length - numIndices;
+            this.baseIndices = new Uint16Array(indices.slice(this.baseIndicesOffset));
+            this.numBaseIndices = numIndices;
 
             // TODO: parameterize and refactor!!!!!
             // Software engineering notes: There are patterns being used in the following code that should be abstracted.
@@ -1204,9 +1186,6 @@ define([
              */
             // North border.
             numIndices = 2 * numLonVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             latIndex = numLatVertices - 1;
 
             // Corner vertex.
@@ -1225,15 +1204,12 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesNorth = indices;
+            this.indicesNorthOffset = indices.length - numIndices;
+            this.indicesNorth = new Uint16Array(indices.slice(this.indicesNorthOffset));
             this.numIndicesNorth = numIndices;
 
             // South border.
             numIndices = 2 * numLonVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             latIndex = 0;
 
             // Corner vertex.
@@ -1252,15 +1228,12 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesSouth = indices;
+            this.indicesSouthOffset = indices.length - numIndices;
+            this.indicesSouth = new Uint16Array(indices.slice(this.indicesSouthOffset));
             this.numIndicesSouth = numIndices;
 
             // West border.
             numIndices = 2 * numLatVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             lonIndex = 0;
 
             // Corner vertex.
@@ -1279,15 +1252,12 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesWest = indices;
+            this.indicesWestOffset = indices.length - numIndices;
+            this.indicesWest = new Uint16Array(indices.slice(this.indicesWestOffset));
             this.numIndicesWest = numIndices;
 
             // East border.
             numIndices = 2 * numLatVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             lonIndex = numLonVertices - 1;
 
             // Corner vertex.
@@ -1306,8 +1276,8 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesEast = indices;
+            this.indicesEastOffset = indices.length - numIndices;
+            this.indicesEast = new Uint16Array(indices.slice(this.indicesEastOffset));
             this.numIndicesEast = numIndices;
 
             /*
@@ -1319,9 +1289,6 @@ define([
              */
             // North border.
             numIndices = 2 * numLonVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             latIndex = numLatVertices - 1;
 
             // Corner vertex.
@@ -1344,15 +1311,12 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesLoresNorth = indices;
+            this.indicesLoresNorthOffset = indices.length - numIndices;
+            this.indicesLoresNorth = new Uint16Array(indices.slice(this.indicesLoresNorthOffset));
             this.numIndicesLoresNorth = numIndices;
 
             // South border.
             numIndices = 2 * numLonVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             latIndex = 0;
 
             // Corner vertex.
@@ -1375,15 +1339,12 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesLoresSouth = indices;
+            this.indicesLoresSouthOffset = indices.length - numIndices;
+            this.indicesLoresSouth = new Uint16Array(indices.slice(this.indicesLoresSouthOffset));
             this.numIndicesLoresSouth = numIndices;
 
             // West border.
             numIndices = 2 * numLatVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             lonIndex = 0;
 
             // Corner vertex.
@@ -1406,15 +1367,12 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesLoresWest = indices;
+            this.indicesLoresWestOffset = indices.length - numIndices;
+            this.indicesLoresWest = new Uint16Array(indices.slice(this.indicesLoresWestOffset));
             this.numIndicesLoresWest = numIndices;
 
             // East border.
             numIndices = 2 * numLatVertices - 2;
-            indices = new Int16Array(numIndices);
-
-            index = 0;
             lonIndex = numLonVertices - 1;
 
             // Corner vertex.
@@ -1437,9 +1395,20 @@ define([
             vertexIndex = lonIndex + latIndex * numLonVertices;
             indices[index++] = vertexIndex;
 
-            // assert(index == numIndices);
-            this.indicesLoresEast = indices;
+            this.indicesLoresEastOffset = indices.length - numIndices;
+            this.indicesLoresEast = new Uint16Array(indices.slice(this.indicesLoresEastOffset));
             this.numIndicesLoresEast = numIndices;
+
+            var wireframeIndices = this.buildWireframeIndices(tileWidth, tileHeight);
+            var outlineIndices = this.buildOutlineIndices(tileWidth, tileHeight);
+
+            indices = indices.concat(wireframeIndices);
+            this.wireframeIndicesOffset = indices.length - this.numWireframeIndices;
+
+            indices = indices.concat(outlineIndices);
+            this.outlineIndicesOffset = indices.length - this.numOutlineIndices;
+
+            this.indices = new Uint16Array(indices);
         };
 
         Tessellator.prototype.buildWireframeIndices = function (tileWidth, tileHeight) {
@@ -1451,7 +1420,7 @@ define([
 
             // Allocate an array to hold the computed indices.
             var numIndices = 2 * tileWidth * numLatVertices + 2 * tileHeight * numLonVertices;
-            var indices = new Int16Array(numIndices);
+            var indices = [];
 
             var rowStride = numLonVertices;
 
@@ -1480,7 +1449,8 @@ define([
                 }
             }
 
-            this.wireframeIndices = indices;
+            this.numWireframeIndices = numIndices;
+            return indices;
         };
 
         Tessellator.prototype.buildOutlineIndices = function (tileWidth, tileHeight) {
@@ -1492,7 +1462,7 @@ define([
 
             // Allocate an array to hold the computed indices.
             var numIndices = 2 * (numLatVertices - 2) + 2 * numLonVertices + 1;
-            var indices = new Int16Array(numIndices);
+            var indices = [];
 
             var rowStride = numLatVertices;
 
@@ -1533,7 +1503,8 @@ define([
                 index += 1
             }
 
-            this.outlineIndices = indices;
+            this.numOutlineIndices = numIndices;
+            return indices;
         };
 
         Tessellator.prototype.cacheSharedGeometryVBOs = function (dc) {
@@ -1556,96 +1527,6 @@ define([
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
                 dc.frameStatistics.incrementVboLoadCount(1);
                 gpuResourceCache.putResource(this.indicesVboCacheKey, indicesVbo, this.indices.length * 2);
-            }
-
-            var indicesNorthVbo = gpuResourceCache.resourceForKey(this.indicesNorthVboCacheKey);
-            if (!indicesNorthVbo) {
-                indicesNorthVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesNorthVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesNorth, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesNorthVboCacheKey, indicesNorthVbo, this.indicesNorth.length * 2);
-            }
-
-            var indicesSouthVbo = gpuResourceCache.resourceForKey(this.indicesSouthVboCacheKey);
-            if (!indicesSouthVbo) {
-                indicesSouthVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesSouthVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesSouth, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesSouthVboCacheKey, indicesSouthVbo, this.indicesSouth.length * 2);
-            }
-
-            var indicesWestVbo = gpuResourceCache.resourceForKey(this.indicesWestVboCacheKey);
-            if (!indicesWestVbo) {
-                indicesWestVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesWestVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesWest, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesWestVboCacheKey, indicesWestVbo, this.indicesWest.length * 2);
-            }
-
-            var indicesEastVbo = gpuResourceCache.resourceForKey(this.indicesEastVboCacheKey);
-            if (!indicesEastVbo) {
-                indicesEastVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesEastVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesEast, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesEastVboCacheKey, indicesEastVbo, this.indicesEast.length * 2);
-            }
-
-            var indicesLoresNorthVbo = gpuResourceCache.resourceForKey(this.indicesLoresNorthVboCacheKey);
-            if (!indicesLoresNorthVbo) {
-                indicesLoresNorthVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresNorthVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesLoresNorth, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesLoresNorthVboCacheKey, indicesLoresNorthVbo, this.indicesLoresNorth.length * 2);
-            }
-
-            var indicesLoresSouthVbo = gpuResourceCache.resourceForKey(this.indicesLoresSouthVboCacheKey);
-            if (!indicesLoresSouthVbo) {
-                indicesLoresSouthVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresSouthVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesLoresSouth, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesLoresSouthVboCacheKey, indicesLoresSouthVbo, this.indicesLoresSouth.length * 2);
-            }
-
-            var indicesLoresWestVbo = gpuResourceCache.resourceForKey(this.indicesLoresWestVboCacheKey);
-            if (!indicesLoresWestVbo) {
-                indicesLoresWestVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresWestVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesLoresWest, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesLoresWestVboCacheKey, indicesLoresWestVbo, this.indicesLoresWest.length * 2);
-            }
-
-            var indicesLoresEastVbo = gpuResourceCache.resourceForKey(this.indicesLoresEastVboCacheKey);
-            if (!indicesLoresEastVbo) {
-                indicesLoresEastVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesLoresEastVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indicesLoresEast, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.indicesLoresEastVboCacheKey, indicesLoresEastVbo, this.indicesLoresEast.length * 2);
-            }
-
-            var outlineIndicesVbo = gpuResourceCache.resourceForKey(this.outlineIndicesVboCacheKey);
-            if (!outlineIndicesVbo) {
-                outlineIndicesVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, outlineIndicesVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.outlineIndices, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.outlineIndicesVboCacheKey, outlineIndicesVbo, this.outlineIndices.length * 2);
-            }
-
-            var wireframeIndicesVbo = gpuResourceCache.resourceForKey(this.wireframeIndicesVboCacheKey);
-            if (!wireframeIndicesVbo) {
-                wireframeIndicesVbo = gl.createBuffer();
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, wireframeIndicesVbo);
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.wireframeIndices, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                gpuResourceCache.putResource(this.wireframeIndicesVboCacheKey, wireframeIndicesVbo, this.wireframeIndices.length * 2);
             }
         };
 

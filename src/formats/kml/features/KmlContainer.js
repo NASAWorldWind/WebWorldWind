@@ -57,7 +57,9 @@ define([
                 currentTimeInterval: kmlOptions.currentTimeInterval,
                 regionInvisible: kmlOptions.regionInvisible,
                 fileCache: kmlOptions.fileCache,
-                styleResolver: kmlOptions.styleResolver
+                styleResolver: kmlOptions.styleResolver,
+                listener: kmlOptions.listener,
+                activeEvents: kmlOptions.activeEvents
             });
         });
     };

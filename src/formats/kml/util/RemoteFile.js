@@ -13,22 +13,38 @@ define([
 ) {
     "use strict";
     /**
-     * Creates representation of Remote object, which returns Promise of this object.
+     * Creates representation of RemoteFile. In order to load an object it is necessary to run get function on created object.
      * @param options {Object}
      * @param options.ajax {Boolean} If we should use plain AJAX
      * @param options.zip {Boolean} If we are downloading kmz
      * @param options.responseType {String} Optional responseType applied in specific circumstances for the kmz
      * @constructor
-     * @alias Remote
+     * @alias RemoteFile
      */
-    var Remote = function(options) {
-        // Returns promise.
+    var RemoteFile = function(options) {
+        if(!options.ajax && !options.zip) {
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "RemoteDocument", "constructor",
+                    "Invalid option for retrieval specified. Use either ajax or zip option.")
+            );
+        }
+
+        this.options = options;
+    };
+
+	/**
+     * It retrieves the current file. Usually it is used only once, but it can be used multiple times.
+     * @returns {Promise}
+     */
+    RemoteFile.prototype.get = function() {
+        var options = this.options;
         if(options.ajax) {
             return this.ajax(options.url, options);
         } else if(options.zip) {
             options.responseType = options.responseType || "arraybuffer";
             return this.ajax(options.url, options);
         } else {
+            // This branch should never happen.
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "RemoteDocument", "constructor",
                     "Invalid option for retrieval specified. Use either ajax or zip option.")
@@ -43,7 +59,7 @@ define([
      * @param options.responseType {String} If set, rewrites default responseType.
      * @returns {Promise} Promise of the data.
      */
-    Remote.prototype.ajax = function(url, options) {
+    RemoteFile.prototype.ajax = function(url, options) {
         // Return promise.
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
@@ -56,7 +72,7 @@ define([
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         var text = this.responseText;
-                        resolve(text);
+                        resolve({text: text, headers: xhr.getAllResponseHeaders()});
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -81,5 +97,5 @@ define([
         });
     };
 
-    return Remote;
+    return RemoteFile;
 });

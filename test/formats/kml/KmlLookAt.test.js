@@ -2,20 +2,15 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/KmlLookAt',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlLookAt,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlLookAtTest", {
-        testValidKml: CatchTest(function () {
+    describe ("KmlLookAtTest", function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<LookAt>" +
@@ -31,14 +26,15 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var lookAt = new KmlLookAt({objectNode:
                 kmlRepresentation.getElementsByTagName("LookAt")[0]});
+        it ('should have the Longitude, Latitude, Altitude, Heading, Tilt, Range and AltitudeMode properties',function (){
 
-            assertEquals(10, lookAt.kmlLongitude);
-            assertEquals(9, lookAt.kmlLatitude);
-            assertEquals(8, lookAt.kmlAltitude);
-            assertEquals(1, lookAt.kmlHeading);
-            assertEquals(7, lookAt.kmlTilt);
-            assertEquals(6, lookAt.kmlRange);
-            assertEquals("clampToGround", lookAt.kmlAltitudeMode);
-        })
-    })
+            expect(lookAt.kmlLongitude).toBe(10);
+            expect(lookAt.kmlLatitude).toBe(9);
+            expect(lookAt.kmlAltitude).toBe(8);
+            expect(lookAt.kmlHeading).toBe(1);
+            expect(lookAt.kmlTilt).toBe(7);
+            expect(lookAt.kmlRange).toBe(6);
+            expect(lookAt.kmlAltitudeMode).toBe("clampToGround");
+        });
+    });
 });

@@ -118,7 +118,7 @@ define(['../../error/ArgumentError',
                 return null;
             }
 
-            return this.readNextRecord(this._buffer, this.numRecordsRead);
+            return this.readNextRecord(this._buffer, ++this.numRecordsRead);
         };
 
         //**************************************************************//
@@ -290,19 +290,6 @@ define(['../../error/ArgumentError',
         //**************************************************************//
         //********************  Records  *******************************//
         //**************************************************************//
-
-        /**
-         * Reads the next {@link DBaseRecord} instance from this DBaseFile. This file is assumed to have one or more
-         * remaining records available.
-         *
-         * @return {DBaseRecord} A new {@link DBaseRecord} instance.
-         *
-         * @throws Error If the record cannot be read for any reason.
-         */
-        DBaseFile.prototype.readNextRecord = function() {
-            // Create a record object from the record buffer.
-            return this.readRecordFromBuffer(this._buffer, ++this.numRecordsRead);
-        };
 
         /**
          * Reads a {@link DBaseRecord} instance from the given buffer;

@@ -2,19 +2,14 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/util/XmlDocument',
     'src/formats/kml/KmlTimeSpan'
 ], function(
-    CatchTest,
     XmlDocument,
     KmlTimeSpan
 ){
-    TestCase("KmlTimeSpanTest", {
-        testValidTimeSpan: CatchTest(function() {
+    describe("KmlTimeSpanTest", function() {
             var validTimeSpanXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<TimeSpan id=\"1\">" +
@@ -25,9 +20,11 @@ require({
 
             var kmlRepresentation = new XmlDocument(validTimeSpanXml).dom();
             var timeSpan = new KmlTimeSpan({objectNode:kmlRepresentation.getElementsByTagName("TimeSpan")[0], style: {}});
+        it('should have the begin and end properties', function(){
+            expect(timeSpan.kmlBegin.toUTCString()).toEqual("Wed, 16 Jul 1997 07:30:15 GMT");
+            expect(timeSpan.kmlEnd.toUTCString()).toEqual("Wed, 16 Jul 1997 08:30:15 GMT");
+        });
 
-            assertEquals("Wed, 16 Jul 1997 07:30:15 GMT", timeSpan.kmlBegin.toUTCString());
-            assertEquals("Wed, 16 Jul 1997 08:30:15 GMT", timeSpan.kmlEnd.toUTCString());
-        })
+
+        });
     });
-});

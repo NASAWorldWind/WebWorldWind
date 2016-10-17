@@ -68,7 +68,7 @@ define([
                     '    gl_FragColor = color * floor(textureColor.a + 0.5);\n' +
                     'else\n' +
                     '    gl_FragColor = color * opacity;\n' +
-                    'if (gl_FragColor.a == 0.0) {discard; return;}\n' +
+                    'if (gl_FragColor.a == 0.0) {discard;}\n' +
                     'if (applyLighting) {\n' +
                     '    vec4 n = normal * (gl_FrontFacing ? 1.0 : -1.0);\n' +
                     '    gl_FragColor.rgb *= clamp(ambient + dot(lightDirection, n), 0.0, 1.0);\n' +

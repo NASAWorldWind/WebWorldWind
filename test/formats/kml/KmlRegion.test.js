@@ -2,24 +2,19 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-require({
-    baseUrl: '/test/'
-}, [
-    'test/CatchTest',
+define([
     'src/formats/kml/KmlRegion',
     'src/formats/kml/KmlLatLonAltBox',
     'src/formats/kml/KmlLod',
     'src/util/XmlDocument'
 ], function (
-    CatchTest,
     KmlRegion,
     KmlLatLonAltBox,
     KmlLod,
     XmlDocument
 ) {
     "use strict";
-    TestCase("KmlRegionTest", {
-        testValidKml: CatchTest(function () {
+    describe ("KmlRegionTest", function () {
             var validKml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                 "<kml xmlns=\"http://www.opengis.net/kml/2.2\">" +
                 "<Region>" +
@@ -30,9 +25,12 @@ require({
             var kmlRepresentation = new XmlDocument(validKml).dom();
             var style = new KmlRegion({objectNode:
                 kmlRepresentation.getElementsByTagName("Region")[0]});
+        it('should have the prototype property of KmlLatLonAltBox and KmlLod', function(){
+            expect(style.kmlLatLonAltBox instanceof KmlLatLonAltBox).toBeTruthy();
+            expect(style.kmlLod instanceof KmlLod).toBeTruthy();
 
-            assertTrue(style.kmlLatLonAltBox instanceof KmlLatLonAltBox);
-            assertTrue(style.kmlLod instanceof KmlLod);
-        })
-    })
-});
+        });
+
+
+        });
+    });
