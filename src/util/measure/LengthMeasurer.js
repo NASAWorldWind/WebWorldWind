@@ -95,15 +95,14 @@ define([
          *
          * @param {Position[]} positions
          * @param {Boolean} followTerrain
-         * @param {String} pathType
+         * @param {String} pathType One of WorldWind.LINEAR, WorldWind.RHUMB_LINE or WorldWind.GREAT_CIRCLE
          *
          * @return the current path length or -1 if the position list is too short.
          */
         LengthMeasurer.prototype.getLength = function (positions, followTerrain, pathType) {
-            var _positions = this.clonePositions(positions);
             pathType = pathType || WorldWind.GREAT_CIRCLE;
             this.subdividedPositions = null;
-            return this.computeLength(_positions, followTerrain, pathType);
+            return this.computeLength(positions, followTerrain, pathType);
         };
 
         /**
@@ -116,9 +115,8 @@ define([
          * @return the current path length or -1 if the position list is too short.
          */
         LengthMeasurer.prototype.getPathLength = function (path) {
-            var positions = this.clonePositions(path.positions);
             this.subdividedPositions = null;
-            return this.computeLength(positions, path.followTerrain, path.pathType);
+            return this.computeLength(path.positions, path.followTerrain, path.pathType);
         };
 
         /**
@@ -170,9 +168,9 @@ define([
 
         /**
          * Computes the length.
-         * @param {Position[]} positions An array of positions
+         * @param {Position[]} positions
          * @param {Boolean} followTerrain
-         * @param {String} pathType
+         * @param {String} pathType One of WorldWind.LINEAR, WorldWind.RHUMB_LINE or WorldWind.GREAT_CIRCLE
          */
         LengthMeasurer.prototype.computeLength = function (positions, followTerrain, pathType) {
             if (!positions || positions.length < 2) {
@@ -210,107 +208,6 @@ define([
             }
 
             return distance;
-        };
-
-        /**
-         * Subdivide a list of positions so that no segment is longer then the provided maxLength.
-         * <p>If needed, new intermediate positions will be created along lines that follow the given pathType one of
-         * WorldWind.LINEAR, WorldWind.RHUMB_LINE or WorldWind.GREAT_CIRCLE.
-         * All position elevations will be either at the terrain surface if followTerrain is true, or interpolated
-         * according to the original elevations.</p>
-         *
-         * @param {Position[]} positions
-         * @param {Boolean} followTerrain
-         * @param {String} pathType
-         * @param {Number} maxLength The maximum length for one segment.
-         *
-         * @return {Position[]} a list of positions with no segment longer then maxLength and elevations following
-         * terrain or not.
-         */
-        LengthMeasurer.prototype.subdividePositions = function (positions, followTerrain, pathType, maxLength) {
-            var globe = this.wwd.globe;
-            var subdividedPositions = [];
-            var loc = new Location(0, 0);
-            var destLatLon = new Location(0, 0);
-            var pos1 = positions[0];
-            var elevation;
-
-            if (followTerrain) {
-                elevation = globe.elevationAtLocation(pos1.latitude, pos1.longitude);
-            }
-            else {
-                elevation = pos1.altitude;
-            }
-            subdividedPositions.push(new Position(pos1.latitude, pos1.longitude, elevation));
-
-            for (var i = 1; i < positions.length; i++) {
-                var pos2 = positions[i];
-                var arcLengthRadians = Location.greatCircleDistance(pos1, pos2);
-                loc = Location.interpolateAlongPath(pathType, 0.5, pos1, pos2, loc);
-                var arcLength = arcLengthRadians * globe.radiusAt(loc.latitude, loc.longitude);
-                if (arcLength > maxLength) {
-                    // if necessary subdivide segment at regular intervals smaller then maxLength
-                    var segmentAzimuth = null;
-                    var segmentDistance = null;
-                    var steps = Math.ceil(arcLength / maxLength); // number of intervals - at least two
-                    for (var j = 1; j < steps; j++) {
-                        var s = j / steps;
-                        if (pathType === WorldWind.LINEAR) {
-                            destLatLon = Location.interpolateLinear(s, pos1, pos2, destLatLon);
-                        }
-                        else if (pathType === WorldWind.RHUMB_LINE) {
-                            if (segmentAzimuth == null) {
-                                segmentAzimuth = Location.rhumbAzimuth(pos1, pos2);
-                                segmentDistance = Location.rhumbDistance(pos1, pos2);
-                            }
-                            destLatLon = Location.rhumbLocation(pos1, segmentAzimuth, s * segmentDistance, destLatLon);
-                        }
-                        else {
-                            //GREAT_CIRCLE
-                            if (segmentAzimuth == null) {
-                                segmentAzimuth = Location.greatCircleAzimuth(pos1, pos2); //degrees
-                                segmentDistance = Location.greatCircleDistance(pos1, pos2); //radians
-                            }
-                            //Location, degrees, radians, Location
-                            destLatLon = Location.greatCircleLocation(pos1, segmentAzimuth, s * segmentDistance, destLatLon);
-                        }
-
-                        // Set elevation
-                        if (followTerrain) {
-                            elevation = globe.elevationAtLocation(destLatLon.latitude, destLatLon.longitude);
-                        }
-                        else {
-                            elevation = pos1.altitude * (1 - s) + pos2.altitude * s;
-                        }
-
-                        subdividedPositions.push(new Position(destLatLon.latitude, destLatLon.longitude, elevation));
-                    }
-                }
-
-                // Finally add the segment end position
-                if (followTerrain) {
-                    elevation = globe.elevationAtLocation(pos2.latitude, pos2.longitude);
-                }
-                else {
-                    elevation = pos2.altitude;
-                }
-                subdividedPositions.push(new Position(pos2.latitude, pos2.longitude, elevation));
-
-                // Prepare for next segment
-                pos1 = pos2;
-            }
-
-            return subdividedPositions;
-        };
-
-        /**
-         * Clones an array of positions
-         * @param {Position[]} positions
-         */
-        LengthMeasurer.prototype.clonePositions = function (positions) {
-            return positions.map(function (position) {
-                return new Position(position.latitude, position.longitude, position.altitude);
-            });
         };
 
         return LengthMeasurer;

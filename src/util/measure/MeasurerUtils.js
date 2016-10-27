@@ -15,7 +15,7 @@ define([
          * Provides utilities for Measurements.
          * @exports MeasurerUtils
          */
-        return {
+        var MeasurerUtils = {
 
             /**
              * Subdivide a list of positions so that no segment is longer then the provided maxLength.
@@ -27,8 +27,8 @@ define([
              * @param {Globe} globe
              * @param {Position[]} positions
              * @param {Boolean} followTerrain
-             * @param {String} pathType
-             * @param {Number} maxLength The maximum length for one segment.
+             * @param {String} pathType One of WorldWind.LINEAR, WorldWind.RHUMB_LINE or WorldWind.GREAT_CIRCLE
+             * @param {Number} maxLength The maximum length for one segment
              *
              * @return {Position[]} a list of positions with no segment longer then maxLength and elevations following
              * terrain or not.
@@ -40,13 +40,7 @@ define([
                 var pos1 = positions[0];
                 var elevation;
 
-                if (followTerrain) {
-                    elevation = globe.elevationAtLocation(pos1.latitude, pos1.longitude);
-                }
-                else {
-                    elevation = pos1.altitude;
-                }
-                subdividedPositions.push(new Position(pos1.latitude, pos1.longitude, elevation));
+                this.addPosition(globe, subdividedPositions, pos1, followTerrain);
 
                 for (var i = 1; i < positions.length; i++) {
                     var pos2 = positions[i];
@@ -95,19 +89,33 @@ define([
                     }
 
                     // Finally add the segment end position
-                    if (followTerrain) {
-                        elevation = globe.elevationAtLocation(pos2.latitude, pos2.longitude);
-                    }
-                    else {
-                        elevation = pos2.altitude;
-                    }
-                    subdividedPositions.push(new Position(pos2.latitude, pos2.longitude, elevation));
+                    this.addPosition(globe, subdividedPositions, pos2, followTerrain);
 
                     // Prepare for next segment
                     pos1 = pos2;
                 }
 
                 return subdividedPositions;
+            },
+
+            /**
+             * Adds a position to a list of positions.
+             * If the path is following the terrain the elevation is also computed.
+             *
+             * @param {Globe} globe
+             * @param {Position[]} positions The list of positions to add to
+             * @param {Position} position The position to add to the list
+             * @param {Boolean} followTerrain
+             *
+             * @return {Position[]} The list of positions
+             */
+            addPosition: function (globe, positions, position, followTerrain) {
+                var elevation = position.altitude;
+                if (followTerrain) {
+                    elevation = globe.elevationAtLocation(position.latitude, position.longitude);
+                }
+                positions.push(new Position(position.latitude, position.longitude, elevation));
+                return positions;
             },
 
             /**
@@ -167,5 +175,7 @@ define([
             }
 
         };
+
+        return MeasurerUtils;
 
     });

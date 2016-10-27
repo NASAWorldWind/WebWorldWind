@@ -301,27 +301,20 @@ define([
                 }
             });
 
-            tess.gluTessCallback(libtess.gluEnum.GLU_TESS_VERTEX_DATA,
-                function (data, tris) {
-                    tris.push(data[0]);
-                    tris.push(data[1]);
-                    tris.push(data[2]);
-                });
+            tess.gluTessCallback(libtess.gluEnum.GLU_TESS_VERTEX_DATA, function (data, tris) {
+                tris.push(data[0]);
+                tris.push(data[1]);
+                tris.push(data[2]);
+            });
 
             //prevents triangle fans and strips
             tess.gluTessCallback(libtess.gluEnum.GLU_TESS_EDGE_FLAG, function () {
             });
 
-            tess.gluTessCallback(libtess.gluEnum.GLU_TESS_COMBINE,
-                function (coords, data, weight) {
-                    return [coords[0], coords[1], coords[2]];
-                });
-
-            tess.gluTessCallback(libtess.gluEnum.GLU_TESS_ERROR,
-                function (errno) {
-                    Logger.logMessage(Logger.LEVEL_WARNING, "AreaMeasurer", "tessellatePolygon",
-                        "Tessellation error " + errno + ".");
-                });
+            tess.gluTessCallback(libtess.gluEnum.GLU_TESS_ERROR, function (errno) {
+                Logger.logMessage(Logger.LEVEL_WARNING, "AreaMeasurer", "tessellatePolygon",
+                    "Tessellation error " + errno + ".");
+            });
 
             // Tessellate the polygon.
             tess.gluTessBeginPolygon(triangles);
