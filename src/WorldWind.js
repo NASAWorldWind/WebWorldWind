@@ -207,6 +207,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
         './util/WcsTileUrlBuilder',
+        './ogc/WfsCapabilities',
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',
@@ -422,6 +423,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ViewControlsLayer,
               ViewVolume,
               WcsTileUrlBuilder,
+              WfsCapabilities,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
@@ -794,6 +796,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
+        WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
