@@ -154,6 +154,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var indexMap = {};
         var indicesArray = [];
         var pos = 0;
+        var indexedRendering = false;
 
         for (var i = 0; i < count; i++) {
 
@@ -175,6 +176,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                 prevIndex = currentIndex;
                 if (indexMap.hasOwnProperty(vecId)) {
                     currentIndex = indexMap[vecId];
+                    indexedRendering = true;
                 }
                 else {
 
@@ -215,6 +217,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
 
         var mesh = {
             vertices: new Float32Array(inputs[0][1]),
+            indexedRendering: indexedRendering,
             material: material
         };
 
@@ -312,7 +315,9 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             }
         }
 
-        mesh.indices = new Uint16Array(indicesArray);
+        if (mesh.indexedRendering) {
+            mesh.indices = new Uint16Array(indicesArray);
+        }
 
         return mesh;
     };
