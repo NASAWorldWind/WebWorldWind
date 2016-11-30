@@ -614,6 +614,30 @@ define([
             return this.elevationModel.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
         };
 
+        Globe.prototype.computeViewHeading = function () {
+
+        };
+
+        Globe.prototype.computeViewTilt = function () {
+
+        };
+
+        Globe.prototype.cameraToLookAt = function () {
+            var modelview = new Matrix(); //
+        };
+
+        Globe.prototype.cameraToCartesianTransform = function () {
+
+        };
+
+        Globe.prototype.lookAtToCamera = function () {
+
+        };
+
+        Globe.prototype.lookAtToCartesianTransform = function () {
+
+        };
+
         return Globe;
     }
 )

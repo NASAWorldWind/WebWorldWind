@@ -8,6 +8,7 @@
  */
 define([
         './error/ArgumentError',
+        './navigate/WorldWindowController',
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
@@ -16,7 +17,7 @@ define([
         './util/GoToAnimator',
         './cache/GpuResourceCache',
         './util/Logger',
-        './navigate/LookAtNavigator',
+        './navigate/Navigator',
         './navigate/NavigatorState',
         './pick/PickedObjectList',
         './geom/Rectangle',
@@ -26,6 +27,7 @@ define([
         './globe/Terrain',
         './geom/Vec2'],
     function (ArgumentError,
+              WorldWindowController,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
@@ -34,7 +36,7 @@ define([
               GoToAnimator,
               GpuResourceCache,
               Logger,
-              LookAtNavigator,
+              Navigator,
               NavigatorState,
               PickedObjectList,
               Rectangle,
@@ -124,11 +126,18 @@ define([
             this.layers = [];
 
             /**
-             * The navigator used to manipulate the globe.
-             * @type {LookAtNavigator}
-             * @default [LookAtNavigator]{@link LookAtNavigator}
+             * The controller setting up rules for basic interaction with user.
+             * @type {WorldWindowController}
+             * @default [WorldWindowController]{@link WorldWindowController}
              */
-            this.navigator = new LookAtNavigator(this);
+            this.controller = new WorldWindowController(this);
+
+            /**
+             * The navigator
+             * @type {Navigator}
+             * @default [Navigator] {@link Navigator}
+             */
+            this.navigator = new Navigator(worldWindow);
 
             /**
              * The vertical exaggeration to apply to the terrain.
@@ -273,6 +282,7 @@ define([
 
             return new Vec2(xc, yc);
         };
+        // TODO: Handle GoToAnimator and ViewsControlsLayer, they are using the navigator directly.
 
         /**
          * Registers an event listener for the specified event type on this World Window's canvas. This function
@@ -587,7 +597,7 @@ define([
             dc.reset();
             dc.globe = this.globe;
             dc.layers = this.layers;
-            dc.navigatorState = this.navigator.currentState();
+            dc.navigatorState = this.navigator.currentState(this.globe); // This will remain. This then means that the logic associated with creation of Navigator State will remain the same.
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
             dc.deepPicking = this.deepPicking;
