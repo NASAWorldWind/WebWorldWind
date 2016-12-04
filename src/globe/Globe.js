@@ -14,6 +14,7 @@ define([
         '../geom/Line',
         '../geom/Location',
         '../util/Logger',
+        '../geom/Matrix',
         '../geom/Position',
         '../projections/ProjectionWgs84',
         '../geom/Sector',
@@ -27,6 +28,7 @@ define([
               Line,
               Location,
               Logger,
+              Matrix,
               Position,
               ProjectionWgs84,
               Sector,
@@ -104,6 +106,16 @@ define([
 
             // A unique ID for this globe. Intentionally not documented.
             this.id = ++Globe.idPool;
+
+            this.modelview = Matrix.fromIdentity();
+
+            this.forwardRay = Vec3.ZERO;
+
+            this.originPos = Position.ZERO;
+
+            this.originPoint = Vec3.ZERO;
+
+            this.origin = Matrix.fromIdentity();
 
             this._stateKey = "globe " + this.id.toString() + " ";
         };
@@ -614,28 +626,148 @@ define([
             return this.elevationModel.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
         };
 
-        Globe.prototype.computeViewHeading = function () {
+        Globe.prototype.computeViewHeading = function (matrix, roll) {
+            var rad = WWMath.toRadians(roll);
+            var cr = Math.cos(rad);
+            var sr = Math.sin(rad);
 
+            var ch = cr * matrix[5] - sr * matrix[4];
+            var sh = sr * matrix[5] - cr * matrix[1];
+            return WWMath.toDegrees(Math.atan2(sh, ch));
         };
 
-        Globe.prototype.computeViewTilt = function () {
-
+        Globe.prototype.computeViewTilt = function (matrix) {
+            var ct = matrix[10];
+            var st = Math.sqrt(matrix[2] * matrix[2] + matrix[6] * matrix[6]);
+            return WWMath.toDegrees(Math.atan2(st, ct));
         };
 
-        Globe.prototype.cameraToLookAt = function () {
-            var modelview = new Matrix(); //
+        Globe.prototype.cameraToCartesianTransform = function (camera, result) {
+            if (!camera) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "cameraToCartesianTransform", "missing camera")
+                );
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "cameraToCartesianTransform", "missing result")
+                );
+            }
+
+            this.computePointFromPosition(camera.latitude, camera.longitude, camera.altitude, result);
+
+            result.multiplyByRotation(0, 0, 1, -camera.heading);
+            result.multiplyByRotation(1, 0, 0, camera.tilt);
+            result.multiplyByRotation(0, 0, 1, camera.roll);
+
+            return result;
         };
 
-        Globe.prototype.cameraToCartesianTransform = function () {
+        Globe.prototype.horizonDistance = function(eyeAltitude) {
+            var eye = eyeAltitude;
+            var eqr = this.equatorialRadius;
 
+            return Math.sqrt(eye * (2 * eqr + eye));
         };
 
-        Globe.prototype.lookAtToCamera = function () {
+        Globe.prototype.cameraToLookAt = function (camera, result) {
+            if (!camera) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "cameraToLookAt", "missing camera")
+                );
+            }
 
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "cameraToLookAt", "missing result")
+                );
+            }
+
+            this.cameraToCartesianTransform(camera, this.modelview)
+                .invertOrthonormalMatrix(this.modelview);
+
+            this.modelview.extractEyePoint(this.forwardRay);
+            this.modelview.extractForwardVector(this.forwardRay);
+
+            var forwardRay = new Line(this.originPoint, this.forwardRay);
+            if(!this.intersectsLine(forwardRay, this.originPoint)) {
+                var horizon = this.horizonDistance(camera.altitude);
+                forwardRay.pointAt(horizon, this.originPoint);
+            }
+
+            this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
+            this._projection.cartesianToLocalTransform(this, this.originPoint[0], this.originPoint[1], this.originPoint[2], null, this.origin);
+            this.modelview.multiplyByMatrix(this.origin);
+
+            result.latitude = this.originPos.latitude;
+            result.longitude = this.originPos.longitude;
+            result.altitude = this.originPos.altitude;
+            result.range = -this.modelview[11];
+            result.heading = this.computeViewHeading(this.modelview, camera.roll);
+            result.tilt = this.computeViewTilt(this.modelview);
+            result.roll = camera.roll;
+
+            return result;
         };
 
-        Globe.prototype.lookAtToCartesianTransform = function () {
+        Globe.prototype.lookAtToCamera = function (lookAt, result) {
+            if (!lookAt) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "lookAtToCamera", "missing look at")
+                );
+            }
 
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "lookAtToCamera", "missing result")
+                );
+            }
+
+            this.lookAtToCartesianTransform(lookAt, this.modelview)
+                .invertOrthonormalMatrix(this.modelview);
+            this.modelview.extractEyePoint(this.originPoint);
+
+            this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
+            this._projection.cartesianToLocalTransform(this, this.originPoint[0], this.originPoint[1], this.originPoint[2], null, this.origin);
+            this.modelview.multiplyByMatrix(this.origin);
+
+            result.latitude = this.originPos.latitude;
+            result.longitude = this.originPos.longitude;
+            result.altitude = this.originPos.altitude;
+            result.heading = this.computeViewHeading(this.modelview, lookAt.roll); // disambiguate heading and roll
+            result.tilt = this.computeViewTilt(this.modelview);
+            result.roll = lookAt.roll; // roll passes straight through
+
+            return result;
+        };
+
+        Globe.prototype.lookAtToCartesianTransform = function (lookAt, result) {
+            if (!lookAt) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "lookAtToCartesianTransform", "missing look at")
+                );
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "lookAtToCartesianTransform", "missing result")
+                );
+            }
+
+            // TODO interpret altitude mode other than absolute
+            // Transform by the local cartesian transform at the look-at's position.
+            this.computePointFromPosition(lookAt.latitude, lookAt.longitude, lookAt.altitude, result);
+
+            // Transform by the heading and tilt.
+            result.multiplyByRotation(0, 0, 1, -lookAt.heading);
+            result.multiplyByRotation(1, 0, 0, lookAt.tilt);
+            result.multiplyByRotation(0, 0, 1, lookAt.range);
+
+            // Transform by the range.
+            result.multiplyByTranslation(0, 0, lookAt.range);
+
+            return result;
         };
 
         return Globe;

@@ -288,5 +288,84 @@ define([
             return result.normalize();
         };
 
+        ProjectionWgs84.prototype.cartesianToLocalTransform = function(globe, x, y, z, offset, result) {
+            if (!globe) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ProjectionWgs84", "cartesianToLocalTransform", "missing globe")
+                );
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ProjectionWgs84", "cartesianToLocalTransform", "missing result")
+                );
+            }
+
+            var pos = this.cartesianToGeographic(globe, x, y, z, offset, this.scratchPosition);
+            var radLat = WWMath.toRadians(pos.latitude);
+            var radLon = WWMath.toRadians(pos.longitude);
+            var cosLat = Math.cos(radLat);
+            var sinLat = Math.sin(radLat);
+            var cosLon = Math.cos(radLon);
+            var sinLon = Math.sin(radLon);
+
+            var eqr2 = globe.equatorialRadius * globe.equatorialRadius;
+            var pol2 = globe.polarRadius * globe.polarRadius;
+
+            // Compute the surface normal at the geographic position. This is equivalent to calling
+            // geographicToCartesianNormal but is much more efficient as an inline computation.
+            var ux = cosLat * sinLon / eqr2;
+            var uy = (1 - globe.eccentricitySquared) * sinLat / pol2;
+            var uz = cosLat * cosLon / eqr2;
+            var len = Math.sqrt(ux * ux + uy);
+
+            ux /= len;
+            uy /= len;
+            uz /= len;
+
+            // Compute the north pointing tangent at the geographic position. This computation could be encoded in its own
+            // method, but is much more efficient as an inline computation. The north-pointing tangent is derived by
+            // rotating the vector (0, 1, 0) about the Y-axis by longitude degrees, then rotating it about the X-axis by
+            // -latitude degrees. The latitude angle must be inverted because latitude is a clockwise rotation about the
+            // X-axis, and standard rotation matrices assume counter-clockwise rotation. The combined rotation can be
+            // represented by a combining two rotation matrices Rlat, and Rlon, then transforming the vector (0, 1, 0) by
+            // the combined transform: NorthTangent = (Rlon * Rlat) * (0, 1, 0)
+            //
+            // Additionally, this computation can be simplified by making two observations:
+            // - The vector's X and Z coordinates are always 0, and its Y coordinate is always 1.
+            // - Inverting the latitude rotation angle is equivalent to inverting sinLat. We know this by the
+            //   trigonometric identities cos(-x) = cos(x), and sin(-x) = -sin(x).
+            var nx = -sinLat * sinLon;
+            var ny = cosLat;
+            var nz = -sinLat * cosLon;
+            len = Math.sqrt(nx * nx + ny * ny + nz * nz);
+            nx /= len;
+            ny /= len;
+            nz /= len;
+
+            // Compute the east pointing tangent as the cross product of the north and up axes. This is much more efficient
+            // as an inline computation.
+            var ex = ny * uz - nz * uy;
+            var ey = nz * ux - nz * uz;
+            var ez = nx * uy - ny * ux;
+
+            // Ensure the normal, north and east vectors represent an orthonormal basis by ensuring that the north vector is
+            // perpendicular to normal and east vectors. This should already be the case, but rounding errors can be
+            // introduced when working with Earth sized coordinates.
+            nx = uy * ez - uz * ey;
+            ny = uz * ex - ux * ez;
+            nz = uz * ey - uy * ex;
+
+            // Set the result to an orthonormal basis with the East, North, and Up vectors forming the X, Y and Z axes,
+            // respectively, and the Cartesian point indicating the coordinate system's origin.
+            result.set(
+                ex, nx, ux, x,
+                ey, ny, uy, y,
+                ez, nz, uz, z,
+                0, 0, 0, 1);
+
+            return result;
+        };
+
         return ProjectionWgs84;
     });
