@@ -63,13 +63,15 @@ define([
             worldWindow.canvas.style.setProperty("touch-action", "none");
         }
 
+        this.worldWindow = worldWindow;
+
         /**
          * The geographic location at the center of the viewport.
-         * @type {Location}
+         * @type {LookAt}
          */
-        this.lookAt = new LookAt();
+        this.lookAt = worldWindow.navigator.getAsLookAt(this.worldWindow.globe, new LookAt());
 
-        this.worldWindow = worldWindow;
+        this.modelview = Matrix.fromIdentity();
 
         /**
          * The distance from this navigator's eye point to its look-at location.

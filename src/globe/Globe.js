@@ -664,11 +664,22 @@ define([
             return result;
         };
 
-        Globe.prototype.horizonDistance = function(eyeAltitude) {
+        Globe.prototype.horizonDistance = function(eyeAltitude, objectAltitude) {
             var eye = eyeAltitude;
             var eqr = this.equatorialRadius;
+            var eyeDistance = Math.sqrt(eye * (2 * eqr + eye));
+            if(arguments.length == 1) {
+                return eyeDistance;
+            } else if(arguments.length == 2) {
+                var obj = objectAltitude;
+                var horDistance = Math.sqrt(obj * (2 * eqr + obj));
 
-            return Math.sqrt(eye * (2 * eqr + eye));
+                return eyeDistance + horDistance;
+            } else {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "horizon distance", "Wrong amount of parameters. Expected: 2 or 1, Actual: " + arguments.length)
+                );
+            }
         };
 
         Globe.prototype.cameraToLookAt = function (camera, result) {
@@ -698,7 +709,7 @@ define([
 
             this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
             this._projection.cartesianToLocalTransform(this, this.originPoint[0], this.originPoint[1], this.originPoint[2], null, this.origin);
-            this.modelview.multiplyByMatrix(this.origin);
+            this.modelview.multiplyMatrix(this.origin);
 
             result.latitude = this.originPos.latitude;
             result.longitude = this.originPos.longitude;
@@ -730,7 +741,7 @@ define([
 
             this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
             this._projection.cartesianToLocalTransform(this, this.originPoint[0], this.originPoint[1], this.originPoint[2], null, this.origin);
-            this.modelview.multiplyByMatrix(this.origin);
+            this.modelview.multiplyMatrix(this.origin);
 
             result.latitude = this.originPos.latitude;
             result.longitude = this.originPos.longitude;

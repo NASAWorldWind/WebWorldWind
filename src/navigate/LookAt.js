@@ -7,7 +7,6 @@
  */
 define([], function(){
     var LookAt = function() {
-
     };
 
     Object.defineProperties(LookAt.prototype, {

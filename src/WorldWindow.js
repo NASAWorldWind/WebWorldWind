@@ -126,18 +126,18 @@ define([
             this.layers = [];
 
             /**
+             * The navigator
+             * @type {Navigator}
+             * @default [Navigator] {@link Navigator}
+             */
+            this.navigator = new Navigator(this);
+
+            /**
              * The controller setting up rules for basic interaction with user.
              * @type {WorldWindowController}
              * @default [WorldWindowController]{@link WorldWindowController}
              */
             this.controller = new WorldWindowController(this);
-
-            /**
-             * The navigator
-             * @type {Navigator}
-             * @default [Navigator] {@link Navigator}
-             */
-            this.navigator = new Navigator(worldWindow);
 
             /**
              * The vertical exaggeration to apply to the terrain.

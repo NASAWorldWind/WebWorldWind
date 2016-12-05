@@ -1,8 +1,20 @@
 define([
+    '../error/ArgumentError',
     './Camera',
-    '../geom/Matrix'
-], function (Camera,
-             Matrix) {
+    '../util/Logger',
+    '../geom/Matrix',
+    './NavigatorState',
+    '../geom/Position',
+    '../geom/Vec3',
+    '../util/WWMath'
+], function (ArgumentError,
+             Camera,
+             Logger,
+             Matrix,
+             NavigatorState,
+             Position,
+             Vec3,
+             WWMath) {
     var Navigator = function (worldWindow) {
         this.scratchCamera = new Camera();
 
@@ -27,6 +39,12 @@ define([
          */
         this.tilt = 0;
 
+        this.latitude = 30;
+
+        this.longitude = 110;
+
+        this.altitude = 100000;
+
         /**
          * This navigator's roll, in degrees.
          * @type {Number}
@@ -44,66 +62,70 @@ define([
     Object.defineProperties(Navigator.prototype, {
         latitude: {
             get: function () {
-                return this.latitude;
+                return this._latitude;
             },
             set: function (latitude) {
-                this.latitude = latitude;
+                this._latitude = latitude;
             }
         },
 
         longitude: {
             get: function () {
-                return this.longitude;
+                return this._longitude;
             },
             set: function (longitude) {
-                this.longitude = longitude;
+                this._longitude = longitude;
             }
         },
 
         altitude: {
             get: function () {
-                return this.altitude;
+                return this._altitude;
             },
             set: function (altitude) {
-                this.altitude = altitude;
+                this._altitude = altitude;
             }
         },
 
         heading: {
             get: function () {
-                return this.heading;
+                return this._heading;
             },
             set: function (heading) {
-                this.heading = heading;
+                this._heading = heading;
             }
         },
 
         tilt: {
             get: function () {
-                return this.tilt;
+                return this._tilt;
             },
             set: function (tilt) {
-                this.tilt = tilt;
+                this._tilt = tilt;
             }
         },
 
         roll: {
             get: function () {
-                return this.roll;
+                return this._roll;
             },
             set: function (roll) {
-                this.roll = roll;
+                this._roll = roll;
             }
         }
     });
 
     Navigator.prototype.getAsCamera = function (globe, result) {
         if (!globe) {
-            // Log missing globe
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "getAsCamera", "missing globe")
+            );
         }
 
         if (!result) {
-            // Log missing result
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "getAsCamera", "missing result")
+            );
         }
 
         result.latitude = this.latitude;
@@ -119,11 +141,15 @@ define([
 
     Navigator.prototype.setAsCamera = function (globe, camera) {
         if (!globe) {
-            // Log missing globe
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "setAsCamera", "missing globe")
+            );
         }
 
         if (!camera) {
-            // Log missing result
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "setAsCamera", "missing camera")
+            );
         }
 
         this.latitude = camera.latitude;
@@ -132,54 +158,59 @@ define([
         this.heading = camera.heading;
         this.tilt = camera.tilt;
         this.roll = camera.roll;
+
+        return this;
     };
 
     Navigator.prototype.getAsLookAt = function (globe, result) {
         if (!globe) {
-            // Log missing globe
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "getAsLookAt", "missing globe")
+            );
         }
 
         if (!result) {
-            // Log missing result
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "getAsLookAt", "missing result")
+            );
         }
 
-        this.getAsCamera(globe, this.scratchCamera);
-        globe.cameraToLookAt()
+        this.getAsCamera(globe, this.scratchCamera); // get this navigator's properties as a Camera
+        globe.cameraToLookAt(this.scratchCamera, result); // convert the Camera to a LookAt
+
+        return result;
     };
 
     Navigator.prototype.setAsLookAt = function (globe, lookAt) {
         if (!globe) {
-            // Log missing globe
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "setAsLookAt", "missing globe")
+            );
         }
 
         if (!lookAt) {
-            // Log missing result
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "setAsLookAt", "missing lookAt")
+            );
         }
 
+        globe.lookAtToCamera(lookAt, this.scratchCamera);
+        this.setAsCamera(globe, this.scratchCamera);
 
+        return this;
     };
 
     /**
      * @return {NavigatorState}
      */
-    Navigator.prototype.currentState = function(globe) {
-        var camera = this.getAsLookAt(globe, new LookAt());
+    Navigator.prototype.currentState = function() {
+        var camera = this.getAsCamera(this.worldWindow.globe, this.scratchCamera),
+            modelview = Matrix.fromIdentity(),
+            viewerPosition = new Position(this.latitude, this.longitude, this.altitude);
 
-        var modelview = Matrix.fromIdentity();
-        var projection = Matrix.fromIdentity();
-        // Here I need to prepare all the transformation on modelview and projection matrix.
-        // This is the part with most uncertainty for me.
+        modelview.multiplyByLookAtModelview(viewerPosition, camera.range, camera.heading, camera.tilt, camera.roll, this.worldWindow.globe);
 
-        return new NavigatorState(modelview, projection, null, camera.heading, camera.tilt);
-
-        /*this.applyLimits();
-
-        var globe = this.worldWindow.globe,
-            lookAtPosition = new Position(this.lookAtLocation.latitude, this.lookAtLocation.longitude, 0),
-            modelview = Matrix.fromIdentity();
-        modelview.multiplyByLookAtModelview(lookAtPosition, this.range, this.heading, this.tilt, this.roll, globe);
-
-        return this.currentStateForModelview(modelview);*/
+        return this.currentStateForModelview(modelview, camera);
     };
 
     /**
@@ -191,7 +222,7 @@ define([
      * @returns {NavigatorState} The current navigator state.
      * @throws {ArgumentError} If the specified matrix is null or undefined.
      */
-    Navigator.prototype.currentStateForModelview = function (modelviewMatrix) {
+    Navigator.prototype.currentStateForModelview = function (modelviewMatrix, camera) {
         if (!modelviewMatrix) {
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "currentStateForModelview", "missingMatrix"));
@@ -235,7 +266,7 @@ define([
         // WebGL viewport.
         projectionMatrix.setToPerspectiveProjection(viewport.width, viewport.height, this.nearDistance, this.farDistance);
 
-        return new NavigatorState(modelviewMatrix, projectionMatrix, viewport, this.heading, this.tilt);
+        return new NavigatorState(modelviewMatrix, projectionMatrix, viewport, camera.heading, camera.tilt);
     };
 
     return Navigator;
