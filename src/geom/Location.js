@@ -291,9 +291,9 @@ define([
             endLatRadians = Math.asin(Math.sin(latRadians) * Math.cos(pathLengthRadians) +
                 Math.cos(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
             endLonRadians = lonRadians + Math.atan2(
-                Math.sin(pathLengthRadians) * Math.sin(azimuthRadians),
-                Math.cos(latRadians) * Math.cos(pathLengthRadians) -
-                Math.sin(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
+                    Math.sin(pathLengthRadians) * Math.sin(azimuthRadians),
+                    Math.cos(latRadians) * Math.cos(pathLengthRadians) -
+                    Math.sin(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
 
             if (isNaN(endLatRadians) || isNaN(endLonRadians)) {
                 result.latitude = location.latitude;
@@ -475,8 +475,7 @@ define([
             dLon = pathLengthRadians * Math.sin(azimuthRadians) / q;
 
             // Handle latitude passing over either pole.
-            if (WWMath.fabs(endLatRadians) > Math.PI / 2)
-            {
+            if (WWMath.fabs(endLatRadians) > Math.PI / 2) {
                 endLatRadians = endLatRadians > 0 ? Math.PI - endLatRadians : -Math.PI - endLatRadians;
             }
 
@@ -641,8 +640,7 @@ define([
                 endLonRadians;
 
             // Handle latitude passing over either pole.
-            if (WWMath.fabs(endLatRadians) > Math.PI / 2)
-            {
+            if (WWMath.fabs(endLatRadians) > Math.PI / 2) {
                 endLatRadians = endLatRadians > 0 ? Math.PI - endLatRadians : -Math.PI - endLatRadians;
             }
 
@@ -666,7 +664,7 @@ define([
          * @returns {boolean} True if the dateline is crossed, else false.
          * @throws {ArgumentError} If the locations list is null.
          */
-        Location.locationsCrossDateLine = function(locations) {
+        Location.locationsCrossDateLine = function (locations) {
             if (!locations) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "locationsCrossDateline", "missingLocation"));
@@ -701,7 +699,7 @@ define([
          *
          * @throws IllegalArgumentException if locations is null.
          */
-        Location.greatCircleArcExtremeLocations = function(locations) {
+        Location.greatCircleArcExtremeLocations = function (locations) {
             if (!locations) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeLocations", "missingLocation"));
@@ -746,7 +744,7 @@ define([
          *
          * @throws {ArgumentError} If either begin or end are null.
          */
-        Location.greatCircleArcExtremeForTwoLocations = function(begin, end) {
+        Location.greatCircleArcExtremeForTwoLocations = function (begin, end) {
             if (!begin || !end) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeForTwoLocations", "missingLocation"));
@@ -823,7 +821,7 @@ define([
          *
          * @throws {ArgumentError} If location is null.
          */
-        Location.greatCircleExtremeLocationsUsingAzimuth = function(location, azimuth) {
+        Location.greatCircleExtremeLocationsUsingAzimuth = function (location, azimuth) {
             if (!location) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeLocationsUsingAzimuth", "missingLocation"));
@@ -859,7 +857,7 @@ define([
 
             return [
                 Location.greatCircleLocation(location, azimuth, extremeDistance1, new Location(0, 0)),
-                Location.greatCircleLocation(location, azimuth, extremeDistance2, new Location(0,0))
+                Location.greatCircleLocation(location, azimuth, extremeDistance2, new Location(0, 0))
             ];
         };
 
@@ -879,7 +877,7 @@ define([
          * TODO: this code allocates 4 new Vec3 and 1 new Position; use scratch variables???
          * TODO: Why not? Every location created would then allocated those variables as well, even if they aren't needed :(.
          */
-        Location.intersectionWithMeridian = function(p1, p2, meridian, globe) {
+        Location.intersectionWithMeridian = function (p1, p2, meridian, globe) {
             // TODO: add support for 2D
             //if (globe instanceof Globe2D)
             //{
@@ -917,6 +915,218 @@ define([
             return pos.latitude;
         };
 
+        Location.splitPolygons = function (points, globe) {
+            var intersections = [];
+            var pointsClone = [];
+
+            var pole = Location.findIntersectionsAndPole(points, pointsClone, intersections, globe);
+
+            if (intersections.length === 0) {
+                return [points];
+            }
+            if (intersections.length > 2) {
+                intersections.sort(function (a, b) {
+                    return b[0].latitude - a[0].latitude;
+                });
+            }
+            if (pole !== Location.poles.NONE) {
+                console.info('Polygon contains a Pole');
+                pointsClone = this.handleOnePole(pointsClone, intersections, pole);
+            }
+            if (intersections.length === 0) {
+                return [pointsClone];
+            }
+
+            Location.linkIntersections(intersections);
+            var polygons = Location.makePolygons(pointsClone, intersections);
+            return polygons;
+        };
+
+        Location.findIntersectionsAndPole = function (points, pointsClone, intersections, globe) {
+            var minLatitude = 90.0;
+            var maxLatitude = -90.0;
+            var containsPole = false;
+
+            for (var i = 0, len = points.length; i < len; i++) {
+                var pt1 = points[i];
+                var pt2 = points[(i + 1) % len];
+
+                if (pt1.equals(pt2)) {
+                    continue;
+                }
+
+                if (pt1.longitude > 180 || pt1.longitude < -180) {
+                    pt1.longitude = Angle.normalizedDegreesLongitude(pt1.longitude);
+                }
+                if (pt2.longitude > 180 || pt2.longitude < -180) {
+                    pt2.longitude = Angle.normalizedDegreesLongitude(pt2.longitude);
+                }
+
+                minLatitude = Math.min(minLatitude, pt1.latitude);
+                maxLatitude = Math.max(maxLatitude, pt1.latitude);
+
+                var doesCross = Location.locationsCrossDateLine([pt1, pt2]);
+                if (doesCross) {
+                    containsPole = !containsPole;
+                    var iLatitude = Location.intersectionWithMeridian(pt1, pt2, 180, globe);
+                    var iLongitude = WWMath.signum(pt1.longitude) * 180 || 180;
+
+                    var iLoc1 = Location.makeIntersectionPoint(iLatitude, iLongitude, pt1.altitude);
+                    var iLoc2 = Location.makeIntersectionPoint(iLatitude, -iLongitude, pt2.altitude);
+
+                    Location.safeAdd(pointsClone, pt1);
+                    iLoc1.index = pointsClone.length;
+                    iLoc2.index = pointsClone.length + 1;
+                    Location.safeAdd(pointsClone, iLoc1);
+                    Location.safeAdd(pointsClone, iLoc2);
+                    Location.safeAdd(pointsClone, pt2);
+
+                    intersections.push([iLoc1, iLoc2]);
+                }
+                else {
+                    Location.safeAdd(pointsClone, pt1);
+                    Location.safeAdd(pointsClone, pt2);
+                }
+            }
+
+            var pole = Location.poles.NONE;
+            if (containsPole) {
+                pole = Location.determinePole(minLatitude, maxLatitude);
+            }
+
+            return pole;
+
+        };
+
+        Location.handleOnePole = function (points, intersections, pole) {
+            var pointsClone;
+
+            if (pole === Location.poles.NORTH) {
+                var intersection = intersections.shift();
+                var poleLat = 90;
+            }
+            else if (pole === Location.poles.SOUTH) {
+                intersection = intersections.pop();
+                poleLat = -90;
+            }
+
+            var iEnd = intersection[0];
+            var iStart = intersection[1];
+            iEnd.isIntersection = false;
+            iStart.isIntersection = false;
+
+            pointsClone = points.slice(0, iEnd.index + 1);
+            pointsClone.push(new Location(poleLat, iEnd.longitude), new Location(poleLat, iStart.longitude));
+            pointsClone = pointsClone.concat(points.slice(iStart.index));
+
+            return pointsClone;
+        };
+
+        Location.linkIntersections = function (intersections) {
+            for (var i = 0, len = intersections.length - 1; i < len; i += 2) {
+                var i0 = intersections[i];
+                var i1 = intersections[i + 1];
+                var i0end = i0[0];
+                var i0start = i0[1];
+                var i1end = i1[0];
+                var i1start = i1[1];
+
+                i0end.linkTo = i1start.index;
+                i0start.linkTo = i1end.index;
+                i1end.linkTo = i0start.index;
+                i1start.linkTo = i0end.index;
+            }
+        };
+
+        Location.makePolygons = function (points, intersections) {
+            var polygons = [];
+
+            for (var i = 0; i < intersections.length - 1; i += 2) {
+                var i0 = intersections[i];
+                var i1 = intersections[i + 1];
+
+                var start = i0[1].index;
+                var end = i1[0].index;
+                var polygon = Location.makePolygon(start, end, points);
+                if (polygon.length) {
+                    polygons.push(polygon);
+                }
+
+                start = i1[1].index;
+                end = i0[0].index;
+                polygon = Location.makePolygon(start, end, points);
+                if (polygon.length) {
+                    polygons.push(polygon);
+                }
+            }
+
+            return polygons;
+        };
+
+        Location.makePolygon = function (start, end, points) {
+            var polygon = [];
+            var pass = false;
+            var len = points.length;
+
+            if (end < start) {
+                end += len;
+            }
+
+            for (var i = start; i <= end; i++) {
+                var pt = points[i % len];
+                if (pt.visited) {
+                    break;
+                }
+                polygon.push(pt);
+                if (pt.isIntersection) {
+                    if (pass) {
+                        i = pt.linkTo - 1; //'connecting intersection index - 1'
+                        if (i + 1 === start) {
+                            break;
+                        }
+                    }
+                    pass = !pass;
+                    pt.visited = true;
+                }
+            }
+
+            return polygon;
+        };
+
+        Location.determinePole = function (minLatitude, maxLatitude) {
+            // Determine which pole is enclosed. If the shape is entirely in one hemisphere, then assume that it encloses
+            // the pole in that hemisphere. Otherwise, assume that it encloses the pole that is closest to the shape's
+            // extreme latitude.
+            var pole;
+            if (minLatitude > 0) {
+                pole = Location.poles.NORTH; // Entirely in Northern Hemisphere.
+            }
+            else if (maxLatitude < 0) {
+                pole = Location.poles.SOUTH; // Entirely in Southern Hemisphere.
+            }
+            else if (Math.abs(maxLatitude) >= Math.abs(minLatitude)) {
+                pole = Location.poles.NORTH; // Spans equator, but more north than south.
+            }
+            else {
+                pole = Location.poles.SOUTH; // Spans equator, but more south than north.
+            }
+            return pole;
+        };
+
+        Location.makeIntersectionPoint = function (latitude, longitude, altitude) {
+            if (altitude != null) {
+                return new IntersectionPosition(latitude, longitude, altitude);
+            }
+            return new IntersectionLocation(latitude, longitude);
+        };
+
+        Location.safeAdd = function (arr, el) {
+            if (!el._added) {
+                arr.push(el);
+                el._added = true;
+            }
+        };
+
         /**
          * A bit mask indicating which if any pole is being referenced.
          * This corresponds to Java WW's AVKey.NORTH and AVKey.SOUTH,
@@ -929,6 +1139,24 @@ define([
             'NORTH': 1,
             'SOUTH': 2
         };
+
+        function IntersectionLocation(latitude, longitude) {
+            Location.call(this, latitude, longitude);
+            this.visited = false;
+            this.isIntersection = true;
+        }
+
+        IntersectionLocation.prototype = Object.create(Location.prototype);
+        IntersectionLocation.prototype.constructor = IntersectionLocation;
+
+        function IntersectionPosition(latitude, longitude, altitude) {
+            WorldWind.Position.call(this, latitude, longitude, altitude);
+            this.visited = false;
+            this.isIntersection = true;
+        }
+
+        IntersectionPosition.prototype = Object.create(Position.prototype);
+        IntersectionPosition.prototype.constructor = IntersectionPosition;
 
         return Location;
     });
