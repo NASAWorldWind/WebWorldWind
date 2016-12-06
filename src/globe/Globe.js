@@ -655,7 +655,7 @@ define([
                 );
             }
 
-            this.computePointFromPosition(camera.latitude, camera.longitude, camera.altitude, result);
+            this._projection.geographicToCartesianTransform(this, camera.latitude, camera.longitude, camera.altitude, null, result);
 
             result.multiplyByRotation(0, 0, 1, -camera.heading);
             result.multiplyByRotation(1, 0, 0, camera.tilt);

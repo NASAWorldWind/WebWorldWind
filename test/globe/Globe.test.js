@@ -3,10 +3,12 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    'src/navigate/Camera',
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
     'src/geom/Matrix'
-], function (EarthElevationModel,
+], function (Camera,
+             EarthElevationModel,
              Globe,
              Matrix) {
     describe ("Globe", function () {
@@ -47,6 +49,23 @@ define([
                 );
                 var viewTilt = globe.computeViewTilt(source);
                 expect(viewTilt).toBe(113.79711637384179);
+            });
+        });
+
+        describe('#cameraToCartesianTransform', function() {
+            it('correctly transforms information from camera to cartesian coordinates', function(){
+                var expected = new Matrix(
+                    0.97130427063354, 0.23620624315079436, 0.027832077637773192, 547587.1239615995,
+                    -0.2365642216731213, 0.9715611188002498, 0.010313169241199488, 1100422.1959130284,
+                    -0.024604529526848273, -0.01660129911166929, 0.999559409937482, 6258949.467199742,
+                    0.0, 0.0, 0.0, 1.0
+                );
+                var result = Matrix.fromIdentity();
+                var camera = new Camera(10.0, 5.0, 1000.0, WorldWind.ABSOLUTE, 20.0, 10.0, 6.0);
+
+                globe.cameraToCartesianTransform(camera, result);
+
+                expect(result.equalsWithPrecision(expected, 6)).toBe(true);
             });
         });
     });
