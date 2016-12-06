@@ -5,19 +5,21 @@
 define([
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
+    'src/geom/Matrix',
     'src/geom/Position',
     'src/projections/ProjectionWgs84',
     'src/geom/Vec3'
 ], function (EarthElevationModel,
              Globe,
+             Matrix,
              Position,
              ProjectionWgs84,
              Vec3) {
     describe("ProjectionWgs84", function () {
         var projection = new ProjectionWgs84();
-        var globe = new Globe(new EarthElevationModel());
+        var globe = new Globe(new EarthElevationModel(), projection);
 
-        describe('#geographictoCartesian', function () {
+        describe('#geographicToCartesian', function () {
             it('computes correct representation of all default stations', function(){
                 var stations = getStations();
                 stations.forEach(function(station) {
@@ -31,6 +33,32 @@ define([
                     expect(result[1]).toBe(vec[1]);
                     expect(result[2]).toBe(vec[2]);
                 });
+            });
+        });
+
+        describe('#cartesianToLocalTransform', function(){
+            it('correctly transform coordinates from cartesian space to local space', function(){
+                var x = -4610466.9131683465; // KOXR airport
+                var y = 3565379.0227454384;
+                var z = -2576702.8642047923;
+                var result = new Matrix();
+                var expected = new Matrix(
+                    -0.4878596591387329, 0.4906549897935131, -0.7219768929652575, -4610466.9131683465,
+                    2.7755575615628914E-17, 0.8270805742745618, 0.5620833778521306, 3565379.0227454384,
+                    0.8729220772698095, 0.274217805126488, -0.4034992470458552, -2576702.8642047923,
+                    0.0, 0.0, 0.0, 1.0
+                );
+
+                projection.cartesianToLocalTransform(globe, x, y, z, null, result);
+
+                console.log(result);
+                expect(result.equals(expected)).toBe(true);
+            });
+        });
+
+        describe('#geographicToCartesianGrid', function() {
+            it('', function(){
+
             });
         });
     });
