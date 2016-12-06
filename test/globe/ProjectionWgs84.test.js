@@ -31,8 +31,6 @@ define([
 
                     projection.geographicToCartesian(globe, position.latitude, position.longitude, position.altitude, null, result);
 
-                    console.log("Result: ", result);
-                    console.log("Expected: ", vec);
                     expect(result[0].toFixed(3)).toBe(vec[0].toFixed(3));
                     expect(result[1].toFixed(3)).toBe(vec[1].toFixed(3));
                     expect(result[2].toFixed(3)).toBe(vec[2].toFixed(3));
@@ -72,10 +70,21 @@ define([
 
                 projection.cartesianToLocalTransform(globe, x, y, z, null, result);
 
-                console.log(result);
-                expect(result.equals(expected)).toBe(true);
+                expect(result.equalsWithPrecision(expected, 4)).toBe(true);
             });
         });
+
+        /*
+         'Result: ', Object{0: -1.0202361151670322e-7, 1: 1.9916835171780496e-14, 2: -1.5098335877506238e-7, 3: -4610466.9131683465,
+         4: -1.8263347775997496e-8, 5: 3.6170906246266256e-14, 6: 1.175456410129028e-7, 7: 3565379.0227454384,
+         8: 1.8254975837303858e-7, 9: 1.3533524007111095e-14, 10: -8.43817470833149e-8, 11: -2576702.8642047923,
+         12: 0, 13: 0, 14: 0, 15: 1}
+         'Expected: ', Object{0: -0.4878596591387329, 1: 0.4906549897935131, 2: -0.7219768929652575, 3: -4610466.9131683465,
+          4: 2.7755575615628914e-17, 5: 0.8270805742745618, 6: 0.5620833778521306, 7: 3565379.0227454384,
+          8: 0.8729220772698095, 9: 0.274217805126488, 10: -0.4034992470458552, 11: -2576702.8642047923,
+          12: 0, 13: 0, 14: 0, 15: 1}
+
+         */
 
         describe('#geographicToCartesianGrid', function () {
             it('', function () {

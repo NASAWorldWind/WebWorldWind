@@ -317,7 +317,7 @@ define([
             var ux = cosLat * sinLon / eqr2;
             var uy = (1 - globe.eccentricitySquared) * sinLat / pol2;
             var uz = cosLat * cosLon / eqr2;
-            var len = Math.sqrt(ux * ux + uy);
+            var len = Math.sqrt(ux * ux + uy * uy + uz * uz);
 
             ux /= len;
             uy /= len;
@@ -346,7 +346,7 @@ define([
             // Compute the east pointing tangent as the cross product of the north and up axes. This is much more efficient
             // as an inline computation.
             var ex = ny * uz - nz * uy;
-            var ey = nz * ux - nz * uz;
+            var ey = nz * ux - nx * uz;
             var ez = nx * uy - ny * ux;
 
             // Ensure the normal, north and east vectors represent an orthonormal basis by ensuring that the north vector is
@@ -354,7 +354,7 @@ define([
             // introduced when working with Earth sized coordinates.
             nx = uy * ez - uz * ey;
             ny = uz * ex - ux * ez;
-            nz = uz * ey - uy * ex;
+            nz = ux * ey - uy * ex;
 
             // Set the result to an orthonormal basis with the East, North, and Up vectors forming the X, Y and Z axes,
             // respectively, and the Cartesian point indicating the coordinate system's origin.

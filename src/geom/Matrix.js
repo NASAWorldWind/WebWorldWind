@@ -249,6 +249,32 @@ define([
         };
 
         /**
+         *
+         * @param matrix
+         * @param precision
+         * @returns {*|boolean}
+         */
+        Matrix.prototype.equalsWithPrecision = function(matrix, precision) {
+            return matrix
+                && this[0].toFixed(precision) == matrix[0].toFixed(precision)
+                && this[1].toFixed(precision) == matrix[1].toFixed(precision)
+                && this[2].toFixed(precision) == matrix[2].toFixed(precision)
+                && this[3].toFixed(precision) == matrix[3].toFixed(precision)
+                && this[4].toFixed(precision) == matrix[4].toFixed(precision)
+                && this[5].toFixed(precision) == matrix[5].toFixed(precision)
+                && this[6].toFixed(precision) == matrix[6].toFixed(precision)
+                && this[7].toFixed(precision) == matrix[7].toFixed(precision)
+                && this[8].toFixed(precision) == matrix[8].toFixed(precision)
+                && this[9].toFixed(precision) == matrix[9].toFixed(precision)
+                && this[10].toFixed(precision) == matrix[10].toFixed(precision)
+                && this[11].toFixed(precision) == matrix[11].toFixed(precision)
+                && this[12].toFixed(precision) == matrix[12].toFixed(precision)
+                && this[13].toFixed(precision) == matrix[13].toFixed(precision)
+                && this[14].toFixed(precision) == matrix[14].toFixed(precision)
+                && this[15].toFixed(precision) == matrix[15].toFixed(precision);
+        };
+
+        /**
          * Stores this matrix's components in column-major order in a specified array.
          * <p>
          * The array must have space for at least 16 elements. This matrix's components are stored in the array
