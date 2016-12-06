@@ -71,9 +71,9 @@ define([
                 sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS),
                 rpm = globe.equatorialRadius / Math.sqrt(1.0 - globe.eccentricitySquared * sinLat * sinLat);
 
-            result[0] = (rpm + altitude) * cosLat * sinLon;
-            result[1] = (rpm * (1.0 - globe.eccentricitySquared) + altitude) * sinLat;
-            result[2] = (rpm + altitude) * cosLat * cosLon;
+            result[0] = (altitude + rpm) * cosLat * sinLon;
+            result[1] = (altitude + rpm * (1.0 - globe.eccentricitySquared)) * sinLat;
+            result[2] = (altitude + rpm) * cosLat * cosLon;
 
             return result;
         };

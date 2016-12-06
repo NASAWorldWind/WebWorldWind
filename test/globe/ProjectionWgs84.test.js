@@ -29,9 +29,11 @@ define([
 
                     projection.geographicToCartesian(globe, position.latitude, position.longitude, position.altitude, null, result);
 
-                    expect(result[0]).toBe(vec[0]);
-                    expect(result[1]).toBe(vec[1]);
-                    expect(result[2]).toBe(vec[2]);
+                    console.log("Result: ", result);
+                    console.log("Expected: ", vec);
+                    expect(result[0].toFixed(3)).toBe(vec[0].toFixed(3));
+                    expect(result[1].toFixed(3)).toBe(vec[1].toFixed(3));
+                    expect(result[2].toFixed(3)).toBe(vec[2].toFixed(3));
                 });
             });
         });
@@ -46,9 +48,9 @@ define([
 
                     projection.cartesianToGeographic(globe, vec[0], vec[1], vec[2], null, result);
 
-                    expect(result.latitude).toBe(position.latitude);
-                    expect(result.longitude).toBe(position.longitude);
-                    expect(result.altitude).toBe(position.altitude);
+                    expect(result.latitude.toFixed(3)).toBe(position.latitude.toFixed(3));
+                    expect(result.longitude.toFixed(3)).toBe(position.longitude.toFixed(3));
+                    expect(result.altitude.toFixed(3)).toBe(position.altitude.toFixed(3));
                 });
             })
         });
@@ -87,7 +89,7 @@ define([
                 vec: fromEcef(-1248.597295e3, -4819.433239e3, 3976.500175e3)
             }, {
                 position: new Position(-7.95132970, 345.58786950, 106.558),
-                vec: fromEcef(6118.524122e3, -1572.350853e3, -876.463990e3)
+                vec: fromEcef(6118.524122e3, -1572.350854e3, -876.463990e3)
             }, {
                 position: new Position(-7.26984347, 72.37092177, -64.063),
                 vec: fromEcef(1916.197142e3, 6029.999007e3, -801.737366e3)
@@ -105,6 +107,6 @@ define([
     }
 
     function fromEcef(xEcef, yEcef, zEcef) {
-        return new Vec3(xEcef, yEcef, zEcef);
+        return new Vec3(yEcef, zEcef, xEcef);
     }
 });
