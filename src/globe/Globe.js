@@ -631,7 +631,7 @@ define([
             var cr = Math.cos(rad);
             var sr = Math.sin(rad);
 
-            var ch = cr * matrix[5] - sr * matrix[4];
+            var ch = cr * matrix[0] - sr * matrix[4];
             var sh = sr * matrix[5] - cr * matrix[1];
             return WWMath.toDegrees(Math.atan2(sh, ch));
         };
