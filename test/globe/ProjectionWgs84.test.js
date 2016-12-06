@@ -20,9 +20,9 @@ define([
         var globe = new Globe(new EarthElevationModel(), projection);
 
         describe('#geographicToCartesian', function () {
-            it('computes correct representation of all default stations', function(){
+            it('computes correct representation of all default stations', function () {
                 var stations = getStations();
-                stations.forEach(function(station) {
+                stations.forEach(function (station) {
                     var position = station.position;
                     var vec = station.vec;
                     var result = new Vec3();
@@ -36,8 +36,25 @@ define([
             });
         });
 
-        describe('#cartesianToLocalTransform', function(){
-            it('correctly transform coordinates from cartesian space to local space', function(){
+        describe('#cartesianToGeographic', function () {
+            it('correctly transform stations to geographic locations', function () {
+                var stations = getStations();
+                stations.forEach(function (station) {
+                    var position = station.position;
+                    var vec = station.vec;
+                    var result = new Vec3();
+
+                    projection.cartesianToGeographic(globe, vec[0], vec[1], vec[2], null, result);
+
+                    expect(result.latitude).toBe(position.latitude);
+                    expect(result.longitude).toBe(position.longitude);
+                    expect(result.altitude).toBe(position.altitude);
+                });
+            })
+        });
+
+        describe('#cartesianToLocalTransform', function () {
+            it('correctly transform coordinates from cartesian space to local space', function () {
                 var x = -4610466.9131683465; // KOXR airport
                 var y = 3565379.0227454384;
                 var z = -2576702.8642047923;
@@ -56,8 +73,8 @@ define([
             });
         });
 
-        describe('#geographicToCartesianGrid', function() {
-            it('', function(){
+        describe('#geographicToCartesianGrid', function () {
+            it('', function () {
 
             });
         });
