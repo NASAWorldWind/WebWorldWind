@@ -917,6 +917,19 @@ define([
             return pos.latitude;
         };
 
+        Location.normalizeLatitude = function(degrees){
+            var lat = degrees % 180;
+            var normalizedLat = lat > 90 ? 180 - lat : (lat < -90 ? -180 - lat: lat);
+
+            var numEquatorCrosses = Math.round(degrees / 180);
+            return (numEquatorCrosses % 2 == 0) ? normalizedLat: -normalizedLat;
+        };
+
+        Location.normalizeLongitude = function(degrees) {
+            var lon = degrees % 360;
+            return lon > 180 ? lon - 360 : (lon < -180 ? 360 + lon : lon);
+        };
+
         /**
          * A bit mask indicating which if any pole is being referenced.
          * This corresponds to Java WW's AVKey.NORTH and AVKey.SOUTH,

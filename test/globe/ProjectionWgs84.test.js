@@ -5,12 +5,14 @@
 define([
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
+    'src/geom/Location',
     'src/geom/Matrix',
     'src/geom/Position',
     'src/projections/ProjectionWgs84',
     'src/geom/Vec3'
 ], function (EarthElevationModel,
              Globe,
+             Location,
              Matrix,
              Position,
              ProjectionWgs84,
@@ -48,8 +50,8 @@ define([
 
                     projection.cartesianToGeographic(globe, vec[0], vec[1], vec[2], null, result);
 
-                    expect(result.latitude.toFixed(3)).toBe(position.latitude.toFixed(3));
-                    expect(result.longitude.toFixed(3)).toBe(position.longitude.toFixed(3));
+                    expect(result.latitude.toFixed(3)).toBe(Location.normalizeLatitude(position.latitude).toFixed(3));
+                    expect(result.longitude.toFixed(3)).toBe(Location.normalizeLongitude(position.longitude).toFixed(3));
                     expect(result.altitude.toFixed(3)).toBe(position.altitude.toFixed(3));
                 });
             })
