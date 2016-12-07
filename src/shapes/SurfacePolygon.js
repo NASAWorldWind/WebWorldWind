@@ -50,68 +50,61 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "constructor",
                         "The specified boundary array is null or undefined."));
             }
+            if (!Array.isArray(boundaries)) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "constructor",
+                        "The specified boundary is not an array."));
+            }
 
             SurfaceShape.call(this, attributes);
 
-            // Convert the boundaries to the form SurfaceShape wants them.
-            // TODO: Eliminate this once the SurfaceShape code is rewritten to handle multiple boundaries in the
-            // form they were specified.
-            var newBoundaries = null;
-
-            // Determine whether we've been passed a boundary or a boundary list.
-            if (boundaries.length > 0 && boundaries[0].latitude !== undefined) {
-                newBoundaries = boundaries.slice(0);
-                newBoundaries.push(boundaries[0]);
-                this._boundariesSpecifiedSimply = true;
-            } else if (boundaries.length > 1) {
-                var lastLocation = null;
-
-                newBoundaries = [];
-
-                for (var b = 0; b < boundaries.length; b++) {
-                    var firstLocation = boundaries[b][0];
-
-                    for (var i = 0; i < boundaries[b].length; i++) {
-                        newBoundaries.push(boundaries[b][i]);
-                    }
-
-                    newBoundaries.push(firstLocation);
-
-                    // Close the polygon for secondary parts by returning back to the first point
-                    // (which coincides with the last point of the first part in a well-formed shapefile).
-                    if (!!lastLocation) {
-                        newBoundaries.push(lastLocation);
-                    }
-                    else {
-                        lastLocation = newBoundaries[newBoundaries.length - 1];
-                    }
-                }
-            } else if (boundaries.length === 1) {
-                newBoundaries = boundaries[0].slice(0);
-                newBoundaries.push(boundaries[0][0]);
-            }
-
-            this._boundaries = newBoundaries;
+            this._userDefinedBoundaries = boundaries;
+            this._boundaries = null;
+            this.computeBoundaries();
         };
 
         SurfacePolygon.prototype = Object.create(SurfaceShape.prototype);
 
         Object.defineProperties(SurfacePolygon.prototype, {
-            ///**
-            // * This polygon's boundaries. A two-dimensional array containing the polygon boundaries. Each entry of the
-            // * array specifies the vertices for one boundary of the polygon. If the boundaries were specified to the
-            // * constructor as a simple array of locations, then this property returns them in that form.
-            // * @type {Position[][] | Position[]}
-            // * @memberof SurfacePolygon.prototype
-            // * @readonly
-            // */
-            //boundaries: {
-            //    // TODO: Make this property read/write once the boundaries are interpolated correctly.
-            //    get: function () {
-            //        return this._boundariesSpecifiedSimply ? this._boundaries[0] : this._boundaries;
-            //    }
-            //}
+            boundaries: {
+                get: function () {
+                    return this._userDefinedBoundaries;
+                },
+                set: function (boundaries) {
+                    if (!Array.isArray(boundaries)) {
+                        throw new ArgumentError(
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "set boundaries",
+                                "The specified value is not an array."));
+                    }
+                    this._userDefinedBoundaries = boundaries;
+                    this.computeBoundaries();
+                }
+            }
         });
+
+        SurfacePolygon.prototype.computeBoundaries = function () {
+            if (this._userDefinedBoundaries.length === 0 || this._userDefinedBoundaries[0].latitude == null) {
+                this._boundaries = this._userDefinedBoundaries;
+            }
+            else {
+                this._boundaries = [this._userDefinedBoundaries];
+            }
+            //this.closeContours();
+        };
+
+        SurfacePolygon.prototype.closeContours = function () {
+            for (var i = 0, len = this._boundaries.length; i < len; i++) {
+                var contour = this._boundaries[i];
+                if (contour.length < 3) {
+                    continue;
+                }
+                var p1 = contour[0];
+                var p2 = contour[contour.length - 1];
+                if (!p1.equals(p2)) {
+                    contour.push(p1);
+                }
+            }
+        };
 
         // Internal use only. Intentionally not documented.
         SurfacePolygon.staticStateKey = function (shape) {

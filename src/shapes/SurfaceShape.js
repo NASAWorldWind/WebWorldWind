@@ -93,6 +93,8 @@ define([
              */
             this._boundaries = null;
 
+            this._interpolatedBoundries = null;
+
             /*
              * The collection of locations that describes a closed curve which can be filled.
              * @type {Location[][]}
@@ -146,7 +148,7 @@ define([
                  * @memberof SurfaceShape.prototype
                  * @type {String}
                  */
-                get: function() {
+                get: function () {
                     // If we don't have a state key for the shape attributes, consider this state key to be invalid.
                     if (!this._attributesStateKey) {
                         // Update the state key for the appropriate attributes for future
@@ -201,10 +203,10 @@ define([
              * @default Surface Shape
              */
             displayName: {
-                get: function() {
+                get: function () {
                     return this._displayName;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this._displayName = value;
                 }
@@ -217,10 +219,10 @@ define([
              * @default see [ShapeAttributes]{@link ShapeAttributes}
              */
             attributes: {
-                get: function() {
+                get: function () {
                     return this._attributes;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this._attributes = value;
                     this._attributesStateKey = value.stateKey;
@@ -236,10 +238,10 @@ define([
              * @default null
              */
             highlightAttributes: {
-                get: function() {
+                get: function () {
                     return this._highlightAttributes;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this._highlightAttributes = value;
                 }
@@ -252,10 +254,10 @@ define([
              * @default false
              */
             highlighted: {
-                get: function() {
+                get: function () {
                     return this._highlighted;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this._highlighted = value;
                 }
@@ -268,10 +270,10 @@ define([
              * @default true
              */
             enabled: {
-                get: function() {
+                get: function () {
                     return this._enabled;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this._enabled = value;
                 }
@@ -289,10 +291,10 @@ define([
              * @default WorldWind.GREAT_CIRCLE
              */
             pathType: {
-                get: function() {
+                get: function () {
                     return this._pathType;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this._pathType = value;
                 }
@@ -307,10 +309,10 @@ define([
              * @default SurfaceShape.DEFAULT_NUM_EDGE_INTERVALS
              */
             maximumNumEdgeIntervals: {
-                get: function() {
+                get: function () {
                     return this._maximumNumEdgeIntervals;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this._maximumNumEdgeIntervals = value;
                 }
@@ -341,13 +343,13 @@ define([
              * @type {Sector}
              */
             sector: {
-                get: function() {
+                get: function () {
                     return this._sector;
                 }
             }
         });
 
-        SurfaceShape.staticStateKey = function(shape) {
+        SurfaceShape.staticStateKey = function (shape) {
             shape.stateKeyInvalid = false;
 
             if (shape.highlighted) {
@@ -368,22 +370,22 @@ define([
                 }
             }
 
-            return   "dn " + shape.displayName +
-                    " at " + (!shape._attributesStateKey ? "null" : shape._attributesStateKey) +
-                    " hi " + shape.highlighted +
-                    " en " + shape.enabled +
-                    " pt " + shape.pathType +
-                    " ne " + shape.maximumNumEdgeIntervals +
-                    " po " + shape.polarThrottle +
-                    " se " + "[" +
-                        shape.sector.minLatitude + "," +
-                        shape.sector.maxLatitude + "," +
-                        shape.sector.minLongitude + "," +
-                        shape.sector.maxLongitude +
-                    "]";
+            return "dn " + shape.displayName +
+                " at " + (!shape._attributesStateKey ? "null" : shape._attributesStateKey) +
+                " hi " + shape.highlighted +
+                " en " + shape.enabled +
+                " pt " + shape.pathType +
+                " ne " + shape.maximumNumEdgeIntervals +
+                " po " + shape.polarThrottle +
+                " se " + "[" +
+                shape.sector.minLatitude + "," +
+                shape.sector.maxLatitude + "," +
+                shape.sector.minLongitude + "," +
+                shape.sector.maxLongitude +
+                "]";
         };
 
-        SurfaceShape.prototype.computeStateKey = function() {
+        SurfaceShape.prototype.computeStateKey = function () {
             return SurfaceShape.staticStateKey(this);
         };
 
@@ -400,7 +402,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.computeBoundaries = function(globe) {
+        SurfaceShape.prototype.computeBoundaries = function (globe) {
             // This method is in the base class and should be overridden if the boundaries are generated.
             // It should be called only if the geometry has been provided by the user and does not need to be generated.
             // assert(!this._boundaries);
@@ -410,7 +412,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.render = function(dc) {
+        SurfaceShape.prototype.render = function (dc) {
             if (!this.enabled) {
                 return;
             }
@@ -423,8 +425,8 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.interpolateLocations = function(locations) {
-            var first  = locations[0],
+        SurfaceShape.prototype.interpolateLocations = function (locations) {
+            var first = locations[0],
                 next = first,
                 prev,
                 isNextFirst = true,
@@ -479,7 +481,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.interpolateEdge = function(start, end, locations) {
+        SurfaceShape.prototype.interpolateEdge = function (start, end, locations) {
             var distanceRadians = Location.greatCircleDistance(start, end),
                 steps = Math.round(this._maximumNumEdgeIntervals * distanceRadians / Math.PI),
                 dt,
@@ -499,7 +501,7 @@ define([
 
         // Internal function. Intentionally not documented.
         // Return a throttled step size when near the poles.
-        SurfaceShape.prototype.throttledStep = function(dt, location) {
+        SurfaceShape.prototype.throttledStep = function (dt, location) {
             var cosLat = Math.cos(location.latitude * Angle.DEGREES_TO_RADIANS);
             cosLat *= cosLat; // Square cos to emphasize poles and de-emphasize equator.
 
@@ -512,8 +514,10 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.prepareBoundaries = function(dc) {
-            if (this.isPrepared) return;
+        SurfaceShape.prototype.prepareBoundaries = function (dc) {
+            if (this.isPrepared) {
+                return;
+            }
 
             // Some shapes generate boundaries, such as ellipses and sectors;
             // others don't, such as polylines and polygons.
@@ -523,14 +527,94 @@ define([
             }
 
             if (!this._locations) {
-                this.interpolateLocations(this._boundaries);
+                //this.interpolateLocations(this._boundaries);
             }
 
-            this.prepareGeometry(dc);
+            this.interpolateBoundaries(this._boundaries);
+            //var windingOrders = this.windingOrder(this._boundaries);
+
+            var polygons = Location.splitPolygons(this._interpolatedBoundries, dc.globe);
+            this.contours = polygons;
+
+            this.prepareGeometry(dc, polygons);
 
             this.prepareSectors();
 
             this.isPrepared = true;
+        };
+
+        SurfaceShape.prototype.interpolateBoundaries = function (boundaries) {
+            this._interpolatedBoundries = [];
+
+            for (var i = 0, len = boundaries.length; i < len; i++) {
+                var contour = boundaries[i];
+                this.normalizeLongitude(contour);
+                var interpolatedContour = this.interpolateLocations(contour);
+                //this.closeShape(interpolatedContour);
+                this._interpolatedBoundries.push(this._locations.slice());
+                this._locations.length = 0;
+            }
+
+            return this._interpolatedBoundries;
+        };
+
+        SurfaceShape.prototype.normalizeLongitude = function (contour) {
+            for (var i = 0, len = contour.length; i < len; i++) {
+                var point = contour[i];
+                if (point.longitude > 180 || point.longitude < -180) {
+                    point.longitude = Angle.normalizedDegreesLongitude(point.longitude)
+                }
+            }
+
+        };
+
+        SurfaceShape.prototype.interpolateContour = function (contour) {
+            var interpolatedContour = [];
+            for (var i = 0, len = contour.length; i < len; i++) {
+                var pt1 = contour[i];
+                var pt2 = contour[(i + 1) % len];
+                if (pt1.equals(pt2)) {
+                    continue;
+                }
+                if (pt1.longitude > 180 || pt1.longitude < -180) {
+                    pt1.longitude = Angle.normalizedDegreesLongitude(pt1.longitude);
+                }
+                if (pt2.longitude > 180 || pt2.longitude < -180) {
+                    pt2.longitude = Angle.normalizedDegreesLongitude(pt2.longitude);
+                }
+                this.interpolateEdge(pt1, pt2, interpolatedContour);
+            }
+            return interpolatedContour;
+        };
+
+        SurfaceShape.prototype.closeShape = function (points) {
+            var pt1 = points[0];
+            var pt2 = points[points.length - 1];
+            if (!pt1.equals(pt2)) {
+                points.push(new Location(pt1.latitude, pt1.longitude));
+            }
+        };
+
+        SurfaceShape.prototype.windingOrder = function (boundaries) {
+            var windingOrders = [];
+            for (var i = 0, len = boundaries.length; i < len; i++) {
+                var area = 0;
+                var contour = boundaries[i];
+                for (var j = 0, lenC = contour.length; j < lenC; j++) {
+                    var p1 = contour[i];
+                    var p2 = contour[(i + 1) % lenC];
+                    //area += (p1.latitude * p2.longitude - p2.latitude * p1.longitude); //this might not be correct
+                    area += (p2.longitude * Angle.DEGREES_TO_RADIANS - p1.longitude * Angle.DEGREES_TO_RADIANS) *
+                        (2 + Math.sin(p1.latitude * Angle.DEGREES_TO_RADIANS) + Math.sin(p2.latitude * Angle.DEGREES_TO_RADIANS));
+                }
+                if (area < 0) {
+                    windingOrders.push('CCW');
+                }
+                else {
+                    windingOrders.push('CW');
+                }
+            }
+            return windingOrders;
         };
 
         /**
@@ -541,7 +625,7 @@ define([
          *
          * @return {Sector[]}  Bounding sectors for the shape.
          */
-        SurfaceShape.prototype.computeSectors = function(dc) {
+        SurfaceShape.prototype.computeSectors = function (dc) {
             // Return a previously computed value if it already exists.
             if (this._sectors && this._sectors.length > 0) {
                 return this._sectors;
@@ -553,7 +637,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.prepareSectors = function() {
+        SurfaceShape.prototype.prepareSectors_original = function () {
             var boundaries = this._boundaries;
             if (!boundaries) {
                 return;
@@ -579,7 +663,71 @@ define([
                 this._sectors = Sector.splitBoundingSectors(boundaries);
             }
             else {
-                 if (!this._sector.isEmpty()) {
+                if (!this._sector.isEmpty()) {
+                    this._sectors = [this._sector];
+                }
+            }
+
+            if (!this._sectors) {
+                return;
+            }
+
+            // Great circle paths between two latitudes may result in a latitude which is greater or smaller than either of
+            // the two latitudes. All other path types are bounded by the defining locations.
+            if (this._pathType === WorldWind.GREAT_CIRCLE) {
+                for (var idx = 0, len = this._sectors.length; idx < len; idx += 1) {
+                    var sector = this._sectors[idx];
+
+                    var extremes = Location.greatCircleArcExtremeLocations(boundaries);
+
+                    var minLatitude = Math.min(sector.minLatitude, extremes[0].latitude);
+                    var maxLatitude = Math.max(sector.maxLatitude, extremes[1].latitude);
+
+                    this._sectors[idx] = new Sector(minLatitude, maxLatitude, sector.minLongitude, sector.maxLongitude);
+                }
+            }
+        };
+
+        SurfaceShape.prototype.prepareSectors = function () {
+
+            for (var i = 0, len = this.contours.length; i < len; i++) {
+                var contour = this.contours[i];
+                for (var j = 0, lenC = contour.length; j < lenC; j++) {
+
+                }
+                //this._sectors.push(sector)
+            }
+            this._sector = new Sector(-90, 90, -180, 180);
+            this._sectors = [this._sector];
+
+            return;
+
+            var boundaries = this._boundaries;
+            if (!boundaries) {
+                return;
+            }
+
+            this._sector = new Sector(-90, 90, -180, 180);
+            this._sector.setToBoundingSector(boundaries);
+
+            var pole = this.containsPole(boundaries);
+            if (pole != Location.poles.NONE) {
+                // If the shape contains a pole, then the bounding sector is defined by the shape's extreme latitude, the
+                // latitude of the pole, and the full range of longitude.
+                if (pole == Location.poles.NORTH) {
+                    this._sector = new Sector(this._sector.minLatitude, 90, -180, 180);
+                }
+                else {
+                    this._sector = new Sector(-90, this._sector.maxLatitude, -180, 180);
+                }
+
+                this._sectors = [this._sector];
+            }
+            else if (Location.locationsCrossDateLine(boundaries)) {
+                this._sectors = Sector.splitBoundingSectors(boundaries);
+            }
+            else {
+                if (!this._sector.isEmpty()) {
                     this._sectors = [this._sector];
                 }
             }
@@ -605,7 +753,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.prepareGeometry = function(dc) {
+        SurfaceShape.prototype.prepareGeometry_original = function (dc) {
             var datelineLocations;
 
             this._interiorGeometry = [];
@@ -639,183 +787,68 @@ define([
             }
         };
 
-        /**
-         * Determine if a list of geographic locations encloses either the North or South pole. The list is treated as a
-         * closed loop. (If the first and last positions are not equal the loop will be closed for purposes of this
-         * computation.)
-         *
-         * @param {Location[]} locations Locations to test.
-         *
-         * @return {Number} Location.poles.NORTH if the North Pole is enclosed,
-         *                  Location.poles.SOUTH if the South Pole is enclosed, or
-         *                  Location.poles.NONE if neither pole is enclosed.
-         *                  Always returns Location.poles.NONE if {@link #canContainPole()} returns false.
-         *
-         * TODO: handle a shape that contains both poles.
-         */
-        SurfaceShape.prototype.containsPole = function(locations) {
-            // Determine how many times the path crosses the date line. Shapes that include a pole will cross an odd number of times.
-            var containsPole = false;
+        SurfaceShape.prototype.prepareGeometry = function (dc, contours) {
+            var datelineLocations;
 
-            var minLatitude = 90.0;
-            var maxLatitude = -90.0;
+            var polygons = [];
+            for (var i = 0; i < contours.length; i++) {
+                var contour = contours[i];
+                polygons = polygons.concat(contours[i]);
+            }
 
-            var prev = locations[0];
-            for (var idx = 1, len = locations.length; idx < len; idx += 1) {
-                var next = locations[idx];
-
-                if (Location.locationsCrossDateLine([prev, next])) {
-                    containsPole = !containsPole;
+           /* var points = [];
+            for (i = 0; i < polygons.length; i++) {
+                var polygon = polygons[i];
+                var p1 = polygon[0];
+                var p2 = polygon[polygon.length - 1];
+                if (!p1.equals(p2)) {
+                    polygon.push(p1);
                 }
+                points = points.concat(polygons[i]);
+            }*/
 
-                minLatitude = Math.min(minLatitude, next.latitude);
-                maxLatitude = Math.max(maxLatitude, next.latitude);
+            this._interiorGeometry = polygons;
+            this._outlineGeometry = polygons;
+            //this._interiorGeometry = [locs];
+            //this._outlineGeometry = [locs];
+            //this._interiorGeometry = [points];
+            //this._outlineGeometry = [points];
+            //this._interiorGeometry = contours;
+            //this._outlineGeometry = contours;
 
-                prev = next;
-            }
+            return;
 
-            // Close the loop by connecting the last position to the first. If the loop is already closed then the following
-            // test will always fail, and will not affect the result.
-            var first = locations[0];
-            if (Location.locationsCrossDateLine([first, prev])) {
-                containsPole = !containsPole;
-            }
+            var locations = this._locations;
 
-            if (!containsPole) {
-                return Location.poles.NONE;
-            }
+            var pole = this.containsPole(locations);
+            if (pole != Location.poles.NONE) {
+                // Wrap the shape interior around the pole and along the anti-meridian. See WWJ-284.
+                var poleLocations = this.cutAlongDateLine(locations, pole, dc.globe);
+                this._interiorGeometry.push(poleLocations);
 
-            // Determine which pole is enclosed. If the shape is entirely in one hemisphere, then assume that it encloses
-            // the pole in that hemisphere. Otherwise, assume that it encloses the pole that is closest to the shape's
-            // extreme latitude.
-            if (minLatitude > 0) {
-                return Location.poles.NORTH; // Entirely in Northern Hemisphere.
+                // The outline need only compensate for dateline crossing. See WWJ-452.
+                datelineLocations = this.repeatAroundDateline(locations);
+                this._outlineGeometry.push(datelineLocations[0]);
+                if (datelineLocations.length > 1) {
+                    this._outlineGeometry.push(datelineLocations[1]);
+                }
             }
-            else if (maxLatitude < 0) {
-                return Location.poles.SOUTH; // Entirely in Southern Hemisphere.
-            }
-            else if (Math.abs(maxLatitude) >= Math.abs(minLatitude)) {
-                return Location.poles.NORTH; // Spans equator, but more north than south.
+            else if (Location.locationsCrossDateLine(locations)) {
+                datelineLocations = this.repeatAroundDateline(locations);
+                this._interiorGeometry.push(datelineLocations[0]); //this._interiorGeometry.addAll(datelineLocations);
+                this._interiorGeometry.push(datelineLocations[1]); //this._interiorGeometry.addAll(datelineLocations);
+                this._outlineGeometry.push(datelineLocations[0]); //this._outlineGeometry.addAll(datelineLocations);
+                this._outlineGeometry.push(datelineLocations[1]); //this._outlineGeometry.addAll(datelineLocations);
             }
             else {
-                return Location.poles.SOUTH; // Spans equator, but more south than north.
+                this._interiorGeometry.push(locations);
+                this._outlineGeometry.push(locations);
             }
         };
 
-        /**
-         * Divide a list of locations that encloses a pole along the international date line. This method determines where
-         * the locations cross the date line, and inserts locations to the pole, and then back to the intersection position.
-         * This allows the shape to be "unrolled" when projected in a lat-lon projection.
-         *
-         * @param {Location[]} locations    Locations to cut at date line. This list is not modified.
-         * @param {Number} pole             Pole contained by locations, either AVKey.NORTH or AVKey.SOUTH.
-         * @param {Globe} globe             Current globe.
-         *
-         * @return {Location[]} New location list with locations added to correctly handle date line intersection.
-         */
-        SurfaceShape.prototype.cutAlongDateLine = function(locations, pole, globe)
-        {
-            // If the locations do not contain a pole, then there's nothing to do.
-            if (pole == Location.poles.NONE) {
-                return locations;
-            }
-
-            var newLocations = [];
-
-            var poleLat = pole == Location.poles.NORTH ? 90 : -90;
-
-            var prev = locations[locations.length - 1];
-            for (var idx = 0, len = locations.length; idx < len; idx += 1) {
-                var next = locations[idx];
-
-                newLocations.push(prev);
-                if (Location.locationsCrossDateLine([prev, next])) {
-                    // Determine where the segment crosses the date line.
-                    var latitude = Location.intersectionWithMeridian(prev, next, 180, globe);
-                    var sign = WWMath.signum(prev.longitude);
-
-                    var lat = latitude;
-                    var thisSideLon = 180 * sign;
-                    var otherSideLon = -thisSideLon;
-
-                    // Add locations that run from the intersection to the pole, then back to the intersection. Note
-                    // that the longitude changes sign when the path returns from the pole.
-                    //         . Pole
-                    //      2 ^ | 3
-                    //        | |
-                    //      1 | v 4
-                    // --->---- ------>
-                    newLocations.push(new Location(lat, thisSideLon));
-                    newLocations.push(new Location(poleLat, thisSideLon));
-                    newLocations.push(new Location(poleLat, otherSideLon));
-                    newLocations.push(new Location(lat, otherSideLon));
-                }
-
-                prev = next;
-            }
-            newLocations.push(prev);
-
-            return newLocations;
-        };
-
-        /**
-         * Returns a list containing two copies of the specified list of locations crossing the dateline: one that extends
-         * across the -180 longitude  boundary and one that extends across the +180 longitude boundary. If the list of
-         * locations does not cross the dateline this returns a list containing a copy of the original list.
-         *
-         * @param {Location[]} locations Locations to repeat. This is list not modified.
-         *
-         * @return {Location[][]} A list containing two new location lists, one copy for either side of the date line.
-         */
-        SurfaceShape.prototype.repeatAroundDateline = function(locations) {
-            var lonOffset = 0,
-                applyLonOffset = false;
-
-            var newLocations = [];
-
-            var prev= locations[0];
-            newLocations.push(prev);
-            for (var idx = 1, len = locations.length; idx < len; idx += 1) {
-                var next = locations[idx];
-
-                if (Location.locationsCrossDateLine([prev, next])) {
-                    if (lonOffset == 0) {
-                        lonOffset = prev.longitude < 0 ? -360 : 360;
-                    }
-
-                    applyLonOffset = !applyLonOffset;
-                }
-
-                if (applyLonOffset) {
-                    newLocations.push(new Location(next.latitude, next.longitude + lonOffset));
-                }
-                else {
-                    newLocations.push(next);
-                }
-
-                prev = next;
-            }
-
-            var locationGroup = [newLocations];
-
-            if (lonOffset != 0) {
-                var oldLocations = newLocations;
-                newLocations = [];
-
-                for (idx = 0, len = oldLocations.length; idx < len; idx += 1) {
-                    var cur = oldLocations[idx];
-
-                    newLocations.push(new Location(cur.latitude, cur.longitude - lonOffset));
-                }
-
-                locationGroup.push(newLocations);
-            }
-
-            return locationGroup;
-        };
 
         // Internal use only. Intentionally not documented.
-        SurfaceShape.prototype.resetPickColor = function() {
+        SurfaceShape.prototype.resetPickColor = function () {
             this.pickColor = null;
         };
 
@@ -829,7 +862,7 @@ define([
          * @param {Number} dx The additive offset in the horizontal direction.
          * @param {Number} dy The additive offset in the vertical direction.
          */
-        SurfaceShape.prototype.renderToTexture = function(dc, ctx2D, xScale, yScale, dx, dy) {
+        SurfaceShape.prototype.renderToTexture = function (dc, ctx2D, xScale, yScale, dx, dy) {
             var idx,
                 len,
                 path = [],
@@ -846,6 +879,7 @@ define([
             if (!this._isInteriorInhibited && attributes.drawInterior) {
                 ctx2D.fillStyle = isPicking ? this.pickColor.toRGBAString() : attributes.interiorColor.toRGBAString();
 
+                ctx2D.beginPath();
                 for (idx = 0, len = this._interiorGeometry.length; idx < len; idx += 1) {
                     idxPath = 0;
                     lenPath = this._outlineGeometry[idx].length * 2;
@@ -854,7 +888,7 @@ define([
                     // Convert the geometry to a transformed path that can be drawn directly, and as a side effect,
                     // detect if the path is smaller than a pixel. If it is, don't bother drawing it.
                     if (this.transformPath(this._interiorGeometry[idx], xScale, yScale, dx, dy, path)) {
-                        ctx2D.beginPath();
+                        //ctx2D.beginPath();
 
                         ctx2D.moveTo(path[idxPath++], path[idxPath++]);
 
@@ -864,9 +898,10 @@ define([
 
                         ctx2D.closePath();
 
-                        ctx2D.fill();
+                        //ctx2D.fill();
                     }
                 }
+                ctx2D.fill();
             }
 
             // Draw the outline of the shape.
@@ -901,7 +936,7 @@ define([
                             isNextFirst = true,
                             countFirst = 0;
 
-                        for (idxPath = 2, lenPath = path.length; idxPath < lenPath; ) {
+                        for (idxPath = 2, lenPath = path.length; idxPath < lenPath;) {
                             // Remember the previous point in the path.
                             xPrev = xNext;
                             yPrev = yNext;
@@ -947,7 +982,7 @@ define([
         // Transform a path and compute its extrema.
         // In the process of transforming it, optimize out line segments that are too short (shorter than some threshold).
         // Return an indicator of the path is "big enough".
-        SurfaceShape.prototype.transformPath = function(path, xScale, yScale, xOffset, yOffset, result) {
+        SurfaceShape.prototype.transformPath = function (path, xScale, yScale, xOffset, yOffset, result) {
             var xPrev, yPrev,
                 xNext, yNext,
                 xFirst, yFirst,

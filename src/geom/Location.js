@@ -915,43 +915,114 @@ define([
             return pos.latitude;
         };
 
-        Location.splitPolygons = function (points, globe) {
-            var intersections = [];
-            var pointsClone = [];
+        Location.splitPolygons = function (contours, globe) {
+            var polygonsInfo = {
+                contours: [],
+                poles: [],
+                contoursIntersections: [],
+                contoursInfo: [],
+                outputContours: []
+            };
+            var contoursIntersections = [];
+            var newContours = [];
+            var poles = [];
 
-            var pole = Location.findIntersectionsAndPole(points, pointsClone, intersections, globe);
+            var doesCross = Location.findIntersectionsAndPole(contours, newContours, contoursIntersections, poles, globe);
 
-            if (intersections.length === 0) {
-                return [points];
-            }
-            if (intersections.length > 2) {
-                intersections.sort(function (a, b) {
-                    return b[0].latitude - a[0].latitude;
-                });
-            }
-            if (pole !== Location.poles.NONE) {
-                console.info('Polygon contains a Pole');
-                pointsClone = this.handleOnePole(pointsClone, intersections, pole);
-            }
-            if (intersections.length === 0) {
-                return [pointsClone];
+            if (!doesCross) {
+                return contours;
             }
 
-            Location.linkIntersections(intersections);
-            var polygons = Location.makePolygons(pointsClone, intersections);
+            Location.sortIntersections(contoursIntersections);
+
+            Location.handlePoles(newContours, contoursIntersections, poles);
+
+            if (Location.intersectionsIsEmpty(contoursIntersections)) {
+                return newContours;
+            }
+
+            Location.linkIntersectionsBoundaries(contoursIntersections);
+
+            var polygons = Location.makePolygonsBoundaries(newContours, contoursIntersections);
+
             return polygons;
         };
 
-        Location.findIntersectionsAndPole = function (points, pointsClone, intersections, globe) {
+        Location.findIntersectionsAndPole = function (contours, newContours, contoursIntersections, poles, globe) {
+            var crossesOnce = false;
+
+            for (var i = 0, len = contours.length; i < len; i++) {
+                var contour = contours[i];
+                var points = [];
+                var intersections = [];
+                var minLatitude = 90.0;
+                var maxLatitude = -90.0;
+                var containsPole = false;
+
+                for (var j = 0, lenC = contour.length; j < lenC; j++) {
+                    var pt1 = contour[j];
+                    var pt2 = contour[(j + 1) % lenC];
+
+                    if (pt1.equals(pt2)) {
+                        continue;
+                    }
+
+                    minLatitude = Math.min(minLatitude, pt1.latitude);
+                    maxLatitude = Math.max(maxLatitude, pt1.latitude);
+
+                    var doesCross = Location.locationsCrossDateLine([pt1, pt2]);
+                    if (doesCross) {
+                        crossesOnce = true;
+                        containsPole = !containsPole;
+
+                        var iLatitude = Location.intersectionWithMeridian(pt1, pt2, 180, globe);
+                        var iLongitude = WWMath.signum(pt1.longitude) * 180 || 180;
+
+                        var iLoc1 = new Location(iLatitude, iLongitude);
+                        var iLoc2 = new Location(iLatitude, -iLongitude);
+                        iLoc1.isIntersection = true;
+                        iLoc2.isIntersection = true;
+
+                        Location.safeAdd(points, pt1);
+                        iLoc1.index = points.length;
+                        iLoc2.index = points.length + 1;
+                        Location.safeAdd(points, iLoc1);
+                        Location.safeAdd(points, iLoc2);
+                        Location.safeAdd(points, pt2);
+
+                        intersections.push([iLoc1, iLoc2]);
+                    }
+                    else {
+                        Location.safeAdd(points, pt1);
+                        Location.safeAdd(points, pt2);
+                    }
+                }
+
+                var pole = Location.poles.NONE;
+                if (containsPole) {
+                    pole = Location.determinePole(minLatitude, maxLatitude);
+                }
+
+                newContours.push(points);
+                contoursIntersections.push(intersections);
+                poles.push(pole);
+            }
+
+            return crossesOnce;
+        };
+
+        Location.findIntersectionsAndPole_original = function (points, pointsClone, intersections, boundariesLimits, globe) {
             var minLatitude = 90.0;
             var maxLatitude = -90.0;
             var containsPole = false;
 
+            var j = 0;
             for (var i = 0, len = points.length; i < len; i++) {
                 var pt1 = points[i];
                 var pt2 = points[(i + 1) % len];
 
-                if (pt1.equals(pt2)) {
+                if (i === boundariesLimits[j] || pt1.equals(pt2)) {
+                    j++;
                     continue;
                 }
 
@@ -971,8 +1042,8 @@ define([
                     var iLatitude = Location.intersectionWithMeridian(pt1, pt2, 180, globe);
                     var iLongitude = WWMath.signum(pt1.longitude) * 180 || 180;
 
-                    var iLoc1 = Location.makeIntersectionPoint(iLatitude, iLongitude, pt1.altitude);
-                    var iLoc2 = Location.makeIntersectionPoint(iLatitude, -iLongitude, pt2.altitude);
+                    var iLoc1 = new Location(iLatitude, iLongitude);
+                    var iLoc2 = new Location(iLatitude, -iLongitude);
 
                     Location.safeAdd(pointsClone, pt1);
                     iLoc1.index = pointsClone.length;
@@ -996,6 +1067,141 @@ define([
 
             return pole;
 
+        };
+
+        Location.linkIntersectionsBoundaries = function (contoursIntersections) {
+            for (var i = 0, len = contoursIntersections.length; i < len; i++) {
+                Location.linkIntersections(contoursIntersections[i]);
+            }
+        };
+
+        Location.linkIntersections = function (intersections) {
+            for (var i = 0, len = intersections.length - 1; i < len; i += 2) {
+                var i0 = intersections[i];
+                var i1 = intersections[i + 1];
+                var i0end = i0[0];
+                var i0start = i0[1];
+                var i1end = i1[0];
+                var i1start = i1[1];
+
+                i0end.linkTo = i1start.index;
+                i0start.linkTo = i1end.index;
+                i1end.linkTo = i0start.index;
+                i1start.linkTo = i0end.index;
+            }
+        };
+
+        Location.makePolygonsBoundaries = function (contours, contoursIntersections) {
+            var polygons = [];
+            for (var i = 0, len = contours.length; i < len; i++) {
+                var splitContour = Location.makePolygons(contours[i], contoursIntersections[i]);
+                polygons.push(splitContour);
+            }
+            return polygons;
+        };
+
+        Location.makePolygons = function (points, intersections) {
+            if (intersections.length === 0) {
+                return [points];
+            }
+
+            var polygons = [];
+            var unvisitedPoints = points.length;
+
+            for (var i = 0, len = intersections.length; i < len - 1; i += 2) {
+                var i0 = intersections[i];
+                var i1 = intersections[i + 1];
+
+                var start = i0[1].index;
+                var end = i1[0].index;
+                var polygon = Location.makePolygon(start, end, points);
+                unvisitedPoints -= polygon.length;
+                if (polygon.length) {
+                    polygons.push(polygon);
+                }
+
+                start = i1[1].index;
+                end = i0[0].index;
+                polygon = Location.makePolygon(start, end, points);
+                unvisitedPoints -= polygon.length;
+                if (polygon.length) {
+                    polygons.push(polygon);
+                }
+            }
+
+            if (unvisitedPoints > 0) {
+                polygon = [];
+                for (i = 0, len = points.length; i < len; i++) {
+                    if (!points[i].visited) {
+                        polygon.push(points[i]);
+                    }
+                }
+                polygons.push(polygon);
+            }
+
+            return polygons;
+        };
+
+        Location.makePolygon = function (start, end, points) {
+            var polygon = [];
+            var pass = false;
+            var len = points.length;
+
+            if (end < start) {
+                end += len;
+            }
+
+            for (var i = start; i <= end; i++) {
+                var pt = points[i % len];
+                if (pt.visited) {
+                    break;
+                }
+                polygon.push(pt);
+                pt.visited = true;
+                if (pt.isIntersection) {
+                    if (pass) {
+                        i = pt.linkTo - 1; //'connecting intersection index - 1'
+                        if (i + 1 === start) {
+                            break;
+                        }
+                    }
+                    pass = !pass;
+                    //pt.visited = true;
+                }
+            }
+
+            return polygon;
+        };
+
+        Location.sortIntersections = function (contoursIntersections) {
+            for (var i = 0, len = contoursIntersections.length; i < len; i++) {
+                var intersections = contoursIntersections[i];
+                if (intersections.length > 2) {
+                    intersections.sort(function (a, b) {
+                        return b[0].latitude - a[0].latitude;
+                    });
+                }
+            }
+        };
+
+        Location.intersectionsIsEmpty = function (contoursIntersections) {
+            var isEmpty = true;
+            for (var i = 0, len = contoursIntersections.length; i < len; i++) {
+                if (contoursIntersections[i].length > 0) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+            return isEmpty;
+        };
+
+        Location.handlePoles = function (contours, contoursIntersections, poles) {
+            for (var i = 0, len = contours.length; i < len; i++) {
+                if (poles[i] === Location.poles.NONE) {
+                    continue;
+                }
+                contours[i] = Location.handleOnePole(contours[i], contoursIntersections[i], poles[i]);
+            }
         };
 
         Location.handleOnePole = function (points, intersections, pole) {
@@ -1022,77 +1228,6 @@ define([
             return pointsClone;
         };
 
-        Location.linkIntersections = function (intersections) {
-            for (var i = 0, len = intersections.length - 1; i < len; i += 2) {
-                var i0 = intersections[i];
-                var i1 = intersections[i + 1];
-                var i0end = i0[0];
-                var i0start = i0[1];
-                var i1end = i1[0];
-                var i1start = i1[1];
-
-                i0end.linkTo = i1start.index;
-                i0start.linkTo = i1end.index;
-                i1end.linkTo = i0start.index;
-                i1start.linkTo = i0end.index;
-            }
-        };
-
-        Location.makePolygons = function (points, intersections) {
-            var polygons = [];
-
-            for (var i = 0; i < intersections.length - 1; i += 2) {
-                var i0 = intersections[i];
-                var i1 = intersections[i + 1];
-
-                var start = i0[1].index;
-                var end = i1[0].index;
-                var polygon = Location.makePolygon(start, end, points);
-                if (polygon.length) {
-                    polygons.push(polygon);
-                }
-
-                start = i1[1].index;
-                end = i0[0].index;
-                polygon = Location.makePolygon(start, end, points);
-                if (polygon.length) {
-                    polygons.push(polygon);
-                }
-            }
-
-            return polygons;
-        };
-
-        Location.makePolygon = function (start, end, points) {
-            var polygon = [];
-            var pass = false;
-            var len = points.length;
-
-            if (end < start) {
-                end += len;
-            }
-
-            for (var i = start; i <= end; i++) {
-                var pt = points[i % len];
-                if (pt.visited) {
-                    break;
-                }
-                polygon.push(pt);
-                if (pt.isIntersection) {
-                    if (pass) {
-                        i = pt.linkTo - 1; //'connecting intersection index - 1'
-                        if (i + 1 === start) {
-                            break;
-                        }
-                    }
-                    pass = !pass;
-                    pt.visited = true;
-                }
-            }
-
-            return polygon;
-        };
-
         Location.determinePole = function (minLatitude, maxLatitude) {
             // Determine which pole is enclosed. If the shape is entirely in one hemisphere, then assume that it encloses
             // the pole in that hemisphere. Otherwise, assume that it encloses the pole that is closest to the shape's
@@ -1111,13 +1246,6 @@ define([
                 pole = Location.poles.SOUTH; // Spans equator, but more south than north.
             }
             return pole;
-        };
-
-        Location.makeIntersectionPoint = function (latitude, longitude, altitude) {
-            if (altitude != null) {
-                return new IntersectionPosition(latitude, longitude, altitude);
-            }
-            return new IntersectionLocation(latitude, longitude);
         };
 
         Location.safeAdd = function (arr, el) {
@@ -1139,24 +1267,6 @@ define([
             'NORTH': 1,
             'SOUTH': 2
         };
-
-        function IntersectionLocation(latitude, longitude) {
-            Location.call(this, latitude, longitude);
-            this.visited = false;
-            this.isIntersection = true;
-        }
-
-        IntersectionLocation.prototype = Object.create(Location.prototype);
-        IntersectionLocation.prototype.constructor = IntersectionLocation;
-
-        function IntersectionPosition(latitude, longitude, altitude) {
-            WorldWind.Position.call(this, latitude, longitude, altitude);
-            this.visited = false;
-            this.isIntersection = true;
-        }
-
-        IntersectionPosition.prototype = Object.create(Position.prototype);
-        IntersectionPosition.prototype.constructor = IntersectionPosition;
 
         return Location;
     });
