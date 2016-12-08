@@ -14,6 +14,7 @@ define([
         '../util/Logger',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
+        '../util/polySplitter/PolygonSplitter',
         '../render/Renderable',
         '../geom/Sector',
         '../shapes/ShapeAttributes',
@@ -27,6 +28,7 @@ define([
               Logger,
               NotYetImplementedError,
               PickedObject,
+              PolygonSplitter,
               Renderable,
               Sector,
               ShapeAttributes,
@@ -137,6 +139,8 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.pickColor = null;
+
+            this.polygonsSplits = [];
         };
 
         SurfaceShape.prototype = Object.create(Renderable.prototype);
@@ -425,7 +429,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.interpolateLocations = function (locations) {
+        SurfaceShape.prototype.interpolateLocations = function (locations, preventClose) {
             var first = locations[0],
                 next = first,
                 prev,
@@ -471,7 +475,7 @@ define([
             }
 
             // Force the closing of the border.
-            if (!this._isInteriorInhibited) {
+            if (!this._isInteriorInhibited && !preventClose) {
                 // Avoid duplication if the first endpoint was already emitted.
                 if (prev.latitude != first.latitude || prev.longitude != first.longitude) {
                     this.interpolateEdge(prev, first, this._locations);
@@ -533,14 +537,36 @@ define([
             this.interpolateBoundaries(this._boundaries);
             //var windingOrders = this.windingOrder(this._boundaries);
 
-            var polygons = Location.splitPolygons(this._interpolatedBoundries, dc.globe);
-            this.contours = polygons;
+            //var polygons = Location.splitPolygons(this._interpolatedBoundries, dc.globe);
+            var contoursInfo = [];
+            var doesCross = PolygonSplitter.splitContours(this._boundaries, contoursInfo, this._pathType, dc.globe);
+            this.interpolateContours(contoursInfo);
+            this.contours = contoursInfo;
+            this.doesCross = true;
 
-            this.prepareGeometry(dc, polygons);
+            this.prepareGeometry(dc, contoursInfo);
 
             this.prepareSectors();
 
             this.isPrepared = true;
+        };
+
+        SurfaceShape.prototype.interpolateContours = function (contours) {
+            for (var i = 0, len = contours.length; i < len; i++) {
+                var contour = contours[i];
+                var lenC = contour.polygons.length;
+                var preventClose = false;
+                if (lenC > 1) {
+                    preventClose = true;
+                }
+                for (var j = 0; j < lenC; j++) {
+                    var polygon = contour.polygons[j];
+                    this.polygonsSplits.push(preventClose);
+                    this.interpolateLocations(polygon, preventClose);
+                    contour.polygons[j] = this._locations.slice();
+                    this._locations.length = 0;
+                }
+            }
         };
 
         SurfaceShape.prototype.interpolateBoundaries = function (boundaries) {
@@ -689,66 +715,37 @@ define([
         };
 
         SurfaceShape.prototype.prepareSectors = function () {
-
-            for (var i = 0, len = this.contours.length; i < len; i++) {
-                var contour = this.contours[i];
-                for (var j = 0, lenC = contour.length; j < lenC; j++) {
-
+            if (this.doesCross) {
+                var eastSector = new Sector(90, -90, 180, -180); //positive
+                var westSector = new Sector(90, -90, 180, -180); //negative
+                for (var i = 0, len = this.contours.length; i < len; i++) {
+                    var sectors = this.contours[i].sectors;
+                    var lenS = sectors.length;
+                    for (var j = 0; j < lenS; j++) {
+                        var sector = sectors[j];
+                        if (sector.minLongitude < 0) {
+                            westSector.union(sector);
+                        }
+                        else {
+                            eastSector.union(sector);
+                        }
+                    }
                 }
-                //this._sectors.push(sector)
-            }
-            this._sector = new Sector(-90, 90, -180, 180);
-            this._sectors = [this._sector];
-
-            return;
-
-            var boundaries = this._boundaries;
-            if (!boundaries) {
-                return;
-            }
-
-            this._sector = new Sector(-90, 90, -180, 180);
-            this._sector.setToBoundingSector(boundaries);
-
-            var pole = this.containsPole(boundaries);
-            if (pole != Location.poles.NONE) {
-                // If the shape contains a pole, then the bounding sector is defined by the shape's extreme latitude, the
-                // latitude of the pole, and the full range of longitude.
-                if (pole == Location.poles.NORTH) {
-                    this._sector = new Sector(this._sector.minLatitude, 90, -180, 180);
-                }
-                else {
-                    this._sector = new Sector(-90, this._sector.maxLatitude, -180, 180);
-                }
-
-                this._sectors = [this._sector];
-            }
-            else if (Location.locationsCrossDateLine(boundaries)) {
-                this._sectors = Sector.splitBoundingSectors(boundaries);
+                var minLatitude = Math.min(eastSector.minLatitude, westSector.minLatitude);
+                var maxLatitude = Math.max(eastSector.maxLatitude, eastSector.maxLatitude);
+                this._sector = new Sector(minLatitude, maxLatitude, -180, 180);
+                this._sectors = [eastSector, westSector];
             }
             else {
-                if (!this._sector.isEmpty()) {
-                    this._sectors = [this._sector];
+                this._sector = new Sector(90, -90, 180, -180);
+                for (i = 0, len = this.contours.length; i < len; i++) {
+                    sectors = this.contours[i].sectors;
+                    lenS = sectors.length;
+                    for (j = 0; j < lenS; j++) {
+                        this._sector.union(sectors[j]);
+                    }
                 }
-            }
-
-            if (!this._sectors) {
-                return;
-            }
-
-            // Great circle paths between two latitudes may result in a latitude which is greater or smaller than either of
-            // the two latitudes. All other path types are bounded by the defining locations.
-            if (this._pathType === WorldWind.GREAT_CIRCLE) {
-                for (var idx = 0, len = this._sectors.length; idx < len; idx += 1) {
-                    var sector = this._sectors[idx];
-
-                    var extremes = Location.greatCircleArcExtremeLocations(boundaries);
-
-                    var minLatitude = Math.min(sector.minLatitude, extremes[0].latitude);
-                    var maxLatitude = Math.max(sector.maxLatitude, extremes[1].latitude);
-
-                    this._sectors[idx] = new Sector(minLatitude, maxLatitude, sector.minLongitude, sector.maxLongitude);
-                }
+                this._sectors = [this._sector];
             }
         };
 
@@ -791,24 +788,26 @@ define([
             var datelineLocations;
 
             var polygons = [];
-            for (var i = 0; i < contours.length; i++) {
+            for (var i = 0, len = contours.length; i < len; i++) {
                 var contour = contours[i];
-                polygons = polygons.concat(contours[i]);
+                for (var j = 0, lenC = contour.polygons.length; j < lenC; j++) {
+                    polygons.push(contour.polygons[j]);
+                }
             }
 
-           /* var points = [];
-            for (i = 0; i < polygons.length; i++) {
-                var polygon = polygons[i];
-                var p1 = polygon[0];
-                var p2 = polygon[polygon.length - 1];
-                if (!p1.equals(p2)) {
-                    polygon.push(p1);
-                }
-                points = points.concat(polygons[i]);
-            }*/
+            /* var points = [];
+             for (i = 0; i < polygons.length; i++) {
+             var polygon = polygons[i];
+             var p1 = polygon[0];
+             var p2 = polygon[polygon.length - 1];
+             if (!p1.equals(p2)) {
+             polygon.push(p1);
+             }
+             points = points.concat(polygons[i]);
+             }*/
 
             this._interiorGeometry = polygons;
-            this._outlineGeometry = polygons;
+            //this._outlineGeometry = polygons;
             //this._interiorGeometry = [locs];
             //this._outlineGeometry = [locs];
             //this._interiorGeometry = [points];
@@ -862,7 +861,7 @@ define([
          * @param {Number} dx The additive offset in the horizontal direction.
          * @param {Number} dy The additive offset in the vertical direction.
          */
-        SurfaceShape.prototype.renderToTexture = function (dc, ctx2D, xScale, yScale, dx, dy) {
+        SurfaceShape.prototype.renderToTexture_original = function (dc, ctx2D, xScale, yScale, dx, dy) {
             var idx,
                 len,
                 path = [],
@@ -879,7 +878,6 @@ define([
             if (!this._isInteriorInhibited && attributes.drawInterior) {
                 ctx2D.fillStyle = isPicking ? this.pickColor.toRGBAString() : attributes.interiorColor.toRGBAString();
 
-                ctx2D.beginPath();
                 for (idx = 0, len = this._interiorGeometry.length; idx < len; idx += 1) {
                     idxPath = 0;
                     lenPath = this._outlineGeometry[idx].length * 2;
@@ -888,7 +886,7 @@ define([
                     // Convert the geometry to a transformed path that can be drawn directly, and as a side effect,
                     // detect if the path is smaller than a pixel. If it is, don't bother drawing it.
                     if (this.transformPath(this._interiorGeometry[idx], xScale, yScale, dx, dy, path)) {
-                        //ctx2D.beginPath();
+                        ctx2D.beginPath();
 
                         ctx2D.moveTo(path[idxPath++], path[idxPath++]);
 
@@ -898,10 +896,9 @@ define([
 
                         ctx2D.closePath();
 
-                        //ctx2D.fill();
+                        ctx2D.fill();
                     }
                 }
-                ctx2D.fill();
             }
 
             // Draw the outline of the shape.
@@ -977,12 +974,101 @@ define([
             }
         };
 
+        //Possible performance improvement, as this method draws only once on the canvas instead of two times
+        // for interior and outline
+        //quick test to see if the shape must be drawn
+        //begin a path for a all the contours of the shape
+        //draw all the contours
+        //stoke and/or fill as necessary
+        SurfaceShape.prototype.renderToTexture = function (dc, ctx2D, xScale, yScale, dx, dy) {
+            var idx,
+                len,
+                path = [],
+                idxPath,
+                lenPath,
+                isPicking = dc.pickingMode,
+                attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
+
+            if (!this.mustRenderToTexture(attributes)) {
+                return;
+            }
+
+            if (isPicking && !this.pickColor) {
+                this.pickColor = dc.uniquePickColor();
+            }
+
+            //use one path for a list polygons(multi dim arrays), since they use the same attributes
+            //every polygon is referred to as a a sub-path of this path
+            //the canvas automatically draws holes if the winding order of the outer polygon and inner polygons
+            // is different
+            //this shows increased performance on jsPerf, requires further testing
+            ctx2D.beginPath();
+
+            //draw the contours
+            for (idx = 0, len = this._interiorGeometry.length; idx < len; idx += 1) {
+                idxPath = 0;
+                //lenPath = this._interiorGeometry[idx].length * 2;//this._outlineGeometry[idx].length * 2;
+                path.length = 0;
+
+                // Convert the geometry to a transformed path that can be drawn directly, and as a side effect,
+                // detect if the path is smaller than a pixel. If it is, don't bother drawing it.
+                var isPathBigEnough = this.transformPath(this._interiorGeometry[idx], xScale, yScale, dx, dy, path);
+                if (isPathBigEnough) {
+                    lenPath = path.length;
+                    ctx2D.moveTo(path[idxPath], path[idxPath + 1]);
+                    idxPath += 2;
+                    while (idxPath < lenPath) {
+                        ctx2D.lineTo(path[idxPath], path[idxPath + 1]);
+                        idxPath += 2;
+                    }
+                    //tricky to set, don't want it for split polygons, but want it for regular ones
+                    //if (!this.polygonsSplits[idx]) {
+                    //ctx2D.closePath();
+                    //}
+                }
+            }
+
+            //fill and/or stroke as necessary
+            if (!this._isInteriorInhibited && attributes.drawInterior) {
+                ctx2D.fillStyle = isPicking ? this.pickColor.toRGBAString() : attributes.interiorColor.toRGBAString();
+                ctx2D.fill();
+            }
+
+            if (attributes.drawOutline && attributes.outlineWidth > 0) {
+                ctx2D.lineWidth = 4 * attributes.outlineWidth;
+                ctx2D.strokeStyle = isPicking ? this.pickColor.toRGBAString() : attributes.outlineColor.toRGBAString();
+                ctx2D.stroke();
+            }
+
+            if (isPicking) {
+                var po = new PickedObject(this.pickColor.clone(), this.pickDelegate ? this.pickDelegate : this,
+                    null, this.layer, false);
+                dc.resolvePick(po);
+            }
+        };
+
+        SurfaceShape.prototype.mustRenderToTexture = function (attributes) {
+            var mustRender = false;
+            //todo test for alpha 0? - yes test
+            if (!this._isInteriorInhibited && attributes.drawInterior) {
+                mustRender = true;
+            }
+            if (attributes.drawOutline && attributes.outlineWidth > 0) {
+                mustRender = true;
+            }
+            return mustRender;
+        };
+
         //
         // Internal use only.
         // Transform a path and compute its extrema.
         // In the process of transforming it, optimize out line segments that are too short (shorter than some threshold).
         // Return an indicator of the path is "big enough".
         SurfaceShape.prototype.transformPath = function (path, xScale, yScale, xOffset, yOffset, result) {
+            //xScale = 11.377777777777778
+            //yScale = -11.377777777777778
+            //xOffset = 2048
+            //yOffset = -256
             var xPrev, yPrev,
                 xNext, yNext,
                 xFirst, yFirst,
@@ -1029,7 +1115,10 @@ define([
 
                 // If the line is smaller than a single pixel, accumulate more data before emitting,
                 // unless the point is the same as the first point, in which case it is always emitted.
-                if (isNextFirst || dr2 >= dr2Min) {
+                //florin:
+                //this optimization now also removes points that are too close to a dateLine intersection
+                // or the intersection itself thus leaving gaps
+                if (isNextFirst || true /*dr2 >= dr2Min*/) {
                     xMin = Math.min(xMin, xNext);
                     xMax = Math.max(xMax, xNext);
                     yMin = Math.min(yMin, yNext);
@@ -1047,6 +1136,9 @@ define([
 
                     xPrev = xNext;
                     yPrev = yNext;
+                }
+                if ((idxPath + 1) * 2 !== idxResult) {
+                    console.log('break here');
                 }
             }
 

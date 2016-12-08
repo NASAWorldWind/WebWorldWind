@@ -150,19 +150,25 @@ define([
             }
 
             // If shapes have been removed since the previous iteration, ...
-            for (idx = 0, len = this.prevSurfaceShapes; idx < len; idx += 1) {
+            for (idx = 0, len = this.prevSurfaceShapes.length; idx < len; idx += 1) {
                 surfaceShape = this.prevSurfaceShapes[idx];
 
-                if (this.surfaceShapes.indexOf(surfaceShape) < 0) {
+                /*if (this.surfaceShapes.indexOf(surfaceShape) < 0) {
+                    return true;
+                }*/
+                if (this.surfaceShapes[idx] !== surfaceShape){
                     return true;
                 }
             }
 
             // If shapes added since the previous iteration, ...
-            for (idx = 0, len = this.surfaceShapes; idx < len; idx += 1) {
+            for (idx = 0, len = this.surfaceShapes.length; idx < len; idx += 1) {
                 surfaceShape = this.surfaceShapes[idx];
 
-                if (this.prevSurfaceShapes.indexOf(surfaceShape) < 0) {
+                /*if (this.prevSurfaceShapes.indexOf(surfaceShape) < 0) {
+                    return true;
+                }*/
+                if (this.prevSurfaceShapes[idx] !== surfaceShape) {
                     return true;
                 }
             }
@@ -172,7 +178,7 @@ define([
                 surfaceShape = this.surfaceShapes[idx];
                 surfaceShapeStateKey = this.surfaceShapeStateKeys[idx];
 
-                if (surfaceShapeStateKey != surfaceShape.stateKey) {
+                if (surfaceShapeStateKey !== surfaceShape.stateKey) {
                     return true;
                 }
             }

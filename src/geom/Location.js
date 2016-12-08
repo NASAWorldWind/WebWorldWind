@@ -977,9 +977,10 @@ define([
 
                         var iLatitude = Location.intersectionWithMeridian(pt1, pt2, 180, globe);
                         var iLongitude = WWMath.signum(pt1.longitude) * 180 || 180;
+                        var correctLat = Location.greatCircleIntersection(pt1, pt2);
 
-                        var iLoc1 = new Location(iLatitude, iLongitude);
-                        var iLoc2 = new Location(iLatitude, -iLongitude);
+                        var iLoc1 = new Location(correctLat, iLongitude);
+                        var iLoc2 = new Location(correctLat, -iLongitude);
                         iLoc1.isIntersection = true;
                         iLoc2.isIntersection = true;
 
@@ -1040,6 +1041,7 @@ define([
                 if (doesCross) {
                     containsPole = !containsPole;
                     var iLatitude = Location.intersectionWithMeridian(pt1, pt2, 180, globe);
+
                     var iLongitude = WWMath.signum(pt1.longitude) * 180 || 180;
 
                     var iLoc1 = new Location(iLatitude, iLongitude);
@@ -1253,6 +1255,98 @@ define([
                 arr.push(el);
                 el._added = true;
             }
+        };
+
+        Location.greatCircleIntersection = function (path1Start, path1End, path2Start, path2End) {
+            // if c1 & c2 are great circles through start and end points (or defined by start point + bearing),
+            // then candidate intersections are simply c1 × c2 & c2 × c1; most of the work is deciding correct
+            // intersection point to select! if bearing is given, that determines which intersection, if both
+            // paths are defined by start/end points, take closer intersection
+
+            var p1 = Location.toVector(path1Start);
+            var p2 = Location.toVector(path1End);
+            //var p2 = this.toVector(path2Start);
+
+            // c1 & c2 are vectors defining great circles through start & end points; p × c gives initial bearing vector
+            var c1 = Location.cross(p1, p2);
+            //var c2 = this.v1.cross1(this.v2);
+            var c2 = Location.dateLineVectors.c2;
+
+            // there are two (antipodal) candidate intersection points; we have to choose which to return
+            var i1 = Location.cross(c1, c2);
+            var i2 = Location.cross(c2, c1);
+
+            var mid = Location.add(p1, Location.dateLineVectors.v1, p2, Location.dateLineVectors.v2);
+            var i = mid.dot(i1) > 0 ? i1 : i2;
+
+            var latRad = Math.atan2(i[2], Math.sqrt(i[0] * i[0] + i[1] * i[1]));
+            //return this.toLatLonS(intersection).latitude;
+            return latRad * Angle.RADIANS_TO_DEGREES;
+
+            /*switch (path1def + '+' + path2def) {
+             case 'bearing+bearing':
+             // if c×p⋅i1 is +ve, the initial bearing is towards i1, otherwise towards antipodal i2
+             dir1 = Math.sign(c1.cross1(p1).dot(i1)); // c1×p1⋅i1 +ve means p1 bearing points to i1
+             dir2 = Math.sign(c2.cross1(p2).dot(i1)); // c2×p2⋅i1 +ve means p2 bearing points to i1
+
+             switch (dir1 + dir2) {
+             case  2: // dir1, dir2 both +ve, 1 & 2 both pointing to i1
+             intersection = i1;
+             break;
+             case -2: // dir1, dir2 both -ve, 1 & 2 both pointing to i2
+             intersection = i2;
+             break;
+             case  0: // dir1, dir2 opposite; intersection is at further-away intersection point
+             // take opposite intersection from mid-point of p1 & p2 [is this always true?]
+             intersection = p1.add(p2).dot(i1) > 0 ? i2 : i1;
+             break;
+             }
+             break;
+             case 'bearing+endpoint': // use bearing c1 × p1
+             dir1 = Math.sign(c1.cross(p1).dot(i1)); // c1×p1⋅i1 +ve means p1 bearing points to i1
+             intersection = dir1 > 0 ? i1 : i2;
+             break;
+             case 'endpoint+bearing': // use bearing c2 × p2
+             dir2 = Math.sign(c2.cross(p2).dot(i1)); // c2×p2⋅i1 +ve means p2 bearing points to i1
+             intersection = dir2 > 0 ? i1 : i2;
+             break;
+             case 'endpoint+endpoint': // select nearest intersection to mid-point of all points
+             var mid = p1.add1(p2).add1(this.toVector(path1brngEnd)).add1(this.toVector(path2brngEnd));
+             intersection = mid.dot(i1) > 0 ? i1 : i2;
+             break;
+             }*/
+        };
+
+        Location.toVector = function (point) {
+            var phi = point.latitude * Angle.DEGREES_TO_RADIANS;
+            var lambda = point.longitude * Angle.DEGREES_TO_RADIANS;
+
+            // right-handed vector: x -> 0°E,0°N; y -> 90°E,0°N, z -> 90°N
+            var cosPhi = Math.cos(phi);
+            var x = cosPhi * Math.cos(lambda);
+            var y = cosPhi * Math.sin(lambda);
+            var z = Math.sin(phi);
+
+            return new Vec3(x, y, z);
+        };
+
+        Location.add = function (v1, v2, v3, v4) {
+            var v = new Vec3(0, 0, 0);
+            v[0] = v1[0] + v2[0] + v3[0] + v4[0];
+            v[1] = v1[1] + v2[1] + v3[1] + v4[1];
+            v[2] = v1[2] + v2[2] + v3[2] + v4[2];
+            return v;
+        };
+
+        Location.cross = function (v1, v2) {
+            var v = new Vec3(v1[0], v1[1], v1[2]);
+            return v.cross(v2);
+        };
+
+        Location.dateLineVectors = {
+            v1: new Vec3(-6.123233995736766e-17, 7.498798913309288e-33, 1),
+            v2: new Vec3(-6.123233995736766e-17, 7.498798913309288e-33, -1),
+            c2: new Vec3(-1.4997597826618576e-32, -1.2246467991473532e-16, 0)
         };
 
         /**

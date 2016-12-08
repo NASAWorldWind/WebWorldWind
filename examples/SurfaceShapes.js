@@ -19,17 +19,18 @@ requirejs(['../src/WorldWind',
 
         // Create the World Window.
         var wwd = new WorldWind.WorldWindow("canvasOne");
+        window.wwd = wwd;
 
         /**
          * Added imagery layers.
          */
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
-            {layer: new WorldWind.CompassLayer(), enabled: true},
+            //{layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            //{layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
+            //{layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+            //{layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -59,42 +60,48 @@ requirejs(['../src/WorldWind',
 
         var shape = new WorldWind.SurfacePolygon(boundary, attributes);
         shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        //shapesLayer.addRenderable(shape);
 
+        var offset = -108;
         // Create a polygon with a hole in it.
         var boundaries = [];
         boundaries[0] = []; // outer boundary
-        boundaries[0].push(new WorldWind.Location(40, -70));
-        boundaries[0].push(new WorldWind.Location(45, -80));
-        boundaries[0].push(new WorldWind.Location(40, -90));
+        //CCW
+        boundaries[0].push(new WorldWind.Location(40, -70 + offset));
+        boundaries[0].push(new WorldWind.Location(45, -80 + offset));
+        boundaries[0].push(new WorldWind.Location(40, -90 + offset));
         boundaries[1] = []; // inner boundary
-        boundaries[1].push(new WorldWind.Location(41, -73));
+        /*boundaries[1].push(new WorldWind.Location(41, -73));
         boundaries[1].push(new WorldWind.Location(44, -80));
-        boundaries[1].push(new WorldWind.Location(41, -87));
+        boundaries[1].push(new WorldWind.Location(41, -87));*/
+        //CW
+        boundaries[1].push(new WorldWind.Location(41, -73 + offset));
+        boundaries[1].push(new WorldWind.Location(41, -87 + offset));
+        boundaries[1].push(new WorldWind.Location(44, -80 + offset));
 
         shape = new WorldWind.SurfacePolygon(boundaries, attributes);
-        shape.highlightAttributes = highlightAttributes;
+        //shape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(shape);
 
         // Create a surface circle with a radius of 200 km.
         shape = new WorldWind.SurfaceCircle(new WorldWind.Location(35, -120), 200e3, attributes);
         shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        //shapesLayer.addRenderable(shape);
 
         // Create a surface ellipse with a minor radius of 200 km, a major radius of 300 km and a heading of 45 degrees.
         shape = new WorldWind.SurfaceEllipse(new WorldWind.Location(35, -110), 300e3, 200e3, 45, attributes);
         shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        //shapesLayer.addRenderable(shape);
 
         // Create a surface rectangle with a width of 200 km, a height of 300 km and a heading of -45 degrees.
         shape = new WorldWind.SurfaceRectangle(new WorldWind.Location(35, -100), 200e3, 300e3, -45, attributes);
         shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        //shapesLayer.addRenderable(shape);
 
         // Create a surface sector.
         shape = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
         shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        //shapesLayer.addRenderable(shape);
 
         // Create a surface polyline. Use different attributes then for the filled shapes.
         boundary = [];
@@ -110,12 +117,12 @@ requirejs(['../src/WorldWind',
 
         shape = new WorldWind.SurfacePolyline(boundary, attributes);
         shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        //shapesLayer.addRenderable(shape);
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
         // Now set up to handle highlighting.
-        var highlightController = new WorldWind.HighlightController(wwd);
+        //var highlightController = new WorldWind.HighlightController(wwd);
     }
 );
