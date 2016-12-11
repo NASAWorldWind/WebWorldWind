@@ -25,7 +25,20 @@ module.exports = function (grunt) {
                     baseUrl: 'src',
                     name: '../tools/almond',
                     include: ['WorldWind'],
-                    out: 'worldwindlib.js',
+                    out: 'worldwind.min.js',
+                    wrap: {
+                        startFile: 'tools/wrap.start',
+                        endFile: 'tools/wrap.end'
+                    }
+                }
+            },
+            compileDebug: {
+                options: {
+                    baseUrl: 'src',
+                    name: '../tools/almond',
+                    include: ['WorldWind'],
+                    optimize: 'none',
+                    out: 'worldwind.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
@@ -42,7 +55,8 @@ module.exports = function (grunt) {
                 files: [
                     {src: [
                         'api-doc/**',
-                        'worldwindlib.js',
+                        'worldwind.js',
+                        'worldwind.min.js',
                         'apps/**',
                         'design-notes/**',
                         'examples/**',
