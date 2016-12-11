@@ -64,7 +64,6 @@ module.exports = function (grunt) {
                         'performance/**',
                         'src/**',
                         'test/**',
-                        'thirdparty/**',
                         'tools/**',
                         'build.js',
                         'Gruntfile.js',
