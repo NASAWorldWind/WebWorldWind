@@ -741,7 +741,7 @@ define([
                 .invertOrthonormalMatrix(this.modelview);
             this.modelview.extractEyePoint(this.originPoint);
 
-            this._projection.cartesianToGeographic(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
+            this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos); // equivalent to cartesianToGeographic
             this._projection.cartesianToLocalTransform(this, this.originPoint[0], this.originPoint[1], this.originPoint[2], null, this.origin);
             this.modelview.multiplyMatrix(this.origin);
 

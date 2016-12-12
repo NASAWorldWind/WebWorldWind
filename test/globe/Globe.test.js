@@ -85,6 +85,19 @@ define([
 
                 result = globe.cameraToLookAt(camera, result);
 
+                expect(expected.equals(result)).toBe(true);
+            });
+        });
+
+        describe('#lookAtCamera', function(){
+            it('correctly transforms information from Camera to LookAt', function() {
+                var lookAt = new LookAt(10.001498028471193, 5.0005500563563015, -0.00042827677065647776, WorldWind.ABSOLUTE, 1015.429535612464,
+                    20.000095523319562, 10.001592958107716, 6.0);
+                var expected = new Camera(10.000000000179542, 4.999999999502379, 999.9999999964463, WorldWind.ABSOLUTE, 19.999999999821082, 10.000000000002204, 6);
+                var result = new Camera();
+
+                result = globe.lookAtToCamera(lookAt, result);
+
                 console.log(result);
 
                 expect(expected.equals(result)).toBe(true);
