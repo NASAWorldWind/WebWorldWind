@@ -6,11 +6,17 @@ define([
     'src/navigate/Camera',
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
-    'src/geom/Matrix'
+    'src/geom/Line',
+    'src/navigate/LookAt',
+    'src/geom/Matrix',
+    'src/geom/Vec3'
 ], function (Camera,
              EarthElevationModel,
              Globe,
-             Matrix) {
+             Line,
+             LookAt,
+             Matrix,
+             Vec3) {
     describe ("Globe", function () {
         var globe = new Globe(new EarthElevationModel());
 
@@ -66,6 +72,34 @@ define([
                 globe.cameraToCartesianTransform(camera, result);
 
                 expect(result.equalsWithPrecision(expected, 6)).toBe(true);
+            });
+        });
+
+        describe('#cameraToLookAt', function(){
+            it('correctly transforms information from LookAt to Camera', function(){
+                var camera = new Camera(10, 5, 1000, WorldWind.ABSOLUTE, 20, 10, 6);
+
+                var result = new LookAt();
+                var expected = new LookAt(10.001498028471193, 5.0005500563563015, -0.00042827677065647776, WorldWind.ABSOLUTE, 1015.429535612464,
+                    20.000095523319562, 10.001592958107716, 6.0);
+
+                result = globe.cameraToLookAt(camera, result);
+
+                console.log(result);
+
+                expect(expected.equals(result)).toBe(true);
+            });
+        });
+
+        describe('#intersectLine', function(){
+            // TODO: There are slight differences between Android and Web version, but it is after the third decimal, so I suppose that the reason is in rounding.
+            it('correctly decides vector representing the point of intersection in 3D', function(){
+                var result = new Vec3();
+                var expected = new Vec3(-1702989.9895088992, -3405979.9790177983, -5108969.968526698);
+                var lineToIntersect = new Line(new Vec3(1,2,3), new Vec3(1,2,3));
+
+                expect(globe.intersectsLine(lineToIntersect, result)).toBe(true);
+                expect(expected.equals(result)).toBe(true);
             });
         });
     });

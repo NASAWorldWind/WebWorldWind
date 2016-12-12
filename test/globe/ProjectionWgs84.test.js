@@ -5,6 +5,7 @@
 define([
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
+    'src/geom/Line',
     'src/geom/Location',
     'src/geom/Matrix',
     'src/geom/Position',
@@ -12,6 +13,7 @@ define([
     'src/geom/Vec3'
 ], function (EarthElevationModel,
              Globe,
+             Line,
              Location,
              Matrix,
              Position,

@@ -6,7 +6,15 @@
  * @exports BasicWorldWindController
  */
 define([], function(){
-    var LookAt = function() {
+    var LookAt = function(latitude, longitude, altitude, altitudeMode, range, heading, tilt, roll) {
+        this._latitude = latitude || 0;
+        this._longitude = longitude || 0;
+        this._altitude = altitude || 0;
+        this._altitudeMode = altitudeMode || WorldWind.ABSOLUTE;
+        this._range = range || 0;
+        this._heading = heading || 0;
+        this._tilt = tilt || 0;
+        this._roll = roll || 0;
     };
 
     Object.defineProperties(LookAt.prototype, {
@@ -102,6 +110,18 @@ define([], function(){
         this.roll = lookAt.roll;
 
         return this;
+    };
+
+    LookAt.prototype.equals = function(lookAt) {
+        return lookAt &&
+            this.latitude == lookAt.latitude &&
+            this.longitude == lookAt.longitude &&
+            this.altitude == lookAt.altitude &&
+            this.altitudeMode == lookAt.altitudeMode &&
+            this.range == lookAt.range &&
+            this.heading == lookAt.heading &&
+            this.tilt == lookAt.tilt &&
+            this.roll == lookAt.roll
     };
 
     return LookAt;

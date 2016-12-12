@@ -695,19 +695,21 @@ define([
                 );
             }
 
-            this.cameraToCartesianTransform(camera, this.modelview)
-                .invertOrthonormalMatrix(this.modelview);
+            var cartesianTransform = this.cameraToCartesianTransform(camera, this.modelview);
+            cartesianTransform.invertOrthonormalMatrix(this.modelview);
 
-            this.modelview.extractEyePoint(this.forwardRay);
-            this.modelview.extractForwardVector(this.forwardRay);
+            var origin = new Vec3();
+            var direction = new Vec3();
+            this.modelview.extractEyePoint(origin);
+            this.modelview.extractForwardVector(direction);
 
-            var forwardRay = new Line(this.originPoint, this.forwardRay);
+            var forwardRay = new Line(origin, direction);
             if(!this.intersectsLine(forwardRay, this.originPoint)) {
                 var horizon = this.horizonDistance(camera.altitude);
                 forwardRay.pointAt(horizon, this.originPoint);
             }
 
-            this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
+            this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos); // equivalent to cartesianToGeographic
             this._projection.cartesianToLocalTransform(this, this.originPoint[0], this.originPoint[1], this.originPoint[2], null, this.origin);
             this.modelview.multiplyMatrix(this.origin);
 
@@ -739,7 +741,7 @@ define([
                 .invertOrthonormalMatrix(this.modelview);
             this.modelview.extractEyePoint(this.originPoint);
 
-            this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
+            this._projection.cartesianToGeographic(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos);
             this._projection.cartesianToLocalTransform(this, this.originPoint[0], this.originPoint[1], this.originPoint[2], null, this.origin);
             this.modelview.multiplyMatrix(this.origin);
 
@@ -768,12 +770,12 @@ define([
 
             // TODO interpret altitude mode other than absolute
             // Transform by the local cartesian transform at the look-at's position.
-            this.computePointFromPosition(lookAt.latitude, lookAt.longitude, lookAt.altitude, result);
+            this._projection.geographicToCartesianTransform(this, lookAt.latitude, lookAt.longitude, lookAt.altitude, null, result);
 
             // Transform by the heading and tilt.
             result.multiplyByRotation(0, 0, 1, -lookAt.heading);
             result.multiplyByRotation(1, 0, 0, lookAt.tilt);
-            result.multiplyByRotation(0, 0, 1, lookAt.range);
+            result.multiplyByRotation(0, 0, 1, lookAt.roll);
 
             // Transform by the range.
             result.multiplyByTranslation(0, 0, lookAt.range);
@@ -783,5 +785,4 @@ define([
 
         return Globe;
     }
-)
-;
+);

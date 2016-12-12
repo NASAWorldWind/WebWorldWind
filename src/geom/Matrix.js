@@ -1624,21 +1624,27 @@ define([
             // Upper-3x3 is inverted, translation is transformed by inverted-upper-3x3 and negated.
 
             var a = matrix;
+            var a1 = a[1],
+                a2 = a[2],
+                a6 = a[6],
+                x = a[3],
+                y = a[7],
+                z = a[11];
 
             this[0] = a[0];
             this[1] = a[4];
             this[2] = a[8];
-            this[3] = 0.0 - (a[0] * a[3]) - (a[4] * a[7]) - (a[8] * a[11]);
+            this[3] = 0.0 - (a[0] * x) - (a[1] * y) - (a[2] * z);
 
-            this[4] = a[1];
+            this[4] = a1;
             this[5] = a[5];
             this[6] = a[9];
-            this[7] = 0.0 - (a[1] * a[3]) - (a[5] * a[7]) - (a[9] * a[11]);
+            this[7] = 0.0 - (a[4] * x) - (a[5] * y) - (a[6] * z);
 
-            this[8] = a[2];
-            this[9] = a[6];
+            this[8] = a2;
+            this[9] = a6;
             this[10] = a[10];
-            this[11] = 0.0 - (a[2] * a[3]) - (a[6] * a[7]) - (a[10] * a[11]);
+            this[11] = 0.0 - (a[8] * x) - (a[9] * y) - (a[10] * z);
 
             this[12] = 0;
             this[13] = 0;

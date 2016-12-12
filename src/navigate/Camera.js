@@ -100,5 +100,16 @@ define([], function(){
         return this;
     };
 
+    Camera.prototype.equals = function(camera) {
+        return camera &&
+            this.latitude == camera.latitude &&
+            this.longitude == camera.longitude &&
+            this.altitude == camera.altitude &&
+            this.altitudeMode == camera.altitudeMode &&
+            this.heading == camera.heading &&
+            this.tilt == camera.tilt &&
+            this.roll == camera.roll;
+    };
+
     return Camera;
 });
