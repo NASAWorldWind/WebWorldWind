@@ -14,7 +14,7 @@ define([
         '../util/Logger',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
-        '../util/polySplitter/PolygonSplitter',
+        '../util/polySplitter/polygonSplitter',
         '../render/Renderable',
         '../geom/Sector',
         '../shapes/ShapeAttributes',
@@ -28,7 +28,7 @@ define([
               Logger,
               NotYetImplementedError,
               PickedObject,
-              PolygonSplitter,
+              polygonSplitter,
               Renderable,
               Sector,
               ShapeAttributes,
@@ -140,7 +140,10 @@ define([
             // Internal use only. Intentionally not documented.
             this.pickColor = null;
 
-            this.polygonsSplits = [];
+            //the split contours returned from polygon splitter
+            this.contours = [];
+            this.containsPole = false;
+            this.crossesAntiMeridian = false;
         };
 
         SurfaceShape.prototype = Object.create(Renderable.prototype);
@@ -475,6 +478,7 @@ define([
             }
 
             // Force the closing of the border.
+            //florin: prevent closing the border for split polygons as it will close on the common side
             if (!this._isInteriorInhibited && !preventClose) {
                 // Avoid duplication if the first endpoint was already emitted.
                 if (prev.latitude != first.latitude || prev.longitude != first.longitude) {
@@ -498,6 +502,15 @@ define([
                 for (var t = this.throttledStep(dt, location); t < 1; t += this.throttledStep(dt, location)) {
                     location = new Location(0, 0);
                     Location.interpolateAlongPath(this._pathType, t, start, end, location);
+
+                    //florin: ensure correct longitude sign and decimal error for anti-meridian
+                    if (start.longitude === 180 && end.longitude === 180) {
+                        location.longitude = 180;
+                    }
+                    else if (start.longitude === -180 && end.longitude === -180) {
+                        location.longitude = -180;
+                    }
+
                     locations.push(location);
                 }
             }
@@ -530,25 +543,48 @@ define([
                 this.computeBoundaries(dc);
             }
 
-            if (!this._locations) {
-                //this.interpolateLocations(this._boundaries);
-            }
+            this.formatBoundaries();
+            this.normalizeAngles();
 
-            this.interpolateBoundaries(this._boundaries);
-            //var windingOrders = this.windingOrder(this._boundaries);
-
-            //var polygons = Location.splitPolygons(this._interpolatedBoundries, dc.globe);
             var contoursInfo = [];
-            var doesCross = PolygonSplitter.splitContours(this._boundaries, contoursInfo, this._pathType, dc.globe);
+            var doesCross = polygonSplitter.splitContours(this._boundaries, contoursInfo, this._pathType, dc.globe);
             this.interpolateContours(contoursInfo);
             this.contours = contoursInfo;
-            this.doesCross = true;
+            this.crossesAntiMeridian = doesCross;
 
             this.prepareGeometry(dc, contoursInfo);
 
             this.prepareSectors();
 
             this.isPrepared = true;
+        };
+
+        SurfaceShape.prototype.formatBoundaries = function () {
+            var boundaries = this._boundaries || [];
+            if (!boundaries.length) {
+                return;
+            }
+            if (boundaries[0].latitude != null) {
+                //not multi dim array
+                boundaries = [this._boundaries];
+            }
+            this._boundaries = boundaries;
+            return boundaries;
+        };
+
+        SurfaceShape.prototype.normalizeAngles = function () {
+            for (var i = 0, len = this._boundaries.length; i < len; i++) {
+                var polygon = this._boundaries[i];
+                for (var j = 0, lenP = polygon.length; j < lenP; j++) {
+                    var point = polygon[j];
+                    if (point.longitude < -180 || point.longitude > 180) {
+                        point.longitude = Angle.normalizedDegreesLongitude(point.longitude);
+                    }
+                    if (point.latitude < -90 || point.latitude > 90) {
+                        point.latitude = Angle.normalizedDegreesLatitude(point.latitude);
+                    }
+                }
+            }
         };
 
         SurfaceShape.prototype.interpolateContours = function (contours) {
@@ -561,86 +597,11 @@ define([
                 }
                 for (var j = 0; j < lenC; j++) {
                     var polygon = contour.polygons[j];
-                    this.polygonsSplits.push(preventClose);
                     this.interpolateLocations(polygon, preventClose);
                     contour.polygons[j] = this._locations.slice();
                     this._locations.length = 0;
                 }
             }
-        };
-
-        SurfaceShape.prototype.interpolateBoundaries = function (boundaries) {
-            this._interpolatedBoundries = [];
-
-            for (var i = 0, len = boundaries.length; i < len; i++) {
-                var contour = boundaries[i];
-                this.normalizeLongitude(contour);
-                var interpolatedContour = this.interpolateLocations(contour);
-                //this.closeShape(interpolatedContour);
-                this._interpolatedBoundries.push(this._locations.slice());
-                this._locations.length = 0;
-            }
-
-            return this._interpolatedBoundries;
-        };
-
-        SurfaceShape.prototype.normalizeLongitude = function (contour) {
-            for (var i = 0, len = contour.length; i < len; i++) {
-                var point = contour[i];
-                if (point.longitude > 180 || point.longitude < -180) {
-                    point.longitude = Angle.normalizedDegreesLongitude(point.longitude)
-                }
-            }
-
-        };
-
-        SurfaceShape.prototype.interpolateContour = function (contour) {
-            var interpolatedContour = [];
-            for (var i = 0, len = contour.length; i < len; i++) {
-                var pt1 = contour[i];
-                var pt2 = contour[(i + 1) % len];
-                if (pt1.equals(pt2)) {
-                    continue;
-                }
-                if (pt1.longitude > 180 || pt1.longitude < -180) {
-                    pt1.longitude = Angle.normalizedDegreesLongitude(pt1.longitude);
-                }
-                if (pt2.longitude > 180 || pt2.longitude < -180) {
-                    pt2.longitude = Angle.normalizedDegreesLongitude(pt2.longitude);
-                }
-                this.interpolateEdge(pt1, pt2, interpolatedContour);
-            }
-            return interpolatedContour;
-        };
-
-        SurfaceShape.prototype.closeShape = function (points) {
-            var pt1 = points[0];
-            var pt2 = points[points.length - 1];
-            if (!pt1.equals(pt2)) {
-                points.push(new Location(pt1.latitude, pt1.longitude));
-            }
-        };
-
-        SurfaceShape.prototype.windingOrder = function (boundaries) {
-            var windingOrders = [];
-            for (var i = 0, len = boundaries.length; i < len; i++) {
-                var area = 0;
-                var contour = boundaries[i];
-                for (var j = 0, lenC = contour.length; j < lenC; j++) {
-                    var p1 = contour[i];
-                    var p2 = contour[(i + 1) % lenC];
-                    //area += (p1.latitude * p2.longitude - p2.latitude * p1.longitude); //this might not be correct
-                    area += (p2.longitude * Angle.DEGREES_TO_RADIANS - p1.longitude * Angle.DEGREES_TO_RADIANS) *
-                        (2 + Math.sin(p1.latitude * Angle.DEGREES_TO_RADIANS) + Math.sin(p2.latitude * Angle.DEGREES_TO_RADIANS));
-                }
-                if (area < 0) {
-                    windingOrders.push('CCW');
-                }
-                else {
-                    windingOrders.push('CW');
-                }
-            }
-            return windingOrders;
         };
 
         /**
@@ -662,189 +623,132 @@ define([
             return this._sectors;
         };
 
-        // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.prepareSectors_original = function () {
-            var boundaries = this._boundaries;
-            if (!boundaries) {
-                return;
-            }
-
-            this._sector = new Sector(-90, 90, -180, 180);
-            this._sector.setToBoundingSector(boundaries);
-
-            var pole = this.containsPole(boundaries);
-            if (pole != Location.poles.NONE) {
-                // If the shape contains a pole, then the bounding sector is defined by the shape's extreme latitude, the
-                // latitude of the pole, and the full range of longitude.
-                if (pole == Location.poles.NORTH) {
-                    this._sector = new Sector(this._sector.minLatitude, 90, -180, 180);
-                }
-                else {
-                    this._sector = new Sector(-90, this._sector.maxLatitude, -180, 180);
-                }
-
-                this._sectors = [this._sector];
-            }
-            else if (Location.locationsCrossDateLine(boundaries)) {
-                this._sectors = Sector.splitBoundingSectors(boundaries);
-            }
-            else {
-                if (!this._sector.isEmpty()) {
-                    this._sectors = [this._sector];
-                }
-            }
-
-            if (!this._sectors) {
-                return;
-            }
-
-            // Great circle paths between two latitudes may result in a latitude which is greater or smaller than either of
-            // the two latitudes. All other path types are bounded by the defining locations.
-            if (this._pathType === WorldWind.GREAT_CIRCLE) {
-                for (var idx = 0, len = this._sectors.length; idx < len; idx += 1) {
-                    var sector = this._sectors[idx];
-
-                    var extremes = Location.greatCircleArcExtremeLocations(boundaries);
-
-                    var minLatitude = Math.min(sector.minLatitude, extremes[0].latitude);
-                    var maxLatitude = Math.max(sector.maxLatitude, extremes[1].latitude);
-
-                    this._sectors[idx] = new Sector(minLatitude, maxLatitude, sector.minLongitude, sector.maxLongitude);
-                }
-            }
-        };
-
         SurfaceShape.prototype.prepareSectors = function () {
-            if (this.doesCross) {
-                var eastSector = new Sector(90, -90, 180, -180); //positive
-                var westSector = new Sector(90, -90, 180, -180); //negative
-                for (var i = 0, len = this.contours.length; i < len; i++) {
-                    var sectors = this.contours[i].sectors;
-                    var lenS = sectors.length;
-                    for (var j = 0; j < lenS; j++) {
-                        var sector = sectors[j];
-                        if (sector.minLongitude < 0) {
-                            westSector.union(sector);
-                        }
-                        else {
-                            eastSector.union(sector);
-                        }
-                    }
-                }
-                var minLatitude = Math.min(eastSector.minLatitude, westSector.minLatitude);
-                var maxLatitude = Math.max(eastSector.maxLatitude, eastSector.maxLatitude);
-                this._sector = new Sector(minLatitude, maxLatitude, -180, 180);
-                this._sectors = [eastSector, westSector];
+            if (this.crossesAntiMeridian) {
+                this.sectorsOverAntiMeridian();
             }
             else {
-                this._sector = new Sector(90, -90, 180, -180);
-                for (i = 0, len = this.contours.length; i < len; i++) {
-                    sectors = this.contours[i].sectors;
-                    lenS = sectors.length;
-                    for (j = 0; j < lenS; j++) {
-                        this._sector.union(sectors[j]);
-                    }
-                }
-                this._sectors = [this._sector];
+                this.sectorsNotOverAntiMeridian();
             }
         };
 
-        // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.prepareGeometry_original = function (dc) {
-            var datelineLocations;
-
-            this._interiorGeometry = [];
-            this._outlineGeometry = [];
-
-            var locations = this._locations;
-
-            var pole = this.containsPole(locations);
-            if (pole != Location.poles.NONE) {
-                // Wrap the shape interior around the pole and along the anti-meridian. See WWJ-284.
-                var poleLocations = this.cutAlongDateLine(locations, pole, dc.globe);
-                this._interiorGeometry.push(poleLocations);
-
-                // The outline need only compensate for dateline crossing. See WWJ-452.
-                datelineLocations = this.repeatAroundDateline(locations);
-                this._outlineGeometry.push(datelineLocations[0]);
-                if (datelineLocations.length > 1) {
-                    this._outlineGeometry.push(datelineLocations[1]);
+        SurfaceShape.prototype.sectorsOverAntiMeridian = function () {
+            var eastSector = new Sector(90, -90, 180, -180); //positive
+            var westSector = new Sector(90, -90, 180, -180); //negative
+            for (var i = 0, len = this.contours.length; i < len; i++) {
+                var sectors = this.contours[i].sectors;
+                for (var j = 0, lenS = sectors.length; j < lenS; j++) {
+                    var sector = sectors[j];
+                    if (sector.minLatitude < 0 && sector.maxLatitude > 0) {
+                        westSector.union(sector);
+                        eastSector.union(sector);
+                    }
+                    else if (sector.minLongitude < 0) {
+                        westSector.union(sector);
+                    }
+                    else {
+                        eastSector.union(sector);
+                    }
                 }
             }
-            else if (Location.locationsCrossDateLine(locations)) {
-                datelineLocations = this.repeatAroundDateline(locations);
-                this._interiorGeometry.push(datelineLocations[0]); //this._interiorGeometry.addAll(datelineLocations);
-                this._interiorGeometry.push(datelineLocations[1]); //this._interiorGeometry.addAll(datelineLocations);
-                this._outlineGeometry.push(datelineLocations[0]); //this._outlineGeometry.addAll(datelineLocations);
-                this._outlineGeometry.push(datelineLocations[1]); //this._outlineGeometry.addAll(datelineLocations);
+            var minLatitude = Math.min(eastSector.minLatitude, westSector.minLatitude);
+            var maxLatitude = Math.max(eastSector.maxLatitude, eastSector.maxLatitude);
+            this._sector = new Sector(minLatitude, maxLatitude, -180, 180);
+            this._sectors = [eastSector, westSector];
+        };
+
+        SurfaceShape.prototype.sectorsNotOverAntiMeridian = function () {
+            this._sector = new Sector(90, -90, 180, -180);
+            for (var i = 0, len = this.contours.length; i < len; i++) {
+                var sectors = this.contours[i].sectors;
+                for (var j = 0, lenS = sectors.length; j < lenS; j++) {
+                    this._sector.union(sectors[j]);
+                }
             }
-            else {
-                this._interiorGeometry.push(locations);
-                this._outlineGeometry.push(locations);
-            }
+            this._sectors = [this._sector];
         };
 
         SurfaceShape.prototype.prepareGeometry = function (dc, contours) {
-            var datelineLocations;
+            var interiorPolygons = [];
+            var outlinePolygons = [];
 
-            var polygons = [];
             for (var i = 0, len = contours.length; i < len; i++) {
                 var contour = contours[i];
+                var poleIndex = contour.poleIndex;
+
                 for (var j = 0, lenC = contour.polygons.length; j < lenC; j++) {
-                    polygons.push(contour.polygons[j]);
+                    var polygon = contour.polygons[j];
+                    interiorPolygons.push(polygon);
+
+                    if (contour.pole !== Location.poles.NONE && lenC > 1) {
+                        //split with pole
+                        if (j === poleIndex) {
+                            this.outlineForPole(polygon, outlinePolygons);
+                        }
+                        else {
+                            this.outlineForSplit(polygon, outlinePolygons);
+                        }
+                    }
+                    else if (contour.pole !== Location.poles.NONE && lenC === 1) {
+                        //only pole
+                        this.outlineForPole(polygon, outlinePolygons);
+                    }
+                    else if (contour.pole === Location.poles.NONE && lenC > 1) {
+                        //only split
+                        this.outlineForSplit(polygon, outlinePolygons);
+                    }
+                    else if (contour.pole === Location.poles.NONE && lenC === 1) {
+                        //no pole, no split
+                        outlinePolygons.push(polygon);
+                    }
                 }
             }
 
-            /* var points = [];
-             for (i = 0; i < polygons.length; i++) {
-             var polygon = polygons[i];
-             var p1 = polygon[0];
-             var p2 = polygon[polygon.length - 1];
-             if (!p1.equals(p2)) {
-             polygon.push(p1);
-             }
-             points = points.concat(polygons[i]);
-             }*/
+            this._interiorGeometry = interiorPolygons;
+            this._outlineGeometry = outlinePolygons;
+        };
 
-            this._interiorGeometry = polygons;
-            //this._outlineGeometry = polygons;
-            //this._interiorGeometry = [locs];
-            //this._outlineGeometry = [locs];
-            //this._interiorGeometry = [points];
-            //this._outlineGeometry = [points];
-            //this._interiorGeometry = contours;
-            //this._outlineGeometry = contours;
-
-            return;
-
-            var locations = this._locations;
-
-            var pole = this.containsPole(locations);
-            if (pole != Location.poles.NONE) {
-                // Wrap the shape interior around the pole and along the anti-meridian. See WWJ-284.
-                var poleLocations = this.cutAlongDateLine(locations, pole, dc.globe);
-                this._interiorGeometry.push(poleLocations);
-
-                // The outline need only compensate for dateline crossing. See WWJ-452.
-                datelineLocations = this.repeatAroundDateline(locations);
-                this._outlineGeometry.push(datelineLocations[0]);
-                if (datelineLocations.length > 1) {
-                    this._outlineGeometry.push(datelineLocations[1]);
+        SurfaceShape.prototype.outlineForPole = function (polygon, outlinePolygons) {
+            this.containsPole = true;
+            var outlinePolygon = [];
+            var pCount = 0;
+            for (var k = 0, lenP = polygon.length; k < lenP; k++) {
+                var point = polygon[k];
+                if (point.isPole) {
+                    pCount++;
+                    if (pCount % 2 === 1) {
+                        outlinePolygon.push(point);
+                        outlinePolygons.push(outlinePolygon);
+                        outlinePolygon = [];
+                    }
+                }
+                if (pCount % 2 === 0) {
+                    outlinePolygon.push(point);
                 }
             }
-            else if (Location.locationsCrossDateLine(locations)) {
-                datelineLocations = this.repeatAroundDateline(locations);
-                this._interiorGeometry.push(datelineLocations[0]); //this._interiorGeometry.addAll(datelineLocations);
-                this._interiorGeometry.push(datelineLocations[1]); //this._interiorGeometry.addAll(datelineLocations);
-                this._outlineGeometry.push(datelineLocations[0]); //this._outlineGeometry.addAll(datelineLocations);
-                this._outlineGeometry.push(datelineLocations[1]); //this._outlineGeometry.addAll(datelineLocations);
-            }
-            else {
-                this._interiorGeometry.push(locations);
-                this._outlineGeometry.push(locations);
+            if (outlinePolygon.length) {
+                outlinePolygons.push(outlinePolygon);
             }
         };
 
+        SurfaceShape.prototype.outlineForSplit = function (polygon, outlinePolygons) {
+            var outlinePolygon = [];
+            var iCount = 0;
+            for (var k = 0, lenP = polygon.length; k < lenP; k++) {
+                var point = polygon[k];
+                if (point.isIntersection) {
+                    iCount++;
+                    if (iCount % 2 === 0) {
+                        outlinePolygon.push(point);
+                        outlinePolygons.push(outlinePolygon);
+                        outlinePolygon = [];
+                    }
+                }
+                if (iCount % 2 === 1) {
+                    outlinePolygon.push(point);
+                }
+            }
+        };
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.resetPickColor = function () {
@@ -974,89 +878,69 @@ define([
             }
         };
 
-        //Possible performance improvement, as this method draws only once on the canvas instead of two times
-        // for interior and outline
-        //quick test to see if the shape must be drawn
-        //begin a path for a all the contours of the shape
-        //draw all the contours
-        //stoke and/or fill as necessary
+        //Possibly faster implementation
+        //Only draws once for contours that don't cross the anti-meridian or don't contain a pole
         SurfaceShape.prototype.renderToTexture = function (dc, ctx2D, xScale, yScale, dx, dy) {
-            var idx,
-                len,
-                path = [],
-                idxPath,
-                lenPath,
-                isPicking = dc.pickingMode,
-                attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
+            var attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
+            var drawInterior = (!this._isInteriorInhibited && attributes.drawInterior);
+            var drawOutline = (attributes.drawOutline && attributes.outlineWidth > 0);
 
-            if (!this.mustRenderToTexture(attributes)) {
+            if (!drawInterior && !drawOutline) {
                 return;
             }
 
-            if (isPicking && !this.pickColor) {
+            if (dc.pickingMode && !this.pickColor) {
                 this.pickColor = dc.uniquePickColor();
             }
 
-            //use one path for a list polygons(multi dim arrays), since they use the same attributes
-            //every polygon is referred to as a a sub-path of this path
-            //the canvas automatically draws holes if the winding order of the outer polygon and inner polygons
-            // is different
-            //this shows increased performance on jsPerf, requires further testing
-            ctx2D.beginPath();
-
-            //draw the contours
-            for (idx = 0, len = this._interiorGeometry.length; idx < len; idx += 1) {
-                idxPath = 0;
-                //lenPath = this._interiorGeometry[idx].length * 2;//this._outlineGeometry[idx].length * 2;
-                path.length = 0;
-
-                // Convert the geometry to a transformed path that can be drawn directly, and as a side effect,
-                // detect if the path is smaller than a pixel. If it is, don't bother drawing it.
-                var isPathBigEnough = this.transformPath(this._interiorGeometry[idx], xScale, yScale, dx, dy, path);
-                if (isPathBigEnough) {
-                    lenPath = path.length;
-                    ctx2D.moveTo(path[idxPath], path[idxPath + 1]);
-                    idxPath += 2;
-                    while (idxPath < lenPath) {
-                        ctx2D.lineTo(path[idxPath], path[idxPath + 1]);
-                        idxPath += 2;
-                    }
-                    //tricky to set, don't want it for split polygons, but want it for regular ones
-                    //if (!this.polygonsSplits[idx]) {
-                    //ctx2D.closePath();
-                    //}
+            if (this.crossesAntiMeridian || this.containsPole) {
+                if (drawInterior) {
+                    this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
+                    ctx2D.fillStyle = dc.pickingMode ? this.pickColor.toRGBAString() : attributes.interiorColor.toRGBAString();
+                    ctx2D.fill();
+                }
+                if (drawOutline) {
+                    this.draw(this._outlineGeometry, ctx2D, xScale, yScale, dx, dy);
+                    ctx2D.lineWidth = 4 * this.attributes.outlineWidth;
+                    ctx2D.strokeStyle = dc.pickingMode ? this.pickColor.toRGBAString() : attributes.outlineColor.toRGBAString();
+                    ctx2D.stroke();
+                }
+            }
+            else {
+                this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
+                if (drawInterior) {
+                    ctx2D.fillStyle = dc.pickingMode ? this.pickColor.toRGBAString() : attributes.interiorColor.toRGBAString();
+                    ctx2D.fill();
+                }
+                if (drawOutline) {
+                    ctx2D.lineWidth = 4 * this.attributes.outlineWidth;
+                    ctx2D.strokeStyle = dc.pickingMode ? this.pickColor.toRGBAString() : attributes.outlineColor.toRGBAString();
+                    ctx2D.stroke();
                 }
             }
 
-            //fill and/or stroke as necessary
-            if (!this._isInteriorInhibited && attributes.drawInterior) {
-                ctx2D.fillStyle = isPicking ? this.pickColor.toRGBAString() : attributes.interiorColor.toRGBAString();
-                ctx2D.fill();
-            }
-
-            if (attributes.drawOutline && attributes.outlineWidth > 0) {
-                ctx2D.lineWidth = 4 * attributes.outlineWidth;
-                ctx2D.strokeStyle = isPicking ? this.pickColor.toRGBAString() : attributes.outlineColor.toRGBAString();
-                ctx2D.stroke();
-            }
-
-            if (isPicking) {
+            if (dc.pickingMode) {
                 var po = new PickedObject(this.pickColor.clone(), this.pickDelegate ? this.pickDelegate : this,
                     null, this.layer, false);
                 dc.resolvePick(po);
             }
         };
 
-        SurfaceShape.prototype.mustRenderToTexture = function (attributes) {
-            var mustRender = false;
-            //todo test for alpha 0? - yes test
-            if (!this._isInteriorInhibited && attributes.drawInterior) {
-                mustRender = true;
+        SurfaceShape.prototype.draw = function (contours, ctx2D, xScale, yScale, dx, dy) {
+            ctx2D.beginPath();
+            for (var i = 0, len = contours.length; i < len; i++) {
+                var contour = contours[i];
+                var point = contour[0];
+                var x = point.longitude * xScale + dx;
+                var y = point.latitude * yScale + dy;
+                ctx2D.moveTo(x, y);
+                for (var j = 1, lenC = contour.length; j < lenC; j++) {
+                    point = contour[j];
+                    x = point.longitude * xScale + dx;
+                    y = point.latitude * yScale + dy;
+                    ctx2D.lineTo(x, y);
+                }
             }
-            if (attributes.drawOutline && attributes.outlineWidth > 0) {
-                mustRender = true;
-            }
-            return mustRender;
         };
 
         //
@@ -1064,6 +948,10 @@ define([
         // Transform a path and compute its extrema.
         // In the process of transforming it, optimize out line segments that are too short (shorter than some threshold).
         // Return an indicator of the path is "big enough".
+
+        //florin:
+        //this "optimization" now also removes points that are too close to a dateLine intersection
+        // or the intersection itself thus leaving gaps at certain zoom levels
         SurfaceShape.prototype.transformPath = function (path, xScale, yScale, xOffset, yOffset, result) {
             //xScale = 11.377777777777778
             //yScale = -11.377777777777778
@@ -1079,6 +967,7 @@ define([
                 dr2Min = 4, // Squared length of minimum length line that must be drawn.
                 isNextFirst,
                 location, idxResult, idxPath, lenPath;
+
 
             idxResult = 0;
 

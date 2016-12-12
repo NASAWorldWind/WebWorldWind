@@ -27,13 +27,18 @@ define([
 
             //cross product of north and south poles vectors
             this.c2 = new Vec3(-1.4997597826618576e-32, -1.2246467991473532e-16, 0);
+
+            //the index where the pole is inserted
+            this.offsetPoint = -1;
+
+            this._polarThrottle = 10;
         };
 
-        PolygonSplitter.prototype.splitContours = function (contours, newContours, pathType, globe) {
+        PolygonSplitter.prototype.splitContours = function (contours, resultContours, pathType, globe) {
             pathType = pathType || WorldWind.GREAT_CIRCLE;
 
             if (pathType !== WorldWind.GREAT_CIRCLE && !globe) {
-                throw new Error('PolygonSplitter splitContours - missing globe');
+                throw new Error('PolygonSplitter splitContours - a globe instance is required for rhumb or linear paths');
             }
 
             var doesCross = false;
@@ -42,7 +47,7 @@ define([
                 if (contourInfo.intersections.length) {
                     doesCross = true;
                 }
-                newContours.push(contourInfo);
+                resultContours.push(contourInfo);
             }
             return doesCross;
         };
@@ -54,7 +59,7 @@ define([
 
             if (intersections.length === 0) {
                 var sector = this.computeSector(newPoints);
-                return this.formatContourOutput([newPoints], intersections, pole, [sector]);
+                return this.formatContourOutput([newPoints], intersections, pole, [sector], -1);
             }
 
             if (intersections.length > 2) {
@@ -69,21 +74,23 @@ define([
             }
             if (intersections.length === 0) {
                 sector = this.computeSector(newPoints);
-                return this.formatContourOutput([newPoints], intersections, pole, [sector]);
+                return this.formatContourOutput([newPoints], intersections, pole, [sector], 0);
             }
 
             this.linkIntersections(intersections);
 
             var sectors = [];
-            var polygons = this.makePolygons(newPoints, intersections, sectors, pathType);
+            var polygons = [];
+            var poleIndex = this.makePolygons(newPoints, intersections, polygons, sectors, pathType);
 
-            return this.formatContourOutput(polygons, intersections, pole, sectors);
+            return this.formatContourOutput(polygons, intersections, pole, sectors, poleIndex);
         };
 
         PolygonSplitter.prototype.findIntersectionAndPole = function (points, newPoints, intersections, pathType, globe) {
             var containsPole = false;
             var minLatitude = 90.0;
             var maxLatitude = -90.0;
+            this.offsetPoint = -1;
 
             for (var i = 0, lenC = points.length; i < lenC; i++) {
                 var pt1 = points[i];
@@ -152,6 +159,37 @@ define([
             return pole;
         };
 
+        PolygonSplitter.prototype.handleOnePole = function (points, intersections, pole) {
+            var pointsClone;
+
+            if (pole === Location.poles.NORTH) {
+                var intersection = intersections.shift();
+                var poleLat = 90;
+            }
+            else if (pole === Location.poles.SOUTH) {
+                intersection = intersections.pop();
+                poleLat = -90;
+            }
+
+            var iEnd = intersection[0];
+            var iStart = intersection[1];
+            iEnd.isIntersection = false;
+            iStart.isIntersection = false;
+            iEnd.isPole = true;
+            iStart.isPole = true;
+
+            pointsClone = points.slice(0, iEnd.index + 1);
+            var polePoint1 = new Location(poleLat, iEnd.longitude);
+            var polePoint2 = new Location(poleLat, iStart.longitude);
+            //polePoint1.isPole = true;
+            //polePoint2.isPole = true;
+            pointsClone.push(polePoint1, polePoint2);
+            this.offsetPoint = pointsClone.length - 1;
+            pointsClone = pointsClone.concat(points.slice(iStart.index));
+
+            return pointsClone;
+        };
+
         PolygonSplitter.prototype.linkIntersections = function (intersections) {
             for (var i = 0, len = intersections.length - 1; i < len; i += 2) {
                 var i0 = intersections[i];
@@ -161,6 +199,8 @@ define([
                 var i1end = i1[0];
                 var i1start = i1[1];
 
+                this.reindexIntersections(i0end, i0start, i1end, i1start);
+
                 i0end.linkTo = i1start.index;
                 i0start.linkTo = i1end.index;
                 i1end.linkTo = i0start.index;
@@ -168,8 +208,26 @@ define([
             }
         };
 
-        PolygonSplitter.prototype.makePolygons = function (points, intersections, sectors, pathType) {
-            var polygons = [];
+        PolygonSplitter.prototype.reindexIntersections = function (i0end, i0start, i1end, i1start) {
+            if (this.offsetPoint === -1) {
+                return;
+            }
+            if (i0end.index > this.offsetPoint) {
+                i0end.index += 2;
+            }
+            if (i0start.index > this.offsetPoint) {
+                i0start.index += 2;
+            }
+            if (i1end.index > this.offsetPoint) {
+                i1end.index += 2;
+            }
+            if (i1start.index > this.offsetPoint) {
+                i1start.index += 2;
+            }
+        };
+
+        PolygonSplitter.prototype.makePolygons = function (points, intersections, polygons, sectors, pathType) {
+            var poleIndex = -1;
             for (var i = 0; i < intersections.length - 1; i += 2) {
                 var i0 = intersections[i];
                 var i1 = intersections[i + 1];
@@ -177,28 +235,37 @@ define([
                 var start = i0[1].index;
                 var end = i1[0].index;
                 var polygon = [];
-                var sector = this.makePolygon(start, end, points, polygon, pathType);
+                var sector = new Sector(0, 0, 0, 0);
+                var containsPole = this.makePolygon(start, end, points, polygon, sector, pathType);
                 if (polygon.length) {
                     polygons.push(polygon);
                     sectors.push(sector);
+                    if (containsPole) {
+                        poleIndex = polygons.length - 1;
+                    }
                 }
 
                 start = i1[1].index;
                 end = i0[0].index;
                 polygon = [];
-                sector = this.makePolygon(start, end, points, polygon, pathType);
+                sector = new Sector(0, 0, 0, 0);
+                containsPole = this.makePolygon(start, end, points, polygon, sector, pathType);
                 if (polygon.length) {
                     polygons.push(polygon);
                     sectors.push(sector);
+                    if (containsPole) {
+                        poleIndex = polygons.length - 1;
+                    }
                 }
             }
 
-            return polygons;
+            return poleIndex;
         };
 
-        PolygonSplitter.prototype.makePolygon = function (start, end, points, polygon, pathType) {
+        PolygonSplitter.prototype.makePolygon = function (start, end, points, polygon, sector, pathType) {
             var pass = false;
             var len = points.length;
+            var containsPole = false;
 
             var minLatitude = 90,
                 maxLatitude = -90,
@@ -213,6 +280,9 @@ define([
                 var pt = points[i % len];
                 if (pt.visited) {
                     break;
+                }
+                if (pt.isPole) {
+                    containsPole = true;
                 }
                 polygon.push(pt);
 
@@ -234,10 +304,10 @@ define([
             }
 
             if (polygon.length) {
-                if (minLongitude === -180 && maxLongitude === 180) {
-                    //spans the globe;
-                }
-                var sector = new Sector(minLatitude, maxLatitude, minLongitude, maxLongitude);
+                sector.minLatitude = minLatitude;
+                sector.maxLatitude = maxLatitude;
+                sector.minLongitude = minLongitude;
+                sector.maxLongitude = maxLongitude;
                 if (pathType === WorldWind.GREAT_CIRCLE) {
                     var extremes = Location.greatCircleArcExtremeLocations(polygon);
                     minLatitude = Math.min(sector.minLatitude, extremes[0].latitude);
@@ -247,7 +317,7 @@ define([
                 }
             }
 
-            return sector;
+            return containsPole;
         };
 
         PolygonSplitter.prototype.computeSector = function (points, pathType) {
@@ -280,23 +350,19 @@ define([
         };
 
         PolygonSplitter.prototype.greatCircleIntersection = function (path1Start, path1End) {
-            // if c1 & c2 are great circles through start and end points (or defined by start point + bearing),
+            // if c1 & c2 are great circles through start and end points,
             // then candidate intersections are simply c1 × c2 & c2 × c1; most of the work is deciding correct
-            // intersection point to select! if bearing is given, that determines which intersection, if both
-            // paths are defined by start/end points, take closer intersection
+            // intersection point to select, which is the closer intersection
 
             var p1 = this.toVector(path1Start);
             var p2 = this.toVector(path1End);
-            //var p2 = this.toVector(path2Start);
 
             // c1 & c2 are vectors defining great circles through start & end points; p × c gives initial bearing vector
             var c1 = this.cross(p1, p2);
-            //var c2 = this.v1.cross1(this.v2);
-            var c2 = this.c2;
 
             // there are two (antipodal) candidate intersection points; we have to choose which to return
-            var i1 = this.cross(c1, c2);
-            var i2 = this.cross(c2, c1);
+            var i1 = this.cross(c1, this.c2);
+            var i2 = this.cross(this.c2, c1);
 
             var mid = this.add(p1, this.v1, p2, this.v2);
             var i = mid.dot(i1) > 0 ? i1 : i2;
@@ -344,10 +410,6 @@ define([
             return intersection;
         };
 
-        PolygonSplitter.prototype.linearIntersection = function (p1, p2, globe) {
-
-        };
-
         PolygonSplitter.prototype.toVector = function (point) {
             var phi = point.latitude * Angle.DEGREES_TO_RADIANS;
             var lambda = point.longitude * Angle.DEGREES_TO_RADIANS;
@@ -374,12 +436,13 @@ define([
             return v.cross(v2);
         };
 
-        PolygonSplitter.prototype.formatContourOutput = function (polygons, intersections, pole, sectors) {
+        PolygonSplitter.prototype.formatContourOutput = function (polygons, intersections, pole, sectors, poleIndex) {
             return {
                 polygons: polygons,
                 intersections: intersections,
                 pole: pole,
-                sectors: sectors
+                sectors: sectors,
+                poleIndex: poleIndex,
             };
         };
 
@@ -390,12 +453,13 @@ define([
             // Remap polarThrotle:
             //  0 .. INF => 0 .. 1
             // This acts as a weight between no throttle and fill throttle.
-            var weight = 10 / (1 + 10);
+            var weight = this._polarThrottle / (1 + this._polarThrottle);
 
             return dt * ((1 - weight) + weight * cosLat);
         };
 
         var polygonSplitter = new PolygonSplitter();
+
         return polygonSplitter;
 
     });
