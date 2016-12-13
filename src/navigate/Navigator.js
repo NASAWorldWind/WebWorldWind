@@ -15,6 +15,11 @@ define([
              Position,
              Vec3,
              WWMath) {
+    /**
+     *
+     * @param worldWindow
+     * @constructor
+     */
     var Navigator = function (worldWindow) {
         this.scratchCamera = new Camera();
 
@@ -175,7 +180,9 @@ define([
             );
         }
 
+        console.log("Before: ", this.scratchCamera);
         this.getAsCamera(globe, this.scratchCamera); // get this navigator's properties as a Camera
+        console.log("After: ",this.scratchCamera);
         globe.cameraToLookAt(this.scratchCamera, result); // convert the Camera to a LookAt
 
         return result;
@@ -204,13 +211,13 @@ define([
      * @return {NavigatorState}
      */
     Navigator.prototype.currentState = function() {
-        var camera = this.getAsCamera(this.worldWindow.globe, this.scratchCamera),
+        var lookAt = this.getAsLookAt(this.worldWindow.globe, this.scratchCamera),
             modelview = Matrix.fromIdentity(),
             viewerPosition = new Position(this.latitude, this.longitude, this.altitude);
 
-        modelview.multiplyByLookAtModelview(viewerPosition, camera.range, camera.heading, camera.tilt, camera.roll, this.worldWindow.globe);
+        modelview.multiplyByLookAtModelview(viewerPosition, lookAt.range, lookAt.heading, lookAt.tilt, lookAt.roll, this.worldWindow.globe);
 
-        return this.currentStateForModelview(modelview, camera);
+        return this.currentStateForModelview(modelview, lookAt);
     };
 
     /**
@@ -222,7 +229,7 @@ define([
      * @returns {NavigatorState} The current navigator state.
      * @throws {ArgumentError} If the specified matrix is null or undefined.
      */
-    Navigator.prototype.currentStateForModelview = function (modelviewMatrix, camera) {
+    Navigator.prototype.currentStateForModelview = function (modelviewMatrix, lookAt) {
         if (!modelviewMatrix) {
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "currentStateForModelview", "missingMatrix"));
@@ -266,7 +273,7 @@ define([
         // WebGL viewport.
         projectionMatrix.setToPerspectiveProjection(viewport.width, viewport.height, this.nearDistance, this.farDistance);
 
-        return new NavigatorState(modelviewMatrix, projectionMatrix, viewport, camera.heading, camera.tilt);
+        return new NavigatorState(modelviewMatrix, projectionMatrix, viewport, lookAt.heading, lookAt.tilt);
     };
 
     return Navigator;

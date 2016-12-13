@@ -6,6 +6,18 @@
  * @exports BasicWorldWindController
  */
 define([], function(){
+    /**
+     *
+     * @param latitude
+     * @param longitude
+     * @param altitude
+     * @param altitudeMode
+     * @param range
+     * @param heading
+     * @param tilt
+     * @param roll
+     * @constructor
+     */
     var LookAt = function(latitude, longitude, altitude, altitudeMode, range, heading, tilt, roll) {
         this._latitude = latitude || 0;
         this._longitude = longitude || 0;

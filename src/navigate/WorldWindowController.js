@@ -43,7 +43,11 @@ define([
              Vec3,
              WWMath) {
     "use strict";
-
+    /**
+     *
+     * @param worldWindow
+     * @constructor
+     */
     var WorldWindowController = function (worldWindow) {
         var thisNavigator = this;
         // Prevent the browser's default actions in response to mouse and touch events, which interfere with
@@ -251,8 +255,8 @@ define([
             ty = recognizer.translationY;
 
         if (state == WorldWind.BEGAN) {
-            this.beginHeading = this.heading;
-            this.beginTilt = this.tilt;
+            this.beginHeading = this.lookAt.heading;
+            this.beginTilt = this.lookAt.tilt;
         } else if (state == WorldWind.CHANGED) {
             // Compute the current translation from screen coordinates to degrees. Use the canvas dimensions as a
             // metric for converting the gesture translation to a fraction of an angle.
@@ -274,7 +278,7 @@ define([
             scale = recognizer.scale;
 
         if (state == WorldWind.BEGAN) {
-            this.beginRange = this.range;
+            this.beginRange = this.lookAt.range;
         } else if (state == WorldWind.CHANGED) {
             if (scale != 0) {
                 // Apply the change in pinch scale to this navigator's range, relative to the range when the gesture
