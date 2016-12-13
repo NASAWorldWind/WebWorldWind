@@ -40,28 +40,48 @@ define([
 
 
         it("test the colinearity of three arrays", function () {
-            var a=new Vec3(2,4,6);
-            var b=new Vec3(4,8,12);
-            var c=new Vec3(8,16,24);
-            expect(Vec3.areColinear(a,b,c)).toEqual(true);
+            var a = new Vec3(2, 4, 6);
+            var b = new Vec3(4, 8, 12);
+            var c = new Vec3(8, 16, 24);
+            expect(Vec3.areColinear(a, b, c)).toEqual(true);
         });
 
         it("compute triangle normals", function () {
-            var a=new Vec3(0,0,0);
-            var b=new Vec3(1,0,0);
-            var c=new Vec3(1,1,0);
-            expect(Vec3.computeTriangleNormal(a,b,c)).toEqual(new Vec3(0, 0, 1));
+            var a = new Vec3(0, 0, 0);
+            var b = new Vec3(1, 0, 0);
+            var c = new Vec3(1, 1, 0);
+            expect(Vec3.computeTriangleNormal(a, b, c)).toEqual(new Vec3(0, 0, 1));
         });
 
         it("finds three non-colinear points in an array of coordinates", function () {
-            var a=new Vec3(0,0,0);
-            var b=new Vec3(1,0,0);
-            var c=new Vec3(1,1,0);
-            expect(Vec3.computeTriangleNormal(a,b,c)).toEqual(new Vec3(0, 0, 1));
+            var a = new Vec3(0, 0, 0);
+            var b = new Vec3(1, 0, 0);
+            var c = new Vec3(1, 1, 0);
+            expect(Vec3.computeTriangleNormal(a, b, c)).toEqual(new Vec3(0, 0, 1));
         });
 
+        it("finds three independent vertices", function () {
+            var nonColinearPoints = Vec3.findThreeIndependentVertices([0, 0, 0, 1, 0, 0, 1, 1, 0], 3);
+            var expectednonColinearPoints = [
+                new Vec3(0, 0, 0),
+                new Vec3(1, 0, 0),
+                new Vec3(0, 1, 0)
+            ];
 
+            for (var i = 0; i < nonColinearPoints.length; i++) {
+                expect(nonColinearPoints[i]).toEqual(expectednonColinearPoints[i]);
+            }
 
+        });
+
+        it("computer buffer normals", function () {
+            var bufferNormal = Vec3.computeBufferNormal([0, 0, 0, 1, 0, 0, 1, 1, 0], 1);
+            expect(bufferNormal).toEqual(new Vec3(-1, 0, 0));
+
+            bufferNormal = Vec3.computeBufferNormal([0, 0, 0, 1, 0, 0, 1, 1, 0], 3);
+            expect(bufferNormal).toEqual(new Vec3(0, 0, 1));
+
+        });
 
 
     });
