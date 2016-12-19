@@ -45,11 +45,6 @@ define([
          * @throws {ArgumentError} If the specified boundaries are null or undefined.
          */
         var SurfacePolygon = function (boundaries, attributes) {
-            if (!boundaries) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "constructor",
-                        "The specified boundary array is null or undefined."));
-            }
             if (!Array.isArray(boundaries)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "constructor",
@@ -58,17 +53,22 @@ define([
 
             SurfaceShape.call(this, attributes);
 
-            this._userDefinedBoundaries = boundaries;
-            this._boundaries = null;
-            this.computeBoundaries();
+            this._boundaries = boundaries;
         };
 
         SurfacePolygon.prototype = Object.create(SurfaceShape.prototype);
 
         Object.defineProperties(SurfacePolygon.prototype, {
+            /**
+             * This polygon's boundaries. The polygons boundary locations. If this argument is an array of
+             * [Locations]{@link Location} they define this polygon's outer boundary. If it is an array of arrays of
+             * Locations then each array entry defines one of this polygon's boundaries.
+             * @type {Location[][] | Location[]}
+             * @memberof SurfacePolygon.prototype
+             */
             boundaries: {
                 get: function () {
-                    return this._userDefinedBoundaries;
+                    return this._boundaries;
                 },
                 set: function (boundaries) {
                     if (!Array.isArray(boundaries)) {
@@ -76,35 +76,11 @@ define([
                             Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "set boundaries",
                                 "The specified value is not an array."));
                     }
-                    this._userDefinedBoundaries = boundaries;
-                    this.computeBoundaries();
+                    this._boundaries = boundaries;
+                    this.isPrepared = false;
                 }
             }
         });
-
-        SurfacePolygon.prototype.computeBoundaries = function () {
-            if (this._userDefinedBoundaries.length === 0 || this._userDefinedBoundaries[0].latitude == null) {
-                this._boundaries = this._userDefinedBoundaries;
-            }
-            else {
-                this._boundaries = [this._userDefinedBoundaries];
-            }
-            //this.closeContours();
-        };
-
-        SurfacePolygon.prototype.closeContours = function () {
-            for (var i = 0, len = this._boundaries.length; i < len; i++) {
-                var contour = this._boundaries[i];
-                if (contour.length < 3) {
-                    continue;
-                }
-                var p1 = contour[0];
-                var p2 = contour[contour.length - 1];
-                if (!p1.equals(p2)) {
-                    contour.push(p1);
-                }
-            }
-        };
 
         // Internal use only. Intentionally not documented.
         SurfacePolygon.staticStateKey = function (shape) {

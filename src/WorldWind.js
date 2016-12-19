@@ -66,6 +66,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/GpuResourceCache',
         './shaders/GpuShader',
         './shaders/GroundProgram',
+        './util/HashMap',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
@@ -149,6 +150,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/PlacemarkAttributes',
         './geom/Plane',
         './shapes/Polygon',
+        './util/PolygonSplitter',
         './geom/Position',
         './projections/ProjectionEquirectangular',
         './projections/ProjectionGnomonic',
@@ -282,6 +284,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuResourceCache,
               GpuShader,
               GroundProgram,
+              HashMap,
               HighlightController,
               ImagePyramid,
               ImageSource,
@@ -365,6 +368,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               PlacemarkAttributes,
               Plane,
               Polygon,
+              PolygonSplitter,
               Position,
               ProjectionEquirectangular,
               ProjectionGnomonic,
@@ -707,6 +711,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuResourceCache'] = GpuResourceCache;
         WorldWind['GpuShader'] = GpuShader;
         WorldWind['GroundProgram'] = GroundProgram;
+        WorldWind['HashMap'] = HashMap;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
@@ -741,6 +746,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['PlacemarkAttributes'] = PlacemarkAttributes;
         WorldWind['Plane'] = Plane;
         WorldWind['Polygon'] = Polygon;
+        WorldWind['PolygonSplitter'] = PolygonSplitter;
         WorldWind['Position'] = Position;
         WorldWind['ProjectionEquirectangular'] = ProjectionEquirectangular;
         WorldWind['ProjectionGnomonic'] = ProjectionGnomonic;
