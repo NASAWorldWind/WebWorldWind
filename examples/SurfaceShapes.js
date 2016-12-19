@@ -117,7 +117,5 @@ requirejs(['../src/WorldWind',
 
         // Now set up to handle highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
-
-
     }
 );

@@ -430,7 +430,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        SurfaceShape.prototype.interpolateLocations = function (locations, preventClose) {
+        SurfaceShape.prototype.interpolateLocations = function (locations) {
             var first = locations[0],
                 next = first,
                 prev,

@@ -18,16 +18,16 @@ requirejs(['../src/WorldWind',
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create the World Window.
-        var wwd = new WorldWind.WorldWindow("canvasOne"/*, new WorldWind.ZeroElevationModel()*/);
+        var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
          * Added imagery layers.
          */
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            //{layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-            //{layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            //{layer: new WorldWind.CompassLayer(), enabled: true}
+            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
+            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            {layer: new WorldWind.CompassLayer(), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -36,7 +36,7 @@ requirejs(['../src/WorldWind',
         }
 
         var polygonsLayer = new WorldWind.RenderableLayer(),
-            width = 1.0, //2.0
+            width = 2.0,
             height = 1e4,
             attributes = new WorldWind.ShapeAttributes(null),
             textureCoordinates = [
@@ -44,12 +44,12 @@ requirejs(['../src/WorldWind',
             ],
             highlightAttributes, numPolygons;
 
-        //attributes.imageSource = "../images/400x230-splash-nww.png";
+        attributes.imageSource = "../images/400x230-splash-nww.png";
         attributes.drawInterior = true;
         attributes.drawOutline = true;
         attributes.interiorColor = WorldWind.Color.WHITE;
         attributes.outlineColor = WorldWind.Color.BLUE;
-        //attributes.drawVerticals = true;
+        attributes.drawVerticals = true;
 
         highlightAttributes = new WorldWind.ShapeAttributes(attributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
@@ -58,19 +58,19 @@ requirejs(['../src/WorldWind',
         for (var lat = -80; lat <= 80; lat += 2 * width) {
             for (var lon = -170; lon <= 170; lon += 2 * width) {
                 var boundary = [
-                        new WorldWind.Location(lat, lon, height),
-                        new WorldWind.Location(lat, lon + width, height),
-                        new WorldWind.Location(lat + width, lon + width, height),
-                        new WorldWind.Location(lat + width, lon, height)
+                        new WorldWind.Position(lat, lon, height),
+                        new WorldWind.Position(lat, lon + width, height),
+                        new WorldWind.Position(lat + width, lon + width, height),
+                        new WorldWind.Position(lat + width, lon, height)
                     ],
-                    polygon = new WorldWind.SurfacePolygon(boundary, attributes);
+                    polygon = new WorldWind.Polygon([boundary], null);
 
-                //polygon.altitudeMode = WorldWind.ABSOLUTE;
-                //polygon.extrude = attributes.drawVerticals;
-                //polygon.textureCoordinates = textureCoordinates;
+                polygon.altitudeMode = WorldWind.ABSOLUTE;
+                polygon.extrude = attributes.drawVerticals;
+                polygon.textureCoordinates = textureCoordinates;
 
-                //polygon.attributes = attributes;
-                //polygon.highlightAttributes = highlightAttributes;
+                polygon.attributes = attributes;
+                polygon.highlightAttributes = highlightAttributes;
 
                 polygonsLayer.addRenderable(polygon);
                 ++numPolygons;
@@ -131,8 +131,8 @@ requirejs(['../src/WorldWind',
         };
 
         // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
-        //wwd.addEventListener("mousemove", handlePick);
+        wwd.addEventListener("mousemove", handlePick);
 
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-        //var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
+        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     });
