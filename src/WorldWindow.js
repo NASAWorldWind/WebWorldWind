@@ -8,7 +8,7 @@
  */
 define([
         './error/ArgumentError',
-        './navigate/WorldWindowController',
+        './navigate/Camera',
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
@@ -25,9 +25,10 @@ define([
         './shapes/SurfaceShape',
         './shapes/SurfaceShapeTileBuilder',
         './globe/Terrain',
-        './geom/Vec2'],
+        './geom/Vec2',
+        './navigate/WorldWindowController'],
     function (ArgumentError,
-              WorldWindowController,
+              Camera,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
@@ -44,7 +45,8 @@ define([
               SurfaceShape,
               SurfaceShapeTileBuilder,
               Terrain,
-              Vec2) {
+              Vec2,
+              WorldWindowController) {
         "use strict";
 
         /**
@@ -87,6 +89,8 @@ define([
 
             // Internal. Intentionally not documented.
             this.redrawRequestId = null;
+
+            this.scratchCamera = new Camera();
 
             /**
              * The HTML canvas associated with this World Window.
@@ -179,6 +183,8 @@ define([
              * @type {FrameStatistics}
              */
             this.frameStatistics = new FrameStatistics();
+
+            this.fieldOfView = 45;
 
             /**
              * The {@link GoToAnimator} used by this world window to respond to its goTo method.
@@ -1261,6 +1267,33 @@ define([
                     }
                 }
             }
+        };
+
+        // TODO: Discuss moving this stuff to the WorldWindow.
+        WorldWindow.prototype.computeViewingTransform = function(projection, modelview) {
+            // Compute the clip plane distances. The near distance is set to a large value that does not clip the globe's
+            // surface. The far distance is set to the smallest value that does not clip the atmosphere.
+            // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+            // TODO horizon is not in view
+            // TODO parameterize the object altitude for horizon distance
+            var near = this.navigator.altitude * 0.5;
+            var far = this.globe.horizonDistance(this.navigator.altitude, 160000);
+
+            if(this.depthBits != 0) {
+                var maxDepthValue = (1 << this.depthBits) - 1;
+                var farResolution = 10.0;
+                var nearDistance = far / (maxDepthValue / (1 - farResolution / far) - maxDepthValue + 1);
+                // Use the computed near distance only when it's less than our default distance.
+                if(near > nearDistance) {
+                    near = nearDistance;
+                }
+            }
+
+            projection.setToPerspectiveProjection(this.viewport.width, this.viewport.height, this.fieldOfView, near, far);
+
+            this.navigator.getAsCamera(this.globe, this.scratchCamera);
+            this.globe.cameraToCartesianTransform(this.scratchCamera, modelview)
+                .invertOrthonormal(modelview);
         };
 
         return WorldWindow;

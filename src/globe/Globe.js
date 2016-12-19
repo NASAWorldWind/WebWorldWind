@@ -696,7 +696,7 @@ define([
             }
 
             var cartesianTransform = this.cameraToCartesianTransform(camera, this.modelview);
-            cartesianTransform.invertOrthonormalMatrix(this.modelview);
+            cartesianTransform.invertOrthonormal(this.modelview);
 
             var origin = new Vec3();
             var direction = new Vec3();
@@ -738,7 +738,7 @@ define([
             }
 
             this.lookAtToCartesianTransform(lookAt, this.modelview)
-                .invertOrthonormalMatrix(this.modelview);
+                .invertOrthonormal(this.modelview);
             this.modelview.extractEyePoint(this.originPoint);
 
             this.computePositionFromPoint(this.originPoint[0], this.originPoint[1], this.originPoint[2], this.originPos); // equivalent to cartesianToGeographic

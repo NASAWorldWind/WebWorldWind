@@ -279,5 +279,32 @@ define([
             }
         };
 
+        Plane.prototype.set = function (x, y, z, distance) {
+            this.normal.x = x;
+            this.normal.y = y;
+            this.normal.z = z;
+            this.distance = distance;
+            this.normalizeIfNeeded();
+        };
+
+        Plane.prototype.normalizeIfNeeded = function() {
+            var magnitude = this.normal.magnitude();
+
+            if(magnitude == 0) {
+                return;
+            }
+
+            var NEAR_ZERO_THRESHOLD = 1e-10;
+            if (magnitude >= 1 - NEAR_ZERO_THRESHOLD && magnitude <= 1 + NEAR_ZERO_THRESHOLD) {
+                return;
+            }
+
+            // Normalize the caller-specified plane coordinates.
+            this.normal.x /= magnitude;
+            this.normal.y /= magnitude;
+            this.normal.z /= magnitude;
+            this.distance /= magnitude;
+        };
+
         return Plane;
     });

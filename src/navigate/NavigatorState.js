@@ -40,11 +40,12 @@ define([
          * a NavigatorState instance has no effect on the Navigator from which they came.
          * @param {Matrix} modelViewMatrix The navigator's model-view matrix.
          * @param {Matrix} projectionMatrix The navigator's projection matrix.
+         * @param {Matrix} infiniteProjectionMatrix The matrix for infinite projection.
          * @param {Rectangle} viewport The navigator's viewport.
          * @param {Number} heading The navigator's heading.
          * @param {Number} tilt The navigator's tilt.
          */
-        var NavigatorState = function (modelViewMatrix, projectionMatrix, viewport, heading, tilt) {
+        var NavigatorState = function (modelViewMatrix, projectionMatrix, infiniteProjectionMatrix, viewport, heading, tilt) {
 
             /**
              * The navigator's model-view matrix. The model-view matrix transforms points from model coordinates to eye
@@ -78,6 +79,8 @@ define([
              * @readonly
              */
             this.viewport = viewport;
+
+            this.infiniteProjection = infiniteProjectionMatrix;
 
             /**
              * Indicates the number of degrees clockwise from north to which the view is directed.
@@ -116,9 +119,9 @@ define([
             // coordinates.
             var modelviewTranspose = Matrix.fromIdentity();
             modelviewTranspose.setToTransposeOfMatrix(this.modelview);
+
             this.frustumInModelCoordinates = Frustum.fromProjectionMatrix(this.projection);
-            this.frustumInModelCoordinates.transformByMatrix(modelviewTranspose);
-            this.frustumInModelCoordinates.normalize();
+            this.frustumInModelCoordinates.setToModelViewProjection(projectionMatrix, modelViewMatrix, viewport);
 
             // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
             // are used to support operations on navigator state, such as project, unProject, and pixelSizeAtDistance.

@@ -68,7 +68,7 @@ define([
                     0.0, 0.0, 0.0, 1.0
                 );
 
-                var result = matrix.invertOrthonormalMatrix(orthonormalTranslation);
+                var result = matrix.invertOrthonormal(orthonormalTranslation);
                 expect(expected.equals(result)).toBe(true);
             });
 
@@ -85,7 +85,7 @@ define([
                     0.027832077637773192, 0.010313169241199488, 0.999559409937482, -6282781.16395346,
                     0.0, 0.0, 0.0, 1.0
                 );
-                var result = matrix.invertOrthonormalMatrix(matrix);
+                var result = matrix.invertOrthonormal(matrix);
 
                 expect(expected.equals(result)).toBe(true);
             });
