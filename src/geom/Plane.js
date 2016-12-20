@@ -280,9 +280,9 @@ define([
         };
 
         Plane.prototype.set = function (x, y, z, distance) {
-            this.normal.x = x;
-            this.normal.y = y;
-            this.normal.z = z;
+            this.normal[0] = x;
+            this.normal[1] = y;
+            this.normal[2] = z;
             this.distance = distance;
             this.normalizeIfNeeded();
         };
@@ -300,9 +300,9 @@ define([
             }
 
             // Normalize the caller-specified plane coordinates.
-            this.normal.x /= magnitude;
-            this.normal.y /= magnitude;
-            this.normal.z /= magnitude;
+            this.normal[0] /= magnitude;
+            this.normal[1] /= magnitude;
+            this.normal[2] /= magnitude;
             this.distance /= magnitude;
         };
 

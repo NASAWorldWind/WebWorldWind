@@ -1277,7 +1277,7 @@ define([
             // TODO horizon is not in view
             // TODO parameterize the object altitude for horizon distance
             var near = this.navigator.altitude * 0.5;
-            var far = this.globe.horizonDistance(this.navigator.altitude, 160000);
+            var far = this.globe.horizonDistance(this.navigator.altitude); // 160000
 
             if(this.depthBits != 0) {
                 var maxDepthValue = (1 << this.depthBits) - 1;

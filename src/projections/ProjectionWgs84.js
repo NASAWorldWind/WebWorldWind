@@ -380,7 +380,7 @@ define([
                 );
             }
 
-            var radLat = WWMath.toRadians(latitude);
+            var radLat = WWMath.toRadians(latitude); // Go back to the same version
             var radLon = WWMath.toRadians(longitude);
             var cosLat = Math.cos(radLat);
             var sinLat = Math.sin(radLat);

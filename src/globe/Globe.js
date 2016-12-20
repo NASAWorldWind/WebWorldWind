@@ -109,11 +109,11 @@ define([
 
             this.modelview = Matrix.fromIdentity();
 
-            this.forwardRay = Vec3.ZERO;
+            this.forwardRay = new Vec3(0,0,0);
 
-            this.originPos = Position.ZERO;
+            this.originPos = new Position(0,0,0);
 
-            this.originPoint = Vec3.ZERO;
+            this.originPoint = new Vec3(0,0,0);
 
             this.origin = Matrix.fromIdentity();
 
@@ -640,8 +640,10 @@ define([
             var ct = matrix[10];
             var st = Math.sqrt(matrix[2] * matrix[2] + matrix[6] * matrix[6]);
             return WWMath.toDegrees(Math.atan2(st, ct));
+
         };
 
+        // 2,3,4,8
         Globe.prototype.cameraToCartesianTransform = function (camera, result) {
             if (!camera) {
                 throw new ArgumentError(

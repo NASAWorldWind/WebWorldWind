@@ -983,7 +983,7 @@ define([
             var aspect = viewportWidth / viewportHeight;
             var tanfovy_2 = Math.tan(WWMath.toRadians(fovyDegrees * 0.5));
             var nearHeight = 2 * nearDistance * tanfovy_2;
-            var nearWidth = viewportHeight * aspect;
+            var nearWidth = nearHeight * aspect;
             var near = nearDistance;
             var far = farDistance;
 

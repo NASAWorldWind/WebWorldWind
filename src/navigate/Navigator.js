@@ -208,6 +208,7 @@ define([
     };
 
     /**
+     * TODO: There are differences between the modelview, projection and frustum against the relevant previous version.
      * @return {NavigatorState}
      */
     Navigator.prototype.currentState = function(globe) {
