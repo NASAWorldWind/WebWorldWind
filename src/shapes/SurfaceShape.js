@@ -804,6 +804,9 @@ define([
 
             if (dc.pickingMode && !this.pickColor) {
                 this.pickColor = dc.uniquePickColor();
+            }
+
+            if (dc.pickingMode) {
                 var pickColor = this.pickColor.toHexString();
             }
 
