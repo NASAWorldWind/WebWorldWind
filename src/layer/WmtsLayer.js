@@ -488,7 +488,7 @@ define([
                 config.title = wmtsLayerCapabilities.identifier;
             }
 
-            
+
             return config;
         };
 
@@ -549,6 +549,14 @@ define([
         };
 
         WmtsLayer.prototype.addTileOrDescendants = function (dc, tile) {
+            // Check if the new sub-tile fits in TileMatrix ranges
+            if (tile.column >= tile.tileMatrix.matrixWidth) {
+                tile.column = tile.column - tile.tileMatrix.matrixWidth;
+            }
+            if (tile.column < 0) {
+                tile.column = tile.column + tile.tileMatrix.matrixWidth;
+            }
+
             if (this.tileMeetsRenderingCriteria(dc, tile)) {
                 this.addTile(dc, tile);
                 return;
