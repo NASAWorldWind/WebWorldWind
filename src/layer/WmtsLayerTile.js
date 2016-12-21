@@ -97,17 +97,17 @@ define([
                     subCol = subFactorLonCeil * this.column + j;
 
                     // Check if the new sub-tile fits in TileMatrix ranges
-                    if (subCol >= tile.tileMatrix.matrixWidth) {
-                        subCol = subCol - tile.tileMatrix.matrixWidth;
+                    if (subCol >= this.tileMatrix.matrixWidth) {
+                        subCol = subCol - this.tileMatrix.matrixWidth;
                     }
                     if (subCol < 0) {
-                        subCol = subCol + tile.tileMatrix.matrixWidth;
+                        subCol = subCol + this.tileMatrix.matrixWidth;
                     }
-                    if (subRow >= tile.tileMatrix.matrixHeight) {
-                        subRow = subRow - tile.tileMatrix.matrixHeight;
+                    if (subRow >= this.tileMatrix.matrixHeight) {
+                        subRow = subRow - this.tileMatrix.matrixHeight;
                     }
-                    if (subRoww < 0) {
-                        subRow = subRow + tile.tileMatrix.matrixHeight;
+                    if (subRow < 0) {
+                        subRow = subRow + this.tileMatrix.matrixHeight;
                     }
 
                     children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
