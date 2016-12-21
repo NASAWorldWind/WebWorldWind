@@ -95,6 +95,21 @@ define([
                 for (var j = 0; j < indJ ; j++) {
                     subRow = subFactorLatCeil * this.row + i;
                     subCol = subFactorLonCeil * this.column + j;
+
+                    // Check if the new sub-tile fits in TileMatrix ranges
+                    if (subCol >= tile.tileMatrix.matrixWidth) {
+                        subCol = subCol - tile.tileMatrix.matrixWidth;
+                    }
+                    if (subCol < 0) {
+                        subCol = subCol + tile.tileMatrix.matrixWidth;
+                    }
+                    if (subRow >= tile.tileMatrix.matrixHeight) {
+                        subRow = subRow - tile.tileMatrix.matrixHeight;
+                    }
+                    if (subRoww < 0) {
+                        subRow = subRow + tile.tileMatrix.matrixHeight;
+                    }
+
                     children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
                 }
             }
