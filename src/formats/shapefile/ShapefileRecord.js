@@ -276,7 +276,7 @@ define([
          * is not {@link Shapefile#NULL}. Records of type NULL are always valid, and
          * may appear in any Shapefile.
          * <p/>
-         * For details, see the ESRI Shapefile specification at <a href="http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf"/>,
+         * For details, see the ESRI Shapefile specification at <a href="https://www.esri.com/library/whitepapers/pdfs/shapefile.pdf"/>,
          * pages 4 and 5.
          *
          * @throws Error If the shape types do not match.

@@ -138,7 +138,7 @@ define(['../../error/ArgumentError',
         /**
          * Retrieves the coordinate system and its parameters from an OGC coordinate system encoded as well-known text. For
          * details, see to the OGC Coordinate Transform Service (CT) specification at <a
-         * href="http://www.opengeospatial.org/standards/ct">http://www.opengeospatial.org/standards/ct</a>. This recognizes
+         * href="https://www.opengeospatial.org/standards/ct">https://www.opengeospatial.org/standards/ct</a>. This recognizes
          * Geographic and UTM coordinate systems.
          *
          * If an exception occurs while parsing the coordinate system text, the parameter list is left unchanged.
