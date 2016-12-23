@@ -40,7 +40,7 @@ requirejs(['../src/WorldWind',
 
 
         // A list of prominent peaks in the U.S.
-        // This list was mined from http://en.wikipedia.org/wiki/List_of_Ultras_of_the_United_States
+        // This list was mined from https://en.wikipedia.org/wiki/List_of_Ultras_of_the_United_States
         var peaks =
             [
                 {

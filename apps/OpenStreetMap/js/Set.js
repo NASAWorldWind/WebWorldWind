@@ -4,7 +4,7 @@
  */
 
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js'], function(ww) {
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js'], function(ww) {
 
 
     function Set() {
