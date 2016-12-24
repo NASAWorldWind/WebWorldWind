@@ -18,7 +18,6 @@ requirejs([
         // Add imagery layers
         var layers = [
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
