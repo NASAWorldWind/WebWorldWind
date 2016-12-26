@@ -211,6 +211,21 @@ define([
             expect(vec_a.distanceTo(vec_b)).toEqual(Math.sqrt(14));
         });
 
+        it("Swap the components of the current vector with another one", function () {
+            var vec_a = new WorldWind.Vec3(1, 2, 3);
+            var vec_b = new WorldWind.Vec3(2, 4, 6);
+            vec_a.swap(vec_b);
+            expect(vec_a).toEqual(new WorldWind.Vec3(2, 4, 6));
+            expect(vec_b).toEqual(new WorldWind.Vec3(1, 2, 3));
+        });
+
+
+        it("Returns a string representation of this vector", function () {
+            var vec_a = new WorldWind.Vec3(1, 2, 3);
+            expect(vec_a.toString()).toEqual("(1, 2, 3)");
+
+        });
+
 
 
     });
