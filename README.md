@@ -18,7 +18,7 @@ library source, examples and tutorials.
 - [Developer's Guide](https://webworldwind.org) has a complete description of Web World Wind's functionality. You'll 
   also find there links to many Web World Wind resources, including a user guide. The Web World Wind distribution 
   provides many simple examples showing how to use all of Web World Wind's functionality.
-- [World Wind Forum](http://forum.worldwindcentral.com) provides help from the World Wind community
+- [World Wind Forum](https://forum.worldwindcentral.com) provides help from the World Wind community
 - [GitHub Issues](https://github.com/NASAWorldWind/WebWorldWind/issues) provides requirements and issue tracking
 - [WebStorm](https://www.jetbrains.com/webstorm) is used by the NASA World Wind development team
 
