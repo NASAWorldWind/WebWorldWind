@@ -26,7 +26,8 @@ define([
         './shapes/SurfaceShapeTileBuilder',
         './globe/Terrain',
         './geom/Vec2',
-        './navigate/WorldWindowController'],
+        './navigate/WorldWindowController',
+        './util/WWMath'],
     function (ArgumentError,
               Camera,
               DrawContext,
@@ -46,7 +47,8 @@ define([
               SurfaceShapeTileBuilder,
               Terrain,
               Vec2,
-              WorldWindowController) {
+              WorldWindowController,
+              WWMath) {
         "use strict";
 
         /**
@@ -60,7 +62,7 @@ define([
          * @throws {ArgumentError} If there is no HTML element with the specified name in the document, or if the
          * HTML canvas does not support WebGL.
          */
-        var WorldWindow = function (canvasName, elevationModel) {
+        var WorldWindow = function (canvasName, elevationModel, controller) {
             if (!(window.WebGLRenderingContext)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor",
@@ -141,7 +143,7 @@ define([
              * @type {WorldWindowController}
              * @default [WorldWindowController]{@link WorldWindowController}
              */
-            this.controller = new WorldWindowController(this);
+            this.controller = new controller(this) || new WorldWindowController(this);
 
             /**
              * The vertical exaggeration to apply to the terrain.
@@ -1294,6 +1296,12 @@ define([
             this.navigator.getAsCamera(this.globe, this.scratchCamera);
             this.globe.cameraToCartesianTransform(this.scratchCamera, modelview)
                 .invertOrthonormal(modelview);
+        };
+
+        WorldWindow.prototype.distanceToViewGlobeExtents = function() {
+            var sinfovy_2 = Math.sin(WWMath.toRadians(this.fieldOfView * 0.5));
+            var radius = this.globe.equatorialRadius;
+            return radius / sinfovy_2 - radius;
         };
 
         return WorldWindow;

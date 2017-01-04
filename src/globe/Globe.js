@@ -626,6 +626,18 @@ define([
             return this.elevationModel.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
         };
 
+        Globe.prototype.getRadiusAt = function(latitude, longitude) {
+            // The radius for an ellipsoidal globe is a function of its latitude. The following solution was derived by
+            // observing that the length of the ellipsoidal point at the specified latitude and longitude indicates the
+            // radius at that location. The formula for the length of the ellipsoidal point was then converted into the
+            // simplified form below.
+
+            var sinLat = Math.sin(WWMath.toRadians(latitude));
+            var ec2 = this.eccentricitySquared;
+            var rpm = this.equatorialRadius / Math.sqrt(1 - ec2 * sinLat * sinLat);
+            return rpm * Math.sqrt(1 + (ec2 * ec2 - 2 * ec2) * sinLat * sinLat);
+        };
+
         Globe.prototype.computeViewHeading = function (matrix, roll) {
             var rad = WWMath.toRadians(roll);
             var cr = Math.cos(rad);
