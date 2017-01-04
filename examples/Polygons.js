@@ -8,9 +8,11 @@
  * @version $Id: Polygons.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['../src/navigate/CameraController',
+        '../src/WorldWind',
         './LayerManager'],
-    function (ww,
+    function (CameraController,
+              ww,
               LayerManager) {
         "use strict";
 
@@ -18,7 +20,7 @@ requirejs(['../src/WorldWind',
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create the World Window.
-        var wwd = new WorldWind.WorldWindow("canvasOne");
+        var wwd = new WorldWind.WorldWindow("canvasOne", null, CameraController);
 
         /**
          * Add imagery layers.

@@ -224,5 +224,33 @@ define([
             return result;
         };
 
+        /**
+         *
+         * @param globe
+         * @param latitude
+         * @param longitude
+         * @param altitude
+         * @param offset
+         * @param result
+         */
+        GeographicProjection.prototype.geographicToCartesianTransform = function(globe, latitude, longitude, altitude, offset, result) {
+            throw new UnsupportedOperationError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeographicProjection", "geographicToCartesianTransform", "abstractInvocation"));
+        };
+
+        /**
+         *
+         * @param globe
+         * @param x
+         * @param y
+         * @param z
+         * @param offset
+         * @param result
+         */
+        GeographicProjection.prototype.cartesianToLocalTransform = function(globe, x, y, z, offset, result) {
+            throw new UnsupportedOperationError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeographicProjection", "cartesianToLocalTransform", "abstractInvocation"));
+        };
+
         return GeographicProjection;
     });

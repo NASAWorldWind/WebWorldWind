@@ -44,8 +44,9 @@ define([
              WWMath) {
     "use strict";
     /**
-     *
-     * @param worldWindow
+     * Default controller for WorldWind, which uses LookAt as a basic model for controlling the globe via user
+     * interactions.
+     * @param worldWindow {WorldWindow} WorldWindow this controller is associated with.
      * @constructor
      */
     var WorldWindowController = function (worldWindow) {

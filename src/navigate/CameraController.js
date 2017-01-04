@@ -44,8 +44,9 @@ define([
              WWMath) {
     "use strict";
     /**
-     *
-     * @param worldWindow
+     * Alternative controller for World wind, which controls the globe via user interaction as if the user was handling
+     * a camera to watch the place.
+     * @param worldWindow {WorldWindow} WorldWindow this controller is associated with.
      * @constructor
      */
     var CameraController = function (worldWindow) {
@@ -376,6 +377,7 @@ define([
         this.worldWindow.redraw();
     };
 
+    // Intentionally not documented.
     CameraController.prototype.gestureDidBegin = function() {
         this.worldWindow.navigator.getAsCamera(this.worldWindow.globe, this.beginCamera);
         this.camera.set(this.beginCamera);
@@ -389,8 +391,7 @@ define([
         var maxAltitude = distanceToExtents;
         camera.altitude = WWMath.clamp(camera.altitude, minAltitude, maxAltitude);
 
-        // Limit the tilt to between nadir and the horizon (roughly)
-        var r = this.worldWindow.globe.getRadiusAt(camera.latitude, camera.latitude);
+        camera.tilt = WWMath.clamp(camera.tilt, 0, 180);
     };
 
     return CameraController;

@@ -3,21 +3,15 @@ define([
     './Camera',
     '../util/Logger',
     '../geom/Matrix',
-    './NavigatorState',
-    '../geom/Position',
-    '../geom/Vec3',
-    '../util/WWMath'
+    './NavigatorState'
 ], function (ArgumentError,
              Camera,
              Logger,
              Matrix,
-             NavigatorState,
-             Position,
-             Vec3,
-             WWMath) {
+             NavigatorState) {
     /**
-     *
-     * @param worldWindow
+     * Current state of the eye point in the same form as for Camera.
+     * @param worldWindow {WorldWindow} World Window to which this navigator is associated.
      * @constructor
      */
     var Navigator = function (worldWindow) {
@@ -30,6 +24,10 @@ define([
          */
         this.worldWindow = worldWindow;
 
+        /**
+         * Field of view of the camera in degrees.
+         * @type {number}
+         */
         this.fieldOfView = 45;
 
         /**
@@ -46,10 +44,22 @@ define([
          */
         this.tilt = 0;
 
+        /**
+         * Starting latitude of the navigator
+         * @type {Number}
+         */
         this.latitude = 30;
 
+        /**
+         * Starting longitude of the navigator
+         * @type {Number}
+         */
         this.longitude = 110;
 
+        /**
+         * Starting altitude of the navigator
+         * @type {Number}
+         */
         this.altitude = 10000000;
 
         /**
@@ -58,15 +68,16 @@ define([
          * @default 0
          */
         this.roll = 0;
-
-        // Intentionally not documented.
-        this.nearDistance = 1;
-
-        // Intentionally not documented.
-        this.farDistance = 10e6;
     };
 
     Object.defineProperties(Navigator.prototype, {
+        /**
+         * Latitude of the virtual camera. Degrees north or south of the Equator (0 degrees). Values range from -90
+         * degrees to 90 degrees.
+         * @memberof Navigator.prototype
+         * @readonly
+         * @type {Number}
+         */
         latitude: {
             get: function () {
                 return this._latitude;
@@ -76,6 +87,14 @@ define([
             }
         },
 
+        /**
+         * Longitude of the virtual camera (eye point). Angular distance in degrees, relative to the Prime Meridian.
+         * Values west of the Meridian range from +-180 to 0 degrees. Values east of the Meridian range from 0
+         * to 180 degrees.
+         * @memberof Navigator.prototype
+         * @readonly
+         * @type {Number}
+         */
         longitude: {
             get: function () {
                 return this._longitude;
@@ -85,6 +104,13 @@ define([
             }
         },
 
+        /**
+         * Distance of the camera from the earth's surface, in meters. Interpreted according to the Camera's
+         * &lt;altitudeMode&gt; or &lt;gx:altitudeMode&gt;.
+         * @memberOf Navigator.prototype
+         * @readonly
+         * @type {Number}
+         */
         altitude: {
             get: function () {
                 return this._altitude;
@@ -94,6 +120,13 @@ define([
             }
         },
 
+        /**
+         * Direction (azimuth) of the camera, in degrees. Default=0 (true North). (See diagram.) Values range from
+         * 0 to 360 degrees.
+         * @memberof Camera.prototype
+         * @readonly
+         * @type {Number}
+         */
         heading: {
             get: function () {
                 return this._heading;
@@ -103,6 +136,16 @@ define([
             }
         },
 
+        /**
+         * Rotation, in degrees, of the camera around the X axis. A value of 0 indicates that the view is aimed
+         * straight down toward the earth (the most common case). A value for 90 for &lt;tilt&gt; indicates that the
+         * view
+         * is aimed toward the horizon. Values greater than 90 indicate that the view is pointed up into the sky.
+         * Values for &lt;tilt&gt; are clamped at +180 degrees.
+         * @memberof Camera.prototype
+         * @readonly
+         * @type {Number}
+         */
         tilt: {
             get: function () {
                 return this._tilt;
@@ -112,6 +155,12 @@ define([
             }
         },
 
+        /**
+         * Rotation, in degrees, of the camera around the Z axis. Values range from -180 to +180 degrees.
+         * @memberof Camera.prototype
+         * @readonly
+         * @type {String}
+         */
         roll: {
             get: function () {
                 return this._roll;
@@ -122,13 +171,13 @@ define([
         }
     });
 
+    /**
+     * It retrieves properties of this navigator in the form of camera.
+     * @param globe {Globe} Unused here
+     * @param result {Camera} Camera which will be returned with current properties of navigator imprinted on it.
+     * @returns {Camera} result
+     */
     Navigator.prototype.getAsCamera = function (globe, result) {
-        if (!globe) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "getAsCamera", "missing globe")
-            );
-        }
-
         if (!result) {
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "getAsCamera", "missing result")
@@ -146,13 +195,13 @@ define([
         return result;
     };
 
+    /**
+     * It sets properties of this navigator based on the supplied Camera.
+     * @param globe {Globe} Actually unused in this computation.
+     * @param camera {Camera} Camera representation of the properties.
+     * @returns {Navigator} this
+     */
     Navigator.prototype.setAsCamera = function (globe, camera) {
-        if (!globe) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "setAsCamera", "missing globe")
-            );
-        }
-
         if (!camera) {
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "setAsCamera", "missing camera")
@@ -169,6 +218,12 @@ define([
         return this;
     };
 
+    /**
+     * It retrieve properties of this navigator in the form of LookAt
+     * @param globe {Globe} Globe used to do the computations.
+     * @param result {LookAt} Current navigator properties represented as LookAt
+     * @returns {LookAt} Updated result.
+     */
     Navigator.prototype.getAsLookAt = function (globe, result) {
         if (!globe) {
             throw new ArgumentError(
@@ -188,6 +243,12 @@ define([
         return result;
     };
 
+    /**
+     * It sets properties of this navigator based on the information supplies as LookAt.
+     * @param globe {Globe} Globe used to do certain computations.
+     * @param lookAt {LookAt} LookAt representation of the properties.
+     * @returns {Navigator} this
+     */
     Navigator.prototype.setAsLookAt = function (globe, lookAt) {
         if (!globe) {
             throw new ArgumentError(
@@ -208,7 +269,8 @@ define([
     };
 
     /**
-     * TODO: There are differences between the modelview, projection and frustum against the relevant previous version.
+     * It transforms the properties of current navigator into the Navigator State. This means computing modelview matrix,
+     * projection matrix and others documented in the NavigatorState.
      * @return {NavigatorState}
      */
     Navigator.prototype.currentState = function(globe) {
