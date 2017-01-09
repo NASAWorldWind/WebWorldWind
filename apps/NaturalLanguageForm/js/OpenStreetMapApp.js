@@ -19,7 +19,7 @@
 * This application creates a listener for all placemarks and pins and creates a hud to appear on click. It also creates
 *   a HUD with the building color key.
  */
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
         'OpenStreetMapConfig',
         'jquery',
         'OSMDataRetriever',

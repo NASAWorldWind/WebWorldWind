@@ -1,5 +1,5 @@
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js'
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js'
 ,'Cylinder'], function(ww, Cylinder) {
     'use strict';
     var EarthquakeViewLayer = function (worldWindow,name) {

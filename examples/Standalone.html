@@ -4,7 +4,7 @@
         - Download and unzip http://worldwindserver.net/webworldwind/WebWorldWind.zip.
         - Download http://worldwindserver.net/webworldwind/WebWorldWindStandaloneData.zip and
           unzip it into the Web World Wind top-level directory so that the "standalonedata" directory is a peer
-          of examples, src, apps and worldwindlib.js.
+          of examples, src, apps and worldwind.js.
         - Ensure that your web server is configured to send an HTTP content type of application/octet-stream
           or application/bil16 for files with a .bil suffix. You can do this for Apache servers by adding bil
           to the list of application-octet-stream suffixes in the mime.types file and then restarting the server.
@@ -21,7 +21,7 @@
     <meta charset="UTF-8">
     <title>World Wind Example</title>
     <!-- Include the Web World Wind library. -->
-    <script src="../worldwindlib.js" type="text/javascript"></script>
+    <script src="../worldwind.min.js" type="text/javascript"></script>
 </head>
 <body>
 <div style="position: absolute; top: 50px; left: 50px;">
