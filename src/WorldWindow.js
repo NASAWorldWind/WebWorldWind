@@ -143,7 +143,7 @@ define([
              * @type {WorldWindowController}
              * @default [WorldWindowController]{@link WorldWindowController}
              */
-            this.controller = new controller(this) || new WorldWindowController(this);
+            this.controller = (controller && new controller(this)) || new WorldWindowController(this);
 
             /**
              * The vertical exaggeration to apply to the terrain.

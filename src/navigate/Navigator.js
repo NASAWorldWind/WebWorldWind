@@ -54,7 +54,7 @@ define([
          * Starting longitude of the navigator
          * @type {Number}
          */
-        this.longitude = 110;
+        this.longitude = -110;
 
         /**
          * Starting altitude of the navigator

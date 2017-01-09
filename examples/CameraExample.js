@@ -7,9 +7,11 @@
  */
 
 requirejs(['../src/navigate/CameraController',
+        '../src/geom/Position',
         '../src/WorldWind',
         './LayerManager'],
     function (CameraController,
+              Position,
               ww,
               LayerManager) {
         "use strict";
@@ -35,6 +37,84 @@ requirejs(['../src/navigate/CameraController',
             wwd.addLayer(layers[l].layer);
         }
 
+        var polygonsLayer = new WorldWind.RenderableLayer();
+        polygonsLayer.displayName = "Polygons";
+        wwd.addLayer(polygonsLayer);
+
+        var boundaries = [];
+        boundaries[0] = []; // outer boundary
+        boundaries[0].push(new WorldWind.Position(30, -100, 1e5));
+        boundaries[0].push(new WorldWind.Position(30, -90, 1e5));
+        boundaries[0].push(new WorldWind.Position(35, -90, 1e5));
+        boundaries[0].push(new WorldWind.Position(35, -100, 1e5));
+        boundaries[1] = []; // inner boundary
+        boundaries[1].push(new WorldWind.Position(32, -96, 1e5));
+        boundaries[1].push(new WorldWind.Position(32, -94, 1e5));
+        boundaries[1].push(new WorldWind.Position(33, -94, 1e5));
+        boundaries[1].push(new WorldWind.Position(33, -96, 1e5));
+
+        var polygon = new WorldWind.Polygon(boundaries, null);
+        polygon.altitudeMode = WorldWind.ABSOLUTE;
+        polygon.extrude = false;
+        polygon.textureCoordinates = [
+            [new WorldWind.Vec2(0, 0), new WorldWind.Vec2(1, 0), new WorldWind.Vec2(1, 1), new WorldWind.Vec2(0, 1)],
+            [new WorldWind.Vec2(0.4, 0.4), new WorldWind.Vec2(0.6, 0.4), new WorldWind.Vec2(0.6, 0.6),
+                new WorldWind.Vec2(0.4, 0.6)]
+        ];
+
+        var polygonAttributes = new WorldWind.ShapeAttributes(null);
+        polygonAttributes.imageSource = "../images/400x230-splash-nww.png";
+        polygonAttributes.drawInterior = true;
+        polygonAttributes.drawOutline = true;
+        polygonAttributes.outlineColor = WorldWind.Color.BLUE;
+        polygonAttributes.interiorColor = WorldWind.Color.WHITE;
+        polygonAttributes.drawVerticals = polygon.extrude;
+        polygonAttributes.applyLighting = true;
+        polygon.attributes = polygonAttributes;
+        var highlightAttributes = new WorldWind.ShapeAttributes(polygonAttributes);
+        highlightAttributes.outlineColor = WorldWind.Color.RED;
+        polygon.highlightAttributes = highlightAttributes;
+
+        polygonsLayer.addRenderable(polygon);
+
+        var boundaries = [];
+        boundaries[0] = []; // outer boundary
+        boundaries[0].push(new WorldWind.Position(30, -100, 1e6));
+        boundaries[0].push(new WorldWind.Position(30, -90, 1e6));
+        boundaries[0].push(new WorldWind.Position(35, -90, 1e6));
+        boundaries[0].push(new WorldWind.Position(35, -100, 1e6));
+        boundaries[1] = []; // inner boundary
+        boundaries[1].push(new WorldWind.Position(32, -96, 1e6));
+        boundaries[1].push(new WorldWind.Position(32, -94, 1e6));
+        boundaries[1].push(new WorldWind.Position(33, -94, 1e6));
+        boundaries[1].push(new WorldWind.Position(33, -96, 1e6));
+
+        var polygon = new WorldWind.Polygon(boundaries, null);
+        polygon.altitudeMode = WorldWind.ABSOLUTE;
+        polygon.extrude = false;
+        polygon.textureCoordinates = [
+            [new WorldWind.Vec2(0, 0), new WorldWind.Vec2(1, 0), new WorldWind.Vec2(1, 1), new WorldWind.Vec2(0, 1)],
+            [new WorldWind.Vec2(0.4, 0.4), new WorldWind.Vec2(0.6, 0.4), new WorldWind.Vec2(0.6, 0.6),
+                new WorldWind.Vec2(0.4, 0.6)]
+        ];
+
+        var polygonAttributes = new WorldWind.ShapeAttributes(null);
+        polygonAttributes.imageSource = "../images/400x230-splash-nww.png";
+        polygonAttributes.drawInterior = true;
+        polygonAttributes.drawOutline = true;
+        polygonAttributes.outlineColor = WorldWind.Color.BLUE;
+        polygonAttributes.interiorColor = WorldWind.Color.WHITE;
+        polygonAttributes.drawVerticals = polygon.extrude;
+        polygonAttributes.applyLighting = true;
+        polygon.attributes = polygonAttributes;
+        var highlightAttributes = new WorldWind.ShapeAttributes(polygonAttributes);
+        highlightAttributes.outlineColor = WorldWind.Color.RED;
+        polygon.highlightAttributes = highlightAttributes;
+
+        polygonsLayer.addRenderable(polygon);
+
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
+
+        wwd.goTo(new Position(45, 10));
     });
