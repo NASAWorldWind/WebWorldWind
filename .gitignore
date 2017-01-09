@@ -1,5 +1,6 @@
 api-doc/
-worldwindlib.js
+worldwind.js
+worldwind.min.js
 WebWorldWind.zip
 node_modules/
 test-results

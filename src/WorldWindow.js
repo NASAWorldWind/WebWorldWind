@@ -277,11 +277,11 @@ define([
         /**
          * Registers an event listener for the specified event type on this World Window's canvas. This function
          * delegates the processing of events to the World Window's canvas. For details on this function and its
-         * arguments, see the W3C [EventTarget]{@link http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget}
+         * arguments, see the W3C [EventTarget]{@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget}
          * documentation.
          *
          * Registering event listeners using this function enables applications to prevent the World Window's default
-         * navigation behavior. To prevent default navigation behavior, call the [Event]{@link http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event}'s
+         * navigation behavior. To prevent default navigation behavior, call the [Event]{@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event}'s
          * preventDefault method from within an event listener for any events the navigator should not respond to.
          *
          * When an event occurs, this calls the registered event listeners in order of reverse registration. Since the

@@ -199,9 +199,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/TiledImageLayer',
         './util/TileFactory',
         './gesture/TiltRecognizer',
-        './ogc/TmsCapabilities',
-        './layer/TmsLayer',
-        './ogc/TmsLayerCapabilities',
         './gesture/Touch',
         './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
@@ -210,6 +207,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
         './util/WcsTileUrlBuilder',
+        './ogc/WfsCapabilities',
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',
@@ -417,9 +415,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               TiledImageLayer,
               TileFactory,
               TiltRecognizer,
-              TmsCapabilities,
-              TmsLayer,
-              TmsLayerCapabilities,
               Touch,
               TriangleMesh,
               UnsupportedOperationError,
@@ -428,6 +423,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ViewControlsLayer,
               ViewVolume,
               WcsTileUrlBuilder,
+              WfsCapabilities,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
@@ -793,9 +789,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['TiledImageLayer'] = TiledImageLayer;
         WorldWind['TileFactory'] = TileFactory;
         WorldWind['TiltRecognizer'] = TiltRecognizer;
-        WorldWind['TmsCapabilities'] = TmsCapabilities;
-        WorldWind['TmsLayer'] = TmsLayer;
-        WorldWind['TmsLayerCapabilities'] = TmsLayerCapabilities;
         WorldWind['Touch'] = Touch;
         WorldWind['TriangleMesh'] = TriangleMesh;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
@@ -803,6 +796,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
+        WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;

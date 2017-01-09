@@ -16,7 +16,6 @@ require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
         {layer: new WorldWind.BingAerialLayer(null), enabled: false},
         {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
         {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
-        {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
         {layer: new WorldWind.CompassLayer(), enabled: true},
         {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
         {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
