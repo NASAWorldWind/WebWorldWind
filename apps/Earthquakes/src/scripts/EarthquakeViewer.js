@@ -3,7 +3,7 @@
  */
 
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
         'http://worldwindserver.net/webworldwind/examples/LayerManager.js',
         'http://worldwindserver.net/webworldwind/examples/CoordinateController.js',
         'UGSDataRetriever', 'QueryParameterExtractor', 'EarthquakeViewLayer',

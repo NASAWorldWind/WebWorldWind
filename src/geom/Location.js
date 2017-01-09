@@ -244,7 +244,7 @@ define([
                 return 0;
             }
 
-            // "Haversine formula," taken from http://en.wikipedia.org/wiki/Great-circle_distance#Formul.C3.A6
+            // "Haversine formula," taken from https://en.wikipedia.org/wiki/Great-circle_distance#Formul.C3.A6
             a = Math.sin((lat2Radians - lat1Radians) / 2.0);
             b = Math.sin((lon2Radians - lon1Radians) / 2.0);
             c = a * a + Math.cos(lat1Radians) * Math.cos(lat2Radians) * b * b;

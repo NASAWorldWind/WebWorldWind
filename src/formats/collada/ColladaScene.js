@@ -588,9 +588,13 @@ define([
 
             this.applyMatrix(dc, hasLighting, hasTexture , nodeWorldMatrix, nodeNormalMatrix);
 
-            this.applyIndices(dc, buffers);
-
-            gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_SHORT, 0);
+            if (buffers.indexedRendering) {
+                this.applyIndices(dc, buffers);
+                gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_SHORT, 0);
+            }
+            else {
+                gl.drawArrays(gl.TRIANGLES, 0, Math.floor(buffers.vertices.length / 3));
+            }
 
             this.resetDraw(dc, hasLighting, hasTexture);
 
