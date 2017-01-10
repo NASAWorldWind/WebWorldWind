@@ -37,14 +37,15 @@ define([
             if (!bingMapsKey) {
                 this.bingMapsKey = WorldWind.BingMapsKey;
 
-                if (!bingMapsKey) {
+                if (!this.bingMapsKey) {
                     this.bingMapsKey = wwBingMapsKey;
                 }
-
-                if (bingMapsKey === wwBingMapsKey) {
-                    this.bingMapsKey = wwBingMapsKey;
-                    BingImageryUrlBuilder.showBingMapsKeyWarning();
-                }
+            } else {
+                this.bingMapsKey = bingMapsKey;
+            }
+                
+            if (this.bingMapsKey === wwBingMapsKey) {
+                BingImageryUrlBuilder.showBingMapsKeyWarning();
             }
 
             this.imagerySet = imagerySet;
