@@ -78,6 +78,7 @@ define([
                     }
                     this._boundaries = boundaries;
                     this.isPrepared = false;
+                    this.stateKeyInvalid = true;
                 }
             }
         });
