@@ -1,7 +1,10 @@
-/**
- * Created by Florin on 12/22/2016.
+/*
+ * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
  */
-
+/**
+ * @exports StarFieldLayer
+ */
 define([
         './Layer',
         '../geom/Matrix',
@@ -12,47 +15,100 @@ define([
               StarFieldProgram) {
         'use strict';
 
-        var StarFieldLayer = function () {
+        /**
+         * Constructs a layer showing bright stars visible from the Earth with the naked eye.
+         * @alias StarFieldLayer
+         * @constructor
+         * @classdesc Provides a layer showing bright stars visible from the Earth with the naked eye.
+         * @param {URL} starDataSource optional url for the stars data.
+         * @augments Layer
+         */
+        var StarFieldLayer = function (starDataSource) {
             Layer.call(this, 'StarField');
 
+            // The StarField Layer is not pickable.
             this.pickEnabled = false;
 
-            this._date = new Date();
-            this._positions = [];
+            //Documented in defineProperties below.
+            this._starDataSource = starDataSource ||
+                WorldWind.configuration.baseUrl + 'examples/data/stars.json';
+
+            //Internal use only.
+            //The MVP matrix of this layer.
             this._matrix = Matrix.fromIdentity();
+
+            //Internal use only.
+            //gpu cache key for this layer vbo.
             this._positionsVboCacheKey = null;
 
+            //Internal use only.
+            this._numStars = 0;
+
+            //Internal use only.
             this._starData = null;
+
+            //Internal use only.
+            //A flag to indicate the star data is currently being retrieved.
             this._loadStarted = false;
         };
 
         StarFieldLayer.prototype = Object.create(Layer.prototype);
 
         Object.defineProperties(StarFieldLayer.prototype, {
-            date: {
+            /**
+             * Url for the stars data.
+             * @memberof StarFieldLayer.prototype
+             * @type {URL}
+             */
+            starDataSource: {
                 get: function () {
-                    return this._date;
+                    return this._starDataSource;
                 },
                 set: function (value) {
-                    this._date = value;
+                    this._starDataSource = value;
+                    this.invalidateStarData();
                 }
             }
         });
 
+        // Documented in superclass.
         StarFieldLayer.prototype.doRender = function (dc) {
+            if (dc.globe.is2D()) {
+                return;
+            }
+
             if (!this._starData) {
                 this.fetchStarData();
                 return;
             }
 
-            if (!this._positions.length) {
-                this.createGeometry(dc);
+            this.beginRendering(dc);
+            try {
+                this.doDraw(dc);
             }
+            finally {
+                this.endRendering(dc);
+            }
+        };
 
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.beginRendering = function (dc) {
             dc.findAndBindProgram(StarFieldProgram);
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.doDraw = function (dc) {
+            var gl = dc.currentGlContext;
+            this.loadUniforms(dc);
+            this.loadAttributes(dc);
+            gl.depthMask(false);
+            gl.drawArrays(gl.POINTS, 0, this._numStars);
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.loadUniforms = function (dc) {
             var gl = dc.currentGlContext;
             var program = dc.currentProgram;
-            var gpuResourceCache = dc.gpuResourceCache;
 
             //multiplyByScale is necessary until the new camera implementation with the infinite projection matrix
             var eyePoint = dc.navigatorState.eyePoint;
@@ -62,21 +118,29 @@ define([
             this._matrix.multiplyByScale(altitude, altitude, altitude);
             program.loadModelviewProjection(gl, this._matrix);
 
-            var JD = this.julianDate(this._date);
+            var JD = this.julianDate(this.time);
             //this subtraction does not work properly on the GPU, it must be done on the CPU
             //possibly due to precision loss
             //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
-            program.loadJD(gl, JD - 2451545.0);
+            program.loadNumDays(gl, JD - 2451545.0);
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.loadAttributes = function (dc) {
+            var gl = dc.currentGlContext;
+            var gpuResourceCache = dc.gpuResourceCache;
 
             if (!this._positionsVboCacheKey) {
-                this._positionsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
+                this._positionsVboCacheKey = gpuResourceCache.generateCacheKey();
             }
             var vboId = gpuResourceCache.resourceForKey(this._positionsVboCacheKey);
             if (!vboId) {
                 vboId = gl.createBuffer();
-                gpuResourceCache.putResource(this._positionsVboCacheKey, vboId, this._positions.length * 4);
+                var positions = this.createGeometry();
+                gpuResourceCache.putResource(this._positionsVboCacheKey, vboId, positions.length * 4);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._positions), gl.STATIC_DRAW);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+                this._numStars = Math.floor(positions.length / 4);
             }
             else {
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
@@ -85,14 +149,16 @@ define([
 
             gl.enableVertexAttribArray(0);
             gl.vertexAttribPointer(0, 4, gl.FLOAT, false, 0, 0);
-
-            gl.depthMask(false);
-
-            gl.drawArrays(gl.POINTS, 0, Math.floor(this._positions.length / 4));
-
-            gl.depthMask(true);
         };
 
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.endRendering = function (dc) {
+            var gl = dc.currentGlContext;
+            gl.depthMask(true);
+            gl.disableVertexAttribArray(0);
+        };
+
+        // Internal. Intentionally not documented.
         StarFieldLayer.prototype.fetchStarData = function () {
             if (this._loadStarted) {
                 return;
@@ -124,26 +190,30 @@ define([
                 self._loadStarted = false;
             };
 
-            xhr.open('GET', './data/stars.json', true);
+            xhr.open('GET', this._starDataSource, true);
             xhr.send();
         };
 
+        // Internal. Intentionally not documented.
         StarFieldLayer.prototype.createGeometry = function () {
             var data = this._starData.data;
+            var positions = [];
             for (var i = 0, len = data.length; i < len; i++) {
                 var starInfo = data[i];
-                var dec = starInfo[2]; //for latitude
-                var ra = starInfo[1]; //for longitude
-                var mag = starInfo[3];
-                var pSize = mag < 4 ? 2 : 1;
-                this._positions.push(dec, ra, pSize, mag);
+                var declination = starInfo[2]; //for latitude
+                var rightAscension = starInfo[1]; //for longitude
+                var magnitude = starInfo[3];
+                var pointSize = magnitude < 4 ? 2 : 1;
+                positions.push(declination, rightAscension, pointSize, magnitude);
             }
+            return positions;
         };
 
+        // Internal. Intentionally not documented.
         StarFieldLayer.prototype.julianDate = function julianDate(date) {
             //http://quasar.as.utexas.edu/BillInfo/JulianDatesG.html
 
-            //date = date || new Date();
+            date = date || new Date();
             var year = date.getUTCFullYear();
             var month = date.getUTCMonth() + 1;
             var day = date.getUTCDate();
@@ -164,6 +234,12 @@ define([
 
             return JD0h + dayFraction;
 
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.invalidateStarData = function (){
+            this._starData = null;
+            this._positionsVboCacheKey = null;
         };
 
         return StarFieldLayer;

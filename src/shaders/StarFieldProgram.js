@@ -3,17 +3,14 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @exports BasicProgram
- * @version $Id: BasicProgram.js 3327 2015-07-21 19:03:39Z dcollins $
+ * @exports StarFieldProgram
  */
 define([
         '../error/ArgumentError',
-        '../util/Color',
         '../shaders/GpuProgram',
         '../util/Logger'
     ],
     function (ArgumentError,
-              Color,
               GpuProgram,
               Logger) {
         "use strict";
@@ -22,48 +19,39 @@ define([
          * Constructs a new program.
          * Initializes, compiles and links this GLSL program with the source code for its vertex and fragment shaders.
          * <p>
-         * This method creates WebGL shaders for the program's shader sources and attaches them to a new GLSL program. This
-         * method then compiles the shaders and then links the program if compilation is successful. Use the bind method to make the
-         * program current during rendering.
+         * This method creates WebGL shaders for the program's shader sources and attaches them to a new GLSL program.
+         * This method then compiles the shaders and then links the program if compilation is successful.
+         * Use the bind method to make the program current during rendering.
          *
-         * @alias BasicProgram
+         * @alias StarFieldProgram
          * @constructor
          * @augments GpuProgram
-         * @classdesc BasicProgram is a GLSL program that draws geometry in a solid color.
+         * @classdesc StarFieldProgram is a GLSL program that draws points representing stars.
          * @param {WebGLRenderingContext} gl The current WebGL context.
-         * @throws {ArgumentError} If the shaders cannot be compiled, or linking of
-         * the compiled shaders into a program fails.
+         * @throws {ArgumentError} If the shaders cannot be compiled, or linking of the compiled shaders into a program
+         * fails.
          */
         var StarFieldProgram = function (gl) {
             var vertexShaderSource =
                     'attribute vec4 vertexPoint;\n' +
 
                     'uniform mat4 mvpMatrix;\n' +
-                    'uniform float JD;\n' +
+                    'uniform float numDays;\n' +
 
                     'varying float mag;\n' +
-
-                    'const float altitude = 1.0;\n' + //67310000.0
 
                     'float normalizeAngle(float angle) {\n' +
                     '   float angleDivisions = angle / 360.0;\n' +
                     '   return 360.0 * (angleDivisions - floor(angleDivisions));\n' +
                     '}\n' +
 
-                    'float normalizedDegreesLongitude(float angle) {\n' +
-                    '   float na = angle + 179.0;\n' +
-                    '   return mod((mod(na, 360.0) + 360.0), 360.0) - 179.0;\n' +
-                    '}\n' +
-
                     'vec3 computePosition(float dec, float ra) {\n' +
-                    //'   float n = JD - 2451545.0;\n' +
-                    '   float GMST = normalizeAngle(280.46061837 + 360.98564736629 * JD);\n' +
+                    '   float GMST = normalizeAngle(280.46061837 + 360.98564736629 * numDays);\n' +
                     '   float lon = 180.0 - normalizeAngle(GMST - ra);\n' +
-                    //'   lon = normalizedDegreesLongitude(lon);\n' +
                     '   float latRad = radians(dec);\n' +
                     '   float lonRad = radians(lon);\n' +
-                    '   float radCosLat = altitude * cos(latRad);\n' +
-                    '   return vec3(radCosLat * sin(lonRad), altitude * sin(latRad), radCosLat * cos(lonRad));\n' +
+                    '   float radCosLat = cos(latRad);\n' +
+                    '   return vec3(radCosLat * sin(lonRad), sin(latRad), radCosLat * cos(lonRad));\n' +
                     '}\n' +
 
                     'void main() {\n' +
@@ -83,11 +71,10 @@ define([
 
                     'void main() {\n' +
                     '   gl_FragColor = mix(white, grey, mag);\n' + //doesn't appear to be correct
-                    //'   gl_FragColor = white;\n' +
                     '}';
 
             // Call to the superclass, which performs shader program compiling and linking.
-            GpuProgram.call(this, gl, vertexShaderSource, fragmentShaderSource, ['vertexPoint']);
+            GpuProgram.call(this, gl, vertexShaderSource, fragmentShaderSource, ["vertexPoint"]);
 
             /**
              * The WebGL location for this program's 'vertexPoint' attribute.
@@ -103,7 +90,12 @@ define([
              */
             this.mvpMatrixLocation = this.uniformLocation(gl, "mvpMatrix");
 
-            this.JDLocation = this.uniformLocation(gl, "JD");
+            /**
+             * The WebGL location for this program's 'numDays' uniform.
+             * @type {WebGLUniformLocation}
+             * @readonly
+             */
+            this.numDaysLocation = this.uniformLocation(gl, "numDays");
         };
 
         /**
@@ -132,8 +124,20 @@ define([
             this.loadUniformMatrix(gl, matrix, this.mvpMatrixLocation);
         };
 
-        StarFieldProgram.prototype.loadJD = function(gl, JD){
-            gl.uniform1f(this.JDLocation, JD);
+        /**
+         * Loads the specified number as the value of this program's 'numDays' uniform variable.
+         *
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @param {Number} numDays The number of days (positive or negative) since Greenwich noon, Terrestrial Time,
+         * on 1 January 2000 (J2000.0)
+         * @throws {ArgumentError} If the specified number is null or undefined.
+         */
+        StarFieldProgram.prototype.loadNumDays = function (gl, numDays) {
+            if (!numDays) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "StarFieldProgram", "loadNumDays", "missingNumDays"));
+            }
+            gl.uniform1f(this.numDaysLocation, numDays);
         };
 
         return StarFieldProgram;

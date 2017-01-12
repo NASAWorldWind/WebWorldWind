@@ -2,9 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: BasicExample.js 3320 2015-07-15 20:53:05Z dcollins $
- */
 
 requirejs([
         '../src/WorldWind',
@@ -25,16 +22,14 @@ requirejs([
         var starFieldLayer = new WorldWind.StarFieldLayer();
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(BMNGLayer);
-
         wwd.addLayer(atmosphereLayer);
         wwd.addLayer(starFieldLayer);
-
 
         atmosphereLayer.lightLocation = sunCalculator(new Date());
         var layerManger = new LayerManager(wwd);
         wwd.redraw();
 
-        wwd._redrawCallbacks.push(runSunSimulation1);
+        wwd._redrawCallbacks.push(runSunSimulation);
 
         var sunSimulationCheckBox = document.getElementById('sun-simulation');
         var doRunSimulation = false;
@@ -48,17 +43,17 @@ requirejs([
             if (!doRunSimulation) {
                 var date = new Date();
                 atmosphereLayer.lightLocation = sunCalculator(date);
-                starFieldLayer.date = date;
+                starFieldLayer.time = date;
             }
             wwd.redraw();
         }
 
-        function runSunSimulation1(wwd, stage) {
+        function runSunSimulation(wwd, stage) {
             if (stage === WorldWind.AFTER_REDRAW && doRunSimulation) {
                 timeStamp += (factor * 60 * 1000);
                 var date = new Date(timeStamp);
                 atmosphereLayer.lightLocation = sunCalculator(date);
-                starFieldLayer.date = date;
+                starFieldLayer.time = date;
                 wwd.redraw();
             }
         }
