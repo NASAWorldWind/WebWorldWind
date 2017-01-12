@@ -33,18 +33,27 @@ define([
          */
         var StarFieldProgram = function (gl) {
             var vertexShaderSource =
+                    //.x = declination
+                    //.y = right ascension
+                    //.z = point size
+                    //.w = magnitude
                     'attribute vec4 vertexPoint;\n' +
 
                     'uniform mat4 mvpMatrix;\n' +
+                    //number of days (positive or negative) since Greenwich noon, Terrestrial Time,
+                    // on 1 January 2000 (J2000.0)
                     'uniform float numDays;\n' +
+                    'uniform vec2 magnitudeRange;\n' +
 
-                    'varying float mag;\n' +
+                    'varying float magnitudeWeight;\n' +
 
+                    //normalizes an angle between 0.0 and 359.0
                     'float normalizeAngle(float angle) {\n' +
                     '   float angleDivisions = angle / 360.0;\n' +
                     '   return 360.0 * (angleDivisions - floor(angleDivisions));\n' +
                     '}\n' +
 
+                    //transforms declination and right ascension in cartesian coordinates
                     'vec3 computePosition(float dec, float ra) {\n' +
                     '   float GMST = normalizeAngle(280.46061837 + 360.98564736629 * numDays);\n' +
                     '   float lon = 180.0 - normalizeAngle(GMST - ra);\n' +
@@ -54,23 +63,30 @@ define([
                     '   return vec3(radCosLat * sin(lonRad), sin(latRad), radCosLat * cos(lonRad));\n' +
                     '}\n' +
 
+                    //normalizes a value between 0.0 and 1.0
+                    'float normalizeScalar(float value, float minValue, float maxValue){\n' +
+                    '   return (value - minValue) / (maxValue - minValue);\n' +
+                    '}\n' +
+
                     'void main() {\n' +
                     '   vec3 vertexPosition = computePosition(vertexPoint.x, vertexPoint.y);\n' +
                     '   gl_Position = mvpMatrix * vec4(vertexPosition.xyz, 1.0);\n' +
                     '   gl_Position.z = gl_Position.w - 0.00001;\n' +
                     '   gl_PointSize = vertexPoint.z;\n' +
-                    '   mag = vertexPoint.w;\n' +
+                    '   magnitudeWeight = normalizeScalar(vertexPoint.w, magnitudeRange.x, magnitudeRange.y);\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
 
-                    'varying float mag;\n' +
+                    'varying float magnitudeWeight;\n' +
 
                     'const vec4 white = vec4(1.0, 1.0, 1.0, 1.0);\n' +
-                    'const vec4 grey = vec4(0.93, 0.93, 0.93, 1.0);\n' +
+                    'const vec4 grey = vec4(0.5, 0.5, 0.5, 1.0);\n' +
 
                     'void main() {\n' +
-                    '   gl_FragColor = mix(white, grey, mag);\n' + //doesn't appear to be correct
+                    //paint the starts in shades of grey
+                    //the brightest star is white and the dimmest star is grey
+                    '   gl_FragColor = mix(white, grey, magnitudeWeight);\n' +
                     '}';
 
             // Call to the superclass, which performs shader program compiling and linking.
@@ -96,6 +112,13 @@ define([
              * @readonly
              */
             this.numDaysLocation = this.uniformLocation(gl, "numDays");
+
+            /**
+             * The WebGL location for this program's 'magnitudeRangeLocation' uniform.
+             * @type {WebGLUniformLocation}
+             * @readonly
+             */
+            this.magnitudeRangeLocation = this.uniformLocation(gl, "magnitudeRange");
         };
 
         /**
@@ -133,11 +156,31 @@ define([
          * @throws {ArgumentError} If the specified number is null or undefined.
          */
         StarFieldProgram.prototype.loadNumDays = function (gl, numDays) {
-            if (!numDays) {
+            if (numDays == null) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "StarFieldProgram", "loadNumDays", "missingNumDays"));
             }
             gl.uniform1f(this.numDaysLocation, numDays);
+        };
+
+        /**
+         * Loads the specified number as the value of this program's 'numDays' uniform variable.
+         *
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @param {Number} minMag
+         * @param {Number} maxMag
+         * @throws {ArgumentError} If the specified numbers are null or undefined.
+         */
+        StarFieldProgram.prototype.loadMagnitudeRange = function (gl, minMag, maxMag) {
+            if (minMag == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "StarFieldProgram", "loadMagRange", "missingMinMag"));
+            }
+            if (maxMag == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "StarFieldProgram", "loadMagRange", "missingMaxMag"));
+            }
+            gl.uniform2f(this.magnitudeRangeLocation, minMag, maxMag);
         };
 
         return StarFieldProgram;

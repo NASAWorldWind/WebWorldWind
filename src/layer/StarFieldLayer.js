@@ -7,10 +7,12 @@
  */
 define([
         './Layer',
+        '../util/Logger',
         '../geom/Matrix',
         '../shaders/StarFieldProgram'
     ],
     function (Layer,
+              Logger,
               Matrix,
               StarFieldProgram) {
         'use strict';
@@ -46,6 +48,10 @@ define([
 
             //Internal use only.
             this._starData = null;
+
+            //Internal use only.
+            this._minMagnitude = Number.MAX_VALUE;
+            this._maxMagnitude = Number.MIN_VALUE;
 
             //Internal use only.
             //A flag to indicate the star data is currently being retrieved.
@@ -110,7 +116,6 @@ define([
             var gl = dc.currentGlContext;
             var program = dc.currentProgram;
 
-            //multiplyByScale is necessary until the new camera implementation with the infinite projection matrix
             var eyePoint = dc.navigatorState.eyePoint;
             var position = dc.globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], {});
             var altitude = position.altitude * 1.5;
@@ -118,11 +123,14 @@ define([
             this._matrix.multiplyByScale(altitude, altitude, altitude);
             program.loadModelviewProjection(gl, this._matrix);
 
+            //todo: these uniforms could be loaded in the call with gl.uniform3f as a vec3
             var JD = this.julianDate(this.time);
             //this subtraction does not work properly on the GPU, it must be done on the CPU
             //possibly due to precision loss
             //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
             program.loadNumDays(gl, JD - 2451545.0);
+
+            program.loadMagnitudeRange(gl, this._minMagnitude, this._maxMagnitude);
         };
 
         // Internal. Intentionally not documented.
@@ -174,19 +182,20 @@ define([
                         self._starData = JSON.parse(this.response);
                     }
                     catch (e) {
-                        console.error('StarFieldLayer unable to parse JSON for star data', e);
+                        Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to parse JSON for star data' +
+                            e.toString());
                     }
                 }
                 self._loadStarted = false;
             };
 
             xhr.onerror = function (e) {
-                console.error('StarFieldLayer unable to fetch star data', e);
+                Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to fetch star data' + e.toString());
                 self._loadStarted = false;
             };
 
             xhr.ontimeout = function () {
-                console.error('StarFieldLayer fetch star data timeout');
+                Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer fetch star data has timeout');
                 self._loadStarted = false;
             };
 
@@ -198,14 +207,23 @@ define([
         StarFieldLayer.prototype.createGeometry = function () {
             var data = this._starData.data;
             var positions = [];
+
+            this._minMagnitude = Number.MAX_VALUE;
+            this._maxMagnitude = Number.MIN_VALUE;
+
             for (var i = 0, len = data.length; i < len; i++) {
                 var starInfo = data[i];
                 var declination = starInfo[2]; //for latitude
                 var rightAscension = starInfo[1]; //for longitude
                 var magnitude = starInfo[3];
                 var pointSize = magnitude < 4 ? 2 : 1;
+
                 positions.push(declination, rightAscension, pointSize, magnitude);
+
+                this._minMagnitude = Math.min(this._minMagnitude, magnitude);
+                this._maxMagnitude = Math.max(this._maxMagnitude, magnitude);
             }
+
             return positions;
         };
 
