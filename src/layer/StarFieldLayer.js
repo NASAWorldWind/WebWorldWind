@@ -105,8 +105,8 @@ define([
         // Internal. Intentionally not documented.
         StarFieldLayer.prototype.doDraw = function (dc) {
             var gl = dc.currentGlContext;
-            this.loadUniforms(dc);
             this.loadAttributes(dc);
+            this.loadUniforms(dc);
             gl.depthMask(false);
             gl.drawArrays(gl.POINTS, 0, this._numStars);
         };
@@ -148,7 +148,6 @@ define([
                 gpuResourceCache.putResource(this._positionsVboCacheKey, vboId, positions.length * 4);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-                this._numStars = Math.floor(positions.length / 4);
             }
             else {
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
@@ -223,6 +222,7 @@ define([
                 this._minMagnitude = Math.min(this._minMagnitude, magnitude);
                 this._maxMagnitude = Math.max(this._maxMagnitude, magnitude);
             }
+            this._numStars = Math.floor(positions.length / 4);
 
             return positions;
         };

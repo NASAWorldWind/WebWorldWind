@@ -84,8 +84,7 @@ define([
                     'const vec4 grey = vec4(0.5, 0.5, 0.5, 1.0);\n' +
 
                     'void main() {\n' +
-                    //paint the starts in shades of grey
-                    //the brightest star is white and the dimmest star is grey
+                    //paint the starts in shades of grey, where the brightest star is white and the dimmest star is grey
                     '   gl_FragColor = mix(white, grey, magnitudeWeight);\n' +
                     '}';
 
