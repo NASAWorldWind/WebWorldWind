@@ -33,7 +33,7 @@ requirejs([
         /*                              Create a layer from capabilities document                             */
         {
             // Fetch capabilities document
-            $.get('http://mrdata.usgs.gov/mapcache/tms/1.0.0/', function (response) {
+            $.get('https://mrdata.usgs.gov/mapcache/tms/1.0.0/', function (response) {
                 // Parse first capabilities
                 TmsCapabilities = new WorldWind.TmsCapabilities(response);
             })
