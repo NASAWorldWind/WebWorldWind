@@ -37,6 +37,16 @@ requirejs(['../src/navigate/CameraController',
             wwd.addLayer(layers[l].layer);
         }
 
+        var modelLayer = new WorldWind.RenderableLayer("model");
+        wwd.addLayer(modelLayer);
+        var position = new WorldWind.Position(45, -100, 1000e3);
+        var colladaLoader = new WorldWind.ColladaLoader(position);
+        colladaLoader.init({dirPath: './collada_models/sentinel1Reduced/'});
+        colladaLoader.load('Sentinel_1_07.01.2016.dae', function (scene) {
+            scene.scale = 500000;
+            modelLayer.addRenderable(scene);
+        });
+
         var polygonsLayer = new WorldWind.RenderableLayer();
         polygonsLayer.displayName = "Polygons";
         wwd.addLayer(polygonsLayer);
@@ -115,6 +125,4 @@ requirejs(['../src/navigate/CameraController',
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
-
-        wwd.goTo(new Position(45, 10));
     });

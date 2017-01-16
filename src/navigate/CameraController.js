@@ -162,6 +162,7 @@ define([
             ty = recognizer.translationY;
 
         if (state == WorldWind.BEGAN) {
+            this.gestureDidBegin();
             this.lastPoint.set(0, 0);
         } else if (state == WorldWind.CHANGED) {
             // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
@@ -215,6 +216,7 @@ define([
             ty = recognizer.translationY;
 
         if (state == WorldWind.BEGAN) {
+            this.gestureDidBegin();
             this.beginPoint.set(x, y);
             this.lastPoint.set(x, y);
         } else if (state == WorldWind.CHANGED) {
@@ -273,6 +275,7 @@ define([
             ty = recognizer.translationY;
 
         if (state == WorldWind.BEGAN) {
+            this.gestureDidBegin();
             this.beginHeading = this.camera.heading;
             this.beginTilt = this.camera.tilt;
         } else if (state == WorldWind.CHANGED) {
@@ -364,6 +367,8 @@ define([
         } else if (event.deltaMode == WheelEvent.DOM_DELTA_PAGE) {
             normalizedDelta = event.deltaY * 400;
         }
+
+        this.gestureDidBegin();
 
         // Compute a zoom scale factor by adding a fraction of the normalized delta to 1. When multiplied by the
         // navigator's range, this has the effect of zooming out or zooming in depending on whether the delta is

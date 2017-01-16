@@ -161,6 +161,8 @@ define([
             ty = recognizer.translationY;
 
         if (state == WorldWind.BEGAN) {
+            this.worldWindow.navigator.getAsLookAt(this.worldWindow.globe, this.lookAt);
+
             this.lastPoint.set(0, 0);
         } else if (state == WorldWind.CHANGED) {
             // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
@@ -198,6 +200,8 @@ define([
             ty = recognizer.translationY;
 
         if (state == WorldWind.BEGAN) {
+            this.worldWindow.navigator.getAsLookAt(this.worldWindow.globe, this.lookAt);
+
             this.beginPoint.set(x, y);
             this.lastPoint.set(x, y);
         } else if (state == WorldWind.CHANGED) {
@@ -243,7 +247,6 @@ define([
             this.lookAt.tilt = params.tilt;
             this.lookAt.roll = params.roll;
             this.applyLimits();
-            this.wwd.navigator.setAsLookAt(this.wwd.globe, this.lookAt);
             this.worldWindow.navigator.setAsLookAt(this.worldWindow.globe, this.lookAt);
             this.worldWindow.redraw();
         }
@@ -254,6 +257,8 @@ define([
         var state = recognizer.state,
             tx = recognizer.translationX,
             ty = recognizer.translationY;
+
+        this.worldWindow.navigator.getAsLookAt(this.worldWindow.globe, this.lookAt);
 
         if (state == WorldWind.BEGAN) {
             this.beginHeading = this.lookAt.heading;
@@ -279,6 +284,8 @@ define([
             scale = recognizer.scale;
 
         if (state == WorldWind.BEGAN) {
+            this.worldWindow.navigator.getAsLookAt(this.worldWindow.globe, this.lookAt);
+
             this.beginRange = this.lookAt.range;
         } else if (state == WorldWind.CHANGED) {
             if (scale != 0) {
@@ -298,6 +305,8 @@ define([
             rotation = recognizer.rotation;
 
         if (state == WorldWind.BEGAN) {
+            this.worldWindow.navigator.getAsLookAt(this.worldWindow.globe, this.lookAt);
+
             this.lastRotation = 0;
         } else if (state == WorldWind.CHANGED) {
             // Apply the change in gesture rotation to this navigator's current heading. We apply relative to the
@@ -317,6 +326,8 @@ define([
             ty = recognizer.translationY;
 
         if (state == WorldWind.BEGAN) {
+            this.worldWindow.navigator.getAsLookAt(this.worldWindow.globe, this.lookAt);
+
             this.beginTilt = this.lookAt.tilt;
         } else if (state == WorldWind.CHANGED) {
             // Compute the gesture translation from screen coordinates to degrees. Use the canvas dimensions as a
@@ -334,6 +345,8 @@ define([
     WorldWindowController.prototype.handleWheelEvent = function (event) {
         // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
         // browsers and input devices.
+        this.worldWindow.navigator.getAsLookAt(this.worldWindow.globe, this.lookAt);
+
         var normalizedDelta;
         if (event.deltaMode == WheelEvent.DOM_DELTA_PIXEL) {
             normalizedDelta = event.deltaY;
