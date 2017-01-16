@@ -12,6 +12,8 @@ requirejs(['../../src/WorldWind',
               LayerManager) {
         "use strict";
 
+        ww.configuration.baseUrl += "../";
+
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");

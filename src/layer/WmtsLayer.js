@@ -151,7 +151,28 @@ define([
                         "No EPSG:4326 bounding box was specified in the layer or tile matrix set capabilities."));
             }
 
+            // Check if tile subdivision is valid
+            var tileMatrix = config.tileMatrixSet.tileMatrix,
+                widthArray = [],
+                heightArray = [],
+                invalidLevel;
 
+            tileMatrix.forEach(function(matrix) {
+                widthArray.push(matrix.matrixWidth);
+                heightArray.push(matrix.matrixHeight);
+            });
+
+            if (WmtsLayer.checkTileSubdivision(widthArray) !== 0) {
+                invalidLevel = WmtsLayer.checkTileSubdivision(widthArray);
+                Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
+                    "Tile subdivision not supported for layer : "+config.identifier+". Display until level "+(invalidLevel-1));
+                tileMatrix.splice(invalidLevel);
+            } else if (WmtsLayer.checkTileSubdivision(heightArray) !== 0) {
+                invalidLevel = WmtsLayer.checkTileSubdivision(heightArray);
+                Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
+                    "Tile subdivision not supported for layer : "+config.identifier+". Display until level "+(invalidLevel-1));
+               tileMatrix.splice(invalidLevel);
+            }
 
             // Form a unique string to identify cache entries.
             this.cachePath = (this.resourceUrl || this.serviceUrl) +
@@ -184,6 +205,35 @@ define([
              * @default 1.75
              */
             this.detailControl = 1.75;
+        };
+
+        WmtsLayer.checkTileSubdivision = function(dimensionArray) {
+            if (dimensionArray.length < 1) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "checkTileSubdivision",
+                        "Empty dimension array"));
+            }
+
+            var ratio,
+                invalidLevel = 0,
+                i = 0;
+
+            while (++i < dimensionArray.length && invalidLevel == 0) {
+                var newRatio = dimensionArray[i]/dimensionArray[i-1];
+
+                // If the ratio is not an integer, the level is invalid
+                if ((dimensionArray[i] % dimensionArray[i-1]) !== 0) {
+                    invalidLevel = i;
+                }
+                // If ratios are different, the level is invalid
+                else if (ratio && (ratio !== newRatio)) {
+                    invalidLevel = i;
+                }
+                ratio = newRatio;
+            }
+
+            // Tile subdivision is valid when invalidLevel == 0
+            return invalidLevel;
         };
 
 
@@ -737,7 +787,6 @@ define([
             } else if (WmtsLayer.isEpsg3857Crs(this.tileMatrixSet.supportedCRS)) {
                 return this.createTile3857(tileMatrix, row, column);
             }
-            //TODO
             else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
                 return this.createTileCrs84(tileMatrix, row, column);
             }
@@ -745,9 +794,8 @@ define([
         };
 
 
-        // TODO
         WmtsLayer.prototype.createTileCrs84 = function (tileMatrix, row, column) {
-            var tileDeltaLat = this.sector.deltaLatitude() / tileMatrix.matrixHeight, // TODO: calculate from metadata
+            var tileDeltaLat = this.sector.deltaLatitude() / tileMatrix.matrixHeight,
                 tileDeltaLon = this.sector.deltaLongitude() / tileMatrix.matrixWidth,
                 maxLat = tileMatrix.topLeftCorner[1] - row * tileDeltaLat,
                 minLat = maxLat - tileDeltaLat,
@@ -761,7 +809,7 @@ define([
 
 
         WmtsLayer.prototype.createTile4326 = function (tileMatrix, row, column) {
-            var tileDeltaLat = this.sector.deltaLatitude() / tileMatrix.matrixHeight, // TODO: calculate from metadata
+            var tileDeltaLat = this.sector.deltaLatitude() / tileMatrix.matrixHeight,
                 tileDeltaLon = this.sector.deltaLongitude() / tileMatrix.matrixWidth,
                 maxLat = tileMatrix.topLeftCorner[0] - row * tileDeltaLat,
                 minLat = maxLat - tileDeltaLat,
@@ -828,7 +876,6 @@ define([
             } else if (WmtsLayer.isEpsg3857Crs(this.tileMatrixSet.supportedCRS)) {
                 return this.createTexture3857(dc, tile, image);
             }
-            // TODO
             else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
                 return new Texture(dc.currentGlContext, image);
             }
@@ -896,8 +943,6 @@ define([
                 && ((crs.indexOf("3857") >= 0) || (crs.indexOf("900913") >= 0)); // 900913 is google's 3857 alias
         };
 
-
-        //TODO
         WmtsLayer.isOGCCrs84 = function (crs) {
             return (crs.indexOf("OGC") >= 0) && (crs.indexOf("CRS84") >= 0);
         };
