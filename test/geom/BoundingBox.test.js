@@ -31,19 +31,22 @@ define([
         });
 
         describe("Set to points method", function () {
-            var boundingBox = new BoundingBox();
+
             it("Sets this bounding box such that it minimally encloses a specified collection of points", function () {
+                var boundingBox = new BoundingBox();
                 var samplePoints = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]);
                 expect(boundingBox.setToPoints(samplePoints).radius).toEqual(1.0606601717798212);
             });
 
-            it("Should throw an exception because of the wrong input", function () {
-                //less than 3 points provided
+            it("Should throw an exception because only two points provided", function () {
+                var boundingBox = new BoundingBox();
                 expect(function () {
                     boundingBox.setToPoints(new Float32Array(2))
                 }).toThrow();
+            });
 
-                //no points provided
+            it("Should throw an exception because of the wrong input", function () {    //no points provided
+                var boundingBox = new BoundingBox();
                 expect(function () {
                     boundingBox.setToPoints(null)
                 }).toThrow();
@@ -52,20 +55,22 @@ define([
         });
 
         describe("Set to sector method", function () {
-            var boundingBox = new BoundingBox();
+
             it("Sets this bounding box to contain a specified sector with min and max elevation", function () {
+                var boundingBox = new BoundingBox();
                 var globe = new Globe(new EarthElevationModel());
                 var sector = new Sector(-90, 90, -180, 180);
                 expect(boundingBox.setToSector(sector, globe, 10, 1000).radius).toEqual(9006353.499282671);
             });
 
-            it("Should throw an exception because of missing inputs", function () {
-                //no globe provided
+            it("Should throw an exception because no globe is provided", function () {
+                var boundingBox = new BoundingBox();
                 expect(function () {
                     boundingBox.setToSector(sector, null, 10, 1000)
                 }).toThrow();
+            });
 
-                //no sector provided
+            it("Should throw an exception because no sector is provided", function () {
                 expect(function () {
                     boundingBox.setToSector(null, globe, 10, 1000)
                 }).toThrow();
@@ -73,9 +78,9 @@ define([
         });
 
         describe("Translates this bounding box by a specified translation vector", function () {
-            var boundingBox = new BoundingBox();
 
             it("Should return the translated bounding box", function () {
+                var boundingBox = new BoundingBox();
                 boundingBox.translate(new Vec3(1, 2, 3));
                 expect(boundingBox.center).toEqual(new Vec3(1, 2, 3));
                 expect(boundingBox.bottomCenter).toEqual(new Vec3(0.5, 2, 3));
@@ -83,6 +88,7 @@ define([
             });
 
             it("Should throw an error on null vector", function () {
+                var boundingBox = new BoundingBox();
                 expect(function () {
                     boundingBox.translate(null)
                 }).toThrow();
@@ -90,14 +96,15 @@ define([
         });
 
         describe("Computes the approximate distance between this bounding box and a specified point", function () {
-            var boundingBox = new BoundingBox();
 
             it("Should return the correct distance", function () {
+                var boundingBox = new BoundingBox();
                 var point = new Vec3(3, 2, 5);
                 expect(boundingBox.distanceTo(point)).toBeCloseTo(4.432, 3);
             });
 
             it("Should throw an error on null point", function () {
+                var boundingBox = new BoundingBox();
                 expect(function () {
                     boundingBox.distanceTo(null)
                 }).toThrow();
@@ -105,14 +112,15 @@ define([
         });
 
         describe("Computes the effective radius of this bounding box relative to a specified plane", function () {
-            var boundingBox = new BoundingBox();
 
             it("Should return the correct radius", function () {
+                var boundingBox = new BoundingBox();
                 var plane = {normal: new Vec3(1, 2, 3)};
                 expect(boundingBox.effectiveRadius(plane)).toEqual(3);
             });
 
             it("Should throw an error on null plane", function () {
+                var boundingBox = new BoundingBox();
                 expect(function () {
                     boundingBox.effectiveRadius(null)
                 }).toThrow();
@@ -140,7 +148,7 @@ define([
 
             it("Should return a positive intersection", function () {
                 var p = new Plane(0.8, -0.5, 0.3, 10000000);
-                var frustum = {near: p,far:p,top:p,left:p,right:p,bottom:p};
+                var frustum = {near: p, far: p, top: p, left: p, right: p, bottom: p};
                 expect(boundingBox.intersectsFrustum(frustum)).toEqual(true);
             });
 

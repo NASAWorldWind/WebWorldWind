@@ -9,98 +9,153 @@ define([
 
     describe("AngleTest", function () {
 
-        it("Normalizes a specified value to be within the range of [-180, 180] degrees", function () {
-            //expected values
-            var normalized = Angle.normalizedDegrees(190);
-            expect(normalized).toEqual(-170);
+        describe("Normalizes a value in the range of [-180, 180] degrees", function () {
 
-            normalized = Angle.normalizedDegrees(360);
-            expect(normalized).toEqual(0);
+            it("Normalizes an angle", function () {
+                var normalized = Angle.normalizedDegrees(190);
+                expect(normalized).toEqual(-170);
+            });
 
-            //undefined or NaN testing
-            normalized = Angle.normalizedDegrees(undefined);
-            expect(normalized).toEqual(NaN);
+            it("Normalizes a full angle", function () {
+                var normalized = Angle.normalizedDegrees(360);
+                expect(normalized).toEqual(0);
+            });
 
-            normalized = Angle.normalizedDegrees(NaN);
-            expect(normalized).toEqual(NaN);
+            it("Normalizes an undefined angle", function () {
+                var normalized = Angle.normalizedDegrees(undefined);
+                expect(normalized).toEqual(NaN);
+            });
+
+            it("Normalizes a NaN", function () {
+                var normalized = Angle.normalizedDegrees(NaN);
+                expect(normalized).toEqual(NaN);
+            });
         });
 
-        it("Normalizes a specified value to be within the range of [-90, 90] degrees", function () {
-            var normalized = Angle.normalizedDegreesLatitude(190);
-            expect(normalized).toEqual(10);
+        describe("Normalizes a Latitude value in the range of [-90, 90] degrees", function () {
 
-            normalized = Angle.normalizedDegreesLatitude(-91);
-            expect(normalized).toEqual(-89);
+            it("Normalizes a positive angle", function () {
+                var normalized = Angle.normalizedDegreesLatitude(190);
+                expect(normalized).toEqual(10);
+            });
 
-            normalized = Angle.normalizedDegreesLatitude(360);
-            expect(normalized).toEqual(0);
+            it("Normalizes a negative angle", function () {
+                var normalized = Angle.normalizedDegreesLatitude(-91);
+                expect(normalized).toEqual(-89);
+            });
+
+            it("Normalizes a full angle", function () {
+                var normalized = Angle.normalizedDegreesLatitude(360);
+                expect(normalized).toEqual(0);
+            });
         });
 
-        it("Normalizes a specified value to be within the range of [-180, 180] degrees", function () {
-            var normalized = Angle.normalizedDegreesLongitude(190);
-            expect(normalized).toEqual(-170);
+        describe("Normalizes a Longitude value in the range of [-180, 180] degrees", function () {
 
-            normalized = Angle.normalizedDegreesLongitude(460);
-            expect(normalized).toEqual(100);
+            it("Normalizes a positive angle", function () {
+                var normalized = Angle.normalizedDegreesLongitude(190);
+                expect(normalized).toEqual(-170);
+            });
+
+            it("Normalizes a negative angle", function () {
+                var normalized = Angle.normalizedDegreesLongitude(-460);
+                expect(normalized).toEqual(-100);
+            });
         });
 
-        it("Normalizes a specified value to be within the range of [-Pi, Pi] radians", function () {
-            var normalized = Angle.normalizedRadians(45);
-            expect(normalized).toEqual(45-14*Math.PI);
+        describe("Normalizes a specified value to be within the range of [-Pi, Pi] radians", function () {
 
-            normalized = Angle.normalizedRadians(60);
-            expect(normalized).toEqual(60-20*Math.PI);
+            it("Normalizes a 45 degree angle", function () {
+                var normalized = Angle.normalizedRadians(45);
+                expect(normalized).toEqual(45 - 14 * Math.PI);
+            });
+
+            it("Normalizes a 60 degree angle", function () {
+                var normalized = Angle.normalizedRadians(60);
+                expect(normalized).toEqual(60 - 20 * Math.PI);
+            });
         });
 
-        it("Normalizes a specified value to be within the range of [-Pi/2, Pi/2] radians.", function () {
-            var normalized = Angle.normalizedRadiansLatitude(60);
-            expect(normalized).toBeCloseTo(60-19*Math.PI, 10);
+        describe("Normalizes a specified value to be within the range of [-Pi/2, Pi/2] radians.", function () {
 
-            normalized = Angle.normalizedRadiansLatitude(88);
-            expect(normalized).toBeCloseTo(88-28*Math.PI, 10);
+            it("Normalizes a 60 degree angle", function () {
+                var normalized = Angle.normalizedRadiansLatitude(60);
+                expect(normalized).toBeCloseTo(60 - 19 * Math.PI, 10);
+            });
+
+            it("Normalizes an 88 degree angle", function () {
+                var normalized = Angle.normalizedRadiansLatitude(88);
+                expect(normalized).toBeCloseTo(88 - 28 * Math.PI, 10);
+            });
         });
 
-        it("Normalizes a specified value to be within the range of [-Pi/2, Pi/2] radians", function () {
-            var normalized = Angle.normalizedRadiansLongitude(60);
-            expect(normalized).toBeCloseTo(60-20*Math.PI, 10);
+        describe("Normalizes a specified value to be within the range of [-Pi/2, Pi/2] radians", function () {
+            it("Normalizes a 60 degree angle", function () {
+                var normalized = Angle.normalizedRadiansLongitude(60);
+                expect(normalized).toBeCloseTo(60 - 20 * Math.PI, 10);
+            });
 
-            normalized = Angle.normalizedRadiansLongitude(180);
-            expect(normalized).toBeCloseTo(180-58*Math.PI, 10);
+            it("Normalizes a 180 degree angle", function () {
+                var normalized = Angle.normalizedRadiansLongitude(180);
+                expect(normalized).toBeCloseTo(180 - 58 * Math.PI, 10);
+            });
         });
 
-        it("Indicates whether a specified value is within the normal range of latitude, [-90, 90]", function () {
-            var validLatitude = Angle.isValidLatitude(60);
-            expect(validLatitude).toEqual(true);
+        describe("Indicates whether a specified value is within the normal range of latitude, [-90, 90]", function () {
 
-            var invalidLatitude = Angle.isValidLatitude(150);
-            expect(invalidLatitude).toEqual(false);
+            it("Valid latitude", function () {
+                var validLatitude = Angle.isValidLatitude(60);
+                expect(validLatitude).toEqual(true);
+            });
+
+            it("Not valid latitude", function () {
+                var invalidLatitude = Angle.isValidLatitude(150);
+                expect(invalidLatitude).toEqual(false);
+            });
         });
 
-        it("Indicates whether a specified value is within the normal range of longitude, [-180, 180]", function () {
-            var validLongitude = Angle.isValidLongitude(150);
-            expect(validLongitude).toEqual(true);
+        describe("Indicates whether a specified value is within the normal range of longitude, [-180, 180]", function () {
 
-            var invalidLongitude = Angle.isValidLongitude(-250);
-            expect(invalidLongitude).toEqual(false);
+            it("Valid longitude", function () {
+                var validLongitude = Angle.isValidLongitude(150);
+                expect(validLongitude).toEqual(true);
+            });
+
+            it("Not valid longitude", function () {
+                var invalidLongitude = Angle.isValidLongitude(-250);
+                expect(invalidLongitude).toEqual(false);
+            });
         });
 
-        it("Returns a decimal degrees string representation of a specified value in degrees", function () {
-            var angle = Angle.toDecimalDegreesString(150);
-            expect(angle).toEqual("150\u00B0");
+        describe("Returns a decimal degrees string representation of a specified value in degrees", function () {
 
-            angle = Angle.toDecimalDegreesString(-150);
-            expect(angle).toEqual("-150\u00B0");
+            it("Positive degrees", function () {
+                var angle = Angle.toDecimalDegreesString(150);
+                expect(angle).toEqual("150\u00B0");
+            });
+
+            it("Negative degrees", function () {
+                var angle = Angle.toDecimalDegreesString(-150);
+                expect(angle).toEqual("-150\u00B0");
+            });
         });
 
-        it("Returns a degrees-minutes-seconds string representation of a specified value in degrees", function () {
-            var angle = Angle.toDMSString(150);
-            expect(angle).toEqual("150\u00B0 0\u2019 0\u201D");
+        describe("Returns a degrees-minutes-seconds string representation of a specified value in degrees", function () {
 
-            angle = Angle.toDMSString(270.65);
-            expect(angle).toEqual("270\u00B0 39\u2019 0\u201D");
+            it("Integer angle", function () {
+                var angle = Angle.toDMSString(150);
+                expect(angle).toEqual("150\u00B0 0\u2019 0\u201D");
+            });
 
-            angle = Angle.toDMSString(50.50556);
-            expect(angle).toEqual("50\u00B0 30\u2019 20\u201D");
+            it("Not integer angle with two decimals expecting minutes", function () {
+                var angle = Angle.toDMSString(270.65);
+                expect(angle).toEqual("270\u00B0 39\u2019 0\u201D");
+            });
+
+            it("Not integer angle with five decimals expecting seconds", function () {
+                var angle = Angle.toDMSString(50.50556);
+                expect(angle).toEqual("50\u00B0 30\u2019 20\u201D");
+            });
         });
 
     });
