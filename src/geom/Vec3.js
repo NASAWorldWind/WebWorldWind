@@ -125,8 +125,8 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Vec3", "areColinear", "missingVector"));
             }
 
-            var ab = b.subtract(a).normalize(),
-                bc = c.subtract(b).normalize();
+           var ab = new Vec3(a[0]-b[0],a[1]-b[1],a[2]-b[2]).normalize(),
+               bc = new Vec3(c[0]-b[0],c[1]-b[1],c[2]-b[2]).normalize();
 
             // ab and bc are considered colinear if their dot product is near +/-1.
             return Math.abs(ab.dot(bc)) > 0.999;
