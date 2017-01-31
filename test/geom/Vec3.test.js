@@ -38,12 +38,21 @@ define([
             expect(Vec3.averageOfBuffer(pointArray, Vec3.ZERO)).toEqual(new Vec3(2, 2, 2));
         });
 
+        describe("Test the colinearity of three arrays", function () {
 
-        it("Test the colinearity of three arrays", function () {
-            var vec3_a = new Vec3(2, 4, 6);
-            var vec3_b = new Vec3(4, 8, 12);
-            var vec3_c = new Vec3(8, 16, 24);
-            expect(Vec3.areColinear(vec3_a, vec3_b, vec3_c)).toEqual(true);
+            it("Vectors are colinear", function () {
+                var vec3_a = new Vec3(2, 4, 6);
+                var vec3_b = new Vec3(4, 8, 12);
+                var vec3_c = new Vec3(8, 16, 24);
+                expect(Vec3.areColinear(vec3_a, vec3_b, vec3_c)).toEqual(true);
+            });
+
+            it("Vectors are not colinear", function () {
+                var vec3_a = new Vec3(1, 5, 7);
+                var vec3_b = new Vec3(4, 9, 11);
+                var vec3_c = new Vec3(8, 16, 24);
+                expect(Vec3.areColinear(vec3_a, vec3_b, vec3_c)).toEqual(false);
+            });
         });
 
         it("Compute triangle normals", function () {
@@ -169,7 +178,6 @@ define([
             expect(vec3.multiplyByMatrix(matrix)).toEqual(expected_vec3);
         });
 
-
         describe('#Vector interpolation', function () {
 
             it("Interpolates with an integer weight", function () {
@@ -266,4 +274,5 @@ define([
         });
 
     });
-});
+})
+;
