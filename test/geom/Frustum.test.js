@@ -10,7 +10,7 @@ define([
 ], function (Frustum, Matrix, Plane, Vec3) {
     "use strict";
 
-    describe("FrustumTest", function () {
+    describe("Frustum Tests", function () {
 
         describe("Frustum constructor", function () {
 
@@ -139,7 +139,7 @@ define([
             });
         });
 
-        describe("Test the frustum methods with a predefined input Frustum", function () {
+        describe("Tests the frustum methods with a predefined input Frustum", function () {
             var frustum;
 
             beforeEach(function () {
@@ -206,7 +206,7 @@ define([
                 expect(normalized._far).toEqual(farExpected);
             });
 
-            describe("Check if a frustum contains a point", function () {
+            describe("Checks if a frustum contains a point", function () {
 
                 it("The frustum contains the point", function () {
                     var point = new Vec3(1, 2, 3);
@@ -225,7 +225,7 @@ define([
                 });
             });
 
-            describe("Check if a frustum intersects a segment", function () {
+            describe("Checks if a frustum intersects a segment", function () {
 
                 it("The frustum intersects the segment", function () {
                     var pointA = new Vec3(1, 2, 3);
