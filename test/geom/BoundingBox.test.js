@@ -12,7 +12,7 @@ define([
 ], function (BoundingBox, Vec3, Plane, Globe, EarthElevationModel, Sector) {
     "use strict";
 
-    describe("BoundingBoxTest", function () {
+    describe("BoundingBox Tests", function () {
 
         it("Should have the basic bounding box properties.", function () {
             var boundingBox = new BoundingBox();
@@ -60,7 +60,7 @@ define([
                 var boundingBox = new BoundingBox();
                 var globe = new Globe(new EarthElevationModel());
                 var sector = new Sector(-90, 90, -180, 180);
-                expect(boundingBox.setToSector(sector, globe, 10, 1000).radius).toEqual(9006353.499282671);
+                expect(boundingBox.setToSector(sector, globe, 10, 1000).radius).toBeCloseTo(9006353.499282671,3);
             });
 
             it("Should throw an exception because no globe is provided", function () {
