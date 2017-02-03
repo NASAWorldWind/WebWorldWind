@@ -419,6 +419,26 @@ define([
             }
         });
 
+        WmsLayerCapabilities.prototype.style = function(name) {
+            if (!name) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmsLayerCapabilities", "style",
+                        "Style name is null or undefined."));
+            }
+
+            var styles = this.styles;
+            if (!styles) {
+                return null;
+            }
+
+            for (var i = 0, len = styles.length, style; i < len; i++) {
+                style = styles[i];
+                if (style.name === name) {
+                    return style;
+                }
+            }
+        }
+
         WmsLayerCapabilities.accumulate = function (layer, propertyName, accumulation) {
             // Accumulate all of the named properties in the specified layer and its ancestors.
             while (layer && (layer instanceof WmsLayerCapabilities)) {

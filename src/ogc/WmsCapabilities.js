@@ -24,7 +24,7 @@ define([
          * specified in the given WMS Capabilities document. Most fields can be accessed as properties named
          * according to their document names converted to camel case. For example, "version", "service.title",
          * "service.contactInformation.contactPersonPrimary". The exceptions are online resources, whose property
-         * path has been shortened. For example "capability.request.getMap.formats" and "capability.request.getMap.url".
+         * path has been shortened. For example "capability.request.getMap.formats" and "capability.request.getMap.getUrl".
          * @param {{}} xmlDom An XML DOM representing the WMS Capabilities document.
          * @throws {ArgumentError} If the specified XML DOM is null or undefined.
          */
@@ -36,6 +36,41 @@ define([
 
             this.assembleDocument(xmlDom);
         };
+
+        WmsCapabilities.prototype.namedLayers = function (namedLayersArray, layerToStart) {
+            var namedLayers = namedLayersArray || [];
+            var layers = layerToStart || this.capability.layers;
+
+            if (layers === undefined) {
+                return namedLayers;
+            }
+
+            for (var i = 0, len = layers.length; i < len; i++) {
+                var layer = layers[i];
+                if (layer.name) {
+                    namedLayers.push(layer);
+                }
+                if (layer.layers) {
+                    this.namedLayers(namedLayers, layer.layers);
+                }
+            }
+
+            return namedLayers;
+        };
+
+        WmsCapabilities.prototype.namedLayer = function (name) {
+            if (name === undefined) {
+                return null;
+            }
+
+            var namedLayers = this.namedLayers();
+
+            for (var i = 0, len = namedLayers.length; i < len; i++) {
+                if (name === namedLayers[i].name) {
+                    return namedLayers[i];
+                }
+            }
+        }
 
         WmsCapabilities.prototype.assembleDocument = function (dom) {
             var root = dom.documentElement;
@@ -73,7 +108,7 @@ define([
                 } else if (child.localName === "KeywordList") {
                     service.keywordList = this.assembleKeywordList(child);
                 } else if (child.localName === "OnlineResource") {
-                    service.onlineResource = child.getAttribute("xlink:href");
+                    service.url = child.getAttribute("xlink:href");
                 } else if (child.localName === "Fees") {
                     service.fees = child.textContent;
                 } else if (child.localName === "AccessConstraints") {
@@ -240,7 +275,7 @@ define([
                                     for (var c4 = 0; c4 < children4.length; c4++) {
                                         var child4 = children4[c4];
                                         if (child4.localName === "OnlineResource") {
-                                            request.url = child4.getAttribute("xlink:href");
+                                            request.getUrl = child4.getAttribute("xlink:href");
                                         }
                                     }
                                 }
