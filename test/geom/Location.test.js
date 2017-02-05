@@ -40,8 +40,8 @@ define([
                 var locationTarget = new Location(37.52, 15.08);
 
                 location.copy(locationTarget);
-                expect(location.latitude).toBeCloseTo(37.52);
-                expect(location.longitude).toBeCloseTo(15.08);
+                expect(location.latitude).toEqual(37.52);
+                expect(location.longitude).toEqual(15.08);
             });
 
             it("Should throw an exception on missing location input", function () {
