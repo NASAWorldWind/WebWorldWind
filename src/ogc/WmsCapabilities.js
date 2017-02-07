@@ -37,30 +37,48 @@ define([
             this.assembleDocument(xmlDom);
         };
 
-        WmsCapabilities.prototype.namedLayers = function (namedLayersArray, layerToStart) {
-            var namedLayers = namedLayersArray || [];
-            var layers = layerToStart || this.capability.layers;
+        WmsCapabilities.prototype.getNamedLayers = function () {
+            return this.accumulateNamedLayers(this.capability.layers);
+        };
 
-            if (layers === undefined) {
+        /**
+         * Accumulates the named layers recursively from the provided initial array of layers. An optional array for accumulated
+         * results is provided.
+         * @param {WmsLayerCapabilities[]} startLayers the layer array to start accumulation, named layers of this array are included in accumulation
+         * @param {WmsLayerCapabilities[]} namedLayersArray optional accumulation array
+         * @returns an array of named WmsLayerCapabilities
+         */
+        WmsCapabilities.prototype.accumulateNamedLayers = function (startLayers, namedLayersArray) {
+            var namedLayers = namedLayersArray || [];
+            
+            if (!startLayers) {
                 return namedLayers;
             }
 
-            for (var i = 0, len = layers.length; i < len; i++) {
-                var layer = layers[i];
+            for (var i = 0, len = startLayers.length; i < len; i++) {
+                var layer = startLayers[i];
                 if (layer.name) {
                     namedLayers.push(layer);
                 }
                 if (layer.layers) {
-                    this.namedLayers(namedLayers, layer.layers);
+                    this.accumulateNamedLayers(layer.layers, namedLayers);
                 }
             }
 
             return namedLayers;
         };
 
-        WmsCapabilities.prototype.namedLayer = function (name) {
-            if (name === undefined) {
-                return null;
+        /**
+         * Searches for a named layer matching the provided name and returns the WmsLayerCapabilities object representing 
+         * the named layer.
+         * @param {String} name the layer name to find
+         * @returns {WmsLayerCapabilities} if a matching named layer is found or null
+         * @throws {ArgumentError} If the specified name is null or empty.
+         */
+        WmsCapabilities.prototype.getNamedLayer = function (name) {
+            if (!name || (name.length === 0)) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmsCapabilities", "getNamedLayer", "No WMS layer name provided."));
             }
 
             var namedLayers = this.namedLayers();
@@ -70,7 +88,9 @@ define([
                     return namedLayers[i];
                 }
             }
-        }
+
+            return null;
+        };
 
         WmsCapabilities.prototype.assembleDocument = function (dom) {
             var root = dom.documentElement;
