@@ -38,7 +38,8 @@ define([
                 if (child.localName === "ServiceType") {
                     this.serviceType = child.textContent;
                 } else if (child.localName === "ServiceTypeVersion") {
-                    this.serviceTypeVersion = child.textContent;
+                    this.serviceTypeVersions = this.serviceTypeVersions || [];
+                    this.serviceTypeVersions.push(child.textContent);
                 } else if (child.localName === "Profile") {
                     this.profile = this.profiles || [];
                     this.profile.push(child.textContent);
