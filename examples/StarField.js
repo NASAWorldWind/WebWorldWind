@@ -5,18 +5,15 @@
 
 requirejs([
         '../src/WorldWind',
-        './LayerManager',
-        '../thirdparty/sunCalculator'
+        './LayerManager'
     ],
     function (ww,
-              LayerManager,
-              sunCalculator) {
-        "use strict";
+              LayerManager) {
+        'use strict';
 
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        var wwd = new WorldWind.WorldWindow("canvasOne");
-        window.wwd = wwd;
+        var wwd = new WorldWind.WorldWindow('canvasOne');
 
         var BMNGLayer = new WorldWind.BMNGLayer();
         var starFieldLayer = new WorldWind.StarFieldLayer();
@@ -25,13 +22,12 @@ requirejs([
         wwd.addLayer(atmosphereLayer);
         wwd.addLayer(starFieldLayer);
 
-        atmosphereLayer.lightLocation = sunCalculator(new Date());
         var layerManger = new LayerManager(wwd);
         wwd.redraw();
 
-        wwd._redrawCallbacks.push(runSunSimulation);
+        wwd.redrawCallbacks.push(runSunSimulation);
 
-        var sunSimulationCheckBox = document.getElementById('sun-simulation');
+        var sunSimulationCheckBox = document.getElementById('stars-simulation');
         var doRunSimulation = false;
         var timeStamp = Date.now();
         var factor = 1;
@@ -41,9 +37,7 @@ requirejs([
         function onSunCheckBoxClick() {
             doRunSimulation = this.checked;
             if (!doRunSimulation) {
-                var date = new Date();
-                atmosphereLayer.lightLocation = sunCalculator(date);
-                starFieldLayer.time = date;
+                starFieldLayer.time = new Date();
             }
             wwd.redraw();
         }
@@ -51,9 +45,7 @@ requirejs([
         function runSunSimulation(wwd, stage) {
             if (stage === WorldWind.AFTER_REDRAW && doRunSimulation) {
                 timeStamp += (factor * 60 * 1000);
-                var date = new Date(timeStamp);
-                atmosphereLayer.lightLocation = sunCalculator(date);
-                starFieldLayer.time = date;
+                starFieldLayer.time = new Date(timeStamp);
                 wwd.redraw();
             }
         }

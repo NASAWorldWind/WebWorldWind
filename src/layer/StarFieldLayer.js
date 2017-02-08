@@ -18,10 +18,20 @@ define([
         'use strict';
 
         /**
-         * Constructs a layer showing bright stars visible from the Earth with the naked eye.
+         * Constructs a layer showing stars around the Earth.
+         *
+         * If you want to use your own star data, the file provided must be .json
+         * and the fields 'ra', 'dec' and 'vmag' must be present in the metadata.
+         * ra and dec must be expressed in degrees.
+         *
+         * This layer uses J2000.0 as the ref epoch.
+         *
+         * If the star data .json file is too big, consider enabling gzip compression on your web server.
+         * For more info about enabling gzip compression consult the configuration for your web server.
+         *
          * @alias StarFieldLayer
          * @constructor
-         * @classdesc Provides a layer showing bright stars visible from the Earth with the naked eye.
+         * @classdesc Provides a layer showing stars.
          * @param {URL} starDataSource optional url for the stars data.
          * @augments Layer
          */
@@ -204,6 +214,24 @@ define([
 
         // Internal. Intentionally not documented.
         StarFieldLayer.prototype.createGeometry = function () {
+            var indexes = this.parseMetadata(this._starData.metadata);
+
+            if (indexes.raIndex === -1) {
+                throw new Error(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createGeometry',
+                        'Missing ra field in star data.'));
+            }
+            if (indexes.decIndex === -1) {
+                throw new Error(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createGeometry',
+                        'Missing dec field in star data.'));
+            }
+            if (indexes.magIndex === -1) {
+                throw new Error(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createGeometry',
+                        'Missing vmag field in star data.'));
+            }
+
             var data = this._starData.data;
             var positions = [];
 
@@ -212,9 +240,9 @@ define([
 
             for (var i = 0, len = data.length; i < len; i++) {
                 var starInfo = data[i];
-                var declination = starInfo[2]; //for latitude
-                var rightAscension = starInfo[1]; //for longitude
-                var magnitude = starInfo[3];
+                var declination = starInfo[indexes.decIndex]; //for latitude
+                var rightAscension = starInfo[indexes.raIndex]; //for longitude
+                var magnitude = starInfo[indexes.magIndex];
                 var pointSize = magnitude < 4 ? 2 : 1;
 
                 positions.push(declination, rightAscension, pointSize, magnitude);
@@ -225,6 +253,30 @@ define([
             this._numStars = Math.floor(positions.length / 4);
 
             return positions;
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.parseMetadata = function (metadata) {
+            var raIndex = -1,
+                decIndex = -1,
+                magIndex = -1;
+            for (var i = 0, len = metadata.length; i < len; i++) {
+                var starMetaInfo = metadata[i];
+                if (starMetaInfo.name === 'ra') {
+                    raIndex = i;
+                }
+                if (starMetaInfo.name === 'dec') {
+                    decIndex = i;
+                }
+                if (starMetaInfo.name === 'vmag') {
+                    magIndex = i;
+                }
+            }
+            return {
+                raIndex: raIndex,
+                decIndex: decIndex,
+                magIndex: magIndex
+            };
         };
 
         // Internal. Intentionally not documented.

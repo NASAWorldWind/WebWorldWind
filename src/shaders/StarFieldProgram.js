@@ -54,6 +54,7 @@ define([
                     '}\n' +
 
                     //transforms declination and right ascension in cartesian coordinates
+                    //todo: dec/ra -> lat/lon may not be correct
                     'vec3 computePosition(float dec, float ra) {\n' +
                     '   float GMST = normalizeAngle(280.46061837 + 360.98564736629 * numDays);\n' +
                     //'   float lon = 180.0 - normalizeAngle(GMST - ra);\n' +
@@ -164,7 +165,7 @@ define([
         };
 
         /**
-         * Loads the specified number as the value of this program's 'numDays' uniform variable.
+         * Loads the specified number as the value of this program's 'magnitudeRange' uniform variable.
          *
          * @param {WebGLRenderingContext} gl The current WebGL context.
          * @param {Number} minMag
