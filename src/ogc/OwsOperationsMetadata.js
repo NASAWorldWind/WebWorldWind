@@ -71,35 +71,28 @@ define([
                 var child = children[c];
 
                 if (child.localName === "HTTP") {
-                    dcp.http = OwsOperationsMetadata.assembleHttp(child);
+                    var httpMethods = child.children || child.childNodes;
+                    for (var c2 = 0; c2 < httpMethods.length; c2++) {
+                        var httpMethod = httpMethods[c2];
+
+                        if (httpMethod.localName === "Get") {
+                            dcp.getMethods = dcp.getMethods || [];
+                            dcp.getMethods.push(OwsOperationsMetadata.assembleMethod(httpMethod));
+                        } else if (httpMethod.localName === "Post") {
+                            dcp.postMethods = dcp.postMethods || [];
+                            dcp.postMethods.push(OwsOperationsMetadata.assembleMethod(httpMethod));
+                        }
+                    }
                 }
             }
 
             return dcp;
         };
 
-        OwsOperationsMetadata.assembleHttp = function (element) {
+        OwsOperationsMetadata.assembleMethod = function (element) {
             var result = {};
 
-            var children = element.children;
-            for (var c = 0; c < children.length; c++) {
-                var child = children[c];
-
-                if (child.localName === "Get") {
-                    result.get = result.get || [];
-                    result.get.push(OwsOperationsMetadata.assembleGet(child));
-                }
-
-                // TODO: Post
-            }
-
-            return result;
-        };
-
-        OwsOperationsMetadata.assembleGet = function (element) {
-            var result = {};
-
-            result.href = element.getAttribute("xlink:href");
+            result.url = element.getAttribute("xlink:href");
 
             var children = element.children;
             for (var c = 0; c < children.length; c++) {
