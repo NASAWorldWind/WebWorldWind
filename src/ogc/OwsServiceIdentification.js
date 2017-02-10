@@ -7,10 +7,12 @@
  */
 define([
         '../error/ArgumentError',
-        '../util/Logger'
+        '../util/Logger',
+        '../ogc/OwsDescription'
     ],
     function (ArgumentError,
-              Logger) {
+              Logger,
+              OwsDescription) {
         "use strict";
 
         /**
@@ -31,6 +33,8 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "OwsServiceIdentification", "constructor", "missingDomElement"));
             }
 
+            OwsDescription.call(this, element);
+
             var children = element.children;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -43,21 +47,16 @@ define([
                 } else if (child.localName === "Profile") {
                     this.profile = this.profiles || [];
                     this.profile.push(child.textContent);
-                } else if (child.localName === "Title") {
-                    this.title = this.title|| [];
-                    this.title.push(child.textContent);
-                } else if (child.localName === "Abstract") {
-                    this.abstract = this.title|| [];
-                    this.abstract.push(child.textContent);
                 } else if (child.localName === "Fees") {
                     this.fees = child.textContent;
                 } else if (child.localName === "AccessConstraints") {
                     this.accessConstraints = this.accessConstraints || [];
                     this.accessConstraints.push(child.textContent);
                 }
-                // TODO: Keywords
             }
         };
+
+        OwsServiceIdentification.prototype = Object.create(OwsDescription.prototype);
 
         return OwsServiceIdentification;
     });

@@ -8,11 +8,13 @@
 define([
         '../error/ArgumentError',
         '../util/Logger',
+        '../ogc/OwsDescription',
         '../ogc/OwsLanguageString',
         '../ogc/WmsCapabilities'
     ],
     function (ArgumentError,
               Logger,
+              OwsDescription,
               OwsLanguageString,
               WmsCapabilities) {
         "use strict";
@@ -32,6 +34,8 @@ define([
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCapabilities", "constructor", "missingDomElement"));
             }
+
+            OwsDescription.call(this, layerElement);
 
             /**
              * This layer's WMTS capabilities document, as specified to the constructor of this object.
@@ -141,6 +145,8 @@ define([
             this.assembleLayer(layerElement);
         };
 
+        WmtsLayerCapabilities.prototype = Object.create(OwsDescription.prototype);
+
         WmtsLayerCapabilities.prototype.assembleLayer = function (element) {
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -148,12 +154,6 @@ define([
 
                 if (child.localName === "Identifier") {
                     this.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    this.title = this.title || [];
-                    this.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    this.abstract = this.abstract || [];
-                    this.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "WGS84BoundingBox") {
                     this.wgs84BoundingBox = WmtsLayerCapabilities.assembleBoundingBox(child);
                 } else if (child.localName === "BoundingBox") {
@@ -181,13 +181,12 @@ define([
                     this.tileMatrixSetLink = this.tileMatrixSetLink || [];
                     this.tileMatrixSetLink.push(WmtsLayerCapabilities.assembleTileMatrixSetLink(child));
                 }
-                // TODO: Keywords
             }
 
         };
 
         WmtsLayerCapabilities.assembleStyle = function (element) {
-            var result = {};
+            var result = new OwsDescription(element);
 
             result.isDefault = element.getAttribute("isDefault");
 
@@ -197,17 +196,10 @@ define([
 
                 if (child.localName === "Identifier") {
                     result.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    result.title = result.title || [];
-                    result.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    result.abstract = result.abstract || [];
-                    result.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "LegendURL") {
                     result.legendUrl = result.legendUrl || [];
                     result.legendUrl.push(WmtsLayerCapabilities.assembleLegendUrl(child));
                 }
-                // TODO: keywords
             }
 
             return result;
@@ -238,7 +230,7 @@ define([
         };
 
         WmtsLayerCapabilities.assembleDimension = function (element) {
-            var result = {};
+            var result = new OwsDescription(element);
 
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -246,12 +238,6 @@ define([
 
                 if (child.localName === "Identifier") {
                     result.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    result.title = result.title || [];
-                    result.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    result.abstract = result.abstract || [];
-                    result.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "UOM") {
                     result.uom = {
                         name: child.getAttribute("name"),

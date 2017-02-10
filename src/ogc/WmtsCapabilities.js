@@ -8,6 +8,7 @@
 define([
         '../error/ArgumentError',
         '../util/Logger',
+        '../ogc/OwsDescription',
         '../ogc/OwsLanguageString',
         '../ogc/OwsOperationsMetadata',
         '../ogc/OwsServiceIdentification',
@@ -17,6 +18,7 @@ define([
     ],
     function (ArgumentError,
               Logger,
+              OwsDescription,
               OwsLanguageString,
               OwsOperationsMetadata,
               OwsServiceIdentification,
@@ -63,8 +65,9 @@ define([
                     this.operationsMetadata = new OwsOperationsMetadata(child);
                 } else if (child.localName === "Contents") {
                     this.contents = this.assembleContents(child);
+                } else if (child.localName === "Themes") {
+                    this.themes = WmtsCapabilities.assembleThemes(child);
                 }
-                // TODO: Themes
             }
 
             this.resolveTileMatrixSetLinks();
@@ -101,7 +104,7 @@ define([
         };
 
         WmtsCapabilities.assembleTileMatrixSet = function (element) {
-            var tileMatrixSet = {};
+            var tileMatrixSet = new OwsDescription(element);
 
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -118,14 +121,7 @@ define([
                 } else if (child.localName === "TileMatrix") {
                     tileMatrixSet.tileMatrix = tileMatrixSet.tileMatrix || [];
                     tileMatrixSet.tileMatrix.push(WmtsCapabilities.assembleTileMatrix(child));
-                } else if (child.localName === "Title") {
-                    tileMatrixSet.title = tileMatrixSet.title || [];
-                    tileMatrixSet.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    tileMatrixSet.abstract = tileMatrixSet.abstract || [];
-                    tileMatrixSet.abstract.push(new OwsLanguageString(child));
                 }
-                // TODO: Keywords
             }
 
             for (var i = 0; i < tileMatrixSet.tileMatrix.length; i++) {
@@ -136,7 +132,7 @@ define([
         };
 
         WmtsCapabilities.assembleTileMatrix = function (element) {
-            var tileMatrix = {};
+            var tileMatrix = new OwsDescription(element);
 
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -144,12 +140,6 @@ define([
 
                 if (child.localName === "Identifier") {
                     tileMatrix.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    tileMatrix.title = tileMatrixSet.title || [];
-                    tileMatrix.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    tileMatrix.abstract = tileMatrixSet.abstract || [];
-                    tileMatrix.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "ScaleDenominator") {
                     tileMatrix.scaleDenominator = parseFloat(child.textContent);
                 } else if (child.localName === "TileWidth") {
@@ -164,11 +154,47 @@ define([
                     var values = child.textContent.split(" ");
                     tileMatrix.topLeftCorner = [parseFloat(values[0]), parseFloat(values[1])];
                 }
-
-                // TODO: Keywords
             }
 
             return tileMatrix;
+        };
+
+        WmtsCapabilities.assembleThemes = function (element) {
+            var themes;
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Theme") {
+                    themes = themes || [];
+                    themes.push(WmtsCapabilities.assembleTheme(child));
+                }
+
+            }
+
+            return themes;
+        };
+
+        WmtsCapabilities.assembleTheme = function (element) {
+            var theme = new OwsDescription(element);
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Identifier") {
+                    theme.identifier = child.textContent;
+                } else if (child.localName === "LayerRef") {
+                    theme.layerRef = theme.layerRef || [];
+                    theme.layerRef.push(child.textContent);
+                } else if (child.localName === "Theme") {
+                    theme.themes = theme.themes || [];
+                    theme.themes.push(WmtsCapabilities.assembleTheme(child));
+                }
+            }
+
+            return theme;
         };
 
         WmtsCapabilities.prototype.resolveTileMatrixSetLinks = function() {
