@@ -115,7 +115,9 @@ define([
 
             /**
              * The dimensions associated with this layer. The returned array contains objects with the following
-             * properties: TODO
+             * properties:
+             * @type {Object[]}
+             * @readonly
              */
             this.dimension;
 
@@ -260,6 +262,25 @@ define([
 
         WmtsLayerCapabilities.assembleMetadata = function (element) { // TODO
             var result = {};
+
+            var link = element.getAttribute("xlink:href");
+            if (link) {
+                result.url = link;
+            }
+
+            var about = element.getAttribute("about");
+            if (link) {
+                result.about = about;
+            }
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Metadata") {
+                    result.metadata = WmsLayerCapabilities.assembleMetadata(child);
+                }
+            }
 
             return result;
         };

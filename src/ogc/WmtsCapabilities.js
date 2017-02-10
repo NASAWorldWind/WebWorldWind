@@ -67,6 +67,9 @@ define([
                     this.contents = this.assembleContents(child);
                 } else if (child.localName === "Themes") {
                     this.themes = WmtsCapabilities.assembleThemes(child);
+                } else if (child.localName === "ServiceMetadataURL") {
+                    this.serviceMetadataUrls = this.serviceMetadataUrls || [];
+                    this.serviceMetadataUrls.push(WmtsCapabilities.assembleServiceMetadataURL(child));
                 }
             }
 
@@ -195,6 +198,17 @@ define([
             }
 
             return theme;
+        };
+
+        WmtsCapabilities.assembleServiceMetadataURL = function (element) {
+            var result = {};
+
+            var link = element.getAttribute("xlink:href");
+            if (link) {
+                result.url = link;
+            }
+
+            return result;
         };
 
         WmtsCapabilities.prototype.resolveTileMatrixSetLinks = function() {
