@@ -37,17 +37,15 @@ define([
             this.assembleDocument(xmlDom);
         };
 
+        /**
+         * Finds all named layers documented in this WMS capabilities document. Will recursively search sub-layers for
+         * named layers.
+         * @returns {WmsLayerCapabilities[]}
+         */
         WmsCapabilities.prototype.getNamedLayers = function () {
             return this.accumulateNamedLayers(this.capability.layers);
         };
 
-        /**
-         * Accumulates the named layers recursively from the provided initial array of layers. An optional array for accumulated
-         * results is provided.
-         * @param {WmsLayerCapabilities[]} startLayers the layer array to start accumulation, named layers of this array are included in accumulation
-         * @param {WmsLayerCapabilities[]} namedLayersArray optional accumulation array
-         * @returns an array of named WmsLayerCapabilities
-         */
         WmsCapabilities.prototype.accumulateNamedLayers = function (startLayers, namedLayersArray) {
             var namedLayers = namedLayersArray || [];
             
@@ -81,7 +79,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmsCapabilities", "getNamedLayer", "No WMS layer name provided."));
             }
 
-            var namedLayers = this.namedLayers();
+            var namedLayers = this.getNamedLayers();
 
             for (var i = 0, len = namedLayers.length; i < len; i++) {
                 if (name === namedLayers[i].name) {
