@@ -293,6 +293,21 @@ define([
                 result.about = about;
             }
 
+            var type = element.getAttribute("xlink:type");
+            if (type) {
+                result.type = type;
+            }
+
+            var role = element.getAttribute("xlink:role");
+            if (role) {
+                result.role = role;
+            }
+
+            var title = element.getAttribute("xlink:title");
+            if (title) {
+                result.title = title;
+            }
+
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
