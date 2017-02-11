@@ -101,7 +101,7 @@ define([
                         "Layer does not provide a supported image format."));
             }
 
-            if (layerCaps.resourceUrl && (layerCaps.resourceUrl.length > 1)) {
+            if (layerCaps.resourceUrl && (layerCaps.resourceUrl.length > 0)) {
                 for (var i = 0; i < layerCaps.resourceUrl.length; i++) {
                     if (this.imageFormat === layerCaps.resourceUrl[i].format) {
                         this.resourceUrl = layerCaps.resourceUrl[i].template;
