@@ -233,7 +233,7 @@ define([
                 var operation = this.operationsMetadata.operation[i];
 
                 if (operation.name === "GetTile") {
-                    return operation.dcp[0].http.get[0].href;
+                    return operation.dcp[0].getMethods[0].url;
                 }
             }
 

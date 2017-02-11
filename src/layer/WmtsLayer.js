@@ -202,8 +202,8 @@ define([
             }
 
             // Determine a default display name.
-            if (layerCaps.title.length > 0) {
-                this.displayName = layerCaps.title[0].value;
+            if (layerCaps.titles.length > 0) {
+                this.displayName = layerCaps.titles[0].value;
             } else {
                 this.displayName = layerCaps.identifier;
             }

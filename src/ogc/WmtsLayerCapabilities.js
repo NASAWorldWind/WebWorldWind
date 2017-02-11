@@ -149,6 +149,26 @@ define([
 
         WmtsLayerCapabilities.prototype = Object.create(OwsDescription.prototype);
 
+        /**
+         * Provides an array of the TileMatrixSet objects supported by this layer.
+         * @returns {Array}
+         */
+        WmtsLayerCapabilities.prototype.getLayerSupportedTileMatrixSets = function () {
+            var tileMatrixSets = [];
+
+            for (var i = 0, lenA = this.tileMatrixSetLink.length; i < lenA; i++) {
+                var supportedTileMatrixSetIdentifier = this.tileMatrixSetLink[i].tileMatrixSet;
+                for (var j = 0, lenB = this.capabilities.contents.tileMatrixSet.length; j < lenB; j++) {
+                    var tileMatrixSetIdentifier = this.capabilities.contents.tileMatrixSet[j].identifier;
+                    if (tileMatrixSetIdentifier === supportedTileMatrixSetIdentifier) {
+                        tileMatrixSets.push(this.capabilities.contents.tileMatrixSet[j]);
+                    }
+                }
+            }
+
+            return tileMatrixSets;
+        };
+
         WmtsLayerCapabilities.prototype.assembleLayer = function (element) {
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
