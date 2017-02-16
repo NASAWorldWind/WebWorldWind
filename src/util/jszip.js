@@ -883,7 +883,7 @@ var fileAdd = function(name, data, o) {
     }
     else if (dataType === "string") {
         if (o.binary && !o.base64) {
-            // optimizedBinaryString == tru  e means that the file has already been filtered with a 0xFF mask
+            // optimizedBinaryString == true means that the file has already been filtered with a 0xFF mask
             if (o.optimizedBinaryString !== true) {
                 // this is a string, not in a base64 format.
                 // Be sure that this is a correct "binary string"
@@ -908,7 +908,7 @@ var fileAdd = function(name, data, o) {
     var object = new ZipObject(name, data, o);
     // this.files[name] = object;
     //convert  files  from Object to Array
-    push.call(this.file,object);
+    push.call(this.files,object);
     return object;
 };
 
