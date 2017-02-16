@@ -844,8 +844,10 @@ var prepareFileAttrs = function(o) {
  * @param {String|ArrayBuffer|Uint8Array|Buffer} data the data of the file
  * @param {Object} o the options of the file
  * @return {Object} the new file.
+ *
  */
 var fileAdd = function(name, data, o) {
+     var  push =Array.prototype.push;
     // be sure sub folders exist
     var dataType = utils.getTypeOf(data),
         parent;
@@ -881,7 +883,7 @@ var fileAdd = function(name, data, o) {
     }
     else if (dataType === "string") {
         if (o.binary && !o.base64) {
-            // optimizedBinaryString == true means that the file has already been filtered with a 0xFF mask
+            // optimizedBinaryString == tru  e means that the file has already been filtered with a 0xFF mask
             if (o.optimizedBinaryString !== true) {
                 // this is a string, not in a base64 format.
                 // Be sure that this is a correct "binary string"
@@ -904,7 +906,9 @@ var fileAdd = function(name, data, o) {
     }
 
     var object = new ZipObject(name, data, o);
-    this.files[name] = object;
+    // this.files[name] = object;
+    //convert  files  from Object to Array
+    push.call(this.file,object);
     return object;
 };
 
