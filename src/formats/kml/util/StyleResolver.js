@@ -34,14 +34,15 @@ define([
             Logger.logMessage(Logger.LEVEL_WARNING, "StyleResolver", "handleRemoteStyle", "Style was null.");
         }
     };
-
+    //2017-02-16  fix  pair tag getStyle()
     // Intentionally undocumented. For internal use only
     StyleResolver.prototype.handleStyleUrl = function (styleUrl, resolve, reject, filePromise) {
+        var  self = this;
         filePromise = this.handlePromiseOfFile(styleUrl, filePromise);
         filePromise.then(function (kmlFile) {
             kmlFile.resolveStyle(styleUrl).then(function (style) {
                 if (style.isMap) {
-                    style.resolve(resolve, reject);
+                    style.resolve(self,resolve, reject);
                 } else {
                     resolve({normal: style, highlight: null});
                 }
@@ -61,11 +62,12 @@ define([
         }
         return filePromise;
     };
-
+    //2017-02-16  fix  pair tag getStyle()
     // Intentionally undocumented. For internal use only
     StyleResolver.prototype.handleStyleSelector = function (styleSelector, resolve, reject) {
+        var self = this;
         if (styleSelector.isMap) {
-            styleSelector.resolve(resolve, reject);
+            styleSelector.resolve(self,resolve, reject);
         } else {
             // Move this resolve to the end of the stack to prevent recursion.
             window.setTimeout(function () {
