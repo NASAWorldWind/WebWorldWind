@@ -532,8 +532,8 @@ define([
 
 
             // Determine a default display name.
-            if (wmtsLayerCapabilities.title.length > 0) {
-                config.title = wmtsLayerCapabilities.title[0].value;
+            if (wmtsLayerCapabilities.titles.length > 0) {
+                config.title = wmtsLayerCapabilities.titles[0].value;
             } else {
                 config.title = wmtsLayerCapabilities.identifier;
             }

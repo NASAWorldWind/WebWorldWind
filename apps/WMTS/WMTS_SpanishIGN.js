@@ -25,7 +25,7 @@ requirejs(['../../src/WorldWind',
         $.get('http://www.ign.es/wmts/pnoa-ma?request=GetCapabilities&service=WMTS', function (response) {
 
             var wmtsCapabilities = new WorldWind.WmtsCapabilities(response);
-            wmtsCapabilities.contents.layer[0].title[0].value = "Imágenes de satélite Spot";
+            wmtsCapabilities.contents.layer[0].titles[0].value = "Imágenes de satélite Spot";
             wmtsCapabilitiesIGN1 = wmtsCapabilities.contents.layer[0];
         })
             .done(function () {
