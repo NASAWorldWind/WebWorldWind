@@ -129,11 +129,10 @@ define([
 
             //TODO
             if (!isNaN(tileMatrixSet.tileMatrix[0].identifier)) {
-                tileMatrixSet.tileMatrix.sort(function(a,b) {
+                tileMatrixSet.tileMatrix.sort(function (a, b) {
                     return parseFloat(a.identifier) - parseFloat(b.identifier);
                 })
             }
-
 
             for (var i = 0; i < tileMatrixSet.tileMatrix.length; i++) {
                 tileMatrixSet.tileMatrix[i].levelNumber = i;
@@ -176,12 +175,10 @@ define([
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
-
                 if (child.localName === "Theme") {
                     themes = themes || [];
                     themes.push(WmtsCapabilities.assembleTheme(child));
                 }
-
             }
 
             return themes;
@@ -219,7 +216,7 @@ define([
             return result;
         };
 
-        WmtsCapabilities.prototype.resolveTileMatrixSetLinks = function() {
+        WmtsCapabilities.prototype.resolveTileMatrixSetLinks = function () {
             for (var i = 0; i < this.contents.layer.length; i++) {
                 var layer = this.contents.layer[i];
 
@@ -239,7 +236,6 @@ define([
         WmtsCapabilities.prototype.getGetTileKvpAddress = function () {
             for (var i = 0; i < this.operationsMetadata.operation.length; i++) {
                 var operation = this.operationsMetadata.operation[i];
-
                 if (operation.name === "GetTile") {
                     return operation.dcp[0].getMethods[0].url;
                 }

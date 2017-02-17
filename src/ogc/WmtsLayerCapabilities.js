@@ -8,15 +8,11 @@
 define([
         '../error/ArgumentError',
         '../util/Logger',
-        '../ogc/OwsDescription',
-        '../ogc/OwsLanguageString',
-        '../ogc/WmsCapabilities'
+        '../ogc/OwsDescription'
     ],
     function (ArgumentError,
               Logger,
-              OwsDescription,
-              OwsLanguageString,
-              WmsCapabilities) {
+              OwsDescription) {
         "use strict";
 
         /**

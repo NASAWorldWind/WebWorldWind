@@ -112,7 +112,6 @@ define([
 
             // Determine the layer's sector if possible. Mandatory for EPSG:4326 tile matrix sets. (Others compute
             // it from tile Matrix Set metadata.)
-            /*********************************************************************************************************/
             // Sometimes BBOX defined in Matrix and not in Layer
             if (!config.wgs84BoundingBox && !config.boundingBox) {
                 if (this.tileMatrixSet.boundingBox) {
@@ -121,16 +120,13 @@ define([
                         config.tileMatrixSet.boundingBox.upperCorner[1],
                         config.tileMatrixSet.boundingBox.lowerCorner[0],
                         config.tileMatrixSet.boundingBox.upperCorner[0]);
-                }
-                else {
+                } else {
                     // Throw an exception if there is no bounding box.
                     throw new ArgumentError(
                         Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
                             "No bounding box was specified in the layer or tile matrix set capabilities."));
                 }
-            }
-            /*********************************************************************************************************/
-            else if (config.wgs84BoundingBox) {
+            } else if (config.wgs84BoundingBox) {
                 this.sector = new Sector(
                     config.wgs84BoundingBox.lowerCorner[1],
                     config.wgs84BoundingBox.upperCorner[1],
@@ -144,7 +140,6 @@ define([
                     this.tileMatrixSet.boundingBox.lowerCorner[0],
                     this.tileMatrixSet.boundingBox.upperCorner[0]);
             } else if (WmtsLayer.isEpsg4326Crs(this.tileMatrixSet.supportedCRS)) {
-
                 // Throw an exception if there is no 4326 bounding box.
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
@@ -157,7 +152,7 @@ define([
                 heightArray = [],
                 invalidLevel;
 
-            tileMatrix.forEach(function(matrix) {
+            tileMatrix.forEach(function (matrix) {
                 widthArray.push(matrix.matrixWidth);
                 heightArray.push(matrix.matrixHeight);
             });
@@ -165,13 +160,13 @@ define([
             if (WmtsLayer.checkTileSubdivision(widthArray) !== 0) {
                 invalidLevel = WmtsLayer.checkTileSubdivision(widthArray);
                 Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
-                    "Tile subdivision not supported for layer : "+config.identifier+". Display until level "+(invalidLevel-1));
+                    "Tile subdivision not supported for layer : " + config.identifier + ". Display until level " + (invalidLevel - 1));
                 tileMatrix.splice(invalidLevel);
             } else if (WmtsLayer.checkTileSubdivision(heightArray) !== 0) {
                 invalidLevel = WmtsLayer.checkTileSubdivision(heightArray);
                 Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
-                    "Tile subdivision not supported for layer : "+config.identifier+". Display until level "+(invalidLevel-1));
-               tileMatrix.splice(invalidLevel);
+                    "Tile subdivision not supported for layer : " + config.identifier + ". Display until level " + (invalidLevel - 1));
+                tileMatrix.splice(invalidLevel);
             }
 
             // Form a unique string to identify cache entries.
@@ -187,7 +182,6 @@ define([
              * @readonly
              */
             this.displayName = config.title;
-
 
             this.currentTiles = [];
             this.currentTilesInvalid = true;
@@ -207,7 +201,7 @@ define([
             this.detailControl = 1.75;
         };
 
-        WmtsLayer.checkTileSubdivision = function(dimensionArray) {
+        WmtsLayer.checkTileSubdivision = function (dimensionArray) {
             if (dimensionArray.length < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "checkTileSubdivision",
@@ -219,14 +213,13 @@ define([
                 i = 0;
 
             while (++i < dimensionArray.length && invalidLevel == 0) {
-                var newRatio = dimensionArray[i]/dimensionArray[i-1];
+                var newRatio = dimensionArray[i] / dimensionArray[i - 1];
 
                 // If the ratio is not an integer, the level is invalid
-                if ((dimensionArray[i] % dimensionArray[i-1]) !== 0) {
+                if ((dimensionArray[i] % dimensionArray[i - 1]) !== 0) {
                     invalidLevel = i;
-                }
-                // If ratios are different, the level is invalid
-                else if (ratio && (ratio !== newRatio)) {
+                } else if (ratio && (ratio !== newRatio)) {
+                    // If ratios are different, the level is invalid
                     invalidLevel = i;
                 }
                 ratio = newRatio;
@@ -260,7 +253,7 @@ define([
          * @throws {ArgumentError} If the specified params.tileSize is null or undefined.
          * @throws {ArgumentError} If the specified params.topLeftCorner is null or undefined.
          */
-        WmtsLayer.createTileMatrixSet = function(params) {
+        WmtsLayer.createTileMatrixSet = function (params) {
 
             if (!params.matrixSet) { // matrixSet
                 throw new ArgumentError(
@@ -280,8 +273,8 @@ define([
 
             // Define the boundingBox
             var boundingBox = {
-                lowerCorner : [params.extent[0], params.extent[1]],
-                upperCorner : [params.extent[2], params.extent[3]]
+                lowerCorner: [params.extent[0], params.extent[1]],
+                upperCorner: [params.extent[2], params.extent[3]]
             };
 
             // Resolutions
@@ -334,33 +327,31 @@ define([
                 // Compute the matrix width / height
                 var unitWidth = params.tileSize * params.resolutions[i];
                 var unitHeight = params.tileSize * params.resolutions[i];
-                var matrixWidth = Math.ceil((params.extent[2]-params.extent[0]-0.01*unitWidth)/unitWidth);
-                var matrixHeight = Math.ceil((params.extent[3]-params.extent[1]-0.01*unitHeight)/unitHeight);
+                var matrixWidth = Math.ceil((params.extent[2] - params.extent[0] - 0.01 * unitWidth) / unitWidth);
+                var matrixHeight = Math.ceil((params.extent[3] - params.extent[1] - 0.01 * unitHeight) / unitHeight);
 
                 // Define the tile matrix
                 var tileMatrix = {
-                    identifier : params.prefix ? params.matrixSet+":"+i : i,
-                    levelNumber : i,
-                    matrixHeight : matrixHeight,
-                    matrixWidth : matrixWidth,
-                    tileHeight : params.tileSize,
-                    tileWidth : params.tileSize,
-                    topLeftCorner : params.topLeftCorner,
-                    scaleDenominator : scale
+                    identifier: params.prefix ? params.matrixSet + ":" + i : i,
+                    levelNumber: i,
+                    matrixHeight: matrixHeight,
+                    matrixWidth: matrixWidth,
+                    tileHeight: params.tileSize,
+                    tileWidth: params.tileSize,
+                    topLeftCorner: params.topLeftCorner,
+                    scaleDenominator: scale
                 };
 
                 tileMatrixSet.push(tileMatrix);
             }
 
-
             return {
-                identifier : params.matrixSet,
-                supportedCRS:params.projection,
-                boundingBox : boundingBox,
-                tileMatrix : tileMatrixSet
+                identifier: params.matrixSet,
+                supportedCRS: params.projection,
+                boundingBox: boundingBox,
+                tileMatrix: tileMatrixSet
             };
         };
-
 
 
         /**
@@ -387,7 +378,6 @@ define([
              * @readonly
              */
             config.identifier = wmtsLayerCapabilities.identifier;
-
 
             // Validate that the specified image format exists, or determine one if not specified.
             if (imageFormat) {
@@ -437,7 +427,6 @@ define([
                 }
             } else { // resource-oriented interface not supported, so use KVP interface
                 config.service = wmtsLayerCapabilities.capabilities.getGetTileKvpAddress();
-
                 if (config.service) {
                     config.service = WmsUrlBuilder.fixGetMapString(config.service);
                 }
@@ -529,8 +518,6 @@ define([
             config.boundingBox = wmtsLayerCapabilities.boundingBox;
             config.wgs84BoundingBox = wmtsLayerCapabilities.wgs84BoundingBox;
 
-
-
             // Determine a default display name.
             if (wmtsLayerCapabilities.titles.length > 0) {
                 config.title = wmtsLayerCapabilities.titles[0].value;
@@ -538,10 +525,8 @@ define([
                 config.title = wmtsLayerCapabilities.identifier;
             }
 
-
             return config;
         };
-
 
         WmtsLayer.prototype = Object.create(Layer.prototype);
 
@@ -676,6 +661,7 @@ define([
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
                 s *= 1.2;
             }
+
             return tile.tileMatrix.levelNumber === (this.tileMatrixSet.tileMatrix.length - 1) || !tile.mustSubdivide(dc, s);
         };
 
@@ -731,10 +717,7 @@ define([
             var url;
 
             if (this.resourceUrl) {
-                url = this.resourceUrl.replace("{Style}", this.styleIdentifier).
-                replace("{TileMatrixSet}", this.tileMatrixSet.identifier).
-                replace("{TileMatrix}", tile.tileMatrix.identifier).
-                replace("{TileCol}", tile.column).replace("{TileRow}", tile.row);
+                url = this.resourceUrl.replace("{Style}", this.styleIdentifier).replace("{TileMatrixSet}", this.tileMatrixSet.identifier).replace("{TileMatrix}", tile.tileMatrix.identifier).replace("{TileCol}", tile.column).replace("{TileRow}", tile.row);
 
                 if (this.timeString) {
                     url = url.replace("{Time}", this.timeString);
@@ -786,11 +769,9 @@ define([
                 return this.createTile4326(tileMatrix, row, column);
             } else if (WmtsLayer.isEpsg3857Crs(this.tileMatrixSet.supportedCRS)) {
                 return this.createTile3857(tileMatrix, row, column);
-            }
-            else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
+            } else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
                 return this.createTileCrs84(tileMatrix, row, column);
             }
-
         };
 
 
@@ -875,8 +856,7 @@ define([
                 return new Texture(dc.currentGlContext, image);
             } else if (WmtsLayer.isEpsg3857Crs(this.tileMatrixSet.supportedCRS)) {
                 return this.createTexture3857(dc, tile, image);
-            }
-            else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
+            } else if (WmtsLayer.isOGCCrs84(this.tileMatrixSet.supportedCRS)) {
                 return new Texture(dc.currentGlContext, image);
             }
         };
