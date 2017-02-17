@@ -509,7 +509,7 @@ function JSZip(data, options) {
     //   "folder/" : {...},
     //   "folder/data.txt" : {...}
     // }
-    this.files = {};
+    this.files = [];
 
     this.comment = null;
 
