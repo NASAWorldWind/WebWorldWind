@@ -127,6 +127,14 @@ define([
                 }
             }
 
+            //TODO
+            if (!isNaN(tileMatrixSet.tileMatrix[0].identifier)) {
+                tileMatrixSet.tileMatrix.sort(function(a,b) {
+                    return parseFloat(a.identifier) - parseFloat(b.identifier);
+                })
+            }
+
+
             for (var i = 0; i < tileMatrixSet.tileMatrix.length; i++) {
                 tileMatrixSet.tileMatrix[i].levelNumber = i;
             }
