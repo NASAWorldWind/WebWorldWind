@@ -51,7 +51,7 @@ requirejs(['../src/WorldWind',
 
             // Add the layers to World Wind and create the layer manager
             createLayerManager();
-        }
+        };
 
         var createLayerManager = function () {
             for (var l = 0; l < layers.length; l++) {
@@ -61,7 +61,7 @@ requirejs(['../src/WorldWind',
 
             // Create a layer manager for controlling layer visibility.
             var layerManger = new LayerManager(wwd);
-        }
+        };
 
         // Execute the WMS XML GetCapabilities request
         var req = new XMLHttpRequest();
