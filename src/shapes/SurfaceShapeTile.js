@@ -37,7 +37,7 @@ define([
          * are less than zero, or the specified image path is null, undefined or empty.
          *
          */
-        var SurfaceShapeTile = function(sector, level, row, column) {
+        var SurfaceShapeTile = function (sector, level, row, column) {
             TextureTile.call(this, sector, level, row, column); // args are checked in the superclass' constructor
 
             /**
@@ -78,7 +78,7 @@ define([
         /**
          * Clear all collected surface shapes.
          */
-        SurfaceShapeTile.prototype.clearShapes = function() {
+        SurfaceShapeTile.prototype.clearShapes = function () {
             // Exchange previous and next surface shape lists to avoid allocating memory.
             var swap = this.prevSurfaceShapes;
             this.prevSurfaceShapes = this.surfaceShapes;
@@ -92,7 +92,7 @@ define([
          * Query whether any surface shapes have been collected.
          * @returns {boolean} Returns true if there are collected surface shapes.
          */
-        SurfaceShapeTile.prototype.hasShapes = function() {
+        SurfaceShapeTile.prototype.hasShapes = function () {
             return this.surfaceShapes.length > 0;
         };
 
@@ -100,7 +100,7 @@ define([
          * Get all shapes that this tile references.
          * @returns {SurfaceShape[]} The collection of surface shapes referenced by this tile.
          */
-        SurfaceShapeTile.prototype.getShapes = function() {
+        SurfaceShapeTile.prototype.getShapes = function () {
             return this.surfaceShapes;
         };
 
@@ -108,7 +108,7 @@ define([
          * Set the shapes this tile should reference.
          * @param {SurfaceShape[]} surfaceShapes The collection of surface shapes to be referenced by this tile.
          */
-        SurfaceShapeTile.prototype.setShapes = function(surfaceShapes) {
+        SurfaceShapeTile.prototype.setShapes = function (surfaceShapes) {
             this.surfaceShapes = surfaceShapes;
         };
 
@@ -116,7 +116,7 @@ define([
          * The sector that bounds this tile.
          * @returns {Sector}
          */
-        SurfaceShapeTile.prototype.getSector = function() {
+        SurfaceShapeTile.prototype.getSector = function () {
             return this.sector;
         };
 
@@ -124,7 +124,7 @@ define([
          * Add a surface shape to this tile's collection of surface shapes.
          * @param {SurfaceShape} surfaceShape The surface shape to add.
          */
-        SurfaceShapeTile.prototype.addSurfaceShape = function(surfaceShape) {
+        SurfaceShapeTile.prototype.addSurfaceShape = function (surfaceShape) {
             this.surfaceShapes.push(surfaceShape);
             this.surfaceShapeStateKeys.push(surfaceShape.stateKey);
         };
@@ -133,7 +133,7 @@ define([
          * Add multiple surface shapes to this tile's collection.
          * @param {SurfaceShape[]} shapes A collection of surface shapes to add to the collection of this tile.
          */
-        SurfaceShapeTile.prototype.addAllSurfaceShapes = function(shapes) {
+        SurfaceShapeTile.prototype.addAllSurfaceShapes = function (shapes) {
             for (var idx = 0, len = shapes.length; idx < len; idx += 1) {
                 var shape = shapes[idx];
                 this.addAllSurfaceShapes(shape);
@@ -141,7 +141,7 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        SurfaceShapeTile.prototype.needsUpdate = function(dc) {
+        SurfaceShapeTile.prototype.needsUpdate = function (dc) {
             var idx, len, surfaceShape, surfaceShapeStateKey;
 
             // If the number of shapes have changed, ... (cheap test)
@@ -172,7 +172,7 @@ define([
                 surfaceShape = this.surfaceShapes[idx];
                 surfaceShapeStateKey = this.surfaceShapeStateKeys[idx];
 
-                if (surfaceShapeStateKey != surfaceShape.stateKey) {
+                if (surfaceShapeStateKey !== surfaceShape.stateKey) {
                     return true;
                 }
             }
@@ -191,7 +191,7 @@ define([
          * @param {DrawContext} dc The draw context.
          * @returns {boolean} True if the surface shape tile has a valid texture, else false.
          */
-        SurfaceShapeTile.prototype.hasTexture = function(dc) {
+        SurfaceShapeTile.prototype.hasTexture = function (dc) {
             if (dc.pickingMode) {
                 return false;
             }
@@ -212,7 +212,7 @@ define([
          * @param {DrawContext} dc
          * @returns {Texture}
          */
-        SurfaceShapeTile.prototype.updateTexture = function(dc) {
+        SurfaceShapeTile.prototype.updateTexture = function (dc) {
             var gl = dc.currentGlContext,
                 canvas = SurfaceShapeTile.canvas;
 
@@ -257,11 +257,11 @@ define([
          * Get a key suitable for cache look-ups.
          * @returns {string}
          */
-        SurfaceShapeTile.prototype.getCacheKey = function() {
+        SurfaceShapeTile.prototype.getCacheKey = function () {
             if (!this.cacheKey) {
                 this.cacheKey = "SurfaceShapeTile:" +
-                this.tileKey + "," +
-                this.pickSequence.toString();
+                    this.tileKey + "," +
+                    this.pickSequence.toString();
             }
 
             return this.cacheKey;
@@ -270,7 +270,7 @@ define([
         /**
          * Create a new canvas and its 2D context on demand.
          */
-        SurfaceShapeTile.prototype.createCtx2D = function() {
+        SurfaceShapeTile.prototype.createCtx2D = function () {
             // If the context was previously created, ...
             if (!SurfaceShapeTile.ctx2D) {
                 SurfaceShapeTile.canvas = document.createElement("canvas");
