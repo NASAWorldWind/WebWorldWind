@@ -47,6 +47,22 @@ define([
             this.assembleDocument(xmlDom);
         };
 
+        /**
+         * Provides all of the layers associated with this WMTS. This method is for convienence and returns the layer
+         * array captured in the contents of this WmtsCapabilities object.
+         * @returns {WmtsLayerCapabilities[]}
+         */
+        WmtsCapabilities.prototype.getLayers = function () {
+            return this.contents.layer;
+        };
+
+        /**
+         * Retrieve the WmtsLayerCapabilities object for the provided identifier.
+         * @param identifier
+         * @returns {WmtsLayerCapabilities} object for the provided identifier or null if no identifier was found in the
+         * WmtsCapabilities object.
+         * @throws {ArgumentError} If the specified identifier is null or undefined.
+         */
         WmtsCapabilities.prototype.getLayer = function (identifier) {
             if (!identifier) {
                 throw new ArgumentError(
@@ -88,8 +104,6 @@ define([
                     this.serviceMetadataUrls.push(WmtsCapabilities.assembleServiceMetadataURL(child));
                 }
             }
-
-            this.resolveTileMatrixSetLinks();
         };
 
         WmtsCapabilities.prototype.assembleContents = function (element) {
@@ -230,23 +244,6 @@ define([
             }
 
             return result;
-        };
-
-        WmtsCapabilities.prototype.resolveTileMatrixSetLinks = function () {
-            for (var i = 0; i < this.contents.layer.length; i++) {
-                var layer = this.contents.layer[i];
-
-                for (var j = 0; j < layer.tileMatrixSetLink.length; j++) {
-                    var link = layer.tileMatrixSetLink[j];
-
-                    for (var k = 0; k < this.contents.tileMatrixSet.length; k++) {
-                        if (this.contents.tileMatrixSet[k].identifier === link.tileMatrixSet) {
-                            link.tileMatrixSetRef = this.contents.tileMatrixSet[k];
-                            break;
-                        }
-                    }
-                }
-            }
         };
 
         WmtsCapabilities.prototype.getGetTileKvpAddress = function () {
