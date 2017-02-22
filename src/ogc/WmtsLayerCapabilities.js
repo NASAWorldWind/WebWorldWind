@@ -7,12 +7,14 @@
  */
 define([
         '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsDescription'
+        '../geom/Sector',
+        '../ogc/OwsDescription',
+        '../util/Logger'
     ],
     function (ArgumentError,
-              Logger,
-              OwsDescription) {
+              Sector,
+              OwsDescription,
+              Logger) {
         "use strict";
 
         /**
@@ -241,6 +243,13 @@ define([
                 } else if (child.localName === "UpperCorner") {
                     var uc = child.textContent.split(" ");
                     result.upperCorner = [parseFloat(uc[0]), parseFloat(uc[1])];
+                }
+            }
+
+            // Add a utility which provides a Sector based on the WGS84BoundingBox element
+            if (element.localName === "WGS84BoundingBox") {
+                result.getSector = function () {
+                    return new Sector(result.lowerCorner[1], result.upperCorner[1], result.lowerCorner[0], result.upperCorner[0]);
                 }
             }
 

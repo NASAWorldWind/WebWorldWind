@@ -127,11 +127,7 @@ define([
                             "No bounding box was specified in the layer or tile matrix set capabilities."));
                 }
             } else if (config.wgs84BoundingBox) {
-                this.sector = new Sector(
-                    config.wgs84BoundingBox.lowerCorner[1],
-                    config.wgs84BoundingBox.upperCorner[1],
-                    config.wgs84BoundingBox.lowerCorner[0],
-                    config.wgs84BoundingBox.upperCorner[0]);
+                this.sector = config.wgs84BoundingBox.getSector();
             } else if (this.tileMatrixSet.boundingBox &&
                 WmtsLayer.isEpsg4326Crs(this.tileMatrixSet.boundingBox.crs)) {
                 this.sector = new Sector(
