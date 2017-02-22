@@ -1,9 +1,6 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * Copyright (C) 2016 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
- */
-/**
- * @version $Id: WMTS.js 2016-07-12 rsirac $
  */
 
 requirejs([
@@ -18,77 +15,53 @@ requirejs([
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // Variable to store the capabilities documents
-        var wmtsCapabilities;
+        // Standard World Wind layers
+        var layers = [
+            {layer: new WorldWind.BMNGLayer(), enabled: true},
+            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
+            {layer: new WorldWind.BingAerialLayer(null), enabled: false},
+            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
+            {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
+            {layer: new WorldWind.CompassLayer(), enabled: true},
+            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+        ];
 
-        // Fetch capabilities document
-        $.get('http://map1.vis.earthdata.nasa.gov/wmts-webmerc/wmts.cgi?SERVICE=WMTS&request=GetCapabilities', function (response) {
-            // Parse capabilities
-            wmtsCapabilities = new WorldWind.WmtsCapabilities(response);
-        })
-            .done(function () {
+        for (var l = 0; l < layers.length; l++) {
+            layers[l].layer.enabled = layers[l].enabled;
+            wwd.addLayer(layers[l].layer);
+        }
 
-                /*                              Create a layer from capabilities document                             */
-                {
-                    // We can also precise a specific style, matrix set or image format in formLayerConfiguration method.
-                    var config = WorldWind.WmtsLayer.formLayerConfiguration(wmtsCapabilities.contents.layer[0]);
-                    var layer1 = new WorldWind.WmtsLayer(config, "2016-06-08");
-                }
+        // Create a layer manager for controlling layer visibility.
+        var layerManger = new LayerManager(wwd);
 
+        // Web Map Tiling Service information from
+        var serviceAddress = "https://tiles.geoservice.dlr.de/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0";
+        // Layer displaying Global Hillshade based on GMTED2010
+        var layerName = "hillshade";
 
-                /*                                  Create a layer on the fly / hardcoded                             */
-                {
-                    // Create the resolutions array for tile matrix set
-                    var maxResolution = 0.703125;
-                    var resolutions = [];
-                    for (var i = 0; i < 18; i++) {
-                        resolutions.push(maxResolution / Math.pow(2, i));
-                    }
+        var getDocument = function (serviceAddress) {
+            return $.get(serviceAddress)
+                .fail(function () {
+                    console.log("There was an error while retrieving the WMTS Capabilities document");
+                });
+        };
 
-                    // Create tile matrix set
-                    var matrixset = WorldWind.WmtsLayer.createTileMatrixSet(
-                        {
-                            matrixSet: "EPSG:4326",
-                            prefix: true,
-                            projection: "EPSG:4326",
-                            topLeftCorner: [90, -180],
-                            extent: [-180, -90, 180, 90],
-                            resolutions: resolutions,
-                            tileSize: 256
-                        }
-                    );
+        var createLayer = function (xmlDom) {
+            // Create a WmtsCapabilities object from the XML DOM
+            var wmtsCapabilities = new WorldWind.WmtsCapabilities(xmlDom);
+            // Retrieve a WmtsLayerCapabilities object by the desired layer name
+            var wmtsLayerCapabilities = wmtsCapabilities.getLayer(layerName);
+            // Form a configuration object from the WmtsLayerCapablities object
+            var wmtsConfig = WorldWind.WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
+            // Create the WMTS Layer from the configuration object
+            var wmtsLayer = new WorldWind.WmtsLayer(wmtsConfig);
 
-                    // Create the layer
-                    var layer2 = new WorldWind.WmtsLayer(
-                        {
-                            identifier: "eoc:world_relief_bw",
-                            service: "https://tiles.geoservice.dlr.de/service/wmts?",
-                            format: "image/png",
-                            tileMatrixSet: matrixset,
-                            style: "default",
-                            title: "World Relief (GeoService)"
-                        }
-                    );
-                }
+            // Add the layers to World Wind and create the layer manager
+            wwd.addLayer(wmtsLayer);
+            layerManger.synchronizeLayerList();
+        }
 
+        getDocument(serviceAddress).done(createLayer);
 
-                // Create layer list
-                var layers = [
-                    {layer: layer2, enabled: true},
-                    {layer: layer1, enabled: true},
-                    {layer: new WorldWind.CompassLayer(), enabled: true},
-                    {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-                    {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
-                ];
-
-                // Add the layers
-                for (var l = 0; l < layers.length; l++) {
-                    layers[l].layer.enabled = layers[l].enabled;
-                    wwd.addLayer(layers[l].layer);
-                }
-
-                // Create a layer manager for controlling layer visibility.
-                var layerManager = new LayerManager(wwd);
-
-            });
     });

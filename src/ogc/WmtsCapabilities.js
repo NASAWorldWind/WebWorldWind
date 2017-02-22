@@ -47,6 +47,22 @@ define([
             this.assembleDocument(xmlDom);
         };
 
+        WmtsCapabilities.prototype.getLayer = function (identifier) {
+            if (!identifier) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsCapabilities", "getLayer", "empty identifier"));
+            }
+
+            for (var i = 0, len = this.contents.layer.length; i < len; i++) {
+                var wmtsLayerCapabilities = this.contents.layer[i];
+                if (wmtsLayerCapabilities.identifier === identifier) {
+                    return wmtsLayerCapabilities;
+                }
+            }
+
+            return null;
+        };
+
         WmtsCapabilities.prototype.assembleDocument = function (dom) {
             var root = dom.documentElement;
 
