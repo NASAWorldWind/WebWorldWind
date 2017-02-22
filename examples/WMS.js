@@ -1,20 +1,19 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * Copyright (C) 2017 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
 requirejs(['../src/WorldWind',
-        './LayerManager',
-        '../src/layer/WmsLayer'],
+        './LayerManager'],
     function (ww,
-              LayerManager,
-              WmsLayer) {
+              LayerManager) {
         "use strict";
 
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Standard World Wind layers
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
@@ -26,46 +25,37 @@ requirejs(['../src/WorldWind',
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
 
+        for (var l = 0; l < layers.length; l++) {
+            layers[l].layer.enabled = layers[l].enabled;
+            wwd.addLayer(layers[l].layer);
+        }
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManger = new LayerManager(wwd);
+
         // Web Map Service information from NASA's Near Earth Observations WMS
         var serviceAddress = "http://neowms.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
-        // Layer displaying Average Temparature
+        // Named layer displaying Average Temperature data
         var layerName = "MOD_LSTD_CLIM_M";
 
-        // Callback function to execute upon retrieval of the XML WMS GetCapabilities document
-        var createWmsLayer = function () {
+        // Asynchronous call to retrieve WMS GetCapabilities document, parse, and add as a layer
+        $.get(serviceAddress, function (xmlDom) {
             // Create a WmsCapabilities object from the returned XML
-            var wms = new WorldWind.WmsCapabilities(this.responseXML);
+            var wms = new WorldWind.WmsCapabilities(xmlDom);
             // Retrieve a WmsLayerCapabilities object by the desired layer name
             var wmsLayerCapabilities = wms.getNamedLayer(layerName);
             // Form a configuration object from the WmsLayerCapability object
-            var wmsConfig = WmsLayer.formLayerConfiguration(wmsLayerCapabilities);
-            // Modify a configuration property (optional)
+            var wmsConfig = WorldWind.WmsLayer.formLayerConfiguration(wmsLayerCapabilities);
+            // Modify the configuration objects title property to a more user friendly title
             wmsConfig.title = "Average Surface Temp";
-            // Create the WMS Layer
+            // Create the WMS Layer from the configuration object
             var wmsLayer = new WorldWind.WmsLayer(wmsConfig);
 
-            // Add to the existing list of layers
-            layers.push(
-                {layer: wmsLayer, enabled: true}
-            );
-
             // Add the layers to World Wind and create the layer manager
-            createLayerManager();
-        };
-
-        var createLayerManager = function () {
-            for (var l = 0; l < layers.length; l++) {
-                layers[l].layer.enabled = layers[l].enabled;
-                wwd.addLayer(layers[l].layer);
-            }
-
-            // Create a layer manager for controlling layer visibility.
-            var layerManger = new LayerManager(wwd);
-        };
-
-        // Execute the WMS XML GetCapabilities request
-        var req = new XMLHttpRequest();
-        req.addEventListener('load', createWmsLayer);
-        req.open('GET', serviceAddress);
-        req.send();
+            wwd.addLayer(wmsLayer);
+            layerManger.synchronizeLayerList();
+        })
+            .fail(function () {
+                console.log("Unable to load the WMS GetCapabilities document");
+            });
     });
