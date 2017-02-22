@@ -54,11 +54,9 @@ define([
                     '}\n' +
 
                     //transforms declination and right ascension in cartesian coordinates
-                    //todo: dec/ra -> lat/lon may not be correct
                     'vec3 computePosition(float dec, float ra) {\n' +
                     '   float GMST = normalizeAngle(280.46061837 + 360.98564736629 * numDays);\n' +
-                    //'   float lon = 180.0 - normalizeAngle(GMST - ra);\n' +
-                    '   float lon = ra - GMST;\n' +
+                    '   float lon = 180.0 - normalizeAngle(GMST - ra);\n' +
                     '   float latRad = radians(dec);\n' +
                     '   float lonRad = radians(lon);\n' +
                     '   float radCosLat = cos(latRad);\n' +

@@ -43,7 +43,7 @@ define([
 
             //Documented in defineProperties below.
             this._starDataSource = starDataSource ||
-                WorldWind.configuration.baseUrl + 'examples/data/stars.json';
+                WorldWind.configuration.baseUrl + 'images/stars.json';
 
             //Internal use only.
             //The MVP matrix of this layer.
@@ -133,7 +133,6 @@ define([
             this._matrix.multiplyByScale(altitude, altitude, altitude);
             program.loadModelviewProjection(gl, this._matrix);
 
-            //todo: these uniforms could be loaded in the call with gl.uniform3f as a vec3
             var JD = this.julianDate(this.time);
             //this subtraction does not work properly on the GPU, it must be done on the CPU
             //possibly due to precision loss
@@ -191,7 +190,7 @@ define([
                         self._starData = JSON.parse(this.response);
                     }
                     catch (e) {
-                        Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to parse JSON for star data' +
+                        Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to parse JSON for star data ' +
                             e.toString());
                     }
                 }
@@ -199,7 +198,7 @@ define([
             };
 
             xhr.onerror = function (e) {
-                Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to fetch star data' + e.toString());
+                Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to fetch star data ' + e.toString());
                 self._loadStarted = false;
             };
 
@@ -243,7 +242,7 @@ define([
                 var declination = starInfo[indexes.decIndex]; //for latitude
                 var rightAscension = starInfo[indexes.raIndex]; //for longitude
                 var magnitude = starInfo[indexes.magIndex];
-                var pointSize = magnitude < 4 ? 2 : 1;
+                var pointSize = magnitude < 2 ? 2 : 1;
 
                 positions.push(declination, rightAscension, pointSize, magnitude);
 
@@ -307,7 +306,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        StarFieldLayer.prototype.invalidateStarData = function (){
+        StarFieldLayer.prototype.invalidateStarData = function () {
             this._starData = null;
             this._positionsVboCacheKey = null;
         };
