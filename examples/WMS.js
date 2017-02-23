@@ -38,13 +38,6 @@ requirejs(['../src/WorldWind',
         // Named layer displaying Average Temperature data
         var layerName = "MOD_LSTD_CLIM_M";
 
-        var getDocument = function (serviceAddress) {
-            return $.get(serviceAddress)
-                .fail(function () {
-                    console.log("There was an error while retrieving the WMS Capabilities document");
-                });
-        };
-
         var createLayer = function (xmlDom) {
             // Create a WmsCapabilities object from the XML DOM
             var wms = new WorldWind.WmsCapabilities(xmlDom);
@@ -62,6 +55,6 @@ requirejs(['../src/WorldWind',
             layerManger.synchronizeLayerList();
         };
 
-        getDocument(serviceAddress).done(createLayer);
+        $.get(serviceAddress).done(createLayer).fail(console.log("There was an error while retrieving the WMS Capabilities document"));
 
     });

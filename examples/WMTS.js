@@ -40,13 +40,6 @@ requirejs([
         // Layer displaying Global Hillshade based on GMTED2010
         var layerName = "hillshade";
 
-        var getDocument = function (serviceAddress) {
-            return $.get(serviceAddress)
-                .fail(function () {
-                    console.log("There was an error while retrieving the WMTS Capabilities document");
-                });
-        };
-
         var createLayer = function (xmlDom) {
             // Create a WmtsCapabilities object from the XML DOM
             var wmtsCapabilities = new WorldWind.WmtsCapabilities(xmlDom);
@@ -62,6 +55,6 @@ requirejs([
             layerManger.synchronizeLayerList();
         }
 
-        getDocument(serviceAddress).done(createLayer);
+        $.get(serviceAddress).done(createLayer).fail(console.log("There was an error while retrieving the WMTS Capabilities document"));
 
     });
