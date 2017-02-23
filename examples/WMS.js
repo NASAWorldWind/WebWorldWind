@@ -56,7 +56,7 @@ requirejs(['../src/WorldWind',
         };
 
         $.get(serviceAddress).done(createLayer).fail(function () {
-            console.log("There was an error while retrieving the WMS Capabilities document")
+            console.log("There was an error while retrieving the WMS Capabilities document");
         });
 
     });

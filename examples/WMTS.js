@@ -56,7 +56,7 @@ requirejs([
         }
 
         $.get(serviceAddress).done(createLayer).fail(function () {
-            console.log("There was an error while retrieving the WMTS Capabilities document")
+            console.log("There was an error while retrieving the WMTS Capabilities document");
         });
 
     });
