@@ -9,7 +9,7 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        './WmsLayerCapabilities'
+        '../../ogc/wms/WmsLayerCapabilities'
     ],
     function (ArgumentError,
               Logger,

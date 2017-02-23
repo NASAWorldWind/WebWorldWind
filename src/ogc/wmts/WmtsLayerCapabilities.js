@@ -8,7 +8,7 @@
 define([
         '../../error/ArgumentError',
         '../../geom/Sector',
-        './OwsDescription',
+        '../../ogc/wmts/OwsDescription',
         '../../util/Logger'
     ],
     function (ArgumentError,

@@ -8,7 +8,7 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        './OwsDescription'
+        '../../ogc/wmts/OwsDescription'
     ],
     function (ArgumentError,
               Logger,

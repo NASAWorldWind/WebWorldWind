@@ -8,13 +8,13 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        './OwsDescription',
-        './OwsLanguageString',
-        './OwsOperationsMetadata',
-        './OwsServiceIdentification',
-        './OwsServiceProvider',
+        '../../ogc/wmts/OwsDescription',
+        '../../ogc/wmts/OwsLanguageString',
+        '../../ogc/wmts/OwsOperationsMetadata',
+        '../../ogc/wmts/OwsServiceIdentification',
+        '../../ogc/wmts/OwsServiceProvider',
         '../../ogc/wms/WmsCapabilities',
-        './WmtsLayerCapabilities'
+        '../../ogc/wmts/WmtsLayerCapabilities'
     ],
     function (ArgumentError,
               Logger,
