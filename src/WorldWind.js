@@ -10,6 +10,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Angle',
         './shapes/Annotation',
         './shapes/AnnotationAttributes',
+        './util/measure/AreaMeasurer',
         './error/ArgumentError',
         './layer/AtmosphereLayer',
         './shaders/AtmosphereProgram',
@@ -66,6 +67,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/GpuResourceCache',
         './shaders/GpuShader',
         './shaders/GroundProgram',
+        './util/HashMap',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
@@ -121,6 +123,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/geom/KmlTrack',
         './layer/LandsatRestLayer',
         './layer/Layer',
+        './util/measure/LengthMeasurer',
         './util/Level',
         './util/LevelRowColumnUrlBuilder',
         './util/LevelSet',
@@ -129,6 +132,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/Logger',
         './navigate/LookAtNavigator',
         './geom/Matrix',
+        './util/measure/MeasurerUtils',
         './cache/MemoryCache',
         './cache/MemoryCacheListener',
         './layer/MercatorTiledImageLayer',
@@ -149,6 +153,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/PlacemarkAttributes',
         './geom/Plane',
         './shapes/Polygon',
+        './util/PolygonSplitter',
         './geom/Position',
         './projections/ProjectionEquirectangular',
         './projections/ProjectionGnomonic',
@@ -226,6 +231,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Angle,
               Annotation,
               AnnotationAttributes,
+              AreaMeasurer,
               ArgumentError,
               AtmosphereLayer,
               AtmosphereProgram,
@@ -282,6 +288,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuResourceCache,
               GpuShader,
               GroundProgram,
+              HashMap,
               HighlightController,
               ImagePyramid,
               ImageSource,
@@ -337,6 +344,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlTrack,
               LandsatRestLayer,
               Layer,
+              LengthMeasurer,
               Level,
               LevelRowColumnUrlBuilder,
               LevelSet,
@@ -345,6 +353,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Logger,
               LookAtNavigator,
               Matrix,
+              MeasurerUtils,
               MemoryCache,
               MemoryCacheListener,
               MercatorTiledImageLayer,
@@ -365,6 +374,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               PlacemarkAttributes,
               Plane,
               Polygon,
+              PolygonSplitter,
               Position,
               ProjectionEquirectangular,
               ProjectionGnomonic,
@@ -651,6 +661,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Angle'] = Angle;
         WorldWind['Annotation'] = Annotation;
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
+        WorldWind['AreaMeasurer'] = AreaMeasurer;
         WorldWind['ArgumentError'] = ArgumentError;
         WorldWind['AtmosphereLayer'] = AtmosphereLayer;
         WorldWind['AtmosphereProgram'] = AtmosphereProgram;
@@ -707,6 +718,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuResourceCache'] = GpuResourceCache;
         WorldWind['GpuShader'] = GpuShader;
         WorldWind['GroundProgram'] = GroundProgram;
+        WorldWind['HashMap'] = HashMap;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
@@ -714,6 +726,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['KmlFile'] = KmlFile;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
+        WorldWind['LengthMeasurer'] = LengthMeasurer;
         WorldWind['Level'] = Level;
         WorldWind['LevelRowColumnUrlBuilder'] = LevelRowColumnUrlBuilder;
         WorldWind['LevelSet'] = LevelSet;
@@ -722,6 +735,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Logger'] = Logger;
         WorldWind['LookAtNavigator'] = LookAtNavigator;
         WorldWind['Matrix'] = Matrix;
+        WorldWind['MeasurerUtils'] = MeasurerUtils;
         WorldWind['MemoryCache'] = MemoryCache;
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
         WorldWind['MercatorTiledImageLayer'] = MercatorTiledImageLayer;
@@ -741,6 +755,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['PlacemarkAttributes'] = PlacemarkAttributes;
         WorldWind['Plane'] = Plane;
         WorldWind['Polygon'] = Polygon;
+        WorldWind['PolygonSplitter'] = PolygonSplitter;
         WorldWind['Position'] = Position;
         WorldWind['ProjectionEquirectangular'] = ProjectionEquirectangular;
         WorldWind['ProjectionGnomonic'] = ProjectionGnomonic;
