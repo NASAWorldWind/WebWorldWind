@@ -6,9 +6,9 @@
  * @exports OwsOperationsMetadata
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsConstraint'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        './OwsConstraint'
     ],
     function (ArgumentError,
               Logger,

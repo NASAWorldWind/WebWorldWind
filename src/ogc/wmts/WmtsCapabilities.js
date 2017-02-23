@@ -6,15 +6,15 @@
  * @exports WmtsCapabilities
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsDescription',
-        '../ogc/OwsLanguageString',
-        '../ogc/OwsOperationsMetadata',
-        '../ogc/OwsServiceIdentification',
-        '../ogc/OwsServiceProvider',
-        '../ogc/WmsCapabilities',
-        '../ogc/WmtsLayerCapabilities'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        './OwsDescription',
+        './OwsLanguageString',
+        './OwsOperationsMetadata',
+        './OwsServiceIdentification',
+        './OwsServiceProvider',
+        '../../ogc/wms/WmsCapabilities',
+        './WmtsLayerCapabilities'
     ],
     function (ArgumentError,
               Logger,

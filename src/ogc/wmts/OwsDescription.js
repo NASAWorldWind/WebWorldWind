@@ -6,9 +6,9 @@
  * @exports OwsDescription
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsLanguageString'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        './OwsLanguageString'
     ],
 
     function (ArgumentError,

@@ -6,9 +6,9 @@
  * @exports OwsServiceIdentification
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsDescription'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        './OwsDescription'
     ],
     function (ArgumentError,
               Logger,

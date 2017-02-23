@@ -55,6 +55,8 @@ requirejs([
             layerManger.synchronizeLayerList();
         }
 
-        $.get(serviceAddress).done(createLayer).fail(console.log("There was an error while retrieving the WMTS Capabilities document"));
+        $.get(serviceAddress).done(createLayer).fail(function () {
+            console.log("There was an error while retrieving the WMTS Capabilities document")
+        });
 
     });

@@ -6,10 +6,10 @@
  * @exports WmtsLayerCapabilities
  */
 define([
-        '../error/ArgumentError',
-        '../geom/Sector',
-        '../ogc/OwsDescription',
-        '../util/Logger'
+        '../../error/ArgumentError',
+        '../../geom/Sector',
+        './OwsDescription',
+        '../../util/Logger'
     ],
     function (ArgumentError,
               Sector,

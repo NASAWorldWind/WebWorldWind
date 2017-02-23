@@ -6,8 +6,8 @@
  * @exports OwsLanguageString
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger'
+        '../../error/ArgumentError',
+        '../../util/Logger'
     ],
     function (ArgumentError,
               Logger) {
