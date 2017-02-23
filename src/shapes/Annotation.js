@@ -111,6 +111,9 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.calloutPoints = null;
+
+            // Internal use only. Intentionally not documented.
+            this.texCoordMatrix = Matrix.fromIdentity();
         };
 
         Annotation.matrix = Matrix.fromIdentity();
@@ -257,7 +260,7 @@ define([
             // annotation
             this.label = dc.textSupport.wrap(
                 this.label,
-                this.attributes.width,this.attributes.height,
+                this.attributes.width, this.attributes.height,
                 this.attributes.textAttributes.font);
 
             // Compute the annotation's model point.
@@ -320,7 +323,7 @@ define([
                 leaderOffsetY = 0;
             }
 
-            if (this.attributes.stateKey != this.lastStateKey){
+            if (this.attributes.stateKey != this.lastStateKey) {
                 this.calloutPoints = this.createCallout(
                     width, height,
                     leaderOffsetX, leaderOffsetY,
@@ -471,7 +474,7 @@ define([
             }
 
             // Remove the last generated vbo data if attributes changed
-            if (calloutAttributesChanged && this.calloutCacheKey){
+            if (calloutAttributesChanged && this.calloutCacheKey) {
                 dc.gpuResourceCache.removeResource(this.calloutCacheKey);
             }
 
@@ -509,6 +512,10 @@ define([
             program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
+
+            this.texCoordMatrix.setToIdentity();
+            this.texCoordMatrix.multiplyByTextureTransform(this.labelTexture);
+            program.loadTextureMatrix(gl, this.texCoordMatrix);
 
             // Configure GL to use the draw context's unit quad VBOs for both model coordinates and texture coordinates.
             // Most browsers can share the same buffer for vertex and texture coordinates, but Internet Explorer requires

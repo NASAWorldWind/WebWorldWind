@@ -291,9 +291,9 @@ define([
             endLatRadians = Math.asin(Math.sin(latRadians) * Math.cos(pathLengthRadians) +
                 Math.cos(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
             endLonRadians = lonRadians + Math.atan2(
-                Math.sin(pathLengthRadians) * Math.sin(azimuthRadians),
-                Math.cos(latRadians) * Math.cos(pathLengthRadians) -
-                Math.sin(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
+                    Math.sin(pathLengthRadians) * Math.sin(azimuthRadians),
+                    Math.cos(latRadians) * Math.cos(pathLengthRadians) -
+                    Math.sin(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
 
             if (isNaN(endLatRadians) || isNaN(endLonRadians)) {
                 result.latitude = location.latitude;
@@ -475,8 +475,7 @@ define([
             dLon = pathLengthRadians * Math.sin(azimuthRadians) / q;
 
             // Handle latitude passing over either pole.
-            if (WWMath.fabs(endLatRadians) > Math.PI / 2)
-            {
+            if (WWMath.fabs(endLatRadians) > Math.PI / 2) {
                 endLatRadians = endLatRadians > 0 ? Math.PI - endLatRadians : -Math.PI - endLatRadians;
             }
 
@@ -641,8 +640,7 @@ define([
                 endLonRadians;
 
             // Handle latitude passing over either pole.
-            if (WWMath.fabs(endLatRadians) > Math.PI / 2)
-            {
+            if (WWMath.fabs(endLatRadians) > Math.PI / 2) {
                 endLatRadians = endLatRadians > 0 ? Math.PI - endLatRadians : -Math.PI - endLatRadians;
             }
 
@@ -666,7 +664,7 @@ define([
          * @returns {boolean} True if the dateline is crossed, else false.
          * @throws {ArgumentError} If the locations list is null.
          */
-        Location.locationsCrossDateLine = function(locations) {
+        Location.locationsCrossDateLine = function (locations) {
             if (!locations) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "locationsCrossDateline", "missingLocation"));
@@ -681,7 +679,8 @@ define([
                     // and are more than 180 degrees longitude apart
                     if (WWMath.signum(pos.longitude) != WWMath.signum(posNext.longitude)) {
                         var delta = Math.abs(pos.longitude - posNext.longitude);
-                        if (delta > 180 && delta < 360)
+                        //florin added <= 360, handles (90, 180) -> (0, -180) -> (-90, 180)
+                        if (delta > 180 && delta <= 360)
                             return true;
                     }
                 }
@@ -701,7 +700,7 @@ define([
          *
          * @throws IllegalArgumentException if locations is null.
          */
-        Location.greatCircleArcExtremeLocations = function(locations) {
+        Location.greatCircleArcExtremeLocations = function (locations) {
             if (!locations) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeLocations", "missingLocation"));
@@ -746,7 +745,7 @@ define([
          *
          * @throws {ArgumentError} If either begin or end are null.
          */
-        Location.greatCircleArcExtremeForTwoLocations = function(begin, end) {
+        Location.greatCircleArcExtremeForTwoLocations = function (begin, end) {
             if (!begin || !end) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeForTwoLocations", "missingLocation"));
@@ -823,7 +822,7 @@ define([
          *
          * @throws {ArgumentError} If location is null.
          */
-        Location.greatCircleExtremeLocationsUsingAzimuth = function(location, azimuth) {
+        Location.greatCircleExtremeLocationsUsingAzimuth = function (location, azimuth) {
             if (!location) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeLocationsUsingAzimuth", "missingLocation"));
@@ -859,7 +858,7 @@ define([
 
             return [
                 Location.greatCircleLocation(location, azimuth, extremeDistance1, new Location(0, 0)),
-                Location.greatCircleLocation(location, azimuth, extremeDistance2, new Location(0,0))
+                Location.greatCircleLocation(location, azimuth, extremeDistance2, new Location(0, 0))
             ];
         };
 
@@ -879,7 +878,7 @@ define([
          * TODO: this code allocates 4 new Vec3 and 1 new Position; use scratch variables???
          * TODO: Why not? Every location created would then allocated those variables as well, even if they aren't needed :(.
          */
-        Location.intersectionWithMeridian = function(p1, p2, meridian, globe) {
+        Location.intersectionWithMeridian = function (p1, p2, meridian, globe) {
             // TODO: add support for 2D
             //if (globe instanceof Globe2D)
             //{
@@ -915,6 +914,34 @@ define([
             globe.computePositionFromPoint(intersectionPoint[0], intersectionPoint[1], intersectionPoint[2], pos);
 
             return pos.latitude;
+        };
+
+        /**
+         * Determine where a line between two positions crosses a given meridian. The intersection test is performed by
+         * intersecting a line in Cartesian space. Thus, it is most suitable for working with positions that are fairly
+         * close together as the calculation does not take into account great circle or rhumb paths.
+         *
+         * @param {Location | Position} p1 First position.
+         * @param {Location | Position} p2 Second position.
+         * @param {number} meridian Longitude line to intersect with.
+         *
+         * @return {number | null} latitude The intersection latitude along the meridian
+         * or null if the line is collinear with the meridian
+         */
+        Location.meridianIntersection = function(p1, p2, meridian){
+                // y = mx + b case after normalizing negative angles.
+                var lon1 = p1.longitude < 0 ? p1.longitude + 360 : p1.longitude;
+                var lon2 = p2.longitude < 0 ? p2.longitude + 360 : p2.longitude;
+                if (lon1 === lon2) {
+                    //infinite solutions, the line is collinear with the anti-meridian
+                    return null;
+                }
+
+                var med = meridian < 0 ? meridian + 360 : meridian;
+                var slope = (p2.latitude - p1.latitude) / (lon2 - lon1);
+                var lat = p1.latitude + slope * (med - lon1);
+
+                return lat;
         };
 
         /**
