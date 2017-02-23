@@ -38,25 +38,29 @@ requirejs([
         // Web Map Tiling Service information from
         var serviceAddress = "https://tiles.geoservice.dlr.de/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0";
         // Layer displaying Global Hillshade based on GMTED2010
-        var layerName = "hillshade";
+        var layerIdentifier = "hillshade";
 
+        // Called asynchronously to parse and create the WMTS layer
         var createLayer = function (xmlDom) {
             // Create a WmtsCapabilities object from the XML DOM
             var wmtsCapabilities = new WorldWind.WmtsCapabilities(xmlDom);
             // Retrieve a WmtsLayerCapabilities object by the desired layer name
-            var wmtsLayerCapabilities = wmtsCapabilities.getLayer(layerName);
-            // Form a configuration object from the WmtsLayerCapablities object
+            var wmtsLayerCapabilities = wmtsCapabilities.getLayer(layerIdentifier);
+            // Form a configuration object from the WmtsLayerCapabilities object
             var wmtsConfig = WorldWind.WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
             // Create the WMTS Layer from the configuration object
             var wmtsLayer = new WorldWind.WmtsLayer(wmtsConfig);
 
-            // Add the layers to World Wind and create the layer manager
+            // Add the layers to World Wind and update the layer manager
             wwd.addLayer(wmtsLayer);
             layerManger.synchronizeLayerList();
         }
 
-        $.get(serviceAddress).done(createLayer).fail(function () {
-            console.log("There was an error while retrieving the WMTS Capabilities document");
-        });
+        // Called if an error occurs during WMTS Capabilities document retrieval
+        var logError = function (jqXhr, text, exception) {
+            console.log("There was a failure retrieving the capabilities document: " + text + " exception: " + exception);
+        };
+
+        $.get(serviceAddress).done(createLayer).fail(logError);
 
     });
