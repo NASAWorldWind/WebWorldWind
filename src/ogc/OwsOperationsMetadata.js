@@ -44,6 +44,42 @@ define([
             }
         };
 
+        /**
+         * Attempts to find the first OwsOperationsMetadata object named GetCapabilities.
+         * @returns {OwsOperationsMetadata} if a matching OwsOperationsMetadata object is found, otherwise null.
+         */
+        OwsOperationsMetadata.prototype.getGetCapabilities = function () {
+            return this.getOperationMetadataByName("GetCapabilities");
+        };
+
+        /**
+         * Attempts to find the first OwsOperationsMetadata object named GetTile.
+         * @returns {OwsOperationsMetadata} if a matching OwsOperationsMetadata object is found, otherwise null.
+         */
+        OwsOperationsMetadata.prototype.getGetTile = function () {
+            return this.getOperationMetadataByName("GetTile");
+        };
+
+        /**
+         * Searches for the OWS Operations Metadata objects for the operation with a name matching the  provided name.
+         * Returns the first successful match.
+         * @returns {OwsOperationsMetadata} of a matching name or null if none was found
+         */
+        OwsOperationsMetadata.prototype.getOperationMetadataByName = function (name) {
+            if (!name) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "OwsOperationsMetadata", "getOperationsMetadataByName", "missingName"));
+            }
+
+            for (var i = 0; i < this.operation.length; i++) {
+                if (this.operation[i].name === name) {
+                    return this.operation[i];
+                }
+            }
+
+            return null;
+        };
+
         OwsOperationsMetadata.assembleOperation = function (element) {
             var operation = {};
 
