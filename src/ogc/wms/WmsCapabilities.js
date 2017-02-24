@@ -7,9 +7,9 @@
  * @version $Id: WmsCapabilities.js 3055 2015-04-29 21:39:51Z tgaskins $
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/WmsLayerCapabilities'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        '../../ogc/wms/WmsLayerCapabilities'
     ],
     function (ArgumentError,
               Logger,

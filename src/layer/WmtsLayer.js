@@ -127,11 +127,7 @@ define([
                             "No bounding box was specified in the layer or tile matrix set capabilities."));
                 }
             } else if (config.wgs84BoundingBox) {
-                this.sector = new Sector(
-                    config.wgs84BoundingBox.lowerCorner[1],
-                    config.wgs84BoundingBox.upperCorner[1],
-                    config.wgs84BoundingBox.lowerCorner[0],
-                    config.wgs84BoundingBox.upperCorner[0]);
+                this.sector = config.wgs84BoundingBox.getSector();
             } else if (this.tileMatrixSet.boundingBox &&
                 WmtsLayer.isEpsg4326Crs(this.tileMatrixSet.boundingBox.crs)) {
                 this.sector = new Sector(
@@ -470,13 +466,17 @@ define([
                     "No default style available. A style will not be specified in tile requests.");
             }
 
+            // Retrieve the supported tile matrix sets for testing against provided tile matrix set or for tile matrix
+            // set negotiation.
+            var supportedTileMatrixSets = wmtsLayerCapabilities.getLayerSupportedTileMatrixSets();
+
             // Validate that the specified style identifier exists, or determine one if not specified.
             if (matrixSet) {
                 var tileMatrixSetFound = false;
-                for (var i = 0; i < wmtsLayerCapabilities.tileMatrixSetLink.length; i++) {
-                    if (wmtsLayerCapabilities.tileMatrixSetLink[i].tileMatrixSetRef.identifier === matrixSet) {
+                for (var i = 0, len = supportedTileMatrixSets.length; i < len; i++) {
+                    if (supportedTileMatrixSets[i].identifier === matrixSet) {
                         tileMatrixSetFound = true;
-                        config.tileMatrixSet = wmtsLayerCapabilities.tileMatrixSetLink[i].tileMatrixSetRef;
+                        config.tileMatrixSet = supportedTileMatrixSets[i];
                         break;
                     }
                 }
@@ -492,15 +492,14 @@ define([
                 // Find the tile matrix set we want to use. Prefer EPSG:4326, then EPSG:3857.
                 var tms, tms4326 = null, tms3857 = null, tmsCRS84 = null;
 
-                for (i = 0; i < wmtsLayerCapabilities.tileMatrixSetLink.length; i++) {
-                    tms = wmtsLayerCapabilities.tileMatrixSetLink[i].tileMatrixSetRef;
+                for (var i = 0, len = supportedTileMatrixSets.length; i < len; i++) {
+                    tms = supportedTileMatrixSets[i];
 
                     if (WmtsLayer.isEpsg4326Crs(tms.supportedCRS)) {
                         tms4326 = tms4326 || tms;
                     } else if (WmtsLayer.isEpsg3857Crs(tms.supportedCRS)) {
                         tms3857 = tms3857 || tms;
-                    }
-                    else if (WmtsLayer.isOGCCrs84(tms.supportedCRS)) {
+                    } else if (WmtsLayer.isOGCCrs84(tms.supportedCRS)) {
                         tmsCRS84 = tmsCRS84 || tms;
                     }
                 }

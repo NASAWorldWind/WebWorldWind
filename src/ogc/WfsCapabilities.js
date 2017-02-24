@@ -8,10 +8,10 @@
 define([
         '../error/ArgumentError',
         '../util/Logger',
-        '../ogc/OwsLanguageString',
-        '../ogc/OwsOperationsMetadata',
-        '../ogc/OwsServiceIdentification',
-        '../ogc/OwsServiceProvider'
+        '../ogc/wmts/OwsLanguageString',
+        '../ogc/wmts/OwsOperationsMetadata',
+        '../ogc/wmts/OwsServiceIdentification',
+        '../ogc/wmts/OwsServiceProvider'
     ],
     function (ArgumentError,
               Logger,
