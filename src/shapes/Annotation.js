@@ -111,9 +111,6 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.calloutPoints = null;
-
-            // Internal use only. Intentionally not documented.
-            this.texCoordMatrix = Matrix.fromIdentity();
         };
 
         Annotation.matrix = Matrix.fromIdentity();
@@ -509,13 +506,13 @@ define([
             Annotation.matrix.multiplyMatrix(this.labelTransform);
             program.loadModelviewProjection(gl, Annotation.matrix);
 
+            Annotation.matrix.setToIdentity();
+            Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
+            program.loadTextureMatrix(gl, Annotation.matrix);
+
             program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
-
-            this.texCoordMatrix.setToIdentity();
-            this.texCoordMatrix.multiplyByTextureTransform(this.labelTexture);
-            program.loadTextureMatrix(gl, this.texCoordMatrix);
 
             // Configure GL to use the draw context's unit quad VBOs for both model coordinates and texture coordinates.
             // Most browsers can share the same buffer for vertex and texture coordinates, but Internet Explorer requires
