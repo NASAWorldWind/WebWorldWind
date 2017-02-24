@@ -1,12 +1,10 @@
 /*
- * Copyright (C) 2016 United States Government as represented by the Administrator of the
+ * Copyright (C) 2017 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
-requirejs([
-        '../src/WorldWind',
-        '../examples/LayerManager'
-    ],
+requirejs(['../src/WorldWind',
+        './LayerManager'],
     function (ww,
               LayerManager) {
         "use strict";
@@ -35,28 +33,30 @@ requirejs([
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
-        // Web Map Tiling Service information from
-        var serviceAddress = "https://tiles.geoservice.dlr.de/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0";
-        // Layer displaying Global Hillshade based on GMTED2010
-        var layerIdentifier = "hillshade";
+        // Web Map Service information from NASA's Near Earth Observations WMS
+        var serviceAddress = "http://neowms.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+        // Named layer displaying Average Temperature data
+        var layerName = "MOD_LSTD_CLIM_M";
 
-        // Called asynchronously to parse and create the WMTS layer
+        // Called asynchronously to parse and create the WMS layer
         var createLayer = function (xmlDom) {
-            // Create a WmtsCapabilities object from the XML DOM
-            var wmtsCapabilities = new WorldWind.WmtsCapabilities(xmlDom);
-            // Retrieve a WmtsLayerCapabilities object by the desired layer name
-            var wmtsLayerCapabilities = wmtsCapabilities.getLayer(layerIdentifier);
-            // Form a configuration object from the WmtsLayerCapabilities object
-            var wmtsConfig = WorldWind.WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
-            // Create the WMTS Layer from the configuration object
-            var wmtsLayer = new WorldWind.WmtsLayer(wmtsConfig);
+            // Create a WmsCapabilities object from the XML DOM
+            var wms = new WorldWind.WmsCapabilities(xmlDom);
+            // Retrieve a WmsLayerCapabilities object by the desired layer name
+            var wmsLayerCapabilities = wms.getNamedLayer(layerName);
+            // Form a configuration object from the WmsLayerCapability object
+            var wmsConfig = WorldWind.WmsLayer.formLayerConfiguration(wmsLayerCapabilities);
+            // Modify the configuration objects title property to a more user friendly title
+            wmsConfig.title = "Average Surface Temp";
+            // Create the WMS Layer from the configuration object
+            var wmsLayer = new WorldWind.WmsLayer(wmsConfig);
 
             // Add the layers to World Wind and update the layer manager
-            wwd.addLayer(wmtsLayer);
+            wwd.addLayer(wmsLayer);
             layerManger.synchronizeLayerList();
-        }
+        };
 
-        // Called if an error occurs during WMTS Capabilities document retrieval
+        // Called if an error occurs during WMS Capabilities document retrieval
         var logError = function (jqXhr, text, exception) {
             console.log("There was a failure retrieving the capabilities document: " + text + " exception: " + exception);
         };

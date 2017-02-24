@@ -6,15 +6,15 @@
  * @exports WmtsCapabilities
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsDescription',
-        '../ogc/OwsLanguageString',
-        '../ogc/OwsOperationsMetadata',
-        '../ogc/OwsServiceIdentification',
-        '../ogc/OwsServiceProvider',
-        '../ogc/WmsCapabilities',
-        '../ogc/WmtsLayerCapabilities'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        '../../ogc/wmts/OwsDescription',
+        '../../ogc/wmts/OwsLanguageString',
+        '../../ogc/wmts/OwsOperationsMetadata',
+        '../../ogc/wmts/OwsServiceIdentification',
+        '../../ogc/wmts/OwsServiceProvider',
+        '../../ogc/wms/WmsCapabilities',
+        '../../ogc/wmts/WmtsLayerCapabilities'
     ],
     function (ArgumentError,
               Logger,
@@ -47,6 +47,38 @@ define([
             this.assembleDocument(xmlDom);
         };
 
+        /**
+         * Provides all of the layers associated with this WMTS. This method is for convienence and returns the layer
+         * array captured in the contents of this WmtsCapabilities object.
+         * @returns {WmtsLayerCapabilities[]}
+         */
+        WmtsCapabilities.prototype.getLayers = function () {
+            return this.contents.layer;
+        };
+
+        /**
+         * Retrieve the WmtsLayerCapabilities object for the provided identifier.
+         * @param identifier
+         * @returns {WmtsLayerCapabilities} object for the provided identifier or null if no identifier was found in the
+         * WmtsCapabilities object.
+         * @throws {ArgumentError} If the specified identifier is null or undefined.
+         */
+        WmtsCapabilities.prototype.getLayer = function (identifier) {
+            if (!identifier) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsCapabilities", "getLayer", "empty identifier"));
+            }
+
+            for (var i = 0, len = this.contents.layer.length; i < len; i++) {
+                var wmtsLayerCapabilities = this.contents.layer[i];
+                if (wmtsLayerCapabilities.identifier === identifier) {
+                    return wmtsLayerCapabilities;
+                }
+            }
+
+            return null;
+        };
+
         WmtsCapabilities.prototype.assembleDocument = function (dom) {
             var root = dom.documentElement;
 
@@ -72,8 +104,6 @@ define([
                     this.serviceMetadataUrls.push(WmtsCapabilities.assembleServiceMetadataURL(child));
                 }
             }
-
-            this.resolveTileMatrixSetLinks();
         };
 
         WmtsCapabilities.prototype.assembleContents = function (element) {
@@ -214,23 +244,6 @@ define([
             }
 
             return result;
-        };
-
-        WmtsCapabilities.prototype.resolveTileMatrixSetLinks = function () {
-            for (var i = 0; i < this.contents.layer.length; i++) {
-                var layer = this.contents.layer[i];
-
-                for (var j = 0; j < layer.tileMatrixSetLink.length; j++) {
-                    var link = layer.tileMatrixSetLink[j];
-
-                    for (var k = 0; k < this.contents.tileMatrixSet.length; k++) {
-                        if (this.contents.tileMatrixSet[k].identifier === link.tileMatrixSet) {
-                            link.tileMatrixSetRef = this.contents.tileMatrixSet[k];
-                            break;
-                        }
-                    }
-                }
-            }
         };
 
         WmtsCapabilities.prototype.getGetTileKvpAddress = function () {
