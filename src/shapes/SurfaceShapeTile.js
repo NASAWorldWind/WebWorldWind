@@ -129,17 +129,6 @@ define([
             this.surfaceShapeStateKeys.push(surfaceShape.stateKey);
         };
 
-        /**
-         * Add multiple surface shapes to this tile's collection.
-         * @param {SurfaceShape[]} shapes A collection of surface shapes to add to the collection of this tile.
-         */
-        SurfaceShapeTile.prototype.addAllSurfaceShapes = function (shapes) {
-            for (var idx = 0, len = shapes.length; idx < len; idx += 1) {
-                var shape = shapes[idx];
-                this.addAllSurfaceShapes(shape);
-            }
-        };
-
         // Internal use only. Intentionally not documented.
         SurfaceShapeTile.prototype.needsUpdate = function (dc) {
             var idx, len, surfaceShape, surfaceShapeStateKey;
@@ -196,12 +185,11 @@ define([
                 return false;
             }
 
-            var gpuResourceCache = dc.gpuResourceCache;
-
             if (!this.gpuCacheKey) {
                 this.gpuCacheKey = this.getCacheKey();
             }
 
+            var gpuResourceCache = dc.gpuResourceCache;
             var texture = gpuResourceCache.resourceForKey(this.gpuCacheKey);
 
             return !!texture;
@@ -214,12 +202,11 @@ define([
          */
         SurfaceShapeTile.prototype.updateTexture = function (dc) {
             var gl = dc.currentGlContext,
-                canvas = SurfaceShapeTile.canvas;
+                canvas = SurfaceShapeTile.canvas,
+                ctx2D = SurfaceShapeTile.ctx2D;
 
             canvas.width = this.tileWidth;
             canvas.height = this.tileHeight;
-
-            var ctx2D = SurfaceShapeTile.ctx2D;
 
             // Mapping from lat/lon to x/y:
             //  lon = minlon => x = 0
@@ -242,12 +229,10 @@ define([
                 shape.renderToTexture(dc, ctx2D, xScale, yScale, xOffset, yOffset);
             }
 
-            var texture = new Texture(gl, canvas);
-
-            var gpuResourceCache = dc.gpuResourceCache;
-
             this.gpuCacheKey = this.getCacheKey();
 
+            var gpuResourceCache = dc.gpuResourceCache;
+            var texture = new Texture(gl, canvas);
             gpuResourceCache.putResource(this.gpuCacheKey, texture, texture.size);
 
             return texture;
