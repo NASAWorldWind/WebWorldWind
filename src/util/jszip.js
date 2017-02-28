@@ -509,7 +509,7 @@ function JSZip(data, options) {
     //   "folder/" : {...},
     //   "folder/data.txt" : {...}
     // }
-    this.files = [];
+    this.files = {};
 
     this.comment = null;
 
@@ -844,10 +844,8 @@ var prepareFileAttrs = function(o) {
  * @param {String|ArrayBuffer|Uint8Array|Buffer} data the data of the file
  * @param {Object} o the options of the file
  * @return {Object} the new file.
- *
  */
 var fileAdd = function(name, data, o) {
-     var  push =Array.prototype.push;
     // be sure sub folders exist
     var dataType = utils.getTypeOf(data),
         parent;
@@ -906,9 +904,7 @@ var fileAdd = function(name, data, o) {
     }
 
     var object = new ZipObject(name, data, o);
-    // this.files[name] = object;
-    //convert  files  from Object to Array
-    push.call(this.files,object);
+    this.files[name] = object;
     return object;
 };
 

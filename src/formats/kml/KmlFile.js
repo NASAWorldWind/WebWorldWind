@@ -80,7 +80,8 @@ define([
                 } else {
                     var kmzFile = new JsZip();
                     kmzFile.load(loadedDocument);
-                    kmzFile.files.forEach(function (file) {
+                    Object.keys(kmzFile.files).forEach(function(key){
+                        var file = kmzFile.files[key];
                         if (file.name.endsWith(".kml") && rootDocument == null) {
                             rootDocument = file.asText();
                         }
