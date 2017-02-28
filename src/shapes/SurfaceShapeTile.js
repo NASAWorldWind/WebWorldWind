@@ -67,8 +67,12 @@ define([
             // Internal use only. Intentionally not documented.
             this.surfaceShapeStateKeys = [];
 
-            // Internal use only. Intentionally not documented.
-            this.prevSurfaceShapes = [];
+            /**
+             * Internal use only. Intentionally not documented. Tracks the number of surface shapes this tile currently
+             * renders.
+             * @type {number}
+             */
+            this.surfaceShapesRendered = 0;
 
             this.createCtx2D();
         };
@@ -79,12 +83,7 @@ define([
          * Clear all collected surface shapes.
          */
         SurfaceShapeTile.prototype.clearShapes = function () {
-            // Exchange previous and next surface shape lists to avoid allocating memory.
-            var swap = this.prevSurfaceShapes;
-            this.prevSurfaceShapes = this.surfaceShapes;
-            this.surfaceShapes = swap;
-
-            // Clear out next surface shape list.
+            // Clear out next surface shape.
             this.surfaceShapes.splice(0, this.surfaceShapes.length);
         };
 
@@ -126,37 +125,18 @@ define([
          */
         SurfaceShapeTile.prototype.addSurfaceShape = function (surfaceShape) {
             this.surfaceShapes.push(surfaceShape);
-            this.surfaceShapeStateKeys.push(surfaceShape.stateKey);
         };
 
         // Internal use only. Intentionally not documented.
         SurfaceShapeTile.prototype.needsUpdate = function (dc) {
             var idx, len, surfaceShape, surfaceShapeStateKey;
 
-            // If the number of shapes have changed, ... (cheap test)
-            if (this.prevSurfaceShapes.length != this.surfaceShapes.length) {
+            // If the number of surface shapes does not match the number of surface shapes already in the texture
+            if (this.surfaceShapes.length != this.surfaceShapesRendered) {
                 return true;
             }
 
-            // If shapes have been removed since the previous iteration, ...
-            for (idx = 0, len = this.prevSurfaceShapes.length; idx < len; idx += 1) {
-                surfaceShape = this.prevSurfaceShapes[idx];
-
-                if (this.surfaceShapes.indexOf(surfaceShape) < 0) {
-                    return true;
-                }
-            }
-
-            // If shapes added since the previous iteration, ...
-            for (idx = 0, len = this.surfaceShapes.length; idx < len; idx += 1) {
-                surfaceShape = this.surfaceShapes[idx];
-
-                if (this.prevSurfaceShapes.indexOf(surfaceShape) < 0) {
-                    return true;
-                }
-            }
-
-            // If the state key of the shape is different than the saved state key for that shape, ...
+            // If the state key of the shape is different from the saved state key (in order or configuration)
             for (idx = 0, len = this.surfaceShapes.length; idx < len; idx += 1) {
                 surfaceShape = this.surfaceShapes[idx];
                 surfaceShapeStateKey = this.surfaceShapeStateKeys[idx];
@@ -222,7 +202,10 @@ define([
                 xOffset = -this.sector.minLongitude * xScale,
                 yOffset = -this.sector.maxLatitude * yScale;
 
-            for (var idx = 0, len = this.surfaceShapes.length; idx < len; idx += 1) {
+            // Set the number of surface shapes which will be on the texture for this tile
+            this.surfaceShapesRendered = this.surfaceShapes.length;
+
+            for (var idx = 0; idx < this.surfaceShapesRendered; idx += 1) {
                 var shape = this.surfaceShapes[idx];
                 this.surfaceShapeStateKeys[idx] = shape.stateKey;
 
