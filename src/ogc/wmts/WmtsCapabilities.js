@@ -157,12 +157,7 @@ define([
                 }
             }
 
-            //TODO
-            if (!isNaN(tileMatrixSet.tileMatrix[0].identifier)) {
-                tileMatrixSet.tileMatrix.sort(function (a, b) {
-                    return parseFloat(a.identifier) - parseFloat(b.identifier);
-                })
-            }
+            WmtsCapabilities.sortTileMatrices(tileMatrixSet);
 
             for (var i = 0; i < tileMatrixSet.tileMatrix.length; i++) {
                 tileMatrixSet.tileMatrix[i].levelNumber = i;
@@ -244,6 +239,22 @@ define([
             }
 
             return result;
+        };
+
+        /**
+         * Sorts a tile matrix set by the tile matrices scale denominator.
+         * @param tileMatrixSet
+         */
+        WmtsCapabilities.sortTileMatrices = function (tileMatrixSet) {
+            // This operation is not required by the WMTS specification. The WMTS specification assumes Tile Matrix
+            // selection based on a scale denominator value. Web World Wind currently matches the tile's Level to the
+            // corresponding Tile Matrix index in the Tile Matrix Set. If the Tile Matrices are not ordered in a
+            // typical pyramid fashion, this could result in undefined behavior. Sorting the matrices by the scale
+            // denominator should ensure the World Wind Level will match the Tile Matrix index. This operation will not
+            // be required once a system which matches the scale denominator is implemented.
+            tileMatrixSet.tileMatrix.sort(function (a, b) {
+                return b.scaleDenominator - a.scaleDenominator;
+            });
         };
 
         WmtsCapabilities.prototype.getGetTileKvpAddress = function () {
