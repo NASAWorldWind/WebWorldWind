@@ -26,6 +26,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
         './geom/BoundingBox',
+        './navigate/Camera',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
@@ -128,6 +129,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Line',
         './geom/Location',
         './util/Logger',
+        './navigate/LookAt',
         './geom/Matrix',
         './cache/MemoryCache',
         './cache/MemoryCacheListener',
@@ -241,6 +243,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGLayer,
               BMNGOneImageLayer,
               BoundingBox,
+              Camera,
               ClickRecognizer,
               ColladaLoader,
               Color,
@@ -343,6 +346,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Line,
               Location,
               Logger,
+              LookAt,
               Matrix,
               MemoryCache,
               MemoryCacheListener,
@@ -665,6 +669,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BoundingBox'] = BoundingBox;
+        WorldWind['Camera'] = Camera;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
@@ -719,6 +724,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Line'] = Line;
         WorldWind['Location'] = Location;
         WorldWind['Logger'] = Logger;
+        WorldWind['LookAt'] = LookAt;
         WorldWind['Matrix'] = Matrix;
         WorldWind['MemoryCache'] = MemoryCache;
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
