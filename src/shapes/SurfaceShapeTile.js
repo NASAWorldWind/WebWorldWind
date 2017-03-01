@@ -46,6 +46,12 @@ define([
              */
             this.surfaceShapes = [];
 
+            // Internal use only. Intentionally not documented.
+            this.surfaceShapeStateKeys = [];
+
+            // Internal use only. Intentionally not documented.
+            this.asRenderedSurfaceShapeStateKeys = [];
+
             /**
              * The sector that bounds this tile.
              * @type {Sector}
@@ -58,21 +64,8 @@ define([
              */
             this.cacheKey = null;
 
-            /**
-             * Internal use only. Intentionally not documented.
-             * @type {number}
-             */
-            this.pickSequence = 0;
-
             // Internal use only. Intentionally not documented.
-            this.surfaceShapeStateKeys = [];
-
-            /**
-             * Internal use only. Intentionally not documented. Tracks the number of surface shapes this tile currently
-             * renders.
-             * @type {number}
-             */
-            this.surfaceShapesRendered = 0;
+            this.pickSequence = 0;
 
             this.createCtx2D();
         };
@@ -84,7 +77,8 @@ define([
          */
         SurfaceShapeTile.prototype.clearShapes = function () {
             // Clear out next surface shape.
-            this.surfaceShapes.splice(0, this.surfaceShapes.length);
+            this.surfaceShapes = [];
+            this.surfaceShapeStateKeys = [];
         };
 
         /**
@@ -125,6 +119,7 @@ define([
          */
         SurfaceShapeTile.prototype.addSurfaceShape = function (surfaceShape) {
             this.surfaceShapes.push(surfaceShape);
+            this.surfaceShapeStateKeys.push(surfaceShape.stateKey);
         };
 
         // Internal use only. Intentionally not documented.
@@ -132,16 +127,13 @@ define([
             var idx, len, surfaceShape, surfaceShapeStateKey;
 
             // If the number of surface shapes does not match the number of surface shapes already in the texture
-            if (this.surfaceShapes.length != this.surfaceShapesRendered) {
+            if (this.surfaceShapes.length != this.asRenderedSurfaceShapeStateKeys.length) {
                 return true;
             }
 
             // If the state key of the shape is different from the saved state key (in order or configuration)
             for (idx = 0, len = this.surfaceShapes.length; idx < len; idx += 1) {
-                surfaceShape = this.surfaceShapes[idx];
-                surfaceShapeStateKey = this.surfaceShapeStateKeys[idx];
-
-                if (surfaceShapeStateKey !== surfaceShape.stateKey) {
+                if (this.surfaceShapeStateKeys[idx] !== this.asRenderedSurfaceShapeStateKeys[idx]) {
                     return true;
                 }
             }
@@ -202,12 +194,12 @@ define([
                 xOffset = -this.sector.minLongitude * xScale,
                 yOffset = -this.sector.maxLatitude * yScale;
 
-            // Set the number of surface shapes which will be on the texture for this tile
-            this.surfaceShapesRendered = this.surfaceShapes.length;
+            // Reset the surface shape state keys
+            this.asRenderedSurfaceShapeStateKeys = [];
 
-            for (var idx = 0; idx < this.surfaceShapesRendered; idx += 1) {
+            for (var idx = 0, len = this.surfaceShapes.length; idx < len; idx += 1) {
                 var shape = this.surfaceShapes[idx];
-                this.surfaceShapeStateKeys[idx] = shape.stateKey;
+                this.asRenderedSurfaceShapeStateKeys.push(this.surfaceShapeStateKeys[idx]);
 
                 shape.renderToTexture(dc, ctx2D, xScale, yScale, xOffset, yOffset);
             }
