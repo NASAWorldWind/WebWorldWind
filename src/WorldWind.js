@@ -218,6 +218,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/WmtsLayer',
         './ogc/WmtsLayerCapabilities',
         './WorldWindow',
+        './navigate/WorldWindowController',
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
@@ -435,6 +436,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
+              WorldWindowController,
               WWMath,
               WWMessage,
               WWUtil,
@@ -812,6 +814,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
+        WorldWind['WorldWindowController'] = WorldWindowController;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**
