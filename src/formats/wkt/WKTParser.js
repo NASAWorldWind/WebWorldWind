@@ -6,34 +6,38 @@
  * @exports WKTParser
  */
 define([
+        '../../geom/Location',
         '../../util/Logger',
+        '../../shapes/PlacemarkAttributes',
+        '../../layer/RenderableLayer',
+        '../../shapes/ShapeAttributes',
+        '../../shapes/SurfaceCircle',
+        '../../shapes/SurfacePolygon',
+        '../../shapes/SurfacePolyline',
         './WKTConstants',
-        // './WKTCRS',
-        // './WKTFeature',
-        // './WKTFeatureCollection',
         './WKTGeometry',
-        // './WKTGeometryCollection',
         './WKTGeometryLineString',
         './WKTGeometryMultiLineString',
         './WKTGeometryMultiPoint',
         './WKTGeometryMultiPolygon',
         './WKTGeometryPoint',
-        './WKTGeometryPolygon'
+        './WKTGeometryPolygon',
     ],
-    function (
-        Logger,
-        // WKTCRS,
-        // WKTFeature,
-        // WKTFeatureCollection,
-        WKTGeometry,
-        // WKTGeometryCollection,
-        WKTGeometryLineString,
-        WKTGeometryMultiLineString,
-        WKTGeometryMultiPoint,
-        WKTGeometryMultiPolygon,
-        WKTGeometryPoint,
-        WKTGeometryPolygon
-    ) {
+    function (Location,
+              Logger,
+              PlacemarkAttributes,
+              RenderableLayer,
+              ShapeAttributes,
+              SurfaceCircle,
+              SurfacePolygon,
+              SurfacePolyline,
+              WKTGeometry,
+              WKTGeometryLineString,
+              WKTGeometryMultiLineString,
+              WKTGeometryMultiPoint,
+              WKTGeometryMultiPolygon,
+              WKTGeometryPoint,
+              WKTGeometryPolygon) {
         "use strict";
 
         /**
@@ -80,7 +84,7 @@ define([
 
             this.defaultShapeAttributes = new ShapeAttributes(null);
 
-            this.setProj4jsAliases();
+            //this.setProj4jsAliases();
         };
 
         Object.defineProperties(WKTParser.prototype, {
@@ -222,7 +226,7 @@ define([
             this._layer = layer || new RenderableLayer();
 
             // if (this.isDataSourceWKT()){ // TODO - how to find out if it is WKT
-                this.parse(this.dataSource);
+            this.parse(this.dataSource);
             // }
             // else {
             //     this.requestUrl(this.dataSource);
@@ -309,82 +313,51 @@ define([
 
             var geometryType = matching[1];
 
-
+            if (geometryType == 'POLYGON') {
+                var polygonCoordinates = WKTString.replace('POLYGON ((', '').replace('))', '');
+                if (WKTString.indexOf("),(") != -1) {
+                    var polygonBoundaries = polygonCoordinates.split("),(");
+                    var outerBoundaries = this.parseBoundaries(polygonBoundaries[0]);
+                    var innerBoundaries = this.parseBoundaries(polygonBoundaries[1]);
+                    this._layer.addRenderable(new SurfacePolygon([outerBoundaries, innerBoundaries], this.defaultShapeAttributes));
+                } else {
+                    var boundaries = this.parseBoundaries(polygonCoordinates);
+                    this._layer.addRenderable(new SurfacePolygon(boundaries, this.defaultShapeAttributes));
+                }
+            } else if (geometryType == 'POINT') {
+                var pointCoordinates = WKTString.replace('POINT ((', '').replace('))', '');
+                var latitudeLongitude = pointCoordinates.split(' ');
+                this._layer.addRenderable(
+                    new SurfaceCircle(
+                        new Location(latitudeLongitude[0], latitudeLongitude[1]), 10, this.defaultShapeAttributes
+                    )
+                );
+            } else if (geometryType == 'LINESTRING') {
+                var polygonCoordinates = WKTString.replace('LINESTRING ((', '').replace('))', '');
+                var boundaries = this.parseBoundaries(polygonCoordinates);
+                this._layer.addRenderable(new SurfacePolyline(boundaries, this.defaultShapeAttributes));
+            }
             // TODO what to do with EMPTY?
 
 
             // TODO - filter out invalid geometry types
 
 
-
-
             // TODO if single feature
-
-
 
 
             // TODO if multi feature
 
-
-
-
-
-
-
-
-            // try {
-            //     this._WKTObject = JSON.parse(WKTString); // TODO
-            // }
-            // catch (e) {
-            //     Logger.logMessage(Logger.LEVEL_SEVERE, "WKT", "parse",
-            //         "invalidWKTObject");
-            // }
-            // finally {
-            //     if (this.WKTObject){
-            //         if (Object.prototype.toString.call(this.WKTObject) === '[object Array]') {
-            //             throw new ArgumentError(
-            //                 Logger.logMessage(Logger.LEVEL_SEVERE, "WKT", "parse",
-            //                     "invalidWKTObjectLength"));
-            //         }
-            //
-            //         if (this.WKTObject.hasOwnProperty(WKTConstants.FIELD_TYPE)) {
-            //             this.setWKTType();
-            //             this.setWKTCRS();
-            //         }
-            //         else{
-            //             throw new ArgumentError(
-            //                 Logger.logMessage(Logger.LEVEL_SEVERE, "WKT", "parse",
-            //                     "missingWKTType"));
-            //         }
-            //
-            //         if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
-            //             this._parserCompletionCallback(this.layer);
-            //         }
-            //     }
-            // }
         };
 
-        // Set WKT CRS object.
-        // If no crs member can be so acquired, the default CRS shall apply to the WKT object.
-        // The crs member should be on the top-level WKT object in a hierarchy (in feature collection, feature,
-        // geometry order) and should not be repeated or overridden on children or grandchildren of the object.
-        // Internal use only.
-        WKTParser.prototype.setWKTCRS = function () {
-            if (this.WKTObject[WKTConstants.FIELD_CRS]){
-                this._crs = new WKTCRS (
-                    this.WKTObject[WKTConstants.FIELD_CRS][WKTConstants.FIELD_TYPE],
-                    this.WKTObject[WKTConstants.FIELD_CRS][WKTConstants.FIELD_PROPERTIES]);
-
-                var crsCallback = (function() {
-                    this.addRenderablesForWKT(this.layer);
-                }).bind(this);
-
-                this.crs.setCRSString(crsCallback);
-            }
-            else{
-                // If no CRS, consider default one
-                this.addRenderablesForWKT(this.layer);
-            }
+        WKTParser.prototype.parseBoundaries = function (boundariesText) {
+            var coordinatePairs = boundariesText.split(', ');
+            var boundaries = [];
+            coordinatePairs.forEach(function (coordinatePair) {
+                var latitudeLongitude = coordinatePair.split(' ');
+                boundaries.push(new Location(latitudeLongitude[0], latitudeLongitude[1]));
+            });
+            return boundaries;
         };
 
         /**
@@ -406,9 +379,9 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WKT", "addRenderablesForWKT", "missingLayer"));
             }
 
-            switch(this.WKTType) {
+            switch (this.WKTType) {
                 case WKTConstants.TYPE_FEATURE:
-                    var feature = new  WKTFeature(
+                    var feature = new WKTFeature(
                         this.WKTObject[WKTConstants.FIELD_GEOMETRY],
                         this.WKTObject[WKTConstants.FIELD_PROPERTIES],
                         this.WKTObject[WKTConstants.FIELD_ID],
@@ -464,7 +437,7 @@ define([
          * @throws {ArgumentError} If the specified layer is null or undefined.
          * @throws {ArgumentError} If the geometry is null or undefined.
          */
-        WKTParser.prototype.addRenderablesForGeometry = function (layer, geometry, properties){
+        WKTParser.prototype.addRenderablesForGeometry = function (layer, geometry, properties) {
             if (!layer) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WKT", "addRenderablesForGeometry", "missingLayer"));
@@ -475,7 +448,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WKT", "addRenderablesForGeometry", "missingGeometry"));
             }
 
-            switch(geometry[WKTConstants.FIELD_TYPE]){
+            switch (geometry[WKTConstants.FIELD_TYPE]) {
                 case WKTConstants.TYPE_POINT:
                     var pointGeometry = new WKTGeometryPoint(
                         geometry[WKTConstants.FIELD_COORDINATES],
@@ -571,7 +544,7 @@ define([
             if (!this.crs || this.crs.isCRSSupported()) {
                 var longitude = geometry.coordinates[0],
                     latitude = geometry.coordinates[1],
-                    altitude = geometry.coordinates[2] ?  geometry.coordinates[2] : 0;
+                    altitude = geometry.coordinates[2] ? geometry.coordinates[2] : 0;
 
                 var reprojectedCoordinate = this.getReprojectedIfRequired(
                     latitude,
@@ -584,7 +557,7 @@ define([
                     configuration && configuration.attributes ? configuration.attributes : null);
 
                 placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
-                if (configuration && configuration.name){
+                if (configuration && configuration.name) {
                     placemark.label = configuration.name;
                 }
                 if (configuration.highlightAttributes) {
@@ -629,10 +602,10 @@ define([
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
             if (!this.crs || this.crs.isCRSSupported()) {
-                for (var pointIndex = 0, points = geometry.coordinates.length; pointIndex < points; pointIndex += 1){
+                for (var pointIndex = 0, points = geometry.coordinates.length; pointIndex < points; pointIndex += 1) {
                     var longitude = geometry.coordinates[pointIndex][0],
                         latitude = geometry.coordinates[pointIndex][1],
-                        altitude = geometry.coordinates[pointIndex][2] ?  geometry.coordinates[pointIndex][2] : 0;
+                        altitude = geometry.coordinates[pointIndex][2] ? geometry.coordinates[pointIndex][2] : 0;
 
                     var reprojectedCoordinate = this.getReprojectedIfRequired(
                         latitude,
@@ -644,7 +617,7 @@ define([
                         false,
                         configuration && configuration.attributes ? configuration.attributes : null);
                     placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
-                    if (configuration && configuration.name){
+                    if (configuration && configuration.name) {
                         placemark.label = configuration.name;
                     }
                     if (configuration.highlightAttributes) {
@@ -839,7 +812,8 @@ define([
                     }
                     if (configuration && configuration.userProperties) {
                         shape.userProperties = configuration.userProperties;
-                    }                    layer.addRenderable(shape);
+                    }
+                    layer.addRenderable(shape);
                 }
             }
         };
@@ -937,7 +911,7 @@ define([
 
             for (var geometryIndex = 0, geometries = geometryCollection.geometries;
                  geometryIndex < geometries.length; geometryIndex++) {
-                if(geometries[geometryIndex].hasOwnProperty(WKTConstants.FIELD_TYPE)){
+                if (geometries[geometryIndex].hasOwnProperty(WKTConstants.FIELD_TYPE)) {
                     this.addRenderablesForGeometry(layer, geometries[geometryIndex], properties);
                 }
             }
@@ -1079,34 +1053,19 @@ define([
                         "missingLongitude"));
             }
 
-            if (!crsObject || crsObject.isDefault()){
+            if (!crsObject || crsObject.isDefault()) {
                 return [longitude, latitude];
             }
-            else{
+            else {
                 return Proj4(crsObject.projectionString, WKTConstants.EPSG4326_CRS, [longitude, latitude]);
             }
         };
 
-        // Use this function to add aliases for some projection strings that proj4js doesn't recognize.
-        WKTParser.prototype.setProj4jsAliases = function () {
-            Proj4.defs([
-                [
-                    'urn:ogc:def:crs:OGC:1.3:CRS84',
-                    Proj4.defs('EPSG:4326')
-                ],
-                [
-                    'urn:ogc:def:crs:EPSG::3857',
-                    Proj4.defs('EPSG:3857')
-
-                ]
-            ]);
-        };
-
         /**
-        * Indicate whether the data source is of a JSON type.
-        * @returns {Boolean} True if the data source is of JSON type.
-        */
-        WKTParser.prototype.isDataSourceJson = function() {
+         * Indicate whether the data source is of a JSON type.
+         * @returns {Boolean} True if the data source is of JSON type.
+         */
+        WKTParser.prototype.isDataSourceJson = function () {
             try {
                 JSON.parse(this.dataSource);
             } catch (e) {
