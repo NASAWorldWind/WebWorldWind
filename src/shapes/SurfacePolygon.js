@@ -54,6 +54,8 @@ define([
             SurfaceShape.call(this, attributes);
 
             this._boundaries = boundaries;
+
+            this._stateId = SurfacePolygon.stateId++;
         };
 
         SurfacePolygon.prototype = Object.create(SurfaceShape.prototype);
@@ -77,6 +79,7 @@ define([
                                 "The specified value is not an array."));
                     }
                     this._boundaries = boundaries;
+                    this._stateId = SurfacePolygon.stateId++;
                     this.isPrepared = false;
                     this.stateKeyInvalid = true;
                 }
@@ -84,10 +87,14 @@ define([
         });
 
         // Internal use only. Intentionally not documented.
+        SurfacePolygon.stateId = Number.MIN_SAFE_INTEGER;
+
+        // Internal use only. Intentionally not documented.
         SurfacePolygon.staticStateKey = function (shape) {
             var shapeStateKey = SurfaceShape.staticStateKey(shape);
 
-            return shapeStateKey;
+            return shapeStateKey +
+                " pg " + shape._stateId;
         };
 
         // Internal use only. Intentionally not documented.
