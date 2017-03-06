@@ -325,11 +325,11 @@ define([
                     this._layer.addRenderable(new SurfacePolygon(boundaries, this.defaultShapeAttributes));
                 }
             } else if (geometryType == 'POINT') {
-                var pointCoordinates = WKTString.replace('POINT ((', '').replace('))', '');
+                var pointCoordinates = WKTString.replace('POINT (', '').replace(')', '');
                 var latitudeLongitude = pointCoordinates.split(' ');
                 this._layer.addRenderable(
                     new SurfaceCircle(
-                        new Location(latitudeLongitude[0], latitudeLongitude[1]), 10, this.defaultShapeAttributes
+                        new Location(latitudeLongitude[0], latitudeLongitude[1]), 1000, this.defaultShapeAttributes
                     )
                 );
             } else if (geometryType == 'LINESTRING') {
