@@ -72,6 +72,7 @@ define([
              * @param {Vec3} result A pre-allocated Vec3 instance in which to return the computed point.
              * @returns {boolean} true if the line intersects the ellipsoid, otherwise false
              * @throws {ArgumentError} If the specified line or result is null or undefined.
+             * @deprecated utilize the Globe.intersectsLine method attached implementation
              */
             computeEllipsoidalGlobeIntersection: function (line, equatorialRadius, polarRadius, result) {
                 if (!line) {
