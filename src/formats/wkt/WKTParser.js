@@ -273,7 +273,7 @@ define([
          */
         WKTParser.prototype.createMultiLineString = function(WKTString) {
             var multiLineString = WKTString.replace('MULTILINESTRING ((', '').replace('))','');
-            var lineStrings = multiLineString.split('), (');
+            var lineStrings = multiLineString.split('),(');
             var self = this;
             lineStrings.forEach(function(lineString){
                 self.createLineString(lineString);
@@ -286,16 +286,17 @@ define([
          */
         WKTParser.prototype.createMultiPoint = function(WKTString) {
             var multiplePointCoordinates = WKTString.replace('MULTIPOINT ((', '').replace('))', '');
-            var pointsCoordinates = multiplePointCoordinates.split("), (");
+            var pointsCoordinates = multiplePointCoordinates.split("),(");
+            var self = this;
             pointsCoordinates.forEach(function(latitudeLongitude) {
                 var latitudeLongitudeCoordinates = latitudeLongitude.split(' ');
 
                 var latitude = latitudeLongitudeCoordinates[0];
                 var longitude = latitudeLongitudeCoordinates[1];
 
-                this._layer.addRenderable(
+                self._layer.addRenderable(
                     new SurfaceCircle(
-                        new Location(latitude, longitude), 1000, this.defaultShapeAttributes
+                        new Location(latitude, longitude), 1000, self.defaultShapeAttributes
                     )
                 );
             });
@@ -307,7 +308,7 @@ define([
          */
         WKTParser.prototype.createMultiPolygon = function(WKTString) {
             var multiPolygonCoordinates = WKTString.replace('MULTIPOLYGON (((', '').replace(')))', '');
-            var multiPolygons = multiPolygonCoordinates.split('),(');
+            var multiPolygons = multiPolygonCoordinates.split(')),((');
             var self = this;
             multiPolygons.forEach(function(polygon){
                 self.createPolygon(polygon);

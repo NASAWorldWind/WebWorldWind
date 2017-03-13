@@ -90,7 +90,7 @@ requirejs(['../src/WorldWind',
 
         // MultiPolygon test
         var multiPolygonLayer = new WorldWind.RenderableLayer("MultiPolygon");
-        var multiPolygonWKT = new WorldWind.WKTParser("MULTIPOLYGON (((), ()))");
+        var multiPolygonWKT = new WorldWind.WKTParser("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))");
         multiPolygonWKT.load(null, shapeConfigurationCallback, multiPolygonLayer);
         wwd.addLayer(multiPolygonLayer);
 
@@ -102,7 +102,7 @@ requirejs(['../src/WorldWind',
 
         //MultiPoint test
         var multiPointLayer = new WorldWind.RenderableLayer("MultiPoint");
-        var multiPointWKT = new WorldWind.WKTParser("MULTIPOINT ((17.2 49.3), (17.23 49.24), (17.14 49.37), (17.2 49.24))");
+        var multiPointWKT = new WorldWind.WKTParser("MULTIPOINT ((17.2 49.3),(17.23 49.24),(17.14 49.37),(17.2 49.24))");
         multiPointWKT.load(null, shapeConfigurationCallback, multiPointLayer);
         wwd.addLayer(multiPointLayer);
 
@@ -115,7 +115,7 @@ requirejs(['../src/WorldWind',
 
         //MultiLineString test
         var multiLineStringLayer = new WorldWind.RenderableLayer("MultiLineString");
-        var multiLineStringWKT = new WorldWind.WKTParser("MULTILINESTRING ((15.14 48.02, 15.16 48.04, 15.11 48.01, 15.09 48.05), (15.14 48.12, 15.16 48.14, 15.11 48.11, 15.09 48.15), (15.14 48.22, 15.16 48.24, 15.11 48.21, 15.09 48.25), (15.14 48.32, 15.16 48.34, 15.11 48.31, 15.09 48.35), (15.14 48.42, 15.16 48.44, 15.11 48.41, 15.09 48.45))");
+        var multiLineStringWKT = new WorldWind.WKTParser("MULTILINESTRING ((38 -70, 42 -75, 38 -80),(43 -65, 47 -70, 43 -75))");
         multiLineStringWKT.load(null, shapeConfigurationCallback, multiLineStringLayer);
         wwd.addLayer(multiLineStringLayer);
 
