@@ -37,11 +37,12 @@ define([
 
     // Intentionally undocumented. For internal use only
     StyleResolver.prototype.handleStyleUrl = function (styleUrl, resolve, reject, filePromise) {
+        var self = this;
         filePromise = this.handlePromiseOfFile(styleUrl, filePromise);
         filePromise.then(function (kmlFile) {
             kmlFile.resolveStyle(styleUrl).then(function (style) {
                 if (style.isMap) {
-                    style.resolve(resolve, reject);
+                    style.resolve(resolve, self);
                 } else {
                     resolve({normal: style, highlight: null});
                 }
@@ -65,7 +66,7 @@ define([
     // Intentionally undocumented. For internal use only
     StyleResolver.prototype.handleStyleSelector = function (styleSelector, resolve, reject) {
         if (styleSelector.isMap) {
-            styleSelector.resolve(resolve, reject);
+            styleSelector.resolve(resolve, this);
         } else {
             // Move this resolve to the end of the stack to prevent recursion.
             window.setTimeout(function () {
