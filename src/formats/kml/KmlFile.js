@@ -79,11 +79,12 @@ define([
                 } else {
                     var kmzFile = new JsZip();
                     kmzFile.load(loadedDocument);
-                    kmzFile.files.forEach(function (file) {
-                        if (file.endsWith(".kml") && rootDocument == null) {
+                    for(var key in kmzFile.files) {
+                        var file = kmzFile.files[key];
+                        if (file.name.endsWith(".kml") && rootDocument == null) {
                             rootDocument = file.asText();
                         }
-                    });
+                    }
                 }
 
                 self._document = new XmlDocument(rootDocument).dom();
