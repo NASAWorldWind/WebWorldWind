@@ -378,11 +378,16 @@ define([
                             currentData.refreshTexCoordBuffer = false;
                         }
 
-                        program.loadTextureEnabled(gl, true);
                         gl.enableVertexAttribArray(program.vertexTexCoordLocation);
                         gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT,
                             false, 0, 0);
+
+                        this.scratchMatrix.setToIdentity();
+                        this.scratchMatrix.multiplyByTextureTransform(this.activeTexture);
+
+                        program.loadTextureEnabled(gl, true);
                         program.loadTextureUnit(gl, gl.TEXTURE0);
+                        program.loadTextureMatrix(gl, this.scratchMatrix);
                         program.loadModulateColor(gl, dc.pickingMode);
                     }
                 }

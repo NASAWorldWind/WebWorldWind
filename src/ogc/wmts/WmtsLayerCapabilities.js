@@ -6,15 +6,15 @@
  * @exports WmtsLayerCapabilities
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsLanguageString',
-        '../ogc/WmsCapabilities'
+        '../../error/ArgumentError',
+        '../../geom/Sector',
+        '../../ogc/wmts/OwsDescription',
+        '../../util/Logger'
     ],
     function (ArgumentError,
-              Logger,
-              OwsLanguageString,
-              WmsCapabilities) {
+              Sector,
+              OwsDescription,
+              Logger) {
         "use strict";
 
         /**
@@ -32,6 +32,8 @@ define([
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayerCapabilities", "constructor", "missingDomElement"));
             }
+
+            OwsDescription.call(this, layerElement);
 
             /**
              * This layer's WMTS capabilities document, as specified to the constructor of this object.
@@ -111,7 +113,9 @@ define([
 
             /**
              * The dimensions associated with this layer. The returned array contains objects with the following
-             * properties: TODO
+             * properties:
+             * @type {Object[]}
+             * @readonly
              */
             this.dimension;
 
@@ -141,6 +145,28 @@ define([
             this.assembleLayer(layerElement);
         };
 
+        WmtsLayerCapabilities.prototype = Object.create(OwsDescription.prototype);
+
+        /**
+         * Provides an array of the TileMatrixSet objects supported by this layer.
+         * @returns {Array}
+         */
+        WmtsLayerCapabilities.prototype.getLayerSupportedTileMatrixSets = function () {
+            var tileMatrixSets = [];
+
+            for (var i = 0, lenA = this.tileMatrixSetLink.length; i < lenA; i++) {
+                var supportedTileMatrixSetIdentifier = this.tileMatrixSetLink[i].tileMatrixSet;
+                for (var j = 0, lenB = this.capabilities.contents.tileMatrixSet.length; j < lenB; j++) {
+                    var tileMatrixSetIdentifier = this.capabilities.contents.tileMatrixSet[j].identifier;
+                    if (tileMatrixSetIdentifier === supportedTileMatrixSetIdentifier) {
+                        tileMatrixSets.push(this.capabilities.contents.tileMatrixSet[j]);
+                    }
+                }
+            }
+
+            return tileMatrixSets;
+        };
+
         WmtsLayerCapabilities.prototype.assembleLayer = function (element) {
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -148,12 +174,6 @@ define([
 
                 if (child.localName === "Identifier") {
                     this.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    this.title = this.title || [];
-                    this.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    this.abstract = this.abstract || [];
-                    this.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "WGS84BoundingBox") {
                     this.wgs84BoundingBox = WmtsLayerCapabilities.assembleBoundingBox(child);
                 } else if (child.localName === "BoundingBox") {
@@ -181,13 +201,12 @@ define([
                     this.tileMatrixSetLink = this.tileMatrixSetLink || [];
                     this.tileMatrixSetLink.push(WmtsLayerCapabilities.assembleTileMatrixSetLink(child));
                 }
-                // TODO: Keywords
             }
 
         };
 
         WmtsLayerCapabilities.assembleStyle = function (element) {
-            var result = {};
+            var result = new OwsDescription(element);
 
             result.isDefault = element.getAttribute("isDefault");
 
@@ -197,17 +216,10 @@ define([
 
                 if (child.localName === "Identifier") {
                     result.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    result.title = result.title || [];
-                    result.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    result.abstract = result.abstract || [];
-                    result.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "LegendURL") {
                     result.legendUrl = result.legendUrl || [];
                     result.legendUrl.push(WmtsLayerCapabilities.assembleLegendUrl(child));
                 }
-                // TODO: keywords
             }
 
             return result;
@@ -234,11 +246,18 @@ define([
                 }
             }
 
+            // Add a utility which provides a Sector based on the WGS84BoundingBox element
+            if (element.localName === "WGS84BoundingBox") {
+                result.getSector = function () {
+                    return new Sector(result.lowerCorner[1], result.upperCorner[1], result.lowerCorner[0], result.upperCorner[0]);
+                }
+            }
+
             return result;
         };
 
         WmtsLayerCapabilities.assembleDimension = function (element) {
-            var result = {};
+            var result = new OwsDescription(element);
 
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -246,12 +265,6 @@ define([
 
                 if (child.localName === "Identifier") {
                     result.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    result.title = result.title || [];
-                    result.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    result.abstract = result.abstract || [];
-                    result.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "UOM") {
                     result.uom = {
                         name: child.getAttribute("name"),
@@ -274,6 +287,40 @@ define([
 
         WmtsLayerCapabilities.assembleMetadata = function (element) { // TODO
             var result = {};
+
+            var link = element.getAttribute("xlink:href");
+            if (link) {
+                result.url = link;
+            }
+
+            var about = element.getAttribute("about");
+            if (link) {
+                result.about = about;
+            }
+
+            var type = element.getAttribute("xlink:type");
+            if (type) {
+                result.type = type;
+            }
+
+            var role = element.getAttribute("xlink:role");
+            if (role) {
+                result.role = role;
+            }
+
+            var title = element.getAttribute("xlink:title");
+            if (title) {
+                result.title = title;
+            }
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Metadata") {
+                    result.metadata = WmsLayerCapabilities.assembleMetadata(child);
+                }
+            }
 
             return result;
         };

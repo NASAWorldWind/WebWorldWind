@@ -6,17 +6,19 @@
  * @exports WmtsCapabilities
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsLanguageString',
-        '../ogc/OwsOperationsMetadata',
-        '../ogc/OwsServiceIdentification',
-        '../ogc/OwsServiceProvider',
-        '../ogc/WmsCapabilities',
-        '../ogc/WmtsLayerCapabilities'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        '../../ogc/wmts/OwsDescription',
+        '../../ogc/wmts/OwsLanguageString',
+        '../../ogc/wmts/OwsOperationsMetadata',
+        '../../ogc/wmts/OwsServiceIdentification',
+        '../../ogc/wmts/OwsServiceProvider',
+        '../../ogc/wms/WmsCapabilities',
+        '../../ogc/wmts/WmtsLayerCapabilities'
     ],
     function (ArgumentError,
               Logger,
+              OwsDescription,
               OwsLanguageString,
               OwsOperationsMetadata,
               OwsServiceIdentification,
@@ -45,6 +47,38 @@ define([
             this.assembleDocument(xmlDom);
         };
 
+        /**
+         * Provides all of the layers associated with this WMTS. This method is for convienence and returns the layer
+         * array captured in the contents of this WmtsCapabilities object.
+         * @returns {WmtsLayerCapabilities[]}
+         */
+        WmtsCapabilities.prototype.getLayers = function () {
+            return this.contents.layer;
+        };
+
+        /**
+         * Retrieve the WmtsLayerCapabilities object for the provided identifier.
+         * @param identifier
+         * @returns {WmtsLayerCapabilities} object for the provided identifier or null if no identifier was found in the
+         * WmtsCapabilities object.
+         * @throws {ArgumentError} If the specified identifier is null or undefined.
+         */
+        WmtsCapabilities.prototype.getLayer = function (identifier) {
+            if (!identifier) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsCapabilities", "getLayer", "empty identifier"));
+            }
+
+            for (var i = 0, len = this.contents.layer.length; i < len; i++) {
+                var wmtsLayerCapabilities = this.contents.layer[i];
+                if (wmtsLayerCapabilities.identifier === identifier) {
+                    return wmtsLayerCapabilities;
+                }
+            }
+
+            return null;
+        };
+
         WmtsCapabilities.prototype.assembleDocument = function (dom) {
             var root = dom.documentElement;
 
@@ -63,11 +97,13 @@ define([
                     this.operationsMetadata = new OwsOperationsMetadata(child);
                 } else if (child.localName === "Contents") {
                     this.contents = this.assembleContents(child);
+                } else if (child.localName === "Themes") {
+                    this.themes = WmtsCapabilities.assembleThemes(child);
+                } else if (child.localName === "ServiceMetadataURL") {
+                    this.serviceMetadataUrls = this.serviceMetadataUrls || [];
+                    this.serviceMetadataUrls.push(WmtsCapabilities.assembleServiceMetadataURL(child));
                 }
-                // TODO: Themes
             }
-
-            this.resolveTileMatrixSetLinks();
         };
 
         WmtsCapabilities.prototype.assembleContents = function (element) {
@@ -101,7 +137,7 @@ define([
         };
 
         WmtsCapabilities.assembleTileMatrixSet = function (element) {
-            var tileMatrixSet = {};
+            var tileMatrixSet = new OwsDescription(element);
 
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -118,15 +154,10 @@ define([
                 } else if (child.localName === "TileMatrix") {
                     tileMatrixSet.tileMatrix = tileMatrixSet.tileMatrix || [];
                     tileMatrixSet.tileMatrix.push(WmtsCapabilities.assembleTileMatrix(child));
-                } else if (child.localName === "Title") {
-                    tileMatrixSet.title = tileMatrixSet.title || [];
-                    tileMatrixSet.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    tileMatrixSet.abstract = tileMatrixSet.abstract || [];
-                    tileMatrixSet.abstract.push(new OwsLanguageString(child));
                 }
-                // TODO: Keywords
             }
+
+            WmtsCapabilities.sortTileMatrices(tileMatrixSet);
 
             for (var i = 0; i < tileMatrixSet.tileMatrix.length; i++) {
                 tileMatrixSet.tileMatrix[i].levelNumber = i;
@@ -136,7 +167,7 @@ define([
         };
 
         WmtsCapabilities.assembleTileMatrix = function (element) {
-            var tileMatrix = {};
+            var tileMatrix = new OwsDescription(element);
 
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -144,12 +175,6 @@ define([
 
                 if (child.localName === "Identifier") {
                     tileMatrix.identifier = child.textContent;
-                } else if (child.localName === "Title") {
-                    tileMatrix.title = tileMatrixSet.title || [];
-                    tileMatrix.title.push(new OwsLanguageString(child));
-                } else if (child.localName === "Abstract") {
-                    tileMatrix.abstract = tileMatrixSet.abstract || [];
-                    tileMatrix.abstract.push(new OwsLanguageString(child));
                 } else if (child.localName === "ScaleDenominator") {
                     tileMatrix.scaleDenominator = parseFloat(child.textContent);
                 } else if (child.localName === "TileWidth") {
@@ -164,36 +189,79 @@ define([
                     var values = child.textContent.split(" ");
                     tileMatrix.topLeftCorner = [parseFloat(values[0]), parseFloat(values[1])];
                 }
-
-                // TODO: Keywords
             }
 
             return tileMatrix;
         };
 
-        WmtsCapabilities.prototype.resolveTileMatrixSetLinks = function() {
-            for (var i = 0; i < this.contents.layer.length; i++) {
-                var layer = this.contents.layer[i];
+        WmtsCapabilities.assembleThemes = function (element) {
+            var themes;
 
-                for (var j = 0; j < layer.tileMatrixSetLink.length; j++) {
-                    var link = layer.tileMatrixSetLink[j];
-
-                    for (var k = 0; k < this.contents.tileMatrixSet.length; k++) {
-                        if (this.contents.tileMatrixSet[k].identifier === link.tileMatrixSet) {
-                            link.tileMatrixSetRef = this.contents.tileMatrixSet[k];
-                            break;
-                        }
-                    }
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+                if (child.localName === "Theme") {
+                    themes = themes || [];
+                    themes.push(WmtsCapabilities.assembleTheme(child));
                 }
             }
+
+            return themes;
+        };
+
+        WmtsCapabilities.assembleTheme = function (element) {
+            var theme = new OwsDescription(element);
+
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Identifier") {
+                    theme.identifier = child.textContent;
+                } else if (child.localName === "LayerRef") {
+                    theme.layerRef = theme.layerRef || [];
+                    theme.layerRef.push(child.textContent);
+                } else if (child.localName === "Theme") {
+                    theme.themes = theme.themes || [];
+                    theme.themes.push(WmtsCapabilities.assembleTheme(child));
+                }
+            }
+
+            return theme;
+        };
+
+        WmtsCapabilities.assembleServiceMetadataURL = function (element) {
+            var result = {};
+
+            var link = element.getAttribute("xlink:href");
+            if (link) {
+                result.url = link;
+            }
+
+            return result;
+        };
+
+        /**
+         * Sorts a tile matrix set by the tile matrices scale denominator.
+         * @param tileMatrixSet
+         */
+        WmtsCapabilities.sortTileMatrices = function (tileMatrixSet) {
+            // This operation is not required by the WMTS specification. The WMTS specification assumes Tile Matrix
+            // selection based on a scale denominator value. Web World Wind currently matches the tile's Level to the
+            // corresponding Tile Matrix index in the Tile Matrix Set. If the Tile Matrices are not ordered in a
+            // typical pyramid fashion, this could result in undefined behavior. Sorting the matrices by the scale
+            // denominator should ensure the World Wind Level will match the Tile Matrix index. This operation will not
+            // be required once a system which matches the scale denominator is implemented.
+            tileMatrixSet.tileMatrix.sort(function (a, b) {
+                return b.scaleDenominator - a.scaleDenominator;
+            });
         };
 
         WmtsCapabilities.prototype.getGetTileKvpAddress = function () {
             for (var i = 0; i < this.operationsMetadata.operation.length; i++) {
                 var operation = this.operationsMetadata.operation[i];
-
                 if (operation.name === "GetTile") {
-                    return operation.dcp[0].http.get[0].href;
+                    return operation.dcp[0].getMethods[0].url;
                 }
             }
 

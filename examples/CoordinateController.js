@@ -142,7 +142,7 @@ define(function () {
 
         // Round to the nearest integer and place a comma every three digits. See the following Stack Overflow thread
         // for more information:
-        // http://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+        // https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
         return number.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " " + units;
     };
 

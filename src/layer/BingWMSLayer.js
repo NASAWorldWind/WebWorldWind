@@ -27,7 +27,7 @@ define([
             this.pickEnabled = false;
             this.maxActiveAltitude = 10e3;
 
-            this.urlBuilder = new WmsUrlBuilder(location.protocol + "//worldwind27.arc.nasa.gov/wms/virtualearth", "ve", "", "1.3.0");
+            this.urlBuilder = new WmsUrlBuilder("https://worldwind27.arc.nasa.gov/wms/virtualearth", "ve", "", "1.3.0");
         };
 
         BingWMSLayer.prototype = Object.create(TiledImageLayer.prototype);

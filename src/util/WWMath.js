@@ -72,6 +72,7 @@ define([
              * @param {Vec3} result A pre-allocated Vec3 instance in which to return the computed point.
              * @returns {boolean} true if the line intersects the ellipsoid, otherwise false
              * @throws {ArgumentError} If the specified line or result is null or undefined.
+             * @deprecated utilize the Globe.intersectsLine method attached implementation
              */
             computeEllipsoidalGlobeIntersection: function (line, equatorialRadius, polarRadius, result) {
                 if (!line) {
@@ -143,7 +144,7 @@ define([
                 }
 
                 // Taken from Moller and Trumbore
-                // http://www.cs.virginia.edu/~gfx/Courses/2003/ImageSynthesis/papers/Acceleration/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
+                // https://www.cs.virginia.edu/~gfx/Courses/2003/ImageSynthesis/papers/Acceleration/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 
                 var vx = line.direction[0],
                     vy = line.direction[1],
@@ -297,7 +298,7 @@ define([
                 }
 
                 // Taken from Moller and Trumbore
-                // http://www.cs.virginia.edu/~gfx/Courses/2003/ImageSynthesis/papers/Acceleration/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
+                // https://www.cs.virginia.edu/~gfx/Courses/2003/ImageSynthesis/papers/Acceleration/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 
                 // Adapted from the original ray-triangle intersection algorithm to optimize for ray-triangle strip
                 // intersection. We optimize by reusing constant terms, replacing use of Vec3 with inline primitives,

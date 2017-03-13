@@ -7,9 +7,9 @@
  * @version $Id: WmsCapabilities.js 3055 2015-04-29 21:39:51Z tgaskins $
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/WmsLayerCapabilities'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        '../../ogc/wms/WmsLayerCapabilities'
     ],
     function (ArgumentError,
               Logger,
@@ -24,7 +24,7 @@ define([
          * specified in the given WMS Capabilities document. Most fields can be accessed as properties named
          * according to their document names converted to camel case. For example, "version", "service.title",
          * "service.contactInformation.contactPersonPrimary". The exceptions are online resources, whose property
-         * path has been shortened. For example "capability.request.getMap.formats" and "capability.request.getMap.url".
+         * path has been shortened. For example "capability.request.getMap.formats" and "capability.request.getMap.getUrl".
          * @param {{}} xmlDom An XML DOM representing the WMS Capabilities document.
          * @throws {ArgumentError} If the specified XML DOM is null or undefined.
          */
@@ -35,6 +35,59 @@ define([
             }
 
             this.assembleDocument(xmlDom);
+        };
+
+        /**
+         * Finds all named layers documented in this WMS capabilities document. Will recursively search sub-layers for
+         * named layers.
+         * @returns {WmsLayerCapabilities[]}
+         */
+        WmsCapabilities.prototype.getNamedLayers = function () {
+            return this.accumulateNamedLayers(this.capability.layers);
+        };
+
+        WmsCapabilities.prototype.accumulateNamedLayers = function (startLayers, namedLayersArray) {
+            var namedLayers = namedLayersArray || [];
+            
+            if (!startLayers) {
+                return namedLayers;
+            }
+
+            for (var i = 0, len = startLayers.length; i < len; i++) {
+                var layer = startLayers[i];
+                if (layer.name) {
+                    namedLayers.push(layer);
+                }
+                if (layer.layers) {
+                    this.accumulateNamedLayers(layer.layers, namedLayers);
+                }
+            }
+
+            return namedLayers;
+        };
+
+        /**
+         * Searches for a named layer matching the provided name and returns the WmsLayerCapabilities object representing 
+         * the named layer.
+         * @param {String} name the layer name to find
+         * @returns {WmsLayerCapabilities} if a matching named layer is found or null
+         * @throws {ArgumentError} If the specified name is null or empty.
+         */
+        WmsCapabilities.prototype.getNamedLayer = function (name) {
+            if (!name || (name.length === 0)) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmsCapabilities", "getNamedLayer", "No WMS layer name provided."));
+            }
+
+            var namedLayers = this.getNamedLayers();
+
+            for (var i = 0, len = namedLayers.length; i < len; i++) {
+                if (name === namedLayers[i].name) {
+                    return namedLayers[i];
+                }
+            }
+
+            return null;
         };
 
         WmsCapabilities.prototype.assembleDocument = function (dom) {
@@ -73,7 +126,7 @@ define([
                 } else if (child.localName === "KeywordList") {
                     service.keywordList = this.assembleKeywordList(child);
                 } else if (child.localName === "OnlineResource") {
-                    service.onlineResource = child.getAttribute("xlink:href");
+                    service.url = child.getAttribute("xlink:href");
                 } else if (child.localName === "Fees") {
                     service.fees = child.textContent;
                 } else if (child.localName === "AccessConstraints") {
@@ -240,7 +293,7 @@ define([
                                     for (var c4 = 0; c4 < children4.length; c4++) {
                                         var child4 = children4[c4];
                                         if (child4.localName === "OnlineResource") {
-                                            request.url = child4.getAttribute("xlink:href");
+                                            request.getUrl = child4.getAttribute("xlink:href");
                                         }
                                     }
                                 }

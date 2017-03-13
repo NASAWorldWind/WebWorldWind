@@ -75,7 +75,7 @@ define([
              */
             worldwindlibLocation: function () {
                 var scripts = document.getElementsByTagName("script"),
-                    libraryName = "/worldwindlib.";
+                    libraryName = "/worldwind.";
 
                 for (var i = 0; i < scripts.length; i++) {
                     var index = scripts[i].src.indexOf(libraryName);

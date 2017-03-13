@@ -3,7 +3,7 @@
     This module acts as the application entry point
  */
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
         'OpenStreetMapLayer',
         'OpenStreetMapConfig',
         'jquery',

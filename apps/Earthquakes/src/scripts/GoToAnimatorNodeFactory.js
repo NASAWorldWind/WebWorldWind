@@ -1,4 +1,4 @@
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
     'GoToAnimatorNode'],function(ww, GoToAnimatorNode) {
 
     'use strict';

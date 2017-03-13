@@ -88,4 +88,4 @@ Please have a look at the existing tests for reference.
      });
 
 For more information about the Jasmine Framework used for defining the tests,
-please visit: http://jasmine.github.io/2.0/introduction.html
+please visit: https://jasmine.github.io/2.0/introduction.html

@@ -6,7 +6,7 @@
  */
 
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
         'jquery'], function(ww, $) {
 
     var OpenStreetMapConfig = function() {
