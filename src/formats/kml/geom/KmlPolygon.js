@@ -127,6 +127,9 @@ define([
      */
     KmlPolygon.prototype.createPolygon = function(styles) {
         this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        if(styles.highlight) {
+            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight);
+        }
         this.moveValidProperties();
     };
 
