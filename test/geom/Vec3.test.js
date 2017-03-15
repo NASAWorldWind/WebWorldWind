@@ -55,18 +55,33 @@ define([
             });
         });
 
-        it("Compute triangle normals", function () {
+        it("Computes triangle normals", function () {
             var vec3_a = new Vec3(0, 0, 0);
             var vec3_b = new Vec3(1, 0, 0);
             var vec3_c = new Vec3(1, 1, 0);
             expect(Vec3.computeTriangleNormal(vec3_a, vec3_b, vec3_c)).toEqual(new Vec3(0, 0, 1));
         });
 
-        it("Finds three non-colinear points in an array of coordinates", function () {
-            var vec3_a = new Vec3(0, 0, 0);
-            var vec3_b = new Vec3(1, 0, 0);
-            var vec3_c = new Vec3(1, 1, 0);
-            expect(Vec3.computeTriangleNormal(vec3_a, vec3_b, vec3_c)).toEqual(new Vec3(0, 0, 1));
+        describe("Finds three non-colinear points in an array of coordinates", function () {
+
+            it("Finds the three points", function () {
+                var coords = [2, 4, 6, 4, 8, 12, 8, 16, 24, 1, 5, 7, 2, 1, 1, 2, 11, 0];
+                var expected = [
+                    new Vec3(2, 4, 6),
+                    new Vec3(4, 8, 12),
+                    new Vec3(1, 5, 7)
+                ];
+                expect(Vec3.findThreeIndependentVertices(coords, 0)).toEqual(expected);
+            });
+
+            it("Does not find three points", function () {
+                var coords = [2, 4, 6, 4, 8, 12, 8, 16, 24];
+                expect(Vec3.findThreeIndependentVertices(coords, 0)).toEqual(null);
+            });
+
+            it("Return null on empty coordinates", function () {
+                expect(Vec3.findThreeIndependentVertices([], 0)).toEqual(null);
+            });
         });
 
         it("Finds three independent vertices", function () {

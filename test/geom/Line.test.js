@@ -83,10 +83,9 @@ define([
                 expect(result).toEqual(expectedResult);
             });
 
-            it("Should throw an exception on missing result cector", function () {
+            it("Should throw an exception on missing result vector", function () {
                 expect(function () {
-                    var B = new Vec3(1, 2, 3);
-                    new Line.fromSegment(null, B);
+                    new Line.pointAt(5, null);
                 }).toThrow();
             });
         });

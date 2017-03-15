@@ -133,11 +133,11 @@ define([
                 p1 = new Vec3(1, 2, 3),
                 p2 = new Vec3(3, 4, 5);
 
-            it("Internal. Intentionally not documented.", function () {
+            it("Indicates where the BoundingBox intersects a point", function () {
                 expect(boundingBox.intersectsAt(plane, 1000, p1, p2)).toEqual(0);
             });
 
-            it("Internal. Intentionally not documented.", function () {
+            it("Indicates the point intersection with the BoundingBox", function () {
                 expect(boundingBox.intersectionPoint(plane)).toEqual(-1);
             });
 

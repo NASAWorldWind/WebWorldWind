@@ -66,7 +66,7 @@ define([
                 expect(sector.isEmpty()).toBe(false);
             });
 
-            it("Sector is not empty", function () {
+            it("Sector is empty", function () {
                 var sector = new Sector(37, 37, 13, 13);
 
                 expect(sector.isEmpty()).toBe(true);
@@ -103,14 +103,10 @@ define([
 
             it("Computes the location correctly", function () {
                 var sector = new Sector(37, 39, 13, 18);
-                var result = Sector.ZERO;
+                var result = new Location(0, 0);
 
                 sector.centroid(result);
 
-                expect(result.minLatitude).toEqual(37);
-                expect(result.maxLatitude).toEqual(39);
-                expect(result.minLongitude).toEqual(13);
-                expect(result.maxLongitude).toEqual(18);
                 expect(result.latitude).toEqual(38);
                 expect(result.longitude).toEqual(15.5);
             });

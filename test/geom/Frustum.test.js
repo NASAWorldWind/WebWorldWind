@@ -66,23 +66,6 @@ define([
             expect(frustum.far).toEqual(far);
         });
 
-        it("Should return all the properties defined as prototypes", function () {
-            var left = new Plane(1, 2, 3, 4);
-            var right = new Plane(5, 6, 7, 8);
-            var bottom = new Plane(9, 10, 11, 12);
-            var top = new Plane(12, 14, 15, 16);
-            var near = new Plane(17, 18, 19, 20);
-            var far = new Plane(21, 22, 23, 24);
-            var frustum = new Frustum(left, right, bottom, top, near, far);
-
-            expect(frustum.left).toEqual(left);
-            expect(frustum.right).toEqual(right);
-            expect(frustum.bottom).toEqual(bottom);
-            expect(frustum.top).toEqual(top);
-            expect(frustum.near).toEqual(near);
-            expect(frustum.far).toEqual(far);
-        });
-
         it("Creates a new frustum with each of its planes 1 meter from the center", function () {
             var unitFrustum = Frustum.unitFrustum();
 

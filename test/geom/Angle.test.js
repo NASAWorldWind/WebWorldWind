@@ -67,12 +67,12 @@ define([
 
             it("Normalizes a 45 degree angle", function () {
                 var normalized = Angle.normalizedRadians(45);
-                expect(normalized).toEqual(45 - 14 * Math.PI);
+                expect(normalized).toBeCloseTo(1.017,2);
             });
 
             it("Normalizes a 60 degree angle", function () {
                 var normalized = Angle.normalizedRadians(60);
-                expect(normalized).toEqual(60 - 20 * Math.PI);
+                expect(normalized).toBeCloseTo(-2.831,2);
             });
         });
 
@@ -80,24 +80,24 @@ define([
 
             it("Normalizes a 60 degree angle", function () {
                 var normalized = Angle.normalizedRadiansLatitude(60);
-                expect(normalized).toBeCloseTo(60 - 19 * Math.PI, 10);
+                expect(normalized).toBeCloseTo(0.3097, 2);
             });
 
             it("Normalizes an 88 degree angle", function () {
                 var normalized = Angle.normalizedRadiansLatitude(88);
-                expect(normalized).toBeCloseTo(88 - 28 * Math.PI, 10);
+                expect(normalized).toBeCloseTo(0.0354, 2);
             });
         });
 
         describe("Normalizes a specified value to be within the range of [-Pi/2, Pi/2] radians", function () {
             it("Normalizes a 60 degree angle", function () {
                 var normalized = Angle.normalizedRadiansLongitude(60);
-                expect(normalized).toBeCloseTo(60 - 20 * Math.PI, 10);
+                expect(normalized).toBeCloseTo(-2.831, 2);
             });
 
             it("Normalizes a 180 degree angle", function () {
                 var normalized = Angle.normalizedRadiansLongitude(180);
-                expect(normalized).toBeCloseTo(180 - 58 * Math.PI, 10);
+                expect(normalized).toBeCloseTo(-2.212, 2);
             });
         });
 
