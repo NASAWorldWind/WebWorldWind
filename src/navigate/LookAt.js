@@ -202,5 +202,22 @@ define([], function(){
             this.roll == lookAt.roll
     };
 
+    /**
+     * Utility function for printing the state when debugging. It is important for when you use console.log to log the
+     * whole object, the inspection always take the last state of the object.
+     */
+    LookAt.prototype.toString = function() {
+        return "LookAt{" +
+            "latitude=" + this.latitude +
+            ", longitude=" + this.longitude +
+            ", altitude=" + this.altitude +
+            ", altitudeMode=" + this.altitudeMode +
+            ", range=" + this.range +
+            ", heading=" + this.heading +
+            ", tilt=" + this.tilt +
+            ", roll=" + this.roll +
+            '}';
+    };
+
     return LookAt;
 });

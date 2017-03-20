@@ -194,5 +194,21 @@ define([], function(){
             this.roll == camera.roll;
     };
 
+    /**
+     * Utility function for printing the state when debugging. It is important for when you use console.log to log the
+     * whole object, the inspection always take the last state of the object.
+     */
+    Camera.prototype.toString = function() {
+        return "Camera{" +
+            "latitude=" + this.latitude +
+            ", longitude=" + this.longitude +
+            ", altitude=" + this.altitude +
+            ", altitudeMode=" + this.altitudeMode +
+            ", heading=" + this.heading +
+            ", tilt=" + this.tilt +
+            ", roll=" + this.roll +
+            '}';
+    };
+
     return Camera;
 });
