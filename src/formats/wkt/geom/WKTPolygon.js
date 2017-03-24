@@ -23,15 +23,28 @@ define([
 
     WKTPolygon.prototype = Object.create(WKTObject.prototype);
 
+    WKTPolygon.prototype.commaWithoutCoordinates = function() {
+        this.outerBoundaries = this.coordinates.slice();
+        this.coordinates = [];
+    };
+
     /**
      * @inheritDoc
      */
     WKTPolygon.prototype.render = function (dc) {
         if (!this._renderable) {
             if (this._is3d) {
-                this._renderable = new Polygon(this.coordinates, this._defaultShapeAttributes);
+                if(this.outerBoundaries) {
+                    this._renderable = new Polygon([this.outerBoundaries, this.coordinates], this._defaultShapeAttributes);
+                } else {
+                    this._renderable = new Polygon(this.coordinates, this._defaultShapeAttributes);
+                }
             } else {
-                this._renderable = new SurfacePolygon(this.coordinates, this._defaultShapeAttributes);
+                if(this.outerBoundaries) {
+                    this._renderable = new SurfacePolygon([this.outerBoundaries, this.coordinates], this._defaultShapeAttributes);
+                } else {
+                    this._renderable = new SurfacePolygon(this.coordinates, this._defaultShapeAttributes);
+                }
             }
         }
 
