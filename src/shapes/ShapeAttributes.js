@@ -300,6 +300,25 @@ define([
             }
         });
 
+        ShapeAttributes.prototype.clone = function () {
+            var attributes = new ShapeAttributes(null);
+
+            attributes._drawInterior = this._drawInterior;
+            attributes._drawOutline = this._drawOutline;
+            attributes._enableLighting = this._enableLighting;
+            attributes._interiorColor = this._interiorColor.clone();
+            attributes._outlineColor = this._outlineColor.clone();
+            attributes._outlineWidth = this._outlineWidth;
+            attributes._outlineStippleFactor = this._outlineStippleFactor;
+            attributes._outlineStipplePattern = this._outlineStipplePattern;
+            attributes._imageSource = this._imageSource;
+            attributes._depthTest = this._depthTest;
+            attributes._drawVerticals = this._drawVerticals;
+            attributes._applyLighting = this._applyLighting;
+
+            return attributes;
+        };
+
         return ShapeAttributes;
     })
 ;
