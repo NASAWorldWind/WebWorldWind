@@ -187,7 +187,7 @@ define([
             this.currentPosition++;
         }
         this.currentPosition--;
-        return numeric;
+        return Number(numeric);
     };
 
     return WKTTokens;
