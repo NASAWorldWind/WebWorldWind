@@ -6,19 +6,22 @@
  * @exports StarFieldLayer
  */
 define([
+        '../util/CelestialProjection',
         './Layer',
         '../util/Logger',
         '../geom/Matrix',
         '../shaders/StarFieldProgram'
     ],
-    function (Layer,
+    function (CelestialProjection,
+              Layer,
               Logger,
               Matrix,
               StarFieldProgram) {
         'use strict';
 
         /**
-         * Constructs a layer showing stars around the Earth.
+         * Constructs a layer showing stars and the Sun around the Earth.
+         * If used together with the AtmosphereLayer, the StarFieldLayer must be inserted before the AtmosphereLayer.
          *
          * If you want to use your own star data, the file provided must be .json
          * and the fields 'ra', 'dec' and 'vmag' must be present in the metadata.
@@ -31,8 +34,8 @@ define([
          *
          * @alias StarFieldLayer
          * @constructor
-         * @classdesc Provides a layer showing stars.
-         * @param {URL} starDataSource optional url for the stars data.
+         * @classdesc Provides a layer showing stars, and the Sun around the Earth
+         * @param {URL} starDataSource optional url for the stars data
          * @augments Layer
          */
         var StarFieldLayer = function (starDataSource) {
@@ -41,16 +44,32 @@ define([
             // The StarField Layer is not pickable.
             this.pickEnabled = false;
 
+            /**
+             * The size of the Sun in pixels.
+             * This can not exceed the maximum allowed pointSize of the GPU.
+             * A warning will be given if the size is too big.
+             * @type {Number}
+             * @default 128
+             */
+            this.sunSize = 128;
+
+            /**
+             * Indicates weather to show or hive the Sun
+             * @type {Boolean}
+             * @default true
+             */
+            this.showSun = true;
+
             //Documented in defineProperties below.
-            this._starDataSource = starDataSource ||
-                WorldWind.configuration.baseUrl + 'images/stars.json';
+            this._starDataSource = starDataSource || WorldWind.configuration.baseUrl + 'images/stars.json';
+            this._sunImageSource = WorldWind.configuration.baseUrl + 'images/sun2_g_small.png';
 
             //Internal use only.
             //The MVP matrix of this layer.
             this._matrix = Matrix.fromIdentity();
 
             //Internal use only.
-            //gpu cache key for this layer vbo.
+            //gpu cache key for the stars vbo.
             this._positionsVboCacheKey = null;
 
             //Internal use only.
@@ -66,6 +85,19 @@ define([
             //Internal use only.
             //A flag to indicate the star data is currently being retrieved.
             this._loadStarted = false;
+
+            //Internal use only.
+            this._minScale = 10e6;
+
+            //Internal use only.
+            this._sunPositionsCacheKey = '';
+            this._sunBufferView = new Float32Array(4);
+
+            //Internal use only.
+            this._MAX_GL_POINT_SIZE = 0;
+
+            //Internal use only.
+            this._julianDate = 0;
         };
 
         StarFieldLayer.prototype = Object.create(Layer.prototype);
@@ -84,6 +116,20 @@ define([
                     this._starDataSource = value;
                     this.invalidateStarData();
                 }
+            },
+
+            /**
+             * Url for the sun texture image.
+             * @memberof StarFieldLayer.prototype
+             * @type {URL}
+             */
+            sunImageSource: {
+                get: function () {
+                    return this._sunImageSource;
+                },
+                set: function (value) {
+                    this._sunImageSource = value;
+                }
             }
         });
 
@@ -93,8 +139,8 @@ define([
                 return;
             }
 
-            if (!this._starData) {
-                this.fetchStarData();
+            if (!this.haveResources(dc)) {
+                this.loadResources(dc);
                 return;
             }
 
@@ -108,44 +154,80 @@ define([
         };
 
         // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.haveResources = function (dc) {
+            var sunTexture = dc.gpuResourceCache.resourceForKey(this._sunImageSource);
+            return (
+                this._starData != null &&
+                sunTexture != null
+            );
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.loadResources = function (dc) {
+            var gl = dc.currentGlContext;
+            var gpuResourceCache = dc.gpuResourceCache;
+
+            if (!this._starData) {
+                this.fetchStarData();
+            }
+
+            var sunTexture = gpuResourceCache.resourceForKey(this._sunImageSource);
+            if (!sunTexture) {
+                gpuResourceCache.retrieveTexture(gl, this._sunImageSource);
+            }
+        };
+
+        // Internal. Intentionally not documented.
         StarFieldLayer.prototype.beginRendering = function (dc) {
+            var gl = dc.currentGlContext;
             dc.findAndBindProgram(StarFieldProgram);
+            gl.enableVertexAttribArray(0);
+            gl.depthMask(false);
+
+            if (!this._MAX_GL_POINT_SIZE) {
+                this._MAX_GL_POINT_SIZE = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1];
+
+                if (this.sunSize > this._MAX_GL_POINT_SIZE) {
+                    Logger.log(Logger.LEVEL_WARNING, 'StarFieldLayer - sunSize is to big, max size allowed is: ' +
+                        this._MAX_GL_POINT_SIZE);
+                }
+            }
         };
 
         // Internal. Intentionally not documented.
         StarFieldLayer.prototype.doDraw = function (dc) {
-            var gl = dc.currentGlContext;
-            this.loadAttributes(dc);
-            this.loadUniforms(dc);
-            gl.depthMask(false);
-            gl.drawArrays(gl.POINTS, 0, this._numStars);
+            this._julianDate = CelestialProjection.computeJulianDate(this.time || new Date());
+
+            this.loadCommonUniforms(dc);
+            this.renderStars(dc);
+            if (this.showSun) {
+                this.renderSun(dc);
+            }
         };
 
         // Internal. Intentionally not documented.
-        StarFieldLayer.prototype.loadUniforms = function (dc) {
+        StarFieldLayer.prototype.loadCommonUniforms = function (dc) {
             var gl = dc.currentGlContext;
             var program = dc.currentProgram;
 
             var eyePoint = dc.navigatorState.eyePoint;
-            var position = dc.globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], {});
-            var altitude = position.altitude * 1.5;
+            var eyePosition = dc.globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], {});
+            var scale = Math.max(eyePosition.altitude * 1.5, this._minScale);
             this._matrix.copy(dc.navigatorState.modelviewProjection);
-            this._matrix.multiplyByScale(altitude, altitude, altitude);
+            this._matrix.multiplyByScale(scale, scale, scale);
             program.loadModelviewProjection(gl, this._matrix);
 
-            var JD = this.julianDate(this.time);
             //this subtraction does not work properly on the GPU, it must be done on the CPU
             //possibly due to precision loss
             //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
-            program.loadNumDays(gl, JD - 2451545.0);
-
-            program.loadMagnitudeRange(gl, this._minMagnitude, this._maxMagnitude);
+            program.loadNumDays(gl, this._julianDate - 2451545.0);
         };
 
         // Internal. Intentionally not documented.
-        StarFieldLayer.prototype.loadAttributes = function (dc) {
+        StarFieldLayer.prototype.renderStars = function (dc) {
             var gl = dc.currentGlContext;
             var gpuResourceCache = dc.gpuResourceCache;
+            var program = dc.currentProgram;
 
             if (!this._positionsVboCacheKey) {
                 this._positionsVboCacheKey = gpuResourceCache.generateCacheKey();
@@ -153,7 +235,7 @@ define([
             var vboId = gpuResourceCache.resourceForKey(this._positionsVboCacheKey);
             if (!vboId) {
                 vboId = gl.createBuffer();
-                var positions = this.createGeometry();
+                var positions = this.createStarsGeometry();
                 gpuResourceCache.putResource(this._positionsVboCacheKey, vboId, positions.length * 4);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
@@ -163,8 +245,54 @@ define([
             }
             dc.frameStatistics.incrementVboLoadCount(1);
 
-            gl.enableVertexAttribArray(0);
             gl.vertexAttribPointer(0, 4, gl.FLOAT, false, 0, 0);
+
+            program.loadMagnitudeRange(gl, this._minMagnitude, this._maxMagnitude);
+            program.loadTextureEnabled(gl, false);
+
+            gl.drawArrays(gl.POINTS, 0, this._numStars);
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.renderSun = function (dc) {
+            var gl = dc.currentGlContext;
+            var program = dc.currentProgram;
+            var gpuResourceCache = dc.gpuResourceCache;
+
+            var sunCelestialLocation = CelestialProjection.computeSunCelestialLocation(this._julianDate);
+
+            //.x = declination
+            //.y = right ascension
+            //.z = point size
+            //.w = magnitude
+            this._sunBufferView[0] = sunCelestialLocation.declination;
+            this._sunBufferView[1] = sunCelestialLocation.rightAscension;
+            this._sunBufferView[2] = Math.min(this.sunSize, this._MAX_GL_POINT_SIZE);
+            this._sunBufferView[3] = 1;
+
+            if (!this._sunPositionsCacheKey) {
+                this._sunPositionsCacheKey = gpuResourceCache.generateCacheKey();
+            }
+            var vboId = gpuResourceCache.resourceForKey(this._sunPositionsCacheKey);
+            if (!vboId) {
+                vboId = gl.createBuffer();
+                gpuResourceCache.putResource(this._sunPositionsCacheKey, vboId, this._sunBufferView.length * 4);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+                gl.bufferData(gl.ARRAY_BUFFER, this._sunBufferView, gl.DYNAMIC_DRAW);
+            }
+            else {
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+                gl.bufferSubData(gl.ARRAY_BUFFER, 0, this._sunBufferView);
+            }
+            dc.frameStatistics.incrementVboLoadCount(1);
+            gl.vertexAttribPointer(0, 4, gl.FLOAT, false, 0, 0);
+
+            program.loadTextureEnabled(gl, true);
+
+            var sunTexture = dc.gpuResourceCache.resourceForKey(this._sunImageSource);
+            sunTexture.bind(dc);
+
+            gl.drawArrays(gl.POINTS, 0, 1);
         };
 
         // Internal. Intentionally not documented.
@@ -188,6 +316,7 @@ define([
                 if (this.status >= 200 && this.status < 300) {
                     try {
                         self._starData = JSON.parse(this.response);
+                        self.sendRedrawRequest();
                     }
                     catch (e) {
                         Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to parse JSON for star data ' +
@@ -212,22 +341,22 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        StarFieldLayer.prototype.createGeometry = function () {
-            var indexes = this.parseMetadata(this._starData.metadata);
+        StarFieldLayer.prototype.createStarsGeometry = function () {
+            var indexes = this.parseStarsMetadata(this._starData.metadata);
 
             if (indexes.raIndex === -1) {
                 throw new Error(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createGeometry',
+                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createStarsGeometry',
                         'Missing ra field in star data.'));
             }
             if (indexes.decIndex === -1) {
                 throw new Error(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createGeometry',
+                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createStarsGeometry',
                         'Missing dec field in star data.'));
             }
             if (indexes.magIndex === -1) {
                 throw new Error(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createGeometry',
+                    Logger.logMessage(Logger.LEVEL_SEVERE, 'StarFieldLayer', 'createStarsGeometry',
                         'Missing vmag field in star data.'));
             }
 
@@ -255,7 +384,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        StarFieldLayer.prototype.parseMetadata = function (metadata) {
+        StarFieldLayer.prototype.parseStarsMetadata = function (metadata) {
             var raIndex = -1,
                 decIndex = -1,
                 magIndex = -1;
@@ -279,36 +408,16 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        StarFieldLayer.prototype.julianDate = function julianDate(date) {
-            //http://quasar.as.utexas.edu/BillInfo/JulianDatesG.html
-
-            date = date || new Date();
-            var year = date.getUTCFullYear();
-            var month = date.getUTCMonth() + 1;
-            var day = date.getUTCDate();
-            var hour = date.getUTCHours();
-            var minute = date.getUTCMinutes();
-            var second = date.getUTCSeconds();
-
-            var dayFraction = (hour + minute / 60 + second / 3600) / 24;
-
-            if (month <= 2) {
-                year -= 1;
-                month += 12;
-            }
-
-            var A = Math.floor(year / 100);
-            var B = 2 - A + Math.floor(A / 4);
-            var JD0h = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
-
-            return JD0h + dayFraction;
-
-        };
-
-        // Internal. Intentionally not documented.
         StarFieldLayer.prototype.invalidateStarData = function () {
             this._starData = null;
             this._positionsVboCacheKey = null;
+        };
+
+        // Internal. Intentionally not documented.
+        StarFieldLayer.prototype.sendRedrawRequest = function () {
+            var e = document.createEvent('Event');
+            e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+            window.dispatchEvent(e);
         };
 
         return StarFieldLayer;

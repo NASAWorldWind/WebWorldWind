@@ -84,14 +84,22 @@ define([
                 fragmentShaderSource =
                     'precision mediump float;\n' +
 
+                    'uniform sampler2D textureSampler;\n' +
+                    'uniform int textureEnabled;\n' +
+
                     'varying float magnitudeWeight;\n' +
 
                     'const vec4 white = vec4(1.0, 1.0, 1.0, 1.0);\n' +
                     'const vec4 grey = vec4(0.5, 0.5, 0.5, 1.0);\n' +
 
                     'void main() {\n' +
+                    '   if (textureEnabled == 1) {\n' +
+                    '       gl_FragColor = texture2D(textureSampler, gl_PointCoord);\n' +
+                    '   }\n' +
+                    '   else {\n' +
                     //paint the starts in shades of grey, where the brightest star is white and the dimmest star is grey
-                    '   gl_FragColor = mix(white, grey, magnitudeWeight);\n' +
+                    '       gl_FragColor = mix(white, grey, magnitudeWeight);\n' +
+                    '   }\n' +
                     '}';
 
             // Call to the superclass, which performs shader program compiling and linking.
@@ -124,6 +132,20 @@ define([
              * @readonly
              */
             this.magnitudeRangeLocation = this.uniformLocation(gl, "magnitudeRange");
+
+            /**
+             * The WebGL location for this program's 'textureSampler' uniform.
+             * @type {WebGLUniformLocation}
+             * @readonly
+             */
+            this.textureUnitLocation = this.uniformLocation(gl, "textureSampler");
+
+            /**
+             * The WebGL location for this program's 'textureEnabled' uniform.
+             * @type {WebGLUniformLocation}
+             * @readonly
+             */
+            this.textureEnabledLocation = this.uniformLocation(gl, "textureEnabled");
         };
 
         /**
@@ -186,6 +208,24 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "StarFieldProgram", "loadMagRange", "missingMaxMag"));
             }
             gl.uniform2f(this.magnitudeRangeLocation, minMag, maxMag);
+        };
+
+        /**
+         * Loads the specified number as the value of this program's 'textureSampler' uniform variable.
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @param {Number} unit The texture unit.
+         */
+        StarFieldProgram.prototype.loadTextureUnit = function (gl, unit) {
+            gl.uniform1i(this.textureUnitLocation, unit - gl.TEXTURE0);
+        };
+
+        /**
+         * Loads the specified boolean as the value of this program's 'textureEnabledLocation' uniform variable.
+         * @param {WebGLRenderingContext} gl The current WebGL context.
+         * @param {Boolean} value
+         */
+        StarFieldProgram.prototype.loadTextureEnabled = function (gl, value) {
+            gl.uniform1i(this.textureEnabledLocation, value ? 1 : 0);
         };
 
         return StarFieldProgram;
