@@ -18,7 +18,7 @@ Install grunt-cli (http://gruntjs.com/getting-started)
 The below installations are per-project — must be performed with each new full-project checkout -
 with cwd as the project folder.
 
-Install requirejs plugin (http://jaketrent.com/post/run-requirejs-with-gruntjs/)
+Install requirejs plugin (https://jaketrent.com/post/run-requirejs-with-gruntjs/)
 	npm install grunt-contrib-requirejs
 
 Install jsdoc 3.3.0 plugin (https://github.com/krampstudio/grunt-jsdoc)

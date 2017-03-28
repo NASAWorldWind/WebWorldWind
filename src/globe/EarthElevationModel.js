@@ -34,7 +34,7 @@ define([
             this.maxElevation = 8850; // Height of Mt. Everest
             this.pixelIsPoint = false; // World Wind WMS elevation layers return pixel-as-area images
 
-            this.urlBuilder = new WmsUrlBuilder("http://worldwind26.arc.nasa.gov/elev",
+            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev",
                 "GEBCO,aster_v2,USGS-NED", "", "1.3.0");
         };
 

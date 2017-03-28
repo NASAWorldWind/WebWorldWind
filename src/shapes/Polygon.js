@@ -381,7 +381,7 @@ define([
                 }
             }
 
-            this.currentData.eyeDistance = Math.sqrt(eyeDistSquared);
+            this.currentData.eyeDistance = 0;/*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
 
             return boundaryPoints;
         };
@@ -564,10 +564,15 @@ define([
 
                 textureBound = this.activeTexture && this.activeTexture.bind(dc);
                 if (textureBound) {
-                    program.loadTextureEnabled(gl, true);
                     gl.enableVertexAttribArray(program.vertexTexCoordLocation);
                     gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, stride, 12);
+
+                    this.scratchMatrix.setToIdentity();
+                    this.scratchMatrix.multiplyByTextureTransform(this.activeTexture);
+
+                    program.loadTextureEnabled(gl, true);
                     program.loadTextureUnit(gl, gl.TEXTURE0);
+                    program.loadTextureMatrix(gl, this.scratchMatrix);
                     program.loadModulateColor(gl, dc.pickingMode);
                 }
             }
@@ -675,11 +680,16 @@ define([
 
                     textureBound = sideTexture && sideTexture.bind(dc);
                     if (textureBound) {
-                        program.loadTextureEnabled(gl, true);
-                        program.loadTextureUnit(gl, gl.TEXTURE0);
                         gl.enableVertexAttribArray(program.vertexTexCoordLocation);
                         gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, numBytesPerVertex,
                             coordByteOffset + 12);
+
+                        this.scratchMatrix.setToIdentity();
+                        this.scratchMatrix.multiplyByTextureTransform(this.activeTexture);
+
+                        program.loadTextureEnabled(gl, true);
+                        program.loadTextureUnit(gl, gl.TEXTURE0);
+                        program.loadTextureMatrix(gl, this.scratchMatrix);
                     } else {
                         program.loadTextureEnabled(gl, false);
                         gl.disableVertexAttribArray(program.vertexTexCoordLocation);

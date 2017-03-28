@@ -257,7 +257,7 @@ define([
             // annotation
             this.label = dc.textSupport.wrap(
                 this.label,
-                this.attributes.width,this.attributes.height,
+                this.attributes.width, this.attributes.height,
                 this.attributes.textAttributes.font);
 
             // Compute the annotation's model point.
@@ -320,7 +320,7 @@ define([
                 leaderOffsetY = 0;
             }
 
-            if (this.attributes.stateKey != this.lastStateKey){
+            if (this.attributes.stateKey != this.lastStateKey) {
                 this.calloutPoints = this.createCallout(
                     width, height,
                     leaderOffsetX, leaderOffsetY,
@@ -471,7 +471,7 @@ define([
             }
 
             // Remove the last generated vbo data if attributes changed
-            if (calloutAttributesChanged && this.calloutCacheKey){
+            if (calloutAttributesChanged && this.calloutCacheKey) {
                 dc.gpuResourceCache.removeResource(this.calloutCacheKey);
             }
 
@@ -505,6 +505,10 @@ define([
             Annotation.matrix.copy(dc.screenProjection);
             Annotation.matrix.multiplyMatrix(this.labelTransform);
             program.loadModelviewProjection(gl, Annotation.matrix);
+
+            Annotation.matrix.setToIdentity();
+            Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
+            program.loadTextureMatrix(gl, Annotation.matrix);
 
             program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
             textureBound = this.labelTexture.bind(dc);

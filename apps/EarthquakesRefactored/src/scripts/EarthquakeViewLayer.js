@@ -1,5 +1,5 @@
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js','./Cylinder'],
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js','./Cylinder'],
     function(ww, Cylinder) {
     'use strict';
 

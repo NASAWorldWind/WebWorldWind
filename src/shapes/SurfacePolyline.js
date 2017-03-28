@@ -53,17 +53,47 @@ define([
              */
             this._boundaries = locations;
 
+            this._stateId = SurfacePolyline.stateId++;
+
             // Internal use only.
             this._isInteriorInhibited = true;
         };
 
         SurfacePolyline.prototype = Object.create(SurfaceShape.prototype);
 
+        Object.defineProperties(SurfacePolyline.prototype, {
+            /**
+             * This polyline's boundaries. The polylines locations.
+             * @type {Location[]}
+             * @memberof SurfacePolyline.prototype
+             */
+            boundaries: {
+                get: function () {
+                    return this._boundaries;
+                },
+                set: function (boundaries) {
+                    if (!Array.isArray(boundaries)) {
+                        throw new ArgumentError(
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolyline", "set boundaries",
+                                "The specified value is not an array."));
+                    }
+                    this._boundaries = boundaries;
+                    this._stateId = SurfacePolyline.stateId++;
+                    this.isPrepared = false;
+                    this.stateKeyInvalid = true;
+                }
+            }
+        });
+
+        // Internal use only. Intentionally not documented.
+        SurfacePolyline.stateId = Number.MIN_SAFE_INTEGER;
+
         // Internal use only. Intentionally not documented.
         SurfacePolyline.staticStateKey = function(shape) {
             var shapeStateKey = SurfaceShape.staticStateKey(shape);
 
-            return shapeStateKey;
+            return shapeStateKey +
+                " pl " + shape._stateId;
         };
 
         // Internal use only. Intentionally not documented.

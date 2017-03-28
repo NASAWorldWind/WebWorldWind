@@ -1,4 +1,4 @@
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js', 'Route','polyline'], function(ww, Route, polyline) {
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js', 'Route','polyline'], function(ww, Route, polyline) {
 
    'use strict';
 
