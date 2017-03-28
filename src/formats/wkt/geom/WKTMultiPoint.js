@@ -3,9 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../shapes/Placemark',
+    '../../../shapes/PlacemarkAttributes',
     './WKTObject',
     '../WKTType'
-], function (WKTObject,
+], function (Placemark,
+             PlacemarkAttributes,
+             WKTObject,
              WKTType) {
     /**
      * @augments WKTObject
@@ -23,11 +27,12 @@ define([
     WKTMultiPoint.prototype.commaWithoutCoordinates = function() {};
 
     /**
-     * It returns array of either Positions or Locations representing this shape. Mainly to use in other processing.
-     * @return {Position[]|Location[]}
+     * @inheritDoc
      */
-    WKTMultiPoint.prototype.reference = function() {
-        return this.coordinates;
+    WKTMultiPoint.prototype._shapes = function() {
+        return this.coordinates.map(function(coordinate){
+            return new Placemark(coordinate, false, new PlacemarkAttributes);
+        }.bind(this));
     };
 
     return WKTMultiPoint;

@@ -208,7 +208,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/util/ViewVolume',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
-        './formats/wkt/WKTObjects',
+        './formats/wkt/WKTParser',
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',

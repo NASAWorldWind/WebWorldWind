@@ -30,10 +30,16 @@ define([
     /**
      * @inheritDoc
      */
-    WKTGeometryCollection.prototype.render = function(dc) {
-        this.objects.forEach(function(object){
-            object.render(dc);
+    WKTGeometryCollection.prototype._shapes = function() {
+        var shapes = [];
+
+        this.objects.forEach(function(associatedShapes){
+            associatedShapes.shapes().forEach(function(shape){
+                shapes.push(shape);
+            });
         });
+
+        return shapes;
     };
 
     return WKTGeometryCollection;

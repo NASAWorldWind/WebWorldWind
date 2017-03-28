@@ -7,18 +7,18 @@
  */
 define([
     '../../../geom/Location',
-    '../../../geom/Position',
-    '../../../shapes/ShapeAttributes'
+    '../../../geom/Position'
 ], function (Location,
-             Position,
-             ShapeAttributes) {
+             Position) {
     /**
      * THis shouldn't be initiated from outside. It is only for internal use. Every other WKT Objects are themselves
      * WKTObject
      * @param type {String} Textual representation of the type of current object.
+     * @param shapeConfigurationCallback {Function} Function which is called whenever any shape is created.
+     * @param layer {Layer} Layer which should be used for adding of all renderables.
      * @constructor
      */
-    var WKTObject = function (type) {
+    var WKTObject = function (type, shapeConfigurationCallback, layer) {
         /**
          * Type of this object.
          * @type {WKTType}
@@ -46,12 +46,16 @@ define([
         this.coordinates = [];
 
         /**
-         * The default attribtues that will be applied to all the shapes in the WKTObjects unless changed
-         * TODO: Add meaningfull way to adapt them.
-         * @protected
-         * @type {ShapeAttributes}
+         * Callback which is called any time the shape is created but before adding it to the layer.
+         * @type {Function}
          */
-        this._defaultShapeAttributes = new ShapeAttributes(null);
+        this.shapeConfigurationCallback = shapeConfigurationCallback;
+
+        /**
+         *
+         * @type {Layer}
+         */
+        this.layer = layer;
     };
 
     /**
@@ -82,11 +86,31 @@ define([
     };
 
     /**
-     * It is possible to render any WKTObject. Default implementation does nothing. Specific objects have their own ways
-     * of handling this, usually by creating some geometry objects and rendering them.
-     * @param dc {DrawContext}
+     * It returns either array of shapes representing the current object.
+     * Every subclass must overwrite this method. This is actually an abstract method even though JS doesn't allow me to
+     * do that.
+     * @protected
+     * @return {Renderable[]} Renderable or array of renderables representing current WKTObject.
      */
-    WKTObject.prototype.render = function(dc) {};
+    WKTObject.prototype._shapes = function() {
+        throw new Error("It must be implemented by all subclasses.");
+    };
+
+    /**
+     * It is used to retrieve and create the shape or shapes associated.
+     * @returns {Renderable[]} Array of renderables associated with given shape.
+     */
+    WKTObject.prototype.shapes = function() {
+        var self = this;
+        var shapes = this._shapes();
+        shapes.forEach(function(shape){
+            self.shapeConfigurationCallback(shape);
+        });
+
+        this.layer.addRenderables(shapes);
+
+        return shapes;
+    };
 
     return WKTObject;
 });

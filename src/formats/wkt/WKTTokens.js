@@ -1,30 +1,50 @@
 define([
-    './geom/WKTGeometryCollection',
-    './geom/WKTLineString',
-    './geom/WKTMultiLineString',
-    './geom/WKTMultiPoint',
-    './geom/WKTMultiPolygon',
+    './WKTElements',
     './geom/WKTObject',
-    './geom/WKTPoint',
-    './geom/WKTPolygon',
-    './geom/WKTTriangle',
     './WKTType'
-], function (WKTGeometryCollection,
-             WKTLineString,
-             WKTMultiLineString,
-             WKTMultiPoint,
-             WKTMultiPolygon,
+], function (WKTElements,
              WKTObject,
-             WKTPoint,
-             WKTPolygon,
-             WKTTriangle,
              WKTType) {
     /**
-     *
+     * Tokenizer, which parses the source texts into the meaningful tokens and then transforms them to the objects.
+     * Intended for the internal use only.
+     * @private
      * @constructor
      */
     var WKTTokens = function (sourceText) {
         this.sourceText = sourceText;
+    };
+
+    /**
+     * It returns correctly initialized objects to render.
+     * @return {Renderable[]}
+     */
+    WKTTokens.prototype.objects = function () {
+        var options = {
+            objects: [],
+            coordinates: [],
+            leftParenthesis: 0,
+            rightParenthesis: 0,
+            currentObject: null
+        };
+
+        this.tokenize(this.sourceText).forEach(function (token) {
+            var value = token.value;
+            if (token.type === WKTType.TokenType.TEXT) {
+                this.text(options, value);
+            } else if (token.type === WKTType.TokenType.LEFT_PARENTHESIS) {
+                options.leftParenthesis++;
+            } else if (token.type === WKTType.TokenType.RIGHT_PARENTHESIS) {
+                options.rightParenthesis++;
+
+                this.rightParenthesis(options);
+            } else if (token.type === WKTType.TokenType.NUMBER) {
+                this.number(options, value);
+            } else if (token.type === WKTType.TokenType.COMMA) {
+                this.comma(options);
+            }
+        });
+        return options.objects;
     };
 
     /**
@@ -35,6 +55,8 @@ define([
      * @return {String[]}
      */
     WKTTokens.prototype.tokenize = function (textToParse) {
+        this.currentPosition = 0;
+
         var tokens = [];
         for (; this.currentPosition < textToParse.length; this.currentPosition++) {
             var c = textToParse.charAt(this.currentPosition);
@@ -73,103 +95,45 @@ define([
         return tokens;
     };
 
+
     /**
-     * It returns correctly initialized objects to render.
-     * @return {Array}
+     * It returns true if the character is letter, regardless of whether uppercase or lowercase.
+     * @private
+     * @param c {String} character to test
+     * @return {boolean} True if it is lowercase or uppercase
      */
-    // TODO: Refactor. This is hell.
-    WKTTokens.prototype.objects = function () {
-        this.currentPosition = 0;
-
-        var tokens = this.tokenize(this.sourceText);
-        var objects = [];
-        var coordinates = [];
-        var currentObject = null;
-        var leftParenthesis = 0, rightParenthesis = 0;
-        tokens.forEach(function (token) {
-            var value = token.value;
-            if (token.type === WKTType.TokenType.TEXT) {
-                var started = null;
-                if (value.indexOf('POINT') === 0) {
-                    started = new WKTPoint();
-                } else if (value.indexOf('MULTIPOINT') === 0) {
-                    started = new WKTMultiPoint();
-                } else if (value.indexOf('POLYGON') === 0) {
-                    started = new WKTPolygon();
-                } else if (value.indexOf('MULTIPOLYGON') === 0) {
-                    started = new WKTMultiPolygon();
-                } else if (value.indexOf('LINESTRING') === 0) {
-                    started = new WKTLineString();
-                } else if (value.indexOf('MULTILINESTRING') === 0) {
-                    started = new WKTMultiLineString();
-                } else if (value.indexOf('TRIANGLE') === 0) {
-                    started = new WKTTriangle();
-                } else if (value.indexOf('GEOMETRYCOLLECTION') === 0) {
-                    started = new WKTGeometryCollection();
-                } else if (value.length > 2) {
-                    started = new WKTObject(); // Set of the objects we don't support.
-                } else {
-                    if(value == 'Z') {
-                        currentObject.set3d();
-                    } else if(value == 'M') {
-                        currentObject.setLrs();
-                    } else if(value == 'MZ') {
-                        currentObject.set3d();
-                        currentObject.setLrs();
-                    }
-
-                    return;
-                }
-
-                if (!currentObject) {
-                    currentObject = started;
-                } else {
-                    currentObject.add(started);
-                }
-            } else if (token.type === WKTType.TokenType.LEFT_PARENTHESIS) {
-                leftParenthesis++;
-            } else if (token.type === WKTType.TokenType.RIGHT_PARENTHESIS) {
-                if(coordinates) {
-                    currentObject.addCoordinates(coordinates);
-                    coordinates = null;
-                }
-                rightParenthesis++;
-                if (leftParenthesis === rightParenthesis) {
-                    objects.push(currentObject);
-                    leftParenthesis = 0;
-                    rightParenthesis = 0;
-                    currentObject = null;
-                }
-            } else if (token.type === WKTType.TokenType.NUMBER) {
-                if(!coordinates) {
-                    coordinates = [];
-                }
-                coordinates.push(value);
-            } else if (token.type === WKTType.TokenType.COMMA ) {
-                if(!coordinates) {
-                    currentObject.commaWithoutCoordinates();
-                } else {
-                    currentObject.addCoordinates(coordinates);
-                    coordinates = null;
-                }
-            }
-        });
-        return objects;
-    };
-
-
     WKTTokens.prototype.isAlpha = function (c) {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
     };
 
+    /**
+     * It returns true if the character is part of the number. It has certain limitations such as -1- is considered as
+     * a number
+     * @private
+     * @param c {String} character to test
+     * @return {boolean} True if it is either Number or - or .
+     */
     WKTTokens.prototype.isNumeric = function (c) {
-        return c >= '0' && c <= '9' || c == '.' || c =='-';
+        return c >= '0' && c <= '9' || c == '.' || c == '-';
     };
 
+    /**
+     * It returns true if the character represents whitespace. It is mainly relevant as whitespaces are one of the
+     * delimiters
+     * @private
+     * @param c {String} character to test
+     * @return {boolean} True if it is any type of white space.
+     */
     WKTTokens.prototype.isWhiteSpace = function (c) {
         return c == ' ' || c == '\t' || c == '\r' || c == '\n';
     };
 
+    /**
+     * It returns the next chunk of the String, which represents the text. Non alpha characters end the text.
+     * @private
+     * @param textToParse {String} The text to use in parsing.
+     * @return {string} The full chunk of text
+     */
     WKTTokens.prototype.readText = function (textToParse) {
         var text = '';
         while (this.isAlpha(textToParse.charAt(this.currentPosition))) {
@@ -180,6 +144,12 @@ define([
         return text;
     };
 
+    /**
+     * It returns the next chunk of the String, which represents the number. Non numeric characters end the text.
+     * @private
+     * @param textToParse {String} The text to use in parsing.
+     * @return {Number} The full chunk of number
+     */
     WKTTokens.prototype.readNumeric = function (textToParse) {
         var numeric = '';
         while (this.isNumeric(textToParse.charAt(this.currentPosition))) {
@@ -188,6 +158,114 @@ define([
         }
         this.currentPosition--;
         return Number(numeric);
+    };
+
+    /**
+     * There are basically three types of tokens in the Text line. The name of the type for the next shape, Empty
+     * representing the empty shape and M or Z or MZ expressing whether it is in 3D or whether Linear Referencing System
+     * should be used.
+     * @private
+     * @param options {}
+     * @param value {String} Value to use for distinguishing among options.
+     */
+    WKTTokens.prototype.text = function(options, value) {
+        value = value.toUpperCase();
+        var started = null;
+        if (value.length <= 2) {
+            this.setOptions(value, started);
+
+            return;
+        } else if (value.indexOf('EMPTY') === 0) {
+            this.nextObject(options);
+        } else {
+            var founded = value.match('[M]?[Z]?$');
+            if(founded) { // It contains either null or M or Z or MZ
+                this.setOptions(founded, started);
+                value = value.substring(0, value.length - founded.length);
+            }
+
+            started = WKTElements[value];
+            if(!started) {
+                started = new WKTObject();
+            }
+        }
+
+        if (!options.currentObject) {
+            options.currentObject = started;
+        } else {
+            options.currentObject.add(started);
+        }
+    };
+
+    /**
+     * Right parenthesis either end coordinates for an object or ends current shape.
+     * @private
+     * @param options
+     */
+    WKTTokens.prototype.rightParenthesis = function(options) {
+        if (options.coordinates) {
+            options.currentObject.addCoordinates(options.coordinates);
+            options.coordinates = null;
+        }
+        if (options.leftParenthesis === options.rightParenthesis) {
+            options.currentObject.shapes().forEach(function (shape) {
+                options.objects.push(shape);
+            });
+            this.nextObject(options);
+        }
+    };
+
+    /**
+     * Comma either means another set of coordinates, or for certain shapes for example another shape or just another
+     * boundary
+     * @private
+     * @param options
+     */
+    WKTTokens.prototype.comma = function(options) {
+        if (!options.coordinates) {
+            options.currentObject.commaWithoutCoordinates();
+        } else {
+            options.currentObject.addCoordinates(options.coordinates);
+            options.coordinates = null;
+        }
+    };
+
+    /**
+     * Handle Number by adding it among coordinates in the current object.
+     * @private
+     * @param options
+     * @param value {Number}
+     */
+    WKTTokens.prototype.number = function(options, value) {
+        options.coordinates = options.coordinates || [];
+        options.coordinates.push(value);
+    };
+
+    /**
+     * Update options when previous WKT object ended.
+     * @private
+     * @param options
+     */
+    WKTTokens.prototype.nextObject = function(options) {
+        options.leftParenthesis = 0;
+        options.rightParenthesis = 0;
+        options.currentObject = null;
+    };
+
+    /**
+     * It sets the options of the current object. This means setting up the 3D and the linear space.
+     * @param text
+     * @param currentObject
+     */
+    WKTTokens.prototype.setOptions = function(text, currentObject) {
+        if (text == 'Z') {
+            currentObject.set3d();
+        } else if (text == 'M') {
+            currentObject.setLrs();
+        } else if (text == 'MZ') {
+            currentObject.set3d();
+            currentObject.setLrs();
+        }
     };
 
     return WKTTokens;

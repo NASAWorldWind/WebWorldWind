@@ -4,10 +4,12 @@
  */
 define([
     '../../../shapes/Path',
+    '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolyline',
     './WKTObject',
     '../WKTType'
 ], function (Path,
+             ShapeAttributes,
              SurfacePolyline,
              WKTObject,
              WKTType) {
@@ -17,8 +19,6 @@ define([
      */
     var WKTLineString = function () {
         WKTObject.call(this, WKTType.SupportedGeometries.LINE_STRING);
-
-        this._renderable = null;
     };
 
     WKTLineString.prototype = Object.create(WKTObject.prototype);
@@ -26,16 +26,12 @@ define([
     /**
      * @inheritDoc
      */
-    WKTLineString.prototype.render = function (dc) {
-        if (!this._renderable) {
-            if (this._is3d) {
-                this._renderable = new Path(this.coordinates, this._defaultShapeAttributes)
-            } else {
-                this._renderable = new SurfacePolyline(this.coordinates, this._defaultShapeAttributes);
-            }
+    WKTLineString.prototype.shape = function () {
+        if (this._is3d) {
+            return new Path(this.coordinates, new ShapeAttributes(null))
+        } else {
+            return new SurfacePolyline(this.coordinates, new ShapeAttributes(null));
         }
-
-        this._renderable.render(dc);
     };
 
     return WKTLineString;

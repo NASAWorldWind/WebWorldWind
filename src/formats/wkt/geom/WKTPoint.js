@@ -3,16 +3,24 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    '../../../shapes/Placemark',
+    '../../../shapes/PlacemarkAttributes',
     './WKTObject',
     '../WKTType'
-], function (WKTObject,
+], function (Placemark,
+             PlacemarkAttributes,
+             WKTObject,
              WKTType) {
     /**
      * @augments WKTObject
      * @constructor
      */
-    var WKTPoint = function () {
+    var WKTPoint = function (shapeConfigurationCallback, layer) {
         WKTObject.call(this, WKTType.SupportedGeometries.POINT);
+
+        this.shapeConfigurationCallback = shapeConfigurationCallback;
+
+        this.layer = layer;
     };
 
     WKTPoint.prototype = Object.create(WKTObject.prototype);
@@ -21,8 +29,12 @@ define([
      * It returns either Position or Location representing this shape. Mainly to use in other processing.
      * @return {Position|Location}
      */
-    WKTPoint.prototype.reference = function() {
-        return this.coordinates[0];
+    WKTPoint.prototype.shape = function () {
+        var placemark = new Placemark(this.coordinates, false, new PlacemarkAttributes);
+
+        this.shapeConfigurationCallback(placemark);
+
+        return placemark;
     };
 
     return WKTPoint;

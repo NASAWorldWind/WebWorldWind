@@ -4,10 +4,12 @@
  */
 define([
     '../../../shapes/Polygon',
+    '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon',
     './WKTObject',
     '../WKTType'
 ], function (Polygon,
+             ShapeAttributes,
              SurfacePolygon,
              WKTObject,
              WKTType) {
@@ -19,8 +21,6 @@ define([
         WKTObject.call(this, WKTType.SupportedGeometries.MULTI_POLYGON);
 
         this.objectBoundaries = [];
-
-        this._renderables = null;
     };
 
     WKTMultiPolygon.prototype = Object.create(WKTObject.prototype);
@@ -28,32 +28,26 @@ define([
     /**
      * Specific for Multi objects as it depicts the boundaries.
      */
-    WKTMultiPolygon.prototype.commaWithoutCoordinates = function() {
-        this.objectBoundaries.push(this.coordinates.slice());
+    WKTMultiPolygon.prototype.commaWithoutCoordinates = function () {
+        this.objectBoundaries.push(this.coordinates.slice()); // In this case it can be an issue of inner outer boundary.
         this.coordinates = [];
     };
 
     /**
      * @inheritDoc
      */
-    WKTMultiPolygon.prototype.render = function(dc) {
-        if(!this._renderables) {
-            this.commaWithoutCoordinates();
-            this._renderables = [];
-            if(this._is3d){
-                this.objectBoundaries.forEach(function(boundaries){
-                    this._renderables.push(new Polygon(boundaries, this._defaultShapeAttributes));
-                }.bind(this))
-            } else {
-                this.objectBoundaries.forEach(function(boundaries){
-                    this._renderables.push(new SurfacePolygon(boundaries, this._defaultShapeAttributes));
-                }.bind(this))
-            }
-        }
+    WKTMultiPolygon.prototype.shape = function () {
+        this.commaWithoutCoordinates();
 
-        this._renderables.forEach(function(renderable){
-            renderable.render(dc);
-        });
+        if (this._is3d) {
+            return this.objectBoundaries.map(function (boundaries) {
+                return new Polygon(boundaries, new ShapeAttributes(null));
+            }.bind(this))
+        } else {
+            return this.objectBoundaries.forEach(function (boundaries) {
+                return new SurfacePolygon(boundaries, new ShapeAttributes(null));
+            }.bind(this))
+        }
     };
 
     return WKTMultiPolygon;

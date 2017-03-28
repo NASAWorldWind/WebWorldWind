@@ -4,10 +4,12 @@
  */
 define([
     '../../../shapes/Path',
+    '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolyline',
     './WKTObject',
     '../WKTType'
 ], function (Path,
+             ShapeAttributes,
              SurfacePolyline,
              WKTObject,
              WKTType) {
@@ -19,8 +21,6 @@ define([
         WKTObject.call(this, WKTType.SupportedGeometries.MULTI_LINE_STRING);
 
         this.objectBoundaries = [];
-
-        this._renderables = null;
     };
 
     WKTMultiLineString.prototype = Object.create(WKTObject.prototype);
@@ -36,24 +36,18 @@ define([
     /**
      * @inheritDoc
      */
-    WKTMultiLineString.prototype.render = function(dc) {
-        if(!this._renderables) {
-            this.commaWithoutCoordinates();
-            this._renderables = [];
-            if(this._is3d){
-                this.objectBoundaries.forEach(function(boundaries){
-                    this._renderables.push(new Path(boundaries, this._defaultShapeAttributes));
-                }.bind(this))
-            } else {
-                this.objectBoundaries.forEach(function(boundaries){
-                    this._renderables.push(new SurfacePolyline(boundaries, this._defaultShapeAttributes));
-                }.bind(this))
-            }
-        }
+    WKTMultiLineString.prototype._shapes = function() {
+        this.commaWithoutCoordinates(); // This needs to be more careful and probably move to the stuff
 
-        this._renderables.forEach(function(renderable){
-            renderable.render(dc);
-        });
+        if(this._is3d){
+            return this.objectBoundaries.map(function(boundaries){
+                return new Path(boundaries, new ShapeAttributes(null));
+            }.bind(this))
+        } else {
+            return this.objectBoundaries.map(function(boundaries){
+                return new SurfacePolyline(boundaries, new ShapeAttributes(null));
+            }.bind(this))
+        }
     };
 
     return WKTMultiLineString;
