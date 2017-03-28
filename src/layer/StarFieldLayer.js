@@ -47,14 +47,14 @@ define([
             /**
              * The size of the Sun in pixels.
              * This can not exceed the maximum allowed pointSize of the GPU.
-             * A warning will be given if the size is too big.
+             * A warning will be given if the size is too big and the allowed max size will be used.
              * @type {Number}
              * @default 128
              */
             this.sunSize = 128;
 
             /**
-             * Indicates weather to show or hive the Sun
+             * Indicates weather to show or hide the Sun
              * @type {Boolean}
              * @default true
              */
@@ -62,7 +62,7 @@ define([
 
             //Documented in defineProperties below.
             this._starDataSource = starDataSource || WorldWind.configuration.baseUrl + 'images/stars.json';
-            this._sunImageSource = WorldWind.configuration.baseUrl + 'images/sun2_g_small.png';
+            this._sunImageSource = WorldWind.configuration.baseUrl + 'images/sunTexture.png';
 
             //Internal use only.
             //The MVP matrix of this layer.
@@ -70,7 +70,7 @@ define([
 
             //Internal use only.
             //gpu cache key for the stars vbo.
-            this._positionsVboCacheKey = null;
+            this._starsPositionsVboCacheKey = null;
 
             //Internal use only.
             this._numStars = 0;
@@ -229,14 +229,14 @@ define([
             var gpuResourceCache = dc.gpuResourceCache;
             var program = dc.currentProgram;
 
-            if (!this._positionsVboCacheKey) {
-                this._positionsVboCacheKey = gpuResourceCache.generateCacheKey();
+            if (!this._starsPositionsVboCacheKey) {
+                this._starsPositionsVboCacheKey = gpuResourceCache.generateCacheKey();
             }
-            var vboId = gpuResourceCache.resourceForKey(this._positionsVboCacheKey);
+            var vboId = gpuResourceCache.resourceForKey(this._starsPositionsVboCacheKey);
             if (!vboId) {
                 vboId = gl.createBuffer();
                 var positions = this.createStarsGeometry();
-                gpuResourceCache.putResource(this._positionsVboCacheKey, vboId, positions.length * 4);
+                gpuResourceCache.putResource(this._starsPositionsVboCacheKey, vboId, positions.length * 4);
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
             }
@@ -410,7 +410,7 @@ define([
         // Internal. Intentionally not documented.
         StarFieldLayer.prototype.invalidateStarData = function () {
             this._starData = null;
-            this._positionsVboCacheKey = null;
+            this._starsPositionsVboCacheKey = null;
         };
 
         // Internal. Intentionally not documented.

@@ -28,7 +28,8 @@ define([
             computeSunGeographicLocation: function (date) {
                 if (date instanceof Date === false) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "computeSunLocation", "missingDate"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "computeSunGeographicLocation",
+                            "missingDate"));
                 }
 
                 var julianDate = this.computeJulianDate(date);
@@ -45,7 +46,8 @@ define([
             computeSunCelestialLocation: function (julianDate) {
                 if (julianDate == null) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "Sun", "computeCelestialLocation", "missingJulianDate"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "computeSunCelestialLocation",
+                            "missingJulianDate"));
                 }
 
                 //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
@@ -89,11 +91,13 @@ define([
             celestialToGeographic: function (celestialLocation, julianDate) {
                 if (!celestialLocation) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "Sun", "celestialToGeographic", "missingCelestialLocation"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "celestialToGeographic",
+                            "missingCelestialLocation"));
                 }
                 if (julianDate == null) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "Sun", "celestialToGeographic", "missingJulianDate"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "celestialToGeographic",
+                            "missingJulianDate"));
                 }
 
                 //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
@@ -105,10 +109,6 @@ define([
                 //Greenwich Hour Angle
                 var GHA = this.normalizeAngle(GMST - celestialLocation.rightAscension);
 
-                /*var longitude = -GHA;
-                if (GHA > 180) {
-                    longitude += 360;
-                }*/
                 var longitude = Angle.normalizedDegreesLongitude(-GHA);
 
                 return {
