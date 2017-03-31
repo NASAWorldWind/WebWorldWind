@@ -173,9 +173,9 @@ define([
             }
 
             if (style.nodeName == KmlStyle.prototype.getTagNames()[0]) {
-                resolve(new KmlStyle({objectNode: style}));
+                resolve(new KmlStyle({objectNode: style}, {styleResolver: self._styleResolver}));
             } else if (style.nodeName == KmlStyleMap.prototype.getTagNames()[0]) {
-                resolve(new KmlStyleMap({objectNode: style}));
+                resolve(new KmlStyleMap({objectNode: style}, {styleResolver: self._styleResolver}));
             } else {
                 Logger.logMessage(Logger.LEVEL_WARNING, "KmlFile", "resolveStyle", "Style must contain either" +
                     " Style node or StyleMap node.");

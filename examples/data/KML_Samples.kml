@@ -103,6 +103,16 @@
         ]]></text>
             </BalloonStyle>
         </Style>
+        <StyleMap id="styleWithHighlight">
+            <Pair>
+                <key>normal</key>
+                <styleUrl>#downArrowIcon</styleUrl>
+            </Pair>
+            <Pair>
+                <key>highlight</key>
+                <styleUrl>#globeIcon</styleUrl>
+            </Pair>
+        </StyleMap>
         <Folder>
             <name>Placemarks</name>
             <visibility>1</visibility>
@@ -139,7 +149,7 @@
                     <tilt>40.5575073395506</tilt>
                     <range>500.6566641072245</range>
                 </LookAt>
-                <styleUrl>#downArrowIcon</styleUrl>
+                <styleUrl>#styleWithHighlight</styleUrl>
                 <Point>
                     <altitudeMode>relativeToGround</altitudeMode>
                     <coordinates>-122.084075,37.4220033612141,50</coordinates>
