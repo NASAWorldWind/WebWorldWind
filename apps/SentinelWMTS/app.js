@@ -5,10 +5,10 @@
 
 requirejs.config({
     "paths": {
-        "SinergiseWMTS": "SinergiseWMTS"
+        "SentinelWMTS": "SentinelWMTS"
     }
 });
 
-requirejs(["SinergiseWMTS"], function (SinergiseWMTS) {
-  new SinergiseWMTS();
+requirejs(["SentinelWMTS"], function (SentinelWMTS) {
+    new SentinelWMTS();
 });
