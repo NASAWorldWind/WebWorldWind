@@ -1,5 +1,5 @@
-<p style="float: right; line-height: 100px;">in partnership with the <a href="http://www.esa.int" target="_blank">European Space Agency</a></p>
 <img src="https://worldwind.arc.nasa.gov/css/images/nasa-logo.svg" height="100"/>
+<p>in partnership with the <a href="http://www.esa.int" target="_blank">European Space Agency</a></p>
 
 # Web World Wind
 
