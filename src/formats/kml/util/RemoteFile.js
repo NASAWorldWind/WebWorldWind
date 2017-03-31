@@ -75,7 +75,7 @@ define([
                         if(options.responseType == 'arraybuffer') {
                             text = this.response;
                         } else {
-                             text = this.responseText;
+                            text = this.responseText;
                         }
                         resolve({text: text, headers: xhr.getAllResponseHeaders()});
                     }
