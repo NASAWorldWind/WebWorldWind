@@ -114,6 +114,17 @@ define([
              */
             this.detailControl = 1.75;
 
+            /**
+             * Indicates whether credentials are sent when requesting images from a different origin.
+             *
+             * Allowed values are anonymous and use-credentials.
+             *
+             * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-crossorigin
+             * @type {string}
+             * @default anonymous
+             */
+            this.crossOrigin = 'anonymous';
+
             /* Intentionally not documented.
              * Indicates the time at which this layer's imagery expire. Expired images are re-retrieved
              * when the current time exceeds the specified expiry time. If null, images do not expire.
@@ -477,7 +488,7 @@ define([
                 };
 
                 this.currentRetrievals.push(imagePath);
-                image.crossOrigin = 'anonymous';
+                image.crossOrigin = this.crossOrigin;
                 image.src = url;
             }
         };
