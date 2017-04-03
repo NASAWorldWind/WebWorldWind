@@ -179,14 +179,17 @@ define([
             this.nextObject(options);
         } else {
             var founded = value.match('[M]?[Z]?$');
-            if(founded && founded.length > 0 && founded[0] != '') { // It contains either null or M or Z or MZ
-                this.setOptions(founded, started);
+            if(founded && founded.length > 0 && founded[0] != '') {
                 value = value.substring(0, value.length - founded.length);
             }
 
             started = WKTElements[value] && new WKTElements[value]();
             if(!started) {
                 started = new WKTObject();
+            }
+
+            if(founded && founded.length > 0 && founded[0] != '') {
+                this.setOptions(founded, started);
             }
         }
 

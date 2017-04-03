@@ -105,7 +105,45 @@ define([
         });
 
         describe('LineString', function () {
+            it('correctly parses 2D line string', function(){
+                var polygon2D = 'LINESTRING ((33 -75, 37 -80, 33 -85))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
 
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTLineString).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Location(33, -75), new Location(37, -80), new Location(33, -85)])).toBeTruthy();
+            });
+
+            it('correctly ignores LRS for 2D line string', function(){
+                var polygon2D = 'LINESTRING M((33 -75 10, 37 -80 10, 33 -85 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTLineString).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Location(33, -75), new Location(37, -80), new Location(33, -85)])).toBeTruthy();
+            });
+
+            it('correctly parses 3D line string', function(){
+                var polygon2D = 'LINESTRINGZ((33 -75 10, 37 -80 10, 33 -85 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTLineString).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Position(33, -75, 10), new Position(37, -80, 10), new Position(33, -85, 10)])).toBeTruthy();
+            });
+
+            it('correctly ignores LRS for 3D line string', function(){
+                var polygon2D = 'LINESTRING MZ((33 -75 10 10, 37 -80 10 10, 33 -85 10 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTLineString).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Position(33, -75, 10), new Position(37, -80, 10), new Position(33, -85, 10)])).toBeTruthy();
+            });
         });
 
         describe('MultiPoint', function () {
@@ -165,7 +203,6 @@ define([
 
         // Helper functions for verifications.
         function equalLocations(locations1, locations2) {
-            console.log(locations1, locations2);
             var equals = true;
             if(locations1.length === locations2.length) {
                 locations1.forEach(function(location, index){
