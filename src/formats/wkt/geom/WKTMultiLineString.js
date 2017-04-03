@@ -36,7 +36,7 @@ define([
     /**
      * @inheritDoc
      */
-    WKTMultiLineString.prototype._shapes = function() {
+    WKTMultiLineString.prototype.shapes = function() {
         this.commaWithoutCoordinates(); // This needs to be more careful and probably move to the stuff
 
         if(this._is3d){

@@ -4,10 +4,12 @@
  */
 define([
     '../../../shapes/Polygon',
+    '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon',
     './WKTObject',
     '../WKTType'
 ], function (Polygon,
+             ShapeAttributes,
              SurfacePolygon,
              WKTObject,
              WKTType) {
@@ -26,16 +28,12 @@ define([
     /**
      * @inheritDoc
      */
-    WKTTriangle.prototype.render = function (dc) {
-        if (!this._renderable) {
-            if (this._is3d) {
-                this._renderable = new Polygon(this.coordinates, this._defaultShapeAttributes);
-            } else {
-                this._renderable = new SurfacePolygon(this.coordinates, this._defaultShapeAttributes);
-            }
+    WKTTriangle.prototype.shapes = function () {
+        if (this._is3d) {
+            return [new Polygon(this.coordinates, new ShapeAttributes(null))];
+        } else {
+            return [new SurfacePolygon(this.coordinates, new ShapeAttributes(null))];
         }
-
-        this._renderable.render(dc);
     };
 
     return WKTTriangle;

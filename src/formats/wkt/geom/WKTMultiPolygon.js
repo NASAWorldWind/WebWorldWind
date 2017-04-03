@@ -36,7 +36,7 @@ define([
     /**
      * @inheritDoc
      */
-    WKTMultiPolygon.prototype.shape = function () {
+    WKTMultiPolygon.prototype.shapes = function () {
         this.commaWithoutCoordinates();
 
         if (this._is3d) {
@@ -44,7 +44,7 @@ define([
                 return new Polygon(boundaries, new ShapeAttributes(null));
             }.bind(this))
         } else {
-            return this.objectBoundaries.forEach(function (boundaries) {
+            return this.objectBoundaries.map(function (boundaries) {
                 return new SurfacePolygon(boundaries, new ShapeAttributes(null));
             }.bind(this))
         }

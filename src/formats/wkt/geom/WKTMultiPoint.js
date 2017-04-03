@@ -29,7 +29,7 @@ define([
     /**
      * @inheritDoc
      */
-    WKTMultiPoint.prototype._shapes = function() {
+    WKTMultiPoint.prototype.shapes = function() {
         return this.coordinates.map(function(coordinate){
             return new Placemark(coordinate, false, new PlacemarkAttributes);
         }.bind(this));

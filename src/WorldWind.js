@@ -425,7 +425,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ViewVolume,
               WcsTileUrlBuilder,
               WfsCapabilities,
-              WKTObjects,
+              WKTParser,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
@@ -799,7 +799,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
-        WorldWind['WKTObjects'] = WKTObjects;
+        WorldWind['WKTParser'] = WKTParser;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;

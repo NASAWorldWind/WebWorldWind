@@ -26,11 +26,11 @@ define([
     /**
      * @inheritDoc
      */
-    WKTLineString.prototype.shape = function () {
+    WKTLineString.prototype.shapes = function () {
         if (this._is3d) {
-            return new Path(this.coordinates, new ShapeAttributes(null))
+            return [new Path(this.coordinates, new ShapeAttributes(null))];
         } else {
-            return new SurfacePolyline(this.coordinates, new ShapeAttributes(null));
+            return [new SurfacePolyline(this.coordinates, new ShapeAttributes(null))];
         }
     };
 

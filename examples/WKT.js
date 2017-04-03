@@ -25,42 +25,39 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-
         // Polygon test
         var polygonLayer = new WorldWind.RenderableLayer("Polygon");
-        polygonLayer.addRenderable(new WorldWind.WKTObjects("POLYGON ((40 -70, 45 -80, 40 -90))"));
+        new WorldWind.WKTParser("POLYGON ((40 -70, 45 -80, 40 -90))").load(null, null, polygonLayer);
         wwd.addLayer(polygonLayer);
 
         // MultiPolygon test
         var multiPolygonLayer = new WorldWind.RenderableLayer("MultiPolygon");
-        multiPolygonLayer.addRenderable(new WorldWind.WKTObjects("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))"));
+        new WorldWind.WKTParser("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(null, null, multiPolygonLayer);
         wwd.addLayer(multiPolygonLayer);
 
         //Point test
         var pointLayer = new WorldWind.RenderableLayer("Point");
-        pointLayer.addRenderable(new WorldWind.WKTObjects("POINT (14.5 50)"));
+        new WorldWind.WKTParser("POINT (14.5 50)").load(null, null, pointLayer);
         wwd.addLayer(pointLayer);
 
         //MultiPoint test
         var multiPointLayer = new WorldWind.RenderableLayer("MultiPoint");
-        multiPointLayer.addRenderable(new WorldWind.WKTObjects("MULTIPOINT ((17.2 49.3),(17.23 49.24),(17.14 49.37),(17.2 49.24))"));
+        new WorldWind.WKTParser("MULTIPOINT ((17.2 49.3),(17.23 49.24),(17.14 49.37),(17.2 49.24))").load(null, null, multiPointLayer);
         wwd.addLayer(multiPointLayer);
 
         //LineString test
         var lineStringLayer = new WorldWind.RenderableLayer("LineString");
-        lineStringLayer.addRenderable(new WorldWind.WKTObjects('LINESTRING ((33 -75, 37 -80, 33 -85))'));
+        new WorldWind.WKTParser('LINESTRING ((33 -75, 37 -80, 33 -85))').load(null, null, lineStringLayer);
         wwd.addLayer(lineStringLayer);
 
         //MultiLineString test
         var multiLineStringLayer = new WorldWind.RenderableLayer("MultiLineString");
-        multiLineStringLayer.addRenderable(new WorldWind.WKTObjects("MULTILINESTRING ((38 -70, 42 -75, 38 -80),(43 -65, 47 -70, 43 -75))"));
+        new WorldWind.WKTParser("MULTILINESTRING ((38 -70, 42 -75, 38 -80),(43 -65, 47 -70, 43 -75))").load(null, null, multiLineStringLayer);
         wwd.addLayer(multiLineStringLayer);
 
         var wktLayer = new WorldWind.RenderableLayer('WKT');
         $('#showWkt').click(function(){
-            wktLayer.addRenderable(
-                new WorldWind.WKTObjects($('#wkt').val())
-            );
+            new WorldWind.WKTParser($('#wkt').val()).load(null, null, wktLayer);
         });
         wwd.addLayer(wktLayer);
 

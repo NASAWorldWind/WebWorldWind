@@ -25,8 +25,8 @@ define([
      * It returns either Position or Location representing this shape. Mainly to use in other processing.
      * @return {Position|Location}
      */
-    WKTPoint.prototype.shape = function () {
-        return new Placemark(this.coordinates, false, new PlacemarkAttributes);
+    WKTPoint.prototype.shapes = function () {
+        return [new Placemark(this.coordinates, false, new PlacemarkAttributes)];
     };
 
     return WKTPoint;

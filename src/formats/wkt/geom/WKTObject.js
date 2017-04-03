@@ -72,22 +72,11 @@ define([
     };
 
     /**
-     * It returns either array of shapes representing the current object.
-     * Every subclass must overwrite this method. This is actually an abstract method even though JS doesn't allow me to
-     * do that.
-     * @protected
-     * @return {Renderable[]} Renderable or array of renderables representing current WKTObject.
-     */
-    WKTObject.prototype._shapes = function() {
-        return []; // No shapes returned for yet unsupported shapes.
-    };
-
-    /**
      * It is used to retrieve and create the shape or shapes associated.
      * @returns {Renderable[]} Array of renderables associated with given shape.
      */
     WKTObject.prototype.shapes = function() {
-        return this._shapes();
+        return [];
     };
 
     return WKTObject;
