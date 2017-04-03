@@ -12,28 +12,28 @@ shapes will be processed, displayed and returned for further updates from the us
 ### Overall architecture
 
 Well Known Text parser (WKTObjects) supports multiple shapes in one String as long as the shapes are properly formatted. 
-The WKTObjects itself is renderable and as such should be added to the Renderable Layer using 
-renderableLayer.addRenderable(wktObjects);
+The WKTParser parses the shapes from the text string and adds them to the provided layer. It is possible to update the 
+properties to the shape either for each shape before added to the layer or modifying shapes after they were added to 
+the layer.
 
 From the architectural point of view, there are three classes at play as external interface and then the classes for each 
 of the Well Known Text shapes that are supported.   
  
- - WKTObjects - It is a core renderable which once it is added to the layer will be rendered. 
- - WKTTokens - It is a parser of the String transforming it at first to lexical tokens and then to the WKT Shapes
+ - WKTParser - It is a core parser class, which receives texts and returns contained WKTObjects and add associated shapes to the layer. 
+ - WKTTokens - It is a parser of the String transforming it at first to lexical tokens and then to the WKT Objects and then shapes
  - WKTObject - It is a base class for all WKTObjects which can be displayed. Those that can be displayed will have its 
-    own implementation as a subclass which handles the rendering of such objects. 
+    own implementation as a subclass which handles the retrieval of valid shapes. 
  
 ### Supported shapes
 
 In general the Z value is supported and used. If the shape has the Z flag it will be displayed in 3D. 
 
-In general the M value is supported for parsing, but doesn't have any further significance as for display it isn't 
-supported 
+In general the M value is supported for parsing, but we don't display such shapes as we aren't sure about the used system.
 
-Point - It is correctly parsed and returned to user for further processing. It isn't displayed. 
+Point - It is correctly parsed and displayed as Placemark
 
-MultiPoint - It is correctly parsed and returned to user as an array of either Positions or Locations. It isn't 
-displayed
+MultiPoint - It is correctly parsed and displayed as Placemarks. For the cases such as higlighting or hover the contained 
+shapes are processed separately.  
 
 LineString - It is correctly parsed and displayed as either a Path or SurfacePolyLine based on whether the shape is 2D 
 or 3D
@@ -54,8 +54,8 @@ above.
 
 ### Shapes not supported
 
-- CircularString - Could be supported.
-- Curve, MultiCurve, CompoundCurve - Could be supported. Find out examples of how they look like
-- CurvePolygon - Would need to add to the implementation of the polygon. 
-- Surface, MultiSurface, PolyhedralSurface - 
+- CircularString
+- Curve, MultiCurve, CompoundCurve
+- CurvePolygon 
+- Surface, MultiSurface, PolyhedralSurface
 - TIN

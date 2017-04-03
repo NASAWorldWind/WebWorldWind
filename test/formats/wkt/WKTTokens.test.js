@@ -11,7 +11,8 @@ define([
     'src/formats/wkt/geom/WKTMultiPolygon',
     'src/formats/wkt/geom/WKTPoint',
     'src/formats/wkt/geom/WKTPolygon',
-    'src/formats/wkt/WKTTokens'
+    'src/formats/wkt/WKTTokens',
+    'src/formats/wkt/geom/WKTTriangle'
 ], function (Location,
              Position,
              WKTLineString,
@@ -20,7 +21,8 @@ define([
              WKTMultiPolygon,
              WKTPoint,
              WKTPolygon,
-             WKTTokens) {
+             WKTTokens,
+             WKTTriangle) {
     "use strict";
 
     describe("WKTTokens", function () {
@@ -63,7 +65,7 @@ define([
         });
 
         describe('Polygon', function () {
-            it('correctly parses 2D polygon', function(){
+            it('correctly parses 2D polygon', function () {
                 var polygon2D = 'POLYGON ((40 -70, 45 -80, 40 -90))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -73,7 +75,7 @@ define([
                 expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
             });
 
-            it('correctly ignores LRS for 2D polygon', function(){
+            it('correctly ignores LRS for 2D polygon', function () {
                 var polygon2D = 'POLYGON M((40 -70 10, 45 -80 10, 40 -90 10))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -83,7 +85,7 @@ define([
                 expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
             });
 
-            it('correctly parses 3D polygon', function(){
+            it('correctly parses 3D polygon', function () {
                 var polygon2D = 'POLYGON Z ((40 -70 10, 45 -80 10, 40 -90 10))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -93,7 +95,7 @@ define([
                 expect(equalLocations(wktObjects[0].coordinates, [new Position(40, -70, 10), new Position(45, -80, 10), new Position(40, -90, 10)])).toBeTruthy();
             });
 
-            it('correctly ignores LRS for 3D polygon', function(){
+            it('correctly ignores LRS for 3D polygon', function () {
                 var polygon2D = 'POLYGON MZ ((40 -70 10, 45 -80 10, 40 -90 10))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -105,7 +107,7 @@ define([
         });
 
         describe('LineString', function () {
-            it('correctly parses 2D line string', function(){
+            it('correctly parses 2D line string', function () {
                 var polygon2D = 'LINESTRING ((33 -75, 37 -80, 33 -85))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -115,7 +117,7 @@ define([
                 expect(equalLocations(wktObjects[0].coordinates, [new Location(33, -75), new Location(37, -80), new Location(33, -85)])).toBeTruthy();
             });
 
-            it('correctly ignores LRS for 2D line string', function(){
+            it('correctly ignores LRS for 2D line string', function () {
                 var polygon2D = 'LINESTRING M((33 -75 10, 37 -80 10, 33 -85 10))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -125,7 +127,7 @@ define([
                 expect(equalLocations(wktObjects[0].coordinates, [new Location(33, -75), new Location(37, -80), new Location(33, -85)])).toBeTruthy();
             });
 
-            it('correctly parses 3D line string', function(){
+            it('correctly parses 3D line string', function () {
                 var polygon2D = 'LINESTRINGZ((33 -75 10, 37 -80 10, 33 -85 10))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -135,7 +137,7 @@ define([
                 expect(equalLocations(wktObjects[0].coordinates, [new Position(33, -75, 10), new Position(37, -80, 10), new Position(33, -85, 10)])).toBeTruthy();
             });
 
-            it('correctly ignores LRS for 3D line string', function(){
+            it('correctly ignores LRS for 3D line string', function () {
                 var polygon2D = 'LINESTRING MZ((33 -75 10 10, 37 -80 10 10, 33 -85 10 10))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
 
@@ -143,6 +145,48 @@ define([
                 expect(wktObjects[0] instanceof WKTLineString).toBeTruthy();
                 expect(wktObjects[0].coordinates.length).toBe(3);
                 expect(equalLocations(wktObjects[0].coordinates, [new Position(33, -75, 10), new Position(37, -80, 10), new Position(33, -85, 10)])).toBeTruthy();
+            });
+        });
+
+        describe('Triangle', function () {
+            it('correctly parses 2D triangle', function () {
+                var polygon2D = 'TRIANGLE ((40 -70, 45 -80, 40 -90))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTTriangle).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
+            });
+
+            it('correctly ignores LRS for 2D triangle', function () {
+                var polygon2D = 'TRIANGLE M((40 -70 10, 45 -80 10, 40 -90 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTTriangle).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
+            });
+
+            it('correctly parses 3D triangle', function () {
+                var polygon2D = 'TRIANGLE Z((40 -70 10, 45 -80 10, 40 -90 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTTriangle).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Position(40, -70, 10), new Position(45, -80, 10), new Position(40, -90, 10)])).toBeTruthy();
+            });
+
+            it('correctly ignores LRS for 3D triangle', function () {
+                var polygon2D = 'TRIANGLE MZ((40 -70 10 10, 45 -80 10 10, 40 -90 10 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTTriangle).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Position(40, -70, 10), new Position(45, -80, 10), new Position(40, -90, 10)])).toBeTruthy();
             });
         });
 
@@ -204,9 +248,9 @@ define([
         // Helper functions for verifications.
         function equalLocations(locations1, locations2) {
             var equals = true;
-            if(locations1.length === locations2.length) {
-                locations1.forEach(function(location, index){
-                    if(!locations2[index].equals(location)){
+            if (locations1.length === locations2.length) {
+                locations1.forEach(function (location, index) {
+                    if (!locations2[index].equals(location)) {
                         equals = false;
                     }
                 });
