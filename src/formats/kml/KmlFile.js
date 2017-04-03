@@ -71,19 +71,20 @@ define([
         filePromise = new Promise(function (resolve) {
             var promise = self.requestRemote(url);
             promise.then(function (options) {
-                var rootDocument;
+                var rootDocument = null;
                 var loadedDocument = options.text;
                 self._headers = options.headers;
-                if (url.indexOf('.kmz') == -1) {
+                if (!self.hasExtension("kmz", url)) {
                     rootDocument = loadedDocument;
                 } else {
                     var kmzFile = new JsZip();
                     kmzFile.load(loadedDocument);
-                    kmzFile.files.forEach(function (file) {
-                        if (file.endsWith(".kml") && rootDocument == null) {
+                    for(var key in kmzFile.files) {
+                        var file = kmzFile.files[key];
+                        if (rootDocument == null && self.hasExtension("kml", file.name)) {
                             rootDocument = file.asText();
                         }
-                    });
+                    }
                 }
 
                 self._document = new XmlDocument(rootDocument).dom();
@@ -137,6 +138,20 @@ define([
 
     /**
      * FOR INTERNAL USE ONLY.
+     * Returns a value indicating whether the URL ends with the given extension.
+     * @param url {String} Url to a file
+     * @returns {boolean} true if the extension matches otherwise false
+     */
+    KmlFile.prototype.hasExtension = function (extension, url) {
+        if (url.endsWith) {
+            return url.endsWith("." + extension);
+        } else {
+            return url.lastIndexOf("." + extension) == (url.length - extension.length - 1);
+        }
+    };
+
+    /**
+     * FOR INTERNAL USE ONLY.
      * Based on the information from the URL, return correct Remote object.
      * @param url {String} Url of the document to retrieve.
      * @returns {Promise} Promise of Remote.
@@ -144,7 +159,7 @@ define([
     KmlFile.prototype.requestRemote = function (url) {
         var options = {};
         options.url = url;
-        if ((url.endsWith && url.endsWith(".kmz")) || (url.indexOf(".kmz") != -1)) {
+        if (this.hasExtension("kmz", url)) {
             options.zip = true;
         } else {
             options.ajax = true;
