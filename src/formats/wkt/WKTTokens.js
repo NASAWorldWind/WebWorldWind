@@ -43,7 +43,7 @@ define([
             } else if (token.type === WKTType.TokenType.COMMA) {
                 this.comma(options);
             }
-        });
+        }.bind(this));
         return options.objects;
     };
 
@@ -172,19 +172,19 @@ define([
         value = value.toUpperCase();
         var started = null;
         if (value.length <= 2) {
-            this.setOptions(value, started);
+            this.setOptions(value, options.currentObject);
 
             return;
         } else if (value.indexOf('EMPTY') === 0) {
             this.nextObject(options);
         } else {
             var founded = value.match('[M]?[Z]?$');
-            if(founded) { // It contains either null or M or Z or MZ
+            if(founded && founded.length > 0 && founded[0] != '') { // It contains either null or M or Z or MZ
                 this.setOptions(founded, started);
                 value = value.substring(0, value.length - founded.length);
             }
 
-            started = WKTElements[value];
+            started = WKTElements[value] && new WKTElements[value]();
             if(!started) {
                 started = new WKTObject();
             }

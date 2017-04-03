@@ -15,12 +15,8 @@ define([
      * @augments WKTObject
      * @constructor
      */
-    var WKTPoint = function (shapeConfigurationCallback, layer) {
+    var WKTPoint = function () {
         WKTObject.call(this, WKTType.SupportedGeometries.POINT);
-
-        this.shapeConfigurationCallback = shapeConfigurationCallback;
-
-        this.layer = layer;
     };
 
     WKTPoint.prototype = Object.create(WKTObject.prototype);
@@ -30,11 +26,7 @@ define([
      * @return {Position|Location}
      */
     WKTPoint.prototype.shape = function () {
-        var placemark = new Placemark(this.coordinates, false, new PlacemarkAttributes);
-
-        this.shapeConfigurationCallback(placemark);
-
-        return placemark;
+        return new Placemark(this.coordinates, false, new PlacemarkAttributes);
     };
 
     return WKTPoint;

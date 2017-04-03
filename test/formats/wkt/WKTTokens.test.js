@@ -23,7 +23,7 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTPoint).toBeTruthy();
-                expect(wktObjects[0].reference().equals(new Location(14.5, 50))).toBeTruthy();
+                expect(wktObjects[0].coordinates[0].equals(new Location(14.5, 50))).toBeTruthy();
             });
 
             it('correctly parses 3D point', function () {
@@ -32,7 +32,7 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTPoint).toBeTruthy();
-                expect(wktObjects[0].reference().equals(new Position(14.5, 50, 13))).toBeTruthy();
+                expect(wktObjects[0].coordinates[0].equals(new Position(14.5, 50, 13))).toBeTruthy();
             });
 
             it('correctly ignores the LRS for 2D point', function () {
@@ -41,7 +41,7 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTPoint).toBeTruthy();
-                expect(wktObjects[0].reference().equals(new Location(14.5, 50))).toBeTruthy();
+                expect(wktObjects[0].coordinates[0].equals(new Location(14.5, 50))).toBeTruthy();
             });
 
             it('correctly ignores the LRS for 3D point', function () {
@@ -50,12 +50,14 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTPoint).toBeTruthy();
-                expect(wktObjects[0].reference().equals(new Position(14.5, 50, 10))).toBeTruthy();
+                expect(wktObjects[0].coordinates[0].equals(new Position(14.5, 50, 10))).toBeTruthy();
             })
         });
 
         describe('Polygon', function () {
+            it('correctly parses 2D polygon', function(){
 
+            });
         });
 
         describe('LineString', function () {
@@ -69,9 +71,9 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTMultiPoint).toBeTruthy();
-                expect(wktObjects[0].reference().length).toBe(2);
-                expect(wktObjects[0].reference()[0].equals(new Location(17, 49.3))).toBeTruthy();
-                expect(wktObjects[0].reference()[1].equals(new Location(-17, 49))).toBeTruthy();
+                expect(wktObjects[0].shapes().length).toBe(2);
+                expect(wktObjects[0].shapes()[0].position.equals(new Location(17, 49.3))).toBeTruthy();
+                expect(wktObjects[0].shapes()[1].position.equals(new Location(-17, 49))).toBeTruthy();
             });
 
             it('correctly parses 3D point', function () {
@@ -80,9 +82,9 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTMultiPoint).toBeTruthy();
-                expect(wktObjects[0].reference().length).toBe(2);
-                expect(wktObjects[0].reference()[0].equals(new Position(17, 49.3, 10))).toBeTruthy();
-                expect(wktObjects[0].reference()[1].equals(new Position(-17, 49, 1))).toBeTruthy();
+                expect(wktObjects[0].shapes().length).toBe(2);
+                expect(wktObjects[0].shapes()[0].position.equals(new Position(17, 49.3, 10))).toBeTruthy();
+                expect(wktObjects[0].shapes()[1].position.equals(new Position(-17, 49, 1))).toBeTruthy();
             });
 
             it('correctly ignores the LRS for 2D point', function () {
@@ -91,9 +93,9 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTMultiPoint).toBeTruthy();
-                expect(wktObjects[0].reference().length).toBe(2);
-                expect(wktObjects[0].reference()[0].equals(new Location(17, 49.3))).toBeTruthy();
-                expect(wktObjects[0].reference()[1].equals(new Location(-17, 49))).toBeTruthy();
+                expect(wktObjects[0].shapes().length).toBe(2);
+                expect(wktObjects[0].shapes()[0].position.equals(new Location(17, 49.3))).toBeTruthy();
+                expect(wktObjects[0].shapes()[1].position.equals(new Location(-17, 49))).toBeTruthy();
             });
 
             it('correctly ignores the LRS for 3D point', function () {
@@ -102,9 +104,9 @@ define([
 
                 expect(wktObjects.length).toBe(1);
                 expect(wktObjects[0] instanceof WKTMultiPoint).toBeTruthy();
-                expect(wktObjects[0].reference().length).toBe(2);
-                expect(wktObjects[0].reference()[0].equals(new Position(17, 49.3, 10))).toBeTruthy();
-                expect(wktObjects[0].reference()[1].equals(new Position(-17, 49, 1))).toBeTruthy();
+                expect(wktObjects[0].shapes().length).toBe(2);
+                expect(wktObjects[0].shapes()[0].position.equals(new Position(17, 49.3, 10))).toBeTruthy();
+                expect(wktObjects[0].shapes()[1].position.equals(new Position(-17, 49, 1))).toBeTruthy();
             })
         });
 
