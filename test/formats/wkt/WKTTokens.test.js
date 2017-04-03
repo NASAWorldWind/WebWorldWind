@@ -237,11 +237,63 @@ define([
         });
 
         describe('MultiLineString', function () {
+            it('correctly parses 2D Multi Line String', function(){
+                var multiLineString = 'MULTILINESTRING ((38 -70, 42 -75, 38 -80),(43 -65, 47 -70, 43 -75))';
+                var wktObjects = new WKTTokens(multiLineString).objects();
 
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiLineString).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+                // Get coordinates from Path and verify against the expectations.
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries, [new Location(38, -70), new Location(42, -75), new Location(38, -80)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(43, -65), new Location(47, -70), new Location(43, -75)])).toBeTruthy();
+            });
+
+            it('correctly parses 2D Multi Line String with LRS', function(){
+                var multiLineString = 'MULTILINESTRING M((38 -70 10, 42 -75 10, 38 -80 10),(43 -65 10, 47 -70 10, 43 -75 10))';
+                var wktObjects = new WKTTokens(multiLineString).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiLineString).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+                // Get coordinates from Path and verify against the expectations.
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries, [new Location(38, -70), new Location(42, -75), new Location(38, -80)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(43, -65), new Location(47, -70), new Location(43, -75)])).toBeTruthy();
+            });
+
+            it('correctly parses 3D Line String', function(){
+                var multiLineString = 'MULTILINESTRING Z((38 -70 10, 42 -75 10, 38 -80 10),(43 -65 10, 47 -70 10, 43 -75 10))';
+                var wktObjects = new WKTTokens(multiLineString).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiLineString).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+                // Get coordinates from Path and verify against the expectations.
+                expect(equalLocations(wktObjects[0].shapes()[0]._positions, [new Position(38, -70, 10), new Position(42, -75, 10), new Position(38, -80, 10)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._positions, [new Position(43, -65, 10), new Position(47, -70, 10), new Position(43, -75, 10)])).toBeTruthy();
+            });
+
+            it('correctly parses 3D Line String with LRS', function(){
+                var multiLineString = 'MULTILINESTRING MZ((38 -70 10 12, 42 -75 10 12, 38 -80 10 12),(43 -65 10 12, 47 -70 10 12, 43 -75 10 12))';
+                var wktObjects = new WKTTokens(multiLineString).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiLineString).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+                // Get coordinates from Path and verify against the expectations.
+                expect(equalLocations(wktObjects[0].shapes()[0]._positions, [new Position(38, -70, 10), new Position(42, -75, 10), new Position(38, -80, 10)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._positions, [new Position(43, -65, 10), new Position(47, -70, 10), new Position(43, -75, 10)])).toBeTruthy();
+            });
         });
 
         describe('MultiPolygon', function () {
-
+            it('correctly parses 2D Multi polygon', function(){
+                var multiPolygon = 'MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))';
+            });
         });
 
 
