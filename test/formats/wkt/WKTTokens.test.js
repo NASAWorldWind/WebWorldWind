@@ -293,6 +293,54 @@ define([
         describe('MultiPolygon', function () {
             it('correctly parses 2D Multi polygon', function(){
                 var multiPolygon = 'MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))';
+                var wktObjects = new WKTTokens(multiPolygon).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiPolygon).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries, [new Location(50, -60), new Location(55, -70), new Location(50, -80), new Location(50, -60)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(30, -60), new Location(35, -70), new Location(30, -80), new Location(30, -60)])).toBeTruthy();
+            });
+
+            it('correctly parses 2D Multi polygon with LRS', function(){
+                var multiPolygon = 'MULTIPOLYGON M (((50 -60 10, 55 -70 10, 50 -80 10)),((30 -60 10, 35 -70 10, 30 -80 10)))';
+                var wktObjects = new WKTTokens(multiPolygon).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiPolygon).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries, [new Location(50, -60), new Location(55, -70), new Location(50, -80), new Location(50, -60)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(30, -60), new Location(35, -70), new Location(30, -80), new Location(30, -60)])).toBeTruthy();
+            });
+
+            it('correctly parses 3D Multi Polygon', function(){
+                var multiPolygon = 'MULTIPOLYGON Z (((50 -60 10, 55 -70 10, 50 -80 10)),((30 -60 10, 35 -70 10, 30 -80 10)))';
+                var wktObjects = new WKTTokens(multiPolygon).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiPolygon).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries[0], [new Position(50, -60, 10), new Position(55, -70, 10), new Position(50, -80, 10)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries[0], [new Position(30, -60, 10), new Position(35, -70, 10), new Position(30, -80, 10)])).toBeTruthy();
+            });
+
+            it('correctly parses 3D Multi Polygon with LRS', function(){
+                var multiPolygon = 'MULTIPOLYGON MZ (((50 -60 10 10, 55 -70 10 10, 50 -80 10 10)),((30 -60 10 10, 35 -70 10 10, 30 -80 10 10)))';
+                var wktObjects = new WKTTokens(multiPolygon).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiPolygon).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries[0], [new Position(50, -60, 10), new Position(55, -70, 10), new Position(50, -80, 10)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries[0], [new Position(30, -60, 10), new Position(35, -70, 10), new Position(30, -80, 10)])).toBeTruthy();
             });
         });
 
