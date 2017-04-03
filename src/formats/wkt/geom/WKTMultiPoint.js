@@ -31,7 +31,7 @@ define([
      */
     WKTMultiPoint.prototype.shapes = function() {
         return this.coordinates.map(function(coordinate){
-            return new Placemark(coordinate, false, new PlacemarkAttributes);
+            return new Placemark(coordinate, true, new PlacemarkAttributes(null));
         }.bind(this));
     };
 

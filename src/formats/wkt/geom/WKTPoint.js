@@ -26,7 +26,7 @@ define([
      * @return {Position|Location}
      */
     WKTPoint.prototype.shapes = function () {
-        return [new Placemark(this.coordinates, false, new PlacemarkAttributes)];
+        return [new Placemark(this.coordinates[0], true, new PlacemarkAttributes(null))];
     };
 
     return WKTPoint;
