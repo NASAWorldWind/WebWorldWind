@@ -5,13 +5,21 @@
 define([
     'src/geom/Location',
     'src/geom/Position',
+    'src/formats/wkt/geom/WKTLineString',
+    'src/formats/wkt/geom/WKTMultiLineString',
     'src/formats/wkt/geom/WKTMultiPoint',
+    'src/formats/wkt/geom/WKTMultiPolygon',
     'src/formats/wkt/geom/WKTPoint',
+    'src/formats/wkt/geom/WKTPolygon',
     'src/formats/wkt/WKTTokens'
 ], function (Location,
              Position,
+             WKTLineString,
+             WKTMultiLineString,
              WKTMultiPoint,
+             WKTMultiPolygon,
              WKTPoint,
+             WKTPolygon,
              WKTTokens) {
     "use strict";
 
@@ -56,7 +64,43 @@ define([
 
         describe('Polygon', function () {
             it('correctly parses 2D polygon', function(){
+                var polygon2D = 'POLYGON ((40 -70, 45 -80, 40 -90))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
 
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTPolygon).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
+            });
+
+            it('correctly ignores LRS for 2D polygon', function(){
+                var polygon2D = 'POLYGON M((40 -70 10, 45 -80 10, 40 -90 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTPolygon).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
+            });
+
+            it('correctly parses 3D polygon', function(){
+                var polygon2D = 'POLYGON Z ((40 -70 10, 45 -80 10, 40 -90 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTPolygon).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Position(40, -70, 10), new Position(45, -80, 10), new Position(40, -90, 10)])).toBeTruthy();
+            });
+
+            it('correctly ignores LRS for 3D polygon', function(){
+                var polygon2D = 'POLYGON MZ ((40 -70 10, 45 -80 10, 40 -90 10))';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTPolygon).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(3);
+                expect(equalLocations(wktObjects[0].coordinates, [new Position(40, -70, 10), new Position(45, -80, 10), new Position(40, -90, 10)])).toBeTruthy();
             });
         });
 
@@ -117,6 +161,24 @@ define([
         describe('MultiPolygon', function () {
 
         });
+
+
+        // Helper functions for verifications.
+        function equalLocations(locations1, locations2) {
+            console.log(locations1, locations2);
+            var equals = true;
+            if(locations1.length === locations2.length) {
+                locations1.forEach(function(location, index){
+                    if(!locations2[index].equals(location)){
+                        equals = false;
+                    }
+                });
+            } else {
+                equals = false;
+            }
+
+            return equals;
+        }
     });
 });
 
