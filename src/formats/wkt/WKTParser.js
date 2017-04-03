@@ -12,7 +12,7 @@ define([
      * wwd.addLayer(layer);
      * This example adds the WKT into the map
      *
-     * The more complex usage allows you to update the objects after adding them to the layer. In this example all
+     * The more complex usage allows you to update the attributes of the objects after adding them to the layer. In this example all
      * the shapes will have font color changed to the red:
      * var layer = new WorldWind.RenderableLayer();
      * var parser = new WKTParser('POINT (19 23)');
@@ -25,13 +25,16 @@ define([
      * }, null, layer);
      * wwd.addLayer(layer);
      *
-     * The most complex usage is when you want to supply different type of objects. For example when you have a Point,
-     * you want to show SurfaceEllipse instead of a Placemark:
+     * The most complex usage is when you want to supply different configuration for object before it is added to the layer.
      * var layer = new WorldWind.RenderableLayer();
      * var parser = new WKTParser('POINT (19 23)');
      * parser.load(null, function(shape) {
      *   if(shape.type == WKTType.SupportedGeometries.POINT) {
-     *     return new SurfaceCircle(shape.position, 1000, shape.attributes);
+     *     var shapeAttributes = new ShapeAttributes(null);
+     *     shapeAttributes.fontColor = Color.RED;
+     *     return {
+     *         attributes: shapeAttributes
+     *     };
      *   }
      * }, layer);
      * wwd.addLayer(layer);
@@ -59,18 +62,29 @@ define([
     WKTParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
         var objects = new WKTTokens(this.textRepresentation).objects();
 
-        // For now ignore the Lrs objects.
-        objects = objects.filter(function(object) {
-            return !object._isLrs;
+        var shapes = [];
+        objects = objects.forEach(function(object){
+            object.shapes().forEach(function(shape){
+                var configuration = shapeConfigurationCallback(object);
+                if(configuration && configuration.attributes) {
+                    shape.attributes = configuration.attributes;
+                }
+                if(configuration && configuration.highlightAttributes) {
+                    shape.highlightAttributes = configuration.highlightAttributes;
+                }
+                if(configuration && configuration.pickDelegate) {
+                    shape.pickDelegate = configuration.pickDelegate;
+                }
+                if(configuration && configuration.userProperties) {
+                    shape.userProperties = configuration.userProperties;
+                }
+                shapes.push(shape);
+            });
         });
 
-        objects = objects.map(function(object){
-            return shapeConfigurationCallback(object) || object;
-        });
+        layer.addRenderables(shapes);
 
-        layer.addRenderables(objects);
-
-        parserCompletionCallback(objects);
+        parserCompletionCallback(shapes);
 
         return objects;
     };

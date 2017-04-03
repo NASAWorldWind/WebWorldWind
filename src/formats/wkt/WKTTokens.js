@@ -16,8 +16,8 @@ define([
     };
 
     /**
-     * It returns correctly initialized objects to render.
-     * @return {Renderable[]}
+     * It returns correctly initialized objects. It is possible to retrieve relevant shapes from all WKT Objects.
+     * @return {WKTObject[]}
      */
     WKTTokens.prototype.objects = function () {
         var options = {
@@ -208,9 +208,7 @@ define([
             options.coordinates = null;
         }
         if (options.leftParenthesis === options.rightParenthesis) {
-            options.currentObject.shapes().forEach(function (shape) {
-                options.objects.push(shape);
-            });
+            options.objects.push(options.currentObject); // Shapes must be called later.
             this.nextObject(options);
         }
     };
