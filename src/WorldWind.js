@@ -25,7 +25,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
         './geom/BoundingBox',
-        './util/CelestialProjection',
+        './util/SunPosition',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
@@ -244,7 +244,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGLayer,
               BMNGOneImageLayer,
               BoundingBox,
-              CelestialProjection,
+              SunPosition,
               ClickRecognizer,
               ColladaLoader,
               Color,
@@ -672,7 +672,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BoundingBox'] = BoundingBox;
-        WorldWind['CelestialProjection'] = CelestialProjection;
+        WorldWind['SunPosition'] = SunPosition;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;

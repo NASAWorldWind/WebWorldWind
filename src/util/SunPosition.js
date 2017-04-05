@@ -14,10 +14,10 @@ define([
         'use strict';
 
         /**
-         * Provides utilities for working with the celestial coordinate system (declination, rightAscension).
-         * @exports CelestialProjection
+         * Provides utilities for determining the Sun geographic and celestial location.
+         * @exports SunPosition
          */
-        var CelestialProjection = {
+        var SunPosition = {
 
             /**
              * Computes the geographic location of the sun for a given date
@@ -25,30 +25,31 @@ define([
              * @throws {ArgumentError} if the date is missing
              * @return {{latitude: Number, longitude: Number}} the geographic location
              */
-            computeSunGeographicLocation: function (date) {
+            getAsGeographicLocation: function (date) {
                 if (date instanceof Date === false) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "computeSunGeographicLocation",
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "SunPosition", "getAsGeographicLocation",
                             "missingDate"));
                 }
 
-                var julianDate = this.computeJulianDate(date);
-                var celestialLocation = this.computeSunCelestialLocation(julianDate);
-                return this.celestialToGeographic(celestialLocation, julianDate);
+                var celestialLocation = this.getAsCelestialLocation(date);
+                return this.celestialToGeographic(celestialLocation, date);
             },
 
             /**
              * Computes the celestial location of the sun for a given julianDate
-             * @param {Number} julianDate
-             * @throws {ArgumentError} if the julianDate is missing
+             * @param {Date} date
+             * @throws {ArgumentError} if the date is missing
              * @return {{declination: Number, rightAscension: Number}} the celestial location
              */
-            computeSunCelestialLocation: function (julianDate) {
-                if (julianDate == null) {
+            getAsCelestialLocation: function (date) {
+                if (date instanceof Date === false) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "computeSunCelestialLocation",
-                            "missingJulianDate"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "SunPosition", "getAsCelestialLocation",
+                            "missingDate"));
                 }
+
+                var julianDate = this.computeJulianDate(date);
 
                 //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
                 var numDays = julianDate - 2451545;
@@ -84,21 +85,22 @@ define([
              * Converts from celestial coordinates (declination and right ascension) to geographic coordinates
              * (latitude, longitude) for a given julian date
              * @param {{declination: Number, rightAscension: Number}} celestialLocation
-             * @param {Number} julianDate
+             * @param {Date} date
              * @throws {ArgumentError} if celestialLocation or julianDate are missing
              * @return {{latitude: Number, longitude: Number}} the geographic location
              */
-            celestialToGeographic: function (celestialLocation, julianDate) {
+            celestialToGeographic: function (celestialLocation, date) {
                 if (!celestialLocation) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "celestialToGeographic",
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "SunPosition", "celestialToGeographic",
                             "missingCelestialLocation"));
                 }
-                if (julianDate == null) {
+                if (date instanceof Date === false) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "celestialToGeographic",
-                            "missingJulianDate"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "SunPosition", "celestialToGeographic", "missingDate"));
                 }
+
+                var julianDate = this.computeJulianDate(date);
 
                 //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
                 var numDays = julianDate - 2451545;
@@ -126,7 +128,7 @@ define([
             computeJulianDate: function (date) {
                 if (date instanceof Date === false) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "computeJulianDate", "missingDate"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "SunPosition", "computeJulianDate", "missingDate"));
                 }
 
                 var year = date.getUTCFullYear();
@@ -159,13 +161,13 @@ define([
             normalizeAngle: function (angle) {
                 if (angle == null) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "CelestialProjection", "normalizeAngle", "missingAngle"));
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "SunPosition", "normalizeAngle", "missingAngle"));
                 }
                 return 360 * (angle / 360 - Math.floor(angle / 360));
             }
 
         };
 
-        return CelestialProjection;
+        return SunPosition;
 
     });

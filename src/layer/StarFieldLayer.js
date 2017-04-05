@@ -6,17 +6,17 @@
  * @exports StarFieldLayer
  */
 define([
-        '../util/CelestialProjection',
         './Layer',
         '../util/Logger',
         '../geom/Matrix',
-        '../shaders/StarFieldProgram'
+        '../shaders/StarFieldProgram',
+        '../util/SunPosition'
     ],
-    function (CelestialProjection,
-              Layer,
+    function (Layer,
               Logger,
               Matrix,
-              StarFieldProgram) {
+              StarFieldProgram,
+              SunPosition) {
         'use strict';
 
         /**
@@ -95,9 +95,6 @@ define([
 
             //Internal use only.
             this._MAX_GL_POINT_SIZE = 0;
-
-            //Internal use only.
-            this._julianDate = 0;
         };
 
         StarFieldLayer.prototype = Object.create(Layer.prototype);
@@ -183,21 +180,10 @@ define([
             dc.findAndBindProgram(StarFieldProgram);
             gl.enableVertexAttribArray(0);
             gl.depthMask(false);
-
-            if (!this._MAX_GL_POINT_SIZE) {
-                this._MAX_GL_POINT_SIZE = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1];
-
-                if (this.sunSize > this._MAX_GL_POINT_SIZE) {
-                    Logger.log(Logger.LEVEL_WARNING, 'StarFieldLayer - sunSize is to big, max size allowed is: ' +
-                        this._MAX_GL_POINT_SIZE);
-                }
-            }
         };
 
         // Internal. Intentionally not documented.
         StarFieldLayer.prototype.doDraw = function (dc) {
-            this._julianDate = CelestialProjection.computeJulianDate(this.time || new Date());
-
             this.loadCommonUniforms(dc);
             this.renderStars(dc);
             if (this.showSun) {
@@ -220,7 +206,8 @@ define([
             //this subtraction does not work properly on the GPU, it must be done on the CPU
             //possibly due to precision loss
             //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
-            program.loadNumDays(gl, this._julianDate - 2451545.0);
+            var julianDate = SunPosition.computeJulianDate(this.time || new Date());
+            program.loadNumDays(gl, julianDate - 2451545.0);
         };
 
         // Internal. Intentionally not documented.
@@ -259,7 +246,15 @@ define([
             var program = dc.currentProgram;
             var gpuResourceCache = dc.gpuResourceCache;
 
-            var sunCelestialLocation = CelestialProjection.computeSunCelestialLocation(this._julianDate);
+            if (!this._MAX_GL_POINT_SIZE) {
+                this._MAX_GL_POINT_SIZE = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1];
+            }
+            if (this.sunSize > this._MAX_GL_POINT_SIZE) {
+                Logger.log(Logger.LEVEL_WARNING, 'StarFieldLayer - sunSize is to big, max size allowed is: ' +
+                    this._MAX_GL_POINT_SIZE);
+            }
+
+            var sunCelestialLocation = SunPosition.getAsCelestialLocation(this.time || new Date());
 
             //.x = declination
             //.y = right ascension
@@ -323,11 +318,15 @@ define([
                             e.toString());
                     }
                 }
+                else {
+                    Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to fetch star data. Status: ' +
+                        this.status + ' ' + this.statusText);
+                }
                 self._loadStarted = false;
             };
 
-            xhr.onerror = function (e) {
-                Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to fetch star data ' + e.toString());
+            xhr.onerror = function () {
+                Logger.log(Logger.LEVEL_SEVERE, 'StarFieldLayer unable to fetch star data');
                 self._loadStarted = false;
             };
 

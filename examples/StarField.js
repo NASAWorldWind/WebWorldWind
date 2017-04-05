@@ -21,11 +21,11 @@ requirejs([
         wwd.addLayer(BMNGLayer);
 
         //IMPORTANT: add the starFieldLayer before the atmosphereLayer
-        wwd.addLayer(atmosphereLayer);
         wwd.addLayer(starFieldLayer);
+        wwd.addLayer(atmosphereLayer);
 
         starFieldLayer.time = new Date();
-        atmosphereLayer.lightLocation = WorldWind.CelestialProjection.computeSunGeographicLocation(starFieldLayer.time);
+        atmosphereLayer.lightLocation = WorldWind.SunPosition.getAsGeographicLocation(starFieldLayer.time);
 
         var layerManger = new LayerManager(wwd);
         wwd.redraw();
@@ -43,7 +43,7 @@ requirejs([
             doRunSimulation = this.checked;
             if (!doRunSimulation) {
                 starFieldLayer.time = new Date();
-                atmosphereLayer.lightLocation = WorldWind.CelestialProjection.computeSunGeographicLocation(starFieldLayer.time);
+                atmosphereLayer.lightLocation = WorldWind.SunPosition.getAsGeographicLocation(starFieldLayer.time);
             }
             wwd.redraw();
         }
@@ -52,7 +52,7 @@ requirejs([
             if (stage === WorldWind.AFTER_REDRAW && doRunSimulation) {
                 timeStamp += (factor * 60 * 1000);
                 starFieldLayer.time = new Date(timeStamp);
-                atmosphereLayer.lightLocation = WorldWind.CelestialProjection.computeSunGeographicLocation(starFieldLayer.time);
+                atmosphereLayer.lightLocation = WorldWind.SunPosition.getAsGeographicLocation(starFieldLayer.time);
                 wwd.redraw();
             }
         }

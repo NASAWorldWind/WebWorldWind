@@ -4,12 +4,12 @@
  */
 
 define([
-        'src/util/CelestialProjection'
+        'src/util/SunPosition'
     ],
-    function (CelestialProjection) {
+    function (SunPosition) {
         'use strict';
 
-        describe('CelestialProjectionTest', function () {
+        describe('SunPosition Test', function () {
 
             describe('Compute the Sun\'s geographic location', function () {
 
@@ -31,7 +31,7 @@ define([
                         {latitude: -23.430434209235372, longitude: -150.2805549482439}
                     ];
                     var computedLocations = dates.map(function (date) {
-                        return CelestialProjection.computeSunGeographicLocation(date);
+                        return SunPosition.getAsGeographicLocation(date);
                     });
                     expectedLocations.forEach(function (expectedResult, i) {
                         expect(expectedResult.latitude).toBeCloseTo(computedLocations[i].latitude);
@@ -44,8 +44,14 @@ define([
             describe('Computes the Sun\'s celestial location', function () {
 
                 it('Computes the Sun\'s celestial location', function () {
-                    var julianDates = [2457755, 2457924.25, 2457926.75, 2457967.0833333335, 2458107.1666666665,
-                        2458110.4166666665];
+                    var dates = [
+                        new Date('2017-01-01T12:00:00.000Z'),
+                        new Date('2017-06-19T18:00:00.000Z'),
+                        new Date('2017-06-22T06:00:00.000Z'),
+                        new Date('2017-08-01T14:00:00.000Z'),
+                        new Date('2017-12-19T16:00:00.000Z'),
+                        new Date('2017-12-22T22:00:00.000Z'),
+                    ];
                     var expectedLocations = [
                         {declination: -22.958797136581314, rightAscension: 282.2493341054377},
                         {declination: 23.42944558814554, rightAscension: 88.51710113901169},
@@ -54,8 +60,8 @@ define([
                         {declination: -23.420379101540863, rightAscension: 267.75877297672787},
                         {declination: -23.430434209235372, rightAscension: 271.36570946223924},
                     ];
-                    var computedLocations = julianDates.map(function (julianDate) {
-                        return CelestialProjection.computeSunCelestialLocation(julianDate);
+                    var computedLocations = dates.map(function (date) {
+                        return SunPosition.getAsCelestialLocation(date);
                     });
                     expectedLocations.forEach(function (expectedResult, i) {
                         expect(expectedResult.declination).toBeCloseTo(computedLocations[i].declination);
@@ -77,15 +83,16 @@ define([
                         {declination: -23.430434209235372, rightAscension: 271.36570946223924},
                     ];
                     var expectedGeographicLocations = [
-                        {latitude: -22.958797136581314, longitude: 40.661307168340386},
-                        {latitude: 23.42944558814554, longitude: -153.07092579808563},
-                        {latitude: 23.432472410610977, longitude: -150.47080188167877},
-                        {latitude: 17.86912793173116, longitude: -109.63696299816115},
-                        {latitude: -23.420379101540863, longitude: 26.170746039630558},
-                        {latitude: -23.430434209235372, longitude: 29.777682525141927}
+                        {latitude: -22.958797136581314, longitude: 91.16498291601772},
+                        {latitude: 23.42944558814554, longitude: -102.56725005040829},
+                        {latitude: 23.432472410610977, longitude: -99.96712613400142},
+                        {latitude: 17.86912793173116, longitude: -59.13328725048382},
+                        {latitude: -23.420379101540863, longitude: 76.67442178730789},
+                        {latitude: -23.430434209235372, longitude: 80.28135827281926}
                     ];
+                    var date = new Date('2017-01-01T06:00:00.000Z');
                     var geographicLocations = celestialLocations.map(function (celestialLocation) {
-                        return CelestialProjection.celestialToGeographic(celestialLocation, 0);
+                        return SunPosition.celestialToGeographic(celestialLocation, date);
                     });
                     expectedGeographicLocations.forEach(function (expectedResult, i) {
                         expect(expectedResult.latitude).toBeCloseTo(geographicLocations[i].latitude);
@@ -109,7 +116,7 @@ define([
                     var expectedJulianDates = [2457755, 2457924.25, 2457926.75, 2457967.0833333335, 2458107.1666666665,
                         2458110.4166666665];
                     var computedJulianDates = dates.map(function (date) {
-                        return CelestialProjection.computeJulianDate(date);
+                        return SunPosition.computeJulianDate(date);
                     });
                     expectedJulianDates.forEach(function (expectedResult, i) {
                         expect(expectedResult).toBeCloseTo(computedJulianDates[i]);
@@ -125,7 +132,7 @@ define([
                     var angles = [0, -10, 360, 1000];
                     var expectedAngles = [0, 350, 0, 280];
                     var computedAngles = angles.map(function (angle) {
-                        return CelestialProjection.normalizeAngle(angle);
+                        return SunPosition.normalizeAngle(angle);
                     });
                     expectedAngles.forEach(function(expectedResult, i){
                         expect(expectedResult).toBeCloseTo(computedAngles[i]);
