@@ -138,6 +138,9 @@ define([
 
                         /* Transform the vertex point by the modelview-projection matrix */
                     '    gl_Position = mvpMatrix * vertexPoint;\n' +
+
+                        /* fix horizon clipping */
+                    '    gl_Position.z = gl_Position.w - 0.00001;\n' +
                     '}',
                 fragmentShaderSource =
                     '#ifdef GL_FRAGMENT_PRECISION_HIGH\n'+
