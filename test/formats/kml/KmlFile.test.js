@@ -13,14 +13,12 @@ define([
         describe("testLoadingKmlFromRelativeRemote", function () {
             var kmlLocation = "../base/examples/data/KML_Samples.kml";
             var loadedFile = false;
+
             beforeEach(function (done) {
-                console.log('BeforeEach');
                 new KmlFile(kmlLocation).then(function () {
-                    console.log("Loaded");
                     loadedFile = true;
                     done();
                 }).catch(function (err) {
-                    console.log("Error: ", err);
                     done(err);
                 });
             });
