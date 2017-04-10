@@ -78,4 +78,4 @@ above.
 - MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80))) Without inner boundaries
 - MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((40 -70, 45 -80, 40 -90), (42 -75, 44 -78, 42 -73))) With inner boundaries
 - MULTIPOLYGON Z (((50 -60 10, 55 -70 10, 50 -80 10)),((30 -60 10, 35 -70 10, 30 -80 10)))
-- GEOMETRYCOLLECTION
+- GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6,7 10))
