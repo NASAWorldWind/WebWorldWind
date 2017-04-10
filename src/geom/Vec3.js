@@ -523,6 +523,14 @@ define([
             return this;
         };
 
+        Vec3.fromLine = function(origin, t, direction)
+        {
+            return new Vec3(
+                origin[0] + (direction[0] * t),
+                origin[1] + (direction[1] * t),
+                origin[2] + (direction[2] * t));
+        };
+
         /**
          * Returns a string representation of this vector.
          * @returns {String} A string representation of this vector, in the form "(x, y, z)".
