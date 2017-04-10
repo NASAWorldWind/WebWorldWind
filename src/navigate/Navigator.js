@@ -106,7 +106,8 @@ define([
                 viewDepthBits = this.worldWindow.depthBits,
                 distanceToSurface,
                 maxNearDistance,
-                projectionMatrix = Matrix.fromIdentity();
+                projectionMatrix = Matrix.fromIdentity(),
+                infiniteProjectionMatrix = Matrix.fromIdentity();
 
             // Compute the far clip distance based on the current eye altitude. This must be done after computing the
             // modelview matrix and before computing the near clip distance. The far clip distance depends on the
@@ -136,7 +137,11 @@ define([
             // WebGL viewport.
             projectionMatrix.setToPerspectiveProjection(viewport.width, viewport.height, this.nearDistance, this.farDistance);
 
-            return new NavigatorState(modelviewMatrix, projectionMatrix, viewport, this.heading, this.tilt);
+            // Compute an infinite projection matrix based on this navigator's perspective properties and the current
+            // WebGL viewport.
+            infiniteProjectionMatrix.setToInfiniteProjection(viewport.width, viewport.height, this.nearDistance, this.farDistance);
+
+            return new NavigatorState(modelviewMatrix, projectionMatrix, infiniteProjectionMatrix, viewport, this.heading, this.tilt);
         };
 
         return Navigator;

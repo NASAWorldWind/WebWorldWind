@@ -40,11 +40,12 @@ define([
          * a NavigatorState instance has no effect on the Navigator from which they came.
          * @param {Matrix} modelViewMatrix The navigator's model-view matrix.
          * @param {Matrix} projectionMatrix The navigator's projection matrix.
+         * @param {Matrix} infiniteProjectionMatrix The navigator's infinite projection matrix.
          * @param {Rectangle} viewport The navigator's viewport.
          * @param {Number} heading The navigator's heading.
          * @param {Number} tilt The navigator's tilt.
          */
-        var NavigatorState = function (modelViewMatrix, projectionMatrix, viewport, heading, tilt) {
+        var NavigatorState = function (modelViewMatrix, projectionMatrix, infiniteProjectionMatrix, viewport, heading, tilt) {
 
             /**
              * The navigator's model-view matrix. The model-view matrix transforms points from model coordinates to eye
@@ -63,6 +64,13 @@ define([
             this.projection = projectionMatrix;
 
             /**
+             * The navigator's infinite projection matrix. Used typically for skyboxes.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.infiniteProjectionMatrix = infiniteProjectionMatrix;
+
+            /**
              * The concatenation of the navigator's model-view and projection matrices. This matrix transforms points
              * from model coordinates to clip coordinates.
              * @type {Matrix}
@@ -70,6 +78,14 @@ define([
              */
             this.modelviewProjection = Matrix.fromIdentity();
             this.modelviewProjection.setToMultiply(projectionMatrix, modelViewMatrix);
+
+            /**
+             * The concatenation of the navigator's model-view and infinite projection matrices.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.infiniteModelviewProjection = Matrix.fromIdentity();
+            this.infiniteModelviewProjection.setToMultiply(infiniteProjectionMatrix, modelViewMatrix);
 
             /**
              * The navigator's viewport, in WebGL screen coordinates. The viewport places the origin in the bottom-left
