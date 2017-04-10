@@ -14,6 +14,7 @@ define([
              WKTObject,
              WKTType) {
     /**
+     * It represents Point
      * @augments WKTObject
      * @constructor
      */
@@ -24,8 +25,8 @@ define([
     WKTPoint.prototype = Object.create(WKTObject.prototype);
 
     /**
-     * It returns either Position or Location representing this shape. Mainly to use in other processing.
-     * @return {Position|Location}
+     * It returns Placemark representing this point.
+     * @return {Placemark[]}
      */
     WKTPoint.prototype.shapes = function () {
         return [new Placemark(this.coordinates[0], true, new PlacemarkAttributes(null))];

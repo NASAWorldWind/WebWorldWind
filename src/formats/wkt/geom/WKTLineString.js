@@ -16,6 +16,7 @@ define([
              WKTObject,
              WKTType) {
     /**
+     * It represents WKT LineString.
      * @augments WKTObject
      * @constructor
      */
@@ -26,7 +27,9 @@ define([
     WKTLineString.prototype = Object.create(WKTObject.prototype);
 
     /**
+     * In case of 2D return SurfacePolyline, in case of 3D returns Path.
      * @inheritDoc
+     * @return {Path[]|SurfacePolyline[]}
      */
     WKTLineString.prototype.shapes = function () {
         if (this._is3d) {

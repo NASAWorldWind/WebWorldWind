@@ -15,6 +15,7 @@ define([
              WKTType) {
     /**
      * This item can contain other geometries to be shown.
+     * @augments WKTObject
      * @constructor
      */
     var WKTGeometryCollection = function () {
@@ -34,9 +35,9 @@ define([
     };
 
     /**
+     * In geometry collection the coordinates should belong to the currently parsed object.
      * Array containing latitude, longitude and potentially either altitude or LRS.
-     * @coordinates {Number[]} Array containing longitude, latitude and potentially altitude of another point in the
-     *  object.
+     * @inheritDoc
      */
     WKTGeometryCollection.prototype.addCoordinates = function (coordinates) {
         var object = this.objects[this.objects.length - 1];
@@ -48,7 +49,9 @@ define([
     };
 
     /**
+     * It returns representation for all shapes in the GeometryCollection.
      * @inheritDoc
+     * @return {Renderable[]}
      */
     WKTGeometryCollection.prototype.shapes = function () {
         var shapes = [];

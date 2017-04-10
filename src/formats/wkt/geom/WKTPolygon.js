@@ -36,7 +36,9 @@ define([
     };
 
     /**
+     * It returns SurfacePolygon for 2D. It returns Polygon for 3D.
      * @inheritDoc
+     * @return {Polygon[]|SurfacePolyline[]}
      */
     WKTPolygon.prototype.shapes = function () {
         if (this._is3d) {

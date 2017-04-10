@@ -16,6 +16,7 @@ define([
              WKTObject,
              WKTType) {
     /**
+     * It represents multiple polygons.
      * @augments WKTObject
      * @constructor
      */
@@ -78,7 +79,9 @@ define([
     };
 
     /**
+     * It returns array of SurfacePolygon in 2D or array of Polygons in 3D
      * @inheritDoc
+     * @return {Polygon[]|SurfacePolygon[]}
      */
     WKTMultiPolygon.prototype.shapes = function () {
         if (this._is3d) {

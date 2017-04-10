@@ -28,7 +28,9 @@ define([
     WKTTriangle.prototype = Object.create(WKTObject.prototype);
 
     /**
+     * It returns SurfacePolygon for 2D. It returns Polygon for 3D. Triangle doesn't support inner boundaries.
      * @inheritDoc
+     * @return {Polygon|SurfacePolyline}
      */
     WKTTriangle.prototype.shapes = function () {
         if (this._is3d) {

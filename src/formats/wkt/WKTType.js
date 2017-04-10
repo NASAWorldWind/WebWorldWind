@@ -13,7 +13,7 @@ define([], function () {
     var WKTType = function () {};
 
     /**
-     *
+     * Names of supported geometries.
      * @type {{LINE_STRING: string, MULTI_LINE_STRING: string, POLYGON: string, MULTI_POLYGON: string, POINT: string, MULTI_POINT: string, TRIANGLE: string, GEOMETRY_COLLECTION: string}}
      */
     WKTType.SupportedGeometries = {
@@ -28,7 +28,7 @@ define([], function () {
     };
 
     /**
-     *
+     * Types of tokens from parsing the text.
      * @type {{LEFT_PARENTHESIS: number, COMMA: number, RIGHT_PARENTHESIS: number, NUMBER: number, TEXT: number}}
      */
     WKTType.TokenType = {

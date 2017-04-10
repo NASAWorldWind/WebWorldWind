@@ -16,6 +16,7 @@ define([
              WKTObject,
              WKTType) {
     /**
+     * It represents multiple line string as one object.
      * @augments WKTObject
      * @constructor
      */
@@ -36,7 +37,9 @@ define([
     };
 
     /**
+     * In case of 2D it returns SurfacePolyline, In case of 3D return Path.
      * @inheritDoc
+     * @return {Path[]|SurfacePolyline[]}
      */
     WKTMultiLineString.prototype.shapes = function() {
         this.commaWithoutCoordinates(); // This needs to be more careful and probably move to the stuff

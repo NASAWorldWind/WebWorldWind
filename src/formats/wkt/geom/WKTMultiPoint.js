@@ -14,6 +14,7 @@ define([
              WKTObject,
              WKTType) {
     /**
+     * It represents multiple points.
      * @augments WKTObject
      * @constructor
      */
@@ -29,7 +30,9 @@ define([
     WKTMultiPoint.prototype.commaWithoutCoordinates = function() {};
 
     /**
+     * It returns Placemark for each point.
      * @inheritDoc
+     * @return {Placemark[]}
      */
     WKTMultiPoint.prototype.shapes = function() {
         return this.coordinates.map(function(coordinate){
