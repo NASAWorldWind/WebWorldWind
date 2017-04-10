@@ -58,6 +58,7 @@ define([
      * @param options {Object}
      * @param options.responseType {String} If set, rewrites default responseType.
      * @returns {Promise} Promise of the data.
+     * 2017-02-16   fix   load  kmz file ，ArrayBuffer  receive failure
      */
     RemoteFile.prototype.ajax = function(url, options) {
         // Return promise.
@@ -71,7 +72,13 @@ define([
             xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        var text = this.responseText;
+
+                        var text ;
+                        if(options.zip){
+                            text=this.response;
+                        }else{
+                            text= this.responseText;
+                        }
                         resolve({text: text, headers: xhr.getAllResponseHeaders()});
                     }
                     else {

@@ -50,6 +50,7 @@ define([
      * @alias KmlFile
      * @classdesc Support for Kml File parsing and display.
      * @augments KmlObject
+     * 2017-02-16   fix  Kmz internal KML suffix get  failed
      */
     var KmlFile = function (url, controls) {
         var self = this;
@@ -79,8 +80,9 @@ define([
                 } else {
                     var kmzFile = new JsZip();
                     kmzFile.load(loadedDocument);
-                    kmzFile.files.forEach(function (file) {
-                        if (file.endsWith(".kml") && rootDocument == null) {
+                    Object.keys(kmzFile.files).forEach(function(key){
+                        var file = kmzFile.files[key];
+                        if (file.name.endsWith(".kml") && rootDocument == null) {
                             rootDocument = file.asText();
                         }
                     });
