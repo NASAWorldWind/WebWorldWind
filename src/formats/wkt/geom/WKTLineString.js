@@ -6,11 +6,13 @@ define([
     '../../../shapes/Path',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolyline',
+    '../WKTElements',
     './WKTObject',
     '../WKTType'
 ], function (Path,
              ShapeAttributes,
              SurfacePolyline,
+             WKTElements,
              WKTObject,
              WKTType) {
     /**
@@ -33,6 +35,8 @@ define([
             return [new SurfacePolyline(this.coordinates, new ShapeAttributes(null))];
         }
     };
+
+    WKTElements['LINESTRING'] = WKTLineString;
 
     return WKTLineString;
 });

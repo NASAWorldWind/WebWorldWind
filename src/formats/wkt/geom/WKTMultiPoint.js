@@ -5,10 +5,12 @@
 define([
     '../../../shapes/Placemark',
     '../../../shapes/PlacemarkAttributes',
+    '../WKTElements',
     './WKTObject',
     '../WKTType'
 ], function (Placemark,
              PlacemarkAttributes,
+             WKTElements,
              WKTObject,
              WKTType) {
     /**
@@ -34,6 +36,8 @@ define([
             return new Placemark(coordinate, true, new PlacemarkAttributes(null));
         }.bind(this));
     };
+
+    WKTElements['MULTIPOINT'] = WKTMultiPoint;
 
     return WKTMultiPoint;
 });

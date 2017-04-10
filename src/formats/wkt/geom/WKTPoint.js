@@ -5,10 +5,12 @@
 define([
     '../../../shapes/Placemark',
     '../../../shapes/PlacemarkAttributes',
+    '../WKTElements',
     './WKTObject',
     '../WKTType'
 ], function (Placemark,
              PlacemarkAttributes,
+             WKTElements,
              WKTObject,
              WKTType) {
     /**
@@ -28,6 +30,8 @@ define([
     WKTPoint.prototype.shapes = function () {
         return [new Placemark(this.coordinates[0], true, new PlacemarkAttributes(null))];
     };
+
+    WKTElements['POINT'] = WKTPoint;
 
     return WKTPoint;
 });

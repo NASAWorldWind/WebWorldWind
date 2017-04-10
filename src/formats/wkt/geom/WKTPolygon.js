@@ -6,11 +6,13 @@ define([
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon',
+    '../WKTElements',
     './WKTObject',
     '../WKTType'
 ], function (Polygon,
              ShapeAttributes,
              SurfacePolygon,
+             WKTElements,
              WKTObject,
              WKTType) {
     /**
@@ -48,6 +50,8 @@ define([
             }
         }
     };
+
+    WKTElements['POLYGON'] = WKTPolygon;
 
     return WKTPolygon;
 });

@@ -6,11 +6,13 @@ define([
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon',
+    '../WKTElements',
     './WKTObject',
     '../WKTType'
 ], function (Polygon,
              ShapeAttributes,
              SurfacePolygon,
+             WKTElements,
              WKTObject,
              WKTType) {
     /**
@@ -35,6 +37,8 @@ define([
             return [new SurfacePolygon(this.coordinates, new ShapeAttributes(null))];
         }
     };
+
+    WKTElements['TRIANGLE'] = WKTTriangle;
 
     return WKTTriangle;
 });

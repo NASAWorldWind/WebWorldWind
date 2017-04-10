@@ -6,11 +6,13 @@ define([
     '../../../shapes/Path',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolyline',
+    '../WKTElements',
     './WKTObject',
     '../WKTType'
 ], function (Path,
              ShapeAttributes,
              SurfacePolyline,
+             WKTElements,
              WKTObject,
              WKTType) {
     /**
@@ -49,6 +51,8 @@ define([
             }.bind(this))
         }
     };
+
+    WKTElements['MULTILINESTRING'] = WKTMultiLineString;
 
     return WKTMultiLineString;
 });

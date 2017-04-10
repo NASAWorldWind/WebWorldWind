@@ -134,6 +134,17 @@ define([
             if(founded && founded.length > 0 && founded[0] != '') {
                 this.setOptions(founded, started);
             }
+
+            // Handle the GeometryCollection.
+            var currentObject = WKTElements[value] && new WKTElements[value]();
+            if(!currentObject) {
+                currentObject = new WKTObject();
+            }
+
+            if(founded && founded.length > 0 && founded[0] != '') {
+                currentObject.setOptions(founded[0], currentObject);
+            }
+            this.add(currentObject);
         }
     };
 
@@ -163,6 +174,8 @@ define([
             options.coordinates = null;
         }
     };
+
+    WKTObject.prototype.commaWithoutCoordinates = function(){};
 
     /**
      * Handle Number by adding it among coordinates in the current object.

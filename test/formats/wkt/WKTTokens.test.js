@@ -117,6 +117,15 @@ define([
         });
 
         describe('LineString', function () {
+            it('correctly parses EMPTY linestring', function () {
+                var polygon2D = 'LINESTRING EMPTY';
+                var wktObjects = new WKTTokens(polygon2D).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTLineString).toBeTruthy();
+                expect(wktObjects[0].coordinates.length).toBe(0);
+            });
+
             it('correctly parses 2D line string', function () {
                 var polygon2D = 'LINESTRING ((33 -75, 37 -80, 33 -85))';
                 var wktObjects = new WKTTokens(polygon2D).objects();
@@ -368,7 +377,7 @@ define([
 
                 expect(wktObjects[0].shapes().length).toBe(2);
                 expect(wktObjects[0].shapes()[0] instanceof Placemark).toBeTruthy();
-                expect(wktObjects[0].shapes()[0] instanceof SurfacePolyline).toBeTruthy();
+                expect(wktObjects[0].shapes()[1] instanceof SurfacePolyline).toBeTruthy();
             });
         });
 
