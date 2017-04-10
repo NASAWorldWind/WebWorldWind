@@ -25,6 +25,8 @@ requirejs(['../src/WorldWind',
         var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
         blueMarbleLayer.enabled = false;
         blueMarbleLayer.showSpinner = true;
+        blueMarbleLayer.serverAddress = "http://worldwindserver.net/webworldwind";
+        blueMarbleLayer.pathToData = "standalonedata/Earth/BlueMarble256/";
         wwd.addLayer(blueMarbleLayer);
 
         // Create a compass and view controls.
