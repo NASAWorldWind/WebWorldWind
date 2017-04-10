@@ -50,7 +50,8 @@ define([
         this.options = {
             coordinates: [],
             leftParenthesis: 0,
-            rightParenthesis: 0
+            rightParenthesis: 0,
+            tokens: []
         };
     };
 
@@ -100,16 +101,15 @@ define([
             // In this part retain only the information about new Object?
             this.text(options, value);
         } else if (token.type === WKTType.TokenType.LEFT_PARENTHESIS) {
-            options.leftParenthesis++;
+            this.leftParenthesis(options);
         } else if (token.type === WKTType.TokenType.RIGHT_PARENTHESIS) {
-            options.rightParenthesis++;
-
             this.rightParenthesis(options);
         } else if (token.type === WKTType.TokenType.NUMBER) {
             this.number(options, value);
         } else if (token.type === WKTType.TokenType.COMMA) {
             this.comma(options);
         }
+        options.tokens.push(token);
     };
 
     /**
@@ -154,10 +154,21 @@ define([
      * @param options
      */
     WKTObject.prototype.rightParenthesis = function(options) {
+        options.rightParenthesis++;
+
         if (options.coordinates) {
             this.addCoordinates(options.coordinates);
             options.coordinates = null;
         }
+    };
+
+    /**
+     * Mainly to be used in specific subclasses.
+     * @private
+     * @param options
+     */
+    WKTObject.prototype.leftParenthesis = function(options) {
+        options.leftParenthesis++;
     };
 
     /**
@@ -168,7 +179,7 @@ define([
      */
     WKTObject.prototype.comma = function(options) {
         if (!options.coordinates) {
-            this.commaWithoutCoordinates();
+            this.commaWithoutCoordinates(options);
         } else {
             this.addCoordinates(options.coordinates);
             options.coordinates = null;
@@ -177,8 +188,9 @@ define([
 
     /**
      * Used by Multi objects to delineate the internal objects. This is default implementation doing nothing.
+     * @private
      */
-    WKTObject.prototype.commaWithoutCoordinates = function(){};
+    WKTObject.prototype.commaWithoutCoordinates = function(options){};
 
     /**
      * Handle Number by adding it among coordinates in the current object.

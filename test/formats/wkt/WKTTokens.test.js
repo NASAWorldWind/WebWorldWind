@@ -81,8 +81,13 @@ define([
                 expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
             });
 
-            it('correctly parses 2D polygon with inner boundaries', function(){
-                var polygon = 'POLYGON ((40 -70, 45 -80, 40 -90), (42 -75, 44 -78, 42 -73))';
+            it('correctly parses 3D polygon with inner boundaries', function(){
+                var polygon = 'POLYGON Z ((40 -70 10, 45 -80 10, 40 -90 10), (42 -75 10, 44 -78 10, 42 -73 10))';
+                var wktObjects = new WKTTokens(polygon).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTPolygon).toBeTruthy();
+                expect(wktObjects[0].shapes()[0]._boundaries.length).toBe(2); // Verify internal boundaries
             });
 
             it('correctly ignores LRS for 2D polygon', function () {
@@ -323,8 +328,16 @@ define([
                 expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(30, -60), new Location(35, -70), new Location(30, -80), new Location(30, -60)])).toBeTruthy();
             });
 
-            it('correctly parses 2D Multi polygon with inner boundaries', function(){
-                var multiPolygon = 'MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((40 -70, 45 -80, 40 -90), (42 -75, 44 -78, 42 -73)))';
+            it('correctly parses 3D Multi polygon with inner boundaries', function(){
+                var multiPolygon = 'MULTIPOLYGON Z (((50 -60 10, 55 -70 10, 50 -80 10)),((40 -70 10, 45 -80 10, 40 -90 10), (42 -75 10, 44 -78 10, 42 -73 10)))';
+                var wktObjects = new WKTTokens(multiPolygon).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTMultiPolygon).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries[0], [new Position(50, -60, 10), new Position(55, -70, 10), new Position(50, -80, 10)])).toBeTruthy();
+                expect(wktObjects[0].shapes()[1]._boundaries.length).toBe(2); // Verify internal boundaries.
             });
 
             it('correctly parses 2D Multi polygon with LRS', function(){
