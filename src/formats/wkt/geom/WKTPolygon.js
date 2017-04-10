@@ -27,6 +27,9 @@ define([
 
     WKTPolygon.prototype = Object.create(WKTObject.prototype);
 
+    /**
+     * @inheritDoc
+     */
     WKTPolygon.prototype.commaWithoutCoordinates = function() {
         this.outerBoundaries = this.coordinates.slice();
         this.coordinates = [];

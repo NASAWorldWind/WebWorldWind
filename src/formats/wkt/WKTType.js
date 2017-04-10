@@ -7,7 +7,7 @@
  */
 define([], function () {
     /**
-     *
+     * Enumerations used throughout the implementation of the WKT
      * @constructor
      */
     var WKTType = function () {};

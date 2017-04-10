@@ -175,6 +175,9 @@ define([
         }
     };
 
+    /**
+     * Used by Multi objects to delineate the internal objects. This is default implementation doing nothing.
+     */
     WKTObject.prototype.commaWithoutCoordinates = function(){};
 
     /**
