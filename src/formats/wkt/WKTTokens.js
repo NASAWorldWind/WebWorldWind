@@ -20,31 +20,33 @@ define([
      * @return {WKTObject[]}
      */
     WKTTokens.prototype.objects = function () {
-        var options = {
-            objects: [],
-            coordinates: [],
-            leftParenthesis: 0,
-            rightParenthesis: 0,
-            currentObject: null
-        };
+        var currentObject;
+        var objects = [];
 
         this.tokenize(this.sourceText).forEach(function (token) {
-            var value = token.value;
-            if (token.type === WKTType.TokenType.TEXT) {
-                this.text(options, value);
-            } else if (token.type === WKTType.TokenType.LEFT_PARENTHESIS) {
-                options.leftParenthesis++;
-            } else if (token.type === WKTType.TokenType.RIGHT_PARENTHESIS) {
-                options.rightParenthesis++;
+            if(currentObject && currentObject.isFinished() || !currentObject) {
+                // It represents new object.
+                var value = token.value;
+                var founded = value.match('[M]?[Z]?$');
+                if(founded && founded.length > 0 && founded[0] != '') {
+                    value = value.substring(0, value.length - founded.length);
+                }
 
-                this.rightParenthesis(options);
-            } else if (token.type === WKTType.TokenType.NUMBER) {
-                this.number(options, value);
-            } else if (token.type === WKTType.TokenType.COMMA) {
-                this.comma(options);
+                currentObject = WKTElements[value] && new WKTElements[value]();
+                if(!currentObject) {
+                    currentObject = new WKTObject();
+                }
+
+                if(founded && founded.length > 0 && founded[0] != '') {
+                    currentObject.setOptions(founded[0], currentObject);
+                }
+                objects.push(currentObject);
+            } else {
+                currentObject.handleToken(token);
             }
-        }.bind(this));
-        return options.objects;
+        });
+
+        return objects;
     };
 
     /**
@@ -158,115 +160,6 @@ define([
         }
         this.currentPosition--;
         return Number(numeric);
-    };
-
-    /**
-     * There are basically three types of tokens in the Text line. The name of the type for the next shape, Empty
-     * representing the empty shape and M or Z or MZ expressing whether it is in 3D or whether Linear Referencing System
-     * should be used.
-     * @private
-     * @param options {}
-     * @param value {String} Value to use for distinguishing among options.
-     */
-    WKTTokens.prototype.text = function(options, value) {
-        value = value.toUpperCase();
-        var started = null;
-        if (value.length <= 2) {
-            this.setOptions(value, options.currentObject);
-
-            return;
-        } else if (value.indexOf('EMPTY') === 0) {
-            this.nextObject(options);
-        } else {
-            var founded = value.match('[M]?[Z]?$');
-            if(founded && founded.length > 0 && founded[0] != '') {
-                value = value.substring(0, value.length - founded.length);
-            }
-
-            started = WKTElements[value] && new WKTElements[value]();
-            if(!started) {
-                started = new WKTObject();
-            }
-
-            if(founded && founded.length > 0 && founded[0] != '') {
-                this.setOptions(founded, started);
-            }
-        }
-
-        if (!options.currentObject) {
-            options.currentObject = started;
-        } else {
-            options.currentObject.add(started);
-        }
-    };
-
-    /**
-     * Right parenthesis either end coordinates for an object or ends current shape.
-     * @private
-     * @param options
-     */
-    WKTTokens.prototype.rightParenthesis = function(options) {
-        if (options.coordinates) {
-            options.currentObject.addCoordinates(options.coordinates);
-            options.coordinates = null;
-        }
-        if (options.leftParenthesis === options.rightParenthesis) {
-            options.objects.push(options.currentObject); // Shapes must be called later.
-            this.nextObject(options);
-        }
-    };
-
-    /**
-     * Comma either means another set of coordinates, or for certain shapes for example another shape or just another
-     * boundary
-     * @private
-     * @param options
-     */
-    WKTTokens.prototype.comma = function(options) {
-        if (!options.coordinates) {
-            options.currentObject.commaWithoutCoordinates();
-        } else {
-            options.currentObject.addCoordinates(options.coordinates);
-            options.coordinates = null;
-        }
-    };
-
-    /**
-     * Handle Number by adding it among coordinates in the current object.
-     * @private
-     * @param options
-     * @param value {Number}
-     */
-    WKTTokens.prototype.number = function(options, value) {
-        options.coordinates = options.coordinates || [];
-        options.coordinates.push(value);
-    };
-
-    /**
-     * Update options when previous WKT object ended.
-     * @private
-     * @param options
-     */
-    WKTTokens.prototype.nextObject = function(options) {
-        options.leftParenthesis = 0;
-        options.rightParenthesis = 0;
-        options.currentObject = null;
-    };
-
-    /**
-     * It sets the options of the current object. This means setting up the 3D and the linear space.
-     * @param text
-     * @param currentObject
-     */
-    WKTTokens.prototype.setOptions = function(text, currentObject) {
-        if (text == 'Z') {
-            currentObject.set3d();
-        } else if (text == 'M') {
-            currentObject.setLrs();
-        } else if (text == 'MZ') {
-            currentObject.set3d();
-            currentObject.setLrs();
-        }
     };
 
     return WKTTokens;

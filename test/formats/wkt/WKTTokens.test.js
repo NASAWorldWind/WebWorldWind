@@ -4,7 +4,10 @@
  */
 define([
     'src/geom/Location',
+    'src/shapes/Placemark',
     'src/geom/Position',
+    'src/shapes/SurfacePolyline',
+    'src/formats/wkt/geom/WKTGeometryCollection',
     'src/formats/wkt/geom/WKTLineString',
     'src/formats/wkt/geom/WKTMultiLineString',
     'src/formats/wkt/geom/WKTMultiPoint',
@@ -14,7 +17,10 @@ define([
     'src/formats/wkt/WKTTokens',
     'src/formats/wkt/geom/WKTTriangle'
 ], function (Location,
+             Placemark,
              Position,
+             SurfacePolyline,
+             WKTGeometryCollection,
              WKTLineString,
              WKTMultiLineString,
              WKTMultiPoint,
@@ -55,7 +61,7 @@ define([
             });
 
             it('correctly ignores the LRS for 3D point', function () {
-                var point3DLrs = 'POINT M (14.5 50 10 13)';
+                var point3DLrs = 'POINT MZ (14.5 50 10 13)';
                 var wktObjects = new WKTTokens(point3DLrs).objects();
 
                 expect(wktObjects.length).toBe(1);
@@ -73,6 +79,10 @@ define([
                 expect(wktObjects[0] instanceof WKTPolygon).toBeTruthy();
                 expect(wktObjects[0].coordinates.length).toBe(3);
                 expect(equalLocations(wktObjects[0].coordinates, [new Location(40, -70), new Location(45, -80), new Location(40, -90)])).toBeTruthy();
+            });
+
+            it('correctly parses 2D polygon with inner boundaries', function(){
+                var polygon = 'POLYGON ((40 -70, 45 -80, 40 -90), (42 -75, 44 -78, 42 -73))';
             });
 
             it('correctly ignores LRS for 2D polygon', function () {
@@ -304,6 +314,10 @@ define([
                 expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(30, -60), new Location(35, -70), new Location(30, -80), new Location(30, -60)])).toBeTruthy();
             });
 
+            it('correctly parses 2D Multi polygon with inner boundaries', function(){
+                var multiPolygon = 'MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((40 -70, 45 -80, 40 -90), (42 -75, 44 -78, 42 -73)))';
+            });
+
             it('correctly parses 2D Multi polygon with LRS', function(){
                 var multiPolygon = 'MULTIPOLYGON M (((50 -60 10, 55 -70 10, 50 -80 10)),((30 -60 10, 35 -70 10, 30 -80 10)))';
                 var wktObjects = new WKTTokens(multiPolygon).objects();
@@ -341,6 +355,20 @@ define([
 
                 expect(equalLocations(wktObjects[0].shapes()[0]._boundaries[0], [new Position(50, -60, 10), new Position(55, -70, 10), new Position(50, -80, 10)])).toBeTruthy();
                 expect(equalLocations(wktObjects[0].shapes()[1]._boundaries[0], [new Position(30, -60, 10), new Position(35, -70, 10), new Position(30, -80, 10)])).toBeTruthy();
+            });
+        });
+
+        describe('GeometryCollection', function(){
+            it('correctly parses geometry collection with multiple objects', function(){
+                var geometryCollection = 'GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6,7 10))';
+                var wktObjects = new WKTTokens(geometryCollection).objects();
+
+                expect(wktObjects.length).toBe(1);
+                expect(wktObjects[0] instanceof WKTGeometryCollection).toBeTruthy();
+
+                expect(wktObjects[0].shapes().length).toBe(2);
+                expect(wktObjects[0].shapes()[0] instanceof Placemark).toBeTruthy();
+                expect(wktObjects[0].shapes()[0] instanceof SurfacePolyline).toBeTruthy();
             });
         });
 

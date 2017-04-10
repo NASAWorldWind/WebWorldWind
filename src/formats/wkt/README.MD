@@ -59,3 +59,23 @@ above.
 - CurvePolygon 
 - Surface, MultiSurface, PolyhedralSurface
 - TIN
+
+### Valid Examples
+
+- POINT (14.5 50)
+- POINT Z(14.5 50 13)
+- POLYGON ((40 -70, 45 -80, 40 -90)) Without inner boundaries
+- POLYGON ((40 -70, 45 -80, 40 -90), (42 -75, 44 -78, 42 -73)) With inner boundaries
+- POLYGON Z ((40 -70 10, 45 -80 10, 40 -90 10))
+- LINESTRING ((33 -75, 37 -80, 33 -85))
+- LINESTRINGZ((33 -75 10, 37 -80 10, 33 -85 10))
+- TRIANGLE ((40 -70, 45 -80, 40 -90))
+- TRIANGLE Z((40 -70 10, 45 -80 10, 40 -90 10))
+- MULTIPOINT ((17 49.3),(-17 49))
+- MULTIPOINT Z((17 49.3 10),(-17 49 1))
+- MULTILINESTRING ((38 -70, 42 -75, 38 -80),(43 -65, 47 -70, 43 -75))
+- MULTILINESTRING Z((38 -70 10, 42 -75 10, 38 -80 10),(43 -65 10, 47 -70 10, 43 -75 10))
+- MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80))) Without inner boundaries
+- MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((40 -70, 45 -80, 40 -90), (42 -75, 44 -78, 42 -73))) With inner boundaries
+- MULTIPOLYGON Z (((50 -60 10, 55 -70 10, 50 -80 10)),((30 -60 10, 35 -70 10, 30 -80 10)))
+- GEOMETRYCOLLECTION

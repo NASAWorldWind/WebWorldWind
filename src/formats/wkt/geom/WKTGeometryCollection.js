@@ -27,10 +27,14 @@ define([
         this.objects.push(object);
     };
 
+    WKTGeometryCollection.prototype.token = function() {
+
+    };
+
     /**
      * @inheritDoc
      */
-    WKTGeometryCollection.prototype._shapes = function() {
+    WKTGeometryCollection.prototype.shapes = function() {
         var shapes = [];
 
         this.objects.forEach(function(associatedShapes){
