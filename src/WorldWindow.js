@@ -979,8 +979,22 @@ define([
         };
 
         /**
-         * Adds a specified layer to the end of this WorldWindow.
-         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not modified.
+         * Indicates whether this world window contains a specified layer.
+         * @param {Layer} layer The layer to test.
+         * @returns {Boolean} true if this world window contains the specified layer, otherwise false.
+         */
+        WorldWindow.prototype.containsLayer = function (layer) {
+            for (var i = 0, len = this.layers.length; i < len; i++) {
+                if (this.layers[i] === layer) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        /**
+         * Adds a specified layer to the end of this world window.
+         * @param {Layer} layer The layer to add. May be null or undefined, in which case this world window is not modified.
          */
         WorldWindow.prototype.addLayer = function (layer) {
             this.layers.push(layer);

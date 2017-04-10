@@ -21,10 +21,10 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ControlPointMarker", "constructor", "missingPosition"));
             }
 
-            // if (!id) {
-            //     throw new ArgumentError(
-            //         Logger.logMessage(Logger.LEVEL_SEVERE, "ControlPointMarker", "constructor", "missingId"));
-            // }
+            if (id === null || id === undefined) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ControlPointMarker", "constructor", "missingId"));
+            }
 
             if (!purpose) {
                 throw new ArgumentError(
