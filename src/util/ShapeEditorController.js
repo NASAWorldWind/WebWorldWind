@@ -56,9 +56,12 @@ define([
         "use strict";
 
         /**
-         * Provides a user interface for editing a shape and performs editing. Depending on the shape type, the shape is
-         * shown with control points for vertex locations and size. All shapes are shown with a handle that provides
-         * rotation.
+         * Constructs a shape editor controller and associates it with a specified world window.
+         * @alias ShapeEditorController
+         * @constructor
+         * @classdesc Provides a user interface for editing a shape and performs editing. Depending on the shape type,
+         * the shape is shown with control points for vertex locations and size. All shapes are shown with a handle that
+         * provides rotation.
          * <p/>
          * Drag on the shape's body moves the whole shape. Drag on a control point performs the action
          * associated with that control point. The editor provides vertex insertion and removal for SurfacePolygon and
@@ -67,7 +70,7 @@ define([
          * <p/>
          * This editor supports all surface shapes except SurfaceImage.
          * @param {WorldWindow} worldWindow The World Window to associate this shape editor controller with.
-         * @constructor
+         * @throws {ArgumentError} If the specified world window is null or undefined.
          */
         var ShapeEditorController = function (worldWindow) {
             if (!worldWindow) {
@@ -101,7 +104,7 @@ define([
             this.accessoryLayer.pickEnabled = false;
 
             /**
-             * The layer holding the contrl point's annotation.
+             * The layer holding the control point's annotation.
              * @type {RenderableLayer}
              */
             this.annotationLayer = new RenderableLayer();
@@ -131,12 +134,6 @@ define([
              * @type {boolean}
              */
             this.active = false;
-
-            /**
-             * Indicates the current editing operation, one of NONE, MOVING or SIZING.
-             * @type {number}
-             */
-            this.activeOperation = ShapeEditorController.NONE;
 
             /**
              * The terrain position associated with the cursor during the just previous drag event.
@@ -236,18 +233,7 @@ define([
                                 shapeEditor.makeShadowShape();
 
                                 //set previous position
-                                var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX,
-                                    event.clientY);
-                                if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                                    var terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint).terrainObject();
-                                    if (terrainObject) {
-                                        shapeEditor.previousPosition = new Position(
-                                            terrainObject.position.latitude,
-                                            terrainObject.position.longitude,
-                                            terrainObject.position.altitude
-                                        );
-                                    }
-                                }
+                                shapeEditor.setPreviousPosition(event);
                             }
                             else if (pickList.objects[p].userObject instanceof ControlPointMarker) {
                                 event.preventDefault();
@@ -258,18 +244,7 @@ define([
                                 shapeEditor.makeShadowShape();
 
                                 //set previous position
-                                var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX,
-                                    event.clientY);
-                                if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                                    var terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint).terrainObject();
-                                    if (terrainObject) {
-                                        shapeEditor.previousPosition = new Position(
-                                            terrainObject.position.latitude,
-                                            terrainObject.position.longitude,
-                                            terrainObject.position.altitude
-                                        );
-                                    }
-                                }
+                                shapeEditor.setPreviousPosition(event);
                             }
                         }
                     }
@@ -297,6 +272,7 @@ define([
                         if (terrainObject) {
                             shapeEditor.reshapeShape(terrainObject);
                             shapeEditor.updateControlPoints();
+                            shapeEditor.updateAnnotation(null);
                         }
                     }
                     shapeEditor.isDragging = false;
@@ -307,7 +283,6 @@ define([
                 var redrawRequired = false;
 
                 var pickList = shapeEditor.worldWindow.pick(shapeEditor.worldWindow.canvasCoordinates(x, y));
-
                 if (pickList.objects.length > 0) {
                     for (var p = 0; p < pickList.objects.length; p++) {
                         if (!pickList.objects[p].isTerrain) {
@@ -317,8 +292,7 @@ define([
                                 shapeEditor.shape.highlighted = true;
                                 shapeEditor.setArmed(true);
                             }
-                            else if (shapeEditor.shape !== pickList.objects[p].userObject &&
-                                !(pickList.objects[p].userObject instanceof ControlPointMarker)) {
+                            else if (shapeEditor.shape !== pickList.objects[p].userObject && !(pickList.objects[p].userObject instanceof ControlPointMarker)) {
                                 // Switch editor to a different shape.
                                 shapeEditor.shape.highlighted = false;
                                 shapeEditor.setArmed(false);
@@ -368,8 +342,9 @@ define([
             };
 
             var handleMouseMove = function (event) {
-                if (shapeEditor.isDragging === false)
+                if (shapeEditor.isDragging === false) {
                     return;
+                }
 
                 var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX, event.clientY);
                 var terrainObject;
@@ -458,11 +433,11 @@ define([
             this.removeAccessory();
             this.worldWindow.removeLayer(this.accessoryLayer);
 
-             this.worldWindow.removeLayer(this.annotationLayer);
+            this.worldWindow.removeLayer(this.annotationLayer);
 
-             this.worldWindow.removeLayer(this.shadowLayer);
+            this.worldWindow.removeLayer(this.shadowLayer);
 
-             this.currentHeading = 0;
+            this.currentHeading = 0;
         };
 
         //Internal use only. Intentionally not documented.
@@ -557,8 +532,9 @@ define([
          */
         ShapeEditorController.prototype.makeShadowShape = function () {
             var shadowShape = this.doMakeShadowShape();
-            if (shadowShape == null)
+            if (shadowShape == null) {
                 return;
+            }
 
             var editingAttributes = this.originalHighlightAttributes.clone();
 
@@ -581,8 +557,7 @@ define([
         ShapeEditorController.prototype.removeShadowShape = function () {
             this.shadowLayer.removeAllRenderables();
 
-            // Restore the original attributes.
-            this.shape.attributes = this.originalAttributes;
+            // Restore the original highlight attributes.
             this.shape.highlightAttributes = this.originalHighlightAttributes;
 
             this.worldWindow.redraw();
@@ -986,9 +961,9 @@ define([
             for (var i = 1; i <= locations.length; i++) // <= is intentional, to handle the closing segment
             {
                 // Skip the closing segment if the shape is not a polygon.
-                if (!(this.shape instanceof SurfacePolygon)
-                    && i == locations.length)
+                if (!(this.shape instanceof SurfacePolygon ) && i == locations.length) {
                     continue;
+                }
 
                 var locationA = locations[i - 1];
                 var locationB = locations[i == locations.length ? 0 : i];
@@ -1092,6 +1067,21 @@ define([
                     var newLocation = Location.greatCircleLocation(center, heading + deltaHeading, distance,
                         new Location(0, 0));
                     locations[i] = newLocation;
+                }
+            }
+        };
+
+        ShapeEditorController.prototype.setPreviousPosition = function (event) {
+            var mousePoint = this.worldWindow.canvasCoordinates(event.clientX,
+                event.clientY);
+            if (this.worldWindow.viewport.containsPoint(mousePoint)) {
+                var terrainObject = this.worldWindow.pickTerrain(mousePoint).terrainObject();
+                if (terrainObject) {
+                    this.previousPosition = new Position(
+                        terrainObject.position.latitude,
+                        terrainObject.position.longitude,
+                        terrainObject.position.altitude
+                    );
                 }
             }
         };
