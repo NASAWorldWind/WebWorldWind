@@ -119,7 +119,7 @@ define([
 
         SurfacePolygon.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
             if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
-                var boundaries = []
+                var boundaries = [];
                 for (var i = 0; i < this._boundaries.length; i++){
                     var locations = [];
                     for (var j = 0; j < this._boundaries[i].length; j++){
