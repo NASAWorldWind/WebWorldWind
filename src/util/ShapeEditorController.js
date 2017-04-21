@@ -652,7 +652,7 @@ define([
 
         /**
          * Moves the entire shape according to a specified event.
-         * @param event
+         * @param {Event} event
          */
         ShapeEditorController.prototype.dragWholeShape = function (event) {
             var refPos = this.shape.getReferencePosition();
