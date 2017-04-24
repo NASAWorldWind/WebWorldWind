@@ -16,6 +16,8 @@ define([
              WKTObject,
              WKTType) {
     /**
+     * It represents triangle.
+     * @alias WKTTriangle
      * @augments WKTObject
      * @constructor
      */

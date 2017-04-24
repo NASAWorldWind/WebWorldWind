@@ -15,6 +15,7 @@ define([
              WKTType) {
     /**
      * It represents multiple points.
+     * @alias WKTMultiPoint
      * @augments WKTObject
      * @constructor
      */

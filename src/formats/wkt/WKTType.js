@@ -9,6 +9,7 @@ define([], function () {
     /**
      * Enumerations used throughout the implementation of the WKT
      * @constructor
+     * @alias WKTType
      */
     var WKTType = function () {};
 

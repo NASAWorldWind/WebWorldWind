@@ -16,6 +16,8 @@ define([
              WKTObject,
              WKTType) {
     /**
+     * It represents the polygon.
+     * @alias WKTPolygon
      * @augments WKTObject
      * @constructor
      */

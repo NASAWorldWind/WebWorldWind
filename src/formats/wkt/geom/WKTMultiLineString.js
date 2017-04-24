@@ -17,6 +17,7 @@ define([
              WKTType) {
     /**
      * It represents multiple line string as one object.
+     * @alias WKTMultiLineString
      * @augments WKTObject
      * @constructor
      */

@@ -15,6 +15,7 @@ define([
              WKTType) {
     /**
      * This item can contain other geometries to be shown.
+     * @alias WKTGeometryCollection
      * @augments WKTObject
      * @constructor
      */

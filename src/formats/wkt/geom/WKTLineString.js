@@ -17,6 +17,7 @@ define([
              WKTType) {
     /**
      * It represents WKT LineString.
+     * @alias WKTLineString
      * @augments WKTObject
      * @constructor
      */

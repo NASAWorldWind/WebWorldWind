@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2017 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
+ */
 define([
     './WKTTokens'
 ], function (WKTTokens) {
@@ -41,6 +45,7 @@ define([
      *
      * @param textRepresentation {String} Text representation of WKT objects.
      * @constructor
+     * @alias WKTParser
      */
     var WKTParser = function (textRepresentation) {
         this.objects = null;

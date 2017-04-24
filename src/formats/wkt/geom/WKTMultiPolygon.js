@@ -17,6 +17,7 @@ define([
              WKTType) {
     /**
      * It represents multiple polygons.
+     * @alias WKTMultiPolygon
      * @augments WKTObject
      * @constructor
      */

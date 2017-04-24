@@ -17,6 +17,7 @@ define([
     /**
      * THis shouldn't be initiated from outside. It is only for internal use. Every other WKT Objects are themselves
      * WKTObject
+     * @alias WKTObject
      * @param type {String} Textual representation of the type of current object.
      * @constructor
      */

@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2017 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
+ */
 define([
     './WKTElements',
     './geom/WKTObject',
@@ -10,6 +14,7 @@ define([
      * Intended for the internal use only.
      * @private
      * @constructor
+     * @alias WKTTokens
      */
     var WKTTokens = function (sourceText) {
         this.sourceText = sourceText;
