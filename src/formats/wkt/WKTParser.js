@@ -7,41 +7,41 @@ define([
 ], function (WKTTokens) {
     /**
      * WKTParser is capable of parsing the text representation of the WKT objects. The explanation of what all is
-     * supported is to be found in the README.MD in this directory.
-     *
-     * The simplest possible usage is:
-     * var layer = new WorldWind.RenderableLayer();
-     * var parser = new WKTParser('POINT (19 23)');
-     * parser.load(null, null, layer);
-     * wwd.addLayer(layer);
-     * This example adds the WKT into the map
+     * supported is to be found in the README.MD in this directory.<br/>
+     * <br/>
+     * The simplest possible usage is:<br/>
+     * var layer = new WorldWind.RenderableLayer();<br/>
+     * var parser = new WKTParser('POINT (19 23)');<br/>
+     * parser.load(null, null, layer);<br/>
+     * wwd.addLayer(layer);<br/>
+     * This example adds the WKT into the map<br/>
      *
      * The more complex usage allows you to update the attributes of the objects after adding them to the layer. In this example all
-     * the shapes will have font color changed to the red:
-     * var layer = new WorldWind.RenderableLayer();
-     * var parser = new WKTParser('POINT (19 23)');
-     * parser.load(function(objects){
-     *  objects.forEach(function(object){
-     *    var shapeAttributes = new ShapeAttributes(null);
-     *    shapeAttributes.fontColor = Color.RED;
-     *    object.highlightAttributes = shapeAttributes;
-     *  })
-     * }, null, layer);
-     * wwd.addLayer(layer);
+     * the shapes will have font color changed to the red:<br/>
+     * var layer = new WorldWind.RenderableLayer();<br/>
+     * var parser = new WKTParser('POINT (19 23)');<br/>
+     * parser.load(function(objects){<br/>
+     *  objects.forEach(function(object){<br/>
+     *    var shapeAttributes = new ShapeAttributes(null);<br/>
+     *    shapeAttributes.fontColor = Color.RED;<br/>
+     *    object.highlightAttributes = shapeAttributes;<br/>
+     *  })<br/>
+     * }, null, layer);<br/>
+     * wwd.addLayer(layer);<br/>
      *
-     * The most complex usage is when you want to supply different configuration for object before it is added to the layer.
-     * var layer = new WorldWind.RenderableLayer();
-     * var parser = new WKTParser('POINT (19 23)');
-     * parser.load(null, function(shape) {
-     *   if(shape.type == WKTType.SupportedGeometries.POINT) {
-     *     var shapeAttributes = new ShapeAttributes(null);
-     *     shapeAttributes.fontColor = Color.RED;
-     *     return {
-     *         attributes: shapeAttributes
-     *     };
-     *   }
-     * }, layer);
-     * wwd.addLayer(layer);
+     * The most complex usage is when you want to supply different configuration for object before it is added to the layer.<br/>
+     * var layer = new WorldWind.RenderableLayer();<br/>
+     * var parser = new WKTParser('POINT (19 23)');<br/>
+     * parser.load(null, function(shape) {<br/>
+     *   if(shape.type == WKTType.SupportedGeometries.POINT) {<br/>
+     *     var shapeAttributes = new ShapeAttributes(null);<br/>
+     *     shapeAttributes.fontColor = Color.RED;<br/>
+     *     return {<br/>
+     *         attributes: shapeAttributes<br/>
+     *     };<br/>
+     *   }<br/>
+     * }, layer);<br/>
+     * wwd.addLayer(layer);<br/>
      *
      * @param textRepresentation {String} Text representation of WKT objects.
      * @constructor

@@ -29,7 +29,7 @@ define([
 
     /**
      * It takes an object and adds it among those, it will render
-     * @param object
+     * @param object {WKTObject} Object to be added to this collection.
      */
     WKTGeometryCollection.prototype.add = function (object) {
         this.objects.push(object);

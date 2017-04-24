@@ -36,7 +36,7 @@ define([
         this._is3d = false;
 
         /**
-         * It is possible for
+         * It is possible for the WKT object to be referenced using Linear referencing system. This is flag for it.
          * @type {boolean}
          * @private
          */
@@ -48,6 +48,11 @@ define([
          */
         this.coordinates = [];
 
+        /**
+         * Options contains information relevant for parsing of this specific Object. Basically processed tokens, parsed
+         * coordinates and amounts of parntheses used to find out whether the object was already finished.
+         * @type {{coordinates: Array, leftParenthesis: number, rightParenthesis: number, tokens: Array}}
+         */
         this.options = {
             coordinates: [],
             leftParenthesis: 0,
@@ -118,7 +123,11 @@ define([
      * representing the empty shape and M or Z or MZ expressing whether it is in 3D or whether Linear Referencing System
      * should be used.
      * @private
-     * @param options {}
+     * @param options {Object} Options specifying current status of the implementation
+     * @param options.coordinates {Number[]} Passed in coordinates
+     * @param options.leftParenthesis {Number} Amount of the left parenthesis
+     * @param options.rightParenthesis {Number} Amount of the right parenthesis
+     * @param options.tokens {Object[]} Processed tokens.
      * @param value {String} Value to use for distinguishing among options.
      */
     WKTObject.prototype.text = function(options, value) {
@@ -127,8 +136,8 @@ define([
         if (value.length <= 2) {
             this.setOptions(value, this);
         } else if (value.indexOf('EMPTY') === 0) {
-            this.options.leftParenthesis = 1;
-            this.options.rightParenthesis = 1;
+            options.leftParenthesis = 1;
+            options.rightParenthesis = 1;
         } else {
             var founded = value.match('[M]?[Z]?$');
 
@@ -152,7 +161,11 @@ define([
     /**
      * Right parenthesis either end coordinates for an object or ends current shape.
      * @private
-     * @param options
+     * @param options {Object} Options specifying current status of the implementation
+     * @param options.coordinates {Number[]} Passed in coordinates
+     * @param options.leftParenthesis {Number} Amount of the left parenthesis
+     * @param options.rightParenthesis {Number} Amount of the right parenthesis
+     * @param options.tokens {Object[]} Processed tokens.
      */
     WKTObject.prototype.rightParenthesis = function(options) {
         options.rightParenthesis++;
@@ -166,7 +179,11 @@ define([
     /**
      * Mainly to be used in specific subclasses.
      * @private
-     * @param options
+     * @param options {Object} Options specifying current status of the implementation
+     * @param options.coordinates {Number[]} Passed in coordinates
+     * @param options.leftParenthesis {Number} Amount of the left parenthesis
+     * @param options.rightParenthesis {Number} Amount of the right parenthesis
+     * @param options.tokens {Object[]} Processed tokens.
      */
     WKTObject.prototype.leftParenthesis = function(options) {
         options.leftParenthesis++;
@@ -176,7 +193,11 @@ define([
      * Comma either means another set of coordinates, or for certain shapes for example another shape or just another
      * boundary
      * @private
-     * @param options
+     * @param options {Object} Options specifying current status of the implementation
+     * @param options.coordinates {Number[]} Passed in coordinates
+     * @param options.leftParenthesis {Number} Amount of the left parenthesis
+     * @param options.rightParenthesis {Number} Amount of the right parenthesis
+     * @param options.tokens {Object[]} Processed tokens.
      */
     WKTObject.prototype.comma = function(options) {
         if (!options.coordinates) {
@@ -196,7 +217,11 @@ define([
     /**
      * Handle Number by adding it among coordinates in the current object.
      * @private
-     * @param options
+     * @param options {Object} Options specifying current status of the implementation
+     * @param options.coordinates {Number[]} Passed in coordinates
+     * @param options.leftParenthesis {Number} Amount of the left parenthesis
+     * @param options.rightParenthesis {Number} Amount of the right parenthesis
+     * @param options.tokens {Object[]} Processed tokens.
      * @param value {Number}
      */
     WKTObject.prototype.number = function(options, value) {
@@ -206,8 +231,8 @@ define([
 
     /**
      * It sets the options of the current object. This means setting up the 3D and the linear space.
-     * @param text
-     * @param currentObject
+     * @param text {String} Specific text used as options.
+     * @param currentObject {WKTObject} Object to apply the options to.
      */
     WKTObject.prototype.setOptions = function(text, currentObject) {
         if (text == 'Z') {
@@ -222,7 +247,7 @@ define([
 
     /**
      * It returns true when the object is finished.
-     * @return {Boolean}
+     * @return {Boolean} True if the parentheses are closed, false otherwise
      */
     WKTObject.prototype.isFinished = function() {
         return this.options.leftParenthesis === this.options.rightParenthesis && this.options.leftParenthesis > 0;
