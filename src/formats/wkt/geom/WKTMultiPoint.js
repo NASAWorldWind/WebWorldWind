@@ -7,11 +7,13 @@ define([
     '../../../shapes/PlacemarkAttributes',
     '../WKTElements',
     './WKTObject',
+    './WKTPoint',
     '../WKTType'
 ], function (Placemark,
              PlacemarkAttributes,
              WKTElements,
              WKTObject,
+             WKTPoint,
              WKTType) {
     /**
      * It represents multiple points.
@@ -37,7 +39,7 @@ define([
      */
     WKTMultiPoint.prototype.shapes = function() {
         return this.coordinates.map(function(coordinate){
-            return new Placemark(coordinate, true, new PlacemarkAttributes(null));
+            return WKTPoint.placemark(coordinate);
         }.bind(this));
     };
 

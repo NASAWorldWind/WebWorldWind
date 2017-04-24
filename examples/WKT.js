@@ -37,12 +37,12 @@ requirejs(['../src/WorldWind',
 
         //Point test
         var pointLayer = new WorldWind.RenderableLayer("Point");
-        new WorldWind.WKTParser("POINT (14.5 50)").load(null, null, pointLayer);
+        new WorldWind.WKTParser("POINT (33 -75)").load(null, null, pointLayer);
         wwd.addLayer(pointLayer);
 
         //MultiPoint test
         var multiPointLayer = new WorldWind.RenderableLayer("MultiPoint");
-        new WorldWind.WKTParser("MULTIPOINT ((17.2 49.3),(17.23 49.24),(17.14 49.37),(17.2 49.24))").load(null, null, multiPointLayer);
+        new WorldWind.WKTParser("MULTIPOINT ((38 -70),(42 -75),(38 -80))").load(null, null, multiPointLayer);
         wwd.addLayer(multiPointLayer);
 
         //LineString test
