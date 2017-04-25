@@ -71,27 +71,27 @@ define([
             if (c == '(') {
                 tokens.push({
                     type: WKTType.TokenType.LEFT_PARENTHESIS
-                })
+                });
             } else if (c == ',') {
                 tokens.push({
                     type: WKTType.TokenType.COMMA
-                })
+                });
             } else if (c == ')') {
                 tokens.push({
                     type: WKTType.TokenType.RIGHT_PARENTHESIS
-                })
+                });
             } else if (this.isAlpha(c)) {
                 var text = this.readText(textToParse);
                 tokens.push({
                     type: WKTType.TokenType.TEXT,
                     value: text
-                })
+                });
             } else if (this.isNumeric(c)) {
                 var numeric = this.readNumeric(textToParse);
                 tokens.push({
                     type: WKTType.TokenType.NUMBER,
                     value: numeric
-                })
+                });
             } else if (this.isWhiteSpace(c)) {
                 continue;
             } else {

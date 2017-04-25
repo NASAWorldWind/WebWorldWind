@@ -48,11 +48,11 @@ define([
         if(this._is3d){
             return this.objectBoundaries.map(function(boundaries){
                 return new Path(boundaries, new ShapeAttributes(null));
-            }.bind(this))
+            }.bind(this));
         } else {
             return this.objectBoundaries.map(function(boundaries){
                 return new SurfacePolyline(boundaries, new ShapeAttributes(null));
-            }.bind(this))
+            }.bind(this));
         }
     };
 

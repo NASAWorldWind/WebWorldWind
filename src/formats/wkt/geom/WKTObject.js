@@ -210,7 +210,12 @@ define([
 
     /**
      * Used by Multi objects to delineate the internal objects. This is default implementation doing nothing.
-     * @private
+     * @protected
+     * @param options {Object} Options specifying current status of the implementation
+     * @param options.coordinates {Number[]} Passed in coordinates
+     * @param options.leftParenthesis {Number} Amount of the left parenthesis
+     * @param options.rightParenthesis {Number} Amount of the right parenthesis
+     * @param options.tokens {Object[]} Processed tokens.
      */
     WKTObject.prototype.commaWithoutCoordinates = function(options){};
 

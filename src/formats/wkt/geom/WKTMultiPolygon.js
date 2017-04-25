@@ -88,11 +88,11 @@ define([
         if (this._is3d) {
             return this.objectBoundaries.map(function (boundaries) {
                 return new Polygon(boundaries, new ShapeAttributes(null));
-            }.bind(this))
+            }.bind(this));
         } else {
             return this.objectBoundaries.map(function (boundaries) {
                 return new SurfacePolygon(boundaries, new ShapeAttributes(null));
-            }.bind(this))
+            }.bind(this));
         }
     };
 
