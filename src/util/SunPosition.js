@@ -6,11 +6,13 @@
 define([
         '../geom/Angle',
         '../error/ArgumentError',
-        './Logger'
+        './Logger',
+        './WWMath'
     ],
     function (Angle,
               ArgumentError,
-              Logger) {
+              Logger,
+              WWMath) {
         'use strict';
 
         /**
@@ -54,9 +56,9 @@ define([
                 //number of days (positive or negative) since Greenwich noon, Terrestrial Time, on 1 January 2000 (J2000.0)
                 var numDays = julianDate - 2451545;
 
-                var meanLongitude = this.normalizeAngle(280.460 + 0.9856474 * numDays);
+                var meanLongitude = WWMath.normalizeAngle360(280.460 + 0.9856474 * numDays);
 
-                var meanAnomaly = this.normalizeAngle(357.528 + 0.9856003 * numDays) * Angle.DEGREES_TO_RADIANS;
+                var meanAnomaly = WWMath.normalizeAngle360(357.528 + 0.9856003 * numDays) * Angle.DEGREES_TO_RADIANS;
 
                 var eclipticLongitude = meanLongitude + 1.915 * Math.sin(meanAnomaly) + 0.02 * Math.sin(2 * meanAnomaly);
                 var eclipticLongitudeRad = eclipticLongitude * Angle.DEGREES_TO_RADIANS;
@@ -73,7 +75,7 @@ define([
                 if (eclipticLongitude >= 90 && eclipticLongitude < 270) {
                     rightAscension += 180;
                 }
-                rightAscension = this.normalizeAngle(rightAscension);
+                rightAscension = WWMath.normalizeAngle360(rightAscension);
 
                 return {
                     declination: declination,
@@ -106,10 +108,10 @@ define([
                 var numDays = julianDate - 2451545;
 
                 //Greenwich Mean Sidereal Time
-                var GMST = this.normalizeAngle(280.46061837 + 360.98564736629 * numDays);
+                var GMST = WWMath.normalizeAngle360(280.46061837 + 360.98564736629 * numDays);
 
                 //Greenwich Hour Angle
-                var GHA = this.normalizeAngle(GMST - celestialLocation.rightAscension);
+                var GHA = WWMath.normalizeAngle360(GMST - celestialLocation.rightAscension);
 
                 var longitude = Angle.normalizedDegreesLongitude(-GHA);
 
@@ -150,20 +152,6 @@ define([
                 var JD0h = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
 
                 return JD0h + dayFraction;
-            },
-
-            /**
-             * Normalizes an angle between 0.0 inclusive and 360.0 exclusive
-             * @param {Number} angle
-             * @throws {ArgumentError} if the angle is missing
-             * @return {Number} the normalised angle
-             */
-            normalizeAngle: function (angle) {
-                if (angle == null) {
-                    throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "SunPosition", "normalizeAngle", "missingAngle"));
-                }
-                return 360 * (angle / 360 - Math.floor(angle / 360));
             }
 
         };

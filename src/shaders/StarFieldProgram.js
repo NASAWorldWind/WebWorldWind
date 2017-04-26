@@ -53,16 +53,11 @@ define([
                     '   return 360.0 * (angleDivisions - floor(angleDivisions));\n' +
                     '}\n' +
 
-                    //the same as: return x > y ? 1.0 : 0.0;
-                    'float if_gt(float x, float y) {\n' +
-                    '   return max(sign(x - y), 0.0);\n' +
-                    '}\n' +
-
                     //transforms declination and right ascension in cartesian coordinates
                     'vec3 computePosition(float dec, float ra) {\n' +
                     '   float GMST = normalizeAngle(280.46061837 + 360.98564736629 * numDays);\n' +
                     '   float GHA = normalizeAngle(GMST - ra);\n' +
-                    '   float lon = -GHA + 360.0 * if_gt(GHA, 180.0);\n' +
+                    '   float lon = -GHA + 360.0 * step(180.0, GHA);\n' +
                     '   float latRad = radians(dec);\n' +
                     '   float lonRad = radians(lon);\n' +
                     '   float radCosLat = cos(latRad);\n' +

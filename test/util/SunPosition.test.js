@@ -126,22 +126,6 @@ define([
 
             });
 
-            describe('Normalize an angle to be between [0, 360)', function () {
-
-                it('Normalize an angle to be between [0, 360)', function () {
-                    var angles = [0, -10, 360, 1000];
-                    var expectedAngles = [0, 350, 0, 280];
-                    var computedAngles = angles.map(function (angle) {
-                        return SunPosition.normalizeAngle(angle);
-                    });
-                    expectedAngles.forEach(function(expectedResult, i){
-                        expect(expectedResult).toBeCloseTo(computedAngles[i]);
-                    });
-
-                });
-
-            });
-
         });
 
     });
