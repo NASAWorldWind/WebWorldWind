@@ -309,8 +309,7 @@ define([
             program.loadModulateColor(gl, dc.pickingMode);
 
             // Turn off depth testing.
-            // tag, 6/17/15: It's not clear why this call was here. It was carried over from WWJ.
-            //gl.disable(WebGLRenderingContext.DEPTH_TEST);
+            gl.disable(gl.DEPTH_TEST);
         };
 
         // Internal. Intentionally not documented.
