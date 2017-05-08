@@ -10,9 +10,9 @@ requirejs(['../src/WorldWind',
         "use strict";
         
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
-
+        
         var wwd = new WorldWind.WorldWindow("canvasOne");
-
+                
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: false},
@@ -55,6 +55,22 @@ requirejs(['../src/WorldWind',
             }, 64);
         }
 
+        $( document ).ready( function() {
+            var opacitySlider = $("#opacitySlider");
+            
+            opacitySlider.slider({
+                value: 0,
+                min: 0,
+                max: 1,
+                step: 0.1,
+                animate: true,
+                slide: function (event, ui) {
+                    $("#opacity").html(ui.value);
+                    atmosphereLayer.opacity = ui.value;
+                }
+            });
+            opacitySlider.slider('value', atmosphereLayer.opacity);        
+        });
     });
 
 
