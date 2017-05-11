@@ -679,8 +679,7 @@ define([
                     // and are more than 180 degrees longitude apart
                     if (WWMath.signum(pos.longitude) != WWMath.signum(posNext.longitude)) {
                         var delta = Math.abs(pos.longitude - posNext.longitude);
-                        //florin added <= 360, handles (90, 180) -> (0, -180) -> (-90, 180)
-                        if (delta > 180 && delta <= 360)
+                        if (delta > 180 && delta < 360)
                             return true;
                     }
                 }
