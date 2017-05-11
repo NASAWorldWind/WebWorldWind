@@ -25,7 +25,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
         './geom/BoundingBox',
-        './util/SunPosition',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
@@ -173,6 +172,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/SkyProgram',
         './layer/StarFieldLayer',
         './shaders/StarFieldProgram',
+        './util/SunPosition',
         './shapes/SurfaceImage',
         './shapes/SurfaceCircle',
         './shapes/SurfaceEllipse',
@@ -244,7 +244,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGLayer,
               BMNGOneImageLayer,
               BoundingBox,
-              SunPosition,
               ClickRecognizer,
               ColladaLoader,
               Color,
@@ -392,6 +391,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               SkyProgram,
               StarFieldLayer,
               StarFieldProgram,
+              SunPosition,
               SurfaceImage,
               SurfaceCircle,
               SurfaceEllipse,
@@ -672,7 +672,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BoundingBox'] = BoundingBox;
-        WorldWind['SunPosition'] = SunPosition;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
@@ -769,6 +768,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['SkyProgram'] = SkyProgram;
         WorldWind['StarFieldLayer'] = StarFieldLayer;
         WorldWind['StarFieldProgram'] = StarFieldProgram;
+        WorldWind['SunPosition'] = SunPosition;
         WorldWind['SurfaceImage'] = SurfaceImage;
         WorldWind['SurfaceCircle'] = SurfaceCircle;
         WorldWind['SurfaceEllipse'] = SurfaceEllipse;
