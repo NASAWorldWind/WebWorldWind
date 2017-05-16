@@ -56,4 +56,66 @@ require([
             expect(WWUtil.transformToBoolean(1)).toBe(true);
         });
     });
+
+    describe('WWUtil', function(){
+        describe('#endsWith', function(){
+            it('recognizes correctly that string ends with given token', function(){
+                var textToTry = 'someTextEndingWithTest';
+                var searchString = 'Test';
+
+                expect(WWUtil.endsWith(textToTry, searchString)).toBe(true);
+            });
+
+            it('recognizes correctly that string minus position ends with given token', function(){
+                var textToTry = 'someTextEndingWithTestGarbage';
+                var searchString = 'Text';
+
+                expect(WWUtil.endsWith(textToTry, searchString, 8)).toBe(true);
+            });
+
+            it('recognizes correctly that string doesnt end with given token', function(){
+                var textToTry = 'someTextEndingWithTest';
+                var searchString = 'Random';
+
+                expect(WWUtil.endsWith(textToTry, searchString)).toBe(false);
+            });
+
+            it('recognizes correctly that string minus position doesnt end with given token', function(){
+                var textToTry = 'someTextEndingWithTestGarbage';
+                var searchString = 'Random';
+
+                expect(WWUtil.endsWith(textToTry, searchString, 7)).toBe(false);
+            });
+        });
+
+        describe('#startsWith', function(){
+            it('recognizes correctly that string starts with given token', function(){
+                var textToTry = 'TestIsAtTheBeginning';
+                var searchString = 'Test';
+
+                expect(WWUtil.startsWith(textToTry, searchString)).toBe(true);
+            });
+
+            it('recognizes correctly that string minus position starts with given token', function(){
+                var textToTry = 'GarbageTestIsAtTheBeginning';
+                var searchString = 'Test';
+
+                expect(WWUtil.startsWith(textToTry, searchString, 7)).toBe(true);
+            });
+
+            it('recognizes correctly that string doesnt start with given token', function(){
+                var textToTry = 'TestIsAtTheBeginning';
+                var searchString = 'Random';
+
+                expect(WWUtil.startsWith(textToTry, searchString)).toBe(false);
+            });
+
+            it('recognizes correctly that string minus position doesnt start with given token', function(){
+                var textToTry = 'GarbageTestIsAtTheBeginning';
+                var searchString = 'Random';
+
+                expect(WWUtil.startsWith(textToTry, searchString, 7)).toBe(false);
+            });
+        });
+    })
 });
