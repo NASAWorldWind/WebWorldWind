@@ -21,7 +21,8 @@ define([
     './util/RefreshListener',
     './util/RemoteFile',
     './util/StyleResolver',
-    '../../util/XmlDocument'
+    '../../util/XmlDocument',
+    '../../util/WWUtil'
 ], function (ArgumentError,
              JsZip,
              KmlElements,
@@ -36,7 +37,8 @@ define([
              RefreshListener,
              RemoteFile,
              StyleResolver,
-             XmlDocument) {
+             XmlDocument,
+             WWUtil) {
     "use strict";
 
     // TODO: Make sure that the KmlFile is also rendered as a part of this hierarchy and not added to the layer.
@@ -143,11 +145,7 @@ define([
      * @returns {boolean} true if the extension matches otherwise false
      */
     KmlFile.prototype.hasExtension = function (extension, url) {
-        if (url.endsWith) {
-            return url.endsWith("." + extension);
-        } else {
-            return url.lastIndexOf("." + extension) == (url.length - extension.length - 1);
-        }
+        return WWUtil.endsWith(url, "." + extension);
     };
 
     /**
