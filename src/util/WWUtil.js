@@ -269,11 +269,11 @@ define([
             },
 
             /**
-             * It tests whether the provided String contains the characters at the beginning.
-             * @param subjectString The String to be searched for the characters at the beginning of the String.
-             * @param searchString The characters to be searched for at the start of this string.
-             * @param position The position in this string at which to begin searching for searchString; defaults to 0.
-             * @return {boolean} true if the given characters are found at the beginning of the string; otherwise, false.
+             * Determines whether subjectString begins with the characters of searchString.
+             * @param {String} subjectString The string to analyse.
+             * @param {String} searchString The characters to be searched for at the start of subjectString.
+             * @param {Number} position The position in subjectString at which to begin searching for searchString; defaults to 0.
+             * @return {Boolean} true if the given characters are found at the beginning of the string; otherwise, false.
              */
             startsWith: function(subjectString, searchString, position) {
                 position = position || 0;
@@ -281,19 +281,19 @@ define([
             },
 
             /**
-             * It tests whether the provided String contains the characters at the end.
-             * @param subjectString The String to be searched for the characters on the end of the String.
-             * @param searchString The characters to be searched for at the end of this string.
-             * @param position Optional. If provided starts the match from the length of the string minus the second argument.If omitted, the default value is the length of the string.
-             * @return {boolean} true if the given characters are found at the end of the string; otherwise, false.
+             * Determines whether subjectString ends with the characters of searchString.
+             * @param {String} subjectString The string to analyse.
+             * @param {String} searchString The characters to be searched for at the end of subjectString.
+             * @param {Number} length Optional. If provided overwrites the considered length of the string to search in. If omitted, the default value is the length of the string.
+             * @return {Boolean} true if the given characters are found at the end of the string; otherwise, false.
              */
-            endsWith: function(subjectString, searchString, position) {
-                if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
-                    position = subjectString.length;
+            endsWith: function(subjectString, searchString, length) {
+                if (typeof length !== 'number' || !isFinite(length) || Math.floor(length) !== length || length > subjectString.length) {
+                    length = subjectString.length;
                 }
-                position -= searchString.length;
-                var lastIndex = subjectString.lastIndexOf(searchString, position);
-                return lastIndex !== -1 && lastIndex === position;
+                length -= searchString.length;
+                var lastIndex = subjectString.lastIndexOf(searchString, length);
+                return lastIndex !== -1 && lastIndex === length;
             }
         };
 
