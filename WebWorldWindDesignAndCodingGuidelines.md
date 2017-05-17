@@ -28,10 +28,11 @@
 * The audience for exceptions is not primarily the user of the client program, but the application or World Wind developer. Throw exceptions that would let them know immediately that they're using faulty logic or data.
 
 ## Code Formatting
+
 * All Web World Wind code follows the same style and conventions and looks the same in style and format.
 * Web World Wind code is heavily commented. The comments describe both the what and how of a block of code.
 * Web World Wind variable and function names are descriptive.
-* World Wind follows the coding conventions described in Chapter 2 of the book <em>JavaScript Patterns</em>. These conventions are encoded in the WebStorm project files.
+* World Wind follows the coding conventions described in Chapter 2 of the book *JavaScript Patterns*. These conventions are encoded in the WebStorm project files.
 * Line length is 120 characters and indentation widths are 4 characters.
 * Variable and function names use camel case. The exception is constructors, which capitalize their first letter. Constants are in all upper case with words separated by underscores.
 * White space is preferred over packing code into a small space. Use white space liberally. Separate functional blocks of code with vertical white space. Think of code within a function as a sequence of paragraphs and separate each with a blank line.
