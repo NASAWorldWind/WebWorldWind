@@ -32,7 +32,7 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        var kmlFilePromise = new KmlFile('data/KML_Samples.kml', [new KmlTreeVisibility('treeControls', wwd)]);
+        var kmlFilePromise = new KmlFile('data/diary.kml', [new KmlTreeVisibility('treeControls', wwd)]);
         kmlFilePromise.then(function (kmlFile) {
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
             renderableLayer.currentTimeInterval = [
