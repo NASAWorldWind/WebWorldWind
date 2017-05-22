@@ -126,11 +126,7 @@ define([
      * @param styles.highlight {KmlStyle} Style applied when item is highlighted
      */
     KmlLineString.prototype.createPath = function (styles) {
-        if(this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
-            this._renderable = new SurfacePolyline(this.prepareLocations(), this.prepareAttributes(styles.normal));
-        } else {
-            this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
-        }
+        this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
         this.moveValidProperties();
     };
 
@@ -179,6 +175,9 @@ define([
     KmlLineString.prototype.moveValidProperties = function () {
         this._renderable.extrude = this.kmlExtrude || false;
         this._renderable.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
+        if(this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
+            this._renderable.followTerrain = true;
+        }
         //noinspection JSUnusedGlobalSymbols
         this._renderable.tesselate = this.kmlTesselate || false;
     };
