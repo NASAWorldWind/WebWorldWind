@@ -76,7 +76,38 @@ requirejs(['../src/WorldWind',
                     1.0);
             }
 
-        return configuration;
+            return configuration;
+        };
+
+        var extrudedConfigurationCallback = function (geometry, properties) {
+            var configuration = {};
+
+            configuration.attributes = new WorldWind.ShapeAttributes(null);
+
+            // Fill the polygon with a random pastel color.
+            configuration.attributes.interiorColor = new WorldWind.Color(
+                0.375 + 0.5 * Math.random(),
+                0.375 + 0.5 * Math.random(),
+                0.375 + 0.5 * Math.random(),
+                1.0);
+
+            configuration.attributes.outlineColor = new WorldWind.Color(
+                0.5 * configuration.attributes.interiorColor.red,
+                0.5 * configuration.attributes.interiorColor.green,
+                0.5 * configuration.attributes.interiorColor.blue,
+                1.0);
+
+            //Extrude the polygon
+            configuration.extrude = true;
+
+            //Set the altitude for the extrusion
+            configuration.altitude=1e5;
+
+            //Set altitude mode to relative
+            configuration.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+
+
+            return configuration;
         };
 
         var parserCompletionCallback = function(layer) {
@@ -172,6 +203,26 @@ requirejs(['../src/WorldWind',
         var usa4326GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "usa_epsg4326.geojson");
         usa4326GeoJSON.load(null, shapeConfigurationCallback, usa4326Layer);
         wwd.addLayer(usa4326Layer);
+
+        //Parsing GeoJSON directly
+
+         //Italy Bounding Box
+         var italyBoundingsLayer = new WorldWind.RenderableLayer("Italy Boundings");
+         var italyBoundingsGeoJSON = new WorldWind.GeoJSONParser('{"type":"FeatureCollection","features":[{"type":"Feature",' +
+         '"properties":{},"geometry":{"type":"Polygon","coordinates":[[[6.30615,36.50963],[18.63281,36.50963],' +
+         '[18.63281,46.81509],[6.30615,46.81509],[6.30615,36.50963]]]}}]}');
+         italyBoundingsGeoJSON.load(null, shapeConfigurationCallback, italyBoundingsLayer);
+         italyBoundingsLayer.enabled = false;
+         wwd.addLayer(italyBoundingsLayer);
+
+        //Sicily Bounding Box Extruded
+        var sicilyBoundingsLayer = new WorldWind.RenderableLayer("Sicily Boundings");
+        var sicilyBoundingsGeoJSON = new WorldWind.GeoJSONParser('{"type":"FeatureCollection","features":[{"type":"' +
+            'Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[12.07397,36.55377],' +
+            '[15.72143,36.55377],[15.72143,38.48799],[12.07397,38.48799],[12.07397,36.55377]]]}}]}');
+        sicilyBoundingsGeoJSON.load(null, extrudedConfigurationCallback, sicilyBoundingsLayer);
+        sicilyBoundingsLayer.enabled = false;
+        wwd.addLayer(sicilyBoundingsLayer);
 
 
         // Create a layer manager for controlling layer visibility.
