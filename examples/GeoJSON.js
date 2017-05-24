@@ -101,7 +101,7 @@ requirejs(['../src/WorldWind',
             configuration.extrude = true;
 
             //Set the altitude for the extrusion
-            configuration.altitude=1e5;
+            configuration.altitude=properties.height || 1e5;
 
             //Set altitude mode to relative
             configuration.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
@@ -218,7 +218,7 @@ requirejs(['../src/WorldWind',
         //Sicily Bounding Box Extruded
         var sicilyBoundingsLayer = new WorldWind.RenderableLayer("Sicily Boundings");
         var sicilyBoundingsGeoJSON = new WorldWind.GeoJSONParser('{"type":"FeatureCollection","features":[{"type":"' +
-            'Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[12.07397,36.55377],' +
+            'Feature","properties":{"height":"1e5"},"geometry":{"type":"Polygon","coordinates":[[[12.07397,36.55377],' +
             '[15.72143,36.55377],[15.72143,38.48799],[12.07397,38.48799],[12.07397,36.55377]]]}}]}');
         sicilyBoundingsGeoJSON.load(null, extrudedConfigurationCallback, sicilyBoundingsLayer);
         sicilyBoundingsLayer.enabled = false;
