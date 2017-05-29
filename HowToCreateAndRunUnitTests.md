@@ -39,7 +39,7 @@ changing the list of browsers in `karma.conf.js` to, for example:
 
 `browsers: ['PhantomJS', 'Chrome’]`
 
-Please make sure that you also have the approriate launchers available in your
+Please make sure that you also have the appropriate launchers available in your
 node modules, for example:
 
 `npm install karma-chrome-launcher`
