@@ -25,10 +25,10 @@ define(function () {
         this.worldWindow = worldWindow;
 
         // Store the loaded annotation so we may read/modify
-        // it/s settings
+        // its settings
         this.currentAnnotation = null;
 
-        //Store DOM slider elements
+        // Store DOM slider elements
         this.opacitySlider = $("#opacitySlider");
         this.scaleSlider = $("#scaleSlider");
         this.cornerSlider = $("#cornerSlider");
@@ -59,7 +59,7 @@ define(function () {
         this.leaderGapLabel = $("#leadSize");
 
         // Create an event for the textbox so that we may update the
-        // annotations text as this one's text changes
+        // annotation's label as the textbox contents change
         this.text.on('input', function (e) {
             self.currentAnnotation.text = this.value;
             self.worldWindow.redraw();

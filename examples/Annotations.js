@@ -14,6 +14,7 @@ requirejs(['../src/WorldWind',
         // Create the World Window.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create  and add imagery and World Window UI layers
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
@@ -27,17 +28,8 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        var annotationsLayer = new WorldWind.RenderableLayer("Annotations");
-
-        // Create UI controller to modify annotation properties interactively
-        var annotationController = new AnnotationController(wwd);
-
-        var annotation,
-            annotationAttributes,
-            location = new WorldWind.Position(40.964231, -103.627767, 1e2);
-
         // Set default annotation attributes
-        annotationAttributes = new WorldWind.AnnotationAttributes(null);
+        var annotationAttributes = new WorldWind.AnnotationAttributes(null);
         annotationAttributes.cornerRadius = 14;
         annotationAttributes.backgroundColor = WorldWind.Color.BLUE;
         annotationAttributes.drawLeader = true;
@@ -50,14 +42,19 @@ requirejs(['../src/WorldWind',
         annotationAttributes.textAttributes.color = WorldWind.Color.WHITE;
         annotationAttributes.insets = new WorldWind.Insets(10, 10, 10, 10);
 
-        annotation = new WorldWind.Annotation(location, annotationAttributes);
+        // Set a location for the annotation to point to and create it.
+        var location = new WorldWind.Position(40.964231, -103.627767, 1e2);
+        var annotation = new WorldWind.Annotation(location, annotationAttributes);
+        // Text can be assigned to the annotation after creating it.
         annotation.label = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
-        annotationsLayer.addRenderable(annotation);
 
-        // Add the annotations layer to the World Window's layer list.
+        // Create and add the annotation layer to the World Window's layer list
+        var annotationsLayer = new WorldWind.RenderableLayer("Annotations");
+        annotationsLayer.addRenderable(annotation);
         wwd.addLayer(annotationsLayer);
 
-        // Load the annotation to the controller so the UI elements can modify it.
+        // Create UI controller to modify annotation properties interactively
+        // and load the annotation to it so the UI elements can modify it.
+        var annotationController = new AnnotationController(wwd);
         annotationController.load(annotation);
-
     });
