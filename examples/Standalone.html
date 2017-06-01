@@ -39,18 +39,78 @@
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_INFO);
 
         // Create a World Window for the canvas. Use a REST elevation model rather than the default.
-        var elevationModel = new WorldWind.EarthRestElevationModel(null, "../standalonedata/Earth/DTED0",
-                "Earth Elevations");
+        var elevationModel = new WorldWind.EarthRestElevationModel(null,
+                                                                   "../standalonedata/Earth/DTED0",
+                                                                   "Earth Elevations");
         var wwd = new WorldWind.WorldWindow("canvasOne", elevationModel);
 
-        // Add some REST image layers to the World Window's globe.
-        wwd.addLayer(new WorldWind.RestTiledImageLayer(null, "../standalonedata/Earth/BlueMarble256/BlueMarble-200404", "Blue Marble"));
-        wwd.addLayer(new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat", "LandSat"));
+        // Add some REST image layers to the World Window's globe:
+
+        // Blue Marble 2004 monthly time series.
+        var blueMarbleTimeSeries = new WorldWind.BMNGRestLayer(null,
+                                                               "../standalonedata/Earth/BlueMarble256/",
+                                                               "Blue Marble time series");
+
+        // Blue Marble layer equivalent to the April 2004 sublayer of the above,
+        // limited to the sector that roughly covers Europe.
+        var configuration = {
+            sector: new WorldWind.Sector(35, 65, -10, 45)
+        };
+
+        var blueMarbleFixed = new WorldWind.RestTiledImageLayer(null,
+                                                                "../standalonedata/Earth/BlueMarble256/BlueMarble-200404",
+                                                                "Blue Marble",
+                                                                configuration);
+
+        // Landsat layer (The data covers only a sector of the globe in North America)
+        var landSat = new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat", "LandSat");
+
+
+        // Disable the time series layer until it's pre-populated with its sub-layers
+        blueMarbleTimeSeries.enabled = false;
+
+        // Add all the layers to the World Window's layer list
+        wwd.addLayer(blueMarbleTimeSeries);
+        wwd.addLayer(blueMarbleFixed);
+        wwd.addLayer(landSat);
+
+        // Ensure that the background and other control layers are displayed while the time series layer is
+        // being pre-populated.
+        wwd.redraw();
 
         // Add a compass, a coordinates display and some view controls to the World Window.
         wwd.addLayer(new WorldWind.CompassLayer());
         wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
+
+        // Wait for the time series layer to pre-populate all its sub-layers before enabling it.
+        var prePopulateInterval = window.setInterval(function () {
+            if (!this.prePopulate) {
+                // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're
+                // loaded.
+                blueMarbleTimeSeries.prePopulate(wwd);
+                this.prePopulate = true;
+                return;
+            }
+
+            // See if the layer is pre-populated now. If so, enable it.
+            if (blueMarbleTimeSeries.isPrePopulated(wwd)) {
+                blueMarbleTimeSeries.enabled = true;
+                blueMarbleTimeSeries.showSpinner = false;
+                window.clearInterval(prePopulateInterval);
+                //layerManger.synchronizeLayerList();
+
+                // Increment the time series layer's time at a specified frequency.
+                var currentIndex = 0;
+                window.setInterval(function () {
+                    if (blueMarbleTimeSeries.enabled) {
+                        currentIndex = ++currentIndex % WorldWind.BMNGRestLayer.availableTimes.length;
+                        blueMarbleTimeSeries.time = WorldWind.BMNGRestLayer.availableTimes[currentIndex];
+                        wwd.redraw();
+                    }
+                }, 200);
+            }
+        }, 200);
     }
 </script>
 </body>
