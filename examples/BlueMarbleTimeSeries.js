@@ -22,6 +22,11 @@ requirejs(['../src/WorldWind',
 
         // Create the Blue Marble layer and add it to the World Window's layer list. Disable it until its images
         // are preloaded, which is initiated below.
+
+        // Note that the Blue Marble time series requires the contents available in:
+        // http://worldwindserver.net/webworldwind/standalonedata/Earth/BlueMarble256/
+        // to be stored locally in a '/standalonedata/Earth/BlueMarble256' folder tree in project root.
+
         var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
         blueMarbleLayer.enabled = false;
         blueMarbleLayer.showSpinner = true;

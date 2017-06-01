@@ -25,13 +25,15 @@ define(function () {
         this.worldWindow = worldWindow;
 
         // Store the loaded annotation so we may read/modify
-        // it/s settings
+        // its settings
         this.currentAnnotation = null;
 
-        //Store DOM slider elements
+        // Store DOM slider elements
         this.opacitySlider = $("#opacitySlider");
         this.scaleSlider = $("#scaleSlider");
         this.cornerSlider = $("#cornerSlider");
+        this.leadWidthSlider = $("#leadWidthSlider");
+        this.leadHeightSlider = $("#leadHeightSlider");
         this.backgroundR = $("#bgR");
         this.backgroundG = $("#bgG");
         this.backgroundB = $("#bgB");
@@ -52,10 +54,12 @@ define(function () {
         this.bgColorLabel = $("#bgColor");
         this.textColorLabel = $("#textColor");
         this.opacityLabel = $("#opacity");
+        this.scaleLabel = $("#scale");
         this.cornerRadiusLabel = $("#cornerRadius");
+        this.leaderGapLabel = $("#leadSize");
 
         // Create an event for the textbox so that we may update the
-        // annotations text as this one's text changes
+        // annotation's label as the textbox contents change
         this.text.on('input', function (e) {
             self.currentAnnotation.text = this.value;
             self.worldWindow.redraw();
@@ -75,7 +79,7 @@ define(function () {
 
         this.scaleSlider.slider({
             value: 1,
-            min: 1,
+            min: 0.70,
             max: 2,
             step: 0.1,
             animate: true,
@@ -88,12 +92,39 @@ define(function () {
         this.cornerSlider.slider({
             value: 1,
             min: 0,
-            max: 20,
+            max: 30,
             step: 1,
             animate: true,
             slide: function (event, ui) {
                 $("#cornerRadius").html(ui.value);
                 self.currentAnnotation.attributes.cornerRadius = ui.value;
+            }
+        });
+
+        // Width value of the lead (arrow)
+        this.leadWidthSlider.slider({
+            //value: 40,
+            min: 0,
+            max: 70,
+            step: 1,
+            animate: true,
+            slide: function (event, ui) {
+                self.changeLeadSize(
+                    self.leadWidthSlider.slider('value'),
+                    self.leadHeightSlider.slider('value'));
+            }
+        });
+
+        // Length value of the lead (arrow)
+        this.leadHeightSlider.slider({
+            //value: 30,
+            min: 0,
+            max: 100,
+            animate: true,
+            slide: function (event, ui) {
+                self.changeLeadSize(
+                    self.leadWidthSlider.slider('value'),
+                    self.leadHeightSlider.slider('value'));
             }
         });
 
@@ -245,6 +276,14 @@ define(function () {
         this.worldWindow.redraw();
     };
 
+    // Internal
+    AnnotationController.prototype.changeLeadSize = function(width, height){
+        this.leaderGapLabel.html("width: " + width + " height: " + height);
+        this.currentAnnotation.attributes.leaderGapWidth = width;
+        this.currentAnnotation.attributes.leaderGapHeight = height;
+        this.worldWindow.redraw();
+    };
+
     /**
      * Loads an annotations and adjusts ui controls based on it's settings
      * @param annotation
@@ -258,7 +297,9 @@ define(function () {
             bgBlue = annotation.attributes.backgroundColor.blue * 255,
             textRed = annotation.attributes.textAttributes.color.red * 255,
             textGreen = annotation.attributes.textAttributes.color.green * 255,
-            textBlue = annotation.attributes.textAttributes.color.blue * 255;
+            textBlue = annotation.attributes.textAttributes.color.blue * 255,
+            leadWidth = annotation.attributes.leaderGapWidth,
+            leadHeight = annotation.attributes.leaderGapHeight;
 
         // Load background RGB sliders and format label based on values
         this.backgroundR.slider('value', bgRed);
@@ -272,11 +313,17 @@ define(function () {
         this.textB.slider('value', textBlue);
         this.textColorLabel.html("RGB(" + textRed + "," + textGreen + "," + textBlue + ")");
 
+        // Load leader size sliders and format label based on values
+        this.leadWidthSlider.slider('value', leadWidth);
+        this.leadHeightSlider.slider('value', leadHeight);
+        this.leaderGapLabel.html("width: " + leadWidth + " height: " + leadHeight);
+
         // Load sliders settings and adjusts labels with their values
         this.opacitySlider.slider('value', annotation.attributes.opacity);
         this.scaleSlider.slider('value', annotation.attributes.scale);
         this.cornerSlider.slider('value', annotation.attributes.cornerRadius);
         this.opacityLabel.html(annotation.attributes.opacity);
+        this.scaleLabel.html(annotation.attributes.scale);
         this.cornerRadiusLabel.html(annotation.attributes.cornerRadius);
 
         // Load insets values into the spinners
