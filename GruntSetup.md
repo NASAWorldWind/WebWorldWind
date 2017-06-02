@@ -19,7 +19,7 @@ The below installations are per-project — must be performed with each new full
   `npm install grunt-contrib-requirejs`
 
 2) Install jsdoc 3.3.0 plugin (https://github.com/krampstudio/grunt-jsdoc)
-  `npm install grunt-jsdoc@beta`
+  `npm install grunt-jsdoc`
 
 3) Install compress plugin (https://github.com/gruntjs/grunt-contrib-compress)
   `npm install grunt-contrib-compress`
