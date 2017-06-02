@@ -69,7 +69,7 @@ define([
             if (!this.metadataRetrievalInProcess) {
                 this.metadataRetrievalInProcess = true;
 
-                var url = "https://dev.virtualearth.net/REST/V1/Imagery/Metadata/" + this.imagerySet + "/0,0?zl=1&key="
+                var url = "https://dev.virtualearth.net/REST/V1/Imagery/Metadata/" + this.imagerySet + "/0,0?zl=1&uriScheme=https&key="
                     + this.bingMapsKey;
 
                 // Use JSONP to request the metadata. Can't use XmlHTTPRequest because the virtual earth server doesn't
