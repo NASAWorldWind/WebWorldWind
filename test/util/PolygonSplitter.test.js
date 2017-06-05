@@ -30,15 +30,6 @@ define([
                 expect(doesCross).toEqual(true);
             });
 
-            it('split a polyline that follows the anti-meridian, alternating 180 to -180', function () {
-                var inputContours = PolygonSplitterData.polyLineInput;
-                var expectedResult = PolygonSplitterData.polyLineOutput;
-                var result = [];
-                var doesCross = PolygonSplitter.splitContours(inputContours, result);
-                expect(expectedResult).toEqual(result);
-                expect(doesCross).toEqual(true);
-            });
-
             it('split a polygon over the globe ending in a concave polygon', function () {
                 var inputContours = PolygonSplitterData.polygonOverTheGlobeInput;
                 var expectedResult = PolygonSplitterData.polygonOverTheGlobeOutput;
@@ -82,6 +73,15 @@ define([
                 var doesCross = PolygonSplitter.splitContours(inputContours, result);
                 expect(expectedResult).toEqual(result);
                 expect(doesCross).toEqual(true);
+            });
+
+            it('doesn\'t split a full sphere sector', function() {
+                var inputContours = PolygonSplitterData.fullSphereSectorInput;
+                var expectedResult = PolygonSplitterData.fullSphereSectorOutput;
+                var result = [];
+                var doesCross = PolygonSplitter.splitContours(inputContours, result);
+                expect(expectedResult).toEqual(result);
+                expect(doesCross).toEqual(false);
             });
 
         });

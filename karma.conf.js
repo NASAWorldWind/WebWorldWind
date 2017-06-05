@@ -17,7 +17,8 @@ module.exports = function(config) {
     files: [
       'test-main.js',
       {pattern: 'test/**/*.test.js', included: false},
-      {pattern: 'src/**/*.js', included: false}
+      {pattern: 'src/**/*.js', included: false},
+      {pattern: 'examples/data/KML_Samples.kml', included: false}
     ],
 
 

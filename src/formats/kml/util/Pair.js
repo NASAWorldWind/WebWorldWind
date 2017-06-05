@@ -87,11 +87,11 @@ define([
     /**
      * @inheritDoc
      */
-    Pair.prototype.getStyle = function() {
+    Pair.prototype.getStyle = function(styleResolver) {
         var self = this;
         return new Promise(function (resolve, reject) {
             window.setTimeout(function(){
-                StyleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
+                styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
             },0);
         });
     };

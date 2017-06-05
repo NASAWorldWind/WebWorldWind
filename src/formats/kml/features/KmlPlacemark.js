@@ -80,6 +80,9 @@ define([
                     false,
                     this.prepareAttributes(kmlOptions.lastStyle.normal)
                 );
+                if(kmlOptions.lastStyle.highlight) {
+                    this._renderable.highlightAttributes = this.prepareAttributes(kmlOptions.lastStyle.highlight);
+                }
                 this.moveValidProperties();
                 dc.redrawRequested = true;
             }

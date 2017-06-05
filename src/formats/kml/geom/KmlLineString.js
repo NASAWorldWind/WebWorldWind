@@ -131,6 +131,9 @@ define([
         } else {
             this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
         }
+        if(styles.highlight) {
+            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight);
+        }
         this.moveValidProperties();
     };
 

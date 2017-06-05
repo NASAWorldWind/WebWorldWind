@@ -9,8 +9,8 @@
  */
 
 requirejs(['../src/WorldWind',
-        './LayerManager',
-        './CoordinateController'],
+        '../examples/LayerManager',
+        '../examples/CoordinateController'],
     function (ww,
               LayerManager,
               CoordinateController) {
@@ -321,8 +321,7 @@ requirejs(['../src/WorldWind',
         }
 
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-        var tapRecognizer = new WorldWind.TapRecognizer(wwd);
-        tapRecognizer.addGestureListener(handlePick);
+        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     },
 
     perfTestBullseyes = function(layer) {

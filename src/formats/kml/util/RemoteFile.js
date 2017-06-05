@@ -71,7 +71,12 @@ define([
             xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        var text = this.responseText;
+                        var text;
+                        if(options.responseType == 'arraybuffer') {
+                            text = this.response;
+                        } else {
+                            text = this.responseText;
+                        }
                         resolve({text: text, headers: xhr.getAllResponseHeaders()});
                     }
                     else {
