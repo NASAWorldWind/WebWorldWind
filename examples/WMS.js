@@ -34,7 +34,7 @@ requirejs(['../src/WorldWind',
         var layerManger = new LayerManager(wwd);
 
         // Web Map Service information from NASA's Near Earth Observations WMS
-        var serviceAddress = "http://neowms.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+        var serviceAddress = "https://neo.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
         // Named layer displaying Average Temperature data
         var layerName = "MOD_LSTD_CLIM_M";
 
