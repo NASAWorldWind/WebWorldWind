@@ -16,10 +16,10 @@ more are available at [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov). 
 library source, examples and tutorials.
 
 - [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has all things World Wind in one place
-- [Developer's Guide](https://webworldwind.org) has a complete description of Web World Wind's functionality. You'll 
+- [Developer's Guide](https://webworldwind.org/developers-guide) has a complete description of Web World Wind's functionality. You'll 
   also find there links to many Web World Wind resources, including a user guide. The Web World Wind distribution 
   provides many simple examples showing how to use all of Web World Wind's functionality.
-- [World Wind Forum](https://forum.worldwindcentral.com) provides help from the World Wind community
+- [World Wind Forum](https://forum.worldwindcentral.com/forum/web-world-wind/web-world-wind-help) provides help from the World Wind community
 - [GitHub Issues](https://github.com/NASAWorldWind/WebWorldWind/issues) provides requirements and issue tracking
 - [WebStorm](https://www.jetbrains.com/webstorm) is used by the NASA World Wind development team
 

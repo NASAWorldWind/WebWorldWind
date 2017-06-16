@@ -4,7 +4,7 @@ If you don't have Node.js, please visit https://nodejs.org/en/download/ and
 install the appropriate release for your system.
 
 In a terminal, go to the project folder and run `npm install` to install
-the necessary dependencies saved as `devDependencies` in `package.json` file.
+the necessary dependencies saved as `devDependencies` in `package.json`.
 
 # How to Run the Tests
 
@@ -39,14 +39,14 @@ changing the list of browsers in `karma.conf.js` to, for example:
 
 `browsers: ['PhantomJS', 'Chrome’]`
 
-Please make sure that you also have the approriate launchers available in your
+Please make sure that you also have the appropriate launchers available in your
 node modules, for example:
 
 `npm install karma-chrome-launcher`
 
 ## Integration with the Build Process
 
-The tests are automatically run when the project is built using the Grunt.
+The tests are automatically run when the project is built using Grunt.
 
 ## Test Results
 
@@ -56,7 +56,7 @@ The test results are available in `test/<USED_BROWSER>/test-results.xml`.
 
 Please have a look at the existing tests for reference.
 
-1) Go to the `test` folder and create a new file. Note that the 'test' folder
+1) Go to the `test` folder and create a new file. Note that the `test` folder
    should maintain the same structure as the `src` folder, so if the module to
    be tested is located in `src/features/`, the related test should be in
    `test/features`.
@@ -70,12 +70,12 @@ Please have a look at the existing tests for reference.
 
      	"use strict";
 
-     	describe("<Name of the module to be tested to help you understand what the test is supposed to be>",
+     	describe("<name of the module to be tested to help you understand what the test is supposed to be>",
                function() {
      	  
         ....
 
-     		it("<Description of the expected results of the test, usually it starts with the word 'should'>",
+     		it("<description of the expected results of the test, usually it starts with the word 'should'>",
      		function() {
      			expect( ... ).<matcher>(...);
 
