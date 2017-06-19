@@ -49,6 +49,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
+        './formats/geojson/GeoJSONExporter',
         './formats/geojson/GeoJSONGeometry',
         './formats/geojson/GeoJSONGeometryCollection',
         './formats/geojson/GeoJSONGeometryLineString',
@@ -288,6 +289,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
+              GeoJSONExporter,
               GeoJSONGeometry,
               GeoJSONGeometryCollection,
               GeoJSONGeometryLineString,
@@ -736,6 +738,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
+        WorldWind['GeoJSONExporter'] = GeoJSONExporter;
         WorldWind['GeoJSONGeometry'] = GeoJSONGeometry;
         WorldWind['GeoJSONGeometryCollection'] = GeoJSONGeometryCollection;
         WorldWind['GeoJSONGeometryLineString'] = GeoJSONGeometryLineString;
