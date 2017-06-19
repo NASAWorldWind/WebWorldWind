@@ -50,8 +50,8 @@ define(['../../error/ArgumentError',
             }
 
             for (var i = 0; i < coordinates.length; i++) {
-                if (coordinates[i][0][0] !== coordinates[i][coordinates[0].length - 1][0] ||
-                    coordinates[i][0][1] !== coordinates[i][coordinates[0].length - 1][1]) {
+                if (coordinates[i][0][0] !== coordinates[i][coordinates[i].length - 1][0] ||
+                    coordinates[i][0][1] !== coordinates[i][coordinates[i].length - 1][1]) {
                     throw new ArgumentError(
                         Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONGeometryPolygon", "constructor",
                             "invalidLinearRing"));
