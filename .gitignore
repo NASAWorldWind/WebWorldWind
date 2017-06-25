@@ -5,3 +5,4 @@ WebWorldWind.zip
 node_modules/
 test-results
 standalonedata/
+.idea/
