@@ -8,6 +8,7 @@
  */
 define([
         './error/ArgumentError',
+        './navigate/Camera',
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
@@ -16,7 +17,7 @@ define([
         './util/GoToAnimator',
         './cache/GpuResourceCache',
         './util/Logger',
-        './navigate/LookAtNavigator',
+        './navigate/Navigator',
         './navigate/NavigatorState',
         './pick/PickedObjectList',
         './geom/Rectangle',
@@ -24,8 +25,11 @@ define([
         './shapes/SurfaceShape',
         './shapes/SurfaceShapeTileBuilder',
         './globe/Terrain',
-        './geom/Vec2'],
+        './geom/Vec2',
+        './navigate/WorldWindowController',
+        './util/WWMath'],
     function (ArgumentError,
+              Camera,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
@@ -34,7 +38,7 @@ define([
               GoToAnimator,
               GpuResourceCache,
               Logger,
-              LookAtNavigator,
+              Navigator,
               NavigatorState,
               PickedObjectList,
               Rectangle,
@@ -42,7 +46,9 @@ define([
               SurfaceShape,
               SurfaceShapeTileBuilder,
               Terrain,
-              Vec2) {
+              Vec2,
+              WorldWindowController,
+              WWMath) {
         "use strict";
 
         /**
@@ -56,7 +62,7 @@ define([
          * @throws {ArgumentError} If there is no HTML element with the specified name in the document, or if the
          * HTML canvas does not support WebGL.
          */
-        var WorldWindow = function (canvasName, elevationModel) {
+        var WorldWindow = function (canvasName, elevationModel, controller) {
             if (!(window.WebGLRenderingContext)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor",
@@ -85,6 +91,8 @@ define([
 
             // Internal. Intentionally not documented.
             this.redrawRequestId = null;
+
+            this.scratchCamera = new Camera();
 
             /**
              * The HTML canvas associated with this World Window.
@@ -124,11 +132,18 @@ define([
             this.layers = [];
 
             /**
-             * The navigator used to manipulate the globe.
-             * @type {LookAtNavigator}
-             * @default [LookAtNavigator]{@link LookAtNavigator}
+             * The navigator
+             * @type {Navigator}
+             * @default [Navigator] {@link Navigator}
              */
-            this.navigator = new LookAtNavigator(this);
+            this.navigator = new Navigator(this);
+
+            /**
+             * The controller setting up rules for basic interaction with user.
+             * @type {WorldWindowController}
+             * @default [WorldWindowController]{@link WorldWindowController}
+             */
+            this.controller = (controller && new controller(this)) || new WorldWindowController(this);
 
             /**
              * The vertical exaggeration to apply to the terrain.
@@ -170,6 +185,8 @@ define([
              * @type {FrameStatistics}
              */
             this.frameStatistics = new FrameStatistics();
+
+            this.fieldOfView = 45;
 
             /**
              * The {@link GoToAnimator} used by this world window to respond to its goTo method.
@@ -273,6 +290,7 @@ define([
 
             return new Vec2(xc, yc);
         };
+        // TODO: Handle GoToAnimator and ViewsControlsLayer, they are using the navigator directly.
 
         /**
          * Registers an event listener for the specified event type on this World Window's canvas. This function
@@ -587,7 +605,7 @@ define([
             dc.reset();
             dc.globe = this.globe;
             dc.layers = this.layers;
-            dc.navigatorState = this.navigator.currentState();
+            dc.navigatorState = this.navigator.currentState(this.globe); // This will remain. This then means that the logic associated with creation of Navigator State will remain the same.
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
             dc.deepPicking = this.deepPicking;
@@ -1251,6 +1269,39 @@ define([
                     }
                 }
             }
+        };
+
+        // TODO: Discuss moving this stuff to the WorldWindow.
+        WorldWindow.prototype.computeViewingTransform = function(projection, modelview) {
+            // Compute the clip plane distances. The near distance is set to a large value that does not clip the globe's
+            // surface. The far distance is set to the smallest value that does not clip the atmosphere.
+            // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+            // TODO horizon is not in view
+            // TODO parameterize the object altitude for horizon distance
+            var near = this.navigator.altitude * 0.5;
+            var far = this.globe.horizonDistance(this.navigator.altitude); // 160000
+
+            if(this.depthBits != 0) {
+                var maxDepthValue = (1 << this.depthBits) - 1;
+                var farResolution = 10.0;
+                var nearDistance = far / (maxDepthValue / (1 - farResolution / far) - maxDepthValue + 1);
+                // Use the computed near distance only when it's less than our default distance.
+                if(near > nearDistance) {
+                    near = nearDistance;
+                }
+            }
+
+            projection.setToPerspectiveProjection(this.viewport.width, this.viewport.height, this.fieldOfView, near, far);
+
+            this.navigator.getAsCamera(this.globe, this.scratchCamera);
+            this.globe.cameraToCartesianTransform(this.scratchCamera, modelview)
+                .invertOrthonormal(modelview);
+        };
+
+        WorldWindow.prototype.distanceToViewGlobeExtents = function() {
+            var sinfovy_2 = Math.sin(WWMath.toRadians(this.fieldOfView * 0.5));
+            var radius = this.globe.equatorialRadius;
+            return radius / sinfovy_2 - radius;
         };
 
         return WorldWindow;

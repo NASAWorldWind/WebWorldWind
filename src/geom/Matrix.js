@@ -249,6 +249,32 @@ define([
         };
 
         /**
+         *
+         * @param matrix
+         * @param precision
+         * @returns {*|boolean}
+         */
+        Matrix.prototype.equalsWithPrecision = function(matrix, precision) {
+            return matrix
+                && this[0].toFixed(precision) == matrix[0].toFixed(precision)
+                && this[1].toFixed(precision) == matrix[1].toFixed(precision)
+                && this[2].toFixed(precision) == matrix[2].toFixed(precision)
+                && this[3].toFixed(precision) == matrix[3].toFixed(precision)
+                && this[4].toFixed(precision) == matrix[4].toFixed(precision)
+                && this[5].toFixed(precision) == matrix[5].toFixed(precision)
+                && this[6].toFixed(precision) == matrix[6].toFixed(precision)
+                && this[7].toFixed(precision) == matrix[7].toFixed(precision)
+                && this[8].toFixed(precision) == matrix[8].toFixed(precision)
+                && this[9].toFixed(precision) == matrix[9].toFixed(precision)
+                && this[10].toFixed(precision) == matrix[10].toFixed(precision)
+                && this[11].toFixed(precision) == matrix[11].toFixed(precision)
+                && this[12].toFixed(precision) == matrix[12].toFixed(precision)
+                && this[13].toFixed(precision) == matrix[13].toFixed(precision)
+                && this[14].toFixed(precision) == matrix[14].toFixed(precision)
+                && this[15].toFixed(precision) == matrix[15].toFixed(precision);
+        };
+
+        /**
          * Stores this matrix's components in column-major order in a specified array.
          * <p>
          * The array must have space for at least 16 elements. This matrix's components are stored in the array
@@ -922,12 +948,13 @@ define([
          *
          * @param {Number} viewportWidth The viewport width, in screen coordinates.
          * @param {Number} viewportHeight The viewport height, in screen coordinates.
+         * @param {Number} fovyDegrees    the vertical field of view in degrees
          * @param {Number} nearDistance The near clip plane distance, in model coordinates.
          * @param {Number} farDistance The far clip plane distance, in model coordinates.
          * @throws {ArgumentError} If the specified width or height is less than or equal to zero, if the near and far
          * distances are equal, or if either the near or far distance are less than or equal to zero.
          */
-        Matrix.prototype.setToPerspectiveProjection = function (viewportWidth, viewportHeight, nearDistance, farDistance) {
+        Matrix.prototype.setToPerspectiveProjection = function (viewportWidth, viewportHeight, fovyDegrees, nearDistance, farDistance) {
             if (viewportWidth <= 0) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
                     "invalidWidth"));
@@ -936,6 +963,11 @@ define([
             if (viewportHeight <= 0) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
                     "invalidHeight"));
+            }
+
+            if (fovyDegrees <= 0 || fovyDegrees >= 180) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
+                    "invalidFieldOfView"));
             }
 
             if (nearDistance === farDistance) {
@@ -948,30 +980,32 @@ define([
                         "Near or far distance is less than or equal to zero."));
             }
 
-            // Compute the dimensions of the viewport rectangle at the near distance.
-            var nearRect = WWMath.perspectiveFrustumRectangle(viewportWidth, viewportHeight, nearDistance),
-                left = nearRect.getMinX(),
-                right = nearRect.getMaxX(),
-                bottom = nearRect.getMinY(),
-                top = nearRect.getMaxY();
+            var aspect = viewportWidth / viewportHeight;
+            var tanfovy_2 = Math.tan(WWMath.toRadians(fovyDegrees * 0.5));
+            var nearHeight = 2 * nearDistance * tanfovy_2;
+            var nearWidth = nearHeight * aspect;
+            var near = nearDistance;
+            var far = farDistance;
 
             // Taken from Mathematics for 3D Game Programming and Computer Graphics, Second Edition, equation 4.52.
-
             // Row 1
-            this[0] = 2 * nearDistance / (right - left);
+            this[0] = (2 * near) / nearWidth;
             this[1] = 0;
-            this[2] = (right + left) / (right - left);
+            this[2] = 0;
             this[3] = 0;
+
             // Row 2
             this[4] = 0;
-            this[5] = 2 * nearDistance / (top - bottom);
-            this[6] = (top + bottom) / (top - bottom);
+            this[5] = (2 * near) / nearHeight;
+            this[6] = 0;
             this[7] = 0;
+
             // Row 3
             this[8] = 0;
             this[9] = 0;
-            this[10] = -(farDistance + nearDistance) / (farDistance - nearDistance);
-            this[11] = -2 * nearDistance * farDistance / (farDistance - nearDistance);
+            this[10] = -(far + near) / (far - near);
+            this[11] = -(2 * near * far) / (far - near);
+
             // Row 4
             this[12] = 0;
             this[13] = 0;
@@ -1043,6 +1077,79 @@ define([
             this[13] = 0;
             this[14] = 0;
             this[15] = 1;
+
+            return this;
+        };
+
+        /**
+         * Sets this matrix to an infinite perspective projection matrix for the specified viewport dimensions, vertical
+         * field of view and near clip distance.
+         * <p/>
+         * An infinite perspective projection matrix maps points in a manner similar to a standard projection matrix, but is
+         * not bounded by depth. Objects at any depth greater than or equal to the near distance may be rendered. In
+         * addition, this matrix interprets vertices with a w-coordinate of 0 as infinitely far from the camera in the
+         * direction indicated by the point's coordinates.
+         * <p/>
+         * The field of view must be positive and less than 180. The near distance must be positive.
+         *
+         * @param viewportWidth  the viewport width in screen coordinates
+         * @param viewportHeight the viewport height in screen coordinates
+         * @param fovyDegrees    the vertical field of view in degrees
+         * @param nearDistance   the near clip plane distance in model coordinates
+         *
+         * @throws IllegalArgumentException If either the width or the height is less than or equal to zero, if the field of
+         *                                  view is less than or equal to zero or greater than 180, if the near distance is
+         *                                  less than or equal to zero
+         */
+        Matrix.prototype.setToInfiniteProjection = function(viewportWidth, viewportHeight, fovyDegrees, nearDistance) {
+            if (viewportWidth <= 0) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "invalidWidth"));
+            }
+
+            if (viewportHeight <= 0) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "invalidHeight"));
+            }
+
+            if (fovyDegrees <= 0 || fovyDegrees >= 180) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "invalidFieldOfView"));
+            }
+
+            if (nearDistance <= 0) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToInfiniteProjection",
+                    "invalidClipDistance"));
+            }
+
+            // Compute the dimensions of the near rectangle given the specified parameters.
+            var aspect = viewportWidth / viewportHeight;
+            var tanfovy_2 = Math.tan(WWMath.toRadians(fovyDegrees * 0.5));
+            var nearHeight = 2 * nearDistance * tanfovy_2;
+            var nearWidth = nearHeight * aspect;
+            var near = nearDistance;
+
+            // Taken from Mathematics for 3D Game Programming and Computer Graphics, Second Edition, equation 4.52.
+
+            this[0] = (2 * near) / nearWidth;
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = 0;
+
+            this[4] = 0;
+            this[5] = (2 * near) / nearHeight;
+            this[6] = 0;
+            this[7] = 0;
+
+            this[8] = 0;
+            this[9] = 0;
+            this[10] = -1;
+            this[11] = -2 * near;
+
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = -1;
+            this[15] = 0;
 
             return this;
         };
@@ -1613,6 +1720,59 @@ define([
             this[9] = a[6];
             this[10] = a[10];
             this[11] = 0.0 - (a[2] * a[3]) - (a[6] * a[7]) - (a[10] * a[11]);
+
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
+            this[15] = 1;
+
+            return this;
+        };
+
+        /**
+         * Inverts the specified matrix and stores the result in this matrix.
+         * <p>
+         * The specified matrix is assumed to represent an orthonormal transform matrix. This matrix's upper 3x3 is
+         * transposed, then its fourth column is transformed by the transposed upper 3x3 and negated.
+         * <p>
+         *
+         * @param {Matrix} matrix The matrix whose inverse is computed. This matrix is assumed to represent an
+         * orthonormal transform matrix.
+         * @returns {Matrix} This matrix set to the inverse of the specified matrix.
+         *
+         * @throws {ArgumentError} If the specified matrix is null or undefined.
+         */
+        Matrix.prototype.invertOrthonormal = function(matrix){
+            if (!matrix) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "invertOrthonormalMatrix", "missingMatrix"));
+            }
+
+            // 'a' is assumed to contain a 3D transformation matrix.
+            // Upper-3x3 is inverted, translation is transformed by inverted-upper-3x3 and negated.
+
+            var a = matrix;
+            var a1 = a[1],
+                a2 = a[2],
+                a6 = a[6],
+                x = a[3],
+                y = a[7],
+                z = a[11];
+
+            this[0] = a[0];
+            this[1] = a[4];
+            this[2] = a[8];
+            this[3] = 0.0 - (a[0] * x) - (a[1] * y) - (a[2] * z);
+
+            this[4] = a1;
+            this[5] = a[5];
+            this[6] = a[9];
+            this[7] = 0.0 - (a[4] * x) - (a[5] * y) - (a[6] * z);
+
+            this[8] = a2;
+            this[9] = a6;
+            this[10] = a[10];
+            this[11] = 0.0 - (a[8] * x) - (a[9] * y) - (a[10] * z);
 
             this[12] = 0;
             this[13] = 0;

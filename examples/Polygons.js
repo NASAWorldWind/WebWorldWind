@@ -18,7 +18,7 @@ requirejs(['../src/WorldWind',
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create the World Window.
-        var wwd = new WorldWind.WorldWindow("canvasOne");
+        var wwd = new WorldWind.WorldWindow("canvasOne", null);
 
         /**
          * Add imagery layers.

@@ -11,6 +11,7 @@ define([
         '../error/ArgumentError',
         '../layer/Layer',
         '../geom/Location',
+        '../navigate/LookAt',
         '../util/Logger',
         '../util/Offset',
         '../shapes/ScreenImage',
@@ -21,6 +22,7 @@ define([
               ArgumentError,
               Layer,
               Location,
+              LookAt,
               Logger,
               Offset,
               ScreenImage,
@@ -647,6 +649,9 @@ define([
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
 
+                var lookAt = new LookAt();
+                this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+
                 // This function is called by the timer to perform the operation.
                 var thisLayer = this; // capture 'this' for use in the function
                 var setLookAtLocation = function () {
@@ -654,16 +659,16 @@ define([
                         var dx = thisLayer.panControlCenter[0] - thisLayer.currentEventPoint[0],
                             dy = thisLayer.panControlCenter[1]
                                 - (thisLayer.wwd.viewport.height - thisLayer.currentEventPoint[1]),
-                            oldLat = thisLayer.wwd.navigator.lookAtLocation.latitude,
-                            oldLon = thisLayer.wwd.navigator.lookAtLocation.longitude,
+                            oldLat = lookAt.latitude,
+                            oldLon = lookAt.longitude,
                         // Scale the increment by a constant and the relative distance of the eye to the surface.
                             scale = thisLayer.panIncrement
-                                * (thisLayer.wwd.navigator.range / thisLayer.wwd.globe.radiusAt(oldLat, oldLon)),
-                            heading = thisLayer.wwd.navigator.heading + (Math.atan2(dx, dy) * Angle.RADIANS_TO_DEGREES),
+                                * (lookAt.range / thisLayer.wwd.globe.radiusAt(oldLat, oldLon)),
+                            heading = lookAt.heading + (Math.atan2(dx, dy) * Angle.RADIANS_TO_DEGREES),
                             distance = scale * Math.sqrt(dx * dx + dy * dy);
 
-                        Location.greatCircleLocation(thisLayer.wwd.navigator.lookAtLocation, heading, -distance,
-                            thisLayer.wwd.navigator.lookAtLocation);
+                        Location.greatCircleLocation(lookAt, heading, -distance, lookAt);
+                        thisLayer.wwd.navigator.setAsLookAt(thisLayer.wwd.globe, lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setLookAtLocation, 50);
                     }
@@ -680,6 +685,9 @@ define([
                 this.activeOperation = this.handleZoom;
                 e.preventDefault();
 
+                var lookAt = new LookAt();
+                this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+
                 if (e.type === "touchstart") {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
@@ -689,10 +697,12 @@ define([
                 var setRange = function () {
                     if (thisLayer.activeControl) {
                         if (thisLayer.activeControl === thisLayer.zoomInControl) {
-                            thisLayer.wwd.navigator.range *= (1 - thisLayer.zoomIncrement);
+                            lookAt.range *= (1 - thisLayer.zoomIncrement);
                         } else if (thisLayer.activeControl === thisLayer.zoomOutControl) {
-                            thisLayer.wwd.navigator.range *= (1 + thisLayer.zoomIncrement);
+                            lookAt.range *= (1 + thisLayer.zoomIncrement);
                         }
+
+                        thisLayer.wwd.navigator.setAsLookAt(thisLayer.wwd.globe, lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
@@ -709,6 +719,9 @@ define([
                 this.activeOperation = this.handleHeading;
                 e.preventDefault();
 
+                var lookAt = new LookAt();
+                this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+
                 if (e.type === "touchstart") {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
@@ -718,10 +731,11 @@ define([
                 var setRange = function () {
                     if (thisLayer.activeControl) {
                         if (thisLayer.activeControl === thisLayer.headingLeftControl) {
-                            thisLayer.wwd.navigator.heading += thisLayer.headingIncrement;
+                            lookAt.heading += thisLayer.headingIncrement;
                         } else if (thisLayer.activeControl === thisLayer.headingRightControl) {
-                            thisLayer.wwd.navigator.heading -= thisLayer.headingIncrement;
+                            lookAt.heading -= thisLayer.headingIncrement;
                         }
+                        thisLayer.wwd.navigator.setAsLookAt(thisLayer.wwd.globe, lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
@@ -738,6 +752,9 @@ define([
                 this.activeOperation = this.handleTilt;
                 e.preventDefault();
 
+                var lookAt = new LookAt();
+                this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+
                 if (e.type === "touchstart") {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
@@ -747,12 +764,13 @@ define([
                 var setRange = function () {
                     if (thisLayer.activeControl) {
                         if (thisLayer.activeControl === thisLayer.tiltUpControl) {
-                            thisLayer.wwd.navigator.tilt =
-                                Math.max(0, thisLayer.wwd.navigator.tilt - thisLayer.tiltIncrement);
+                            lookAt.tilt =
+                                Math.max(0, lookAt.tilt - thisLayer.tiltIncrement);
                         } else if (thisLayer.activeControl === thisLayer.tiltDownControl) {
-                            thisLayer.wwd.navigator.tilt =
-                                Math.min(90, thisLayer.wwd.navigator.tilt + thisLayer.tiltIncrement);
+                            lookAt.tilt =
+                                Math.min(90, lookAt.tilt + thisLayer.tiltIncrement);
                         }
+                        thisLayer.wwd.navigator.setAsLookAt(thisLayer.wwd.globe, lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }

@@ -790,7 +790,16 @@ define([
              * @param {Number} degrees the angle to wrap in degrees
              *
              * @return {Number} the specified angle wrapped to [0, 360] degrees
-             */
+            },
+
+            toRadians: function(value) {
+                return Angle.DEGREES_TO_RADIANS * value;
+            },
+
+            toDegrees: function(value) {
+                return Angle.RADIANS_TO_DEGREES * value;
+            },
+
             normalizeAngle360: function(degrees) {
                 var angle = degrees % 360;
                 return angle >= 0 ? angle : (angle < 0 ? 360 + angle : 360 - angle);
