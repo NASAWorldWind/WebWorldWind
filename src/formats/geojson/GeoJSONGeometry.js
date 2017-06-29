@@ -5,9 +5,13 @@
 /**
  * @exports GeoJSONGeometry
  */
-define(['./GeoJSONConstants'
+define(['../../error/ArgumentError',
+        './GeoJSONConstants',
+        '../../util/Logger'
     ],
-    function (GeoJSONConstants) {
+    function (ArgumentError,
+              GeoJSONConstants,
+              Logger) {
         "use strict";
 
         /**
@@ -43,7 +47,7 @@ define(['./GeoJSONConstants'
             this._coordinates = coordinates;
 
             // Documented in defineProperties below.
-            this._type =  type;
+            this._type = type;
 
             // Documented in defineProperties below.
             this._bbox = bbox ? bbox : null;

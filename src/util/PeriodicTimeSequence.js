@@ -267,7 +267,7 @@ define([
             var struct;
 
             // upcase the string just in case people don't follow the letter of the law
-            period = period.toUpperCase();
+            period = period.toUpperCase().trim();
 
             // input validation
             if (!period)

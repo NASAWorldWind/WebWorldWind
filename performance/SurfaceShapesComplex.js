@@ -9,8 +9,8 @@
  */
 
 requirejs(['../src/WorldWind',
-        './LayerManager',
-        './CoordinateController'],
+        '../examples/LayerManager',
+        '../examples/CoordinateController'],
     function (ww,
               LayerManager,
               CoordinateController) {
@@ -28,7 +28,6 @@ requirejs(['../src/WorldWind',
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
@@ -322,8 +321,7 @@ requirejs(['../src/WorldWind',
         }
 
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-        var tapRecognizer = new WorldWind.TapRecognizer(wwd);
-        tapRecognizer.addGestureListener(handlePick);
+        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     },
 
     perfTestBullseyes = function(layer) {

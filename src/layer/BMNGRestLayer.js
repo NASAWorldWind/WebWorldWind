@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @exports BlueMarbleLayer
+ * @exports BMNGRestLayer
  */
 define([
         '../error/ArgumentError',
@@ -21,22 +21,25 @@ define([
 
         /**
          * Constructs a Blue Marble layer.
-         * @alias BlueMarbleLayer
+         * @alias BMNGRestLayer
          * @constructor
          * @augments Layer
          * @classdesc Represents the 12 month collection of Blue Marble Next Generation imagery for the year 2004.
          * By default the month of January is displayed, but this can be changed by setting this class' time
          * property to indicate the month to display.
+         * @param {String} serverAddress The server address of the tile service. May be null, in which case the
+         * current origin is used (see window.location).
+         * @param {String} pathToData The path to the data directory relative to the specified server address.
+         * May be null, in which case the server address is assumed to be the full path to the data directory.
          * @param {String} displayName The display name to assign this layer. Defaults to "Blue Marble" if null or
          * undefined.
          * @param {Date} initialTime A date value indicating the month to display. The nearest month to the specified
          * time is displayed. January is displayed if this argument is null or undefined, i.e., new Date("2004-01");
-         * @param {{}} configuration An optional object with properties defining the layer configuration.
          * See {@link RestTiledImageLayer} for a description of its contents. May be null, in which case default
          * values are used.
          */
-        var BlueMarbleLayer = function (displayName, initialTime, configuration) {
-            Layer.call(this, displayName || "Blue Marble");
+        var BMNGRestLayer = function (serverAddress, pathToData, displayName, initialTime) {
+            Layer.call(this, displayName || "Blue Marble time series");
 
             /**
              * A value indicating the month to display. The nearest month to the specified time is displayed.
@@ -45,8 +48,6 @@ define([
              */
             this.time = initialTime || new Date("2004-01");
 
-            this.configuration = configuration;
-
             this.pickEnabled = false;
 
             // Intentionally not documented.
@@ -54,33 +55,44 @@ define([
 
             // Intentionally not documented.
             this.layerNames = [
-                {month: "BlueMarble-200401", time: BlueMarbleLayer.availableTimes[0]},
-                {month: "BlueMarble-200402", time: BlueMarbleLayer.availableTimes[1]},
-                {month: "BlueMarble-200403", time: BlueMarbleLayer.availableTimes[2]},
-                {month: "BlueMarble-200404", time: BlueMarbleLayer.availableTimes[3]},
-                {month: "BlueMarble-200405", time: BlueMarbleLayer.availableTimes[4]},
-                {month: "BlueMarble-200406", time: BlueMarbleLayer.availableTimes[5]},
-                {month: "BlueMarble-200407", time: BlueMarbleLayer.availableTimes[6]},
-                {month: "BlueMarble-200408", time: BlueMarbleLayer.availableTimes[7]},
-                {month: "BlueMarble-200409", time: BlueMarbleLayer.availableTimes[8]},
-                {month: "BlueMarble-200410", time: BlueMarbleLayer.availableTimes[9]},
-                {month: "BlueMarble-200411", time: BlueMarbleLayer.availableTimes[10]},
-                {month: "BlueMarble-200412", time: BlueMarbleLayer.availableTimes[11]}
+                {month: "BlueMarble-200401", time: BMNGRestLayer.availableTimes[0]},
+                {month: "BlueMarble-200402", time: BMNGRestLayer.availableTimes[1]},
+                {month: "BlueMarble-200403", time: BMNGRestLayer.availableTimes[2]},
+                {month: "BlueMarble-200404", time: BMNGRestLayer.availableTimes[3]},
+                {month: "BlueMarble-200405", time: BMNGRestLayer.availableTimes[4]},
+                {month: "BlueMarble-200406", time: BMNGRestLayer.availableTimes[5]},
+                {month: "BlueMarble-200407", time: BMNGRestLayer.availableTimes[6]},
+                {month: "BlueMarble-200408", time: BMNGRestLayer.availableTimes[7]},
+                {month: "BlueMarble-200409", time: BMNGRestLayer.availableTimes[8]},
+                {month: "BlueMarble-200410", time: BMNGRestLayer.availableTimes[9]},
+                {month: "BlueMarble-200411", time: BMNGRestLayer.availableTimes[10]},
+                {month: "BlueMarble-200412", time: BMNGRestLayer.availableTimes[11]}
             ];
             this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
 
-            this.serverAddress = null;
-            this.pathToData = "../standalonedata/Earth/BlueMarble256/";
+            // By default if no server address and path are sent as parameters in the constructor,
+            // the layer's data is retrieved from http://worldwindserver.net
+            this.serverAddress = serverAddress || "http://worldwindserver.net/webworldwind/";
+            this.pathToData = pathToData || "/standalonedata/Earth/BlueMarble256/";
+
+            // Alternatively, the data can be retrieved from a local folder as follows.
+            // - Download the file located in:
+            //   http://worldwindserver.net/webworldwind/WebWorldWindStandaloneData.zip
+            // - Unzip it into the Web World Wind top-level directory so that the "standalonedata" directory is a peer
+            //   of examples, src, apps and worldwind.js.
+            // - Uncomment the following lines or call BMNGRestLayer from the application with these parameters:
+            //this.serverAddress = serverAddress || null;
+            //this.pathToData = pathToData || "../standalonedata/Earth/BlueMarble256/";
         };
 
-        BlueMarbleLayer.prototype = Object.create(Layer.prototype);
+        BMNGRestLayer.prototype = Object.create(Layer.prototype);
 
         /**
          * Indicates the available times for this layer.
          * @type {Date[]}
          * @readonly
          */
-        BlueMarbleLayer.availableTimes = [
+        BMNGRestLayer.availableTimes = [
             new Date("2004-01"),
             new Date("2004-02"),
             new Date("2004-03"),
@@ -105,10 +117,10 @@ define([
          * @param {WorldWindow} wwd The world window for which to pre-populate this layer.
          * @throws {ArgumentError} If the specified world window is null or undefined.
          */
-        BlueMarbleLayer.prototype.prePopulate = function (wwd) {
+        BMNGRestLayer.prototype.prePopulate = function (wwd) {
             if (!wwd) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BlueMarbleLayer", "prePopulate", "missingWorldWindow"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "BMNGRestLayer", "prePopulate", "missingWorldWindow"));
             }
 
             for (var i = 0; i < this.layerNames.length; i++) {
@@ -130,7 +142,7 @@ define([
          * @returns {Boolean} true if all level 0 images have been retrieved, otherwise false.
          * @throws {ArgumentError} If the specified world window is null or undefined.
          */
-        BlueMarbleLayer.prototype.isPrePopulated = function (wwd) {
+        BMNGRestLayer.prototype.isPrePopulated = function (wwd) {
             for (var i = 0; i < this.layerNames.length; i++) {
                 var layer = this.layers[this.layerNames[i].month];
                 if (!layer || !layer.isPrePopulated(wwd)) {
@@ -141,7 +153,7 @@ define([
             return true;
         };
 
-        BlueMarbleLayer.prototype.doRender = function (dc) {
+        BMNGRestLayer.prototype.doRender = function (dc) {
             var layer = this.nearestLayer(this.time);
             layer.opacity = this.opacity;
             if (this.detailControl) {
@@ -154,7 +166,7 @@ define([
         };
 
         // Intentionally not documented.
-        BlueMarbleLayer.prototype.nearestLayer = function (time) {
+        BMNGRestLayer.prototype.nearestLayer = function (time) {
             var nearestName = this.nearestLayerName(time);
 
             if (!this.layers[nearestName]) {
@@ -164,14 +176,13 @@ define([
             return this.layers[nearestName];
         };
 
-        BlueMarbleLayer.prototype.createSubLayer = function (layerName) {
+        BMNGRestLayer.prototype.createSubLayer = function (layerName) {
             var dataPath = this.pathToData + layerName;
-            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, dataPath, this.displayName,
-                this.configuration);
+            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, dataPath, this.displayName);
         };
 
         // Intentionally not documented.
-        BlueMarbleLayer.prototype.nearestLayerName = function (time) {
+        BMNGRestLayer.prototype.nearestLayerName = function (time) {
             var milliseconds = time.getTime();
 
             if (milliseconds <= this.layerNames[0].time.getTime()) {
@@ -195,5 +206,5 @@ define([
             }
         };
 
-        return BlueMarbleLayer;
+        return BMNGRestLayer;
     });

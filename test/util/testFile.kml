@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2">
-<Point id="1">
-    <extrude>true</extrude>
-    <altitudeMode>clampToGround</altitudeMode>
-    <coordinates>-122.0822035425683,37.42228990140251,0</coordinates>
-</Point>
-</kml>

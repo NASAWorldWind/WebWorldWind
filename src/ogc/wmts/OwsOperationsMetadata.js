@@ -6,9 +6,9 @@
  * @exports OwsOperationsMetadata
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger',
-        '../ogc/OwsConstraint'
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        '../../ogc/wmts/OwsConstraint'
     ],
     function (ArgumentError,
               Logger,
@@ -44,6 +44,42 @@ define([
             }
         };
 
+        /**
+         * Attempts to find the first OwsOperationsMetadata object named GetCapabilities.
+         * @returns {OwsOperationsMetadata} if a matching OwsOperationsMetadata object is found, otherwise null.
+         */
+        OwsOperationsMetadata.prototype.getGetCapabilities = function () {
+            return this.getOperationMetadataByName("GetCapabilities");
+        };
+
+        /**
+         * Attempts to find the first OwsOperationsMetadata object named GetTile.
+         * @returns {OwsOperationsMetadata} if a matching OwsOperationsMetadata object is found, otherwise null.
+         */
+        OwsOperationsMetadata.prototype.getGetTile = function () {
+            return this.getOperationMetadataByName("GetTile");
+        };
+
+        /**
+         * Searches for the OWS Operations Metadata objects for the operation with a name matching the  provided name.
+         * Returns the first successful match.
+         * @returns {OwsOperationsMetadata} of a matching name or null if none was found
+         */
+        OwsOperationsMetadata.prototype.getOperationMetadataByName = function (name) {
+            if (!name) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "OwsOperationsMetadata", "getOperationsMetadataByName", "missingName"));
+            }
+
+            for (var i = 0; i < this.operation.length; i++) {
+                if (this.operation[i].name === name) {
+                    return this.operation[i];
+                }
+            }
+
+            return null;
+        };
+
         OwsOperationsMetadata.assembleOperation = function (element) {
             var operation = {};
 
@@ -71,35 +107,28 @@ define([
                 var child = children[c];
 
                 if (child.localName === "HTTP") {
-                    dcp.http = OwsOperationsMetadata.assembleHttp(child);
+                    var httpMethods = child.children || child.childNodes;
+                    for (var c2 = 0; c2 < httpMethods.length; c2++) {
+                        var httpMethod = httpMethods[c2];
+
+                        if (httpMethod.localName === "Get") {
+                            dcp.getMethods = dcp.getMethods || [];
+                            dcp.getMethods.push(OwsOperationsMetadata.assembleMethod(httpMethod));
+                        } else if (httpMethod.localName === "Post") {
+                            dcp.postMethods = dcp.postMethods || [];
+                            dcp.postMethods.push(OwsOperationsMetadata.assembleMethod(httpMethod));
+                        }
+                    }
                 }
             }
 
             return dcp;
         };
 
-        OwsOperationsMetadata.assembleHttp = function (element) {
+        OwsOperationsMetadata.assembleMethod = function (element) {
             var result = {};
 
-            var children = element.children;
-            for (var c = 0; c < children.length; c++) {
-                var child = children[c];
-
-                if (child.localName === "Get") {
-                    result.get = result.get || [];
-                    result.get.push(OwsOperationsMetadata.assembleGet(child));
-                }
-
-                // TODO: Post
-            }
-
-            return result;
-        };
-
-        OwsOperationsMetadata.assembleGet = function (element) {
-            var result = {};
-
-            result.href = element.getAttribute("xlink:href");
+            result.url = element.getAttribute("xlink:href");
 
             var children = element.children;
             for (var c = 0; c < children.length; c++) {

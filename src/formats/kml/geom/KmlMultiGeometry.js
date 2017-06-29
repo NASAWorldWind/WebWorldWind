@@ -74,11 +74,11 @@ define([
 	/**
      * @inheritDoc
      */
-    KmlMultiGeometry.prototype.render = function(dc) {
-        KmlGeometry.prototype.render.call(this, dc);
+    KmlMultiGeometry.prototype.render = function(dc, kmlOptions) {
+        KmlGeometry.prototype.render.call(this, dc, kmlOptions);
 
         this.kmlShapes.forEach(function(shape) {
-            shape.render(dc);
+            shape.render(dc, kmlOptions);
         });
     };
 

@@ -127,7 +127,7 @@ define([
 
         /**
          * Insert a surface shape to be rendered into the surface shape tile builder.
-         * 
+         *
          * @param {SurfaceShape} surfaceShape A surfave shape to be processed.
          */
         SurfaceShapeTileBuilder.prototype.insertSurfaceShape = function(surfaceShape) {
@@ -137,7 +137,7 @@ define([
         /**
          * Perform the rendering of any accumulated surface shapes by building the surface shape tiles that contain these
          * shapes and then rendering those tiles.
-         * 
+         *
          * @param {DrawContext} dc The drawing context.
          */
         SurfaceShapeTileBuilder.prototype.doRender = function(dc) {
@@ -256,7 +256,7 @@ define([
 
         /**
          * Assembles the surface tiles and draws any surface shapes that have been accumulated into those offscreen tiles. The
-         * surface tiles are assembled to meet the necessary resolution of to the draw context's. 
+         * surface tiles are assembled to meet the necessary resolution of to the draw context's.
          * <p/>
          * This does nothing if there are no surface shapes associated with this builder.
          *
@@ -363,10 +363,10 @@ define([
          *
          * @param {DrawContext} dc              The current DrawContext.
          * @param {LevelSet} levels             The tile's LevelSet.
-         * @param {SurfaceShapeTile} parent     The tile's parent, or null if the tile is a top level tile.
+         * @param {SurfaceShapeTile} parentTile The tile's parent, or null if the tile is a top level tile.
          * @param {SurfaceShapeTile} tile       The tile to add.
          */
-        SurfaceShapeTileBuilder.prototype.addTileOrDescendants = function (dc, levels, parent, tile) {
+        SurfaceShapeTileBuilder.prototype.addTileOrDescendants = function (dc, levels, parentTile, tile) {
             // Ignore this tile if it falls completely outside the frustum. This may be the viewing frustum or the pick
             // frustum, depending on the implementation.
             if (!this.intersectsFrustum(dc, tile)) {
@@ -377,8 +377,8 @@ define([
             }
 
             // If the parent tile is not null, add any parent surface shapes that intersect this tile.
-            if (parent != null) {
-                this.addIntersectingShapes(dc, parent, tile);
+            if (parentTile != null) {
+                this.addIntersectingShapes(dc, parentTile, tile);
             }
 
             // Ignore tiles that do not intersect any surface shapes.
@@ -408,51 +408,31 @@ define([
         };
 
         /**
-         * Adds surface shapes from the parent's object list to the specified tile's object list. If the tile's sector
-         * does not intersect the sector bounding the parent's object list, this does nothing. Otherwise, this adds any of
-         * the parent's surface shapes that intersect the tile's sector to the tile's object list.
+         * Adds surface shapes from the parent's object list to the specified tile's object list. Adds any of the
+         * parent's surface shapes that intersect the tile's sector to the tile's object list.
          *
          * @param {DrawContext} dc              The current DrawContext.
-         * @param {SurfaceShapeTile} parent     The tile's parent.
+         * @param {SurfaceShapeTile} parentTile The tile's parent.
          * @param {SurfaceShapeTile} tile       The tile to add intersecting surface shapes to.
          */
-        SurfaceShapeTileBuilder.prototype.addIntersectingShapes = function(dc, parent, tile) {
-            // If the parent has no objects, then there's nothing to add to this tile and we exit immediately.
-            if (!parent.hasShapes())
-                return;
+        SurfaceShapeTileBuilder.prototype.addIntersectingShapes = function (dc, parentTile, tile) {
+            var shapes = parentTile.getShapes();
+            for (var idxShape = 0, lenShapes = shapes.length; idxShape < lenShapes; idxShape += 1) {
+                var shape = shapes[idxShape];
 
-            // If this tile does not intersect the parent's object bounding sector, then none of the parent's objects
-            // intersect this tile. Therefore we exit immediately, and do not add any objects to this tile.
-            if (!tile.sector.intersects(parent.sector))
-                return;
+                var sectors = shape.computeSectors(dc);
+                if (!sectors) {
+                    continue;
+                }
 
-            // If this tile contains the parent's object bounding sector, then all of the parent's objects intersect this
-            // tile. Therefore we just add all of the parent's objects to this tile. Additionally, the parent's object
-            // bounding sector becomes this tile's object bounding sector.
-            if (tile.getSector().contains(parent.sector)) {
-                tile.addAllSurfaceShapes(parent.getShapes());
-            }
-            // Otherwise, the tile may intersect some of the parent's object list. Compute which objects intersect this
-            // tile, and compute this tile's bounding sector as the union of those object's sectors.
-            else {
-                var shapes = parent.getShapes();
-                for (var idxShape = 0, lenShapes = shapes.length; idxShape < lenShapes; idxShape += 1) {
-                    var shape = shapes[idxShape];
+                // Test intersection against each of the surface shape's sectors. We break after finding an
+                // intersection to avoid adding the same object to the tile more than once.
+                for (var idxSector = 0, lenSectors = sectors.length; idxSector < lenSectors; idxSector += 1) {
+                    var sector = sectors[idxSector];
 
-                    var sectors = shape.computeSectors(dc);
-                    if (!sectors) {
-                        continue;
-                    }
-
-                    // Test intersection against each of the surface shape's sectors. We break after finding an
-                    // intersection to avoid adding the same object to the tile more than once.
-                    for (var idxSector = 0, lenSectors = sectors.length; idxSector < lenSectors; idxSector += 1) {
-                        var sector = sectors[idxSector];
-
-                        if (tile.getSector().intersects(sector)) {
-                            tile.addSurfaceShape(shape);
-                            break;
-                        }
+                    if (tile.getSector().intersects(sector)) {
+                        tile.addSurfaceShape(shape);
+                        break;
                     }
                 }
             }

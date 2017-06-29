@@ -6,8 +6,8 @@
  * @exports OwsLanguageString
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger'
+        '../../error/ArgumentError',
+        '../../util/Logger'
     ],
     function (ArgumentError,
               Logger) {
@@ -30,7 +30,18 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "LanguageString", "constructor", "missingDomElement"));
             }
 
+            /**
+             * The text content of the element.
+             * @type {string}
+             */
             this.value = element.textContent;
+
+            /**
+             * Identifier of a language used by the data(set) contents. This language identifier shall be as specified
+             * in IETF RFC 4646. When this element is omitted, the language used is not identified.
+             * @type {string}
+             */
+            this.lang;
 
             var lang = element.getAttribute("lang");
             if (lang) {

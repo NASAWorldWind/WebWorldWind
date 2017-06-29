@@ -5,7 +5,7 @@
  */
 
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js', 'jquery'], function(ww, $) {
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js', 'jquery'], function(ww, $) {
 
 
     function LandmarkFactory() {
