@@ -1,31 +1,21 @@
-This file explains how to install and run Grunt for building Web World Wind artifacts.
-On OS X and Linux, you will need to run the given commands as root (using sudo). On Windows, you can run them as given.
+This file explains how to build the Web WorldWind artifacts.
 
-These 3 installation steps are per-machine:
+- Install Node (https://nodejs.org/download/)
+  Download and install the appropriate installation file. The build is known to work with v6.9.2 (LTS).
 
-1) Install Node (https://nodejs.org/download/)
-  Download and install the appropriate installation file.
+- Install the dependencies
+  `npm install`
 
-2) Install r.js (http://requirejs.org/docs/node.html)
-  `npm install -g requirejs`
+Then you can use the commands below to build artifacts.
 
-3) Install grunt-cli (http://gruntjs.com/getting-started)
-  `npm update`
-  `npm install -g grunt-cli`
+- Build all artifacts (worldwind.js, worldwind.min.js and WebWorldWind.zip):
+  `npm run build`
 
-The installation steps below are per-project — must be performed with each new full-project checkout - with `cwd` as the project folder:
-
-1) Install requirejs plugin (https://jaketrent.com/post/run-requirejs-with-gruntjs/)
-  `npm install grunt-contrib-requirejs`
-
-2) Install jsdoc 3.3.0 plugin (https://github.com/krampstudio/grunt-jsdoc)
-  `npm install grunt-jsdoc`
-
-3) Install compress plugin (https://github.com/gruntjs/grunt-contrib-compress)
-  `npm install grunt-contrib-compress`
-
-You should now be able to run Grunt:
-`grunt jsdoc`
-`grunt requirejs`
-`grunt compress`
-To run all tasks, just run `grunt` without any arguments.
+- Only run the tests:
+    `npm run test`
+  
+- Only generate the documentation:
+    `npm run doc`
+    
+- Automatically run the tests when a file changes:
+    `npm run test:watch`

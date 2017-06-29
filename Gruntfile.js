@@ -65,7 +65,6 @@ module.exports = function (grunt) {
                         'src/**',
                         'test/**',
                         'tools/**',
-                        'build.js',
                         'Gruntfile.js',
                         'README.md',
                         'HowToCreateAndRunUnitTests.txt',

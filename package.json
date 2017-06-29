@@ -17,8 +17,8 @@
     "example": "./examples"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/NASAWorldWind/WebWorldWind.git"
+    "type": "git",
+    "url": "https://github.com/NASAWorldWind/WebWorldWind.git"
   },
   "scripts": {
     "build": "grunt",
