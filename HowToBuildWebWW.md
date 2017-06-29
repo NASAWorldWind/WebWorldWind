@@ -8,7 +8,7 @@ This file explains how to build the Web WorldWind artifacts.
 
 Then you can use the commands below to build artifacts.
 
-- Build all artifacts (worldwind.js, worldwind.min.js and WebWorldWind.zip):
+- Build all artifacts (worldwind.js, worldwind.min.js):
   `npm run build`
 
 - Only run the tests:
