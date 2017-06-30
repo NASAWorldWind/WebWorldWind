@@ -47,40 +47,6 @@ module.exports = function (grunt) {
             }
         },
 
-        compress: {
-            main: {
-                options: {
-                    archive: 'WebWorldWind.zip'
-                },
-                files: [
-                    {src: [
-                        'api-doc/**',
-                        'worldwind.js',
-                        'worldwind.min.js',
-                        'apps/**',
-                        'design-notes/**',
-                        'examples/**',
-                        'images/**',
-                        'performance/**',
-                        'src/**',
-                        'test/**',
-                        'thirdparty/**',
-                        'tools/**',
-                        'build.js',
-                        'Gruntfile.js',
-                        'README.md',
-                        'HowToCreateAndRunUnitTests.txt',
-                        'jsTestDriver.conf',
-                        'package.json',
-                        'config.json',
-                        'layout.tmpl',
-                        'GruntSetup.txt',
-                        'WebWorldWindDesignAndCodingGuidelines.html'
-                    ]}
-                ]
-            }
-        },
-
         karma: {
             unit: {
                 configFile: 'karma.conf.js',
@@ -99,8 +65,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
-    grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'compress']);
+    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs']);
 };

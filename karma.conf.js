@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test-main.js',
+      'test/test-main.js',
       {pattern: 'test/**/*.test.js', included: false},
       {pattern: 'src/**/*.js', included: false},
       {pattern: 'examples/data/KML_Samples.kml', included: false}
