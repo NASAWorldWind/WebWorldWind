@@ -6,18 +6,18 @@
 
 .idea/misc.xml
 
-.idea/shelf.xml
+.idea/shelf
 
 .idea/workspace.xml
 
 api-doc/
-
-worldwind.js
-
-worldwind.min.js
 
 node_modules/
 
 test-results
 
 standalonedata/
+
+worldwind.js
+
+worldwind.min.js
