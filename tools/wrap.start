@@ -1,5 +1,5 @@
 (function (root, factory) {
-    if (typeof exports === "object"){
+    if (typeof exports === "object") {
         // CommonJS-like
         module.exports = factory();
     } else if (typeof define === 'function' && define.amd) {
