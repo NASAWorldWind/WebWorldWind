@@ -1,4 +1,8 @@
-.idea/
+.DS_Store
+.idea/encodings.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/workspace.xml
 api-doc/
 worldwind.js
 worldwind.min.js
