@@ -17,14 +17,9 @@ geometric objects.
 
 ## Get Started
 
-Develop a world-class WorldWind application for the web. Setup instructions, developers guides, API documentation and 
-more are available at [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov). This GitHub repository contains the 
-library source, examples and tutorials.
-
-- [Developer's Guide](https://webworldwind.org/developers-guide) has a complete description of Web WorldWind's functionality. You'll 
-  also find there links to many Web WorldWind resources, including a user guide. The Web WorldWind distribution 
-  provides many simple examples showing how to use all of Web WorldWind's functionality.
-- [Forum](https://forum.worldwindcentral.com/forum/web-world-wind/web-world-wind-help) provides help from the WorldWind community
+The Web WorldWind [Developer's Guide](https://webworldwind.org/developers-guide) has a complete description of Web 
+WorldWind's functionality. You'll  also find there links to many Web WorldWind resources, including a user guide. The 
+latest Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
 
 ## Example Usage
 
