@@ -89,7 +89,6 @@ define([
             });
         });
 
-        // TODO: DOes screen jitter when we switch between Camera model and LookAt model.
         describe('#lookAtCamera', function(){
             it('correctly transforms information from Camera to LookAt', function() {
                 var lookAt = new LookAt(10.001498028471193, 5.0005500563563015, -0.00042827677065647776, WorldWind.ABSOLUTE, 1015.429535612464,
@@ -111,17 +110,6 @@ define([
                 result = globe.cameraToLookAt(transformedLookAt, result);
 
                 expect(initial.equals(result)).toBe(true);
-            });
-        });
-
-        describe('#intersectLine', function(){
-            it('correctly decides vector representing the point of intersection in 3D', function(){
-                var result = new Vec3();
-                var expected = new Vec3(-1702989.9895088992, -3405979.9790177983, -5108969.968526698);
-                var lineToIntersect = new Line(new Vec3(1,2,3), new Vec3(1,2,3));
-
-                expect(globe.intersectsLine(lineToIntersect, result)).toBe(true);
-                expect(expected.equals(result)).toBe(true);
             });
         });
     });

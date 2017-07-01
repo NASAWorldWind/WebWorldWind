@@ -796,10 +796,20 @@ define([
                 return angle >= 0 ? angle : (angle < 0 ? 360 + angle : 360 - angle);
             },
 
+            /**
+             * It takes value in degrees and transform it to the radians
+             * @param value {Number} Angle in degrees
+             * @return {number} Angle in radians
+             */
             toRadians: function(value) {
                 return Angle.DEGREES_TO_RADIANS * value;
             },
 
+            /**
+             * It takes value in radians and transform it to the degrees
+             * @param value {Number} Angle in radians
+             * @return {number} Angle in degrees
+             */
             toDegrees: function(value) {
                 return Angle.RADIANS_TO_DEGREES * value;
             }

@@ -69,6 +69,7 @@ define([
          * Each sequence of three indices defines one triangle in the mesh. The indices identify the index of the
          * position in the associated positions array. The indices for each triangle should be in counter-clockwise
          * order to identify the triangles as front-facing.
+         * // TODO: To discuss the documentation.
          * @param {ShapeAttributes} attributes The attributes to associate with this mesh. May be null, in which case
          * default attributes are associated.
          *
