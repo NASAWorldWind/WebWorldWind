@@ -25,45 +25,25 @@ module.exports = function (grunt) {
                     baseUrl: 'src',
                     name: '../tools/almond',
                     include: ['WorldWind'],
-                    out: 'worldwindlib.js',
+                    out: 'worldwind.min.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
                     }
                 }
-            }
-        },
-
-        compress: {
-            main: {
+            },
+            compileDebug: {
                 options: {
-                    archive: 'WebWorldWind.zip'
-                },
-                files: [
-                    {src: [
-                        'api-doc/**',
-                        'worldwindlib.js',
-                        'apps/**',
-                        'design-notes/**',
-                        'examples/**',
-                        'images/**',
-                        'performance/**',
-                        'src/**',
-                        'test/**',
-                        'thirdparty/**',
-                        'tools/**',
-                        'build.js',
-                        'Gruntfile.js',
-                        'README.md',
-                        'HowToCreateAndRunUnitTests.txt',
-                        'jsTestDriver.conf',
-                        'package.json',
-                        'config.json',
-                        'layout.tmpl',
-                        'GruntSetup.txt',
-                        'WebWorldWindDesignAndCodingGuidelines.html'
-                    ]}
-                ]
+                    baseUrl: 'src',
+                    name: '../tools/almond',
+                    include: ['WorldWind'],
+                    optimize: 'none',
+                    out: 'worldwind.js',
+                    wrap: {
+                        startFile: 'tools/wrap.start',
+                        endFile: 'tools/wrap.end'
+                    }
+                }
             }
         },
 
@@ -85,8 +65,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
-    grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'compress']);
+    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs']);
 };

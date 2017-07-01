@@ -15,7 +15,7 @@ THIS AGREEMENT.
 Government Agency: National Aeronautics and Space Administration (NASA)
 Government Agency Original Software Designation: ARC-15166-1
 Government Agency Original Software Title: WorldWind Version 1.3
-User Registration Requested.  Please Visit http://opensource.arc.nasa.gov/
+User Registration Requested.  Please Visit https://opensource.arc.nasa.gov/
 Government Agency Point of Contact for Original Software: Patrick.Hogan@nasa.gov
 ________________________________________________
 
@@ -146,7 +146,7 @@ or a prior Recipient's participation in this Agreement.
 F. In an effort to track usage and maintain accurate records of the
 Subject Software, each Recipient, upon receipt of the Subject
 Software, is requested to register with Government Agency by visiting
-the following website: http://opensource.arc.nasa.gov.  Recipient's
+the following website: https://opensource.arc.nasa.gov.  Recipient's
 name and personal information shall be used for statistical purposes
 only. Once a Recipient makes a Modification available, it is requested
 that the Recipient inform Government Agency at the web site provided

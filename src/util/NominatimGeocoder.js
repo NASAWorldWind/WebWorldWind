@@ -24,7 +24,7 @@ define([
              * @type {String}
              * @default http://open.mapquestapi.com/nominatim/v1/search/
              */
-            this.service = "http://open.mapquestapi.com/nominatim/v1/search/";
+            this.service = "https://open.mapquestapi.com/nominatim/v1/search/";
         };
 
         /**

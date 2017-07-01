@@ -2,7 +2,7 @@
  * Created by Matthew on 7/29/2015.
  */
 
-define(['http://worldwindserver.net/webworldwind/worldwindlib.js',
+define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
         'OpenStreetMapConfig',
         'ApplicationHUDManager',
         'LayerManager'],
