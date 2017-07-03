@@ -41,10 +41,10 @@ define(['../../error/ArgumentError',
                     return this.exportSurfaceSector(renderable);
                 }
                 else if (renderable instanceof WorldWind.Path) {
-                    this.exportPath(renderable);
+                    return this.exportPath(renderable);
                 }
                 else if (renderable instanceof WorldWind.Polygon) {
-                    this.exportPolygon(renderable);
+                    return this.exportPolygon(renderable);
                 }
                 else {
                     Logger.log(Logger.LEVEL_WARNING, "Export renderable not implemented: " + renderable);
@@ -113,6 +113,7 @@ define(['../../error/ArgumentError',
                     }
                 }
                 sb = sb + ']';
+                sb = sb + '}';
                 return sb;
             },
             exportSurfacePolygon: function (renderable) {
@@ -155,6 +156,7 @@ define(['../../error/ArgumentError',
                     sb = sb + ']';
                 }
                 sb = sb + ']';
+                sb = sb + '}';
                 return sb;
             },
             exportSurfaceEllipse: function (renderable) {
@@ -174,6 +176,7 @@ define(['../../error/ArgumentError',
                 }
                 sb = sb + ']';
                 sb = sb + ']';
+                sb = sb + '}';
                 return sb;
             },
             exportSurfaceRectangle: function (renderable) {
@@ -193,6 +196,7 @@ define(['../../error/ArgumentError',
                 }
                 sb = sb + ']';
                 sb = sb + ']';
+                sb = sb + '}';
                 return sb;
             },
             exportSurfaceSector: function (renderable) {
@@ -216,6 +220,7 @@ define(['../../error/ArgumentError',
                 }
                 sb = sb + ']';
                 sb = sb + ']';
+                sb = sb + '}';
                 return sb;
             },
             exportPath: function (renderable) {
@@ -231,6 +236,7 @@ define(['../../error/ArgumentError',
                     }
                 }
                 sb = sb + ']';
+                sb = sb + '}';
                 return sb;
             },
             exportPolygon: function (renderable) {
@@ -277,6 +283,7 @@ define(['../../error/ArgumentError',
                     sb = sb + ']';
                 }
                 sb = sb + ']';
+                sb = sb + '}';
                 return sb;
             }
         };
