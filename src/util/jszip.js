@@ -10,8 +10,8 @@
  https://github.com/nodeca/pako/blob/master/LICENSE
  */
 ! function(e) {
-    if ("object" == typeof exports && "undefined" != typeof module) module.exports = e();
-    else if ("function" == typeof define && define.amd) define([], e);
+    if ("function" == typeof define && define.amd) define([], e);
+    else if ("object" == typeof exports && "undefined" != typeof module) module.exports = e();
     else {
         var f;
         "undefined" != typeof window ? f = window : "undefined" != typeof global ? f = global : "undefined" != typeof self && (f = self), f.JSZip = e()

@@ -1,6 +1,6 @@
 ! function(e) {
-    if ("object" == typeof exports) module.exports = e();
-    else if ("function" == typeof define && define.amd) define(e);
+    if ("function" == typeof define && define.amd) define(e);
+    else if ("object" == typeof exports) module.exports = e();
     else {
         var f;
         "undefined" != typeof window ? f = window : "undefined" != typeof global ? f = global : "undefined" != typeof self && (f = self), f.proj4 = e()

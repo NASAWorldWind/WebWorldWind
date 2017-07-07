@@ -1,6 +1,6 @@
 {
-  "name": "worldwind",
-  "version": "0.0.1",
+  "name": "test-web-world-wind",
+  "version": "0.1.3",
   "description": "Web World Wind",
   "main": "worldwind.js",
   "homepage": "https://nasaworldwind.github.io/",
