@@ -1,8 +1,5 @@
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-        typeof define === 'function' && define.amd ? define(factory) :
-            (global.proj4 = factory());
-}(this, (function () { 'use strict';
+define([], function () {
+    'use strict';
 
     var globals = function(defs) {
         defs('EPSG:4326', "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees");
@@ -5913,5 +5910,4 @@
     includedProjections(proj4$1);
 
     return proj4$1;
-
-})));
+});
