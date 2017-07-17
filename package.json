@@ -1,8 +1,8 @@
 {
-  "name": "test-web-world-wind",
+  "name": "@nasaworldwind/worldwind",
   "version": "0.1.0",
   "description": "Web World Wind",
-  "main": "worldwind.js",
+  "main": "worldwin.min.js",
   "homepage": "https://nasaworldwind.github.io/",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
@@ -14,14 +14,12 @@
     "ESA Consortium Contact <yann.voumard@solenix.ch>"
   ],
   "directories": {
-    "lib": "./src",
-    "doc": "./api-doc",
-    "test": "./test",
-    "example": "./examples"
+    "example": "examples",
+    "test": "test"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NASAWorldWind/WebWorldWind.git"
+    "url": "git+https://github.com/NASAWorldWind/WebWorldWind.git"
   },
   "scripts": {
     "build": "grunt",
@@ -45,10 +43,12 @@
   },
   "dependencies": {},
   "keywords": [
-    "worldwind",
+    "WorldWind",
     "3D",
+    "WebGL",
     "globe",
     "NASA",
+    "ESA",
     "GIS",
     "geospatial"
   ]
