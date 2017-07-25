@@ -2,31 +2,42 @@
   "name": "web-world-wind",
   "version": "0.0.1",
   "description": "Web World Wind",
+  "homepage": "https://nasaworldwind.github.io/",
+  "bugs": "https://github.com/NASAWorldWind/WebWorldWind/issues",
+  "license": "NASA-1.3",
+  "author": "NASA",
+  "contributors": [
+    "NASA Project Manager <patrick.hogan@nasa.gov>",
+    "ESA Consortium Contact <yann.voumard@solenix.ch>"
+  ],
   "directories": {
-    "example": "examples",
-    "test": "test"
+    "lib": "./src",
+    "doc": "./api-doc",
+    "test": "./test",
+    "example": "./examples"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NASAWorldWind/WebWorldWind.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "grunt",
+    "test": "grunt karma",
+    "doc": "grunt jsdoc",
+    "test:watch": "karma start karma.conf.js"
   },
-  "author": "NASA",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-compress": "^0.13.0",
-    "grunt-contrib-requirejs": "^0.4.4",
-    "grunt-jsdoc": "^0.6.3",
-    "grunt-karma": "^0.12.1",
-    "jasmine": "^2.4.1",
-    "jasmine-core": "^2.4.1",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "^0.2.2",
-    "karma-cli": "^0.1.2",
-    "karma-htmlfile-reporter": "^0.2.2",
-    "karma-jasmine": "^0.3.7",
-    "karma-junit-reporter": "^0.3.8",
-    "karma-phantomjs-launcher": "^1.0.0",
-    "karma-requirejs": "^0.2.4",
-    "phantomjs-prebuilt": "^2.1.5",
-    "requirejs": "^2.1.22"
+    "grunt": "^1.0.1",
+    "grunt-contrib-requirejs": "^1.0.0",
+    "grunt-jsdoc": "^2.1.0",
+    "grunt-karma": "^2.0.0",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-htmlfile-reporter": "^0.3.4",
+    "karma-jasmine": "^1.1.0",
+    "karma-junit-reporter": "^1.2.0",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-requirejs": "^1.1.0"
   }
 }

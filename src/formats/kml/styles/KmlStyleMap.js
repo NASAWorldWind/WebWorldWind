@@ -59,7 +59,7 @@ define([
      * Resolve the information from style map and create the options with normal and highlight.
      * @param resolve Callback to be called when all promises are resolved with correct style.
      */
-    KmlStyleMap.prototype.resolve = function(resolve) {
+    KmlStyleMap.prototype.resolve = function(resolve, styleResolver) {
         // Create promise which resolves, when all styles are resolved.
         var self = this;
         var results = {};
@@ -67,7 +67,7 @@ define([
         var pairs = self.kmlPairs;
         pairs.forEach(function(pair) {
             var key = pair.kmlKey;
-            var style = pair.getStyle();
+            var style = pair.getStyle(styleResolver);
             promises.push(style);
             style.then(function(pStyle){
                 results[key] = pStyle.normal;

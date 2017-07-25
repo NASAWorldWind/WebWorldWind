@@ -2,17 +2,10 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-define([], function () {
+define([
+    '../../../util/WWUtil'
+], function (WWUtil) {
     "use strict";
-
-    var startsWith = function(str, searchString){
-        if(String.prototype.startsWith) {
-            return str.startsWith(searchString);
-        }
-
-        var position = 0;
-        return str.substr(position, searchString.length) === searchString;
-    };
 
     /**
      * Cache working on a basic principle of storing the data as a pair of key, value. Currently the values are
@@ -55,7 +48,7 @@ define([], function () {
                     continue;
                 }
 
-                if(startsWith(keyFromLevel, key)){
+                if(WWUtil.startsWith(keyFromLevel, key)){
                     return currentLevel[keyFromLevel];
                 }
             }

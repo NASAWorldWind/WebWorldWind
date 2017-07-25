@@ -16,7 +16,7 @@ requirejs(['../src/WorldWind',
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // The following access token expires on August 28th.
+        // The following access token is expired and it's given as example (2017-05-13).
         var accessToken = "pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6IjljZjQwNmEyMTNhOWUyMWM5NWUzYWIwOGNhYTY2ZDViIn0.Ju3tOUUUc0C_gcCSAVpFIA";
 
         var layers = [

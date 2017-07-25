@@ -21,7 +21,8 @@ define([
     './util/RefreshListener',
     './util/RemoteFile',
     './util/StyleResolver',
-    '../../util/XmlDocument'
+    '../../util/XmlDocument',
+    '../../util/WWUtil'
 ], function (ArgumentError,
              JsZip,
              KmlElements,
@@ -36,7 +37,8 @@ define([
              RefreshListener,
              RemoteFile,
              StyleResolver,
-             XmlDocument) {
+             XmlDocument,
+             WWUtil) {
     "use strict";
 
     // TODO: Make sure that the KmlFile is also rendered as a part of this hierarchy and not added to the layer.
@@ -71,19 +73,20 @@ define([
         filePromise = new Promise(function (resolve) {
             var promise = self.requestRemote(url);
             promise.then(function (options) {
-                var rootDocument;
+                var rootDocument = null;
                 var loadedDocument = options.text;
                 self._headers = options.headers;
-                if (url.indexOf('.kmz') == -1) {
+                if (!self.hasExtension("kmz", url)) {
                     rootDocument = loadedDocument;
                 } else {
                     var kmzFile = new JsZip();
                     kmzFile.load(loadedDocument);
-                    kmzFile.files.forEach(function (file) {
-                        if (file.endsWith(".kml") && rootDocument == null) {
+                    for(var key in kmzFile.files) {
+                        var file = kmzFile.files[key];
+                        if (rootDocument == null && self.hasExtension("kml", file.name)) {
                             rootDocument = file.asText();
                         }
-                    });
+                    }
                 }
 
                 self._document = new XmlDocument(rootDocument).dom();
@@ -137,6 +140,16 @@ define([
 
     /**
      * FOR INTERNAL USE ONLY.
+     * Returns a value indicating whether the URL ends with the given extension.
+     * @param url {String} Url to a file
+     * @returns {boolean} true if the extension matches otherwise false
+     */
+    KmlFile.prototype.hasExtension = function (extension, url) {
+        return WWUtil.endsWith(url, "." + extension);
+    };
+
+    /**
+     * FOR INTERNAL USE ONLY.
      * Based on the information from the URL, return correct Remote object.
      * @param url {String} Url of the document to retrieve.
      * @returns {Promise} Promise of Remote.
@@ -144,7 +157,7 @@ define([
     KmlFile.prototype.requestRemote = function (url) {
         var options = {};
         options.url = url;
-        if ((url.endsWith && url.endsWith(".kmz")) || (url.indexOf(".kmz") != -1)) {
+        if (this.hasExtension("kmz", url)) {
             options.zip = true;
         } else {
             options.ajax = true;
@@ -173,9 +186,9 @@ define([
             }
 
             if (style.nodeName == KmlStyle.prototype.getTagNames()[0]) {
-                resolve(new KmlStyle({objectNode: style}));
+                resolve(new KmlStyle({objectNode: style}, {styleResolver: self._styleResolver}));
             } else if (style.nodeName == KmlStyleMap.prototype.getTagNames()[0]) {
-                resolve(new KmlStyleMap({objectNode: style}));
+                resolve(new KmlStyleMap({objectNode: style}, {styleResolver: self._styleResolver}));
             } else {
                 Logger.logMessage(Logger.LEVEL_WARNING, "KmlFile", "resolveStyle", "Style must contain either" +
                     " Style node or StyleMap node.");

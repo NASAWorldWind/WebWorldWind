@@ -1,45 +1,43 @@
 <img src="https://worldwind.arc.nasa.gov/css/images/nasa-logo.svg" height="100"/>
 <p>in partnership with the <a href="http://www.esa.int" target="_blank">European Space Agency</a></p>
 
-# Web World Wind
+# Web WorldWind
 
-3D virtual globe API for JavaScript, developed by NASA. Provides a geographic context, complete with terrain, for 
-visualizing geographic or geo-located information in 3D and 2D. Web World Wind provides high-resolution terrain and 
-imagery, retrieved from remote servers automatically as needed. Developers can provide custom terrain and imagery. 
-Contains a rich set of features for displaying and interacting with geographic data and representing a wide range of 
-geometric objects. More information at [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov).    
+[![Build Status](https://travis-ci.org/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.org/NASAWorldWind/WebWorldWind)
+
+3D virtual globe API for JavaScript, developed by NASA in partnership with ESA. Provides a geographic context, complete with terrain, 
+for visualizing geographic or geo-located information in 3D and 2D. Web WorldWind provides high-resolution terrain and 
+imagery, retrieved from remote servers automatically as needed. Developers can provide custom terrain and imagery.
+Provides a collection of shapes for displaying and interacting with geographic data and representing a range of 
+geometric objects.   
+
+- [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has setup instructions, developers guides, API documentation and more
+- [Forum](https://forum.worldwindcentral.com) provides help from the WorldWind community
+- [WebStorm](https://www.jetbrains.com/webstorm) is used by the NASA WorldWind development team
 
 ## Get Started
 
-Develop a world-class World Wind application for the web. Setup instructions, developers guides, API documentation and 
-more are available at [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov). This GitHub repository contains the 
-library source, examples and tutorials.
-
-- [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has all things World Wind in one place
-- [Developer's Guide](https://webworldwind.org) has a complete description of Web World Wind's functionality. You'll 
-  also find there links to many Web World Wind resources, including a user guide. The Web World Wind distribution 
-  provides many simple examples showing how to use all of Web World Wind's functionality.
-- [World Wind Forum](https://forum.worldwindcentral.com) provides help from the World Wind community
-- [GitHub Issues](https://github.com/NASAWorldWind/WebWorldWind/issues) provides requirements and issue tracking
-- [WebStorm](https://www.jetbrains.com/webstorm) is used by the NASA World Wind development team
+The Web WorldWind [Developer's Guide](https://webworldwind.org/developers-guide) has a complete description of Web 
+WorldWind's functionality. You'll  also find there links to many Web WorldWind resources, including a user guide. The 
+latest Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
 
 ## Example Usage
 
-Here is a simple web app using Web World Wind. It is the contents of SimplestExample.html in the example collection. It 
+Here is a simple web app using Web WorldWind. It is the contents of SimplestExample.html in the example collection. It 
 displays an interactive virtual globe in an HTML canvas.
 
     <!DOCTYPE html>
-    <!-- This is a very simple example of using Web World Wind. -->
+    <!-- This is a very simple example of using Web WorldWind. -->
     <html>
     <head lang="en">
         <meta charset="UTF-8">
-        <title>World Wind Example</title>
-        <!-- Include the Web World Wind library. -->
+        <title>WorldWind Example</title>
+        <!-- Include the Web WorldWind library. -->
         <script src="http://worldwindserver.net/webworldwind/worldwind.min.js" type="text/javascript"></script>
     </head>
     <body>
     <div style="position: absolute; top: 50px; left: 50px;">
-        <!-- Create a canvas for Web World Wind. -->
+        <!-- Create a canvas for Web WorldWind. -->
         <canvas id="canvasOne" width="1024" height="768">
             Your browser does not support HTML5 Canvas.
         </canvas>
@@ -48,16 +46,16 @@ displays an interactive virtual globe in an HTML canvas.
         // Register an event listener to be called when the page is loaded.
         window.addEventListener("load", eventWindowLoaded, false);
 
-        // Define the event listener to initialize Web World Wind.
+        // Define the event listener to initialize Web WorldWind.
         function eventWindowLoaded() {
-            // Create a World Window for the canvas.
+            // Create a WorldWindow for the canvas.
             var wwd = new WorldWind.WorldWindow("canvasOne");
 
-            // Add some image layers to the World Window's globe.
+            // Add some image layers to the WorldWindow's globe.
             wwd.addLayer(new WorldWind.BMNGOneImageLayer());
             wwd.addLayer(new WorldWind.BingAerialWithLabelsLayer());
 
-            // Add a compass, a coordinates display and some view controls to the World Window.
+            // Add a compass, a coordinates display and some view controls to the WorldWindow.
             wwd.addLayer(new WorldWind.CompassLayer());
             wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
             wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));

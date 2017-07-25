@@ -77,30 +77,20 @@ define([
                         "The specified tile factory is null or undefined."));
             }
 
-            var subFactorLat,
-                subFactorLon,
-                subRow,
+            var subRow,
                 subCol,
-                children = [];
+                children = [],
+                subFactorLat = tileMatrix.matrixHeight / this.tileMatrix.matrixHeight,
+                subFactorLon = tileMatrix.matrixWidth / this.tileMatrix.matrixWidth;
 
-            subFactorLat = tileMatrix.matrixHeight / this.tileMatrix.matrixHeight;
-            subFactorLon = tileMatrix.matrixWidth / this.tileMatrix.matrixWidth;
+            for (var i = 0; i < subFactorLat; i++) {
+                for (var j = 0; j < subFactorLon; j++) {
+                    subRow = subFactorLat * this.row + i;
+                    subCol = subFactorLon * this.column + j;
 
-            subRow = subFactorLat * this.row;
-            subCol = subFactorLon * this.column;
-            children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
-
-            subRow = subFactorLat * this.row;
-            subCol = subFactorLon * this.column + 1;
-            children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
-
-            subRow = subFactorLat * this.row + 1;
-            subCol = subFactorLon * this.column;
-            children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
-
-            subRow = subFactorLat * this.row + 1;
-            subCol = subFactorLon * this.column + 1;
-            children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
+                    children.push(tileFactory.createTile(tileMatrix, subRow, subCol));
+                }
+            }
 
             return children;
         };
@@ -168,6 +158,7 @@ define([
                 extremes = globe.minAndMaxElevationsForSector(this.sector),
                 minHeight = extremes ? (extremes[0] * verticalExaggeration) : 0,
                 maxHeight = extremes ? (extremes[1] * verticalExaggeration) : 0;
+
             if (minHeight == maxHeight) {
                 minHeight = maxHeight + 10; // TODO: Determine if this is necessary.
             }

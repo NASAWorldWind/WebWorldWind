@@ -136,7 +136,7 @@ define([
             }
 
             // Determine the GetMap service address.
-            config.service = getMapInfo.url;
+            config.service = getMapInfo.getUrl;
 
             // Determine the coordinate system to use.
             var coordinateSystems = wmsLayerCapabilities.crses; // WMS 1.3.0 and greater
