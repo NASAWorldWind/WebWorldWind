@@ -11,7 +11,8 @@ define([
     '../../../geom/Location',
     '../util/NodeTransformers',
     '../../../shapes/Polygon',
-    '../../../shapes/ShapeAttributes'
+    '../../../shapes/ShapeAttributes',
+    '../../../shapes/SurfacePolygon'
 ], function (Color,
              KmlElements,
              KmlGeometry,
@@ -20,7 +21,8 @@ define([
              Location,
              NodeTransformers,
              Polygon,
-             ShapeAttributes) {
+             ShapeAttributes,
+             SurfacePolygon) {
     "use strict";
     /**
      * Constructs an KmlPolygon. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -126,7 +128,11 @@ define([
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
     KmlPolygon.prototype.createPolygon = function(styles) {
-        this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        if(this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
+            this._renderable = new SurfacePolygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        } else {
+            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        }
         if(styles.highlight) {
             this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight);
         }

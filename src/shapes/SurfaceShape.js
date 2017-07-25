@@ -818,7 +818,7 @@ define([
                 }
                 if (drawOutline) {
                     this.draw(this._outlineGeometry, ctx2D, xScale, yScale, dx, dy);
-                    ctx2D.lineWidth = 4 * attributes.outlineWidth;
+                    ctx2D.lineWidth = attributes.outlineWidth;
                     ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
                     ctx2D.stroke();
                 }
@@ -830,7 +830,7 @@ define([
                     ctx2D.fill();
                 }
                 if (drawOutline) {
-                    ctx2D.lineWidth = 4 * attributes.outlineWidth;
+                    ctx2D.lineWidth = attributes.outlineWidth;
                     ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
                     ctx2D.stroke();
                 }

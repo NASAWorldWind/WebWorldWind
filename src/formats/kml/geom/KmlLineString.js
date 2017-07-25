@@ -8,6 +8,7 @@ define([
     '../../../shapes/Path',
     '../../../geom/Position',
     '../../../shapes/ShapeAttributes',
+    '../../../shapes/SurfacePolyline',
     '../../../util/WWUtil'
 ], function (Color,
              KmlElements,
@@ -18,6 +19,7 @@ define([
              Path,
              Position,
              ShapeAttributes,
+             SurfacePolyline,
              WWUtil) {
     "use strict";
 
@@ -124,7 +126,11 @@ define([
      * @param styles.highlight {KmlStyle} Style applied when item is highlighted
      */
     KmlLineString.prototype.createPath = function (styles) {
-        this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        if(this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
+            this._renderable = new SurfacePolyline(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        } else {
+            this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
+        }
         if(styles.highlight) {
             this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight);
         }
