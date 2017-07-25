@@ -26,7 +26,7 @@ define(['../../src/WorldWind',
             * Sinergise for demonstration purposes only. You must obtain your own key at www.sentinel-hub.com before
             * using this layer in your application.
             */
-            var wmtsServer = 'http://services.sentinel-hub.com/v1/wmts/0f4aba77-0648-42f7-b7cf-474967574bcd';
+            var wmtsServer = 'http://services.sentinel-hub.com/v1/wmts/56748ba2-4a88-4854-beea-86f9afc63e35';
 
             $.get(wmtsServer + '?REQUEST=GetCapabilities&SERVICE=WMTS', function (response) {
                 wmtsCapabilities = new WorldWind.WmtsCapabilities(response);
@@ -38,7 +38,7 @@ define(['../../src/WorldWind',
                 ];
 
                 // Sinergise "Agriculture" layer
-                var agricultureLayerCaps = wmtsCapabilities.getLayer('AGRICULTURE');
+                var agricultureLayerCaps = wmtsCapabilities.getLayer('TRUE_COLOR');
                 var agricultureLayerConf = WorldWind.WmtsLayer.formLayerConfiguration(agricultureLayerCaps);
                 var agricultureLayer = new WorldWind.WmtsLayer(agricultureLayerConf, "2017-03-09");
                 layers.push({layer: agricultureLayer, enabled : true});
