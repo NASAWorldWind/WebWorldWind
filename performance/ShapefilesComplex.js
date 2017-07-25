@@ -7,8 +7,8 @@
  */
 
 requirejs(['../src/WorldWind',
-        './LayerManager',
-        './CoordinateController'],
+        '../examples/LayerManager',
+        '../examples/CoordinateController'],
     function (ww,
               LayerManager,
               CoordinateController) {
@@ -31,7 +31,7 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        var dotImage = WorldWind.WWUtil.currentUrlSansFilePart() + "/../images/Dot.png"; // location of the dot image file
+        var dotImage = WorldWind.WWUtil.currentUrlSansFilePart() + "/../images/white-dot.png"; // location of the dot image file
 
         // Set up the common placemark attributes.
         var placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
@@ -146,8 +146,8 @@ requirejs(['../src/WorldWind',
         var worldLayer = new WorldWind.RenderableLayer("Countries");
         var worldLabelsLayer = new WorldWind.RenderableLayer("Country Labels");
 
-        //var worldShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp");
-        //worldShapefile.load(null, defaultAttributeCallback(worldLabelsLayer), worldLayer);
+        var worldShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp");
+        worldShapefile.load(null, defaultAttributeCallback(worldLabelsLayer), worldLayer);
 
         var worldBordersShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_110m_admin_0_boundary_lines_land/ne_110m_admin_0_boundary_lines_land.shp");
         worldBordersShapefile.load(null, defaultAttributeCallback(null), worldLayer);
@@ -159,11 +159,11 @@ requirejs(['../src/WorldWind',
         var usLayer = new WorldWind.RenderableLayer("US States");
         var usLabelsLayer = new WorldWind.RenderableLayer("State Labels");
 
-        //var usShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_110m_admin_1_states_provinces_lakes/ne_110m_admin_1_states_provinces_lakes.shp");
-        //usShapefile.load(null, defaultAttributeCallback(usLabelsLayer), usLayer);
+        var usShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_110m_admin_1_states_provinces_lakes/ne_110m_admin_1_states_provinces_lakes.shp");
+        usShapefile.load(null, defaultAttributeCallback(usLabelsLayer), usLayer);
 
-        //var usBordersShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_110m_admin_1_states_provinces_lines/ne_110m_admin_1_states_provinces_lines.shp");
-        //usBordersShapefile.load(null, defaultAttributeCallback(null), usLayer);
+        var usBordersShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_110m_admin_1_states_provinces_lines/ne_110m_admin_1_states_provinces_lines.shp");
+        usBordersShapefile.load(null, defaultAttributeCallback(null), usLayer);
 
         wwd.addLayer(usLayer);
         wwd.addLayer(usLabelsLayer);
@@ -172,8 +172,8 @@ requirejs(['../src/WorldWind',
         var cityLayer = new WorldWind.RenderableLayer("Cities");
         var cityLabelsLayer = new WorldWind.RenderableLayer("City Labels");
 
-        //var cityShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_50m_populated_places_simple/ne_50m_populated_places_simple.shp");
-        //cityShapefile.load(null, cityAttributeCallback(cityLabelsLayer), cityLayer);
+        var cityShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_50m_populated_places_simple/ne_50m_populated_places_simple.shp");
+        cityShapefile.load(null, cityAttributeCallback(cityLabelsLayer), cityLayer);
 
         cityLabelsLayer.enabled = false;
         wwd.addLayer(cityLayer);

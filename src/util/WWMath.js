@@ -780,6 +780,20 @@ define([
             powerOfTwoFloor: function (value) {
                 var power = Math.floor(Math.log(value) / Math.log(2));
                 return Math.pow(2, power);
+            },
+
+            /**
+             * Restricts an angle to the range [0, 360] degrees, wrapping angles outside the range.
+             * Wrapping takes place as though traversing the edge of a unit circle;
+             * angles less than 0 wrap back to 360, while angles greater than 360 wrap back to 0.
+             *
+             * @param {Number} degrees the angle to wrap in degrees
+             *
+             * @return {Number} the specified angle wrapped to [0, 360] degrees
+             */
+            normalizeAngle360: function(degrees) {
+                var angle = degrees % 360;
+                return angle >= 0 ? angle : (angle < 0 ? 360 + angle : 360 - angle);
             }
         };
 

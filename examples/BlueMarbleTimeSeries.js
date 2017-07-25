@@ -20,12 +20,14 @@ requirejs(['../src/WorldWind',
         backgroundLayer.hide = true; // Don't show it in the layer manager.
         wwd.addLayer(backgroundLayer);
 
-        // Create the Blue Marble layer and add it to the World Window's layer list. Disable it until its images
-        // are preloaded, which is initiated below.
-        var blueMarbleLayer = new WorldWind.BlueMarbleLayer(null, WorldWind.BlueMarbleLayer.availableTimes[0]);
-        blueMarbleLayer.enabled = false;
-        blueMarbleLayer.showSpinner = true;
-        wwd.addLayer(blueMarbleLayer);
+        // Create the Blue Marble time series layer.
+        var blueMarbleTimeSeries = new WorldWind.BMNGRestLayer(null);
+        blueMarbleTimeSeries.enabled = false;
+        blueMarbleTimeSeries.showSpinner = true;
+
+        // Add Blue Marble time series to the World Window's layer list. Disable it until its images are preloaded,
+        // which is initiated below.
+        wwd.addLayer(blueMarbleTimeSeries);
 
         // Create a compass and view controls.
         wwd.addLayer(new WorldWind.CompassLayer());
@@ -44,24 +46,24 @@ requirejs(['../src/WorldWind',
             if (!this.prePopulate) {
                 // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're
                 // loaded.
-                blueMarbleLayer.prePopulate(wwd);
+                blueMarbleTimeSeries.prePopulate(wwd);
                 this.prePopulate = true;
                 return;
             }
 
             // See if the layer is pre-populated now. If so, enable it.
-            if (blueMarbleLayer.isPrePopulated(wwd)) {
-                blueMarbleLayer.enabled = true;
-                blueMarbleLayer.showSpinner = false;
+            if (blueMarbleTimeSeries.isPrePopulated(wwd)) {
+                blueMarbleTimeSeries.enabled = true;
+                blueMarbleTimeSeries.showSpinner = false;
                 window.clearInterval(prePopulateInterval);
                 layerManger.synchronizeLayerList();
 
                 // Increment the Blue Marble layer's time at a specified frequency.
                 var currentIndex = 0;
                 window.setInterval(function () {
-                    if (blueMarbleLayer.enabled) {
-                        currentIndex = ++currentIndex % WorldWind.BlueMarbleLayer.availableTimes.length;
-                        blueMarbleLayer.time = WorldWind.BlueMarbleLayer.availableTimes[currentIndex];
+                    if (blueMarbleTimeSeries.enabled) {
+                        currentIndex = ++currentIndex % WorldWind.BMNGRestLayer.availableTimes.length;
+                        blueMarbleTimeSeries.time = WorldWind.BMNGRestLayer.availableTimes[currentIndex];
                         wwd.redraw();
                     }
                 }, 200);

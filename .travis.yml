@@ -1,0 +1,26 @@
+# Directs the Travis CI build service for Web WorldWind
+# For more information see https://docs.travis-ci.com/user/customizing-the-build/
+
+# Set up to run the JavaScript build script per the Travis CI documentation
+language: node_js
+
+# Configure the build to use the latest Node.js 6.x release
+node_js:
+  - "6"
+
+# Build the project. Travis CI automatically runs npm install before the build
+script:
+  - npm run build
+
+# Node.js build cache configuration. See the Travis CI documentation: https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Caching-with-npm
+cache:
+  directories:
+    - "node_modules"
+
+# Notify the WorldWind mailing list on every build
+notifications:
+  email:
+    recipients:
+      secure: uCjfoh2vWQdUf2AMOLZq30y//e+aiyzuUX5eqX0wlkBkqkSVmMBmayRZfiKf5hkUOuzwhJ7ubQ8PzurNIpGdYpAIjkVOM9jZFFeAM/SYZtDE7gdtlNNlOfEv55quLpUMfDqPmWkA1ZA0HRAzoO96jk904eOrHu9nx7mTPbnY3SxUdd5Ks4WhQw2HgGywdynr5No/PN8BI/n9d6YLILSt1jIPd7ylOe81PQlfzeRDBfPDEbdNaOIIz+Wlz4INFhvfGzcvhLPILwwzVs/GEk8VDx+o8rjys8dQFNAGxzWVt83304OHyZpgU/QKKD5VZpXWka7HjcuKgjgA2RJ//ngJzGwcGZUj9XfLc3EdsoC9k1HZr1XVKixclpR+yJdqGRMBDnVRv/yI6FOasJnrM9zW60HjB97YxgQkufIvRUzBqy4f3tbJF91/8lkQM5Jv+tmnwa8JRtLFeyFcTzX6Bi0WoWz6ekzSMSH9zWhsyiROfnZgz6ZYH4dFsVlsDZzImGEz/tiTaXE8eXxjsdA/cDcEqPVQ4b2G11WinN1+nem0+NAhOyIW0AD+1kD95pyQqxTJ2NyD377VwCTTVxWtQl4upVSud/X4QL4A79dEguwSyyqSwHcwGatCCYKt7ZjUhOd3/kWxRQrLeoY2T4GvrxlHGtlB7RKqR/plqzqdpPzm3j4=
+    on_success: always
+    on_failure: always
