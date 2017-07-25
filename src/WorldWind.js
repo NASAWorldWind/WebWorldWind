@@ -21,10 +21,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
         './layer/BingWMSLayer',
-        './layer/BlueMarbleLayer',
         './layer/BMNGLandsatLayer',
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
+        './layer/BMNGRestLayer',
         './geom/BoundingBox',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
@@ -176,6 +176,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
         './shaders/SkyProgram',
+        './layer/StarFieldLayer',
+        './shaders/StarFieldProgram',
+        './util/SunPosition',
         './shapes/SurfaceImage',
         './shapes/SurfaceCircle',
         './shapes/SurfaceEllipse',
@@ -243,10 +246,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
               BingWMSLayer,
-              BlueMarbleLayer,
               BMNGLandsatLayer,
               BMNGLayer,
               BMNGOneImageLayer,
+              BMNGRestLayer,
               BoundingBox,
               ClickRecognizer,
               ColladaLoader,
@@ -398,6 +401,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Shapefile,
               ShowTessellationLayer,
               SkyProgram,
+              StarFieldLayer,
+              StarFieldProgram,
+              SunPosition,
               SurfaceImage,
               SurfaceCircle,
               SurfaceEllipse,
@@ -674,10 +680,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
         WorldWind['BingWMSLayer'] = BingWMSLayer;
-        WorldWind['BlueMarbleLayer'] = BlueMarbleLayer;
         WorldWind['BMNGLandsatLayer'] = BMNGLandsatLayer;
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
+        WorldWind['BMNGRestLayer'] = BMNGRestLayer;
         WorldWind['BoundingBox'] = BoundingBox;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
@@ -778,6 +784,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Shapefile'] = Shapefile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
         WorldWind['SkyProgram'] = SkyProgram;
+        WorldWind['StarFieldLayer'] = StarFieldLayer;
+        WorldWind['StarFieldProgram'] = StarFieldProgram;
+        WorldWind['SunPosition'] = SunPosition;
         WorldWind['SurfaceImage'] = SurfaceImage;
         WorldWind['SurfaceCircle'] = SurfaceCircle;
         WorldWind['SurfaceEllipse'] = SurfaceEllipse;
