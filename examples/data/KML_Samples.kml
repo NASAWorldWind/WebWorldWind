@@ -103,6 +103,16 @@
         ]]></text>
             </BalloonStyle>
         </Style>
+        <StyleMap id="styleWithHighlight">
+            <Pair>
+                <key>normal</key>
+                <styleUrl>#downArrowIcon</styleUrl>
+            </Pair>
+            <Pair>
+                <key>highlight</key>
+                <styleUrl>#globeIcon</styleUrl>
+            </Pair>
+        </StyleMap>
         <Folder>
             <name>Placemarks</name>
             <visibility>1</visibility>
@@ -139,7 +149,7 @@
                     <tilt>40.5575073395506</tilt>
                     <range>500.6566641072245</range>
                 </LookAt>
-                <styleUrl>#downArrowIcon</styleUrl>
+                <styleUrl>#styleWithHighlight</styleUrl>
                 <Point>
                     <altitudeMode>relativeToGround</altitudeMode>
                     <coordinates>-122.084075,37.4220033612141,50</coordinates>
@@ -301,6 +311,36 @@
                         -112.2596588987972,36.10240001286358,645
                         -112.2610581199487,36.10213176873407,645
                         -112.2626285262793,36.10157011437219,645
+                    </coordinates>
+                </LineString>
+            </Placemark>
+            <Placemark>
+                <name>Clamp to ground</name>
+                <visibility>1</visibility>
+                <description>Black line (10 pixels wide), height tracks terrain</description>
+                <LookAt>
+                    <longitude>-112.2580438551384</longitude>
+                    <latitude>37.1072674824385</latitude>
+                    <altitude>0</altitude>
+                    <heading>4.947421249553717</heading>
+                    <tilt>44.61324882043339</tilt>
+                    <range>2927.61105910266</range>
+                </LookAt>
+                <styleUrl>#thickBlackLine</styleUrl>
+                <LineString>
+                    <tessellate>1</tessellate>
+                    <altitudeMode>clampToGround</altitudeMode>
+                    <coordinates>-112.2532845153347,37.09886943729116
+                        -112.2540466121145,37.09919570465255
+                        -112.254734666947,37.09984998366178
+                        -112.255493345654,37.10051310621746
+                        -112.2563157098468,37.10108441943419
+                        -112.2568033076439,37.10159722088088
+                        -112.257494011321,37.10204323542867
+                        -112.2584106072308,37.10229131995655
+                        -112.2596588987972,37.10240001286358
+                        -112.2610581199487,37.10213176873407
+                        -112.2626285262793,37.10157011437219
                     </coordinates>
                 </LineString>
             </Placemark>
@@ -827,6 +867,37 @@
                                     -112.332616324338,36.14845453364654,100
                                     -112.3339876620524,36.14926570522069,100
                                     -112.3349463145932,36.14988705767721,100
+                                </coordinates>
+                            </LinearRing>
+                        </outerBoundaryIs>
+                    </Polygon>
+                </Placemark>
+                <Placemark>
+                    <name>Clamp to ground Polygon</name>
+                    <visibility>1</visibility>
+                    <LookAt>
+                        <longitude>-112.3350152490417</longitude>
+                        <latitude>36.14943123077423</latitude>
+                        <altitude>0</altitude>
+                        <heading>-118.9214100848499</heading>
+                        <tilt>37.92486261093203</tilt>
+                        <range>345.5169113679813</range>
+                    </LookAt>
+                    <styleUrl>#transGreenPoly</styleUrl>
+                    <Polygon>
+                        <tessellate>1</tessellate>
+                        <altitudeMode>clampToGround</altitudeMode>
+                        <outerBoundaryIs>
+                            <LinearRing>
+                                <coordinates>-112.3349463145932,37.14988705767721
+                                    -112.3354019540677,37.14941108398372
+                                    -112.3344428289146,37.14878490381308
+                                    -112.3331289492913,37.14780840132443
+                                    -112.3317019516947,37.14680755678357
+                                    -112.331131440106,37.1474173426228
+                                    -112.332616324338,37.14845453364654
+                                    -112.3339876620524,37.14926570522069
+                                    -112.3349463145932,37.14988705767721
                                 </coordinates>
                             </LinearRing>
                         </outerBoundaryIs>

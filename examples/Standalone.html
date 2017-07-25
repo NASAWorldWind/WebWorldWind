@@ -39,13 +39,20 @@
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_INFO);
 
         // Create a World Window for the canvas. Use a REST elevation model rather than the default.
-        var elevationModel = new WorldWind.EarthRestElevationModel(null, "../standalonedata/Earth/DTED0",
-                "Earth Elevations");
+        var elevationModel = new WorldWind.EarthRestElevationModel(null, "../standalonedata/Earth/DTED0");
         var wwd = new WorldWind.WorldWindow("canvasOne", elevationModel);
 
-        // Add some REST image layers to the World Window's globe.
-        wwd.addLayer(new WorldWind.RestTiledImageLayer(null, "../standalonedata/Earth/BlueMarble256/BlueMarble-200404", "Blue Marble"));
-        wwd.addLayer(new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat", "LandSat"));
+        // Add some REST image layers to the World Window's globe:
+
+        // Blue Marble Next Generation 2004
+        var blueMarble = new WorldWind.BMNGRestLayer(null, "../standalonedata/Earth/BlueMarble256/");
+
+        // Landsat layer (The offline data covers only a sector of the globe in North America)
+        var landSat = new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat", "LandSat");
+
+        // Add all the layers to the World Window's layer list
+        wwd.addLayer(blueMarble);
+        wwd.addLayer(landSat);
 
         // Add a compass, a coordinates display and some view controls to the World Window.
         wwd.addLayer(new WorldWind.CompassLayer());

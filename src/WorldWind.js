@@ -10,6 +10,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Angle',
         './shapes/Annotation',
         './shapes/AnnotationAttributes',
+        './util/measure/AreaMeasurer',
         './error/ArgumentError',
         './layer/AtmosphereLayer',
         './shaders/AtmosphereProgram',
@@ -20,10 +21,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
         './layer/BingWMSLayer',
-        './layer/BlueMarbleLayer',
         './layer/BMNGLandsatLayer',
         './layer/BMNGLayer',
         './layer/BMNGOneImageLayer',
+        './layer/BMNGRestLayer',
         './geom/BoundingBox',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
@@ -66,6 +67,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/GpuResourceCache',
         './shaders/GpuShader',
         './shaders/GroundProgram',
+        './util/HashMap',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
@@ -121,6 +123,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/geom/KmlTrack',
         './layer/LandsatRestLayer',
         './layer/Layer',
+        './util/measure/LengthMeasurer',
         './util/Level',
         './util/LevelRowColumnUrlBuilder',
         './util/LevelSet',
@@ -129,6 +132,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/Logger',
         './navigate/LookAtNavigator',
         './geom/Matrix',
+        './util/measure/MeasurerUtils',
         './cache/MemoryCache',
         './cache/MemoryCacheListener',
         './layer/MercatorTiledImageLayer',
@@ -149,6 +153,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/PlacemarkAttributes',
         './geom/Plane',
         './shapes/Polygon',
+        './util/PolygonSplitter',
         './geom/Position',
         './projections/ProjectionEquirectangular',
         './projections/ProjectionGnomonic',
@@ -170,6 +175,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
         './shaders/SkyProgram',
+        './layer/StarFieldLayer',
+        './shaders/StarFieldProgram',
+        './util/SunPosition',
         './shapes/SurfaceImage',
         './shapes/SurfaceCircle',
         './shapes/SurfaceEllipse',
@@ -221,14 +229,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/wkt/WKTTokens',
         './formats/wkt/geom/WKTTriangle',
         './formats/wkt/WKTType',
-        './ogc/WmsCapabilities',
+        './ogc/wms/WmsCapabilities',
         './layer/WmsLayer',
-        './ogc/WmsLayerCapabilities',
+        './ogc/wms/WmsLayerCapabilities',
         './layer/WmsTimeDimensionedLayer',
         './util/WmsUrlBuilder',
-        './ogc/WmtsCapabilities',
+        './ogc/wmts/WmtsCapabilities',
         './layer/WmtsLayer',
-        './ogc/WmtsLayerCapabilities',
+        './ogc/wmts/WmtsLayerCapabilities',
         './WorldWindow',
         './util/WWMath',
         './util/WWMessage',
@@ -239,6 +247,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Angle,
               Annotation,
               AnnotationAttributes,
+              AreaMeasurer,
               ArgumentError,
               AtmosphereLayer,
               AtmosphereProgram,
@@ -249,10 +258,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
               BingWMSLayer,
-              BlueMarbleLayer,
               BMNGLandsatLayer,
               BMNGLayer,
               BMNGOneImageLayer,
+              BMNGRestLayer,
               BoundingBox,
               ClickRecognizer,
               ColladaLoader,
@@ -295,6 +304,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuResourceCache,
               GpuShader,
               GroundProgram,
+              HashMap,
               HighlightController,
               ImagePyramid,
               ImageSource,
@@ -350,6 +360,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlTrack,
               LandsatRestLayer,
               Layer,
+              LengthMeasurer,
               Level,
               LevelRowColumnUrlBuilder,
               LevelSet,
@@ -358,6 +369,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Logger,
               LookAtNavigator,
               Matrix,
+              MeasurerUtils,
               MemoryCache,
               MemoryCacheListener,
               MercatorTiledImageLayer,
@@ -378,6 +390,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               PlacemarkAttributes,
               Plane,
               Polygon,
+              PolygonSplitter,
               Position,
               ProjectionEquirectangular,
               ProjectionGnomonic,
@@ -399,6 +412,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Shapefile,
               ShowTessellationLayer,
               SkyProgram,
+              StarFieldLayer,
+              StarFieldProgram,
+              SunPosition,
               SurfaceImage,
               SurfaceCircle,
               SurfaceEllipse,
@@ -677,6 +693,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Angle'] = Angle;
         WorldWind['Annotation'] = Annotation;
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
+        WorldWind['AreaMeasurer'] = AreaMeasurer;
         WorldWind['ArgumentError'] = ArgumentError;
         WorldWind['AtmosphereLayer'] = AtmosphereLayer;
         WorldWind['AtmosphereProgram'] = AtmosphereProgram;
@@ -687,10 +704,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
         WorldWind['BingWMSLayer'] = BingWMSLayer;
-        WorldWind['BlueMarbleLayer'] = BlueMarbleLayer;
         WorldWind['BMNGLandsatLayer'] = BMNGLandsatLayer;
         WorldWind['BMNGLayer'] = BMNGLayer;
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
+        WorldWind['BMNGRestLayer'] = BMNGRestLayer;
         WorldWind['BoundingBox'] = BoundingBox;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
@@ -733,6 +750,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuResourceCache'] = GpuResourceCache;
         WorldWind['GpuShader'] = GpuShader;
         WorldWind['GroundProgram'] = GroundProgram;
+        WorldWind['HashMap'] = HashMap;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
@@ -740,6 +758,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['KmlFile'] = KmlFile;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
+        WorldWind['LengthMeasurer'] = LengthMeasurer;
         WorldWind['Level'] = Level;
         WorldWind['LevelRowColumnUrlBuilder'] = LevelRowColumnUrlBuilder;
         WorldWind['LevelSet'] = LevelSet;
@@ -748,6 +767,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Logger'] = Logger;
         WorldWind['LookAtNavigator'] = LookAtNavigator;
         WorldWind['Matrix'] = Matrix;
+        WorldWind['MeasurerUtils'] = MeasurerUtils;
         WorldWind['MemoryCache'] = MemoryCache;
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
         WorldWind['MercatorTiledImageLayer'] = MercatorTiledImageLayer;
@@ -767,6 +787,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['PlacemarkAttributes'] = PlacemarkAttributes;
         WorldWind['Plane'] = Plane;
         WorldWind['Polygon'] = Polygon;
+        WorldWind['PolygonSplitter'] = PolygonSplitter;
         WorldWind['Position'] = Position;
         WorldWind['ProjectionEquirectangular'] = ProjectionEquirectangular;
         WorldWind['ProjectionGnomonic'] = ProjectionGnomonic;
@@ -786,6 +807,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Shapefile'] = Shapefile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
         WorldWind['SkyProgram'] = SkyProgram;
+        WorldWind['StarFieldLayer'] = StarFieldLayer;
+        WorldWind['StarFieldProgram'] = StarFieldProgram;
+        WorldWind['SunPosition'] = SunPosition;
         WorldWind['SurfaceImage'] = SurfaceImage;
         WorldWind['SurfaceCircle'] = SurfaceCircle;
         WorldWind['SurfaceEllipse'] = SurfaceEllipse;

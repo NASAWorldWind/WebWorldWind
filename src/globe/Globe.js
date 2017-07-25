@@ -503,15 +503,20 @@ define([
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Globe", "intersectsLine", "missingResult"));
             }
 
-            if (this.is2D()) {
-                var vx = line.direction[0],
-                    vy = line.direction[1],
-                    vz = line.direction[2],
-                    sx = line.origin[0],
-                    sy = line.origin[1],
-                    sz = line.origin[2],
-                    t;
+            // Taken from "Mathematics for 3D Game Programming and Computer Graphics, Third Edition", Section 6.2.3.
+            //
+            // Note that the parameter n from equations 6.70 and 6.71 is omitted here. For an ellipsoidal globe this
+            // parameter is always 1, so its square and its product with any other value simplifies to the identity.
 
+            var vx = line.direction[0],
+                vy = line.direction[1],
+                vz = line.direction[2],
+                sx = line.origin[0],
+                sy = line.origin[1],
+                sz = line.origin[2],
+                t;
+
+            if (this.is2D()) {
                 if (vz == 0 && sz != 0) { // ray is parallel to and not coincident with the XY plane
                     return false;
                 }
@@ -526,9 +531,39 @@ define([
                 result[2] = sz + vz * t;
 
                 return true;
-            }
+            } else {
+                var eqr = this.equatorialRadius, eqr2 = eqr * eqr, m = eqr / this.polarRadius, m2 = m * m, a, b, c, d;
 
-            return WWMath.computeEllipsoidalGlobeIntersection(line, this.equatorialRadius, this.polarRadius, result);
+                a = vx * vx + m2 * vy * vy + vz * vz;
+                b = 2 * (sx * vx + m2 * sy * vy + sz * vz);
+                c = sx * sx + m2 * sy * sy + sz * sz - eqr2;
+                d = b * b - 4 * a * c; // discriminant
+
+                if (d < 0) {
+                    return false;
+                }
+
+                t = (-b - Math.sqrt(d)) / (2 * a);
+                // check if the nearest intersection point is in front of the origin of the ray
+                if (t > 0) {
+                    result[0] = sx + vx * t;
+                    result[1] = sy + vy * t;
+                    result[2] = sz + vz * t;
+                    return true;
+                }
+
+                t = (-b + Math.sqrt(d)) / (2 * a);
+                // check if the second intersection point is in the front of the origin of the ray
+                if (t > 0) {
+                    result[0] = sx + vx * t;
+                    result[1] = sy + vy * t;
+                    result[2] = sz + vz * t;
+                    return true;
+                }
+
+                // the intersection points were behind the origin of the provided line
+                return false;
+            }
         };
 
         /**
