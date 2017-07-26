@@ -144,18 +144,18 @@ define([
         ElevationImage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
             if (!sector) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "elevationsForSector", "missingSector"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "elevationsForGrid", "missingSector"));
             }
 
             if (numLat < 1 || numLon < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "elevationsForSector",
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "elevationsForGrid",
                         "The specified number of sample points is less than 1."));
             }
 
             if (!result) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "elevationsForSector", "missingResult"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "elevationsForGrid", "missingResult"));
             }
 
             var minLatSelf = this.sector.minLatitude,
