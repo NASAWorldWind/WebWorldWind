@@ -222,6 +222,8 @@ define([
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
             program.loadLightDirection(gl, this._activeLightDirection);
+            
+            program.loadOpacity(gl, this.opacity);
 
             program.setScale(gl);
 

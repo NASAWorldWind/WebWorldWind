@@ -61,6 +61,7 @@ define([
                     'uniform float scaleDepth;\n' + /* The scale depth (i.e. the altitude at which
                      the atmosphere's average density is found) */
                     'uniform float scaleOverScaleDepth;\n' + /* fScale / fScaleDepth */
+                    'uniform float opacity;\n' + /* The opacity of the ground texture */
 
                     'attribute vec4 vertexPoint;\n' +
                     'attribute vec2 vertexTexCoord;\n' +
@@ -126,7 +127,7 @@ define([
                     '    }\n' +
 
                     '    primaryColor = frontColor * (invWavelength * KrESun + KmESun);\n' +
-                    '    secondaryColor = attenuate;\n' + /* Calculate the attenuation factor for the ground */
+                    '    secondaryColor = mix(vec3(1.0, 1.0, 1.0), attenuate, opacity);\n' + /* Calculate the attenuation factor for the ground with opacity */
                     '}\n' +
 
                     'void main()\n ' +
