@@ -308,5 +308,76 @@ define([
             return false; // segment does not intersect frustum
         };
 
+        Frustum.prototype.setToModelViewProjection = function(projection, modelview, viewport) {
+            if (projection == null || modelview == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Frustum", "setToModelviewProjection", "missingMatrix"));
+            }
+
+            if (viewport == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Frustum", "setToModelviewProjection", "missingViewport"));
+            }
+
+            var scratchMatrix = Matrix.fromIdentity();
+            // Compute the transpose of the modelview matrix.
+            scratchMatrix.setToTransposeOfMatrix(modelview);
+
+            var x, y, z, w;
+
+            // Left Plane = row 4 + row 1:
+            x = projection[12] + projection[0];
+            y = projection[13] + projection[1];
+            z = projection[14] + projection[2];
+            w = projection[15] + projection[3];
+            this.left.set(x, y, z, w); // normalizes the plane's coordinates
+            this.left.transformByMatrix(scratchMatrix);
+
+            // Right Plane = row 4 - row 1:
+            x = projection[12] - projection[0];
+            y = projection[13] - projection[1];
+            z = projection[14] - projection[2];
+            w = projection[15] - projection[3];
+            this.right.set(x, y, z, w); // normalizes the plane's coordinates
+            this.right.transformByMatrix(scratchMatrix);
+
+            // Bottom Plane = row 4 + row 2:
+            x = projection[12] + projection[4];
+            y = projection[13] + projection[5];
+            z = projection[14] + projection[6];
+            w = projection[15] + projection[7];
+            this.bottom.set(x, y, z, w); // normalizes the plane's coordinates
+            this.bottom.transformByMatrix(scratchMatrix);
+
+            // Top Plane = row 4 - row 2:
+            x = projection[12] - projection[4];
+            y = projection[13] - projection[5];
+            z = projection[14] - projection[6];
+            w = projection[15] - projection[7];
+            this.top.set(x, y, z, w); // normalizes the plane's coordinates
+            this.top.transformByMatrix(scratchMatrix);
+
+            // Near Plane = row 4 + row 3:
+            x = projection[12] + projection[8];
+            y = projection[13] + projection[9];
+            z = projection[14] + projection[10];
+            w = projection[15] + projection[11];
+            this.near.set(x, y, z, w); // normalizes the plane's coordinates
+            this.near.transformByMatrix(scratchMatrix);
+
+            // Far Plane = row 4 - row 3:
+            x = projection[12] - projection[8];
+            y = projection[13] - projection[9];
+            z = projection[14] - projection[10];
+            w = projection[15] - projection[11];
+            this.far.set(x, y, z, w); // normalizes the plane's coordinates
+            this.far.transformByMatrix(scratchMatrix);
+
+            // Copy the specified viewport.
+            this.viewport = viewport;
+
+            return this;
+        };
+
         return Frustum;
     });

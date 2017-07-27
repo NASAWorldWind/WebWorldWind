@@ -17,6 +17,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './util/BasicTimeSequence',
+        './navigate/WorldWindowController',
         './layer/BingAerialLayer',
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
@@ -26,6 +27,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGOneImageLayer',
         './layer/BMNGRestLayer',
         './geom/BoundingBox',
+        './navigate/Camera',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
@@ -130,7 +132,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Line',
         './geom/Location',
         './util/Logger',
-        './navigate/LookAtNavigator',
+        './navigate/LookAt',
         './geom/Matrix',
         './util/measure/MeasurerUtils',
         './cache/MemoryCache',
@@ -225,6 +227,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/WmtsLayer',
         './ogc/wmts/WmtsLayerCapabilities',
         './WorldWindow',
+        './navigate/WorldWindowController',
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
@@ -241,6 +244,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BasicProgram,
               BasicTextureProgram,
               BasicTimeSequence,
+              BasicWorldWindowController,
               BingAerialLayer,
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
@@ -250,6 +254,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGOneImageLayer,
               BMNGRestLayer,
               BoundingBox,
+              Camera,
               ClickRecognizer,
               ColladaLoader,
               Color,
@@ -354,7 +359,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Line,
               Location,
               Logger,
-              LookAtNavigator,
+              LookAt,
               Matrix,
               MeasurerUtils,
               MemoryCache,
@@ -449,6 +454,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
+              WorldWindowController,
               WWMath,
               WWMessage,
               WWUtil,
@@ -674,6 +680,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BasicTimeSequence'] = BasicTimeSequence;
+        WorldWind['BasicWorldWindowController'] = BasicWorldWindowController;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
@@ -683,6 +690,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BMNGRestLayer'] = BMNGRestLayer;
         WorldWind['BoundingBox'] = BoundingBox;
+        WorldWind['Camera'] = Camera;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
@@ -739,7 +747,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Line'] = Line;
         WorldWind['Location'] = Location;
         WorldWind['Logger'] = Logger;
-        WorldWind['LookAtNavigator'] = LookAtNavigator;
+        WorldWind['LookAt'] = LookAt;
         WorldWind['Matrix'] = Matrix;
         WorldWind['MeasurerUtils'] = MeasurerUtils;
         WorldWind['MemoryCache'] = MemoryCache;
@@ -833,6 +841,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
+        WorldWind['WorldWindowController'] = WorldWindowController;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**
