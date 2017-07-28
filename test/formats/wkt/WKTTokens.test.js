@@ -323,9 +323,12 @@ define([
                 expect(wktObjects[0] instanceof WKTMultiPolygon).toBeTruthy();
 
                 expect(wktObjects[0].shapes().length).toBe(2);
+                console.log(wktObjects[0].shapes()[0]._boundaries[0]);
+                console.log(wktObjects[0].shapes()[1]._boundaries[0]);
 
-                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries, [new Location(50, -60), new Location(55, -70), new Location(50, -80), new Location(50, -60)])).toBeTruthy();
-                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(30, -60), new Location(35, -70), new Location(30, -80), new Location(30, -60)])).toBeTruthy();
+
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries[0], [new Location(50, -60), new Location(55, -70), new Location(50, -80)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries[0], [new Location(30, -60), new Location(35, -70), new Location(30, -80)])).toBeTruthy();
             });
 
             it('correctly parses 3D Multi polygon with inner boundaries', function(){
@@ -349,8 +352,8 @@ define([
 
                 expect(wktObjects[0].shapes().length).toBe(2);
 
-                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries, [new Location(50, -60), new Location(55, -70), new Location(50, -80), new Location(50, -60)])).toBeTruthy();
-                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries, [new Location(30, -60), new Location(35, -70), new Location(30, -80), new Location(30, -60)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[0]._boundaries[0], [new Location(50, -60), new Location(55, -70), new Location(50, -80)])).toBeTruthy();
+                expect(equalLocations(wktObjects[0].shapes()[1]._boundaries[0], [new Location(30, -60), new Location(35, -70), new Location(30, -80)])).toBeTruthy();
             });
 
             it('correctly parses 3D Multi Polygon', function(){
