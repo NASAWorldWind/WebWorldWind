@@ -51,7 +51,7 @@ module.exports = function (grunt) {
             main: {
                 src: 'worldwind.min.js',
                 dest: 'index.js'
-            }
+            },
         },
 
         karma: {
@@ -73,7 +73,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
-    grunt.loadNpmTasks('grunt-contrib-copy);
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'copy']);
 };
