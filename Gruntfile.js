@@ -44,6 +44,13 @@ module.exports = function (grunt) {
                         endFile: 'tools/wrap.end'
                     }
                 }
+            },
+        },
+
+        copy: {
+            main: {
+                src: 'worldwind.min.js',
+                dest: 'index.js'
             }
         },
 
@@ -66,6 +73,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-contrib-copy);
 
-    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs']);
+    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'copy']);
 };
