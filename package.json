@@ -1,7 +1,7 @@
 {
-  "name": "@nasaworldwind/webww",
-  "version": "0.1.2",
-  "description": "Web World Wind",
+  "name": "@nasaworldwind/worldwind",
+  "version": "0.0.1",
+  "description": "Web WorldWind",
   "main": "index.js",
   "homepage": "https://nasaworldwind.github.io/",
   "bugs": {
