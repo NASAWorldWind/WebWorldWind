@@ -14,12 +14,14 @@
     "ESA Consortium Contact <yann.voumard@solenix.ch>"
   ],
   "directories": {
-    "example": "examples",
-    "test": "test"
+    "lib": "./src",
+    "doc": "./api-doc",
+    "test": "./test",
+    "example": "./examples"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NASAWorldWind/WebWorldWind.git"
+    "url": "https://github.com/NASAWorldWind/WebWorldWind.git"
   },
   "scripts": {
     "build": "grunt",
