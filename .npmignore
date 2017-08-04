@@ -21,5 +21,3 @@ layout.tmpl
 package-lock.json
 package.json
 README.md
-worldwind.min.js
-worldwind.js
