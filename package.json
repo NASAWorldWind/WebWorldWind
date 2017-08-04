@@ -44,7 +44,6 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-requirejs": "^1.1.0"
   },
-  "dependencies": {},
   "keywords": [
     "WorldWind",
     "3D",
