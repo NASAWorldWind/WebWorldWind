@@ -45,13 +45,17 @@
     "karma-requirejs": "^1.1.0"
   },
   "keywords": [
-    "WorldWind",
-    "3D",
-    "WebGL",
+    "sdk",
+    "worldwind",
+    "3d",
     "globe",
-    "NASA",
-    "ESA",
-    "GIS",
-    "geospatial"
+    "earth",
+    "terrain",
+    "imagery",
+    "nasa",
+    "geospatial",
+    "webgl",
+    "html5",
+    "browser"
   ]
 }
