@@ -102,16 +102,19 @@ define([
                 globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
                 eyePoint = modelviewMatrix.extractEyePoint(new Vec3(0, 0, 0)),
                 eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
+                eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
+                atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
                 viewport = this.worldWindow.viewport,
                 viewDepthBits = this.worldWindow.depthBits,
                 distanceToSurface,
                 maxNearDistance,
                 projectionMatrix = Matrix.fromIdentity();
 
-            // Compute the far clip distance based on the current eye altitude. This must be done after computing the
-            // modelview matrix and before computing the near clip distance. The far clip distance depends on the
-            // modelview matrix, and the near clip distance depends on the far clip distance.
-            this.farDistance = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude);
+            // Set the far clip distance to the smallest value that does not clip the atmosphere.
+            // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+            // TODO horizon is not in view
+            // TODO parameterize the object altitude for horizon distance
+            this.farDistance = eyeHorizon + atmosphereHorizon;
             if (this.farDistance < 1e3)
                 this.farDistance = 1e3;
 
