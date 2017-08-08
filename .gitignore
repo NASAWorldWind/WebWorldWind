@@ -18,9 +18,9 @@ index.js
 
 node_modules/
 
-test-results
-
 standalonedata/
+
+test-results/
 
 worldwind.js
 

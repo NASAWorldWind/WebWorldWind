@@ -28,9 +28,9 @@ layout.tmpl
 
 node_modules/
 
-performance/
-
 package-lock.json
+
+performance/
 
 src/
 
