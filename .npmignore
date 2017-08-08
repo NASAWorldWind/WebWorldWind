@@ -1,32 +1,20 @@
-.idea/
-
-api-doc/
-
-apps/
-
-design-notes/
-
-examples/
-
-node_modules/
-
-performance/
-
-src/
-
-test/
-
-test-results/
-
-tools/
-
 .gitignore
+
+.idea/
 
 .npmignore
 
 .travis.yml
 
+api-doc/
+
+apps/
+
 config.json
+
+design-notes/
+
+examples/
 
 Gruntfile.js
 
@@ -38,4 +26,16 @@ karma.conf.js
 
 layout.tmpl
 
+node_modules/
+
+performance/
+
 package-lock.json
+
+src/
+
+test/
+
+test-results/
+
+tools/
