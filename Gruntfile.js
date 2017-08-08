@@ -49,7 +49,7 @@ module.exports = function (grunt) {
 
         copy: {
             main: {
-                src: 'worldwind.min.js',
+                src: 'tools/npmEntryPoint.js',
                 dest: 'index.js'
             },
         },
