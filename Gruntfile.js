@@ -47,13 +47,6 @@ module.exports = function (grunt) {
             },
         },
 
-        copy: {
-            main: {
-                src: 'tools/npmEntryPoint.js',
-                dest: 'index.js'
-            },
-        },
-
         karma: {
             unit: {
                 configFile: 'karma.conf.js',
@@ -71,9 +64,8 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-requirejs');
-    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'copy']);
+    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs']);
 };
