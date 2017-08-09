@@ -44,7 +44,7 @@ module.exports = function (grunt) {
                         endFile: 'tools/wrap.end'
                     }
                 }
-            }
+            },
         },
 
         karma: {
