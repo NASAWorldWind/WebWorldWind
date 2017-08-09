@@ -1,12 +1,8 @@
 .DS_Store
 
-.idea/encodings.xml
-
-.idea/modules.xml
-
-.idea/misc.xml
-
 .idea/shelf
+
+.idea/tasks.xml
 
 .idea/workspace.xml
 
