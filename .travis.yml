@@ -16,11 +16,3 @@ script:
 cache:
   directories:
     - "node_modules"
-
-# Notify the WorldWind mailing list on every build
-notifications:
-  email:
-    recipients:
-      secure: uCjfoh2vWQdUf2AMOLZq30y//e+aiyzuUX5eqX0wlkBkqkSVmMBmayRZfiKf5hkUOuzwhJ7ubQ8PzurNIpGdYpAIjkVOM9jZFFeAM/SYZtDE7gdtlNNlOfEv55quLpUMfDqPmWkA1ZA0HRAzoO96jk904eOrHu9nx7mTPbnY3SxUdd5Ks4WhQw2HgGywdynr5No/PN8BI/n9d6YLILSt1jIPd7ylOe81PQlfzeRDBfPDEbdNaOIIz+Wlz4INFhvfGzcvhLPILwwzVs/GEk8VDx+o8rjys8dQFNAGxzWVt83304OHyZpgU/QKKD5VZpXWka7HjcuKgjgA2RJ//ngJzGwcGZUj9XfLc3EdsoC9k1HZr1XVKixclpR+yJdqGRMBDnVRv/yI6FOasJnrM9zW60HjB97YxgQkufIvRUzBqy4f3tbJF91/8lkQM5Jv+tmnwa8JRtLFeyFcTzX6Bi0WoWz6ekzSMSH9zWhsyiROfnZgz6ZYH4dFsVlsDZzImGEz/tiTaXE8eXxjsdA/cDcEqPVQ4b2G11WinN1+nem0+NAhOyIW0AD+1kD95pyQqxTJ2NyD377VwCTTVxWtQl4upVSud/X4QL4A79dEguwSyyqSwHcwGatCCYKt7ZjUhOd3/kWxRQrLeoY2T4GvrxlHGtlB7RKqR/plqzqdpPzm3j4=
-    on_success: always
-    on_failure: always
