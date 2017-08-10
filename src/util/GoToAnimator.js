@@ -7,15 +7,15 @@
  * @version $Id: GoToAnimator.js 3164 2015-06-09 15:35:14Z tgaskins $
  */
 define([
+        '../navigate/Camera',
         '../geom/Location',
         '../util/Logger',
-        '../navigate/LookAt',
         '../geom/Position',
         '../geom/Vec3'
     ],
-    function (Location,
+    function (Camera,
+              Location,
               Logger,
-              LookAt,
               Position,
               Vec3) {
         "use strict";
@@ -87,8 +87,8 @@ define([
                     "missingPosition"));
             }
 
-            var lookAt = new LookAt();
-            this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+            var camera = new Camera();
+            this.wwd.navigator.getAsCamera(this.wwd.globe, camera);
 
             this.completionCallback = completionCallback;
 
@@ -97,13 +97,13 @@ define([
 
             // Capture the target position and determine its altitude.
             this.targetPosition = new Position(position.latitude, position.longitude,
-                position.altitude || lookAt.range);
+                position.altitude || camera.altitude);
 
             // Capture the start position and start time.
             this.startPosition = new Position(
-                lookAt.latitude,
-                lookAt.longitude,
-                lookAt.range);
+                camera.latitude,
+                camera.longitude,
+                camera.altitude);
             this.startTime = Date.now();
 
             // Determination of the pan and range velocities requires the distance to be travelled.
@@ -133,7 +133,7 @@ define([
             // We need to capture the time the max altitude is reached in order to begin decreasing the range
             // midway through the animation. If we're already above the max altitude, then that time is now since
             // we don't back out if the current altitude is above the computed max altitude.
-            this.maxAltitudeReachedTime = this.maxAltitude <= lookAt.range ? Date.now() : null;
+            this.maxAltitudeReachedTime = this.maxAltitude <= camera.altitude ? Date.now() : null;
 
             // Compute the total range to travel since we need that to compute the range velocity.
             // Note that the range velocity and pan velocity are computed so that the respective animations, which
@@ -165,6 +165,7 @@ define([
 
             // Determine the range velocity, in meters per millisecond.
             this.rangeVelocity = rangeDistance / animationDuration; // meters per millisecond
+            console.log('GoToAnimator#Invoked Pan velocity: ', this.panVelocity, ' Range velocity: ', this.rangeVelocity, ' Animation Duration: ', animationDuration, ' Animation distance: ', animationDistance, ' Target position: ', this.targetPosition);
 
             // Set up the animation timer.
             var thisAnimator = this;
@@ -190,13 +191,13 @@ define([
             // This is the timer callback function. It invokes the range animator and the pan animator.
 
             // TODO: Refactor.
-            var lookAt = new LookAt();
-            this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+            var camera = new Camera();
+            this.wwd.navigator.getAsCamera(this.wwd.globe, camera);
 
             var currentPosition = new Position(
-                lookAt.latitude,
-                lookAt.longitude,
-                lookAt.range);
+                camera.latitude,
+                camera.longitude,
+                camera.altitude);
 
             var continueAnimation = this.updateRange(currentPosition);
             continueAnimation = this.updateLocation(currentPosition) || continueAnimation;
@@ -212,8 +213,8 @@ define([
             var continueAnimation = false,
                 nextRange, elapsedTime;
 
-            var lookAt = new LookAt();
-            this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+            var camera = new Camera();
+            this.wwd.navigator.getAsCamera(this.wwd.globe, camera);
 
             // If we haven't reached the maximum altitude, then step-wise increase it. Otherwise step-wise change
             // the range towards the target altitude.
@@ -221,11 +222,11 @@ define([
                 elapsedTime = Date.now() - this.startTime;
                 nextRange = Math.min(this.startPosition.altitude + this.rangeVelocity * elapsedTime, this.maxAltitude);
                 // We're done if we get withing 1 meter of the desired range.
-                if (Math.abs(lookAt.range - nextRange) < 1) {
+                if (Math.abs(camera.altitude - nextRange) < 1) {
                     this.maxAltitudeReachedTime = Date.now();
                 }
-                lookAt.range = nextRange;
-                this.wwd.navigator.setAsLookAt(this.wwd.globe, lookAt);
+                camera.altitude = nextRange;
+                this.wwd.navigator.setAsCamera(this.wwd.globe, camera);
                 continueAnimation = true;
             } else {
                 elapsedTime = Date.now() - this.maxAltitudeReachedTime;
@@ -236,10 +237,10 @@ define([
                     nextRange = this.maxAltitude + (this.rangeVelocity * elapsedTime);
                     nextRange = Math.min(nextRange, this.targetPosition.altitude);
                 }
-                lookAt.range = nextRange;
-                this.wwd.navigator.setAsLookAt(this.wwd.globe, lookAt);
+                camera.altitude = nextRange;
+                this.wwd.navigator.setAsCamera(this.wwd.globe, camera);
                 // We're done if we get withing 1 meter of the desired range.
-                continueAnimation = Math.abs(lookAt.range - this.targetPosition.altitude) > 1;
+                continueAnimation = Math.abs(camera.altitude - this.targetPosition.altitude) > 1;
             }
 
             return continueAnimation;
@@ -247,6 +248,9 @@ define([
 
         // Intentionally not documented.
         GoToAnimator.prototype.updateLocation = function (currentPosition) {
+            var camera = new Camera();
+            this.wwd.navigator.getAsCamera(this.wwd.globe, camera);
+
             // This function animates the pan to the desired location.
             var elapsedTime = Date.now() - this.startTime,
                 distanceTravelled = Location.greatCircleDistance(this.startPosition, currentPosition),
@@ -257,17 +261,19 @@ define([
                 nextLocation = Location.greatCircleLocation(currentPosition, azimuthToTarget, nextDistance,
                     new Location(0, 0)),
                 locationReached = false;
+            console.log('GoToAnimator Travelled ', distanceTravelled, ' Pan velocity ', this.panVelocity, ' Remaining ', distanceRemaining, ' Now ', distanceForNow, ' Next distance: ', nextDistance);
 
-            var lookAt = new LookAt();
-            this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+            camera.latitude = nextLocation.latitude;
+            camera.longitude = nextLocation.longitude;
 
-            lookAt.latitude = nextLocation.latitude;
-            lookAt.longitude = nextLocation.longitude;
-
-            this.wwd.navigator.setAsLookAt(this.wwd.globe, lookAt);
+            this.wwd.navigator.setAsCamera(this.wwd.globe, camera);
 
             // We're done if we're within a meter of the desired location.
             if (nextDistance < 1 / this.wwd.globe.equatorialRadius) {
+                locationReached = true;
+            }
+
+            if(elapsedTime > 4000) {
                 locationReached = true;
             }
 
