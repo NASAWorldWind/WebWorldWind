@@ -51,7 +51,7 @@ define([
          * @augments Navigator
          * @classdesc Represents a navigator that enables the user to pan, zoom and tilt the globe.
          * This navigator automatically responds to user-input events and gestures.
-         * @param {WorldWindow} worldWindow The world window to associate with this navigator.
+         * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
         var LookAtNavigator = function (worldWindow) {
             Navigator.call(this, worldWindow);

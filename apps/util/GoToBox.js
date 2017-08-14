@@ -14,7 +14,7 @@ define(function () {
      * @alias GoToBox
      * @constructor
      * @classdesc Provides a search box enabling the user to find and move to specified locations.
-     * @param {WorldWindow} worldWindow The World Window to associate this GoToBox with.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this GoToBox with.
      */
     var GoToBox = function (worldWindow) {
         var thisGoToBox = this;

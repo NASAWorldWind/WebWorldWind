@@ -78,7 +78,7 @@ define([
             // Alternatively, the data can be retrieved from a local folder as follows.
             // - Download the file located in:
             //   http://worldwindserver.net/webworldwind/WebWorldWindStandaloneData.zip
-            // - Unzip it into the Web World Wind top-level directory so that the "standalonedata" directory is a peer
+            // - Unzip it into the Web WorldWind top-level directory so that the "standalonedata" directory is a peer
             //   of examples, src, apps and worldwind.js.
             // - Uncomment the following lines or call BMNGRestLayer from the application with these parameters:
             //this.serverAddress = serverAddress || null;
@@ -114,8 +114,8 @@ define([
          * Pre-populating is not required. It is used to eliminate the visual effect of loading tiles incrementally,
          * but only for level 0 tiles. An application might pre-populate a layer in order to delay displaying it
          * within a time series until all the level 0 images have been retrieved and added to memory.
-         * @param {WorldWindow} wwd The world window for which to pre-populate this layer.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @param {WorldWindow} wwd The WorldWindow for which to pre-populate this layer.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         BMNGRestLayer.prototype.prePopulate = function (wwd) {
             if (!wwd) {
@@ -138,9 +138,9 @@ define([
          * Indicates whether this layer's level 0 tile images for all sub-layers have been retrieved and associated
          * with the tiles.
          * Use [prePopulate]{@link TiledImageLayer#prePopulate} to initiate retrieval of level 0 images.
-         * @param {WorldWindow} wwd The world window associated with this layer.
+         * @param {WorldWindow} wwd The WorldWindow associated with this layer.
          * @returns {Boolean} true if all level 0 images have been retrieved, otherwise false.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         BMNGRestLayer.prototype.isPrePopulated = function (wwd) {
             for (var i = 0; i < this.layerNames.length; i++) {

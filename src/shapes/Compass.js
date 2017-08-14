@@ -23,10 +23,10 @@ define([
          * @alias Compass
          * @constructor
          * @augments ScreenImage
-         * @classdesc Displays a compass image at a specified location in the World Window. The compass image rotates
+         * @classdesc Displays a compass image at a specified location in the WorldWindow. The compass image rotates
          * and tilts to reflect the current navigator's heading and tilt.
          * @param {Offset} screenOffset The offset indicating the image's placement on the screen. If null or undefined
-         * the compass is placed at the upper-right corner of the World Window.
+         * the compass is placed at the upper-right corner of the WorldWindow.
          * Use [the image offset property]{@link ScreenImage#imageOffset} to position the image relative to the
          * screen point.
          * @param {String} imagePath The URL of the image to display. If null or undefined, a default compass image is used.
@@ -47,7 +47,7 @@ define([
             }
 
             /**
-             * Specifies the size of the compass as a fraction of the World Window width.
+             * Specifies the size of the compass as a fraction of the WorldWindow width.
              * @type {number}
              * @default 0.15
              */

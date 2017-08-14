@@ -66,7 +66,7 @@ displays an interactive virtual globe in an HTML canvas.
 
 ## License
 
-    NASA WORLD WIND
+    NASA WorldWind
 
     Copyright (C) 2001 United States Government
     as represented by the Administrator of the
@@ -87,7 +87,7 @@ displays an interactive virtual globe in an HTML canvas.
 
     Government Agency: National Aeronautics and Space Administration (NASA)
     Government Agency Original Software Designation: ARC-15166-1
-    Government Agency Original Software Title: NASA World Wind
+    Government Agency Original Software Title: NASA WorldWind
     User Registration Requested. Please send email with your contact information to Patrick.Hogan@nasa.gov
     Government Agency Point of Contact for Original Software: Patrick.Hogan@nasa.gov
 

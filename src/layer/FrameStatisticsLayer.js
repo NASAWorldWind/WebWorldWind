@@ -31,13 +31,13 @@ define([
          * @alias FrameStatisticsLayer
          * @constructor
          * @augments Layer
-         * @classDesc Displays the current performance statistics, which are collected each frame in the World Window's
-         * {@link FrameStatistics}. A frame statics layer cannot be shared among World Windows. Each World Window if it
+         * @classDesc Displays the current performance statistics, which are collected each frame in the WorldWindow's
+         * {@link FrameStatistics}. A frame statics layer cannot be shared among WorldWindows. Each WorldWindow if it
          * is to have a frame statistics layer must have its own.
-         * @param {WorldWindow} worldWindow The World Window associated with this layer.
-         * This layer may not be associated with more than one World Window. Each World Window must have it's own
+         * @param {WorldWindow} worldWindow The WorldWindow associated with this layer.
+         * This layer may not be associated with more than one WorldWindow. Each WorldWindow must have it's own
          * instance of this layer if each window is to have a frame statistics display.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         var FrameStatisticsLayer = function (worldWindow) {
             if (!worldWindow) {
@@ -63,7 +63,7 @@ define([
             this.frameRate = new ScreenText(new Offset(WorldWind.OFFSET_PIXELS, 5, WorldWind.OFFSET_INSET_PIXELS, 25), " ");
             this.frameRate.attributes = textAttributes;
 
-            // Register a redraw callback on the World Window.
+            // Register a redraw callback on the WorldWindow.
             var thisLayer = this;
 
             function redrawCallback(worldWindow, stage) {

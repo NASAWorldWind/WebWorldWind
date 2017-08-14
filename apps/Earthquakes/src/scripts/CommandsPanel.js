@@ -14,7 +14,7 @@ define(['Tour', 'TourManager'], function (Tour,
      * @alias LayersPanel
      * @constructor
      * @classdesc Provides a list of buttons that control layer visibility.
-     * @param {WorldWindow} worldWindow The World Window to associate this layers panel with.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this layers panel with.
      */
     var CommandsPanel = function (wwd,layer) {
         var self = this;
@@ -95,7 +95,7 @@ define(['Tour', 'TourManager'], function (Tour,
         */
 
 
-        // Synchronize the displayed layer list with the World Window's layer list.
+        // Synchronize the displayed layer list with the WorldWindow's layer list.
         for (var i = 0; i < this.buttons.length; i++) {
             var index = i
             var self = this
