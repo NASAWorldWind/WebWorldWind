@@ -10,11 +10,11 @@ rules. Use your best judgment, and feel free to propose changes to this document
 [Design and Coding Guidelines](#design-and-coding-guidelines)
 
 [Contributing](#contributing)
+    *[Reporting Bugs](#reporting-bugs)
+    *[Suggesting New Features](#suggesting-new-features)
+    *[Pull Requests](#pull-requests)
 
 ## Asking Questions
-   *[Reporting Bugs](#reporting-bugs)
-   *[Suggesting New Features](#suggesting-new-features)
-   *[Pull Requests](#pull-requests)
 
 **Please do not file an issue to ask a question.** You will get faster results by using the following resources:
 
