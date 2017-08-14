@@ -10,9 +10,9 @@ rules. Use your best judgment, and feel free to propose changes to this document
 [Design and Coding Guidelines](#design-and-coding-guidelines)
 
 [Contributing](#contributing)
-    *[Reporting Bugs](#reporting-bugs)
-    *[Suggesting New Features](#suggesting-new-features)
-    *[Pull Requests](#pull-requests)
+    * [Reporting Bugs](#reporting-bugs)
+    * [Suggesting New Features](#suggesting-new-features)
+    * [Pull Requests](#pull-requests)
 
 ## Asking Questions
 
