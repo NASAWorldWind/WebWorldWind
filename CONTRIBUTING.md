@@ -1,8 +1,5 @@
 # Contributing to Web WorldWind
 
-The following are a set of guidelines for contributing to the NASA Web WorldWind project. These are mostly guidelines, not
-rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
-
 #### Table of Contents
 
 [Asking Questions](#asking-questions)
@@ -13,6 +10,8 @@ rules. Use your best judgment, and feel free to propose changes to this document
 - [Reporting Bugs](#reporting-bugs)
 - [Suggesting New Features](#suggesting-new-features)
 - [Pull Requests](#pull-requests)
+
+[Resources](#resources)
 
 ## Asking Questions
 
@@ -154,4 +153,10 @@ in the appropriate repository and provide the following information:
 * Explain why this code should be in the core.
 * Describe possible benefits and drawbacks from merging this pull request.
 * Specify some issues to which this pull request is applicable.
+
+## Resources
+
+For Web WorldWind tutorials and examples, please check out our website: https://worldwind.arc.nasa.gov/.
+For community support and FAQs, check out the WorldWind Forum: https://forum.worldwindcentral.com/.
+To reach our Administrative Contact, please email: [mailto:patrick.hogan@nasa.gov](patrick.hogan@nasa.gov).
 
