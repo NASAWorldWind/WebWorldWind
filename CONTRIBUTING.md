@@ -160,5 +160,5 @@ For Web WorldWind tutorials and examples, please check out our website: https://
 
 For community support and FAQs, check out the WorldWind Forum: https://forum.worldwindcentral.com/.
 
-To reach our Administrative Contact, please email: [mailto:patrick.hogan@nasa.gov](patrick.hogan@nasa.gov).
+To reach our Administrative Contact, please email: [patrick.hogan@nasa.gov](mailto:patrick.hogan@nasa.gov).
 
