@@ -33,8 +33,8 @@ define([
          * However, the minimum sampling interval is 30 meters.
          * @alias LengthMeasurer
          * @constructor
-         * @param {WorldWindow} wwd The World Window associated with LengthMeasurer.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @param {WorldWindow} wwd The WorldWindow associated with LengthMeasurer.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         var LengthMeasurer = function (wwd) {
 

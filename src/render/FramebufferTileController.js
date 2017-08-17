@@ -31,7 +31,7 @@ define([
          * @alias FramebufferTileController
          * @constructor
          * @classdesc Provides access to a multi-resolution WebGL framebuffer arranged as adjacent tiles in a pyramid.
-         * World Wind shapes use this class internally to draw on the terrain surface. Applications typically do not
+         * WorldWind shapes use this class internally to draw on the terrain surface. Applications typically do not
          * interact with this class.
          */
         var FramebufferTileController = function () {

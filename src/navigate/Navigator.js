@@ -31,7 +31,7 @@ define([
          * @constructor
          * @classdesc Provides an abstract base class for navigators. This class is not meant to be instantiated
          * directly. See {@Link LookAtNavigator} for a concrete navigator.
-         * @param {WorldWindow} worldWindow The world window to associate with this navigator.
+         * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
         var Navigator = function (worldWindow) {
             if (!worldWindow) {

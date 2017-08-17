@@ -8,10 +8,10 @@ requirejs([
     function (ww,
               LayerManager) {
 
-        // Tell World Wind to log only warnings and errors.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
         var layerManger;
 

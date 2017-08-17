@@ -17,10 +17,10 @@ define(['../../src/WorldWind',
         var USGSWells = function () {
             WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-            // Create the World Window.
+            // Create the WorldWindow.
             this.wwd = new WorldWind.WorldWindow("canvasOne");
 
-            // Configure the World Window layers.
+            // Configure the WorldWindow layers.
             var layers = [
                 {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
                 {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
@@ -54,7 +54,7 @@ define(['../../src/WorldWind',
              this.addWellShape(32.553649, -117.061615, 1430, 30, "Boundary Waters - SDBW (19S/2W-2C7-11)\nPerforation depth 1340-1360 (ft)", layer);
             this.wwd.addLayer(layer);
 
-            // Enable sub-surface rendering for the World Window.
+            // Enable sub-surface rendering for the WorldWindow.
             this.wwd.subsurfaceMode = true;
             // Enable deep picking in order to detect the sub-surface shapes.
             this.wwd.deepPicking = true;

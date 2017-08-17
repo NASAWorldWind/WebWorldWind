@@ -38,12 +38,12 @@ define([
          * @constructor
          * @augments Layer
          * @classDesc Displays the current map coordinates. A coordinates display layer cannot be shared among World
-         * Windows. Each World Window if it is to have a coordinates display layer must have its own. See the
+         * Windows. Each WorldWindow if it is to have a coordinates display layer must have its own. See the
          * MultiWindow example for guidance.
-         * @param {WorldWindow} worldWindow The World Window associated with this layer.
-         * This layer may not be associated with more than one World Window. Each World Window must have it's own
+         * @param {WorldWindow} worldWindow The WorldWindow associated with this layer.
+         * This layer may not be associated with more than one WorldWindow. Each WorldWindow must have it's own
          * instance of this layer if each window is to have a coordinates display.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         var CoordinatesDisplayLayer = function (worldWindow) {
             if (!worldWindow) {
@@ -54,7 +54,7 @@ define([
             Layer.call(this, "Coordinates");
 
             /**
-             * The World Window associated with this layer.
+             * The WorldWindow associated with this layer.
              * @type {WorldWindow}
              * @readonly
              */
@@ -100,7 +100,7 @@ define([
                 imagePath = WorldWind.configuration.baseUrl + "images/crosshair.png";
             this.crosshairImage = new ScreenImage(imageOffset, imagePath);
 
-            // Register user input event listeners on the World Window.
+            // Register user input event listeners on the WorldWindow.
             var thisLayer = this;
 
             function eventListener(event) {
@@ -119,7 +119,7 @@ define([
                 worldWindow.addEventListener("touchmove", eventListener);
             }
 
-            // Register a redraw callback on the World Window.
+            // Register a redraw callback on the WorldWindow.
             function redrawCallback(worldWindow, stage) {
                 thisLayer.handleRedraw(stage);
             }

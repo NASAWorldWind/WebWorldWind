@@ -14,7 +14,7 @@ define(function () {
      * @alias TimeSeriesPlayer
      * @constructor
      * @classdesc Provides a control for time-series layers.
-     * @param {WorldWindow} worldWindow The World Window to associate this player.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this player.
      */
     var TimeSeriesPlayer = function (worldWindow) {
         var self = this;
@@ -27,7 +27,7 @@ define(function () {
         this.timeDisplay = $("#timeSeriesDisplay");// $('<span style="position: absolute; width: 50px">Sat Aug 14, 2015</span>');
 
         /**
-         * The World Window associated with this player, as specified to the constructor.
+         * The WorldWindow associated with this player, as specified to the constructor.
          * @type {WorldWindow}
          * @readonly
          */

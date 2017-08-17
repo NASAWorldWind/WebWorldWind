@@ -15,7 +15,7 @@ define(['../../src/WorldWind',
         var SinergiseWMTS = function () {
             WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-            // Create the World Window.
+            // Create the WorldWindow.
             var wwd = new WorldWind.WorldWindow("canvasOne");
 
             // Sinergise layers

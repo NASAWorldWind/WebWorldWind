@@ -181,7 +181,7 @@ define([
 
             /**
              * The starting time of the current frame, in milliseconds. The frame timestamp is updated immediately
-             * before the World Window associated with this draw context is rendered, either as a result of redrawing or
+             * before the WorldWindow associated with this draw context is rendered, either as a result of redrawing or
              * as a result of a picking operation.
              * @type {Number}
              * @readonly
@@ -190,7 +190,7 @@ define([
 
             /**
              * The [time stamp]{@link DrawContext#timestamp} of the last visible frame, in milliseconds. This indicates
-             * the time stamp that was current during the World Window's last frame, ignoring frames associated with a
+             * the time stamp that was current during the WorldWindow's last frame, ignoring frames associated with a
              * picking operation. The difference between the previous redraw time stamp and the current time stamp
              * indicates the duration between visible frames, e.g. <code style='white-space:nowrap'>timeStamp - previousRedrawTimestamp</code>.
              * @type {Number}
@@ -376,7 +376,7 @@ define([
             if (this.timestamp === previousTimestamp)
                 ++this.timestamp;
 
-            // Reset properties set by the World Window every frame.
+            // Reset properties set by the WorldWindow every frame.
             this.redrawRequested = false;
             this.globe = null;
             this.globeStateKey = null;
@@ -388,7 +388,7 @@ define([
             this.frameStatistics = null;
             this.accumulateOrderedRenderables = true;
 
-            // Reset picking properties that may be set by the World Window.
+            // Reset picking properties that may be set by the WorldWindow.
             this.pickingMode = false;
             this.pickTerrainOnly = false;
             this.deepPicking = false;
