@@ -24,7 +24,7 @@ define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
             this._config = new OpenStreetMapConfig();
 
             /*
-             Changes the size of the canvas that renders the world wind globe
+             Changes the size of the canvas that renders the WorldWind globe
              */
             $(this._config.canvasIDString).
                 attr('width',

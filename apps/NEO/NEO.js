@@ -20,7 +20,7 @@ define(['../../src/WorldWind',
         var NEO = function () {
             WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-            // Create the World Window.
+            // Create the WorldWindow.
             this.wwd = new WorldWind.WorldWindow("canvasOne");
 
             /**

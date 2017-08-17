@@ -22,7 +22,7 @@ define([
          * @alias WcsEarthElevationModel
          * @constructor
          * @augments ElevationModel
-         * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA World Wind elevation service.
+         * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
         var WcsEarthElevationModel = function () {
             ElevationModel.call(this,
@@ -31,7 +31,7 @@ define([
             this.displayName = "WCS Earth Elevation Model";
             this.minElevation = -11000; // Depth of Marianas Trench, in meters
             this.maxElevation = 8850; // Height of Mt. Everest
-            this.pixelIsPoint = false; // World Wind WMS elevation layers return pixel-as-area images
+            this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images
 
             this.urlBuilder = new WcsTileUrlBuilder("https://worldwind26.arc.nasa.gov/wms2",
                 "NASA_SRTM30_900m_Tiled", "1.0.0");

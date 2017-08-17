@@ -195,7 +195,7 @@ define([
          * @param {Function} parserCompletionCallback An optional function called when shapefile loading is complete but
          * shape creation has not begun. If none is specified,
          * [defaultParserCompletionCallback]{@link Shapefile#defaultParserCompletionCallback} is called. That function creates
-         * World Wind shapes for the parsed shapefile records.
+         * WorldWind shapes for the parsed shapefile records.
          * The single argument to the callback function is this shapefile object. When the callback function is
          * called, the layer containing the shapes is available via this shapefile's
          * [layer]{@link Shapefile#layer} property.

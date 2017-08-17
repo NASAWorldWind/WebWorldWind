@@ -35,7 +35,7 @@ define([
          * @constructor
          * @classdesc
          * Provides a layer that displays multi-resolution imagery arranged as adjacent tiles in a pyramid.
-         * This is the primary World Wind base class for displaying imagery of this type. While it may be used as a
+         * This is the primary WorldWind base class for displaying imagery of this type. While it may be used as a
          * stand-alone class, it is typically subclassed by classes that identify the remote image server.
          * <p>
          * While the image tiles for this class are typically drawn from a remote server such as a WMS server. The actual
@@ -145,8 +145,8 @@ define([
          * Pre-populating is not required. It is used to eliminate the visual effect of loading tiles incrementally,
          * but only for level 0 tiles. An application might pre-populate a layer in order to delay displaying it
          * within a time series until all the level 0 images have been retrieved and added to memory.
-         * @param {WorldWindow} wwd The world window for which to pre-populate this layer.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @param {WorldWindow} wwd The WorldWindow for which to pre-populate this layer.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         TiledImageLayer.prototype.prePopulate = function (wwd) {
             if (!wwd) {
@@ -170,10 +170,10 @@ define([
         };
 
         /**
-         * Initiates retrieval of this layer's tiles that are visible in the specified World Window. Pre-populating is
+         * Initiates retrieval of this layer's tiles that are visible in the specified WorldWindow. Pre-populating is
          * not required. It is used to eliminate the visual effect of loading tiles incrementally.
-         * @param {WorldWindow} wwd The world window for which to pre-populate this layer.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @param {WorldWindow} wwd The WorldWindow for which to pre-populate this layer.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         TiledImageLayer.prototype.prePopulateCurrentTiles = function (wwd) {
             if (!wwd) {
@@ -196,9 +196,9 @@ define([
         /**
          * Indicates whether this layer's level 0 tile images have been retrieved and associated with the tiles.
          * Use [prePopulate]{@link TiledImageLayer#prePopulate} to initiate retrieval of level 0 images.
-         * @param {WorldWindow} wwd The world window associated with this layer.
+         * @param {WorldWindow} wwd The WorldWindow associated with this layer.
          * @returns {Boolean} true if all level 0 images have been retrieved, otherwise false.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         TiledImageLayer.prototype.isPrePopulated = function (wwd) {
             if (!wwd) {

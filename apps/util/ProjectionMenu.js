@@ -13,8 +13,8 @@ define(function () {
      * Constructs a projection menu for a specified {@link WorldWindow}.
      * @alias ProjectionMenu
      * @constructor
-     * @classdesc Provides a projection menu to select the projection for a World Window.
-     * @param {WorldWindow} worldWindow The World Window to associate this projection menu with.
+     * @classdesc Provides a projection menu to select the projection for a WorldWindow.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this projection menu with.
      */
     var ProjectionMenu = function (worldWindow) {
         var thisExplorer = this;

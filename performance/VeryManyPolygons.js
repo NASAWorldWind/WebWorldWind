@@ -14,10 +14,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings and errors.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -81,7 +81,7 @@ requirejs(['../src/WorldWind',
         polygonsLayer.displayName = "Polygons";
         wwd.addLayer(polygonsLayer);
 
-        // Draw the World Window for the first time.
+        // Draw the WorldWindow for the first time.
         wwd.redraw();
 
         // Create a layer manager for controlling layer visibility.
