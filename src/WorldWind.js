@@ -141,6 +141,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/NominatimGeocoder',
         './error/NotYetImplementedError',
         './util/Offset',
+        './layer/OpenSearchLayer',
+        './ogc/openSearch/OpenSearchService',
         './layer/OpenStreetMapImageLayer',
         './formats/kml/util/Pair',
         './gesture/PanRecognizer',
@@ -365,6 +367,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               NominatimGeocoder,
               NotYetImplementedError,
               Offset,
+              OpenSearchLayer,
+              OpenSearchService,
               OpenStreetMapImageLayer,
               Pair,
               PanRecognizer,
@@ -750,6 +754,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['NominatimGeocoder'] = NominatimGeocoder;
         WorldWind['NotYetImplementedError'] = NotYetImplementedError;
         WorldWind['Offset'] = Offset;
+        WorldWind['OpenSearchLayer'] = OpenSearchLayer;
+        WorldWind['OpenSearchService'] = OpenSearchService;
         WorldWind['OpenStreetMapImageLayer'] = OpenStreetMapImageLayer;
         WorldWind['PanRecognizer'] = PanRecognizer;
         WorldWind['Path'] = Path;
