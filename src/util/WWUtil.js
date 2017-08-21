@@ -69,8 +69,8 @@ define([
             },
 
             /**
-             * Returns the URL of the directory containing the World Wind library.
-             * @returns {String} The URL of the directory containing the World Wind library, or null if that directory
+             * Returns the URL of the directory containing the WorldWind library.
+             * @returns {String} The URL of the directory containing the WorldWind library, or null if that directory
              * cannot be determined.
              */
             worldwindlibLocation: function () {

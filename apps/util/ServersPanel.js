@@ -15,9 +15,9 @@ define(function () {
      * @constructor
      * @classdesc Provides a list of collapsible panels that indicate the layers associated with a WMS or other
      * image server. Currently on WMS is supported. The user can select a server's layers and they will be added to
-     * the World Window's layer list.
-     * @param {WorldWindow} worldWindow The World Window to associate this layers panel with.
-     * @param {LayersPanel} layersPanel The layers panel managing the specified World Windows layer list.
+     * the WorldWindow's layer list.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this layers panel with.
+     * @param {LayersPanel} layersPanel The layers panel managing the specified WorldWindows layer list.
      */
     var ServersPanel = function (worldWindow, layersPanel, timeSeriesPlayer) {
         var thisServersPanel = this;

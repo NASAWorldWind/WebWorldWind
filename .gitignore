@@ -1,22 +1,20 @@
 .DS_Store
 
-.idea/encodings.xml
-
-.idea/modules.xml
-
-.idea/misc.xml
-
 .idea/shelf
+
+.idea/tasks.xml
 
 .idea/workspace.xml
 
 api-doc/
 
+images.zip
+
 node_modules/
 
-test-results
-
 standalonedata/
+
+test-results/
 
 worldwind.js
 

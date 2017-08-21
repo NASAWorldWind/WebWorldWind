@@ -96,7 +96,7 @@ define(function () {
         layerListItem.find("button").off("click");
         layerListItem.find("button").remove();
 
-        // Synchronize the displayed layer list with the World Window's layer list.
+        // Synchronize the displayed layer list with the WorldWindow's layer list.
         for (var i = 0, len = this.wwd.layers.length; i < len; i++) {
             var layer = this.wwd.layers[i];
             if (layer.hide) {

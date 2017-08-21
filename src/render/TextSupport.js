@@ -29,7 +29,7 @@ define([
          * @alias TextSupport
          * @constructor
          * @classdesc Provides methods useful for displaying text. An instance of this class is attached to the
-         * World Window {@link DrawContext} and is not intended to be used independently of that. Applications typically do
+         * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically do
          * not create instances of this class.
          */
         var TextSupport = function () {

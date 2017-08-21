@@ -44,7 +44,7 @@ module.exports = function (grunt) {
                         endFile: 'tools/wrap.end'
                     }
                 }
-            }
+            },
         },
 
         karma: {
@@ -60,12 +60,24 @@ module.exports = function (grunt) {
                     outputFile: 'test-results/report.html',
                 },
             }
+        },
+
+        compress: {
+            main: {
+                options: {
+                    archive: 'images.zip'
+                },
+                files: [
+                    {src: ['images/**']}
+                ]
+            }
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs']);
+    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'compress']);
 };
