@@ -14,10 +14,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings and errors.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -63,7 +63,7 @@ requirejs(['../src/WorldWind',
         highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.5);
         path.highlightAttributes = highlightAttributes;
 
-        // Add the path to a layer and the layer to the World Window's layer list.
+        // Add the path to a layer and the layer to the WorldWindow's layer list.
         var pathsLayer = new WorldWind.RenderableLayer();
         pathsLayer.displayName = "Paths";
         pathsLayer.addRenderable(path);

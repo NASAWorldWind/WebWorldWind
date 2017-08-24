@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<!-- Invokes Web World Wind without using the internet. Refers to only data stored locally on the web server. -->
+<!-- Invokes Web WorldWind without using the internet. Refers to only data stored locally on the web server. -->
 <!-- To deploy:
         - Download and unzip http://worldwindserver.net/webworldwind/WebWorldWind.zip.
         - Download http://worldwindserver.net/webworldwind/WebWorldWindStandaloneData.zip and
-          unzip it into the Web World Wind top-level directory so that the "standalonedata" directory is a peer
+          unzip it into the Web WorldWind top-level directory so that the "standalonedata" directory is a peer
           of examples, src, apps and worldwind.js.
         - Ensure that your web server is configured to send an HTTP content type of application/octet-stream
           or application/bil16 for files with a .bil suffix. You can do this for Apache servers by adding bil
           to the list of application-octet-stream suffixes in the mime.types file and then restarting the server.
         - Use your browser to invoke this HTML file, the one you're now reading, via the web server. Do not attempt
           to open it using the browser's File->Open menu. Use an http or https URL with the server address.
-      If deployment was successful then you should see a Web World Wind globe in the browser. The globe
+      If deployment was successful then you should see a Web WorldWind globe in the browser. The globe
       should have blue marble imagery all over it and greenish Landsat imagery over most of North America.
       If you zoom into a mountainous region you should see the raised mountains. There are no elevations
       included for the oceans, so they are all flat. -->
@@ -19,13 +19,13 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>World Wind Example</title>
-    <!-- Include the Web World Wind library. -->
+    <title>WorldWind Example</title>
+    <!-- Include the Web WorldWind library. -->
     <script src="../worldwind.min.js" type="text/javascript"></script>
 </head>
 <body>
 <div style="position: absolute; top: 50px; left: 50px;">
-    <!-- Create a canvas for Web World Wind. -->
+    <!-- Create a canvas for Web WorldWind. -->
     <canvas id="canvasOne" width="1024" height="768">
         Your browser does not support HTML5 Canvas.
     </canvas>
@@ -34,15 +34,15 @@
     // Register an event listener to be called when the page is loaded.
     window.addEventListener("load", eventWindowLoaded, false);
 
-    // Define the event listener to initialize Web World Wind.
+    // Define the event listener to initialize Web WorldWind.
     function eventWindowLoaded() {
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_INFO);
 
-        // Create a World Window for the canvas. Use a REST elevation model rather than the default.
+        // Create a WorldWindow for the canvas. Use a REST elevation model rather than the default.
         var elevationModel = new WorldWind.EarthRestElevationModel(null, "../standalonedata/Earth/DTED0");
         var wwd = new WorldWind.WorldWindow("canvasOne", elevationModel);
 
-        // Add some REST image layers to the World Window's globe:
+        // Add some REST image layers to the WorldWindow's globe:
 
         // Blue Marble Next Generation 2004
         var blueMarble = new WorldWind.BMNGRestLayer(null, "../standalonedata/Earth/BlueMarble256/");
@@ -50,11 +50,11 @@
         // Landsat layer (The offline data covers only a sector of the globe in North America)
         var landSat = new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat", "LandSat");
 
-        // Add all the layers to the World Window's layer list
+        // Add all the layers to the WorldWindow's layer list
         wwd.addLayer(blueMarble);
         wwd.addLayer(landSat);
 
-        // Add a compass, a coordinates display and some view controls to the World Window.
+        // Add a compass, a coordinates display and some view controls to the WorldWindow.
         wwd.addLayer(new WorldWind.CompassLayer());
         wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));

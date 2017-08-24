@@ -14,10 +14,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings and errors.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -66,7 +66,7 @@ requirejs(['../src/WorldWind',
         var screenImage2 = new WorldWind.ScreenImage(screenOffset, new WorldWind.ImageSource(canvas));
         screenImage2.imageOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1);
 
-        // Add the screen images to a layer and the layer to the World Window's layer list.
+        // Add the screen images to a layer and the layer to the WorldWindow's layer list.
         var screenImageLayer = new WorldWind.RenderableLayer();
         screenImageLayer.displayName = "Screen Images";
         screenImageLayer.addRenderable(screenImage1);

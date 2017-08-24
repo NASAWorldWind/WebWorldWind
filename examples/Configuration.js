@@ -3,8 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * Illustrates the World Wind configuration options and how to set them. In order to have an effect, most configuration
- * options must be set before creating a World Window or any other World Wind object.
+ * Illustrates the WorldWind configuration options and how to set them. In order to have an effect, most configuration
+ * options must be set before creating a WorldWindow or any other WorldWind object.
  *
  * @version $Id: Configuration.js 3320 2015-07-15 20:53:05Z dcollins $
  */
@@ -21,7 +21,7 @@ requirejs(['../src/WorldWind',
         // Configure the amount of GPU memory to use.
         WorldWind.configuration.gpuCacheSize = 500e6; // 500 MB
 
-        // Create a World Window and some layers to display.
+        // Create a WorldWindow and some layers to display.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         var layers = [

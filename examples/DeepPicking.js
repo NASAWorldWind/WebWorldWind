@@ -14,10 +14,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings.
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -109,10 +109,10 @@ requirejs(['../src/WorldWind',
             placemarkLayer.addRenderable(placemark);
         }
 
-        // Add the placemarks layer to the World Window's layer list.
+        // Add the placemarks layer to the WorldWindow's layer list.
         wwd.addLayer(placemarkLayer);
 
-        // Tell the World Window that we want deep picking.
+        // Tell the WorldWindow that we want deep picking.
         wwd.deepPicking = true;
 
         // Create a layer manager for controlling layer visibility.

@@ -14,7 +14,7 @@ define(function () {
      * @alias TerrainOpacityController
      * @constructor
      * @classdesc Provides a slider to control the opacity of TiledImageLayer layers.
-     * @param {WorldWindow} worldWindow The World Window to associate with this opacity controller.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate with this opacity controller.
      */
     var TerrainOpacityController = function (worldWindow) {
         var thisController = this;

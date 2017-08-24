@@ -15,10 +15,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings.
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -52,7 +52,7 @@ requirejs(['../src/WorldWind',
             // relative to the upper left corner of the canvas rather than the upper left corner of the page.
             var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
 
-            // If only one thing is picked and it is the terrain, tell the world window to go to the picked location.
+            // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
             if (pickList.objects.length == 1 && pickList.objects[0].isTerrain) {
                 var position = pickList.objects[0].position;
                 wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
