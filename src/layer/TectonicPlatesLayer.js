@@ -50,7 +50,7 @@ define([
 
     TectonicPlatesLayer.prototype = Object.create(RenderableLayer.prototype);
 
-    Object.defineProperties(SurfacePolygon.prototype, {
+    Object.defineProperties(RenderableLayer.prototype, {
         /**
          * The attributes to use when drawing the plates.
          * @type {ShapeAttributes}
