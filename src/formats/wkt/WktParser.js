@@ -67,8 +67,8 @@ define([
     WktParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
         var objects = new WktTokens(this.textRepresentation).objects();
 
-        shapeConfigurationCallback = shapeConfigurationCallback || function(){}; // Provide default callbacks.
-        parserCompletionCallback = parserCompletionCallback || function(){};
+        shapeConfigurationCallback = shapeConfigurationCallback || this.defaultShapeConfigurationCallback;
+        parserCompletionCallback = parserCompletionCallback || this.defaultParserCompletionCallback;
 
         var shapes = [];
         objects.forEach(function(object){
@@ -95,6 +95,25 @@ define([
         parserCompletionCallback(shapes);
 
         return objects;
+    };
+
+    /**
+     * It is the default implementation of the shape configuration callback. It is called for every generated shape.
+     * @param shape {Renderable} It is a renderable for which you can provide custom attributes.
+     * @returns {Object} This object can contain attributes to be used for the shape, highlight attributes to be used
+     *   for the shape, pickDelegate to be used and userProperties. All these properties are applied to the shape.
+     */
+    WktParser.prototype.defaultShapeConfigurationCallback = function(shape) {
+        // The default implementation doesn't change the defaults for the Shapes.
+    };
+
+    /**
+     * It is the default implementation of the parser completion callback. It is called with all final shapes after they
+     * were added to the provided layer.
+     * @param shapes {Renderable[]} Array of the Renderables to be displayed. This is the last time to modify them.
+     */
+    WktParser.prototype.defaultParserCompletionCallback = function(shapes) {
+        // The default implementation doesn't change the defaults for the Shapes.
     };
 
     return WktParser;
