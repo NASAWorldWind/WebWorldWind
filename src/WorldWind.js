@@ -482,13 +482,13 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ZeroElevationModel) {
         "use strict";
         /**
-         * This is the top-level World Wind module. It is global.
+         * This is the top-level WorldWind module. It is global.
          * @exports WorldWind
          * @global
          */
         var WorldWind = {
             /**
-             * The World Wind version number.
+             * The WorldWind version number.
              * @default "0.0.0"
              * @constant
              */
@@ -648,7 +648,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             RECOGNIZED: "recognized",
 
             /**
-             * The event name of World Wind redraw events.
+             * The event name of WorldWind redraw events.
              */
             REDRAW_EVENT_TYPE: "WorldWindRedraw",
 
@@ -864,12 +864,12 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**
-         * Holds configuration parameters for World Wind. Applications may modify these parameters prior to creating
-         * their first World Wind objects. Configuration properties are:
+         * Holds configuration parameters for WorldWind. Applications may modify these parameters prior to creating
+         * their first WorldWind objects. Configuration properties are:
          * <ul>
          *     <li><code>gpuCacheSize</code>: A Number indicating the size in bytes to allocate from GPU memory for
          *     resources such as textures, GLSL programs and buffer objects. Default is 250e6 (250 MB).</li>
-         *     <li><code>baseUrl</code>: The URL of the directory containing the World Wind Library and its resources.</li>
+         *     <li><code>baseUrl</code>: The URL of the directory containing the WorldWind Library and its resources.</li>
          * </ul>
          * @type {{gpuCacheSize: number}}
          */

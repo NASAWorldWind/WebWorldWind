@@ -504,7 +504,7 @@ define([
                 gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             } finally {
-                // Restore World Wind's default WebGL state.
+                // Restore WorldWind's default WebGL state.
                 gl.enable(gl.CULL_FACE);
                 gl.bindBuffer(gl.ARRAY_BUFFER, null);
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);

@@ -12,10 +12,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings and errors.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -95,7 +95,7 @@ requirejs(['../src/WorldWind',
         mesh.outlineIndices = outlineIndices;
         mesh.highlightAttributes = highlightAttributes;
 
-        // Add the mesh to a layer and the layer to the World Window's layer list.
+        // Add the mesh to a layer and the layer to the WorldWindow's layer list.
         var meshLayer = new WorldWind.RenderableLayer();
         meshLayer.displayName = "Triangle Mesh";
         meshLayer.addRenderable(mesh);

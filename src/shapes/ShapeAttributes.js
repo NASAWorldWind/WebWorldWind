@@ -20,7 +20,7 @@ define([
          * it does use.
          * @alias ShapeAttributes
          * @constructor
-         * @classdesc Holds attributes applied to World Wind shapes.
+         * @classdesc Holds attributes applied to WorldWind shapes.
          * @param {ShapeAttributes} attributes An attribute bundle whose properties are used to initially populate
          * the constructed attributes bundle. May be null, in which case the constructed attributes bundle is populated
          * with default attributes.

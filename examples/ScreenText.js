@@ -14,10 +14,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings.
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -85,7 +85,7 @@ requirejs(['../src/WorldWind',
         screenText.attributes = textAttributes;
         textLayer.addRenderable(screenText);
 
-        // Add the text layer to the World Window's layer list.
+        // Add the text layer to the WorldWindow's layer list.
         wwd.addLayer(textLayer);
 
         // Create a layer manager for controlling layer visibility.

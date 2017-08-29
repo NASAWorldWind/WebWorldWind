@@ -8,13 +8,13 @@ requirejs(['../src/WorldWind',
               AnnotationController) {
         "use strict";
 
-        // Tell World Wind to log only warnings.
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // Create  and add imagery and World Window UI layers
+        // Create  and add imagery and WorldWindow UI layers
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
@@ -48,7 +48,7 @@ requirejs(['../src/WorldWind',
         // Text can be assigned to the annotation after creating it.
         annotation.label = "Lorem Ipsum is simply dummy text of the printing and typesetting industry.";
 
-        // Create and add the annotation layer to the World Window's layer list
+        // Create and add the annotation layer to the WorldWindow's layer list
         var annotationsLayer = new WorldWind.RenderableLayer("Annotations");
         annotationsLayer.addRenderable(annotation);
         wwd.addLayer(annotationsLayer);

@@ -14,7 +14,7 @@ define(function () {
      * @alias LayersPanel
      * @constructor
      * @classdesc Provides a list of buttons that control layer visibility.
-     * @param {WorldWindow} worldWindow The World Window to associate this layers panel with.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this layers panel with.
      */
     var LayersPanel = function (worldWindow) {
         this.wwd = worldWindow;
@@ -98,7 +98,7 @@ define(function () {
         layerListItem.find("button").off("click");
         layerListItem.empty();
 
-        // Synchronize the displayed layer list with the World Window's layer list.
+        // Synchronize the displayed layer list with the WorldWindow's layer list.
         for (var i = 0, len = this.wwd.layers.length; i < len; i++) {
             var layer = this.wwd.layers[i];
             if (layer.hide) {

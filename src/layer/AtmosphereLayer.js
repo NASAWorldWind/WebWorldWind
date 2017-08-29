@@ -270,7 +270,7 @@ define([
                 terrain.endRenderingTile(dc, currentTile);
             }
 
-            // Restore the default World Wind OpenGL state.
+            // Restore the default WorldWind OpenGL state.
             terrain.endRendering(dc);
             gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 

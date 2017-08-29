@@ -14,10 +14,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings and errors.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -62,7 +62,7 @@ requirejs(['../src/WorldWind',
         var surfaceImage2 = new WorldWind.SurfaceImage(new WorldWind.Sector(30, 40, -100, -80),
             new WorldWind.ImageSource(canvas));
 
-        // Add the surface images to a layer and the layer to the World Window's layer list.
+        // Add the surface images to a layer and the layer to the WorldWindow's layer list.
         var surfaceImageLayer = new WorldWind.RenderableLayer();
         surfaceImageLayer.displayName = "Surface Images";
         surfaceImageLayer.addRenderable(surfaceImage1);

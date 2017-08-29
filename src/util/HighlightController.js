@@ -15,12 +15,12 @@ define([
         "use strict";
 
         /**
-         * Constructs a highlight controller and associates it with a specified world window.
+         * Constructs a highlight controller and associates it with a specified WorldWindow.
          * @alias HighlightController
          * @constructor
          * @classdesc Monitors mouse-move and touch-device tap events and highlights shapes they identify.
-         * @param {WorldWindow} worldWindow The world window to monitor for mouse-move and tap events.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @param {WorldWindow} worldWindow The WorldWindow to monitor for mouse-move and tap events.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         var HighlightController = function (worldWindow) {
             if (!worldWindow) {
@@ -29,7 +29,7 @@ define([
             }
 
             /**
-             * This controller's world window
+             * This controller's WorldWindow
              * @type {WorldWindow}
              * @readonly
              */
