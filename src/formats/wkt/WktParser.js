@@ -67,7 +67,7 @@ define([
     WktParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
         var objects = new WktTokens(this.textRepresentation).objects();
 
-        shapeConfigurationCallback = shapeConfigurationCallback || function(){};
+        shapeConfigurationCallback = shapeConfigurationCallback || function(){}; // Provide default callbacks.
         parserCompletionCallback = parserCompletionCallback || function(){};
 
         var shapes = [];

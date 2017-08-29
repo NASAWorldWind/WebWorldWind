@@ -453,19 +453,19 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ViewVolume,
               WcsTileUrlBuilder,
               WfsCapabilities,
-              WKTElements,
-              WKTGeometryCollection,
-              WKTLineString,
-              WKTMultiLineString,
-              WKTMultiPoint,
-              WKTMultiPolygon,
-              WKTObject,
-              WKTParser,
-              WKTPoint,
-              WKTPolygon,
-              WKTTokens,
-              WKTTriangle,
-              WKTType,
+              WktElements,
+              WktGeometryCollection,
+              WktLineString,
+              WktMultiLineString,
+              WktMultiPoint,
+              WktMultiPolygon,
+              WktObject,
+              WktParser,
+              WktPoint,
+              WktPolygon,
+              WktTokens,
+              WktTriangle,
+              WktType,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
@@ -847,7 +847,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
-        WorldWind['WKTParser'] = WKTParser;
+        WorldWind['WktParser'] = WktParser;
+        WorldWind['WktType'] = WktType;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
