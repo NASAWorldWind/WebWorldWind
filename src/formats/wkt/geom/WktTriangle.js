@@ -6,35 +6,35 @@ define([
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon',
-    '../WKTElements',
-    './WKTObject',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    '../WktType'
 ], function (Polygon,
              ShapeAttributes,
              SurfacePolygon,
-             WKTElements,
-             WKTObject,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktType) {
     /**
      * It represents triangle.
-     * @alias WKTTriangle
-     * @augments WKTObject
+     * @alias WktTriangle
+     * @augments WktObject
      * @constructor
      */
-    var WKTTriangle = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.TRIANGLE);
+    var WktTriangle = function () {
+        WktObject.call(this, WktType.SupportedGeometries.TRIANGLE);
 
         this._renderable = null;
     };
 
-    WKTTriangle.prototype = Object.create(WKTObject.prototype);
+    WktTriangle.prototype = Object.create(WktObject.prototype);
 
     /**
      * It returns SurfacePolygon for 2D. It returns Polygon for 3D. Triangle doesn't support inner boundaries.
      * @inheritDoc
      * @return {Polygon|SurfacePolyline}
      */
-    WKTTriangle.prototype.shapes = function () {
+    WktTriangle.prototype.shapes = function () {
         if (this._is3d) {
             return [new Polygon(this.coordinates, new ShapeAttributes(null))];
         } else {
@@ -42,7 +42,7 @@ define([
         }
     };
 
-    WKTElements['TRIANGLE'] = WKTTriangle;
+    WktElements['TRIANGLE'] = WktTriangle;
 
-    return WKTTriangle;
+    return WktTriangle;
 });

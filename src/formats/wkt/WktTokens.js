@@ -3,20 +3,20 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    './WKTElements',
-    './geom/WKTObject',
-    './WKTType'
-], function (WKTElements,
-             WKTObject,
-             WKTType) {
+    './WktElements',
+    './geom/WktObject',
+    './WktType'
+], function (WktElements,
+             WktObject,
+             WktType) {
     /**
      * Tokenizer, which parses the source texts into the meaningful tokens and then transforms them to the objects.
      * Intended for the internal use only.
      * @private
      * @constructor
-     * @alias WKTTokens
+     * @alias WktTokens
      */
-    var WKTTokens = function (sourceText) {
+    var WktTokens = function (sourceText) {
         this.sourceText = sourceText;
     };
 
@@ -24,7 +24,7 @@ define([
      * It returns correctly initialized objects. It is possible to retrieve relevant shapes from all WKT Objects.
      * @return {WKTObject[]}
      */
-    WKTTokens.prototype.objects = function () {
+    WktTokens.prototype.objects = function () {
         var currentObject;
         var objects = [];
 
@@ -37,9 +37,9 @@ define([
                     value = value.substring(0, value.length - founded.length);
                 }
 
-                currentObject = WKTElements[value] && new WKTElements[value]();
+                currentObject = WktElements[value] && new WktElements[value]();
                 if(!currentObject) {
-                    currentObject = new WKTObject();
+                    currentObject = new WktObject();
                 }
 
                 if(founded && founded.length > 0 && founded[0] != '') {
@@ -61,7 +61,7 @@ define([
      * @private
      * @return {String[]}
      */
-    WKTTokens.prototype.tokenize = function (textToParse) {
+    WktTokens.prototype.tokenize = function (textToParse) {
         this.currentPosition = 0;
 
         var tokens = [];
@@ -70,26 +70,26 @@ define([
 
             if (c == '(') {
                 tokens.push({
-                    type: WKTType.TokenType.LEFT_PARENTHESIS
+                    type: WktType.TokenType.LEFT_PARENTHESIS
                 });
             } else if (c == ',') {
                 tokens.push({
-                    type: WKTType.TokenType.COMMA
+                    type: WktType.TokenType.COMMA
                 });
             } else if (c == ')') {
                 tokens.push({
-                    type: WKTType.TokenType.RIGHT_PARENTHESIS
+                    type: WktType.TokenType.RIGHT_PARENTHESIS
                 });
             } else if (this.isAlpha(c)) {
                 var text = this.readText(textToParse);
                 tokens.push({
-                    type: WKTType.TokenType.TEXT,
+                    type: WktType.TokenType.TEXT,
                     value: text
                 });
             } else if (this.isNumeric(c)) {
                 var numeric = this.readNumeric(textToParse);
                 tokens.push({
-                    type: WKTType.TokenType.NUMBER,
+                    type: WktType.TokenType.NUMBER,
                     value: numeric
                 });
             } else if (this.isWhiteSpace(c)) {
@@ -109,7 +109,7 @@ define([
      * @param c {String} character to test
      * @return {boolean} True if it is lowercase or uppercase
      */
-    WKTTokens.prototype.isAlpha = function (c) {
+    WktTokens.prototype.isAlpha = function (c) {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
     };
 
@@ -120,7 +120,7 @@ define([
      * @param c {String} character to test
      * @return {boolean} True if it is either Number or - or .
      */
-    WKTTokens.prototype.isNumeric = function (c) {
+    WktTokens.prototype.isNumeric = function (c) {
         return c >= '0' && c <= '9' || c == '.' || c == '-';
     };
 
@@ -131,7 +131,7 @@ define([
      * @param c {String} character to test
      * @return {boolean} True if it is any type of white space.
      */
-    WKTTokens.prototype.isWhiteSpace = function (c) {
+    WktTokens.prototype.isWhiteSpace = function (c) {
         return c == ' ' || c == '\t' || c == '\r' || c == '\n';
     };
 
@@ -141,7 +141,7 @@ define([
      * @param textToParse {String} The text to use in parsing.
      * @return {string} The full chunk of text
      */
-    WKTTokens.prototype.readText = function (textToParse) {
+    WktTokens.prototype.readText = function (textToParse) {
         var text = '';
         while (this.isAlpha(textToParse.charAt(this.currentPosition))) {
             text += textToParse.charAt(this.currentPosition);
@@ -157,7 +157,7 @@ define([
      * @param textToParse {String} The text to use in parsing.
      * @return {Number} The full chunk of number
      */
-    WKTTokens.prototype.readNumeric = function (textToParse) {
+    WktTokens.prototype.readNumeric = function (textToParse) {
         var numeric = '';
         while (this.isNumeric(textToParse.charAt(this.currentPosition))) {
             numeric += textToParse.charAt(this.currentPosition);
@@ -167,5 +167,5 @@ define([
         return Number(numeric);
     };
 
-    return WKTTokens;
+    return WktTokens;
 });

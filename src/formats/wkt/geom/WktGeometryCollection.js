@@ -5,33 +5,33 @@
 define([
     '../../../geom/Location',
     '../../../geom/Position',
-    '../WKTElements',
-    './WKTObject',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    '../WktType'
 ], function (Location,
              Position,
-             WKTElements,
-             WKTObject,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktType) {
     /**
      * This item can contain other geometries to be shown.
-     * @alias WKTGeometryCollection
-     * @augments WKTObject
+     * @alias WktGeometryCollection
+     * @augments WktObject
      * @constructor
      */
-    var WKTGeometryCollection = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.GEOMETRY_COLLECTION);
+    var WktGeometryCollection = function () {
+        WktObject.call(this, WktType.SupportedGeometries.GEOMETRY_COLLECTION);
 
         this.objects = [];
     };
 
-    WKTGeometryCollection.prototype = Object.create(WKTObject.prototype);
+    WktGeometryCollection.prototype = Object.create(WktObject.prototype);
 
     /**
      * It takes an object and adds it among those, it will render
      * @param object {WKTObject} Object to be added to this collection.
      */
-    WKTGeometryCollection.prototype.add = function (object) {
+    WktGeometryCollection.prototype.add = function (object) {
         this.objects.push(object);
     };
 
@@ -40,7 +40,7 @@ define([
      * Array containing latitude, longitude and potentially either altitude or LRS.
      * @inheritDoc
      */
-    WKTGeometryCollection.prototype.addCoordinates = function (coordinates) {
+    WktGeometryCollection.prototype.addCoordinates = function (coordinates) {
         var object = this.objects[this.objects.length - 1];
         if (this._is3d) {
             object.coordinates.push(new Position(coordinates[0], coordinates[1], coordinates[2] || 0));
@@ -54,7 +54,7 @@ define([
      * @inheritDoc
      * @return {Renderable[]}
      */
-    WKTGeometryCollection.prototype.shapes = function () {
+    WktGeometryCollection.prototype.shapes = function () {
         var shapes = [];
 
         this.objects.forEach(function (associatedShapes) {
@@ -66,7 +66,7 @@ define([
         return shapes;
     };
 
-    WKTElements['GEOMETRYCOLLECTION'] = WKTGeometryCollection;
+    WktElements['GEOMETRYCOLLECTION'] = WktGeometryCollection;
 
-    return WKTGeometryCollection;
+    return WktGeometryCollection;
 });

@@ -3,15 +3,15 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
-    './WKTTokens'
-], function (WKTTokens) {
+    './WktTokens'
+], function (WktTokens) {
     /**
-     * WKTParser is capable of parsing the text representation of the WKT objects. The explanation of what all is
+     * WktParser is capable of parsing the text representation of the WKT objects. The explanation of what all is
      * supported is to be found in the README.MD in this directory.<br/>
      * <br/>
      * The simplest possible usage is:<br/>
      * var layer = new WorldWind.RenderableLayer();<br/>
-     * var parser = new WKTParser('POINT (19 23)');<br/>
+     * var parser = new WktParser('POINT (19 23)');<br/>
      * parser.load(null, null, layer);<br/>
      * wwd.addLayer(layer);<br/>
      * This example adds the WKT into the map<br/>
@@ -19,7 +19,7 @@ define([
      * The more complex usage allows you to update the attributes of the objects after adding them to the layer. In this example all
      * the shapes will have font color changed to the red:<br/>
      * var layer = new WorldWind.RenderableLayer();<br/>
-     * var parser = new WKTParser('POINT (19 23)');<br/>
+     * var parser = new WktParser('POINT (19 23)');<br/>
      * parser.load(function(objects){<br/>
      *  objects.forEach(function(object){<br/>
      *    var shapeAttributes = new ShapeAttributes(null);<br/>
@@ -31,9 +31,9 @@ define([
      *
      * The most complex usage is when you want to supply different configuration for object before it is added to the layer.<br/>
      * var layer = new WorldWind.RenderableLayer();<br/>
-     * var parser = new WKTParser('POINT (19 23)');<br/>
+     * var parser = new WktParser('POINT (19 23)');<br/>
      * parser.load(null, function(shape) {<br/>
-     *   if(shape.type == WKTType.SupportedGeometries.POINT) {<br/>
+     *   if(shape.type == WktType.SupportedGeometries.POINT) {<br/>
      *     var shapeAttributes = new ShapeAttributes(null);<br/>
      *     shapeAttributes.fontColor = Color.RED;<br/>
      *     return {<br/>
@@ -45,9 +45,9 @@ define([
      *
      * @param textRepresentation {String} Text representation of WKT objects.
      * @constructor
-     * @alias WKTParser
+     * @alias WktParser
      */
-    var WKTParser = function (textRepresentation) {
+    var WktParser = function (textRepresentation) {
         this.objects = null;
 
         this.textRepresentation = textRepresentation;
@@ -64,8 +64,8 @@ define([
      * @param layer {RenderableLayer} Layer to use for adding all the parsed shapes
      * @return {Renderable[]} Array of the Renderables present in the WKT.
      */
-    WKTParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
-        var objects = new WKTTokens(this.textRepresentation).objects();
+    WktParser.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
+        var objects = new WktTokens(this.textRepresentation).objects();
 
         shapeConfigurationCallback = shapeConfigurationCallback || function(){};
         parserCompletionCallback = parserCompletionCallback || function(){};
@@ -97,5 +97,5 @@ define([
         return objects;
     };
 
-    return WKTParser;
+    return WktParser;
 });

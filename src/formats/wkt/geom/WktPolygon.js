@@ -6,33 +6,33 @@ define([
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon',
-    '../WKTElements',
-    './WKTObject',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    '../WktType'
 ], function (Polygon,
              ShapeAttributes,
              SurfacePolygon,
-             WKTElements,
-             WKTObject,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktType) {
     /**
      * It represents the polygon.
-     * @alias WKTPolygon
-     * @augments WKTObject
+     * @alias WktPolygon
+     * @augments WktObject
      * @constructor
      */
-    var WKTPolygon = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.POLYGON);
+    var WktPolygon = function () {
+        WktObject.call(this, WktType.SupportedGeometries.POLYGON);
 
         this._renderable = null;
     };
 
-    WKTPolygon.prototype = Object.create(WKTObject.prototype);
+    WktPolygon.prototype = Object.create(WktObject.prototype);
 
     /**
      * @inheritDoc
      */
-    WKTPolygon.prototype.commaWithoutCoordinates = function() {
+    WktPolygon.prototype.commaWithoutCoordinates = function() {
         this.outerBoundaries = this.coordinates.slice();
         this.coordinates = [];
     };
@@ -42,7 +42,7 @@ define([
      * @inheritDoc
      * @return {Polygon[]|SurfacePolyline[]}
      */
-    WKTPolygon.prototype.shapes = function () {
+    WktPolygon.prototype.shapes = function () {
         if (this._is3d) {
             if(this.outerBoundaries) {
                 return [new Polygon([this.outerBoundaries, this.coordinates], new ShapeAttributes(null))];
@@ -58,7 +58,7 @@ define([
         }
     };
 
-    WKTElements['POLYGON'] = WKTPolygon;
+    WktElements['POLYGON'] = WktPolygon;
 
-    return WKTPolygon;
+    return WktPolygon;
 });

@@ -6,33 +6,33 @@ define([
     '../../../shapes/Path',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolyline',
-    '../WKTElements',
-    './WKTObject',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    '../WktType'
 ], function (Path,
              ShapeAttributes,
              SurfacePolyline,
-             WKTElements,
-             WKTObject,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktType) {
     /**
      * It represents WKT LineString.
-     * @alias WKTLineString
-     * @augments WKTObject
+     * @alias WktLineString
+     * @augments WktObject
      * @constructor
      */
-    var WKTLineString = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.LINE_STRING);
+    var WktLineString = function () {
+        WktObject.call(this, WktType.SupportedGeometries.LINE_STRING);
     };
 
-    WKTLineString.prototype = Object.create(WKTObject.prototype);
+    WktLineString.prototype = Object.create(WktObject.prototype);
 
     /**
      * In case of 2D return SurfacePolyline, in case of 3D returns Path.
      * @inheritDoc
      * @return {Path[]|SurfacePolyline[]}
      */
-    WKTLineString.prototype.shapes = function () {
+    WktLineString.prototype.shapes = function () {
         if (this._is3d) {
             return [new Path(this.coordinates, new ShapeAttributes(null))];
         } else {
@@ -40,7 +40,7 @@ define([
         }
     };
 
-    WKTElements['LINESTRING'] = WKTLineString;
+    WktElements['LINESTRING'] = WktLineString;
 
-    return WKTLineString;
+    return WktLineString;
 });

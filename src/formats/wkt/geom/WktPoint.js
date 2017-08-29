@@ -5,32 +5,32 @@
 define([
     '../../../shapes/Placemark',
     '../../../shapes/PlacemarkAttributes',
-    '../WKTElements',
-    './WKTObject',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    '../WktType'
 ], function (Placemark,
              PlacemarkAttributes,
-             WKTElements,
-             WKTObject,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktType) {
     /**
      * It represents Point
-     * @alias WKTPoint
-     * @augments WKTObject
+     * @alias WktPoint
+     * @augments WktObject
      * @constructor
      */
-    var WKTPoint = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.POINT);
+    var WktPoint = function () {
+        WktObject.call(this, WktType.SupportedGeometries.POINT);
     };
 
-    WKTPoint.prototype = Object.create(WKTObject.prototype);
+    WktPoint.prototype = Object.create(WktObject.prototype);
 
     /**
      * It returns Placemark representing this point.
      * @return {Placemark[]}
      */
-    WKTPoint.prototype.shapes = function () {
-        return [WKTPoint.placemark(this.coordinates[0])];
+    WktPoint.prototype.shapes = function () {
+        return [WktPoint.placemark(this.coordinates[0])];
     };
 
     /**
@@ -38,7 +38,7 @@ define([
      * @param coordinates {Location|Position} Location or Position for the Placemark
      * @return {Placemark} Placemark to be displayed on the map.
      */
-    WKTPoint.placemark = function(coordinates) {
+    WktPoint.placemark = function(coordinates) {
         var placemarkAttributes = new PlacemarkAttributes(null);
         placemarkAttributes.imageScale = 1;
         placemarkAttributes.imageOffset = new WorldWind.Offset(
@@ -59,7 +59,7 @@ define([
         return placemark;
     };
 
-    WKTElements['POINT'] = WKTPoint;
+    WktElements['POINT'] = WktPoint;
 
-    return WKTPoint;
+    return WktPoint;
 });

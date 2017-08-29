@@ -6,33 +6,33 @@ define([
     '../../../shapes/Path',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolyline',
-    '../WKTElements',
-    './WKTObject',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    '../WktType'
 ], function (Path,
              ShapeAttributes,
              SurfacePolyline,
-             WKTElements,
-             WKTObject,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktType) {
     /**
      * It represents multiple line string as one object.
-     * @alias WKTMultiLineString
-     * @augments WKTObject
+     * @alias WktMultiLineString
+     * @augments WktObject
      * @constructor
      */
-    var WKTMultiLineString = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.MULTI_LINE_STRING);
+    var WktMultiLineString = function () {
+        WktObject.call(this, WktType.SupportedGeometries.MULTI_LINE_STRING);
 
         this.objectBoundaries = [];
     };
 
-    WKTMultiLineString.prototype = Object.create(WKTObject.prototype);
+    WktMultiLineString.prototype = Object.create(WktObject.prototype);
 
     /**
      * Specific for Multi objects as it depicts the boundaries.
      */
-    WKTMultiLineString.prototype.commaWithoutCoordinates = function() {
+    WktMultiLineString.prototype.commaWithoutCoordinates = function() {
         this.objectBoundaries.push(this.coordinates.slice());
         this.coordinates = [];
     };
@@ -42,7 +42,7 @@ define([
      * @inheritDoc
      * @return {Path[]|SurfacePolyline[]}
      */
-    WKTMultiLineString.prototype.shapes = function() {
+    WktMultiLineString.prototype.shapes = function() {
         this.commaWithoutCoordinates(); // This needs to be more careful and probably move to the stuff
 
         if(this._is3d){
@@ -56,7 +56,7 @@ define([
         }
     };
 
-    WKTElements['MULTILINESTRING'] = WKTMultiLineString;
+    WktElements['MULTILINESTRING'] = WktMultiLineString;
 
-    return WKTMultiLineString;
+    return WktMultiLineString;
 });

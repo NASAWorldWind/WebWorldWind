@@ -5,45 +5,45 @@
 define([
     '../../../shapes/Placemark',
     '../../../shapes/PlacemarkAttributes',
-    '../WKTElements',
-    './WKTObject',
-    './WKTPoint',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    './WktPoint',
+    '../WktType'
 ], function (Placemark,
              PlacemarkAttributes,
-             WKTElements,
-             WKTObject,
-             WKTPoint,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktPoint,
+             WktType) {
     /**
      * It represents multiple points.
-     * @alias WKTMultiPoint
-     * @augments WKTObject
+     * @alias WktMultiPoint
+     * @augments WktObject
      * @constructor
      */
-    var WKTMultiPoint = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.MULTI_POINT);
+    var WktMultiPoint = function () {
+        WktObject.call(this, WktType.SupportedGeometries.MULTI_POINT);
     };
 
-    WKTMultiPoint.prototype = Object.create(WKTObject.prototype);
+    WktMultiPoint.prototype = Object.create(WktObject.prototype);
 
     /**
      * Specific for Multi objects as it depicts the boundaries.
      */
-    WKTMultiPoint.prototype.commaWithoutCoordinates = function() {};
+    WktMultiPoint.prototype.commaWithoutCoordinates = function() {};
 
     /**
      * It returns Placemark for each point.
      * @inheritDoc
      * @return {Placemark[]}
      */
-    WKTMultiPoint.prototype.shapes = function() {
+    WktMultiPoint.prototype.shapes = function() {
         return this.coordinates.map(function(coordinate){
-            return WKTPoint.placemark(coordinate);
+            return WktPoint.placemark(coordinate);
         }.bind(this));
     };
 
-    WKTElements['MULTIPOINT'] = WKTMultiPoint;
+    WktElements['MULTIPOINT'] = WktMultiPoint;
 
-    return WKTMultiPoint;
+    return WktMultiPoint;
 });

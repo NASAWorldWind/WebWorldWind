@@ -3,21 +3,21 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @exports WKTType
+ * @exports WktType
  */
 define([], function () {
     /**
      * Enumerations used throughout the implementation of the WKT
      * @constructor
-     * @alias WKTType
+     * @alias WktType
      */
-    var WKTType = function () {};
+    var WktType = function () {};
 
     /**
      * Names of supported geometries.
      * @type {{LINE_STRING: string, MULTI_LINE_STRING: string, POLYGON: string, MULTI_POLYGON: string, POINT: string, MULTI_POINT: string, TRIANGLE: string, GEOMETRY_COLLECTION: string}}
      */
-    WKTType.SupportedGeometries = {
+    WktType.SupportedGeometries = {
         LINE_STRING: 'LINESTRING',
         MULTI_LINE_STRING: 'MULTILINESTRING',
         POLYGON: 'POLYGON',
@@ -32,7 +32,7 @@ define([], function () {
      * Types of tokens from parsing the text.
      * @type {{LEFT_PARENTHESIS: number, COMMA: number, RIGHT_PARENTHESIS: number, NUMBER: number, TEXT: number}}
      */
-    WKTType.TokenType = {
+    WktType.TokenType = {
         LEFT_PARENTHESIS: 0,
         COMMA: 1,
         RIGHT_PARENTHESIS: 2,
@@ -40,5 +40,5 @@ define([], function () {
         TEXT: 4
     };
 
-    return WKTType;
+    return WktType;
 });

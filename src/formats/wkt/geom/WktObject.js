@@ -8,20 +8,20 @@
 define([
     '../../../geom/Location',
     '../../../geom/Position',
-    '../WKTElements',
-    '../WKTType'
+    '../WktElements',
+    '../WktType'
 ], function (Location,
              Position,
-             WKTElements,
-             WKTType) {
+             WktElements,
+             WktType) {
     /**
      * THis shouldn't be initiated from outside. It is only for internal use. Every other WKT Objects are themselves
-     * WKTObject
-     * @alias WKTObject
+     * WktObject
+     * @alias WktObject
      * @param type {String} Textual representation of the type of current object.
      * @constructor
      */
-    var WKTObject = function (type) {
+    var WktObject = function (type) {
         /**
          * Type of this object.
          * @type {WKTType}
@@ -64,14 +64,14 @@ define([
     /**
      * It sets the information that this object is actually represented in 3D
      */
-    WKTObject.prototype.set3d = function () {
+    WktObject.prototype.set3d = function () {
         this._is3d = true;
     };
 
     /**
      * It sets the information that the object contain information about LRS offset.
      */
-    WKTObject.prototype.setLrs = function () {
+    WktObject.prototype.setLrs = function () {
         this._isLrs = true;
     };
 
@@ -80,7 +80,7 @@ define([
      * @coordinates {Number[]} Array containing longitude, latitude and potentially altitude of another point in the
      *  object.
      */
-    WKTObject.prototype.addCoordinates = function (coordinates) {
+    WktObject.prototype.addCoordinates = function (coordinates) {
         if (this._is3d) {
             this.coordinates.push(new Position(coordinates[0], coordinates[1], coordinates[2] || 0));
         } else {
@@ -92,7 +92,7 @@ define([
      * It is used to retrieve and create the shape or shapes associated.
      * @returns {Renderable[]} Array of renderables associated with given shape.
      */
-    WKTObject.prototype.shapes = function() {
+    WktObject.prototype.shapes = function() {
         return [];
     };
 
@@ -100,19 +100,19 @@ define([
      * Token handling is delegated to the objects.
      * @param token {Object} It contains type and value.
      */
-    WKTObject.prototype.handleToken = function(token) {
+    WktObject.prototype.handleToken = function(token) {
         var value = token.value;
         var options = this.options;
-        if (token.type === WKTType.TokenType.TEXT) {
+        if (token.type === WktType.TokenType.TEXT) {
             // In this part retain only the information about new Object?
             this.text(options, value);
-        } else if (token.type === WKTType.TokenType.LEFT_PARENTHESIS) {
+        } else if (token.type === WktType.TokenType.LEFT_PARENTHESIS) {
             this.leftParenthesis(options);
-        } else if (token.type === WKTType.TokenType.RIGHT_PARENTHESIS) {
+        } else if (token.type === WktType.TokenType.RIGHT_PARENTHESIS) {
             this.rightParenthesis(options);
-        } else if (token.type === WKTType.TokenType.NUMBER) {
+        } else if (token.type === WktType.TokenType.NUMBER) {
             this.number(options, value);
-        } else if (token.type === WKTType.TokenType.COMMA) {
+        } else if (token.type === WktType.TokenType.COMMA) {
             this.comma(options);
         }
         options.tokens.push(token);
@@ -130,7 +130,7 @@ define([
      * @param options.tokens {Object[]} Processed tokens.
      * @param value {String} Value to use for distinguishing among options.
      */
-    WKTObject.prototype.text = function(options, value) {
+    WktObject.prototype.text = function(options, value) {
         value = value.toUpperCase();
         var started = null;
         if (value.length <= 2) {
@@ -146,9 +146,9 @@ define([
             }
 
             // Handle the GeometryCollection.
-            var currentObject = WKTElements[value] && new WKTElements[value]();
+            var currentObject = WktElements[value] && new WktElements[value]();
             if(!currentObject) {
-                currentObject = new WKTObject();
+                currentObject = new WktObject();
             }
 
             if(founded && founded.length > 0 && founded[0] != '') {
@@ -167,7 +167,7 @@ define([
      * @param options.rightParenthesis {Number} Amount of the right parenthesis
      * @param options.tokens {Object[]} Processed tokens.
      */
-    WKTObject.prototype.rightParenthesis = function(options) {
+    WktObject.prototype.rightParenthesis = function(options) {
         options.rightParenthesis++;
 
         if (options.coordinates) {
@@ -185,7 +185,7 @@ define([
      * @param options.rightParenthesis {Number} Amount of the right parenthesis
      * @param options.tokens {Object[]} Processed tokens.
      */
-    WKTObject.prototype.leftParenthesis = function(options) {
+    WktObject.prototype.leftParenthesis = function(options) {
         options.leftParenthesis++;
     };
 
@@ -199,7 +199,7 @@ define([
      * @param options.rightParenthesis {Number} Amount of the right parenthesis
      * @param options.tokens {Object[]} Processed tokens.
      */
-    WKTObject.prototype.comma = function(options) {
+    WktObject.prototype.comma = function(options) {
         if (!options.coordinates) {
             this.commaWithoutCoordinates(options);
         } else {
@@ -217,7 +217,7 @@ define([
      * @param options.rightParenthesis {Number} Amount of the right parenthesis
      * @param options.tokens {Object[]} Processed tokens.
      */
-    WKTObject.prototype.commaWithoutCoordinates = function(options){};
+    WktObject.prototype.commaWithoutCoordinates = function(options){};
 
     /**
      * Handle Number by adding it among coordinates in the current object.
@@ -229,7 +229,7 @@ define([
      * @param options.tokens {Object[]} Processed tokens.
      * @param value {Number}
      */
-    WKTObject.prototype.number = function(options, value) {
+    WktObject.prototype.number = function(options, value) {
         options.coordinates = options.coordinates || [];
         options.coordinates.push(value);
     };
@@ -237,9 +237,9 @@ define([
     /**
      * It sets the options of the current object. This means setting up the 3D and the linear space.
      * @param text {String} Specific text used as options.
-     * @param currentObject {WKTObject} Object to apply the options to.
+     * @param currentObject {WktObject} Object to apply the options to.
      */
-    WKTObject.prototype.setOptions = function(text, currentObject) {
+    WktObject.prototype.setOptions = function(text, currentObject) {
         if (text == 'Z') {
             currentObject.set3d();
         } else if (text == 'M') {
@@ -254,9 +254,9 @@ define([
      * It returns true when the object is finished.
      * @return {Boolean} True if the parentheses are closed, false otherwise
      */
-    WKTObject.prototype.isFinished = function() {
+    WktObject.prototype.isFinished = function() {
         return this.options.leftParenthesis === this.options.rightParenthesis && this.options.leftParenthesis > 0;
     };
 
-    return WKTObject;
+    return WktObject;
 });

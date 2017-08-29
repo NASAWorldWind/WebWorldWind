@@ -6,23 +6,23 @@ define([
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon',
-    '../WKTElements',
-    './WKTObject',
-    '../WKTType'
+    '../WktElements',
+    './WktObject',
+    '../WktType'
 ], function (Polygon,
              ShapeAttributes,
              SurfacePolygon,
-             WKTElements,
-             WKTObject,
-             WKTType) {
+             WktElements,
+             WktObject,
+             WktType) {
     /**
      * It represents multiple polygons.
-     * @alias WKTMultiPolygon
-     * @augments WKTObject
+     * @alias WktMultiPolygon
+     * @augments WktObject
      * @constructor
      */
-    var WKTMultiPolygon = function () {
-        WKTObject.call(this, WKTType.SupportedGeometries.MULTI_POLYGON);
+    var WktMultiPolygon = function () {
+        WktObject.call(this, WktType.SupportedGeometries.MULTI_POLYGON);
 
         /**
          * Internal object boundaries for used polygons. Some polygons may have inner and outer boundaries.
@@ -37,7 +37,7 @@ define([
         this.currentIndex = 0;
     };
 
-    WKTMultiPolygon.prototype = Object.create(WKTObject.prototype);
+    WktMultiPolygon.prototype = Object.create(WktObject.prototype);
 
     /**
      * In case of right parenthesis, it means either that the boundaries ends or that the object ends or that the WKT
@@ -46,15 +46,15 @@ define([
      * @inheritDoc
      * @private
      */
-    WKTMultiPolygon.prototype.rightParenthesis = function(options) {
-        WKTObject.prototype.rightParenthesis.call(this, options);
+    WktMultiPolygon.prototype.rightParenthesis = function(options) {
+        WktObject.prototype.rightParenthesis.call(this, options);
 
         // MultiPolygon object is distinguished by )),
-        if(options.tokens[options.tokens.length -1].type != WKTType.TokenType.RIGHT_PARENTHESIS) {
+        if(options.tokens[options.tokens.length -1].type != WktType.TokenType.RIGHT_PARENTHESIS) {
             this.addBoundaries();
             // MultiPolygon boundaries are distinguished by ),
-        } else if(options.tokens[options.tokens.length -1].type == WKTType.TokenType.RIGHT_PARENTHESIS &&
-            options.tokens[options.tokens.length -2].type != WKTType.TokenType.RIGHT_PARENTHESIS) {
+        } else if(options.tokens[options.tokens.length -1].type == WktType.TokenType.RIGHT_PARENTHESIS &&
+            options.tokens[options.tokens.length -2].type != WktType.TokenType.RIGHT_PARENTHESIS) {
             this.addObject();
         }
     };
@@ -63,7 +63,7 @@ define([
      * It adds outer or inner boundaries to current polygon.
      * @private
      */
-    WKTMultiPolygon.prototype.addBoundaries = function() {
+    WktMultiPolygon.prototype.addBoundaries = function() {
         if(!this.objectBoundaries[this.currentIndex]) {
             this.objectBoundaries[this.currentIndex] = [];
         }
@@ -75,7 +75,7 @@ define([
      * It ends boundaries for current polygon.
      * @private
      */
-    WKTMultiPolygon.prototype.addObject = function() {
+    WktMultiPolygon.prototype.addObject = function() {
         this.currentIndex++;
     };
 
@@ -84,7 +84,7 @@ define([
      * @inheritDoc
      * @return {Polygon[]|SurfacePolygon[]}
      */
-    WKTMultiPolygon.prototype.shapes = function () {
+    WktMultiPolygon.prototype.shapes = function () {
         if (this._is3d) {
             return this.objectBoundaries.map(function (boundaries) {
                 return new Polygon(boundaries, new ShapeAttributes(null));
@@ -96,7 +96,7 @@ define([
         }
     };
 
-    WKTElements['MULTIPOLYGON'] = WKTMultiPolygon;
+    WktElements['MULTIPOLYGON'] = WktMultiPolygon;
 
-    return WKTMultiPolygon;
+    return WktMultiPolygon;
 });
