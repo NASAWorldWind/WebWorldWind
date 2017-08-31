@@ -42,7 +42,7 @@ requirejs(['../src/WorldWind',
         new WorldWind.WktParser("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(function completionCallback(){
             // Once all the shapes are parsed, this function is called.
             console.log('Parsing of the Wkt was completed');
-        }, function(shape){
+        }, function shapeConfigurationCallback(shape){
             if (shape.type == WorldWind.WktType.SupportedGeometries.MULTI_POLYGON) {
                 var shapeAttributes = new WorldWind.ShapeAttributes(null);
                 shapeAttributes.interiorColor = WorldWind.Color.GREEN;
