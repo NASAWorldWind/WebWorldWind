@@ -2,7 +2,7 @@
   "name": "@nasaworldwind/worldwind",
   "version": "0.0.1",
   "description": "Web WorldWind",
-  "main": "index.js",
+  "main": "worldwind.min.js",
   "homepage": "https://nasaworldwind.github.io/",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
