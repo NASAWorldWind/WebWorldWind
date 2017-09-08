@@ -12,16 +12,12 @@ node_js:
 script:
   - npm run build
 
-# Node.js build cache configuration. See the Travis CI documentation: https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Caching-with-npm
-cache:
-  directories:
-    - "node_modules"
-
+# Deploy build artifacts. Travis does not invoke this step for pull request builds
 deploy:
-  # Publish to npm repository
+  # Publish release artifacts to the npm repository
   - provider: npm
     email: $NPM_EMAIL
-    api_key: $NPM_KEY
+    api_key: $NPM_API_KEY
     skip_cleanup: true
     on:
       tags: true
@@ -38,3 +34,8 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+
+# Node.js build cache configuration. See the Travis CI documentation: https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Caching-with-npm
+cache:
+  directories:
+    - "node_modules"
