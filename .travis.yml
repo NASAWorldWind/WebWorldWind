@@ -16,3 +16,25 @@ script:
 cache:
   directories:
     - "node_modules"
+
+deploy:
+  # Publish to npm repository
+  - provider: npm
+    email: $NPM_EMAIL
+    api_key: $NPM_KEY
+    skip_cleanup: true
+    on:
+      tags: true
+  # Create CHANGELOG.md in the current directory
+  - provider: script
+    script: ./travis/changelog.sh >> CHANGELOG.md
+    skip_cleanup: true
+    on:
+      tags: true
+  # Create a GitHub release and publish CHANGELOG.md to the release assets
+  - provider: releases
+    api_key: $GITHUB_API_KEY
+    file: CHANGELOG.md
+    skip_cleanup: true
+    on:
+      tags: true

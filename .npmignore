@@ -39,3 +39,5 @@ test/
 test-results/
 
 tools/
+
+travis/
