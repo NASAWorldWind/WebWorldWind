@@ -12,6 +12,8 @@ apps/
 
 config.json
 
+CONTRIBUTING.md
+
 design-notes/
 
 examples/
@@ -21,6 +23,8 @@ Gruntfile.js
 HowToBuildWebWW.md
 
 HowToCreateAndRunUnitTests.md
+
+ISSUE_TEMPLATE.md
 
 karma.conf.js
 
@@ -32,6 +36,8 @@ package-lock.json
 
 performance/
 
+PULL_REQUEST_TEMPLATE.md
+
 src/
 
 test/
@@ -39,3 +45,5 @@ test/
 test-results/
 
 tools/
+
+travis/

@@ -59,5 +59,8 @@
     "javascript",
     "webgl",
     "browser"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
