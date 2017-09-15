@@ -76,8 +76,30 @@ define([
                 }
             };
 
+            // Helper function for throttling picking on mousemove
+            var throttle = function(func, threshold) {
+                var last = 0,
+                    timeout = null;
+                return function() {
+                    var callContext = this,
+                        callArguments = arguments,
+                        now = Date.now(),
+                        remaining = threshold - (now - last);
+                    clearTimeout(timeout);
+                    if (remaining > 0) {
+                        timeout = setTimeout(function () {
+                            last = now;
+                            func.apply(callContext, callArguments);
+                        }, remaining);
+                    } else {
+                        last = now;
+                        func.apply(callContext, callArguments);
+                    }
+                }
+            }
+
             // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
-            this.worldWindow.addEventListener("mousemove", handlePick);
+            this.worldWindow.addEventListener("mousemove", throttle(handlePick, 50));
 
             // Listen for taps on mobile devices and highlight the placemarks that the user taps.
             var tapRecognizer = new WorldWind.TapRecognizer(this.worldWindow, handlePick);
