@@ -20,9 +20,10 @@ define([
          * @constructor
          * @classdesc Monitors mouse-move and touch-device tap events and highlights shapes they identify.
          * @param {WorldWindow} worldWindow The WorldWindow to monitor for mouse-move and tap events.
+         * @param {Number} [fastestUpdateInterval=50] The fastest rate in milliseconds at which to update the highlighted items when the mouse moves.
          * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
-        var HighlightController = function (worldWindow) {
+        var HighlightController = function (worldWindow, fastestUpdateInterval) {
             if (!worldWindow) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "HighlightController", "constructor",
                     "missingWorldWindow"));
@@ -34,6 +35,13 @@ define([
              * @readonly
              */
             this.worldWindow = worldWindow;
+
+            /**
+             * This controller's fastest update interval in milliseconds.
+             * @type {Number}
+             * @readonly
+             */
+            this.fastestUpdateInterval = fastestUpdateInterval || 50;
 
             var highlightedItems = [];
 
@@ -77,7 +85,7 @@ define([
             };
 
             // Helper function for throttling picking on mousemove
-            var throttle = function(func, threshold) {
+            var throttle = function (func, threshold) {
                 var last = 0,
                     timeout = null;
                 return function() {
@@ -96,10 +104,10 @@ define([
                         func.apply(callContext, callArguments);
                     }
                 }
-            }
+            };
 
             // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
-            this.worldWindow.addEventListener("mousemove", throttle(handlePick, 50));
+            this.worldWindow.addEventListener("mousemove", throttle(handlePick, this.fastestUpdateInterval));
 
             // Listen for taps on mobile devices and highlight the placemarks that the user taps.
             var tapRecognizer = new WorldWind.TapRecognizer(this.worldWindow, handlePick);
