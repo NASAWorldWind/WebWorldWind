@@ -27,7 +27,7 @@ requirejs(['../src/WorldWind',
 
         // Example showing the usage of Well Known Text collection in real life.
         var defaultLayer = new WorldWind.RenderableLayer("Wkt Shapes");
-        new WorldWind.WktParser("" +
+        new WorldWind.Wkt("" +
             "GEOMETRYCOLLECTION(" +
             "   POLYGON ((40 -70, 45 -80, 40 -90)), " +
             "   POINT (33 -75)," +
@@ -39,9 +39,11 @@ requirejs(['../src/WorldWind',
 
         // Using the callback mechanism presented in the Wkt parser to update the shapes as well as showing the information about the successful rendering.
         var customCallbackLayer = new WorldWind.RenderableLayer("Wkt Shapes");
-        new WorldWind.WktParser("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(function completionCallback(){
+        new WorldWind.Wkt("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(function completionCallback(wkt, objects){
             // Once all the shapes are parsed, this function is called.
             console.log('Parsing of the Wkt was completed');
+
+            wkt.defaultParserCompletionCallback(wkt, objects);
         }, function shapeConfigurationCallback(shape){
             if (shape.type == WorldWind.WktType.SupportedGeometries.MULTI_POLYGON) {
                 var shapeAttributes = new WorldWind.ShapeAttributes(null);

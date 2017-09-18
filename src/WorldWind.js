@@ -216,6 +216,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/util/ViewVolume',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
+        './formats/wkt/Wkt',
         './formats/wkt/WktElements',
         './formats/wkt/geom/WktGeometryCollection',
         './formats/wkt/geom/WktLineString',
@@ -223,7 +224,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/wkt/geom/WktMultiPoint',
         './formats/wkt/geom/WktMultiPolygon',
         './formats/wkt/geom/WktObject',
-        './formats/wkt/WktParser',
         './formats/wkt/geom/WktPoint',
         './formats/wkt/geom/WktPolygon',
         './formats/wkt/WktTokens',
@@ -453,6 +453,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ViewVolume,
               WcsTileUrlBuilder,
               WfsCapabilities,
+              Wkt,
               WktElements,
               WktGeometryCollection,
               WktLineString,
@@ -460,7 +461,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WktMultiPoint,
               WktMultiPolygon,
               WktObject,
-              WktParser,
               WktPoint,
               WktPolygon,
               WktTokens,
@@ -847,7 +847,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
-        WorldWind['WktParser'] = WktParser;
+        WorldWind['Wkt'] = Wkt;
         WorldWind['WktType'] = WktType;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
