@@ -11,7 +11,7 @@ define([
         '../shapes/AnnotationAttributes',
         '../error/ArgumentError',
         '../util/Color',
-        '../util/ControlPointMarker',
+        '../shapes/ControlPointMarker',
         '../util/Font',
         '../util/Insets',
         '../geom/Location',
@@ -403,20 +403,20 @@ define([
          * Called by {@link ShapeEditorController#setArmed} to initialize this editor.
          */
         ShapeEditorController.prototype.enable = function () {
-            if (!this.worldWindow.containsLayer(this.controlPointLayer)) {
+            if (this.worldWindow.indexOfLayer(this.controlPointLayer) == -1) {
                 this.worldWindow.addLayer(this.controlPointLayer);
             }
 
-            if (!this.worldWindow.containsLayer(this.accessoryLayer)) {
+            if (this.worldWindow.indexOfLayer(this.accessoryLayer) == -1) {
                 this.worldWindow.addLayer(this.accessoryLayer);
             }
             this.makeAccessory();
 
-            if (!this.worldWindow.containsLayer(this.annotationLayer)) {
+            if (this.worldWindow.indexOfLayer(this.annotationLayer) == -1) {
                 this.worldWindow.addLayer(this.annotationLayer);
             }
 
-            if (!this.worldWindow.containsLayer(this.shadowLayer)) {
+            if (this.worldWindow.indexOfLayer(this.shadowLayer) == -1) {
                 this.worldWindow.insertLayer(0, this.shadowLayer);
             }
 

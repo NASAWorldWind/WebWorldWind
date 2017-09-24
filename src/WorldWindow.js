@@ -979,17 +979,17 @@ define([
         };
 
         /**
-         * Indicates whether this world window contains a specified layer.
+         * Returns the index of a layer.
          * @param {Layer} layer The layer to test.
-         * @returns {Boolean} true if this world window contains the specified layer, otherwise false.
+         * @returns {Number} Returns the index of the searched layer or -1 if it doesn't exists.
          */
-        WorldWindow.prototype.containsLayer = function (layer) {
-            for (var i = 0, len = this.layers.length; i < len; i++) {
-                if (this.layers[i] === layer) {
-                    return true;
-                }
+        WorldWindow.prototype.indexOfLayer = function (layer) {
+            if (layer == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "indexOfLayer", "missingLayer"));
             }
-            return false;
+
+            return this.layers.indexOf(layer);
         };
 
         /**
