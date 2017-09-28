@@ -848,6 +848,17 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
+        WorldWind['WktElements'] = WktElements;
+        WorldWind['WktGeometryCollection'] = WktGeometryCollection;
+        WorldWind['WktLineString'] = WktLineString;
+        WorldWind['WktMultiLineString'] = WktMultiLineString;
+        WorldWind['WktMultiPoint'] = WktMultiPoint;
+        WorldWind['WktMultiPolygon'] = WktMultiPolygon;
+        WorldWind['WktObject'] = WktObject;
+        WorldWind['WktPoint'] = WktPoint;
+        WorldWind['WktPolygon'] = WktPolygon;
+        WorldWind['WktTokens'] = WktTokens;
+        WorldWind['WktTriangle'] = WktTriangle;
         WorldWind['WktType'] = WktType;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
