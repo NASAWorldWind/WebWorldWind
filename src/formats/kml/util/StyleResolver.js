@@ -4,8 +4,10 @@
  */
 define([
     '../KmlFile',
+    '../styles/KmlStyle',
     '../../../util/Logger'
 ], function (KmlFile,
+             KmlStyle,
              Logger) {
     "use strict";
 
@@ -32,6 +34,7 @@ define([
             this.handleStyleSelector(styleSelector, resolve, reject);
         } else {
             Logger.logMessage(Logger.LEVEL_WARNING, "StyleResolver", "handleRemoteStyle", "Style was null.");
+            resolve(KmlStyle.default());
         }
     };
 
