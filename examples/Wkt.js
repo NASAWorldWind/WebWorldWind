@@ -39,20 +39,24 @@ requirejs(['../src/WorldWind',
 
         // Using the callback mechanism presented in the Wkt parser to update the shapes as well as showing the information about the successful rendering.
         var customCallbackLayer = new WorldWind.RenderableLayer("Wkt Shapes");
-        new WorldWind.Wkt("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(function completionCallback(wkt, objects){
+        new WorldWind.Wkt("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(
+            function completionCallback(wkt, objects){
             // Once all the shapes are parsed, this function is called.
-            console.log('Parsing of the Wkt was completed');
+                console.log('Parsing of the Wkt was completed');
 
-            wkt.defaultParserCompletionCallback(wkt, objects);
-        }, function shapeConfigurationCallback(shape){
-            if (shape.type == WorldWind.WktType.SupportedGeometries.MULTI_POLYGON) {
-                var shapeAttributes = new WorldWind.ShapeAttributes(null);
-                shapeAttributes.interiorColor = WorldWind.Color.GREEN;
-                return {
-                    attributes: shapeAttributes
-                };
-            }
-        }, customCallbackLayer);
+                wkt.defaultParserCompletionCallback(wkt, objects);
+            },
+            function shapeConfigurationCallback(shape){
+                if (shape.type == WorldWind.WktType.SupportedGeometries.MULTI_POLYGON) {
+                    var shapeAttributes = new WorldWind.ShapeAttributes(null);
+                    shapeAttributes.interiorColor = WorldWind.Color.GREEN;
+                    return {
+                        attributes: shapeAttributes
+                    };
+                }
+            },
+            customCallbackLayer
+        );
         wwd.addLayer(customCallbackLayer);
 
         // Allow for parsing of your own Well known text data
