@@ -49,6 +49,7 @@ define([
         this._cache = {};
         
         this._controls = options.controls || [];
+        // It should be possible to keep the context here?
         this._factory = new KmlElementsFactoryCached({controls: this._controls});
         
         this.hook(this._controls, options);
