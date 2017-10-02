@@ -2,6 +2,7 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
+// The issue here is probably that I try to get into a center the camera instead of the point the LookAt would point to.
 /**
  * @exports GoToAnimator
  * @version $Id: GoToAnimator.js 3164 2015-06-09 15:35:14Z tgaskins $
@@ -10,12 +11,14 @@ define([
         '../navigate/Camera',
         '../geom/Location',
         '../util/Logger',
+        '../navigate/LookAt',
         '../geom/Position',
         '../geom/Vec3'
     ],
     function (Camera,
               Location,
               Logger,
+              LookAt,
               Position,
               Vec3) {
         "use strict";
@@ -96,8 +99,7 @@ define([
             this.cancelled = false;
 
             // Capture the target position and determine its altitude.
-            this.targetPosition = new Position(position.latitude, position.longitude,
-                position.altitude || camera.altitude);
+            this.targetPosition = this.getTargetPosition(position);
 
             // Capture the start position and start time.
             this.startPosition = new Position(
@@ -165,7 +167,6 @@ define([
 
             // Determine the range velocity, in meters per millisecond.
             this.rangeVelocity = rangeDistance / animationDuration; // meters per millisecond
-            console.log('GoToAnimator#Invoked Pan velocity: ', this.panVelocity, ' Range velocity: ', this.rangeVelocity, ' Animation Duration: ', animationDuration, ' Animation distance: ', animationDistance, ' Target position: ', this.targetPosition);
 
             // Set up the animation timer.
             var thisAnimator = this;
@@ -184,6 +185,25 @@ define([
                 }
             };
             setTimeout(timerCallback, this.animationFrequency); // invoke it the first time
+        };
+
+        /**
+         * This function gets the information which is in the LookAt format and transforms it to the Camera position
+         * usable to verify we are at the target point.
+         * @param position {Position|Location} Final position required by the user.
+         */
+        GoToAnimator.prototype.getTargetPosition = function(position) {
+            var lookAt = new LookAt();
+            this.wwd.navigator.getAsLookAt(this.wwd.globe, lookAt);
+            if(position.altitude !==  null && typeof position.altitude !== "undefined") {
+                lookAt.altitude = position.altitude;
+            }
+            lookAt.latitude = position.latitude;
+            lookAt.longitude = position.longitude;
+            var resultCamera = new Camera();
+            this.wwd.globe.lookAtToCamera(lookAt, resultCamera);
+
+            return new Position(resultCamera.latitude, resultCamera.longitude, resultCamera.altitude);
         };
 
         // Intentionally not documented.
@@ -261,7 +281,6 @@ define([
                 nextLocation = Location.greatCircleLocation(currentPosition, azimuthToTarget, nextDistance,
                     new Location(0, 0)),
                 locationReached = false;
-            console.log('GoToAnimator Travelled ', distanceTravelled, ' Pan velocity ', this.panVelocity, ' Remaining ', distanceRemaining, ' Now ', distanceForNow, ' Next distance: ', nextDistance);
 
             camera.latitude = nextLocation.latitude;
             camera.longitude = nextLocation.longitude;
