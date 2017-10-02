@@ -536,7 +536,7 @@ define([
                 return;
             }
 
-            var editingAttributes = this.originalHighlightAttributes.clone();
+            var editingAttributes = new ShapeAttributes(this.originalHighlightAttributes);
 
             if (editingAttributes.interiorColor.alpha === 1) {
                 editingAttributes.interiorColor.alpha = 0.7;
@@ -545,7 +545,7 @@ define([
             this.shape.highlightAttributes = editingAttributes;
 
             shadowShape.highlighted = true;
-            shadowShape.highlightAttributes = this.originalHighlightAttributes.clone();
+            shadowShape.highlightAttributes = new ShapeAttributes(this.originalHighlightAttributes);
 
             this.shadowLayer.addRenderable(shadowShape);
             this.worldWindow.redraw();

@@ -31,8 +31,8 @@ define([
             this._drawInterior = attributes ? attributes._drawInterior : true;
             this._drawOutline = attributes ? attributes._drawOutline : true;
             this._enableLighting = attributes ? attributes._enableLighting : false;
-            this._interiorColor = attributes ? attributes._interiorColor : Color.WHITE;
-            this._outlineColor = attributes ? attributes._outlineColor : Color.RED;
+            this._interiorColor = attributes ? attributes._interiorColor.clone() : Color.WHITE.clone();
+            this._outlineColor = attributes ? attributes._outlineColor.clone() : Color.RED.clone();
             this._outlineWidth = attributes ? attributes._outlineWidth : 1.0;
             this._outlineStippleFactor = attributes ? attributes._outlineStippleFactor : 0;
             this._outlineStipplePattern = attributes ? attributes._outlineStipplePattern : 0xF0F0;
@@ -299,25 +299,6 @@ define([
                 }
             }
         });
-
-        ShapeAttributes.prototype.clone = function () {
-            var attributes = new ShapeAttributes(null);
-
-            attributes._drawInterior = this._drawInterior;
-            attributes._drawOutline = this._drawOutline;
-            attributes._enableLighting = this._enableLighting;
-            attributes._interiorColor = this._interiorColor.clone();
-            attributes._outlineColor = this._outlineColor.clone();
-            attributes._outlineWidth = this._outlineWidth;
-            attributes._outlineStippleFactor = this._outlineStippleFactor;
-            attributes._outlineStipplePattern = this._outlineStipplePattern;
-            attributes._imageSource = this._imageSource;
-            attributes._depthTest = this._depthTest;
-            attributes._drawVerticals = this._drawVerticals;
-            attributes._applyLighting = this._applyLighting;
-
-            return attributes;
-        };
 
         return ShapeAttributes;
     })
