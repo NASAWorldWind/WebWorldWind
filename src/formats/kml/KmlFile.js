@@ -70,6 +70,7 @@ define([
         
         var filePromise;
         // Load the document
+        // TODO: Refactor
         filePromise = new Promise(function (resolve) {
             var promise = self.requestRemote(url);
             promise.then(function (options) {
@@ -78,23 +79,41 @@ define([
                 self._headers = options.headers;
                 if (!self.hasExtension("kmz", url)) {
                     rootDocument = loadedDocument;
+
+                    self._document = new XmlDocument(rootDocument).dom();
+                    KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
+
+                    window.setTimeout(function () {
+                        resolve(self);
+                    }, 0);
                 } else {
+                    var promises = [];
                     var kmzFile = new JsZip();
                     kmzFile.load(loadedDocument);
                     for(var key in kmzFile.files) {
                         var file = kmzFile.files[key];
                         if (rootDocument == null && self.hasExtension("kml", file.name)) {
-                            rootDocument = file.asText();
+                            rootDocument = file.async("text").then(function(kmlTextRepresentation){
+
+                            });
+                        } else if(self.hasExtension("kml", file.name)) {
+                            file.async("text")
+                                .then(function (kmlTextRepresentation) {
+                                    var dataURI = "data:image/jpeg;base64," + data64;
+                                });
                         }
                     }
+
+                    // After the file is loaded.
+                    Promise.all(promises).then(function(){
+                        self._document = new XmlDocument(rootDocument).dom();
+                        KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
+
+                        window.setTimeout(function () {
+                            resolve(self);
+                        }, 0);
+                    });
                 }
-
-                self._document = new XmlDocument(rootDocument).dom();
-                KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
-
-                window.setTimeout(function () {
-                    resolve(self);
-                }, 0);
             });
         });
         this._fileCache.add(url, filePromise);
@@ -142,7 +161,9 @@ define([
      * FOR INTERNAL USE ONLY.
      * Returns a value indicating whether the URL ends with the given extension.
      * @param url {String} Url to a file
+     * @param extension {String} Extension of the file.
      * @returns {boolean} true if the extension matches otherwise false
+     * @private
      */
     KmlFile.prototype.hasExtension = function (extension, url) {
         return WWUtil.endsWith(url, "." + extension);
