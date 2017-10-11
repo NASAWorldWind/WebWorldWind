@@ -141,12 +141,12 @@ define([
         }
     });
 
-    KmlStyle.prototype.generate = function(options) {
+    KmlStyle.prototype.generate = function(options, fileCache) {
         options = options || {};
         var style = this || {};
 
         if(style.kmlIconStyle) {
-            KmlIconStyle.update(style.kmlIconStyle, options);
+            KmlIconStyle.update(style.kmlIconStyle, options, fileCache);
         }
         if(style.kmlListStyle) {
             KmlListStyle.update(style.kmlListStyle, options);

@@ -116,7 +116,7 @@ define([
             this.isDownloading = true;
             var self = this;
 
-            new KmlFile(self.buildUrl()).then(function (kmlFile) {
+            new KmlFile(self.buildUrl(kmlOptions.fileCache)).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
                 self.isDownloading = false;
 
@@ -132,8 +132,8 @@ define([
         }
     };
 
-    KmlNetworkLink.prototype.buildUrl = function() {
-        return this.kmlLink.kmlHref;
+    KmlNetworkLink.prototype.buildUrl = function(fileCache) {
+        return this.kmlLink.kmlHref(fileCache);
     };
 
 	/**
@@ -148,7 +148,7 @@ define([
         });
         if(activeEvents.length > 0) {
             var self = this;
-            new KmlFile(self.buildUrl()).then(function (kmlFile) {
+            new KmlFile(self.buildUrl(kmlOptions.fileCache)).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
 
                 self.fireEvent(kmlOptions);

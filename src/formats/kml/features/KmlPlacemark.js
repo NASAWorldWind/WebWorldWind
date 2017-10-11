@@ -78,10 +78,10 @@ define([
                 this._renderable = new Placemark(
                     this.kmlGeometry.kmlCenter,
                     false,
-                    this.prepareAttributes(kmlOptions.lastStyle.normal)
+                    this.prepareAttributes(kmlOptions.lastStyle.normal, kmlOptions.fileCache)
                 );
                 if(kmlOptions.lastStyle.highlight) {
-                    this._renderable.highlightAttributes = this.prepareAttributes(kmlOptions.lastStyle.highlight);
+                    this._renderable.highlightAttributes = this.prepareAttributes(kmlOptions.lastStyle.highlight, kmlOptions.fileCache);
                 }
                 this.moveValidProperties();
                 dc.redrawRequested = true;
@@ -101,8 +101,8 @@ define([
      * @param style {KmlStyle} Style altering the defaults.
      * @returns {PlacemarkAttributes} Attributes representing the current Placemark.
      */
-    KmlPlacemark.prototype.prepareAttributes = function (style) {
-        var options = style && style.generate() || {normal: {}, highlight:{}};
+    KmlPlacemark.prototype.prepareAttributes = function (style, fileCache) {
+        var options = style && style.generate({}, fileCache) || {normal: {}, highlight:{}};
         var placemarkAttributes = new PlacemarkAttributes(KmlStyle.placemarkAttributes(options));
 
         placemarkAttributes.imageOffset = new Offset(

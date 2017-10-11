@@ -44,22 +44,14 @@ define([
             get: function () {
                 return this._factory.specific(this, {name: 'state', transformer: NodeTransformers.string});
             }
-        },
-
-        /**
-         * Specifies the URI of the image used in the List View for the Feature.
-         * @memberof ItemIcon.prototype
-         * @readonly
-         * @type {String}
-         */
-        kmlHref: {
-            get: function () {
-                return new HrefResolver(
-                    this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string})
-                );
-            }
         }
     });
+
+    ItemIcon.prototype.kmlHref = function(fileCache) {
+        return new HrefResolver(
+            this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string}), fileCache
+        ).url();
+    };
 
     /**
      * @inheritDoc

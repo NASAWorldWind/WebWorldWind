@@ -290,7 +290,7 @@ define([
                         this.kmlScreenXYyunits,
                         this.kmlScreenXYy
                     ),
-                    this.kmlIcon.kmlHref
+                    this.kmlIcon.kmlHref(kmlOptions.fileCache)
                 );
                 this._renderable.imageOffset = new Offset(
                     this.kmlOverlayXYxunits,

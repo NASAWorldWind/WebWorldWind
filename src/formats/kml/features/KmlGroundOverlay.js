@@ -114,7 +114,7 @@ define([
                         this.kmlLatLonBox.kmlWest,
                         this.kmlLatLonBox.kmlEast
                     ),
-                    this.kmlIcon.kmlHref
+                    this.kmlIcon.kmlHref(kmlOptions.fileCache)
                 );
                 dc.redrawRequested = true;
             }

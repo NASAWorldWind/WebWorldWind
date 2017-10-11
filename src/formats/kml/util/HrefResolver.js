@@ -28,7 +28,18 @@ define([
         if (WWUtil.startsWith(this._url, 'http://') || WWUtil.startsWith(this._url, 'https://')) {
             return this._url;
         } else {
-            return this._fileCache.retrieve('kmz;' + this._url);
+            var retrieved = this._fileCache.retrieve('kmz;' + this._url);
+            if(!retrieved) {
+                retrieved = this._fileCache.retrieve('href;' + this._url);
+                // Probably relative path.
+                if(!retrieved) {
+                    return this._url;
+                } else {
+                    return retrieved;
+                }
+            } else {
+                return retrieved;
+            }
         }
     };
 

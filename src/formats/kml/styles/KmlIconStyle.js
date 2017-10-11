@@ -125,12 +125,12 @@ define([
         }
     });
 
-    KmlIconStyle.update = function(style, options) {
+    KmlIconStyle.update = function(style, options, fileCache) {
         style = style || {};
         var shapeOptions = options || {};
 
         shapeOptions._imageScale = style.kmlScale || 1;
-        shapeOptions._imageSource = style.kmlIcon && style.kmlIcon.kmlHref || null;
+        shapeOptions._imageSource = style.kmlIcon && style.kmlIcon.kmlHref(fileCache) || null;
 
         return shapeOptions;
     };

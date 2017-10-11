@@ -316,12 +316,7 @@ define([
         }
 
         var self = this;
-        new Promise(function (resolve, reject) {
-            window.setTimeout(function () {
-                // TODO: Refactor handle Remote Style.
-                kmlOptions.styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
-            }, 0);
-        }).then(function(styles){
+        return kmlOptions.styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector).then(function(styles){
             self._pStyle = styles;
             dc.redrawRequested = true;
         });

@@ -8,7 +8,6 @@
  */
 define([
     '../../error/ArgumentError',
-    '../../util/jszip',
     './KmlElements',
     './KmlFileCache',
     './KmlObject',
@@ -16,6 +15,7 @@ define([
     './styles/KmlStyleMap',
     './KmlTimeSpan',
     './KmlTimeStamp',
+    './KmzFile',
     '../../util/Logger',
     '../../util/Promise',
     './util/RefreshListener',
@@ -24,7 +24,6 @@ define([
     '../../util/XmlDocument',
     '../../util/WWUtil'
 ], function (ArgumentError,
-             JsZip,
              KmlElements,
              KmlFileCache,
              KmlObject,
@@ -32,6 +31,7 @@ define([
              KmlStyleMap,
              KmlTimeSpan,
              KmlTimeStamp,
+             KmzFile,
              Logger,
              Promise,
              RefreshListener,
@@ -67,57 +67,25 @@ define([
         this._styleResolver = new StyleResolver(this._fileCache);
         this._listener = new RefreshListener();
         this._headers = null;
-        
-        var filePromise;
-        // Load the document
-        // TODO: Refactor
-        filePromise = new Promise(function (resolve) {
-            var promise = self.requestRemote(url);
-            promise.then(function (options) {
-                var rootDocument = null;
-                var loadedDocument = options.text;
-                self._headers = options.headers;
-                if (!self.hasExtension("kmz", url)) {
-                    rootDocument = loadedDocument;
 
-                    self._document = new XmlDocument(rootDocument).dom();
-                    KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
+        return this.requestRemote(url).then(function (options) {
+            var loadedDocument = options.text;
+            self._headers = options.headers;
 
-                    window.setTimeout(function () {
-                        resolve(self);
-                    }, 0);
-                } else {
-                    var promises = [];
-                    var kmzFile = new JsZip();
-                    kmzFile.load(loadedDocument);
-                    for(var key in kmzFile.files) {
-                        var file = kmzFile.files[key];
-                        if (rootDocument == null && self.hasExtension("kml", file.name)) {
-                            rootDocument = file.async("text").then(function(kmlTextRepresentation){
+            if (!self.hasExtension("kmz", url)) {
+                return loadedDocument;
+            } else {
+                var kmzFile = new KmzFile(loadedDocument, self._fileCache);
+                return kmzFile.load();
+            }
+        }).then(function (rootDocument) {
+            self._document = new XmlDocument(rootDocument).dom();
+            KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
 
-                            });
-                        } else if(self.hasExtension("kml", file.name)) {
-                            file.async("text")
-                                .then(function (kmlTextRepresentation) {
-                                    var dataURI = "data:image/jpeg;base64," + data64;
-                                });
-                        }
-                    }
+            self._fileCache.add(url, self, true);
 
-                    // After the file is loaded.
-                    Promise.all(promises).then(function(){
-                        self._document = new XmlDocument(rootDocument).dom();
-                        KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
-
-                        window.setTimeout(function () {
-                            resolve(self);
-                        }, 0);
-                    });
-                }
-            });
+            return self;
         });
-        this._fileCache.add(url, filePromise);
-        return filePromise;
     };
 
     KmlFile.prototype = Object.create(KmlObject.prototype);
@@ -187,7 +155,7 @@ define([
         return new RemoteFile(options).get();
     };
 
-	/**
+    /**
      * It finds the style in the document.
      * @param pId {String} Id of the style.
      */
@@ -217,11 +185,11 @@ define([
         });
     };
 
-	/**
+    /**
      * This function returns expire time of this file in miliseconds.
      * @returns {Number} miliseconds for this file to expire.
      */
-    KmlFile.prototype.getExpired = function() {
+    KmlFile.prototype.getExpired = function () {
         var expireDate = new Date(this._headers.getRequestHeader("Expires"));
         var currentDate = new Date();
         return currentDate.getTime - expireDate.getTime();

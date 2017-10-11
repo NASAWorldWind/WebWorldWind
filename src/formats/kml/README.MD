@@ -77,6 +77,20 @@ the resources inlined in the kmz file.
 * LatLonAltBox - It is correctly parsed but ignored for rendering.
 * LatLonQuad - It is correctly parsed but ignored for rendering.
 
+### KMZ Support
+
+- Load KMZ file
+
+#### Embedded KML Resources
+
+- Load imagery from KMZ file
+- Load other KML files from KMZ file
+
+#### Multiple KMZ files in one parsing
+
+- Load external KMZ file
+- Load resources from the external kmz file.
+
 ## Examples
 
 ### Load KML File

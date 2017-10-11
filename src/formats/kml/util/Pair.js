@@ -88,12 +88,7 @@ define([
      * @inheritDoc
      */
     Pair.prototype.getStyle = function(styleResolver) {
-        var self = this;
-        return new Promise(function (resolve, reject) {
-            window.setTimeout(function(){
-                styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
-            },0);
-        });
+        return styleResolver.handleRemoteStyle(this.kmlStyleUrl, this.kmlStyleSelector);
     };
 
     KmlElements.addKey(Pair.prototype.getTagNames()[0], Pair);
