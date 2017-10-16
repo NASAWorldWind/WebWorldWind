@@ -4,9 +4,11 @@
  */
 define([
     'src/formats/kml/util/ItemIcon',
+    'src/formats/kml/KmlFileCache',
     'src/util/XmlDocument'
 ], function (
     ItemIcon,
+    KmlFileCache,
     XmlDocument
 ) {
     "use strict";
@@ -23,7 +25,7 @@ define([
                 kmlRepresentation.getElementsByTagName("ItemIcon")[0]});
         it ('should have the State and Href properties', function(){
             expect(scale.kmlState).toEqual("open");
-            expect(scale.kmlHref).toEqual("validUrl");
+            expect(scale.kmlHref(new KmlFileCache())).toEqual("validUrl");
         });
 
 

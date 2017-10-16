@@ -7,7 +7,7 @@ define([
      * It can handle the format in which is the URL present in the file and transform it to the URL available
      * for the relevant other concepts.
      * @param url {String} Representation of the url of the resource.
-     * @param fileCache
+     * @param fileCache {KmlFileCache} Cache representing potential links loaded by current KML file.
      * @constructor
      */
     var HrefResolver = function (url, fileCache) {
@@ -17,12 +17,17 @@ define([
          */
         this._url = url;
 
+        /**
+         * File cache used to retrieve the links URL.
+         */
         this._fileCache = fileCache;
     };
 
     /**
-     * It must return promise of the string.
-     * @return {Promise} Either external URL or internal URL representing the information.
+     * It returns relevant string. Either the url directly or retrieved from cache. It means that the cache needs
+     * to resolve the URLs upfront.
+     * @private
+     * @return {String} Either external URL or internal URL representing the information.
      */
     HrefResolver.prototype.url = function () {
         if (WWUtil.startsWith(this._url, 'http://') || WWUtil.startsWith(this._url, 'https://')) {

@@ -3,9 +3,11 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 define([
+    'src/formats/kml/KmlFileCache',
     'src/formats/kml/KmlIcon',
     'src/util/XmlDocument'
 ], function (
+    KmlFileCache,
     KmlIcon,
     XmlDocument
 ) {
@@ -37,7 +39,7 @@ define([
         expect(link.kmlY).toEqual(0);
         expect(link.kmlW).toEqual(-1);
         expect(link.kmlH).toEqual(-1);
-        expect(link.kmlHref).toEqual ('link');
+        expect(link.kmlHref(new KmlFileCache())).toEqual ('link');
         expect(link.kmlRefreshMode).toEqual('onChange');
         expect(link.kmlRefreshInterval).toEqual(4);
         expect(link.kmlViewRefreshMode).toEqual('never');

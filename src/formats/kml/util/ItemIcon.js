@@ -47,6 +47,11 @@ define([
         }
     });
 
+    /**
+     * It returns valid URL usable for remote resources.
+     * @param fileCache {KmlFileCache} Cache needed to retrieve data urls from remote locations.
+     * @returns {String} URL to use.
+     */
     ItemIcon.prototype.kmlHref = function(fileCache) {
         return new HrefResolver(
             this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string}), fileCache

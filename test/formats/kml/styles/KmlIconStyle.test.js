@@ -2,11 +2,14 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-define([ 'src/util/XmlDocument',
-    'src/formats/kml/styles/KmlIconStyle'
+define([
+    'src/formats/kml/KmlFileCache',
+    'src/formats/kml/styles/KmlIconStyle',
+    'src/util/XmlDocument'
 ], function (
-    XmlDocument,
-    KmlIconStyle
+    KmlFileCache,
+    KmlIconStyle,
+    XmlDocument
 ) {
     "use strict";
     describe ("KmlIconStyle", function (){
@@ -34,7 +37,7 @@ define([ 'src/util/XmlDocument',
                 expect(iconStyle.kmlColorMode).toEqual('normal');
                 expect(iconStyle.kmlScale).toEqual(1);
                 expect(iconStyle.kmlHeading).toEqual(0);
-                expect(iconStyle.kmlIcon.kmlHref).toEqual('test');
+                expect(iconStyle.kmlIcon.kmlHref(new KmlFileCache())).toEqual('test');
 
         });
     });
