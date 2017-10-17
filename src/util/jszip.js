@@ -3044,7 +3044,7 @@ https://github.com/nodeca/pako/blob/master/LICENSE
 
     /**
      * Create a new blob with the given content and the given type.
-     * @param {Array[String|ArrayBuffer]} parts the content to put in the blob. DO NOT use
+     * @param {String[]|ArrayBuffer[]} parts the content to put in the blob. DO NOT use
      * an Uint8Array because the stock browser of android 4 won't accept it (it
      * will be silently converted to a string, "[object Uint8Array]").
      * @param {String} type the mime type of the blob.
