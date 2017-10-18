@@ -77,24 +77,18 @@ requirejs(['../src/WorldWind',
         attributes.outlineColor = WorldWind.Color.BLUE;
         attributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
 
-        var highlightAttributes = new WorldWind.ShapeAttributes(attributes);
-        highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
-
         // Create a surface ellipse with a minor radius of 200 km, a major radius of 300 km.
-        // This example tests changing the heading every second
+        // Heading should change every second
         var currentHeading = 0;
         var shape = new WorldWind.SurfaceEllipse(new WorldWind.Location(35, -110), 900e3, 600e3, currentHeading, attributes);
-        shape.highlightAttributes = highlightAttributes;
+
+        // Add ellipse to the shapes layer
         shapesLayer.addRenderable(shape);
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
-        // Now set up to handle highlighting.
-        var highlightController = new WorldWind.HighlightController(wwd);
-
-        // Update SurfaceShape an placemark states
-        var follow = false;
+        // Update SurfaceShape heading an placemark position with a timer
         window.setInterval(function() {
             // Update placemark position
             placemarkPosition.latitude += 10;
