@@ -30,6 +30,7 @@
     "test:watch": "karma start karma.conf.js"
   },
   "devDependencies": {
+    "glob": "^7.1.2",
     "grunt": "^1.0.1",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-requirejs": "^1.0.0",
@@ -43,7 +44,8 @@
     "karma-junit-reporter": "^1.2.0",
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-requirejs": "^1.1.0",
-    "recursive-readdir": "^2.2.1"
+    "recursive-readdir": "^2.2.1",
+    "tar": "^4.0.1"
   },
   "keywords": [
     "sdk",

@@ -12,15 +12,21 @@
 
 var crypto = require("crypto");
 var fs = require("fs");
+var glob = require("glob");
 var http = require("https");
+var os = require("os");
 var recursive = require("recursive-readdir");
+var tar = require("tar");
 
-var version, apiKey;
+var version, apiKey, outputDir;
 
 /**
- * Initialize environment variables, if the appropriate variables are not available, the script will exit.
+ * Initialize environment variables, if the appropriate variables are not available, the script will exit. Checks for
+ * the published tarball and extracts contents to a temporary directory.
  */
 var init = function () {
+
+    // initialize the environment variables
     if (!process.env.TRAVIS_TAG || !process.env.TRAVIS_TAG.startsWith("v")) {
         console.error("invalid version tag");
         process.exit(101);
@@ -34,6 +40,25 @@ var init = function () {
     } else {
         apiKey = process.env.FILES_API_KEY;
     }
+
+    // extract the npm pack tarball
+    var filename = glob.sync("nasaworldwind-worldwind-*.tgz");
+    if (!filename || filename.length !== 1) {
+        console.error("npm tarball not found");
+        process.exit(103);
+    }
+
+    var path = require("path");
+    outputDir = fs.mkdtempSync(os.tmpdir() + path.sep);
+    console.log(outputDir);
+    console.log(filename[0] + path.sep + "package" + path.sep);
+    tar.extract({
+        "cwd": outputDir,
+        "file": filename[0],
+        "sync": true
+    });
+    // the extracted tarball includes a package directory with all of the contents
+    outputDir += path.sep + "package" + path.sep;
 };
 
 /**
@@ -41,7 +66,18 @@ var init = function () {
  * @param filename the relative filename and path from the root folder
  */
 var submitFile = function (filename) {
-    calculateChecksums(filename, deployChecksum);
+
+    console.log("Attempting to calculate checksums on: " + filename);
+    var hash = calculateChecksums(filename);
+    console.log("Checksums: " + JSON.stringify(hash));
+
+    var options = generateDefaultOptions();
+    options.path = "/artifactory/generic-local/" + version + "/" + filename.slice(outputDir.length);
+    options.headers["X-Checksum-Sha256"] = hash.sha256;
+    options.headers["X-Checksum-Sha1"] = hash.sha1;
+    options.headers["X-Checksum-Md5"] = hash.md5;
+
+    deployFile(filename, options);
 };
 
 /**
@@ -62,89 +98,41 @@ var submitDirectory = function (directory) {
 };
 
 /**
- * Calculates the MD5, SHA1, and SHA256 hash hex representations of the provided file.
- * @param filename the relative filename and path from the root folder
- * @param callback the function to be called with the calculated filename and hashes
+ * Calculates the SHA256, SHA1, and MD5 checksums of the provided file
+ * @param filename
+ * @returns {{sha256: *, sha1: *, md5: *}} an object with the three hashes
  */
-var calculateChecksums = function (filename, callback) {
+var calculateChecksums = function (filename) {
 
     var sha256 = crypto.createHash("sha256");
     var sha1 = crypto.createHash("sha1");
     var md5 = crypto.createHash("md5");
     if (!sha256 || !sha1 || !md5) {
         console.error("hash algorithms not supported on this platform");
-        process.exit(103);
+        process.exit(104);
     }
 
-    var stream = fs.ReadStream(filename);
-    stream.on("data", function (data) {
-        sha256.update(data);
-        sha1.update(data);
-        md5.update(data);
-    });
-    stream.on("end", function () {
-        var hash = {};
-        hash.sha256 = sha256.digest("hex");
-        hash.sha1 = sha1.digest("hex");
-        hash.md5 = md5.digest("hex");
-        callback(filename, hash);
-    });
+    sha256.update(fs.readFileSync(filename));
+    sha1.update(fs.readFileSync(filename));
+    md5.update(fs.readFileSync(filename));
 
+    var hash = {
+        "sha256": sha256.digest("hex"),
+        "sha1": sha1.digest("hex"),
+        "md5": md5.digest("hex")
+    };
+
+    return hash;
 };
 
 /**
- * Deploys the provided filename and hash object to the Artifactory server. This deployment only PUTs the checksums to
- * allow Artifactory to move files on the server if duplicates exists instead of a full file upload and deployment.
- * @param filename the relative filename and path from the root folder
- * @param hash the hash object containing all three hash hex values
- */
-var deployChecksum = function (filename, hash) {
-
-    console.log("attempting to deploy checksum for file: " + filename);
-
-    var options = generateDefaultOptions();
-    options.path = "/artifactory/web/" + version + "/" + filename;
-    options.headers["X-Checksum-Deploy"] = true;
-    options.headers["X-Checksum-Sha256"] = hash.sha256;
-    options.headers["X-Checksum-Sha1"] = hash.sha1;
-    options.headers["X-Checksum-Md5"] = hash.md5;
-
-    http.request(options, onResponse(filename, options).processStatusCode).end();
-};
-
-/**
- * This closure captures the original filename and options object for processing the response status code. If an
- * Artifactory deploy by checksum file is not already found on the server (a response code other than 201), then this
- * closure will call the deploy file which actually deploys the file to the Artifactory instance.
- * @param filename the relative filename and path from the root folder
- * @param options the options object created for deploying this object
- * @returns {{processStatusCode: processStatusCode}}
- */
-var onResponse = function (filename, options) {
-    var fn = filename;
-    var op = options;
-
-    return {
-        processStatusCode: function (response) {
-            console.log("processing response for: " + fn + " with response code: " + response.statusCode);
-
-            if (response.statusCode !== 201) {
-                console.log("deploying file: " + fn + " due to non 201");
-                deployFile(fn, op);
-            }
-        }
-    }
-};
-
-/**
- * Deploys the provided file using the options object used for the attempted deploy by checksum operation.
+ * Deploys the provided file using the options object.
  * @param filename the relative filename and path from the root folder
  * @param options the options object created for deploying this object
  */
 var deployFile = function (filename, options) {
 
-    // must remove the header directing to upload via checksum
-    delete options.headers["X-Checksum-Deploy"];
+    console.log("Attempting to deploy " + filename);
 
     var req = http.request(options, function (res) {
         var chunks = [];
@@ -187,7 +175,4 @@ var generateDefaultOptions = function () {
 
 // Submit the appropriate assets and asset directories
 init();
-submitFile("worldwind.min.js");
-submitFile("worldwind.js");
-submitFile("images.zip");
-submitDirectory("images");
+submitDirectory(outputDir);
