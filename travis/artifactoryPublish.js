@@ -103,7 +103,7 @@ var deployChecksum = function (filename, hash) {
     console.log("attempting to deploy checksum for file: " + filename);
 
     var options = generateDefaultOptions();
-    options.path = "/artifactory/generic-local/" + version + "/" + filename;
+    options.path = "/artifactory/web/" + version + "/" + filename;
     options.headers["X-Checksum-Deploy"] = true;
     options.headers["X-Checksum-Sha256"] = hash.sha256;
     options.headers["X-Checksum-Sha1"] = hash.sha1;
