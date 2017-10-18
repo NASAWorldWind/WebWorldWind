@@ -42,7 +42,8 @@
     "karma-jasmine": "^1.1.0",
     "karma-junit-reporter": "^1.2.0",
     "karma-phantomjs-launcher": "^1.0.2",
-    "karma-requirejs": "^1.1.0"
+    "karma-requirejs": "^1.1.0",
+    "recursive-readdir": "^2.2.1"
   },
   "keywords": [
     "sdk",
