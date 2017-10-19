@@ -39,7 +39,7 @@ requirejs(['../src/WorldWind',
         // Create placemark layer
         var placemarkLayer = new WorldWind.RenderableLayer("Placemark");
 
-        // Set up attibutes for the placemark
+        // Set up attributes for the placemark
         var pinLibrary = WorldWind.configuration.baseUrl + "images/pushpins/",
             placemarkAttributes = new WorldWind.PlacemarkAttributes(null),
             latitude = 47.684444,
@@ -95,7 +95,7 @@ requirejs(['../src/WorldWind',
             placemarkPosition.longitude += 10;
 
             // Update ellipse heading angle (as of now, this fails)
-            currentHeading += 10;
+            shape.currentHeading += 10;
             wwd.redraw();
         }, 1000);
     }
