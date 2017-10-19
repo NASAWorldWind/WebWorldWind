@@ -64,32 +64,45 @@ var init = function () {
  * Submits a file to the Artifactory server for deployment. First calculates the checksums and then deploys the file.
  * @param filename the absolute filename and path
  */
-var submitFile = function (filename) {
+var deployFile = function (filename) {
 
-    var hash = calculateChecksums(filename);
-    var options = generateDefaultOptions();
-    // convert windows back slashes to forward slashes and change path to be relative
-    var normalizedFilename = filename.slice(outputDir.length).replace(/\\/g, "/");
-    options.path = "/artifactory/web/" + version + "/" + normalizedFilename;
-    options.headers["X-Checksum-Sha256"] = hash.sha256;
-    options.headers["X-Checksum-Sha1"] = hash.sha1;
-    options.headers["X-Checksum-Md5"] = hash.md5;
+    console.log("Attempting to deploy " + filename);
 
-    deployFile(filename, options);
+    var options = generateOptions(filename);
+    var req = http.request(options, function (res) {
+        var chunks = [];
+
+        res.on("data", function (chunk) {
+            chunks.push(chunk);
+        });
+
+        res.on("end", function () {
+            var body = Buffer.concat(chunks);
+            console.log(body.toString());
+        });
+    });
+    fs.readFile(filename, function (err, data) {
+        if (err) {
+            console.error(err);
+        }
+
+        req.write(data);
+        req.end();
+    });
 };
 
 /**
  * Submits all of the files (recursively) in the provided directory to the Artifactory server.
  * @param directory
  */
-var submitDirectory = function (directory) {
+var deployDirectory = function (directory) {
     recursive(directory, function (err, files) {
         if (err) {
             console.error(err);
         }
 
         for (var i = 0, len = files.length; i < len; i++) {
-            submitFile(files[i]);
+            deployFile(files[i]);
         }
     });
 };
@@ -123,47 +136,27 @@ var calculateChecksums = function (filename) {
 };
 
 /**
- * Deploys the provided file using the options object.
- * @param filename the relative filename and path from the root folder
- * @param options the options object created for deploying this object
+ * Generates a boilerplate object based on the filename provided. This deployment options object is specific to
+ * Artifactory and the https node package.
+ * @param filename the absolute path and filename of the file
+ * @returns {{path: string, method: string, host: string, headers: {X-JFrog-Art-Api: *, X-Checksum-Sha256: *,
+ *  X-Checksum-Sha1: *, X-Checksum-Md5: *}}}
  */
-var deployFile = function (filename, options) {
+var generateOptions = function (filename) {
 
-    console.log("Attempting to deploy " + filename);
+    var hash = calculateChecksums(filename);
+    // convert windows back slashes to forward slashes and change path to be relative
+    var normalizedFilename = filename.replace(outputDir, "").replace(/\\/g, "/");
 
-    var req = http.request(options, function (res) {
-        var chunks = [];
-
-        res.on("data", function (chunk) {
-            chunks.push(chunk);
-        });
-
-        res.on("end", function () {
-            var body = Buffer.concat(chunks);
-            console.log(body.toString());
-        });
-    });
-    fs.readFile(filename, function (err, data) {
-        if (err) {
-            console.error(err);
-        }
-
-        req.write(data);
-        req.end();
-    });
-};
-
-/**
- * Generates a boilerplate object which should be augmented or modified by deployment operations. This deployment
- * options object is specific to Artifactory and the https node package.
- * @returns {{method: string, host: string, headers: {X-JFrog-Art-Api: *}}}
- */
-var generateDefaultOptions = function () {
     var options = {
+        path: "/artifactory/generic-local/" + version + "/" + normalizedFilename,
         method: "PUT",
         host: "files.worldwind.arc.nasa.gov",
         headers: {
-            "X-JFrog-Art-Api": apiKey
+            "X-JFrog-Art-Api": apiKey,
+            "X-Checksum-Sha256": hash.sha256,
+            "X-Checksum-Sha1": hash.sha1,
+            "X-Checksum-Md5": hash.md5
         }
     };
 
@@ -172,4 +165,4 @@ var generateDefaultOptions = function () {
 
 // Submit the appropriate assets and asset directories
 init();
-submitDirectory(outputDir);
+deployDirectory(outputDir);
