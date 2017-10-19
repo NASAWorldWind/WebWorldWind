@@ -1,13 +1,12 @@
 /**
- * This script deploys the minified and debug WorldWind javascript libraries as well as the images.zip and images
- * folder to the WorldWind content server at Ames. The content server uses Artifactory for managing the assets and the
- * deployment process for a file is two steps. First, the checksums of a file are calculated. The checksums are
- * provided to the Artifactory instance along with a desired server path for the file. If Artifactory already contains
- * the artifact (as determined by duplicate checksums), the artifact will be copied on the server to the new path. If
- * the server does not find the checksum, this script will then upload the file.
+ * This script deploys the contents of the Web WorldWind npm package to the WorldWind content server at Ames. The
+ * content server uses Artifactory for managing the assets.
  *
  * In order for this script to run properly, the desired version and the Ames Artifactory instance (files server) API
  * key should be provided via the environment variables "TRAVIS_TAG" and "FILES_API_KEY".
+ *
+ * The command 'npm pack' must be run before this script is invoked in order to create the
+ * nasaworldwind-worldwind<version>.tgz file.
  */
 
 var crypto = require("crypto");
@@ -15,14 +14,17 @@ var fs = require("fs");
 var glob = require("glob");
 var http = require("https");
 var os = require("os");
+var path = require("path");
 var recursive = require("recursive-readdir");
 var tar = require("tar");
 
-var version, apiKey, outputDir;
+var version, // git version tag without "v"
+    apiKey, // Artifactory API key for the files content server
+    outputDir; // the temporary output directory of the npm pack tarball extraction
 
 /**
- * Initialize environment variables, if the appropriate variables are not available, the script will exit. Checks for
- * the published tarball and extracts contents to a temporary directory.
+ * Initialize environment variables and extract the npm pack tarball. If the appropriate variables are not available,
+ * the script will exit. Checks for the tarball and extracts contents to a temporary directory.
  */
 var init = function () {
 
@@ -48,31 +50,27 @@ var init = function () {
         process.exit(103);
     }
 
-    var path = require("path");
     outputDir = fs.mkdtempSync(os.tmpdir() + path.sep);
-    console.log(outputDir);
-    console.log(filename[0] + path.sep + "package" + path.sep);
     tar.extract({
         "cwd": outputDir,
         "file": filename[0],
         "sync": true
     });
-    // the extracted tarball includes a package directory with all of the contents
+    // the extracted tarball includes a 'package' directory with all of the contents
     outputDir += path.sep + "package" + path.sep;
 };
 
 /**
- * Submits a file to the Artifactory server for deployment. First calculates the checksums and deploys via checksum.
- * @param filename the relative filename and path from the root folder
+ * Submits a file to the Artifactory server for deployment. First calculates the checksums and then deploys the file.
+ * @param filename the absolute filename and path
  */
 var submitFile = function (filename) {
 
-    console.log("Attempting to calculate checksums on: " + filename);
     var hash = calculateChecksums(filename);
-    console.log("Checksums: " + JSON.stringify(hash));
-
     var options = generateDefaultOptions();
-    options.path = "/artifactory/generic-local/" + version + "/" + filename.slice(outputDir.length);
+    // convert windows back slashes to forward slashes and change path to be relative
+    var normalizedFilename = filename.slice(outputDir.length).replace(/\\/g, "/");
+    options.path = "/artifactory/web/" + version + "/" + normalizedFilename;
     options.headers["X-Checksum-Sha256"] = hash.sha256;
     options.headers["X-Checksum-Sha1"] = hash.sha1;
     options.headers["X-Checksum-Md5"] = hash.md5;
@@ -81,8 +79,7 @@ var submitFile = function (filename) {
 };
 
 /**
- * Submits all of the files (recursively) in the provided directory to the Artifactory server. Each files checksum is
- * first calculated and then submitted.
+ * Submits all of the files (recursively) in the provided directory to the Artifactory server.
  * @param directory
  */
 var submitDirectory = function (directory) {
@@ -157,8 +154,8 @@ var deployFile = function (filename, options) {
 };
 
 /**
- * Generates a boilerplate object which should be agumented or modified by deployment operations. This deployment
- * options object is specific to Artifactory and the https node js package.
+ * Generates a boilerplate object which should be augmented or modified by deployment operations. This deployment
+ * options object is specific to Artifactory and the https node package.
  * @returns {{method: string, host: string, headers: {X-JFrog-Art-Api: *}}}
  */
 var generateDefaultOptions = function () {
