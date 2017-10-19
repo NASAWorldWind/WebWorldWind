@@ -64,11 +64,11 @@ var init = function () {
  * Submits a file to the Artifactory server for deployment. First calculates the checksums and then deploys the file.
  * @param filename the absolute filename and path
  */
-var deployFile = function (filename) {
+var deployFile = function (filename, version) {
 
     console.log("Attempting to deploy " + filename);
 
-    var options = generateOptions(filename);
+    var options = generateOptions(filename, version);
     var req = http.request(options, function (res) {
         var chunks = [];
 
@@ -95,14 +95,14 @@ var deployFile = function (filename) {
  * Submits all of the files (recursively) in the provided directory to the Artifactory server.
  * @param directory
  */
-var deployDirectory = function (directory) {
+var deployDirectory = function (directory, version) {
     recursive(directory, function (err, files) {
         if (err) {
             console.error(err);
         }
 
         for (var i = 0, len = files.length; i < len; i++) {
-            deployFile(files[i]);
+            deployFile(files[i], version);
         }
     });
 };
@@ -142,7 +142,7 @@ var calculateChecksums = function (filename) {
  * @returns {{path: string, method: string, host: string, headers: {X-JFrog-Art-Api: *, X-Checksum-Sha256: *,
  *  X-Checksum-Sha1: *, X-Checksum-Md5: *}}}
  */
-var generateOptions = function (filename) {
+var generateOptions = function (filename, version) {
 
     var hash = calculateChecksums(filename);
     // convert windows back slashes to forward slashes and change path to be relative
@@ -165,4 +165,6 @@ var generateOptions = function (filename) {
 
 // Submit the appropriate assets and asset directories
 init();
-deployDirectory(outputDir);
+deployDirectory(outputDir, version);
+// upload again to the "latest" tag
+deployDirectory(outputDir, "latest");
