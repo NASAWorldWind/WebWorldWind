@@ -77,13 +77,17 @@ requirejs(['../src/WorldWind',
         attributes.outlineColor = WorldWind.Color.BLUE;
         attributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
 
-        // Create a surface ellipse with a minor radius of 200 km, a major radius of 300 km.
+        // Create a surface ellipse with a minor radius of 200 km, a major radius of 300 km and heading of 0 deg.
         // Heading should change every second
-        var currentHeading = 0;
-        var shape = new WorldWind.SurfaceEllipse(new WorldWind.Location(35, -110), 900e3, 600e3, currentHeading, attributes);
+        var ellipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(35, -110), 900e3, 600e3, 0, attributes);
 
         // Add ellipse to the shapes layer
-        shapesLayer.addRenderable(shape);
+        shapesLayer.addRenderable(ellipse);
+
+        // Create a surface rectangle with a width of 200 km, a height of 300 km and a heading of -45 degrees.
+        var rectangle = new WorldWind.SurfaceRectangle(new WorldWind.Location(35, -100), 200e3, 300e3, -45, attributes);
+
+        shapesLayer.addRenderable(rectangle);
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
@@ -91,11 +95,19 @@ requirejs(['../src/WorldWind',
         // Update SurfaceShape heading an placemark position with a timer
         window.setInterval(function() {
             // Update placemark position
-            placemarkPosition.latitude += 10;
-            placemarkPosition.longitude += 10;
+            placemarkPosition.latitude += 5;
+            placemarkPosition.longitude += 5;
 
-            // Update ellipse heading angle (as of now, this fails)
-            shape.currentHeading += 10;
+            // Update ellipse heading angle
+            ellipse.heading += 10;
+            //ellipse.isPrepared = false;
+            //ellipse._boundaries = null;
+
+            // Update the rectangle heading angle
+            rectangle.heading -= 45;
+            //rectangle.isPrepared = false;
+            //rectangle._boundaries = null;
+
             wwd.redraw();
         }, 1000);
     }

@@ -132,6 +132,8 @@ define([
                 set: function(value) {
                     this.stateKeyInvalid = true;
                     this._heading = value;
+                    this.isPrepared = false;
+                    this._boundaries = null;
                 }
             }
         });
