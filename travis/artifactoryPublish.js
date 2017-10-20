@@ -18,7 +18,7 @@ var path = require("path");
 var recursive = require("recursive-readdir");
 var tar = require("tar");
 
-var version, // git version tag without "v"
+var deploymentVersion, // git version tag without "v"
     apiKey, // Artifactory API key for the files content server
     outputDir; // the temporary output directory of the npm pack tarball extraction
 
@@ -29,11 +29,15 @@ var version, // git version tag without "v"
 var init = function () {
 
     // initialize the environment variables
-    if (!process.env.TRAVIS_TAG || !process.env.TRAVIS_TAG.startsWith("v")) {
+    if (!process.env.TRAVIS_TAG) {
         console.error("invalid version tag");
         process.exit(101);
     } else {
-        version = process.env.TRAVIS_TAG.slice(1);
+        if (process.env.TRAVIS_TAG.startsWith("v")) {
+            deploymentVersion = process.env.TRAVIS_TAG.slice(1);
+        } else {
+            deploymentVersion = process.env.TRAVIS_TAG;
+        }
     }
 
     if (!process.env.FILES_API_KEY) {
@@ -64,11 +68,11 @@ var init = function () {
  * Submits a file to the Artifactory server for deployment. First calculates the checksums and then deploys the file.
  * @param filename the absolute filename and path
  */
-var deployFile = function (filename, version) {
+var deployFile = function (filename) {
 
     console.log("Attempting to deploy " + filename);
 
-    var options = generateOptions(filename, version);
+    var options = generateOptions(filename);
     var req = http.request(options, function (res) {
         var chunks = [];
 
@@ -95,14 +99,14 @@ var deployFile = function (filename, version) {
  * Submits all of the files (recursively) in the provided directory to the Artifactory server.
  * @param directory
  */
-var deployDirectory = function (directory, version) {
+var deployDirectory = function (directory) {
     recursive(directory, function (err, files) {
         if (err) {
             console.error(err);
         }
 
         for (var i = 0, len = files.length; i < len; i++) {
-            deployFile(files[i], version);
+            deployFile(files[i]);
         }
     });
 };
@@ -142,14 +146,14 @@ var calculateChecksums = function (filename) {
  * @returns {{path: string, method: string, host: string, headers: {X-JFrog-Art-Api: *, X-Checksum-Sha256: *,
  *  X-Checksum-Sha1: *, X-Checksum-Md5: *}}}
  */
-var generateOptions = function (filename, version) {
+var generateOptions = function (filename) {
 
     var hash = calculateChecksums(filename);
     // convert windows back slashes to forward slashes and change path to be relative
     var normalizedFilename = filename.replace(outputDir, "").replace(/\\/g, "/");
 
     var options = {
-        path: "/artifactory/web/" + version + "/" + normalizedFilename,
+        path: "/artifactory/generic-local/" + deploymentVersion + "/" + normalizedFilename,
         method: "PUT",
         host: "files.worldwind.arc.nasa.gov",
         headers: {
@@ -165,6 +169,4 @@ var generateOptions = function (filename, version) {
 
 // Submit the appropriate assets and asset directories
 init();
-deployDirectory(outputDir, version);
-// upload again to the "latest" tag
-deployDirectory(outputDir, "latest");
+deployDirectory(outputDir);
