@@ -123,8 +123,8 @@ requirejs(['../src/WorldWind',
             //rectangle._boundaries = null;
 
             // Update sector max lat and long
-            sector.maxLatitude += 20;
-            sector.maxLongitude += 20;
+            sector.maxLatitude += 5;
+            sector.maxLongitude += 5;
             sector.isPrepared = false;
             sector._boundaries = null;
 
@@ -138,7 +138,9 @@ requirejs(['../src/WorldWind',
 
         function increaseBoundariesLatitude(shape){
             for(var i = 0; i < shape._boundaries.length; i++){
-                shape._boundaries[i].latitude += 2;
+                if(shape._boundaries[i].latitude < 90){
+                    shape._boundaries[i].latitude += 2;
+                }
             }
         }
 
