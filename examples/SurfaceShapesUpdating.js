@@ -24,7 +24,6 @@ requirejs(['../src/WorldWind',
          * Added imagery layers.
          */
         var layers = [
-            {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
@@ -68,8 +67,8 @@ requirejs(['../src/WorldWind',
 
         wwd.addLayer(placemarkLayer);
 
-        // Create a layer to hold a surface shape (in this case, an ellipse)
-        var shapesLayer = new WorldWind.RenderableLayer("Ellipse");
+        // Create a layer to hold surface shapes
+        var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
         wwd.addLayer(shapesLayer);
 
         // Set attributes for the shape
@@ -89,8 +88,23 @@ requirejs(['../src/WorldWind',
 
         shapesLayer.addRenderable(rectangle);
 
+        // Create a surface sector
+        var sector = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
+        shapesLayer.addRenderable(sector);
+
+        // Create a simple surface polygon, a triangle.
+        var boundary = [];
+        boundary.push(new WorldWind.Location(40, -100));
+        boundary.push(new WorldWind.Location(45, -110));
+        boundary.push(new WorldWind.Location(40, -120));
+        var triangle = new WorldWind.SurfacePolygon(boundary, attributes);
+        shapesLayer.addRenderable(triangle);
+
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
+
+        console.log(boundary);
+        console.log(triangle._boundaries);
 
         // Update SurfaceShape heading an placemark position with a timer
         window.setInterval(function() {
@@ -108,7 +122,25 @@ requirejs(['../src/WorldWind',
             //rectangle.isPrepared = false;
             //rectangle._boundaries = null;
 
+            // Update sector max lat and long
+            sector.maxLatitude += 20;
+            sector.maxLongitude += 20;
+            sector.isPrepared = false;
+            sector._boundaries = null;
+
+            // Update triangle polygon latitude
+            increaseBoundariesLatitude(triangle);
+            triangle.isPrepared = false;
+            sector._boundaries = null;
+
             wwd.redraw();
         }, 1000);
+
+        function increaseBoundariesLatitude(shape){
+            for(var i = 0; i < shape._boundaries.length; i++){
+                shape._boundaries[i].latitude += 2;
+            }
+        }
+
     }
 );
