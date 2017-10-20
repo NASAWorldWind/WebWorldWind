@@ -8,7 +8,11 @@
 
 api-doc/
 
+assetsToDeploy/
+
 images.zip
+
+nasaworldwind-worldwind-*.tgz
 
 node_modules/
 

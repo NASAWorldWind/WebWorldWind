@@ -126,7 +126,7 @@ var generateOptions = function (filename) {
     var normalizedFilename = filename.replace(inputDirectory, "").replace(/\\/g, "/");
 
     var options = {
-        path: "/artifactory/generic-local/" + deploymentVersion + "/" + normalizedFilename,
+        path: "/artifactory/web/" + deploymentVersion + "/" + normalizedFilename,
         method: "PUT",
         host: "files.worldwind.arc.nasa.gov",
         headers: {
