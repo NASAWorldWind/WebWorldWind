@@ -35,6 +35,25 @@ deploy:
     on:
       tags: true
 
+  # Create the npm tarball, extract, and deploy files to Artifactory for development builds
+  - provider: script
+    script:
+      - source travis/createExtractTarball.sh
+      - node travis/deployToArtifactory $FILES_API_KEY "develop" $NPM_TMP_DIR
+    skip_cleanup: true
+    on:
+      branch: develop
+      tags: false
+
+  # Create the npm tarball, extract, and deploy files to Artifactory for tagged release builds
+    - provider: script
+      script:
+        - source travis/createExtractTarball.sh
+        - node travis/deployToArtifactory $FILES_API_KEY ${TRAVIS_TAG#"v"} $NPM_TMP_DIR
+      skip_cleanup: true
+      on:
+        tags: true
+
 # Node.js build cache configuration. See the Travis CI documentation: https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Caching-with-npm
 cache:
   directories:

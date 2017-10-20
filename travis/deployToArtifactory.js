@@ -16,11 +16,10 @@ var http = require("https");
 var os = require("os");
 var path = require("path");
 var recursive = require("recursive-readdir");
-var tar = require("tar");
 
-var deploymentVersion, // git version tag without "v"
-    apiKey, // Artifactory API key for the files content server
-    outputDir; // the temporary output directory of the npm pack tarball extraction
+var apiKey,
+    deploymentVersion,
+    inputDirectory;
 
 /**
  * Initialize environment variables and extract the npm pack tarball. If the appropriate variables are not available,
@@ -28,40 +27,14 @@ var deploymentVersion, // git version tag without "v"
  */
 var init = function () {
 
-    // initialize the environment variables
-    if (!process.env.TRAVIS_BRANCH) {
-        console.error("invalid version tag");
+    if (process.argv.length < 5) {
+        console.error("insufficient arguments");
         process.exit(101);
     } else {
-        if (process.env.TRAVIS_BRANCH.startsWith("v")) {
-            deploymentVersion = process.env.TRAVIS_BRANCH.slice(1);
-        } else {
-            deploymentVersion = process.env.TRAVIS_BRANCH;
-        }
+        apiKey = process.argv[2];
+        deploymentVersion = process.argv[3];
+        inputDirectory = process.argv[4];
     }
-
-    if (!process.env.FILES_API_KEY) {
-        console.error("missing file server api key");
-        process.exit(102);
-    } else {
-        apiKey = process.env.FILES_API_KEY;
-    }
-
-    // extract the npm pack tarball
-    var filename = glob.sync("nasaworldwind-worldwind-*.tgz");
-    if (!filename || filename.length !== 1) {
-        console.error("npm tarball not found");
-        process.exit(103);
-    }
-
-    outputDir = fs.mkdtempSync(os.tmpdir() + path.sep);
-    tar.extract({
-        "cwd": outputDir,
-        "file": filename[0],
-        "sync": true
-    });
-    // the extracted tarball includes a 'package' directory with all of the contents
-    outputDir += path.sep + "package" + path.sep;
 };
 
 /**
@@ -150,7 +123,7 @@ var generateOptions = function (filename) {
 
     var hash = calculateChecksums(filename);
     // convert windows back slashes to forward slashes and change path to be relative
-    var normalizedFilename = filename.replace(outputDir, "").replace(/\\/g, "/");
+    var normalizedFilename = filename.replace(inputDirectory, "").replace(/\\/g, "/");
 
     var options = {
         path: "/artifactory/generic-local/" + deploymentVersion + "/" + normalizedFilename,
@@ -169,4 +142,4 @@ var generateOptions = function (filename) {
 
 // Submit the appropriate assets and asset directories
 init();
-deployDirectory(outputDir);
+deployDirectory(inputDirectory);
