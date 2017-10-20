@@ -29,14 +29,14 @@ var deploymentVersion, // git version tag without "v"
 var init = function () {
 
     // initialize the environment variables
-    if (!process.env.TRAVIS_TAG) {
+    if (!process.env.TRAVIS_BRANCH) {
         console.error("invalid version tag");
         process.exit(101);
     } else {
-        if (process.env.TRAVIS_TAG.startsWith("v")) {
-            deploymentVersion = process.env.TRAVIS_TAG.slice(1);
+        if (process.env.TRAVIS_BRANCH.startsWith("v")) {
+            deploymentVersion = process.env.TRAVIS_BRANCH.slice(1);
         } else {
-            deploymentVersion = process.env.TRAVIS_TAG;
+            deploymentVersion = process.env.TRAVIS_BRANCH;
         }
     }
 
