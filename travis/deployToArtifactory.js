@@ -13,7 +13,6 @@ var crypto = require("crypto");
 var fs = require("fs");
 var http = require("https");
 var os = require("os");
-var path = require("path");
 var recursive = require("recursive-readdir");
 
 var apiKey,
