@@ -20,23 +20,23 @@ var apiKey,
     inputDirectory;
 
 /**
- * Initialize environment variables and extract the npm pack tarball. If the appropriate variables are not available,
- * the script will exit. Checks for the tarball and extracts contents to a temporary directory.
+ * Submits all of the files (recursively) in the provided directory to the Artifactory server.
+ * @param directory
  */
-var init = function () {
+var deployDirectory = function (directory) {
+    recursive(directory, function (err, files) {
+        if (err) {
+            console.error(err);
+        }
 
-    if (process.argv.length < 5) {
-        console.error("insufficient arguments");
-        process.exit(101);
-    } else {
-        apiKey = process.argv[2];
-        deploymentVersion = process.argv[3];
-        inputDirectory = process.argv[4];
-    }
+        for (var i = 0, len = files.length; i < len; i++) {
+            deployFile(files[i]);
+        }
+    });
 };
 
 /**
- * Submits a file to the Artifactory server for deployment. First calculates the checksums and then deploys the file.
+ * Deploys a file to the Artifactory server for deployment. First calculates the checksums and then deploys the file.
  * @param filename the absolute filename and path
  */
 var deployFile = function (filename) {
@@ -67,19 +67,31 @@ var deployFile = function (filename) {
 };
 
 /**
- * Submits all of the files (recursively) in the provided directory to the Artifactory server.
- * @param directory
+ * Generates a boilerplate object based on the filename provided. This deployment options object is specific to
+ * Artifactory and the https node package.
+ * @param filename the absolute path and filename of the file
+ * @returns {{path: string, method: string, host: string, headers: {X-JFrog-Art-Api: *, X-Checksum-Sha256: *,
+ *  X-Checksum-Sha1: *, X-Checksum-Md5: *}}}
  */
-var deployDirectory = function (directory) {
-    recursive(directory, function (err, files) {
-        if (err) {
-            console.error(err);
-        }
+var generateOptions = function (filename) {
 
-        for (var i = 0, len = files.length; i < len; i++) {
-            deployFile(files[i]);
+    var hash = calculateChecksums(filename);
+    // convert windows back slashes to forward slashes and change path to be relative
+    var normalizedFilename = filename.replace(inputDirectory, "").replace(/\\/g, "/");
+
+    var options = {
+        path: "/artifactory/web/" + deploymentVersion + "/" + normalizedFilename,
+        method: "PUT",
+        host: "files.worldwind.arc.nasa.gov",
+        headers: {
+            "X-JFrog-Art-Api": apiKey,
+            "X-Checksum-Sha256": hash.sha256,
+            "X-Checksum-Sha1": hash.sha1,
+            "X-Checksum-Md5": hash.md5
         }
-    });
+    };
+
+    return options;
 };
 
 /**
@@ -110,34 +122,14 @@ var calculateChecksums = function (filename) {
     return hash;
 };
 
-/**
- * Generates a boilerplate object based on the filename provided. This deployment options object is specific to
- * Artifactory and the https node package.
- * @param filename the absolute path and filename of the file
- * @returns {{path: string, method: string, host: string, headers: {X-JFrog-Art-Api: *, X-Checksum-Sha256: *,
- *  X-Checksum-Sha1: *, X-Checksum-Md5: *}}}
- */
-var generateOptions = function (filename) {
-
-    var hash = calculateChecksums(filename);
-    // convert windows back slashes to forward slashes and change path to be relative
-    var normalizedFilename = filename.replace(inputDirectory, "").replace(/\\/g, "/");
-
-    var options = {
-        path: "/artifactory/web/" + deploymentVersion + "/" + normalizedFilename,
-        method: "PUT",
-        host: "files.worldwind.arc.nasa.gov",
-        headers: {
-            "X-JFrog-Art-Api": apiKey,
-            "X-Checksum-Sha256": hash.sha256,
-            "X-Checksum-Sha1": hash.sha1,
-            "X-Checksum-Md5": hash.md5
-        }
-    };
-
-    return options;
-};
-
+// Initialize environment variables. If the appropriate variables are not available, the script will exit.
+if (process.argv.length < 5) {
+    console.error("insufficient arguments");
+    process.exit(101);
+} else {
+    apiKey = process.argv[2];
+    deploymentVersion = process.argv[3];
+    inputDirectory = process.argv[4];
+}
 // Submit the appropriate assets and asset directories
-init();
 deployDirectory(inputDirectory);
