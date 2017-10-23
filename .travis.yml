@@ -34,9 +34,13 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-  # Create the npm tarball, extract, and deploy files to Artifactory for tagged release builds
+  # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
   - provider: script
-    script: ./travis/prepareArtifactoryAssets.sh && node travis/deployToArtifactory $FILES_API_KEY ${TRAVIS_TAG#"v"} assetsToDeploy/
+    script:
+      - mkdir assetsToPublish
+      - npm pack
+      - tar -xvf nasaworldwind-worldwind-*.tgz -C ./assetsToPublish --strip-components 1
+      - node travis/publishToArtifactory $FILES_API_KEY ${TRAVIS_TAG#"v"} assetsToPublish/
     skip_cleanup: true
     on:
       tags: true
