@@ -3,10 +3,10 @@
  * content server uses Artifactory for managing the assets.
  *
  * In order for this script to run properly, the desired version and the Ames Artifactory instance (files server) API
- * key should be provided via the environment variables "TRAVIS_TAG" and "FILES_API_KEY".
+ * key should be provided via the environment variables "TRAVIS_TAG" and "ARTIFACTORY_API_KEY".
  *
  * The command 'npm pack' must be run before this script is invoked in order to create the
- * nasaworldwind-worldwind<version>.tgz file.
+ * nasaworldwind-worldwind-<version>.tgz file.
  */
 
 var crypto = require("crypto");
@@ -41,8 +41,6 @@ var deployDirectory = function (directory) {
  */
 var deployFile = function (filename) {
 
-    console.log("Attempting to deploy " + filename);
-
     var options = generateOptions(filename);
     var req = http.request(options, function (res) {
         var chunks = [];
@@ -52,8 +50,11 @@ var deployFile = function (filename) {
         });
 
         res.on("end", function () {
-            var body = Buffer.concat(chunks);
-            console.log(body.toString());
+            if (res.statusCode !== 201) {
+                var body = Buffer.concat(chunks);
+                console.error(body.toString());
+                process.exit(1);
+            }
         });
     });
     fs.readFile(filename, function (err, data) {
@@ -106,7 +107,7 @@ var calculateChecksums = function (filename) {
     var md5 = crypto.createHash("md5");
     if (!sha256 || !sha1 || !md5) {
         console.error("hash algorithms not supported on this platform");
-        process.exit(104);
+        process.exit(1);
     }
 
     sha256.update(fs.readFileSync(filename));
@@ -125,7 +126,7 @@ var calculateChecksums = function (filename) {
 // Initialize environment variables. If the appropriate variables are not available, the script will exit.
 if (process.argv.length < 5) {
     console.error("insufficient arguments");
-    process.exit(101);
+    process.exit(1);
 } else {
     apiKey = process.argv[2];
     deploymentVersion = process.argv[3];
