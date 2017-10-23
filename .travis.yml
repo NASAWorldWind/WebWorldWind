@@ -40,7 +40,7 @@ deploy:
       - mkdir assetsToPublish
       - npm pack
       - tar -xvf nasaworldwind-worldwind-*.tgz -C ./assetsToPublish --strip-components 1
-      - node travis/publishToArtifactory $FILES_API_KEY ${TRAVIS_TAG#"v"} assetsToPublish/
+      - node travis/publishToArtifactory $ARTIFACTORY_API_KEY ${TRAVIS_TAG#"v"} assetsToPublish/
     skip_cleanup: true
     on:
       tags: true
