@@ -30,7 +30,6 @@
     "test:watch": "karma start karma.conf.js"
   },
   "devDependencies": {
-    "glob": "^7.1.2",
     "grunt": "^1.0.1",
     "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-requirejs": "^1.0.0",

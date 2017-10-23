@@ -11,7 +11,6 @@
 
 var crypto = require("crypto");
 var fs = require("fs");
-var glob = require("glob");
 var http = require("https");
 var os = require("os");
 var path = require("path");
