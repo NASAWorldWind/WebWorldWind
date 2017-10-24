@@ -36,11 +36,7 @@ deploy:
       tags: true
   # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
   - provider: script
-    script:
-      - mkdir assetsToPublish
-      - npm pack
-      - tar -xvf nasaworldwind-worldwind-*.tgz -C ./assetsToPublish --strip-components 1
-      - node travis/publishToArtifactory $ARTIFACTORY_API_KEY ${TRAVIS_TAG#"v"} assetsToPublish/
+    script: ./travis/prepareAssetsForArtifactory.sh
     skip_cleanup: true
     on:
       tags: true
