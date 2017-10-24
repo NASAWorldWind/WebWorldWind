@@ -2,11 +2,10 @@
  * This script deploys the contents of the Web WorldWind npm package to the WorldWind content server at Ames. The
  * content server uses Artifactory for managing the assets.
  *
- * In order for this script to run properly, the desired version and the Ames Artifactory instance (files server) API
- * key should be provided via the environment variables "TRAVIS_TAG" and "ARTIFACTORY_API_KEY".
+ * Provide the Artifactory API key, asset version, and source directory as arguments to the node script.
  *
  * The command 'npm pack' must be run before this script is invoked in order to create the
- * nasaworldwind-worldwind-<version>.tgz file.
+ * nasaworldwind-worldwind-<version>.tgz file whose contents should drive.
  */
 
 var crypto = require("crypto");
