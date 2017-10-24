@@ -36,7 +36,7 @@ deploy:
       tags: true
   # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
   - provider: script
-    script: ./travis/prepareAssetsForArtifactory.sh
+    script: ./travis/publishToArtifactory.sh
     skip_cleanup: true
     on:
       tags: true
