@@ -30,7 +30,7 @@ var deployDirectory = function (sourceDirectory, destinationPath) {
             // remove the root directory path from the file path and convert to unix style slashes
             var normalizedFilepath = path.normalize(files[i]).replace(path.normalize(sourceDirectory), "").replace(/\\/g, "/");
             // format the path to conform to Artifactory path requirements
-            var normalizedPath = path.normalize("/" + destinationPath + "/" + normalizedFilepath);
+            var normalizedPath = path.join("/", destinationPath, "/", normalizedFilepath);
             deployFile(files[i], normalizedPath);
         }
     });
