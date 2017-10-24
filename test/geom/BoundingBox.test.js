@@ -52,6 +52,64 @@ define([
                 }).toThrow();
             });
 
+            // Vec3 variations
+            it("Sets this bounding box such that it minimally encloses a specified collection of points", function () {
+                var boundingBox = new BoundingBox();
+                var vecPoints=[];
+                vecPoints.push(new Vec3(1, 0, 0));
+                vecPoints.push(new Vec3(0, 1, 0));
+                vecPoints.push(new Vec3(0, 0, 1));
+                expect(boundingBox.setToVec3Points(vecPoints).radius).toEqual(1.0606601717798212);
+            });
+
+            it("Should throw an exception because of the wrong input", function () {    //no points provided
+                var boundingBox = new BoundingBox();
+                expect(function () {
+                    boundingBox.setToVec3Points(null)
+                }).toThrow();
+            });
+        });
+
+        describe("Get corners method", function () {
+
+            it("Creates a box, verifies correct corners retrieved", function () {
+            	var points=[];
+                points.push(new Vec3(7,8,15));
+                points.push(new Vec3(-4,3,7));
+                points.push(new Vec3(-4,-5,9));
+                points.push(new Vec3(6,-12,18));
+                points.push(new Vec3(-7,-8,-15));
+                points.push(new Vec3(4,-3,-7));
+                points.push(new Vec3(4,5,-9));
+                points.push(new Vec3(-6,12,-18));
+                var boundingBox = new BoundingBox();
+                boundingBox.setToVec3Points(points);
+                var corners=boundingBox.getCorners();
+				expect(corners[0][0]).toBeCloseTo(-13.006629879633422,3);
+				expect(corners[0][1]).toBeCloseTo(-5.673621104400012,3);
+				expect(corners[0][2]).toBeCloseTo(-20.605725543651864,3);
+				expect(corners[1][0]).toBeCloseTo(-1.3671932875281194,3);
+				expect(corners[1][1]).toBeCloseTo(-7.460613776144945,3);
+				expect(corners[1][2]).toBeCloseTo(-23.841735403281938,3);
+				expect(corners[2][0]).toBeCloseTo(3.368652415295916,3);
+				expect(corners[2][1]).toBeCloseTo(15.397291092220424,3);
+				expect(corners[2][2]).toBeCloseTo(-19.43023238071855,3);
+				expect(corners[3][0]).toBeCloseTo(-8.270784176809387,3);
+				expect(corners[3][1]).toBeCloseTo(17.184283763965357,3);
+				expect(corners[3][2]).toBeCloseTo(-16.194222521088477,3);
+				expect(corners[4][0]).toBeCloseTo(-3.368652415295916,3);
+				expect(corners[4][1]).toBeCloseTo(-15.397291092220424,3);
+				expect(corners[4][2]).toBeCloseTo(19.43023238071855,3);
+				expect(corners[5][0]).toBeCloseTo(8.270784176809387,3);
+				expect(corners[5][1]).toBeCloseTo(-17.184283763965357,3);
+				expect(corners[5][2]).toBeCloseTo(16.194222521088477,3);
+				expect(corners[6][0]).toBeCloseTo(13.006629879633422,3);
+				expect(corners[6][1]).toBeCloseTo(5.673621104400012,3);
+				expect(corners[6][2]).toBeCloseTo(20.605725543651864,3);
+				expect(corners[7][0]).toBeCloseTo(1.3671932875281194,3);
+				expect(corners[7][1]).toBeCloseTo(7.460613776144945,3);
+				expect(corners[7][2]).toBeCloseTo(23.841735403281938,3);
+            });
         });
 
         describe("Set to sector method", function () {

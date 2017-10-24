@@ -26,7 +26,8 @@ requirejs(['../src/WorldWind',
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
+            {layer: new WorldWind.FrameStatisticsLayer(wwd), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -52,6 +53,15 @@ requirejs(['../src/WorldWind',
         footprints.push([45.12551356202371,-95.54315,45.148073182871244,-94.1474,44.15979663371134,-94.12808,44.137996748196564,-95.500336,45.12551356202371,-95.54315]);
         footprints.push([43.42648714895223,-92.879425,43.31125028050336,-92.924225,43.26442286797419,-92.94232,43.25815001081029,-94.23251,44.246545441411556,-94.25299,44.25335216097235,-92.87775,43.42648714895223,-92.879425]);
 
+        var locFootprints=[];
+        for (var i=0; i<footprints.length; i++) {
+            var rawFootprint = footprints[i];
+            var locFootprint = [];
+            for (var j = 0; j < rawFootprint.length; j += 2) {
+                locFootprint.push(new WorldWind.Location(rawFootprint[j], rawFootprint[j + 1]));
+            }
+            locFootprints.push(locFootprint);
+        }
         // Create and set attributes for it. The shapes below except the surface polyline use this same attributes
         // object. Real apps typically create new attributes objects for each shape unless they know the attributes
         // can be shared among shapes.
@@ -66,18 +76,10 @@ requirejs(['../src/WorldWind',
         var nTestFootprints=1000;
 
         // Create surface polygons for the satellite image footprints
-        var nFootprints=footprints.length;
-
-        var nTestPatterns=nTestFootprints/nFootprints;
+        var nTestPatterns=nTestFootprints/locFootprints.length;
         for (var t=0; t<nTestPatterns; t++) {
-            for (var i=0; i<nFootprints; i++) {
-                var rawFootprint=footprints[i];
-                var locFootprint=[];
-                var nCoordinates=rawFootprint.length;
-                for (var j=0; j<nCoordinates; j+=2) {
-                    locFootprint.push(new WorldWind.Location(rawFootprint[j],rawFootprint[j+1]));
-                }
-                var footprint = new WorldWind.SurfacePolygon(locFootprint, attributes);
+            for (i=0; i<locFootprints.length; i++) {
+                var footprint = new WorldWind.SurfacePolygon(locFootprints[i], attributes);
                 footprint.highlightAttributes = highlightAttributes;
                 footprintsLayer.addRenderable(footprint);
             }

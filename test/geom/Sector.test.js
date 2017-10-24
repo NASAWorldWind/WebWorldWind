@@ -314,6 +314,28 @@ define([
             });
         });
 
+        describe("Get corners method", function () {
+
+            it("Returns corner points in the correct order", function () {
+                var sector=new Sector(44,45,-94,-95);
+                var corners=sector.getCorners();
+				expect(corners[0].latitude).toEqual(44);
+				expect(corners[0].longitude).toEqual(-94);
+				expect(corners[1].latitude).toEqual(44);
+				expect(corners[1].longitude).toEqual(-95);
+				expect(corners[2].latitude).toEqual(45);
+				expect(corners[2].longitude).toEqual(-95);
+				expect(corners[3].latitude).toEqual(45);
+				expect(corners[3].longitude).toEqual(-94);
+            });
+        });
+
+        // describe("Compute bounding box method", function () {
+        //
+        //     it("Computes the correct bounding box for a given sector", function () {
+        //      });
+        // });
+
         describe("Sets this sector to the union of itself and a specified sector", function () {
 
             it("Returns the intersection", function () {
