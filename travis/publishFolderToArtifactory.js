@@ -1,46 +1,51 @@
 /**
- * This script deploys the contents of the Web WorldWind npm package to the WorldWind content server at Ames. The
+ * This script deploys the contents of the source directory to the WorldWind content server at Ames. The
  * content server uses Artifactory for managing the assets.
  *
- * Provide the Artifactory API key, asset version, and source directory as arguments to the node script.
- *
- * The command 'npm pack' must be run before this script is invoked in order to create the
- * nasaworldwind-worldwind-<version>.tgz file whose contents should drive.
+ * Provide the Artifactory API key, directory of assets to upload, and root deployment path on the Artifactory instance.
  */
 
 var crypto = require("crypto");
 var fs = require("fs");
 var http = require("https");
 var os = require("os");
+var path = require("path");
 var recursive = require("recursive-readdir");
 
-var apiKey,
-    deploymentVersion,
-    inputDirectory;
+// the Artifactory instance API key
+var apiKey;
 
 /**
- * Submits all of the files (recursively) in the provided directory to the Artifactory server.
- * @param directory
+ * Submits all of the files (recursively) in the provided source directory to the Artifactory server.
+ * @param sourceDirectory the directory containing files to deploy to the Artifactory instance
+ * @param destinationPath the root target path for the assets
  */
-var deployDirectory = function (directory) {
-    recursive(directory, function (err, files) {
+var deployDirectory = function (sourceDirectory, destinationPath) {
+    recursive(sourceDirectory, function (err, files) {
         if (err) {
             console.error(err);
         }
 
         for (var i = 0, len = files.length; i < len; i++) {
-            deployFile(files[i]);
+            // remove the root directory path from the file path and convert to unix style slashes
+            var normalizedFilepath = path.normalize(files[i]).replace(path.normalize(sourceDirectory), "").replace(/\\/g, "/");
+            // format the path to conform to Artifactory path requirements
+            var normalizedPath = path.normalize("/" + destinationPath + "/" + normalizedFilepath);
+            deployFile(files[i], normalizedPath);
         }
     });
 };
 
 /**
- * Deploys a file to the Artifactory server for deployment. First calculates the checksums and then deploys the file.
- * @param filename the absolute filename and path
+ * Deploys a file to the Artifactory server. Calculates the checksums and then deploys the file to the provided
+ * destination path. If there is an unsuccessfuly deployment (as defined by a non-201 HTTP status code) the script will
+ * exit.
+ * @param file the file path of the asset to deploy
+ * @param destinationPath the fully defined target deployment path on the Artifactory instance
  */
-var deployFile = function (filename) {
+var deployFile = function (file, destinationPath) {
 
-    var options = generateOptions(filename);
+    var options = generateOptions(file, destinationPath);
     var req = http.request(options, function (res) {
         var chunks = [];
 
@@ -56,7 +61,7 @@ var deployFile = function (filename) {
             }
         });
     });
-    fs.readFile(filename, function (err, data) {
+    fs.readFile(file, function (err, data) {
         if (err) {
             console.error(err);
         }
@@ -67,20 +72,17 @@ var deployFile = function (filename) {
 };
 
 /**
- * Generates a boilerplate object based on the filename provided. This deployment options object is specific to
- * Artifactory and the https node package.
- * @param filename the absolute path and filename of the file
- * @returns {{path: string, method: string, host: string, headers: {X-JFrog-Art-Api: *, X-Checksum-Sha256: *,
- *  X-Checksum-Sha1: *, X-Checksum-Md5: *}}}
+ * Generates the options object for the http package. Includes custom headers for deployment to an Artifactory instance.
+ * @param file the file path of the asset
+ * @param destinationPath the complete target deployment path on the Artifactory instance
+ * @returns {{path: *, method: string, host: string, headers: {X-JFrog-Art-Api: *, X-Checksum-Sha256: *, X-Checksum-Sha1: *, X-Checksum-Md5: *}}}
  */
-var generateOptions = function (filename) {
+var generateOptions = function (file, destinationPath) {
 
-    var hash = calculateChecksums(filename);
-    // convert windows back slashes to forward slashes and change path to be relative
-    var normalizedFilename = filename.replace(inputDirectory, "").replace(/\\/g, "/");
+    var hash = calculateChecksums(file);
 
     var options = {
-        path: "/artifactory/web/" + deploymentVersion + "/" + normalizedFilename,
+        path: destinationPath,
         method: "PUT",
         host: "files.worldwind.arc.nasa.gov",
         headers: {
@@ -128,8 +130,9 @@ if (process.argv.length < 5) {
     process.exit(1);
 } else {
     apiKey = process.argv[2];
-    deploymentVersion = process.argv[3];
-    inputDirectory = process.argv[4];
+    var sourcePath = process.argv[3];
+    var destinationPath = process.argv[4];
+
+    // Submit the appropriate assets and asset directories
+    deployDirectory(sourcePath, destinationPath);
 }
-// Submit the appropriate assets and asset directories
-deployDirectory(inputDirectory);
