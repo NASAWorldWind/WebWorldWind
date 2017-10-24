@@ -29,6 +29,12 @@
     "doc": "grunt jsdoc",
     "test:watch": "karma start karma.conf.js"
   },
+  "files": [
+    "images/",
+    "images.zip",
+    "worldwind.js",
+    "worldwind.min.js"
+  ],
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-contrib-compress": "^1.4.3",
