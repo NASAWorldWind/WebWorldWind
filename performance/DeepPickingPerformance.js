@@ -99,7 +99,7 @@ requirejs(['../src/WorldWind',
 
             var redrawRequired = highlightedItems.length > 0; // must redraw if we de-highlight previously picked items
 
-            // De-highlight any previously highlighted placemarks.
+            // De-highlight any previously highlighted footprints.
             for (var h = 0; h < highlightedItems.length; h++) {
                 highlightedItems[h].highlighted = false;
             }
@@ -146,10 +146,10 @@ requirejs(['../src/WorldWind',
             }
         };
 
-        // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
+        // Listen for mouse moves and highlight the footprints that the cursor rolls over.
         wwd.addEventListener("mousemove", handlePick);
 
-        // Listen for taps on mobile devices and highlight the placemarks that the user taps.
+        // Listen for taps on mobile devices and highlight the footprints that the user taps.
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     }
 );
