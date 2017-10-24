@@ -10,6 +10,8 @@ api-doc/
 
 apps/
 
+assetsToPublish/
+
 config.json
 
 CONTRIBUTING.md
@@ -29,6 +31,8 @@ ISSUE_TEMPLATE.md
 karma.conf.js
 
 layout.tmpl
+
+nasaworldwind-worldwind-*.tgz
 
 node_modules/
 

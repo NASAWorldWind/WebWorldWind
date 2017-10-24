@@ -34,6 +34,12 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+  # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
+  - provider: script
+    script: ./travis/publishToArtifactory.sh
+    skip_cleanup: true
+    on:
+      tags: true
 
 # Node.js build cache configuration. See the Travis CI documentation: https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Caching-with-npm
 cache:
