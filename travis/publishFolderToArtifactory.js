@@ -27,10 +27,10 @@ var deployDirectory = function (sourceDirectory, destinationPath) {
         }
 
         for (var i = 0, len = files.length; i < len; i++) {
-            // remove the root directory path from the file path and convert to unix style slashes
-            var normalizedFilepath = path.normalize(files[i]).replace(path.normalize(sourceDirectory), "").replace(/\\/g, "/");
+            // remove the root directory path from the file path
+            var normalizedFilepath = path.normalize(files[i]).replace(path.normalize(sourceDirectory), "");
             // format the path to conform to Artifactory path requirements
-            var normalizedPath = path.join(destinationPath, normalizedFilepath);
+            var normalizedPath = path.posix.join(destinationPath, normalizedFilepath);
             deployFile(files[i], normalizedPath);
         }
     });
