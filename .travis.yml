@@ -21,6 +21,12 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
+  # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
+  - provider: script
+    script: ./travis/publishToArtifactory.sh
+    skip_cleanup: true
+    on:
+      tags: true
   # Create CHANGELOG.md in the current directory
   - provider: script
     script: ./travis/changelog.sh >> CHANGELOG.md
@@ -31,12 +37,6 @@ deploy:
   - provider: releases
     api_key: $GITHUB_API_KEY
     file: CHANGELOG.md
-    skip_cleanup: true
-    on:
-      tags: true
-  # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
-  - provider: script
-    script: ./travis/publishToArtifactory.sh
     skip_cleanup: true
     on:
       tags: true
