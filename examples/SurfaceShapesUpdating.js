@@ -60,7 +60,12 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(rectangle);
 
         // Surface Sector
-        var sector = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
+        var rotatingSectors = [];
+        rotatingSectors.push(new WorldWind.Sector(33, 37, -95, -90));
+        rotatingSectors.push(new WorldWind.Sector(33, 37, -97, -92));
+        rotatingSectors.push(new WorldWind.Sector(31, 35, -97, -92));
+        rotatingSectors.push(new WorldWind.Sector(31, 35, -95, -90));
+        var sector = new WorldWind.SurfaceSector(rotatingSectors[0], attributes);
         shapesLayer.addRenderable(sector);
 
         // Surface polygon
@@ -69,9 +74,10 @@ requirejs(['../src/WorldWind',
         polygonBoundary.push(new WorldWind.Location(40, -105));
         polygonBoundary.push(new WorldWind.Location(45, -110));
         polygonBoundary.push(new WorldWind.Location(40, -115));
-        polygonBoundary.tick = true;
 
         var polygon = new WorldWind.SurfacePolygon(polygonBoundary, attributes);
+        // Append property to count the times the polygon has shifted eastward or westward
+        polygon.shiftCounter = 0;
         shapesLayer.addRenderable(polygon);
 
         // Surface polyline
@@ -79,14 +85,15 @@ requirejs(['../src/WorldWind',
         polylineBoundary.push(new WorldWind.Location(40, -90));
         polylineBoundary.push(new WorldWind.Location(45, -95));
         polylineBoundary.push(new WorldWind.Location(40, -100));
-        polylineBoundary.tick = true;
 
         var polyline = new WorldWind.SurfacePolyline(polylineBoundary, attributes);
+        // Append property to count the times the polyline has shifted eastward or westward
+        polyline.shiftCounter = 0;
+
         shapesLayer.addRenderable(polyline);
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
-
 
         // Update SurfaceShapes according to a timer
         window.setInterval(function() {
@@ -99,25 +106,46 @@ requirejs(['../src/WorldWind',
             // Update circle radius size
             circle.radius == 200e3 ? circle.radius += 100e3 : circle.radius = 200e3;
 
-            // Enable and disable polygon
-            polygon.enabled ? polygon.enabled = false : polygon.enabled = true;
+            polygon.boundaries = shiftBoundaries(polygon);
 
-            // Enable and disable sector
-            sector.enabled ? sector.enabled = false : sector.enabled = true;
+            polyline.boundaries = shiftBoundaries(polyline);
 
-            // Increase and decrease polyline polygon size (probably not the correct way to do it)
-            // polyline.boundaries[0].longitude === -90 ? polyline.boundaries[0].longitude = -92.5 : polyline.boundaries[0].longitude = -90;
-            // polyline.boundaries[1].latitude === 45 ? polyline.boundaries[1].latitude = 42.5 : polyline.boundaries[1].latitude = 45;
-            // polyline.boundaries[2].longitude === -100 ? polyline.boundaries[2].longitude = -97.5 : polyline.boundaries[2].longitude = -100;
+            sector.sector = moveSector();
 
             wwd.redraw();
         }, 1000);
 
-        function increaseBoundariesLatitude(shape){
-            for(var i = 0; i < shape._boundaries.length; i++){
-                if(shape._boundaries[i].latitude < 90){
-                    shape._boundaries[i].latitude += 2;
-                }
+        function shiftBoundaries(shape){
+            console.log()
+            if (shape.shiftCounter < 2){
+                shape.boundaries = shiftBoundariesWestward(shape.boundaries);
+                shape.shiftCounter += 2;
+            }
+            else if (shape.shiftCounter > -2) {
+                shape.boundaries = shiftBoundariesEastward(shape.boundaries);
+                shape.shiftCounter -= 2;
+            }
+
+            return shape.boundaries;
+        }
+
+        function shiftBoundariesWestward(boundaries){
+            for(var i = 0; i < boundaries.length; i++){
+                boundaries[i].longitude -= 1;
+            }
+            return boundaries;
+        }
+
+        function shiftBoundariesEastward(boundaries){
+            for(var i = 0; i < boundaries.length; i++){
+                boundaries[i].longitude += 1;
+            }
+            return boundaries;
+        }
+
+        function moveSector(){
+            for (var i = 0; i < rotatingSectors.length; i++){
+                return rotatingSectors[i];
             }
         }
 
