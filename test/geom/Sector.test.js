@@ -4,8 +4,11 @@
  */
 define([
     'src/geom/Sector',
-    'src/geom/Location'
-], function (Sector, Location) {
+    'src/geom/Location',
+    'src/globe/EarthElevationModel',
+    'src/geom/BoundingBox',
+    'src/globe/Globe'
+], function (Sector, Location, EarthElevationModel, BoundingBox, Globe) {
     "use strict";
 
     describe("Sector Tests", function () {
@@ -319,22 +322,52 @@ define([
             it("Returns corner points in the correct order", function () {
                 var sector=new Sector(44,45,-94,-95);
                 var corners=sector.getCorners();
-				expect(corners[0].latitude).toEqual(44);
-				expect(corners[0].longitude).toEqual(-94);
-				expect(corners[1].latitude).toEqual(44);
-				expect(corners[1].longitude).toEqual(-95);
-				expect(corners[2].latitude).toEqual(45);
-				expect(corners[2].longitude).toEqual(-95);
-				expect(corners[3].latitude).toEqual(45);
-				expect(corners[3].longitude).toEqual(-94);
+                expect(corners[0].latitude).toEqual(44);
+                expect(corners[0].longitude).toEqual(-94);
+                expect(corners[1].latitude).toEqual(44);
+                expect(corners[1].longitude).toEqual(-95);
+                expect(corners[2].latitude).toEqual(45);
+                expect(corners[2].longitude).toEqual(-95);
+                expect(corners[3].latitude).toEqual(45);
+                expect(corners[3].longitude).toEqual(-94);
             });
         });
 
-        // describe("Compute bounding box method", function () {
-        //
-        //     it("Computes the correct bounding box for a given sector", function () {
-        //      });
-        // });
+        describe("Compute bounding box method", function () {
+
+            // it("Should throw an exception because no globe is provided", function () {
+            //     var sector=new Sector(44,45,-94,-95);
+            //     expect(function () {
+            //         sector.computeBoundingBox(null /* globe */,1 /* verticalExaggeration */)
+            //     }).toThrow();
+            // });
+
+            it("Computes the correct bounding box for a given sector", function () {
+
+                // create a globe that returns mock elevations for a given sector so we don't have to rely on
+                // asynchronous tile calls to finish.
+                Globe.prototype.minAndMaxElevationsForSector = function (sector) {
+                    return [125,350];
+                };
+                var mockGlobe=new Globe(new EarthElevationModel());
+                var sector=new Sector(44,45,-94,-95);
+                var boundingBox=sector.computeBoundingBox(mockGlobe,1 /* verticalExaggeration */);
+                var corners=boundingBox.getCorners();
+                var result=[-4578599.35821,4408517.13637,-400572.38093,-4578165.82389,4408089.51342,-400538.26104,
+                    -4584458.99416,4408089.51342,-320575.95113,-4584892.52848,4408517.13637,-320610.07102,
+                    -4500840.24159,4487839.47267,-394452.60573,-4500406.70727,4487411.84972,-394418.48583,
+                    -4506699.87754,4487411.84972,-314456.17593,-4507133.41186,4487839.47267,-314490.29582];
+
+                var resultCount=0;
+                for (var i=0; i<corners.length; i++) {
+                    var vec=corners[i];
+                    for (var j=0; j<vec.length; j++) {
+                        expect(vec[j]).toBeCloseTo(result[resultCount],3);
+                        resultCount++;
+                    }
+                }
+            });
+        });
 
         describe("Sets this sector to the union of itself and a specified sector", function () {
 
