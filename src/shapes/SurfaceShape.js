@@ -10,6 +10,7 @@ define([
         '../error/AbstractError',
         '../geom/Angle',
         '../error/ArgumentError',
+        '../geom/BoundingBox',
         '../geom/Location',
         '../util/Logger',
         '../error/NotYetImplementedError',
@@ -24,6 +25,7 @@ define([
     function (AbstractError,
               Angle,
               ArgumentError,
+              BoundingBox,
               Location,
               Logger,
               NotYetImplementedError,
@@ -80,6 +82,13 @@ define([
              * @protected
              */
             this._sectors = [];
+
+            /*
+             * The bounding extent for this shape.
+             * @type {BoundingBox}
+             * @protected
+             */
+            this._extent = null;
 
             /*
              * The raw collection of locations defining this shape and are explicitly specified by the client of this class.
@@ -416,6 +425,19 @@ define([
                 Logger.logMessage(Logger.LEVEL_SEVERE, "SurfaceShape", "computeBoundaries", "abstractInvocation"));
         };
 
+        // Internal. Intentionally not documented.
+        SurfaceShape.prototype.intersectsFrustum = function (dc) {
+            if (this._extent) {
+                if (dc.pickingMode) {
+                    return this._extent.intersectsFrustum(dc.pickFrustum);
+                } else {
+                    return this._extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                }
+            } else {
+                return true;
+            }
+        };
+
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.render = function (dc) {
             if (!this.enabled) {
@@ -425,6 +447,11 @@ define([
             this.layer = dc.currentLayer;
 
             this.prepareBoundaries(dc);
+
+            // Use the last computed extent to see if this shape is out of view.
+            if (this._extent && !this.intersectsFrustum(dc)) {
+                return;
+            }
 
             dc.surfaceShapeTileBuilder.insertSurfaceShape(this);
         };
@@ -553,6 +580,8 @@ define([
 
             this.prepareSectors();
 
+            this.computeExtent(dc);
+
             this.boundariesArePrepared = true;
         };
 
@@ -623,6 +652,49 @@ define([
             this.prepareBoundaries(dc);
 
             return this._sectors;
+        };
+
+        /**
+         * Computes the extent for the shape based on its sectors.
+         *
+         * @param {DrawContext} dc The drawing context containing a globe.
+         *
+         * @return {BoundingBox} The extent for the shape.
+         */
+        SurfaceShape.prototype.computeExtent = function (dc) {
+
+            if (!this._sectors || this._sectors.length === 0) {
+                return null;
+            }
+
+            var boxPoints;
+            // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
+            // Return the box which contains that sector.
+            if (this._sectors.length === 1) {
+                boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                this._extent = new BoundingBox();
+                this._extent.setToVec3Points(boxPoints);
+            }
+            // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
+            // Return a box which contains the corners of the boxes bounding each sector.
+            else {
+                var boxCorners = [];
+
+                for (var i = 0; i < this._sectors.length; i++) {
+                    boxPoints = this._sectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                    var box = new BoundingBox();
+                    box.setToVec3Points(boxPoints);
+                    var corners = box.getCorners();
+                    for (var j = 0; j < corners.length; j++) {
+                        boxCorners.push(corners[j]);
+                    }
+                }
+                this._extent = new BoundingBox();
+                this._extent.setToVec3Points(boxCorners);
+            }
+
+            return this._extent;
+
         };
 
         // Internal use only. Intentionally not documented.
