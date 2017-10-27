@@ -62,9 +62,9 @@ define([
 
         Object.defineProperties(SurfaceSector.prototype, {
             /**
-             * This shape's center location.
+             * This shape's sector.
              * @memberof SurfaceSector.prototype
-             * @type {Location}
+             * @type {Sector}
              */
             sector: {
                 get: function() {
