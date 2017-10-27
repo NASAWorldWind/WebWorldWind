@@ -7,17 +7,17 @@
  */
 
 define([
-        '../OpenSearchNameSpaces',
+        '../OpenSearchNamespaces',
         './OpenSearchUrl',
         '../OpenSearchUtils'
     ],
-    function (OpenSearchNameSpaces,
+    function (OpenSearchNamespaces,
               OpenSearchUrl,
               OpenSearchUtils) {
         'use strict';
 
         var DescriptionDocument = function (root) {
-            var ns = OpenSearchNameSpaces.openSearch;
+            var ns = OpenSearchNamespaces.openSearch;
 
             this._shortName = OpenSearchUtils.getChildTextContent(root, 'ShortName', ns);
             this._description = OpenSearchUtils.getChildTextContent(root, 'Description', ns);
