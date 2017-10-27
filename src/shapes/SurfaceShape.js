@@ -576,7 +576,7 @@ define([
         SurfaceShape.prototype.resetBoundaries = function () {
             this.boundariesArePrepared = false;
             this._boundaries = null;
-        }
+        };
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.normalizeAngles = function (boundaries) {
