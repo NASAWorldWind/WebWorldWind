@@ -60,6 +60,24 @@ define([
 
         SurfaceSector.prototype = Object.create(SurfaceShape.prototype);
 
+        Object.defineProperties(SurfaceSector.prototype, {
+            /**
+             * This shape's sector.
+             * @memberof SurfaceSector.prototype
+             * @type {Sector}
+             */
+            sector: {
+                get: function() {
+                    return this._sector;
+                },
+                set: function(value) {
+                    this.stateKeyInvalid = true;
+                    this.resetBoundaries();
+                    this._sector = value;
+                }
+            }
+        });
+
         // Internal use only. Intentionally not documented.
         SurfaceSector.staticStateKey = function(shape) {
             var shapeStateKey = SurfaceShape.staticStateKey(shape);

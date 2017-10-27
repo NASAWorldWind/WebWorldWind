@@ -85,6 +85,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._center = value;
                 }
             },
@@ -100,6 +101,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._majorRadius = value;
                 }
             },
@@ -115,6 +117,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._minorRadius = value;
                 }
             },
@@ -131,6 +134,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._heading = value;
                 }
             },
@@ -147,6 +151,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._intervals = value;
                 }
             }
