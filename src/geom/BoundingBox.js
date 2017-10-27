@@ -110,11 +110,11 @@ define([
          * @returns {Array} the eight box corners in the order bottom-lower-left, bottom-lower-right, bottom-upper-right,
          *         bottom-upper-left, top-lower-left, top-lower-right, top-upper-right, top-upper-left.
          */
-        BoundingBox.prototype.getCorners = function() {
-            var ll=new Vec3(this.s[0],this.s[1],this.s[2]);
-            var lr=new Vec3(this.t[0],this.t[1],this.t[2]);
-            var ur=new Vec3(this.s[0],this.s[1],this.s[2]);
-            var ul=new Vec3(this.s[0],this.s[1],this.s[2]);
+        BoundingBox.prototype.getCorners = function () {
+            var ll = new Vec3(this.s[0], this.s[1], this.s[2]);
+            var lr = new Vec3(this.t[0], this.t[1], this.t[2]);
+            var ur = new Vec3(this.s[0], this.s[1], this.s[2]);
+            var ul = new Vec3(this.s[0], this.s[1], this.s[2]);
 
             ll.add(this.t).multiply(-0.5);     // Lower left.
             lr.subtract(this.s).multiply(0.5); // Lower right.
@@ -122,12 +122,12 @@ define([
             ul.subtract(this.t).multiply(0.5); // Upper left.
 
             var corners = [];
-            for (var i=0; i<4; i++) {
-                corners.push(new Vec3(this.bottomCenter[0],this.bottomCenter[1],this.bottomCenter[2]));
+            for (var i = 0; i < 4; i++) {
+                corners.push(new Vec3(this.bottomCenter[0], this.bottomCenter[1], this.bottomCenter[2]));
             }
 
-            for (i=0; i<4; i++) {
-                corners.push(new Vec3(this.topCenter[0],this.topCenter[1],this.topCenter[2]));
+            for (i = 0; i < 4; i++) {
+                corners.push(new Vec3(this.topCenter[0], this.topCenter[1], this.topCenter[2]));
             }
 
             corners[0].add(ll);

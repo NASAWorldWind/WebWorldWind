@@ -450,7 +450,7 @@ define([
 
             // Use the last computed extent to see if this shape is out of view.
             if (this._extent && !this.intersectsFrustum(dc)) {
-               return;
+                return;
             }
 
             dc.surfaceShapeTileBuilder.insertSurfaceShape(this);
@@ -657,7 +657,7 @@ define([
          */
         SurfaceShape.prototype.computeExtent = function (dc) {
 
-            if (!this._sectors || this._sectors.length===0) {
+            if (!this._sectors || this._sectors.length === 0) {
                 return null;
             }
 
@@ -665,8 +665,8 @@ define([
             // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
             // Return the box which contains that sector.
             if (this._sectors.length === 1) {
-                boxPoints=this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
-                this._extent=new BoundingBox();
+                boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                this._extent = new BoundingBox();
                 this._extent.setToVec3Points(boxPoints);
             }
             // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
@@ -675,11 +675,11 @@ define([
                 var boxCorners = [];
 
                 for (var i = 0; i < this._sectors.length; i++) {
-                    boxPoints =  this._sectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
-                    var box=new BoundingBox();
+                    boxPoints = this._sectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                    var box = new BoundingBox();
                     box.setToVec3Points(boxPoints);
-                    var corners=box.getCorners();
-                    for (var j=0; j<corners.length; j++) {
+                    var corners = box.getCorners();
+                    for (var j = 0; j < corners.length; j++) {
                         boxCorners.push(corners[j]);
                     }
                 }

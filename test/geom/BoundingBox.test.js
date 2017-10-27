@@ -55,7 +55,7 @@ define([
             // Vec3 variations
             it("Sets this bounding box such that it minimally encloses a specified collection of points", function () {
                 var boundingBox = new BoundingBox();
-                var vecPoints=[];
+                var vecPoints = [];
                 vecPoints.push(new Vec3(1, 0, 0));
                 vecPoints.push(new Vec3(0, 1, 0));
                 vecPoints.push(new Vec3(0, 0, 1));
@@ -73,26 +73,26 @@ define([
         describe("Get corners method", function () {
 
             it("Creates a box, verifies correct corners retrieved", function () {
-                var points=[];
-                points.push(new Vec3(7,8,15));
-                points.push(new Vec3(-4,3,7));
-                points.push(new Vec3(-4,-5,9));
-                points.push(new Vec3(6,-12,18));
-                points.push(new Vec3(-7,-8,-15));
-                points.push(new Vec3(4,-3,-7));
-                points.push(new Vec3(4,5,-9));
-                points.push(new Vec3(-6,12,-18));
+                var points = [];
+                points.push(new Vec3(7, 8, 15));
+                points.push(new Vec3(-4, 3, 7));
+                points.push(new Vec3(-4, -5, 9));
+                points.push(new Vec3(6, -12, 18));
+                points.push(new Vec3(-7, -8, -15));
+                points.push(new Vec3(4, -3, -7));
+                points.push(new Vec3(4, 5, -9));
+                points.push(new Vec3(-6, 12, -18));
                 var boundingBox = new BoundingBox();
                 boundingBox.setToVec3Points(points);
-                var corners=boundingBox.getCorners();
-                var results=[-13.006629,-5.673621,-20.605725,-1.367193,-7.460613,-23.841735,3.368652,15.397291,-19.430232,
-                    -8.270784,17.184283,-16.194222,-3.368652,-15.397291,19.430232,8.270784,-17.184283,16.194222,
-                    13.006629,5.673621,20.605725,1.367193,7.460613,23.841735];
-                var resultCount=0;
-                for (var i=0; i<corners.length; i++) {
-                    var vec=corners[i];
-                    for (var j=0; j<vec.length; j++) {
-                        expect(vec[j]).toBeCloseTo(results[resultCount],3);
+                var corners = boundingBox.getCorners();
+                var results = [-13.006629, -5.673621, -20.605725, -1.367193, -7.460613, -23.841735, 3.368652, 15.397291, -19.430232,
+                    -8.270784, 17.184283, -16.194222, -3.368652, -15.397291, 19.430232, 8.270784, -17.184283, 16.194222,
+                    13.006629, 5.673621, 20.605725, 1.367193, 7.460613, 23.841735];
+                var resultCount = 0;
+                for (var i = 0; i < corners.length; i++) {
+                    var vec = corners[i];
+                    for (var j = 0; j < vec.length; j++) {
+                        expect(vec[j]).toBeCloseTo(results[resultCount], 3);
                         resultCount++;
                     }
                 }
@@ -105,7 +105,7 @@ define([
                 var boundingBox = new BoundingBox();
                 var globe = new Globe(new EarthElevationModel());
                 var sector = new Sector(-90, 90, -180, 180);
-                expect(boundingBox.setToSector(sector, globe, 10, 1000).radius).toBeCloseTo(9006353.499282671,3);
+                expect(boundingBox.setToSector(sector, globe, 10, 1000).radius).toBeCloseTo(9006353.499282671, 3);
             });
 
             it("Should throw an exception because no globe is provided", function () {

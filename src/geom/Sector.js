@@ -226,7 +226,7 @@ define([
          * @throws {ArgumentError} If the specified array is null, undefined or empty or the number of locations
          * is less than 2.
          */
-        Sector.splitBoundingSectors = function(locations) {
+        Sector.splitBoundingSectors = function (locations) {
             if (!locations || locations.length < 2) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Sector", "splitBoundingSectors",
                     "missingArray"));
@@ -389,13 +389,13 @@ define([
          *
          * @returns {Array} an array of the four corner locations, in the order SW, SE, NE, NW
          */
-        Sector.prototype.getCorners=function() {
+        Sector.prototype.getCorners = function () {
             var corners = [];
 
-            corners.push(new Location(this.minLatitude,this.minLongitude));
-            corners.push(new Location(this.minLatitude,this.maxLongitude));
-            corners.push(new Location(this.maxLatitude,this.maxLongitude));
-            corners.push(new Location(this.maxLatitude,this.minLongitude));
+            corners.push(new Location(this.minLatitude, this.minLongitude));
+            corners.push(new Location(this.minLatitude, this.maxLongitude));
+            corners.push(new Location(this.maxLatitude, this.maxLongitude));
+            corners.push(new Location(this.maxLatitude, this.minLongitude));
 
             return corners;
         };
@@ -414,8 +414,7 @@ define([
          *
          * @throws {ArgumentError} if the globe is null.
          */
-        Sector.prototype.computeBoundingPoints=function(globe,verticalExaggeration)
-        {
+        Sector.prototype.computeBoundingPoints = function (globe, verticalExaggeration) {
             // TODO: Refactor this method back to computeBoundingBox.
             // This method was originally computeBoundingBox and returned a BoundingBox. This created a circular dependency between
             // Sector and BoundingBox that the Karma unit test suite doesn't appear to like. If we discover a way to make Karma handle this
@@ -435,15 +434,15 @@ define([
                 maxHeight = minHeight + 10; // Ensure the top and bottom heights are not equal.
 
             var points = [];
-            var corners=this.getCorners();
-            for (var i=0; i<corners.length; i++) {
-                points.push(globe.computePointFromPosition(corners[i].latitude,corners[i].longitude, minHeight,new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(corners[i].latitude,corners[i].longitude, maxHeight,new Vec3(0,0,0)));
+            var corners = this.getCorners();
+            for (var i = 0; i < corners.length; i++) {
+                points.push(globe.computePointFromPosition(corners[i].latitude, corners[i].longitude, minHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(corners[i].latitude, corners[i].longitude, maxHeight, new Vec3(0, 0, 0)));
             }
 
             // A point at the centroid captures the maximum vertical dimension.
-            var centroid = this.centroid(new Location(0,0));
-            points.push(globe.computePointFromPosition(centroid.latitude,centroid.longitude, maxHeight, new Vec3(0,0,0)));
+            var centroid = this.centroid(new Location(0, 0));
+            points.push(globe.computePointFromPosition(centroid.latitude, centroid.longitude, maxHeight, new Vec3(0, 0, 0)));
 
             // If the sector spans the equator, then the curvature of all four edges need to be taken into account. The
             // extreme points along the top and bottom edges are located at their mid-points, and the extreme points along
@@ -451,22 +450,22 @@ define([
             // the sector's min and max latitude, and add points with the sector's min and max longitude but with latitude
             // at the equator. See WWJINT-225.
             if (this.minLatitude < 0 && this.maxLatitude > 0) {
-                points.push(globe.computePointFromPosition(this.minLatitude, centroid.longitude,maxHeight,new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(this.maxLatitude, centroid.longitude,maxHeight,new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(0, this.minLongitude, maxHeight,new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(0, this.maxLongitude, maxHeight,new Vec3(0,0,0)));
+                points.push(globe.computePointFromPosition(this.minLatitude, centroid.longitude, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(this.maxLatitude, centroid.longitude, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(0, this.minLongitude, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(0, this.maxLongitude, maxHeight, new Vec3(0, 0, 0)));
             }
             // If the sector is located entirely in the southern hemisphere, then the curvature of its top edge needs to be
             // taken into account. The extreme point along the top edge is located at its mid-point. Add a point with the
             // longitude of the sector's centroid but with the sector's max latitude. See WWJINT-225.
             else if (this.minLatitude < 0) {
-                points.push(globe.computePointFromPosition(this.maxLatitude, centroid.longitude,maxHeight,new Vec3(0,0,0)));
+                points.push(globe.computePointFromPosition(this.maxLatitude, centroid.longitude, maxHeight, new Vec3(0, 0, 0)));
             }
             // If the sector is located entirely in the northern hemisphere, then the curvature of its bottom edge needs to
             // be taken into account. The extreme point along the bottom edge is located at its mid-point. Add a point with
             // the longitude of the sector's centroid but with the sector's min latitude. See WWJINT-225.
             else {
-                points.push(globe.computePointFromPosition(this.minLatitude, centroid.longitude, maxHeight, new Vec3(0,0,0)));
+                points.push(globe.computePointFromPosition(this.minLatitude, centroid.longitude, maxHeight, new Vec3(0, 0, 0)));
             }
 
             // If the sector spans 360 degrees of longitude then is a band around the entire globe. (If one edge is a pole
@@ -474,16 +473,16 @@ define([
             // 0, 180, 90, and -90 to capture full extent of the band.
             if (this.deltaLongitude() >= 360) {
                 var minLat = this.minLatitude;
-                points.push(globe.computePointFromPosition(minLat, 0, maxHeight, new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(minLat, 90, maxHeight, new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(minLat, -90, maxHeight, new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(minLat, 180, maxHeight, new Vec3(0,0,0)));
+                points.push(globe.computePointFromPosition(minLat, 0, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(minLat, 90, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(minLat, -90, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(minLat, 180, maxHeight, new Vec3(0, 0, 0)));
 
                 var maxLat = this.maxLatitude;
-                points.push(globe.computePointFromPosition(maxLat, 0, maxHeight, new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(maxLat, 90, maxHeight, new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(maxLat, -90, maxHeight, new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(maxLat, 180, maxHeight, new Vec3(0,0,0)));
+                points.push(globe.computePointFromPosition(maxLat, 0, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(maxLat, 90, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(maxLat, -90, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(maxLat, 180, maxHeight, new Vec3(0, 0, 0)));
             }
             else if (this.deltaLongitude() > 180) {
                 // Need to compute more points to ensure the box encompasses the full sector.
@@ -491,16 +490,16 @@ define([
                 var cLat = centroid.latitude;
 
                 // centroid latitude, longitude midway between min longitude and centroid longitude
-                var lon = (this.minLongitude+cLon)/2;
-                points.push(globe.computePointFromPosition(cLat, lon, maxHeight, new Vec3(0,0,0)));
+                var lon = (this.minLongitude + cLon) / 2;
+                points.push(globe.computePointFromPosition(cLat, lon, maxHeight, new Vec3(0, 0, 0)));
 
                 // centroid latitude, longitude midway between centroid longitude and max longitude
-                lon = (cLon+this.maxLongitude)/2;
-                points.push(globe.computePointFromPosition(cLat, lon, maxHeight, new Vec3(0,0,0)));
+                lon = (cLon + this.maxLongitude) / 2;
+                points.push(globe.computePointFromPosition(cLat, lon, maxHeight, new Vec3(0, 0, 0)));
 
                 // centroid latitude, longitude at min longitude and max longitude
-                points.push(globe.computePointFromPosition(cLat, this.minLongitude, maxHeight, new Vec3(0,0,0)));
-                points.push(globe.computePointFromPosition(cLat, this.maxLongitude, maxHeight, new Vec3(0,0,0)));
+                points.push(globe.computePointFromPosition(cLat, this.minLongitude, maxHeight, new Vec3(0, 0, 0)));
+                points.push(globe.computePointFromPosition(cLat, this.maxLongitude, maxHeight, new Vec3(0, 0, 0)));
             }
 
             return points;

@@ -43,18 +43,18 @@ requirejs(['../src/WorldWind',
         wwd.deepPicking = true;
 
         // Start out zoomed to the AOI
-        wwd.navigator.lookAtLocation=new WorldWind.Location(44.2,-94.12);
-        wwd.navigator.range=625000;
+        wwd.navigator.lookAtLocation = new WorldWind.Location(44.2, -94.12);
+        wwd.navigator.range = 625000;
 
         // Satellite image footprints
-        var footprints=[];
-        footprints.push([44.22596415476343,-95.50406,44.24783068396879,-94.12976,43.25939191053712,-94.11133,43.23826255332707,-95.46323,44.22596415476343,-95.50406]);
-        footprints.push([45.14674718783555,-94.27255,45.153769755990965,-92.875824,44.165301274896635,-92.87793,44.15851530960486,-94.25113,45.14674718783555,-94.27255]);
-        footprints.push([45.12551356202371,-95.54315,45.148073182871244,-94.1474,44.15979663371134,-94.12808,44.137996748196564,-95.500336,45.12551356202371,-95.54315]);
-        footprints.push([43.42648714895223,-92.879425,43.31125028050336,-92.924225,43.26442286797419,-92.94232,43.25815001081029,-94.23251,44.246545441411556,-94.25299,44.25335216097235,-92.87775,43.42648714895223,-92.879425]);
+        var footprints = [];
+        footprints.push([44.22596415476343, -95.50406, 44.24783068396879, -94.12976, 43.25939191053712, -94.11133, 43.23826255332707, -95.46323, 44.22596415476343, -95.50406]);
+        footprints.push([45.14674718783555, -94.27255, 45.153769755990965, -92.875824, 44.165301274896635, -92.87793, 44.15851530960486, -94.25113, 45.14674718783555, -94.27255]);
+        footprints.push([45.12551356202371, -95.54315, 45.148073182871244, -94.1474, 44.15979663371134, -94.12808, 44.137996748196564, -95.500336, 45.12551356202371, -95.54315]);
+        footprints.push([43.42648714895223, -92.879425, 43.31125028050336, -92.924225, 43.26442286797419, -92.94232, 43.25815001081029, -94.23251, 44.246545441411556, -94.25299, 44.25335216097235, -92.87775, 43.42648714895223, -92.879425]);
 
-        var locFootprints=[];
-        for (var i=0; i<footprints.length; i++) {
+        var locFootprints = [];
+        for (var i = 0; i < footprints.length; i++) {
             var rawFootprint = footprints[i];
             var locFootprint = [];
             for (var j = 0; j < rawFootprint.length; j += 2) {
@@ -70,15 +70,15 @@ requirejs(['../src/WorldWind',
         attributes.interiorColor = new WorldWind.Color(0.5, 0, 0, 0.25);
 
         var highlightAttributes = new WorldWind.ShapeAttributes(attributes);
-        highlightAttributes.interiorColor = new WorldWind.Color(0.5,0.5,0,0.25);
+        highlightAttributes.interiorColor = new WorldWind.Color(0.5, 0.5, 0, 0.25);
 
         // Number of footprints for deep picking stress test
-        var nTestFootprints=1000;
+        var nTestFootprints = 1000;
 
         // Create surface polygons for the satellite image footprints
-        var nTestPatterns=nTestFootprints/locFootprints.length;
-        for (var t=0; t<nTestPatterns; t++) {
-            for (i=0; i<locFootprints.length; i++) {
+        var nTestPatterns = nTestFootprints / locFootprints.length;
+        for (var t = 0; t < nTestPatterns; t++) {
+            for (i = 0; i < locFootprints.length; i++) {
                 var footprint = new WorldWind.SurfacePolygon(locFootprints[i], attributes);
                 footprint.highlightAttributes = highlightAttributes;
                 footprintsLayer.addRenderable(footprint);
