@@ -66,16 +66,13 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(rectangle);
 
         // Surface Sector
-        // Set up coordinates of 4 different sectors to update SurfaceSector
-        var rotatingSectors = [];
-        rotatingSectors.push(new WorldWind.Sector(33, 37, -95, -90));
-        rotatingSectors.push(new WorldWind.Sector(33, 37, -97, -92));
-        rotatingSectors.push(new WorldWind.Sector(31, 35, -97, -92));
-        rotatingSectors.push(new WorldWind.Sector(31, 35, -95, -90));
 
-        var sector = new WorldWind.SurfaceSector(rotatingSectors[0], attributes);
-        sector.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(sector);
+        var surfaceSector = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
+        // Append counter to cycle an array of sectors and set it to this SurfaceSector
+        surfaceSector.sectorCounter = 0;
+
+        surfaceSector.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(surfaceSector);
 
         // Surface polygon
         var polygonBoundary = [];
@@ -130,8 +127,8 @@ requirejs(['../src/WorldWind',
             polygon.boundaries = shiftBoundaries(polygon);
             polyline.boundaries = shiftBoundaries(polyline);
 
-            // TODO: SurfaceSector's state is not updating. Class needs refactoring.
-            // sector.sector = moveSector();
+            // Set
+            surfaceSector.sector = changeSector(surfaceSector);
 
             wwd.redraw();
         }, 1000);
@@ -175,10 +172,22 @@ requirejs(['../src/WorldWind',
             return boundaries;
         }
 
-        function moveSector(){
-            for (var i = 0; i < rotatingSectors.length; i++) {
-                return rotatingSectors[i];
+        // Set up coordinates of 4 different sectors to update SurfaceSector
+        var rotatingSectors = [];
+        rotatingSectors.push(new WorldWind.Sector(33, 37, -95, -90));
+        rotatingSectors.push(new WorldWind.Sector(33, 37, -97, -92));
+        rotatingSectors.push(new WorldWind.Sector(31, 35, -97, -92));
+        rotatingSectors.push(new WorldWind.Sector(31, 35, -95, -90));
+
+        // Cycle through the previous array and set it to the SurfaceSector
+        function changeSector(surfaceSector){
+            if (surfaceSector.sectorCounter < rotatingSectors.length - 1){
+                surfaceSector.sectorCounter += 1;
             }
+            else {
+                surfaceSector.sectorCounter = 0;
+            }
+            return rotatingSectors[surfaceSector.sectorCounter];
         }
 
     }
