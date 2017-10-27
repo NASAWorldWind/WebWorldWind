@@ -101,5 +101,10 @@ define([
             return SurfacePolyline.staticStateKey(this);
         };
 
+        // Internal. Polyline doesn't generate its own boundaries. See SurfaceShape.prototype.computeBoundaries.
+        SurfacePolyline.prototype.computeBoundaries = function(dc) {
+            return;
+        };
+
         return SurfacePolyline;
     });

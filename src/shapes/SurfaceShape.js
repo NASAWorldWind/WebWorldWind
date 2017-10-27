@@ -418,8 +418,6 @@ define([
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.computeBoundaries = function (globe) {
             // This method is in the base class and should be overridden if the boundaries are generated.
-            // It should be called only if the geometry has been provided by the user and does not need to be generated.
-            // assert(!this._boundaries);
 
             throw new AbstractError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "SurfaceShape", "computeBoundaries", "abstractInvocation"));
@@ -560,12 +558,7 @@ define([
                 return;
             }
 
-            // Some shapes generate boundaries, such as ellipses and sectors;
-            // others don't, such as polylines and polygons.
-            // Handle the latter below.
-            if (!this._boundaries) {
-                this.computeBoundaries(dc);
-            }
+            this.computeBoundaries(dc);
 
             var newBoundaries = this.formatBoundaries();
             this.normalizeAngles(newBoundaries);
@@ -604,7 +597,6 @@ define([
         // Internal. Resets boundaries for SurfaceShape recomputing.
         SurfaceShape.prototype.resetBoundaries = function () {
             this.boundariesArePrepared = false;
-            this._boundaries = null;
         };
 
         // Internal use only. Intentionally not documented.

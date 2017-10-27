@@ -73,6 +73,7 @@ define([
                 set: function(value) {
                     this.stateKeyInvalid = true;
                     this.resetBoundaries();
+                    this._boundaries = null;
                     this._sector = value;
                 }
             }
