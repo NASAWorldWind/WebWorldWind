@@ -85,14 +85,14 @@ define([
                 var boundingBox = new BoundingBox();
                 boundingBox.setToVec3Points(points);
                 var corners=boundingBox.getCorners();
-                var result=[-13.006629,-5.673621,-20.605725,-1.367193,-7.460613,-23.841735,3.368652,15.397291,-19.430232,
+                var results=[-13.006629,-5.673621,-20.605725,-1.367193,-7.460613,-23.841735,3.368652,15.397291,-19.430232,
                     -8.270784,17.184283,-16.194222,-3.368652,-15.397291,19.430232,8.270784,-17.184283,16.194222,
                     13.006629,5.673621,20.605725,1.367193,7.460613,23.841735];
                 var resultCount=0;
                 for (var i=0; i<corners.length; i++) {
                     var vec=corners[i];
                     for (var j=0; j<vec.length; j++) {
-                        expect(vec[j]).toBeCloseTo(result[resultCount],3);
+                        expect(vec[j]).toBeCloseTo(results[resultCount],3);
                         resultCount++;
                     }
                 }

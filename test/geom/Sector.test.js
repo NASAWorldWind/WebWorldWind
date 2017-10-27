@@ -7,8 +7,9 @@ define([
     'src/geom/Location',
     'src/globe/EarthElevationModel',
     'src/geom/BoundingBox',
+    'src/geom/Vec3',
     'src/globe/Globe'
-], function (Sector, Location, EarthElevationModel, BoundingBox, Globe) {
+], function (Sector, Location, EarthElevationModel, BoundingBox, Vec3, Globe) {
     "use strict";
 
     describe("Sector Tests", function () {
@@ -320,49 +321,156 @@ define([
         describe("Get corners method", function () {
 
             it("Returns corner points in the correct order", function () {
-                var sector=new Sector(44,45,-94,-95);
+                var sector=new Sector(44,45,-95,-94);
                 var corners=sector.getCorners();
                 expect(corners[0].latitude).toEqual(44);
-                expect(corners[0].longitude).toEqual(-94);
+                expect(corners[0].longitude).toEqual(-95);
                 expect(corners[1].latitude).toEqual(44);
-                expect(corners[1].longitude).toEqual(-95);
+                expect(corners[1].longitude).toEqual(-94);
                 expect(corners[2].latitude).toEqual(45);
-                expect(corners[2].longitude).toEqual(-95);
+                expect(corners[2].longitude).toEqual(-94);
                 expect(corners[3].latitude).toEqual(45);
-                expect(corners[3].longitude).toEqual(-94);
+                expect(corners[3].longitude).toEqual(-95);
             });
         });
 
-        describe("Compute bounding box method", function () {
+        describe("Compute bounding points method", function () {
 
-            // it("Should throw an exception because no globe is provided", function () {
-            //     var sector=new Sector(44,45,-94,-95);
-            //     expect(function () {
-            //         sector.computeBoundingBox(null /* globe */,1 /* verticalExaggeration */)
-            //     }).toThrow();
-            // });
+            it("Should throw an exception because no globe is provided", function () {
+                var sector=new Sector(44,45,-95,-94);
+                expect(function () {
+                    sector.computeBoundingPoints(null /* globe */,1 /* verticalExaggeration */)
+                }).toThrow();
+            });
 
-            it("Computes the correct bounding box for a given sector", function () {
-
+            it("Computes the correct bounding points for a given sector", function () {
                 // create a globe that returns mock elevations for a given sector so we don't have to rely on
                 // asynchronous tile calls to finish.
                 Globe.prototype.minAndMaxElevationsForSector = function (sector) {
-                    return [125,350];
+                    return [125.0,350.0];
                 };
                 var mockGlobe=new Globe(new EarthElevationModel());
-                var sector=new Sector(44,45,-94,-95);
-                var boundingBox=sector.computeBoundingBox(mockGlobe,1 /* verticalExaggeration */);
-                var corners=boundingBox.getCorners();
-                var result=[-4578599.35821,4408517.13637,-400572.38093,-4578165.82389,4408089.51342,-400538.26104,
-                    -4584458.99416,4408089.51342,-320575.95113,-4584892.52848,4408517.13637,-320610.07102,
-                    -4500840.24159,4487839.47267,-394452.60573,-4500406.70727,4487411.84972,-394418.48583,
-                    -4506699.87754,4487411.84972,-314456.17593,-4507133.41186,4487839.47267,-314490.29582];
+                var sector=new Sector(44.0,45.0,-95.0,-94.0);
+                var boundingPoints=sector.computeBoundingPoints(mockGlobe,1 /* verticalExaggeration */);
+                var results=[-4578078.7560, 4408178.4447, -400529.9919,-4578239.9915, 4408334.7429, -400544.0982,
+                    -4584371.7046, 4408178.4447, -320570.4981,-4584533.1618, 4408334.7429, -320581.7883,
+                    -4506674.4276, 4487436.7972, -315137.3752,-4506833.1390, 4487595.8962, -315148.4734,
+                    -4500488.1337, 4487436.7972, -393741.6920,-4500646.6273, 4487595.8962, -393755.5584,
+                    -4542910.2988, 4448133.5080, -357534.7945,-4581561.0285, 4408334.7429, -360576.6729];
 
                 var resultCount=0;
-                for (var i=0; i<corners.length; i++) {
-                    var vec=corners[i];
-                    for (var j=0; j<vec.length; j++) {
-                        expect(vec[j]).toBeCloseTo(result[resultCount],3);
+                for (var i=0; i<boundingPoints.length; i++) {
+                    var vec=boundingPoints[i];
+                    for (var j=0; j<3; j++) {
+                        expect(vec[j]).toBeCloseTo(results[resultCount],3);
+                        resultCount++;
+                    }
+                }
+            });
+
+            it("Computes the correct bounding points for a sector crossing the anti-Meridian", function () {
+                // create a globe that returns mock elevations for a given sector so we don't have to rely on
+                // asynchronous tile calls to finish.
+                Globe.prototype.minAndMaxElevationsForSector = function (sector) {
+                    return [125.0,350.0];
+                };
+                var mockGlobe=new Globe(new EarthElevationModel());
+                var sector=new Sector(44.0,45.0,-179,179.0);
+                var boundingPoints=sector.computeBoundingPoints(mockGlobe,1 /* verticalExaggeration */);
+                var results=[-80203.6904,4408178.4447,-4594866.3461,-80206.5151,4408334.7429,-4595028.1729,
+                     80203.6904,4408178.4447,-4594866.3461,80206.5151,4408334.7429,-4595028.1729,
+                     78844.3747,4487436.7972,-4516991.2028,78847.1514,4487595.8962,-4517150.2776,
+                    -78844.3747,4487436.7972,-4516991.2028,-78847.1514,4487595.8962,-4517150.2776,
+                    0.0000,4448133.5080,4556957.8791,0.0000,4408334.7429,4595728.1245,
+                    -4556784.3641,4448133.5080,39766.4547,4556784.3641,4448133.5080,39766.4547,
+                    -79529.8810,4448133.5080,-4556263.8324,79529.8810,4448133.5080,-4556263.8324];
+
+                var resultCount=0;
+                for (var i=0; i<boundingPoints.length; i++) {
+                    var vec=boundingPoints[i];
+                    for (var j=0; j<3; j++) {
+                        expect(vec[j]).toBeCloseTo(results[resultCount],3);
+                        resultCount++;
+                    }
+                }
+            });
+
+            it("Computes the correct bounding points for a sector spanning the globe horizontally", function () {
+                // create a globe that returns mock elevations for a given sector so we don't have to rely on
+                // asynchronous tile calls to finish.
+                Globe.prototype.minAndMaxElevationsForSector = function (sector) {
+                    return [125.0,350.0];
+                };
+                var mockGlobe=new Globe(new EarthElevationModel());
+                var sector=new Sector(44.0,45.0,-180,180.0);
+                var boundingPoints=sector.computeBoundingPoints(mockGlobe,1 /* verticalExaggeration */);
+                var results=[-0.0000,4408178.4447,-4595566.2731,-0.0000,4408334.7429,-4595728.1245,
+                    0.0000,4408178.4447,-4595566.2731,0.0000,4408334.7429,-4595728.1245,
+                    0.0000,4487436.7972,-4517679.2672,0.0000,4487595.8962,-4517838.3662,
+                    0.0000,4487436.7972,-4517679.2672,-0.0000,4487595.8962,-4517838.3662,
+                    0.0000,4448133.5080,4556957.8791,0.0000,4408334.7429,4595728.1245,
+                    0.0000,4408334.7429,4595728.1245,4595728.1245,4408334.7429,0.0000,
+                    -4595728.1245,4408334.7429,0.0000,0.0000,4408334.7429,-4595728.1245,
+                    0.0000,4487595.8962,4517838.3662,4517838.3662,4487595.8962,
+                    0.0000,-4517838.3662,4487595.8962,0.0000,0.0000,4487595.8962,-4517838.3662];
+
+                var resultCount=0;
+                for (var i=0; i<boundingPoints.length; i++) {
+                    var vec=boundingPoints[i];
+                    for (var j=0; j<3; j++) {
+                        expect(vec[j]).toBeCloseTo(results[resultCount],3);
+                        resultCount++;
+                    }
+                }
+            });
+
+            it("Computes the correct bounding points for a sector in the southern hemisphere", function () {
+                // create a globe that returns mock elevations for a given sector so we don't have to rely on
+                // asynchronous tile calls to finish.
+                Globe.prototype.minAndMaxElevationsForSector = function (sector) {
+                    return [125.0,350.0];
+                };
+                var mockGlobe=new Globe(new EarthElevationModel());
+                var sector=new Sector(-45.0,-44.0,-95.0,-94.0);
+                var boundingPoints=sector.computeBoundingPoints(mockGlobe,1 /* verticalExaggeration */);
+                var results=[-4500488.1337,-4487436.7972, -393741.6920,-4500646.6273,-4487595.8962, -393755.5584,
+                    -4506674.4276,-4487436.7972, -315137.3752,-4506833.1390,-4487595.8962, -315148.4734,
+                    -4584371.7046,-4408178.4447, -320570.4981,-4584533.1618,-4408334.7429, -320581.7883,
+                    -4578078.7560,-4408178.4447, -400529.9919,-4578239.9915,-4408334.7429, -400544.0982,
+                    -4542910.2988,-4448133.5080, -357534.7945,-4581561.0285,-4408334.7429, -360576.6729];
+
+                var resultCount=0;
+                for (var i=0; i<boundingPoints.length; i++) {
+                    var vec=boundingPoints[i];
+                    for (var j=0; j<3; j++) {
+                        expect(vec[j]).toBeCloseTo(results[resultCount],3);
+                        resultCount++;
+                    }
+                }
+            });
+
+            it("Computes the correct bounding points for a sector crossing the equator", function () {
+                // create a globe that returns mock elevations for a given sector so we don't have to rely on
+                // asynchronous tile calls to finish.
+                Globe.prototype.minAndMaxElevationsForSector = function (sector) {
+                    return [125.0,350.0];
+                };
+                var mockGlobe=new Globe(new EarthElevationModel());
+                var sector=new Sector(-10.0,10.0,-95.0,-94.0);
+                var boundingPoints=sector.computeBoundingPoints(mockGlobe,1 /* verticalExaggeration */);
+                var results=[-6258091.0395,-1100270.2538, -547512.0213,-6258311.7780,-1100309.3246, -547531.3334,
+                    -6266693.3042,-1100270.2538, -438209.8842,-6266914.3462,-1100309.3246, -438225.3410,
+                    -6266693.3042, 1100270.2538, -438209.8842,-6266914.3462, 1100309.3246, -438225.3410,
+                    -6258091.0395, 1100270.2538, -547512.0213,-6258311.7780, 1100309.3246, -547531.3334,
+                    -6358824.2533,       0.0000, -500450.3221,-6262851.5323,-1100309.3246, -492897.1052,
+                    -6262851.5323, 1100309.3246, -492897.1052,-6354214.9312,       0.0000, -555921.7721,
+                    -6362949.3262,       0.0000, -444940.7609];
+
+                var resultCount=0;
+                for (var i=0; i<boundingPoints.length; i++) {
+                    var vec=boundingPoints[i];
+                    for (var j=0; j<3; j++) {
+                        expect(vec[j]).toBeCloseTo(results[resultCount],3);
                         resultCount++;
                     }
                 }

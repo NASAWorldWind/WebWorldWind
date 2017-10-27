@@ -9,7 +9,6 @@
 define([
         '../geom/Angle',
         '../error/ArgumentError',
-        '../geom/BoundingBox',
         '../geom/Location',
         '../util/Logger',
         '../geom/Vec3',
@@ -17,7 +16,6 @@ define([
     ],
     function (Angle,
               ArgumentError,
-              BoundingBox,
               Location,
               Logger,
               Vec3,
@@ -403,21 +401,25 @@ define([
         };
 
         /**
-         * Returns a {@link BoundingBox} that bounds the specified sector on the surface of the specified
-         * {@link Globe}. The returned box encloses the globe's surface terrain in the sector,
+         * Returns an array of {@link Vec3} that bounds the specified sector on the surface of the specified
+         * {@link Globe}. The returned points enclose the globe's surface terrain in the sector,
          * according to the specified vertical exaggeration, minimum elevation, and maximum elevation. If the minimum and
-         * maximum elevation are equal, this assumes a maximum elevation of 10 + the minimum. If this fails to compute a box
-         * enclosing the sector, this returns a unit box enclosing one of the boxes corners.
+         * maximum elevation are equal, this assumes a maximum elevation of 10 + the minimum.
          *
          * @param {Globe} globe the globe the extent relates to.
          * @param {Number} verticalExaggeration the globe's vertical surface exaggeration.
          *
-         * @returns {BoundingBox} a box enclosing the globe's surface on the specified sector.
+         * @returns {Vec3} a set of points that enclose the globe's surface on the specified sector. Can be turned into a {@link BoundingBox}
+         * with the setToVec3Points method.
          *
          * @throws {ArgumentError} if the globe is null.
          */
-        Sector.prototype.computeBoundingBox=function(globe,verticalExaggeration)
+        Sector.prototype.computeBoundingPoints=function(globe,verticalExaggeration)
         {
+            // TODO: Refactor this method back to computeBoundingBox.
+            // This method was originally computeBoundingBox and returned a BoundingBox. This created a circular dependency between
+            // Sector and BoundingBox that the Karma unit test suite doesn't appear to like. If we discover a way to make Karma handle this
+            // situation, we should refactor this method.
             if (globe === null) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Sector", "computeBoundingBox", "missingGlobe"));
@@ -501,8 +503,7 @@ define([
                 points.push(globe.computePointFromPosition(cLat, this.maxLongitude, maxHeight, new Vec3(0,0,0)));
             }
 
-            var boundingBox=new BoundingBox();
-            return boundingBox.setToVec3Points(points);
+            return points;
         };
 
         /**
