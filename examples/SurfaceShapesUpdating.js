@@ -110,7 +110,7 @@ requirejs(['../src/WorldWind',
 
             polyline.boundaries = shiftBoundaries(polyline);
 
-            sector.sector = moveSector();
+            // sector.sector = moveSector();
 
             wwd.redraw();
         }, 1000);

@@ -130,7 +130,7 @@ define([
             this._attributesStateKey = null;
 
             // Internal use only. Intentionally not documented.
-            this.isPrepared = false;
+            this.boundariesArePrepared = false;
 
             // Internal use only. Intentionally not documented.
             this.layer = null;
@@ -529,7 +529,7 @@ define([
 
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.prepareBoundaries = function (dc) {
-            if (this.isPrepared) {
+            if (this.boundariesArePrepared) {
                 return;
             }
 
@@ -553,7 +553,7 @@ define([
 
             this.prepareSectors();
 
-            this.isPrepared = true;
+            this.boundariesArePrepared = true;
         };
 
         //Internal. Formats the boundaries of a surface shape to be a multi dimensional array
@@ -571,6 +571,13 @@ define([
             }
             return boundaries;
         };
+
+        // Internal. Resets boundaries for SurfaceShape recomputing.
+        SurfaceShape.prototype.resetBoundaries = function () {
+            this.boundariesArePrepared = false;
+            this._boundaries = null;
+            this.stateKeyInvalid = true;
+        }
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.normalizeAngles = function (boundaries) {

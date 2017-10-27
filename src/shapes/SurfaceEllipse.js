@@ -85,7 +85,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
-                    this.isPrepared = false;
+                    this.boundariesArePrepared = false;
                     this._boundaries = null;
                     this._center = value;
                 }
@@ -102,7 +102,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
-                    this.isPrepared = false;
+                    this.boundariesArePrepared = false;
                     this._boundaries = null;
                     this._majorRadius = value;
                 }
@@ -119,7 +119,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
-                    this.isPrepared = false;
+                    this.boundariesArePrepared = false;
                     this._boundaries = null;
                     this._minorRadius = value;
                 }
@@ -137,7 +137,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
-                    this.isPrepared = false;
+                    this.boundariesArePrepared = false;
                     this._boundaries = null;
                     this._heading = value;
                 }
@@ -155,7 +155,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
-                    this.isPrepared = false;
+                    this.boundariesArePrepared = false;
                     this._boundaries = null;
                     this._intervals = value;
                 }

@@ -73,7 +73,7 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
-                    this.isPrepared = false;
+                    this.boundariesArePrepared = false;
                     this._boundaries = null;
                     this._minorRadius = value;
                     this._majorRadius = value;

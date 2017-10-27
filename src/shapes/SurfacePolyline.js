@@ -79,7 +79,7 @@ define([
                     }
                     this._boundaries = boundaries;
                     this._stateId = SurfacePolyline.stateId++;
-                    this.isPrepared = false;
+                    this.boundariesArePrepared = false;
                     this.stateKeyInvalid = true;
                 }
             }

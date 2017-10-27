@@ -83,9 +83,7 @@ define([
                     return this._center;
                 },
                 set: function(value) {
-                    this.stateKeyInvalid = true;
-                    this.isPrepared = false;
-                    this._boundaries = null;
+                    this.resetBoundaries();
                     this._center = value;
                 }
             },
@@ -100,9 +98,7 @@ define([
                     return this._width;
                 },
                 set: function(value) {
-                    this.stateKeyInvalid = true;
-                    this.isPrepared = false;
-                    this._boundaries = null;
+                    this.resetBoundaries();
                     this._width = value;
                 }
             },
@@ -117,9 +113,7 @@ define([
                     return this._height;
                 },
                 set: function(value) {
-                    this.stateKeyInvalid = true;
-                    this.isPrepared = false;
-                    this._boundaries = null;
+                    this.resetBoundaries();
                     this._height = value;
                 }
             },
@@ -136,9 +130,7 @@ define([
                     return this._heading;
                 },
                 set: function(value) {
-                    this.stateKeyInvalid = true;
-                    this.isPrepared = false;
-                    this._boundaries = null;
+                    this.resetBoundaries();
                     this._heading = value;
                 }
             }
