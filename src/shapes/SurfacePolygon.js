@@ -78,9 +78,9 @@ define([
                             Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "set boundaries",
                                 "The specified value is not an array."));
                     }
+                    this.resetBoundaries();
                     this._boundaries = boundaries;
                     this._stateId = SurfacePolygon.stateId++;
-                    this.boundariesArePrepared = false;
                     this.stateKeyInvalid = true;
                 }
             }

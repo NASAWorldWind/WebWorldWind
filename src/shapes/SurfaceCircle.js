@@ -73,14 +73,16 @@ define([
                 },
                 set: function(value) {
                     this.stateKeyInvalid = true;
-                    this.boundariesArePrepared = false;
-                    this._boundaries = null;
+                    this.resetBoundaries();
+                    this._radius = value;
+                    // Leftovers from SurfaceEllipse inheritance. Should be removed.
                     this._minorRadius = value;
                     this._majorRadius = value;
-                    this._radius = value;
                 }
             }
         });
+
+        // TODO: Implement computeBoundaries function for SurfaceCircle to remove inheritance from SurfaceEllipse
 
         // Internal use only. Intentionally not documented.
         SurfaceCircle.staticStateKey = function(shape) {
