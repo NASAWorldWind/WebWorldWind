@@ -85,6 +85,8 @@ define([
                 set: function(value) {
                     this.stateKeyInvalid = true;
                     this._center = value;
+                    this.isPrepared = false;
+                    this._boundaries = null;
                 }
             },
 
@@ -100,6 +102,8 @@ define([
                 set: function(value) {
                     this.stateKeyInvalid = true;
                     this._width = value;
+                    this.isPrepared = false;
+                    this._boundaries = null;
                 }
             },
 
@@ -115,6 +119,8 @@ define([
                 set: function(value) {
                     this.stateKeyInvalid = true;
                     this._height = value;
+                    this.isPrepared = false;
+                    this._boundaries = null;
                 }
             },
 
@@ -132,6 +138,8 @@ define([
                 set: function(value) {
                     this.stateKeyInvalid = true;
                     this._heading = value;
+                    this.isPrepared = false;
+                    this._boundaries = null;
                 }
             }
         });
@@ -176,6 +184,21 @@ define([
             this._boundaries[idx] = Location.greatCircleLocation(this.center, azimuth * Angle.RADIANS_TO_DEGREES,
                 distance / globeRadius, new Location(0, 0));
 
+        };
+
+        SurfaceRectangle.prototype.getReferencePosition = function () {
+            return this.center;
+        };
+
+        SurfaceRectangle.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
+            var heading = Location.greatCircleAzimuth(oldReferenceLocation,
+                new Location(this.center.latitude, this.center.longitude));
+            var pathLength = Location.greatCircleDistance(oldReferenceLocation,
+                new Location(this.center.latitude, this.center.longitude));
+            var location = new Location(0, 0);
+            Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+
+            this.center = location;
         };
 
         return SurfaceRectangle;

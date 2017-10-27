@@ -74,6 +74,10 @@ define([
                 set: function(value) {
                     this.stateKeyInvalid = true;
                     this._radius = value;
+                    this.minorRadius = value;
+                    this.majorRadius = value;
+                    this.isPrepared = false;
+                    this._boundaries = null;
                 }
             }
         });

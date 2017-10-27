@@ -979,8 +979,22 @@ define([
         };
 
         /**
-         * Adds a specified layer to the end of this WorldWindow.
-         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not modified.
+         * Returns the index of a layer.
+         * @param {Layer} layer The layer to test.
+         * @returns {Number} Returns the index of the searched layer or -1 if it doesn't exists.
+         */
+        WorldWindow.prototype.indexOfLayer = function (layer) {
+            if (layer == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "indexOfLayer", "missingLayer"));
+            }
+
+            return this.layers.indexOf(layer);
+        };
+
+        /**
+         * Adds a specified layer to the end of this world window.
+         * @param {Layer} layer The layer to add. May be null or undefined, in which case this world window is not modified.
          */
         WorldWindow.prototype.addLayer = function (layer) {
             this.layers.push(layer);
