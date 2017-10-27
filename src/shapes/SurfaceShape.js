@@ -576,7 +576,6 @@ define([
         SurfaceShape.prototype.resetBoundaries = function () {
             this.boundariesArePrepared = false;
             this._boundaries = null;
-            this.stateKeyInvalid = true;
         }
 
         // Internal use only. Intentionally not documented.
