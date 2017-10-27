@@ -5,7 +5,6 @@
 /**
  * Illustrates how to update SurfaceShapes.
  *
- * @version $Id: SurfaceShapes.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
 requirejs(['../src/WorldWind',
@@ -21,7 +20,7 @@ requirejs(['../src/WorldWind',
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
-         * Added imagery layers.
+         * Add imagery layers.
          */
         var layers = [
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
@@ -45,6 +44,7 @@ requirejs(['../src/WorldWind',
         attributes.outlineColor = WorldWind.Color.BLUE;
         attributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
 
+        // Create highlight attributes that all the shapes will use (except polyline, see below).
         var highlightAttributes = new WorldWind.ShapeAttributes(attributes);
         highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
 
@@ -66,11 +66,13 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(rectangle);
 
         // Surface Sector
+        // Set up coordinates of 4 different sectors to update SurfaceSector
         var rotatingSectors = [];
         rotatingSectors.push(new WorldWind.Sector(33, 37, -95, -90));
         rotatingSectors.push(new WorldWind.Sector(33, 37, -97, -92));
         rotatingSectors.push(new WorldWind.Sector(31, 35, -97, -92));
         rotatingSectors.push(new WorldWind.Sector(31, 35, -95, -90));
+
         var sector = new WorldWind.SurfaceSector(rotatingSectors[0], attributes);
         sector.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(sector);
@@ -82,8 +84,10 @@ requirejs(['../src/WorldWind',
         polygonBoundary.push(new WorldWind.Location(40, -115));
 
         var polygon = new WorldWind.SurfacePolygon(polygonBoundary, attributes);
-        // Append property to count the times the polygon has shifted eastward or westward
+        // Append properties to shift the polygon eastward and westward.
         polygon.shiftCounter = 0;
+        polygon.shiftDirection = "west";
+
         polygon.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polygon);
 
@@ -94,8 +98,9 @@ requirejs(['../src/WorldWind',
         polylineBoundary.push(new WorldWind.Location(40, -100));
 
         var polyline = new WorldWind.SurfacePolyline(polylineBoundary, attributes);
-        // Append property to count the times the polyline has shifted eastward or westward
+        // Append properties to shift the polyline eastward and westward.
         polyline.shiftCounter = 0;
+        polyline.shiftDirection = "west";
 
         // Since polyline doesn't have an interior, we will set different highlight attributes for it.
         highlightAttributes = new WorldWind.ShapeAttributes(attributes);
@@ -125,19 +130,32 @@ requirejs(['../src/WorldWind',
             polygon.boundaries = shiftBoundaries(polygon);
             polyline.boundaries = shiftBoundaries(polyline);
 
+            // TODO: SurfaceSector's state is not updating. Class needs refactoring.
             // sector.sector = moveSector();
 
             wwd.redraw();
         }, 1000);
 
         function shiftBoundaries(shape){
-            if (shape.shiftCounter < 2){
-                shape.boundaries = shiftBoundariesWestward(shape.boundaries);
-                shape.shiftCounter += 2;
+
+            // Assuming the shape has two appended properties: shiftCounter and shiftDirection.
+            shape.shiftCounter += 1;
+
+            switch(shape.shiftDirection) {
+                case shape.shiftDirection = "east":
+                    shape.boundaries = shiftBoundariesEastward(shape.boundaries);
+                    break;
+                case shape.shiftDirection = "west":
+                    shape.boundaries = shiftBoundariesWestward(shape.boundaries);
+                    break;
+                default:
+                    console.log("Error. This should never appear");
             }
-            else if (shape.shiftCounter > -2) {
-                shape.boundaries = shiftBoundariesEastward(shape.boundaries);
-                shape.shiftCounter -= 2;
+
+            // Shift the shape 5 degrees and then change shift direction
+            if (shape.shiftCounter === 5){
+                shape.shiftDirection === "east" ? shape.shiftDirection = "west" : shape.shiftDirection = "east";
+                shape.shiftCounter = 0;
             }
 
             return shape.boundaries;
