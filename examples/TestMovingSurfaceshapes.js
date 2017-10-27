@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * Illustrates how to update SurfaceShapes.
+ * Illustrates how to move SurfaceShapes while updating their state.
  *
  */
 

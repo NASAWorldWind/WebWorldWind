@@ -82,8 +82,6 @@ define([
             }
         });
 
-        // TODO: Implement computeBoundaries function for SurfaceCircle to remove inheritance from SurfaceEllipse
-
         // Internal use only. Intentionally not documented.
         SurfaceCircle.staticStateKey = function(shape) {
             var shapeStateKey = SurfaceEllipse.staticStateKey(shape);
