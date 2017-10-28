@@ -104,7 +104,6 @@ define([
 
         // Internal. Polygon doesn't generate its own boundaries. See SurfaceShape.prototype.computeBoundaries.
         SurfacePolygon.prototype.computeBoundaries = function(dc) {
-            return;
         };
 
         return SurfacePolygon;
