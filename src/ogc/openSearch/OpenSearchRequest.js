@@ -33,7 +33,7 @@ define([],
             this.relation = options.relation || defaultOptions.relation;
 
             //A flag to indicate if the request should include credentials.
-            this.witchCredentials = options.witchCredentials || defaultOptions.witchCredentials;
+            this.withCredentials = options.withCredentials || defaultOptions.withCredentials;
 
             //A timeout in milliseconds for the ajax request
             this.timeout = options.timeout || defaultOptions.timeout;
@@ -69,7 +69,7 @@ define([],
             encType: 'application/x-www-form-urlencoded',
             type: '',
             relation: 'results',
-            witchCredentials: false,
+            withCredentials: false,
             timeout: 0,
             headers: {},
             body: null,
