@@ -78,9 +78,9 @@ define([
                             Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolygon", "set boundaries",
                                 "The specified value is not an array."));
                     }
+                    this.resetBoundaries();
                     this._boundaries = boundaries;
                     this._stateId = SurfacePolygon.stateId++;
-                    this.isPrepared = false;
                     this.stateKeyInvalid = true;
                 }
             }
@@ -100,6 +100,10 @@ define([
         // Internal use only. Intentionally not documented.
         SurfacePolygon.prototype.computeStateKey = function () {
             return SurfacePolygon.staticStateKey(this);
+        };
+
+        // Internal. Polygon doesn't generate its own boundaries. See SurfaceShape.prototype.computeBoundaries.
+        SurfacePolygon.prototype.computeBoundaries = function(dc) {
         };
 
         return SurfacePolygon;

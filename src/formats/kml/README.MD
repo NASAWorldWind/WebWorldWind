@@ -1,81 +1,103 @@
-# KML
+# KML - Keyhole Markup Language
 
-## Current state of the implementation
+## Current State of the Implementation
 
-KML is a format, which allows you to encode geographical data structures and other additional
-information, which can be displayed on the map. This implementation is based on the KML version 2.1 
+KML is an XML-based file format, which allows you to encode geographical data
+structures and additional information to be displayed on a map or 3D globe. The
+current implementation is based on version 2.1 as found at
+http://www.opengeospatial.org/standards/kml.
 
-The reference of the whole format is available on the URL:
-https://developers.google.com/kml/documentation/kmlreference
+A tutorial is also available at
+https://developers.google.com/kml/documentation/kmlreference.
 
-Overall status at the current moment is that we can parse more or less any kml file. We will understand
-the top level .kml file in the kmz. As for the support of the .kmz it is very limited at the moment. It doesn't load 
-the resources inlined in the kmz file. 
+The overall status is that WebWorldWind can parse almost any KML files. The top
+level KML file in a KMZ (compressed version of KML) will also be parsed
+properly. The support of other resources embedded in KMZ files is currently not
+implemented.
 
 ### Features
 
-* gx:Tour - It is currently only parsed. It isn't displayed at all.
-* NetworkLink - It is correctly parsed and the resources are correctly retrieved. The only issue is with the resources packed in the kmz file. These aren't displayed.
-* Placemark - It is correctly parsed. Associated geometry is displayed. Style is correctly applied. Name is displayed as Placemark in the center of the geometry. 
+* gx:Tour - Only parsed, not displayed.
+* NetworkLink - Parsed and resources retrieved. There are however limitations
+  with resources embedded in KMZ files.
+* Placemark - Parsed, associated geometry displayed, style applied and name
+  displayed as Placemark in the center of the geometry.
 
 #### Overlays
 
-* PhotoOverlay - It is correctly parsed. It isn't displayed yet.  
-* ScreenOverlay - It is correctly parsed. It is displayed on the screen following overlay and screen options. The rotation isn't supported yet. 
-* GroundOverlay - It is correctly parsed. It is displayed draped over the terrain therefore altitude and altitude mode isn't yet supported. The image must be rectangular as only lat lon box is taken into consideration.  
+* PhotoOverlay - Only parsed, not displayed. 
+* ScreenOverlay - Parsed and displayed on the screen following overlay and
+  screen options. The rotation property isn't supported at the moment. 
+* GroundOverlay - Parsed and displayed wrapped over the terrain therefore
+  altitude and altitude mode isn't supported at the moment. The image must be
+  rectangular as only the latitude and longitude box is taken into
+  consideration.  
 
 #### Containers
 
-* Folder - It is correctly parsed and its properties such as Time properties, visibility, Region and LookAt are applied. 
-* Document - It is correctly parsed and its properties such as Time properties, visibility, Region and LookAt are applied.
+* Folder - Parsed and properties applied including time, visibility, region and
+  lookAt. 
+* Document - Parsed and properties applied including time, visibility, region
+  and lookAt.
 
 ### Geometry
 
-* Point - Fully supported. Correctly parsed and displayed as a part of Placemark for example. 
-* LineString - Fully supported. Correctly parsed and displayed as either Path or SurfacePolyline based on the altitude mode.
-* LinearRing - Fully supported. Correctly parsed and displayed as either Path or SurfacePolyline based on the altitude mode. 
-* Polygon - Fully supported. Correctly parsed and displayed as either Polygon or SurfacePolygon based on the altitude mode. 
-* MultiGeometry - Fully supported. The only limit is that highlighting works on the objects constituting the multi geometry and not on that multi geometry. 
+* Point - Fully supported. Parsed and displayed as a part of Placemark for
+  example. 
+* LineString - Fully supported. Parsed and displayed as either Path or
+  SurfacePolyline based on the altitude mode.
+* LinearRing - Fully supported. Parsed and displayed as either Path or
+  SurfacePolyline based on the altitude mode. 
+* Polygon - Fully supported. Parsed and displayed as either Polygon or
+  SurfacePolygon based on the altitude mode. 
+* MultiGeometry - Supported. The only limitation is that highlighting works on
+  the objects composing the multi-geometry and not on the multi-geometry as a
+  whole. 
 * Model - Not supported yet.
-* gx:Track - It is correctly parsed. It isn't displayed.
-* gx:MultiTrack - It is correctly parsed. It isn't displayed.
+* gx:Track - Only parsed, not displayed.
+* gx:MultiTrack - Only parsed, not displayed.
 
 ### StyleSelector
 
-* Style - It is correctly parsed and correctly applied as inline style as well as a style from another document. 
-* StyleMap - It is correctly parsed and the normal as well as highlighted styles are correctly applied. 
+* Style - Parsed and applied as inline style as well as a style from another
+  document. 
+* StyleMap - Parsed and normal as well as highlighted styles applied. 
 
 ### TimePrimitive
 
-* TimeSpan - It represents the span in the time. It is reflected in all the Features that are currently supported.
-* TimeStamp - It represents the point in the time. It is reflected in all the Features that are currently supported.
+* TimeSpan - Represents a span of time and is reflected in the Features
+  currently supported.
+* TimeStamp - Represents a point in time and is reflected in the Features
+  currently supported.
 
 ### AbstractView
 
-* Camera - It is correctly parsed, but it isn't rendered yet.
-* LookAt - It is correctly parsed. It is also displayed meaning that the GoToAnimator is used to get to the LookAt location.
+* Camera - Only parsed, has no effect.
+* LookAt - Parsed and triggers a transition using the GoToAnimator.
 
 ### SubStyle
 
-* BalloonStyle - It is correctly parsed but it isn't used for display yet.
-* ListStyle - It is correctly parsed but it isn't used for display yet.
-* LineStyle - It is correctly parsed and the outline color and outline width is taken form this style.
-* PolyStyle - It is correctly parsed and fill, outline, outline color, color and color mode is used.
-* IconStyle - It is correctly parsed and the scale and href are used when this style is applied.
-* LabelStyle - It is correctly parsed but it isn't used for display yet.
+* BalloonStyle - Only parsed, not used for display.
+* ListStyle - Only parsed, not used for display.
+* LineStyle - Parsed and outline color and outline width applied from this
+  style.
+* PolyStyle - Parsed and fill, outline, outline color, color and color mode
+  applied from this style.
+* IconStyle - Parsed and scale and href applied from this style.
+* LabelStyle - Only parsed, not used for display.
 
 ### Miscellaneous
 
-* Link - It is correctly parsed and correctly used in the scope of the NetworkLinks
-* Icon - It is correctly parsed and correctly used in the scope of the relevant Features.
-* Orientation - It is correctly parsed but ignored for rendering.
-* Location - It is correctly parsed but ignored for rendering.
-* Scale - It is correctly parsed but ignored for rendering.
-* Region - It is correctly parsed and correctly used in the scope of the Features and NetworkLinks.
-* Lod - It is correctly parsed but ignored for rendering.
-* LatLonBox - It is correctly parsed and correctly used in the scope of Overlays. 
-* LatLonAltBox - It is correctly parsed but ignored for rendering.
-* LatLonQuad - It is correctly parsed but ignored for rendering.
+* Link - Parsed and used in the scope of NetworkLinks
+* Icon - Parsed and used in the scope of the relevant Features.
+* Orientation - Parsed, but ignored for rendering.
+* Location - Parsed, but ignored for rendering.
+* Scale - Parsed, but ignored for rendering.
+* Region - Parsed and used in the scope of Features and NetworkLinks.
+* Lod - Parsed, but ignored for rendering.
+* LatLonBox - Parsed and used in the scope of Overlays. 
+* LatLonAltBox - Parsed, but ignored for rendering.
+* LatLonQuad - Parsed, but ignored for rendering.
 
 ### KMZ Support
 
@@ -93,10 +115,12 @@ the resources inlined in the kmz file.
 
 ## Examples
 
-### Load KML File
+### Displaying a KML file
 
-The core of the example loading and displaying the KML File. In this example we prepare a new Layer which contains
-time information relevant for the rendering and add the kmlFile renderable to that layer.
+In this example, a KML file is loaded and then displayed. In the promise, a new
+Layer is created and a time span is defined for it. The parsed KML file is then
+added as a renderable to the Layer before the Layer itself is added to the
+globe.
 
 ```javascript
 var kmlFilePromise = new KmlFile('data/KML_Samples.kml', []);
@@ -113,10 +137,12 @@ kmlFilePromise.then(function (kmlFile) {
 });
 ```
 
-### Load KMZ File
+### Displaying a KMZ archive
 
-The core of the example loading and displaying the KMZ File. In this example we prepare a new Layer which contains
-time information relevant for the rendering and add the kmlFile renderable to that layer.
+In this example, a KMZ archive is loaded and then displayed. In the promise, a
+new Layer is created and a time span is defined for it. The parsed KML content,
+that was extracted from the KMZ archive, is then added as a renderable to the
+Layer before the Layer itself is added to the globe.
 
 ```javascript
 var kmlFilePromise = new KmlFile('data/KML_Samples.kmz', []);
@@ -133,12 +159,16 @@ kmlFilePromise.then(function (kmlFile) {
 });
 ```
 
-### Supply your own implementation for any of elements
+### Customizing elements
 
-In certain cases you need to change the behavior of some of the elements. It is possible to supply your own implementation
-for any element. If for example you needed different implementation of LineString such as one adding 1 000m altitude to
-all points rendered, you can create new javascript class. In the example named NewKmlLineString and provide it to the
-framework in following way:
+In particular cases, it might be needed to change the behavior of the parser for
+some elements. For this purpose, custom implementations can be provided to the
+parser.
+
+For example, one might need to render all LineStrings of a given KML file 1000m
+meters higher than they were defined originally. A new JavaScript class,
+possibly extending the provided KmlLineString class, can be created and provided
+as follows:
 
 ```javascript
 WorldWind.KmlElements.addKey('LineString', NewKmlLineString);
