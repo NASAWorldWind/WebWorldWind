@@ -10,6 +10,7 @@ define([
         '../error/AbstractError',
         '../geom/Angle',
         '../error/ArgumentError',
+        '../geom/BoundingBox',
         '../geom/Location',
         '../util/Logger',
         '../error/NotYetImplementedError',
@@ -24,6 +25,7 @@ define([
     function (AbstractError,
               Angle,
               ArgumentError,
+              BoundingBox,
               Location,
               Logger,
               NotYetImplementedError,
@@ -82,6 +84,13 @@ define([
             this._sectors = [];
 
             /*
+             * The bounding extent for this shape.
+             * @type {BoundingBox}
+             * @protected
+             */
+            this._extent = null;
+
+            /*
              * The raw collection of locations defining this shape and are explicitly specified by the client of this class.
              * @type {Location[]}
              * @protected
@@ -130,7 +139,7 @@ define([
             this._attributesStateKey = null;
 
             // Internal use only. Intentionally not documented.
-            this.isPrepared = false;
+            this.boundariesArePrepared = false;
 
             // Internal use only. Intentionally not documented.
             this.layer = null;
@@ -409,11 +418,22 @@ define([
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.computeBoundaries = function (globe) {
             // This method is in the base class and should be overridden if the boundaries are generated.
-            // It should be called only if the geometry has been provided by the user and does not need to be generated.
-            // assert(!this._boundaries);
 
             throw new AbstractError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "SurfaceShape", "computeBoundaries", "abstractInvocation"));
+        };
+
+        // Internal. Intentionally not documented.
+        SurfaceShape.prototype.intersectsFrustum = function (dc) {
+            if (this._extent) {
+                if (dc.pickingMode) {
+                    return this._extent.intersectsFrustum(dc.pickFrustum);
+                } else {
+                    return this._extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                }
+            } else {
+                return true;
+            }
         };
 
         // Internal function. Intentionally not documented.
@@ -425,6 +445,11 @@ define([
             this.layer = dc.currentLayer;
 
             this.prepareBoundaries(dc);
+
+            // Use the last computed extent to see if this shape is out of view.
+            if (this._extent && !this.intersectsFrustum(dc)) {
+                return;
+            }
 
             dc.surfaceShapeTileBuilder.insertSurfaceShape(this);
         };
@@ -529,16 +554,11 @@ define([
 
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.prepareBoundaries = function (dc) {
-            if (this.isPrepared) {
+            if (this.boundariesArePrepared) {
                 return;
             }
 
-            // Some shapes generate boundaries, such as ellipses and sectors;
-            // others don't, such as polylines and polygons.
-            // Handle the latter below.
-            if (!this._boundaries) {
-                this.computeBoundaries(dc);
-            }
+            this.computeBoundaries(dc);
 
             var newBoundaries = this.formatBoundaries();
             this.normalizeAngles(newBoundaries);
@@ -553,7 +573,9 @@ define([
 
             this.prepareSectors();
 
-            this.isPrepared = true;
+            this.computeExtent(dc);
+
+            this.boundariesArePrepared = true;
         };
 
         //Internal. Formats the boundaries of a surface shape to be a multi dimensional array
@@ -570,6 +592,11 @@ define([
                 boundaries = this._boundaries;
             }
             return boundaries;
+        };
+
+        // Internal. Resets boundaries for SurfaceShape recomputing.
+        SurfaceShape.prototype.resetBoundaries = function () {
+            this.boundariesArePrepared = false;
         };
 
         // Internal use only. Intentionally not documented.
@@ -617,6 +644,49 @@ define([
             this.prepareBoundaries(dc);
 
             return this._sectors;
+        };
+
+        /**
+         * Computes the extent for the shape based on its sectors.
+         *
+         * @param {DrawContext} dc The drawing context containing a globe.
+         *
+         * @return {BoundingBox} The extent for the shape.
+         */
+        SurfaceShape.prototype.computeExtent = function (dc) {
+
+            if (!this._sectors || this._sectors.length === 0) {
+                return null;
+            }
+
+            var boxPoints;
+            // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
+            // Return the box which contains that sector.
+            if (this._sectors.length === 1) {
+                boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                this._extent = new BoundingBox();
+                this._extent.setToVec3Points(boxPoints);
+            }
+            // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
+            // Return a box which contains the corners of the boxes bounding each sector.
+            else {
+                var boxCorners = [];
+
+                for (var i = 0; i < this._sectors.length; i++) {
+                    boxPoints = this._sectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                    var box = new BoundingBox();
+                    box.setToVec3Points(boxPoints);
+                    var corners = box.getCorners();
+                    for (var j = 0; j < corners.length; j++) {
+                        boxCorners.push(corners[j]);
+                    }
+                }
+                this._extent = new BoundingBox();
+                this._extent.setToVec3Points(boxCorners);
+            }
+
+            return this._extent;
+
         };
 
         // Internal use only. Intentionally not documented.

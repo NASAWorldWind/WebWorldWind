@@ -249,5 +249,15 @@ define([
         return attributes;
     };
 
+    /**
+     * It returns default KmlStyle, which doesn't contain any custom information.
+     * @returns {KmlStyle}
+     */
+    KmlStyle.default = function() {
+        return new KmlStyle({
+            objectNode: document.createElement('Style')
+        });
+    };
+
     return KmlStyle;
 });
