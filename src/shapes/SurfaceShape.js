@@ -310,6 +310,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._pathType = value;
                 }
             },
@@ -328,6 +329,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._maximumNumEdgeIntervals = value;
                 }
             },
@@ -346,6 +348,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._polarThrottle = value;
                 }
             },
