@@ -23,7 +23,7 @@ requirejs(['../src/WorldWind',
          * Add imagery layers.
          */
         var layers = [
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -40,8 +40,8 @@ requirejs(['../src/WorldWind',
 
         // Create and set attributes that will be shared with all the shapes.
         var attributes = new WorldWind.ShapeAttributes(null);
-        attributes.outlineWidth = 2;
-        attributes.outlineColor = WorldWind.Color.BLUE;
+        attributes.outlineWidth = 5;
+        attributes.outlineColor = WorldWind.Color.WHITE;
         attributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
 
         // Create highlight attributes that all the shapes will use (except polyline, see below).
@@ -66,7 +66,6 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(rectangle);
 
         // Surface Sector
-
         var surfaceSector = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
         // Append counter to cycle an array of sectors and set it to this SurfaceSector
         surfaceSector.sectorCounter = 0;
@@ -106,6 +105,19 @@ requirejs(['../src/WorldWind',
         polyline.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polyline);
 
+        // Create another SurfacePolyline that crosses a big portion of the western hemisphere
+        // this one will have its pathTypes changed
+        var bigPolylineBoundary = [];
+        bigPolylineBoundary.push(new WorldWind.Location(-45, -135));
+        bigPolylineBoundary.push(new WorldWind.Location(45, -32));
+        var bigPolyline = new WorldWind.SurfacePolyline(bigPolylineBoundary, attributes);
+        shapesLayer.addRenderable(bigPolyline);
+
+        // Create another bigger SurfaceRectangle that will have its number of edges changed
+        var bigRectangle = new WorldWind.SurfaceRectangle(new WorldWind.Location(0, 0), 200e4, 900e4, 0, attributes);
+        bigRectangle.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(bigRectangle);
+
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
@@ -123,15 +135,42 @@ requirejs(['../src/WorldWind',
             // Update circle radius size
             circle.radius === 200e3 ? circle.radius += 100e3 : circle.radius = 200e3;
 
-            // Shift polygon and polyline left and right
+            // Shift polygon and polyline eastward and westward
             polygon.boundaries = shiftBoundaries(polygon);
             polyline.boundaries = shiftBoundaries(polyline);
 
-            // Set
+            // Cycle through different sectors
             surfaceSector.sector = changeSector(surfaceSector);
+
+            // Flip number of edges for the bigger rectangle between 4 and 128
+            bigRectangle.maximumNumEdgeIntervals = flipNumberOfEdgeIntervals(bigRectangle);
+
+            // Cycle through the three different path types for the larger polyline:
+            // Great circle, rhumb line (looks straight in Mercator), and linear (looks straight in equirectangular).
+            bigPolyline.pathType = cycleThroughPathTypes(bigPolyline);
 
             wwd.redraw();
         }, 1000);
+
+        function flipNumberOfEdgeIntervals(shape){
+            if (shape.maximumNumEdgeIntervals === 128){ // 128 is the default number of edges
+                return 4;
+            } else {
+                return 128;
+            }
+        }
+
+        function cycleThroughPathTypes(shape){
+            if (shape.pathType === WorldWind.GREAT_CIRCLE){
+                return WorldWind.RHUMB_LINE;
+            }
+            else if (shape.pathType === WorldWind.RHUMB_LINE){
+                return WorldWind.LINEAR;
+            }
+            else {
+                return WorldWind.GREAT_CIRCLE;
+            }
+        }
 
         function shiftBoundaries(shape){
 
