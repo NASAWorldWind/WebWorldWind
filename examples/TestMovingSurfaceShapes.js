@@ -114,15 +114,22 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(bigPolyline);
 
         // Create another bigger SurfaceRectangle that will have its number of edges changed
-        var bigRectangle = new WorldWind.SurfaceRectangle(new WorldWind.Location(0, 0), 200e4, 900e4, 0, attributes);
+        var bigRectangle = new WorldWind.SurfaceRectangle(new WorldWind.Location(0, 0), 200e4, 900e4, 45, attributes);
         bigRectangle.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(bigRectangle);
+
+        // Create another surface ellipse near the pole to test its changing polar throttling
+        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(85, -110), 300e3, 200e3, 45, attributes);
+        polarEllipse.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(polarEllipse);
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
         // Create a highlight controller for highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
+
+        console.log(polarEllipse.polarThrottle);
 
         // Update SurfaceShapes according to a timer
         window.setInterval(function() {
@@ -149,8 +156,22 @@ requirejs(['../src/WorldWind',
             // Great circle, rhumb line (looks straight in Mercator), and linear (looks straight in equirectangular).
             bigPolyline.pathType = cycleThroughPathTypes(bigPolyline);
 
+            polarEllipse.polarThrottle === 10 ? polarEllipse.polarThrottle = 2 : polarEllipse.polarThrottle = 10;
+
             wwd.redraw();
         }, 1000);
+
+        function changePolarThrottling(shape){
+            switch(shape.polarThrottle) {
+                case (shape.polarThrottle <= 10 && shape.polarThrottle > 2): // Default edge interpolation polar throttling
+                    return shape.polarThrottle -= 2;
+                    break;
+                case 2:
+                    return shape.polarThrottle
+                default:
+                    console.log("Error. This should never appear");
+            }
+        }
 
         function flipNumberOfEdgeIntervals(shape){
             if (shape.maximumNumEdgeIntervals === 128){ // 128 is the default number of edges
@@ -178,10 +199,10 @@ requirejs(['../src/WorldWind',
             shape.shiftCounter += 1;
 
             switch(shape.shiftDirection) {
-                case shape.shiftDirection = "east":
+                case "east":
                     shape.boundaries = shiftBoundariesEastward(shape.boundaries);
                     break;
-                case shape.shiftDirection = "west":
+                case "west":
                     shape.boundaries = shiftBoundariesWestward(shape.boundaries);
                     break;
                 default:
