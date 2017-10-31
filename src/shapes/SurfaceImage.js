@@ -10,12 +10,14 @@ define([
         '../error/ArgumentError',
         '../util/Logger',
         '../pick/PickedObject',
-        '../render/SurfaceTile'
+        '../render/SurfaceTile',
+        '../util/ResamplingMode'
     ],
     function (ArgumentError,
               Logger,
               PickedObject,
-              SurfaceTile) {
+              SurfaceTile,
+              ResamplingMode) {
         "use strict";
 
         /**
@@ -55,6 +57,13 @@ define([
              * @type {String}
              */
             this._imageSource = imageSource;
+
+            /**
+             * This surface image's resampling mode. When this surface image needs to be magnified for rendering the
+             * this resampling mode will be applied.
+             * @type {ResamplingMode}
+             */
+            this.resamplingMode = ResamplingMode.LINEAR;
 
             /**
              * This surface image's opacity. When this surface image is drawn, the actual opacity is the product of
@@ -101,13 +110,22 @@ define([
         });
 
         SurfaceImage.prototype.bind = function (dc) {
+            var gl = dc.currentGlContext;
             var texture = dc.gpuResourceCache.resourceForKey(this._imageSource);
             if (texture && !this.imageSourceWasUpdated) {
+                texture.setTexParameter(
+                    gl.TEXTURE_MAG_FILTER,
+                    this.resamplingMode === ResamplingMode.NEAREST ? gl.NEAREST : gl.LINEAR
+                );
                 return texture.bind(dc);
             } else {
-                texture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this._imageSource);
+                texture = dc.gpuResourceCache.retrieveTexture(gl, this._imageSource);
                 this.imageSourceWasUpdated = false;
                 if (texture) {
+                    texture.setTexParameter(
+                        gl.TEXTURE_MAG_FILTER,
+                        this.resamplingMode === ResamplingMode.NEAREST ? gl.NEAREST : gl.LINEAR
+                    );
                     return texture.bind(dc);
                 }
             }

@@ -161,7 +161,13 @@ define([
             var entry = (key instanceof ImageSource)
                 ? this.entries.entryForKey(key.key) : this.entries.entryForKey(key);
 
-            return entry ? entry.resource : null;
+            var resource = entry ? entry.resource : null;
+
+            if (resource instanceof Texture) {
+                resource.clearTexParameters();
+            }
+
+            return resource;
         };
 
         /**

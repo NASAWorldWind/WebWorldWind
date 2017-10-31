@@ -60,8 +60,6 @@ define([
             gl.bindTexture(gl.TEXTURE_2D, textureId);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
                 isPowerOfTwo ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER,
-                gl.LINEAR);
 
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMode);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapMode);
@@ -91,6 +89,20 @@ define([
              * @type {Date}
              */
             this.creationTime = new Date();
+
+            this._texParameters = {};
+        };
+        
+        Texture.prototype.setTexParameter = function (name, value) {
+            this._texParameters[name] = value;
+        };
+        
+        Texture.prototype.getTexParameter = function (name) {
+            return this._texParameters[name];
+        };
+
+        Texture.prototype.clearTexParameters = function () {
+            this._texParameters = {};
         };
 
         /**
@@ -107,7 +119,13 @@ define([
          * @param {DrawContext} dc The current draw context.
          */
         Texture.prototype.bind = function (dc) {
-            dc.currentGlContext.bindTexture(dc.currentGlContext.TEXTURE_2D, this.textureId);
+            var gl = dc.currentGlContext;
+
+            gl.bindTexture(gl.TEXTURE_2D, this.textureId);
+ 
+            var textureMagFilter = this._texParameters[gl.TEXTURE_MAG_FILTER] || gl.LINEAR;
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureMagFilter);
+ 
             dc.frameStatistics.incrementTextureLoadCount(1);
             return true;
         };

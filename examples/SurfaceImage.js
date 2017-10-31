@@ -62,11 +62,16 @@ requirejs(['../src/WorldWind',
         var surfaceImage2 = new WorldWind.SurfaceImage(new WorldWind.Sector(30, 40, -100, -80),
             new WorldWind.ImageSource(canvas));
 
+        var surfaceImage3 = new WorldWind.SurfaceImage(new WorldWind.Sector(50, 60, -80, -60),
+                                                       "data/surface-image-nearest.png");
+        surfaceImage3.resamplingMode = WorldWind.ResamplingMode.NEAREST; // or LINEAR by default
+
         // Add the surface images to a layer and the layer to the WorldWindow's layer list.
         var surfaceImageLayer = new WorldWind.RenderableLayer();
         surfaceImageLayer.displayName = "Surface Images";
         surfaceImageLayer.addRenderable(surfaceImage1);
         surfaceImageLayer.addRenderable(surfaceImage2);
+        surfaceImageLayer.addRenderable(surfaceImage3);
         wwd.addLayer(surfaceImageLayer);
 
         // Create a layer manager for controlling layer visibility.

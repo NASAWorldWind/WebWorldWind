@@ -164,6 +164,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Rectangle',
         './render/Renderable',
         './layer/RenderableLayer',
+        './util/ResamplingMode',
         './layer/RestTiledImageLayer',
         './gesture/RotationRecognizer',
         './formats/kml/util/Scale',
@@ -401,6 +402,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Rectangle,
               Renderable,
               RenderableLayer,
+              ResamplingMode,
               RestTiledImageLayer,
               RotationRecognizer,
               Scale,
@@ -798,6 +800,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Rectangle'] = Rectangle;
         WorldWind['Renderable'] = Renderable;
         WorldWind['RenderableLayer'] = RenderableLayer;
+        WorldWind['ResamplingMode'] = ResamplingMode;
         WorldWind['RestTiledImageLayer'] = RestTiledImageLayer;
         WorldWind['RotationRecognizer'] = RotationRecognizer;
         WorldWind['ScreenText'] = ScreenText;
