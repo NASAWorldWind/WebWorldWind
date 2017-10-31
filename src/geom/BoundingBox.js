@@ -105,6 +105,44 @@ define([
         BoundingBox.scratchMatrix = Matrix.fromIdentity();
 
         /**
+         * Returns the eight {@link Vec3} corners of the box.
+         *
+         * @returns {Array} the eight box corners in the order bottom-lower-left, bottom-lower-right, bottom-upper-right,
+         *         bottom-upper-left, top-lower-left, top-lower-right, top-upper-right, top-upper-left.
+         */
+        BoundingBox.prototype.getCorners = function () {
+            var ll = new Vec3(this.s[0], this.s[1], this.s[2]);
+            var lr = new Vec3(this.t[0], this.t[1], this.t[2]);
+            var ur = new Vec3(this.s[0], this.s[1], this.s[2]);
+            var ul = new Vec3(this.s[0], this.s[1], this.s[2]);
+
+            ll.add(this.t).multiply(-0.5);     // Lower left.
+            lr.subtract(this.s).multiply(0.5); // Lower right.
+            ur.add(this.t).multiply(0.5);      // Upper right.
+            ul.subtract(this.t).multiply(0.5); // Upper left.
+
+            var corners = [];
+            for (var i = 0; i < 4; i++) {
+                corners.push(new Vec3(this.bottomCenter[0], this.bottomCenter[1], this.bottomCenter[2]));
+            }
+
+            for (i = 0; i < 4; i++) {
+                corners.push(new Vec3(this.topCenter[0], this.topCenter[1], this.topCenter[2]));
+            }
+
+            corners[0].add(ll);
+            corners[1].add(lr);
+            corners[2].add(ur);
+            corners[3].add(ul);
+            corners[4].add(ll);
+            corners[5].add(lr);
+            corners[6].add(ur);
+            corners[7].add(ul);
+
+            return corners;
+        };
+
+        /**
          * Sets this bounding box such that it minimally encloses a specified collection of points.
          * @param {Float32Array} points The points to contain.
          * @returns {BoundingBox} This bounding box set to contain the specified points.
@@ -194,6 +232,29 @@ define([
             this.radius = 0.5 * Math.sqrt(rLen * rLen + sLen * sLen + tLen * tLen);
 
             return this;
+        };
+
+        /**
+         * Sets this bounding box such that it minimally encloses a specified collection of points.
+         * @param {Vec3} points The points to contain.
+         * @returns {BoundingBox} This bounding box set to contain the specified points.
+         * @throws {ArgumentError} If the specified list of points is null, undefined or empty.
+         */
+        BoundingBox.prototype.setToVec3Points = function (points) {
+            if (!points || points.length === 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "BoundingBox", "setToVec3Points", "missingArray"));
+            }
+
+            var pointList = new Float32Array(points.length * 3);
+            for (var i = 0; i < points.length; i++) {
+                var point = points[i];
+                for (var j = 0; j < 3; j++) {
+                    pointList[i * 3 + j] = point[j];
+                }
+            }
+
+            return this.setToPoints(pointList);
         };
 
         /**
@@ -504,7 +565,7 @@ define([
                 gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 
             } finally {
-                // Restore World Wind's default WebGL state.
+                // Restore WorldWind's default WebGL state.
                 gl.enable(gl.CULL_FACE);
                 gl.bindBuffer(gl.ARRAY_BUFFER, null);
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);

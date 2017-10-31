@@ -11,7 +11,7 @@ define(function () {
      * @constructor
      * @classdesc Provides an annotation controller to interactively update DOM elements corresponding to a
      * specific annotation
-     * @param {WorldWindow} worldWindow The World Window to associate this annotation controller with. Used
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this annotation controller with. Used
      * mainly for redrawing the wwd globe after changing settings.
      */
     var AnnotationController = function (worldWindow) {
@@ -19,7 +19,7 @@ define(function () {
         var self = this;
 
         /**
-         * The World Window associated with this annotation controller.
+         * The WorldWindow associated with this annotation controller.
          * @type {WorldWindow}
          */
         this.worldWindow = worldWindow;

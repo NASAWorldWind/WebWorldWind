@@ -13,7 +13,7 @@ requirejs(['../src/WorldWind',
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // Standard World Wind layers
+        // Standard WorldWind layers
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
@@ -34,7 +34,7 @@ requirejs(['../src/WorldWind',
         var layerManger = new LayerManager(wwd);
 
         // Web Map Service information from NASA's Near Earth Observations WMS
-        var serviceAddress = "http://neowms.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+        var serviceAddress = "https://neo.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
         // Named layer displaying Average Temperature data
         var layerName = "MOD_LSTD_CLIM_M";
 
@@ -51,7 +51,7 @@ requirejs(['../src/WorldWind',
             // Create the WMS Layer from the configuration object
             var wmsLayer = new WorldWind.WmsLayer(wmsConfig);
 
-            // Add the layers to World Wind and update the layer manager
+            // Add the layers to WorldWind and update the layer manager
             wwd.addLayer(wmsLayer);
             layerManger.synchronizeLayerList();
         };

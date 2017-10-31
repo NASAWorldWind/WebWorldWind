@@ -22,10 +22,10 @@ define(['../../src/WorldWind',
         var USGSSlabs = function () {
             WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-            // Create the World Window.
+            // Create the WorldWindow.
             this.wwd = new WorldWind.WorldWindow("canvasOne");
 
-            // Configure the World Window layers.
+            // Configure the WorldWindow layers.
             var layers = [
                 {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
                 {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
@@ -47,7 +47,7 @@ define(['../../src/WorldWind',
             this.loadSlabData("MEX", "mex_slab1.0_clip.xyz", 1251, WorldWind.Color.CYAN);
             //this.loadSlabData("ALU", "alu_slab1.0_clip.xyz", 2451, WorldWind.Color.MAGENTA);
 
-            // Enable sub-surface rendering for the World Window.
+            // Enable sub-surface rendering for the WorldWindow.
             this.wwd.subsurfaceMode = true;
             // Enable deep picking in order to detect the sub-surface shapes.
             this.wwd.deepPicking = true;

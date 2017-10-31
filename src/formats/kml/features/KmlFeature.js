@@ -311,7 +311,7 @@ define([
      * @return {Promise|undefined} Promise of the file to deliver
      */
     KmlFeature.prototype.getStyle = function (dc, kmlOptions) {
-        if (this._pStyle || (!this.kmlStyleUrl && !this.kmlStyleSelector)) {
+        if (this._pStyle) {
             return;
         }
 

@@ -12,8 +12,8 @@ define(function () {
      * Constructs a layer manager for a specified {@link WorldWindow}.
      * @alias LayerManager
      * @constructor
-     * @classdesc Provides a layer manager to interactively control layer visibility for a World Window.
-     * @param {WorldWindow} worldWindow The World Window to associated this layer manager with.
+     * @classdesc Provides a layer manager to interactively control layer visibility for a WorldWindow.
+     * @param {WorldWindow} worldWindow The WorldWindow to associated this layer manager with.
      */
     var LayerManager = function (worldWindow) {
         var thisExplorer = this;
@@ -119,7 +119,7 @@ define(function () {
         layerListItem.find("button").off("click");
         layerListItem.find("button").remove();
 
-        // Synchronize the displayed layer list with the World Window's layer list.
+        // Synchronize the displayed layer list with the WorldWindow's layer list.
         for (var i = 0, len = this.wwd.layers.length; i < len; i++) {
             var layer = this.wwd.layers[i];
             if (layer.hide) {

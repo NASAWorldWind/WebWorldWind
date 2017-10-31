@@ -41,8 +41,8 @@ define([
          *
          * @alias AreaMeasurer
          * @constructor
-         * @param {WorldWindow} wwd The World Window associated with AreaMeasurer.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @param {WorldWindow} wwd The WorldWindow associated with AreaMeasurer.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         var AreaMeasurer = function (wwd) {
 

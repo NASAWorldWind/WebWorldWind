@@ -20,7 +20,7 @@ define(['../../src/WorldWind',
         var SubSurface = function () {
             WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-            // Create the World Window.
+            // Create the WorldWindow.
             this.wwd = new WorldWind.WorldWindow("canvasOne");
 
             /**
@@ -40,7 +40,7 @@ define(['../../src/WorldWind',
                 this.wwd.addLayer(layers[l].layer);
             }
 
-            // Enable sub-surface rendering for the World Window.
+            // Enable sub-surface rendering for the WorldWindow.
             this.wwd.subsurfaceMode = true;
 
             // Start the view pointing to a longitude within the current time zone.

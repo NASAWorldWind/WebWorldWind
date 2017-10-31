@@ -25,7 +25,7 @@ requirejs(['../src/WorldWind',
         blueMarbleTimeSeries.enabled = false;
         blueMarbleTimeSeries.showSpinner = true;
 
-        // Add Blue Marble time series to the World Window's layer list. Disable it until its images are preloaded,
+        // Add Blue Marble time series to the WorldWindow's layer list. Disable it until its images are preloaded,
         // which is initiated below.
         wwd.addLayer(blueMarbleTimeSeries);
 
