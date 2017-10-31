@@ -6,12 +6,28 @@
  * @exports OpenSearchUtils
  */
 
-define([],
-    function () {
+define([
+        '../../util/Promise'
+    ],
+    function (Promise) {
         'use strict';
 
+        /**
+         * Provides utilities for the OpenSearch.
+         * @exports OpenSearchUtils
+         */
         var OpenSearchUtils = {
 
+            /**
+             * Gets the trimmed text content of the first child node starting from a root node
+             *
+             * @param {Node} parent The root node from which to start the search
+             * @param {String} localName The local name (without the namespace) of the child node which contains the
+             * text content
+             * @param {String|null} namespaceURI The namespaceURI of the child
+             *
+             * @return {String} The text content of the specified child node
+             */
             getChildTextContent: function (parent, localName, namespaceURI) {
                 var collection = this.getXmlElements(parent, localName, namespaceURI);
                 if (collection.length) {
@@ -20,42 +36,26 @@ define([],
                 return '';
             },
 
-            getChildTextContentWithCodeSpace: function (parent, localName, namespaceURI) {
-                var collection = this.getXmlElements(parent, localName, namespaceURI);
-                if (collection.length) {
-                    var node = collection[0];
-                    return {
-                        codeSpace: node.getAttribute('codeSpace'),
-                        value: node.textContent.trim()
-                    };
-                }
-            },
-
-            getChildTextContentWithUom: function (parent, localName, namespaceURI) {
-                var collection = this.getXmlElements(parent, localName, namespaceURI);
-                if (collection.length) {
-                    var node = collection[0];
-                    return {
-                        uom: node.getAttribute('uom'),
-                        value: node.textContent.trim()
-                    };
-                }
-            },
-
-            getFileNameLink: function (parent, localName, namespaceURI) {
-                var fileNameNode = this.getXmlElements(parent, localName, namespaceURI)[0];
-                if (fileNameNode) {
-                    var ServiceReference = this.getXmlElements(fileNameNode, 'ServiceReference')[0];
-                    if (ServiceReference) {
-                        return ServiceReference.getAttribute('xlink:href');
-                    }
-                }
-            },
-
+            /**
+             * Gets the trimmed text content of node.
+             *
+             * @param {Node} node The node from which to get the text content
+             *
+             * @return {String} The text content of the specified child node
+             */
             getTextContent: function (node) {
                 return node.textContent.trim();
             },
 
+            /**
+             * Finds all the child nodes, that match the localName and namespaceURI, starting from a root node.
+             *
+             * @param {Node} parent The root node from which to start the search
+             * @param {String} localName The local name (without the namespace) of the child node
+             * @param {String|null} namespaceURI The namespaceURI of the child
+             *
+             * @return {[Node]} An array of Nodes.
+             */
             getXmlElements: function (parent, localName, namespaceURI) {
                 var collection;
                 if (namespaceURI) {
@@ -63,7 +63,7 @@ define([],
                 }
                 else {
                     collection = parent.getElementsByTagName(localName);
-                    //hack, Firefox does not return NS nodes with getElementsByTagName
+                    //Firefox does not return namespace nodes with getElementsByTagName
                     if (!collection.length) {
                         collection = parent.getElementsByTagNameNS('*', localName);
                     }
@@ -74,40 +74,15 @@ define([],
                 return [];
             },
 
-            getChildren: function (parent, namespaceURI) {
-                return [].slice.call(parent.childNodes).filter(function (node) {
-                    if (namespaceURI) {
-                        return node.nodeType === 1 && node.namespaceURI === namespaceURI;
-                    }
-                    return node.nodeType === 1;
-                });
-            },
-
-            parseChildNodes: function (childNodesInfo, parentNode, result) {
-                result = result || {};
-                var self = this;
-                childNodesInfo.forEach(function (nodeEntry) {
-                    var value;
-                    if (nodeEntry.attribute === 'codeSpace') {
-                        value = self.getChildTextContentWithCodeSpace(parentNode, nodeEntry.name);
-                    }
-                    else if (nodeEntry.attribute === 'uom') {
-                        value = self.getChildTextContentWithUom(parentNode, nodeEntry.name);
-                    }
-                    else if (nodeEntry.attribute === 'xlink:href') {
-                        value = self.getFileNameLink(parentNode, nodeEntry.name);
-                    }
-                    else {
-                        value = self.getChildTextContent(parentNode, nodeEntry.name);
-                    }
-                    if (value) {
-                        result[nodeEntry.name] = value;
-                    }
-                });
-                return result;
-            },
-
-            parseNodeAttributes: function (node, result) {
+            /**
+             * Gets the attributes of a Node and stores them in an Object
+             *
+             * @param {Node} node
+             * @param {Object} result An object to store the attributes
+             *
+             * @return {Object}
+             */
+            getNodeAttributes: function (node, result) {
                 for (var i = 0, len = node.attributes.length; i < len; i++) {
                     var attribute = node.attributes[i];
                     result[attribute.name] = attribute.value;
@@ -115,37 +90,19 @@ define([],
                 return result;
             },
 
-            getAttributeAsString: function (node, attribute, ns, defaultValue) {
-                var value = this.getNodeAttribute(node, attribute, ns);
-                if (value == null && defaultValue) {
-                    return defaultValue;
-                }
-                return value;
-            },
-
-            getAttributeAsNumber: function (node, attribute, ns, defaultValue) {
-                var value = this.getNodeAttribute(node, attribute, ns);
-                if (value == null && defaultValue) {
-                    return defaultValue;
-                }
-                return +value;
-            },
-
-            getAttributeAsArray: function (node, attribute, ns, defaultValue) {
-                var value = this.getNodeAttribute(node, attribute, ns);
-                if (value == null && defaultValue) {
-                    return defaultValue;
-                }
-                return value;
-            },
-
-            getNodeAttribute: function (node, attribute, ns) {
-                if (ns) {
-                    return node.getAttributeNS(ns, attribute);
-                }
-                return node.getAttribute(attribute);
-            },
-
+            /**
+             * Finds a value in an array that satisfies the provided testing function.
+             *
+             * @param {Array} array The array to search in.
+             * @param {Function} predicate Function to execute on each value in the array, taking three arguments:
+             * element The current element being processed in the array.
+             * index The index of the current element being processed in the array.
+             * array The array find was called upon.
+             * @param {Object|null} context Object to use as "this" when executing the predicate function.
+             *
+             * @return {Any|undefined} the value of the first element in the array that satisfies the provided testing
+             * function. Otherwise undefined is returned.
+             */
             arrayFind: function (array, predicate, context) {
                 if (!Array.isArray(array)) {
                     throw (new Error('arrayFind - missing array'));
@@ -161,11 +118,23 @@ define([],
                 }
             },
 
+            /**
+             * Parses a xml string and return the root element.
+             *
+             * @param {String} xmlString The xml to parse
+             * @return {Element} The root element of the parsed document
+             */
             parseXml: function (xmlString) {
-                var xml = new DOMParser().parseFromString(xmlString, 'text/xml');
-                return xml.documentElement;
+                var xmlDOM = new DOMParser().parseFromString(xmlString, 'text/xml');
+                return xmlDOM.documentElement;
             },
 
+            /**
+             * Provides an interface for fetching resources.
+             *
+             * @param {OpenSearchRequest} options
+             * @return {Promise} A promise that resolves with the response or rejects with an error
+             */
             fetch: function (options) {
                 return new Promise(function (resolve, reject) {
                     var xhr = new XMLHttpRequest();
@@ -185,7 +154,7 @@ define([],
                         return reject(new Error('Request timed out'));
                     };
 
-                    xhr.open(options.method, options.url, true);
+                    xhr.open(options.method, options.url, true, options.user, options.password);
 
                     xhr.withCredentials = options.withCredentials;
 

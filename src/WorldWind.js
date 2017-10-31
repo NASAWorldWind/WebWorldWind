@@ -141,8 +141,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/NominatimGeocoder',
         './error/NotYetImplementedError',
         './util/Offset',
+        './ogc/openSearch/responseFormats/atomParser/OpenSearchAtomParser',
+        './ogc/openSearch/OpenSearchConstants',
+        './ogc/openSearch/descriptionDocument/OpenSearchDescriptionDocument',
+        './ogc/openSearch/responseFormats/atomParser/OpenSearchGeoRssParser',
         './layer/OpenSearchLayer',
+        './ogc/openSearch/OpenSearchNamespaces',
+        './ogc/openSearch/descriptionDocument/OpenSearchParameter',
+        './ogc/openSearch/responseFormats/OpenSearchParserRegistry',
+        './ogc/openSearch/OpenSearchRequest',
         './ogc/openSearch/OpenSearchService',
+        './ogc/openSearch/descriptionDocument/OpenSearchUrl',
+        './ogc/openSearch/OpenSearchUtils',
         './layer/OpenStreetMapImageLayer',
         './formats/kml/util/Pair',
         './gesture/PanRecognizer',
@@ -367,8 +377,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               NominatimGeocoder,
               NotYetImplementedError,
               Offset,
+              OpenSearchAtomParser,
+              OpenSearchConstants,
+              OpenSearchDescriptionDocument,
+              OpenSearchGeoRssParser,
               OpenSearchLayer,
+              OpenSearchNamespaces,
+              OpenSearchParameter,
+              OpenSearchParserRegistry,
+              OpenSearchRequest,
               OpenSearchService,
+              OpenSearchUrl,
+              OpenSearchUtils,
               OpenStreetMapImageLayer,
               Pair,
               PanRecognizer,
@@ -754,8 +774,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['NominatimGeocoder'] = NominatimGeocoder;
         WorldWind['NotYetImplementedError'] = NotYetImplementedError;
         WorldWind['Offset'] = Offset;
+        WorldWind['OpenSearchAtomParser'] = OpenSearchAtomParser;
+        WorldWind['OpenSearchConstants'] = OpenSearchConstants;
+        WorldWind['OpenSearchDescriptionDocument'] = OpenSearchDescriptionDocument;
+        WorldWind['OpenSearchGeoRssParser'] = OpenSearchGeoRssParser;
         WorldWind['OpenSearchLayer'] = OpenSearchLayer;
+        WorldWind['OpenSearchNamespaces'] = OpenSearchNamespaces;
+        WorldWind['OpenSearchParameter'] = OpenSearchParameter;
+        WorldWind['OpenSearchParserRegistry'] = OpenSearchParserRegistry;
+        WorldWind['OpenSearchRequest'] = OpenSearchRequest;
         WorldWind['OpenSearchService'] = OpenSearchService;
+        WorldWind['OpenSearchUrl'] = OpenSearchUrl;
+        WorldWind['OpenSearchUtils'] = OpenSearchUtils;
         WorldWind['OpenStreetMapImageLayer'] = OpenStreetMapImageLayer;
         WorldWind['PanRecognizer'] = PanRecognizer;
         WorldWind['Path'] = Path;

@@ -7,37 +7,53 @@
  */
 
 define([
-        './responseFormats/atomParser/AtomToGeoJSON',
-        './descriptionDocument/DescriptionDocument',
+        '../../error/ArgumentError',
+        '../../util/Logger',
+        './responseFormats/atomParser/OpenSearchAtomParser',
+        './OpenSearchConstants',
+        './descriptionDocument/OpenSearchDescriptionDocument',
+        './responseFormats/OpenSearchParserRegistry',
         './OpenSearchRequest',
         './OpenSearchUtils',
-        './responseFormats/OpenSearchParserRegistry'
+        '../../util/Promise'
     ],
-    function (AtomToGeoJSONNormalized,
-              DescriptionDocument,
+    function (ArgumentError,
+              Logger,
+              OpenSearchAtomParser,
+              OpenSearchConstants,
+              OpenSearchDescriptionDocument,
+              OpenSearchParserRegistry,
               OpenSearchRequest,
               OpenSearchUtils,
-              OpenSearchParserRegistry) {
+              Promise) {
         'use strict';
 
         /**
          * Constructs a service for open search queries.
+         *
+         * The service exposes two methods:
+         *  - discover used to get the description document
+         *  - search used for querying the search engine
+         *
+         * By default this service can handle Atom for EO and geoJSON responses.
+         * Other types of response formats can by added with the registerParser method.
+         *
          * @alias OpenSearchService
          * @constructor
          * @classdesc Provides a search service for working with open search queries.
-         * @param {String} url The URL for the description document.
+         * @param {String} url The url for the description document.
          */
         var OpenSearchService = function (url) {
             this._url = url;
             this._descriptionDocument = null;
             this._parserRegistry = new OpenSearchParserRegistry();
 
-            this.registerParsers();
+            this.registerDefaultParsers();
         };
 
         Object.defineProperties(OpenSearchService.prototype, {
             /**
-             * URL for the description document.
+             * Url for the description document.
              * @memberof OpenSearchService.prototype
              * @type {String}
              */
@@ -46,11 +62,10 @@ define([
                     return this._url;
                 },
                 set: function (value) {
-                    if (!value) {
-                        throw '';
-                    }
-                    if (typeof value !== 'string') {
-                        throw '';
+                    if (!value || typeof value !== 'string') {
+                        throw new ArgumentError(
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "OpenSearchService", "setUrl",
+                                "The specified url is missing or is not a string."));
                     }
                     this._url = value;
                 }
@@ -59,19 +74,16 @@ define([
             /**
              * The parsed description document.
              * @memberof OpenSearchService.prototype
-             * @type {DescriptionDocument}
+             * @type {OpenSearchDescriptionDocument}
              */
             descriptionDocument: {
                 get: function () {
                     return this._descriptionDocument;
-                },
-                set: function (value) {
-                    this._descriptionDocument = value;
                 }
             },
 
             /**
-             * A registry of parsers (xml, geoJSON) to be used with this service.
+             * A registry of parsers (Atom, geoJSON) to be used with this service.
              * @memberof OpenSearchService.prototype
              * @type {OpenSearchParserRegistry}
              */
@@ -87,8 +99,8 @@ define([
 
         /**
          * Fetches and parses an open search description document.
-         * @param {OpenSearchRequest|null} options See OpenSearchRequest for possible options.
-         * @return {Promise} A promise which when resolved return this service, or an error when rejected
+         * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
+         * @return {Promise} A promise which when resolved returns this service, or an error when rejected
          * @example openSearchService
          *                      .discover({url: 'http://example.com/opensearch'})
          *                      .then(result => console.log(result))
@@ -99,42 +111,38 @@ define([
             var requestOptions = new OpenSearchRequest(options);
             requestOptions.url = requestOptions.url || this._url;
             requestOptions.method = requestOptions.method || 'GET';
+            if (!requestOptions.url) {
+                return Promise.reject(new Error('OpenSearchService discover - no url provided'));
+            }
             return OpenSearchUtils.fetch(requestOptions)
                 .then(function (responseText) {
                     var xmlRoot = OpenSearchUtils.parseXml(responseText);
-                    self.descriptionDocument = new DescriptionDocument(xmlRoot);
+                    self._descriptionDocument = new OpenSearchDescriptionDocument(xmlRoot);
                     return self;
-                })
-                .catch(function (err) {
-                    return Promise.reject(err);
                 });
         };
 
         /**
          * Performs a search query.
          * @param {Array|null} searchParams A list of objects, each object must have a name and value property.
-         * @param {OpenSearchRequest|null} options See OpenSearchRequest for possible options.
+         * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
          * @return {Promise} A promise which when resolved returns a geoJSON collection, or an error when rejected.
          * @example openSearchService
          *                      .search([
-         *                          {name: 'count', value: 50}, {name: 'lat', value: 50}, {name: 'lon', value: 20}
+         *                          {name: 'count', value: 10}, {name: 'lat', value: 50}, {name: 'lon', value: 20}
          *                      ])
          *                      .then(result => console.log(result))
          *                      .catch(err => console.error(err));
          */
         OpenSearchService.prototype.search = function (searchParams, options) {
-            if (!this.descriptionDocument) {
-                return Promise.reject(new Error('OpenSearch search - no descriptionDocument, run discover first'));
+            if (!this._descriptionDocument) {
+                return Promise.reject(new Error('OpenSearchService search - no descriptionDocument, run discover first'));
             }
-            return this.searchRequest(searchParams, options);
-        };
 
-        OpenSearchService.prototype.searchRequest = function (searchParams, options) {
             var self = this;
-
             var requestOptions = new OpenSearchRequest(options);
             var supportedFormats = this.getSupportedFormats();
-            var openSearchUrl = this.descriptionDocument.findCompatibleUrl(searchParams, requestOptions, supportedFormats);
+            var openSearchUrl = this._descriptionDocument.findCompatibleUrl(searchParams, requestOptions, supportedFormats);
 
             if (!openSearchUrl) {
                 return Promise.reject(new Error('OpenSearchService - no suitable Url found'));
@@ -153,84 +161,78 @@ define([
                 requestOptions.addHeader('Content-Type', openSearchUrl.encType);
             }
             else {
-                return Promise.reject(new Error('OpenSearch - encoding parse error'));
+                return Promise.reject(new Error('OpenSearchService search - unsupported encoding'));
             }
 
             return OpenSearchUtils.fetch(requestOptions)
                 .then(function (response) {
                     var responseParser = self.getResponseParser(openSearchUrl.type, requestOptions.relation);
                     if (!responseParser) {
-                        throw new Error('OpenSearch - no suitable response parser found');
+                        throw new Error('OpenSearchService search - no suitable response parser found');
                     }
-                    return responseParser.parse(response);
-                })
-                .catch(function (err) {
-                    return Promise.reject(err);
+                    return responseParser.parse(response, requestOptions.relation);
                 });
         };
 
-        OpenSearchService.prototype.registerParser = function (options) {
-            this.parserRegistry.registerParser(options);
+        /**
+         * Registers a parser to be used for the specified mime type and relation
+         *
+         * @param {String} type Mime type for the registered parser
+         * @param {String} rel Open search Url relation for the registered parser
+         * @param {Object} parser An object with a parse method.
+         * The parse method will be called with the response of the server.
+         */
+        OpenSearchService.prototype.registerParser = function (type, rel, parser) {
+            this.parserRegistry.registerParser(type, rel, parser);
         };
 
+        /**
+         * Returns a list with the supported mime types.
+         * @return {[String]} a list of the supported mime types
+         */
         OpenSearchService.prototype.getSupportedFormats = function () {
             return this.parserRegistry.getFormats();
         };
 
+        /**
+         * Gets the response parser for the specified mime type and relation.
+         *
+         * @param {String} type Mime type for parser
+         * @param {String} rel Open search Url relation for the parser
+         *
+         * @return {Object|undefined} the parser
+         */
         OpenSearchService.prototype.getResponseParser = function (type, rel) {
             return this.parserRegistry.getParser(type, rel);
         };
 
-        OpenSearchService.prototype.removeParser = function (type) {
-            this.parserRegistry.removeParser(type);
+        /**
+         * Removes a parser for the specified mime type and relation.
+         *
+         * @param {String} type Mime type for the registered parser
+         * @param {String} rel Open search Url relation for the registered parser
+         */
+        OpenSearchService.prototype.removeParser = function (type, rel) {
+            this.parserRegistry.removeParser(type, rel);
         };
 
-        OpenSearchService.prototype.registerParsers = function () {
-            this.registerParser({
-                mimeType: 'application/atom+xml',
-                rel: 'results',
-                parser: AtomToGeoJSONNormalized
-            });
-            this.registerParser({
-                mimeType: 'application/atom+xml',
-                rel: 'collection',
-                parser: AtomToGeoJSONNormalized
-            });
+        /**
+         * Internal. applications should not call this function.
+         * Registers the default parsers for an OpenSearchService.
+         */
+        OpenSearchService.prototype.registerDefaultParsers = function () {
+            this.registerParser('application/atom+xml', OpenSearchConstants.RESULTS, OpenSearchAtomParser);
+            this.registerParser('application/atom+xml', OpenSearchConstants.COLLECTION, OpenSearchAtomParser);
 
             /** There can be 3 mimeTypes for geoJSON **/
+            this.registerParser('application/vnd.geo+json', OpenSearchConstants.RESULTS, window.JSON);
+            this.registerParser('application/vnd.geo+json', OpenSearchConstants.COLLECTION, window.JSON);
 
-            this.registerParser({
-                mimeType: 'application/vnd.geo+json',
-                rel: 'results',
-                parser: window.JSON
-            });
-            this.registerParser({
-                mimeType: 'application/vnd.geo+json',
-                rel: 'collection',
-                parser: window.JSON
-            });
+            this.registerParser('application/geo+json', OpenSearchConstants.RESULTS, window.JSON);
+            this.registerParser('application/geo+json', OpenSearchConstants.COLLECTION, window.JSON);
 
-            this.registerParser({
-                mimeType: 'application/geo+json',
-                rel: 'results',
-                parser: window.JSON
-            });
-            this.registerParser({
-                mimeType: 'application/geo+json',
-                rel: 'collection',
-                parser: window.JSON
-            });
-
-            this.registerParser({
-                mimeType: 'application/json',
-                rel: 'results',
-                parser: window.JSON
-            });
-            this.registerParser({
-                mimeType: 'application/json',
-                rel: 'collection',
-                parser: window.JSON
-            });
+            this.registerParser('application/json', OpenSearchConstants.RESULTS, window.JSON);
+            this.registerParser('application/json', OpenSearchConstants.COLLECTION, window.JSON);
         };
 
         return OpenSearchService;

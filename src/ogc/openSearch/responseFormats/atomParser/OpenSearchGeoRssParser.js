@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @exports GeoRssParser
+ * @exports OpenSearchGeoRssParser
  */
 
 define([
@@ -14,7 +14,20 @@ define([
               OpenSearchUtils) {
         'use strict';
 
-        var GeoRssParser = {
+        /**
+         * Parses GeoRSS to geoJSON geometry
+         * GeoRSS can be encoded as Simple and GML
+         * @exports OpenSearchGeoRssParser
+         */
+        var OpenSearchGeoRssParser = {
+
+            /**
+             * Parses GeoRSS-Simple to geoJSON geometry
+             *
+             * @param {Node} node the GeoRSS node
+             *
+             * @return {Object} a geoJSON geometry object
+             */
             parseSimple: function (node) {
                 var geometry = {
                     type: '',
@@ -23,20 +36,27 @@ define([
 
                 if (node.localName === 'polygon') {
                     geometry.type = 'Polygon';
-                    geometry.coordinates.push(GeoRssParser.parseLocations(node));
+                    geometry.coordinates.push(OpenSearchGeoRssParser.parseLocations(node));
                 }
                 else if (node.localName === 'point') {
                     geometry.type = 'Point';
-                    geometry.coordinates = GeoRssParser.parseLocations(node);
+                    geometry.coordinates = OpenSearchGeoRssParser.parseLocations(node);
                 }
                 else if (node.localName === 'line') {
                     geometry.type = 'LineString';
-                    geometry.coordinates = GeoRssParser.parseLocations(node);
+                    geometry.coordinates = OpenSearchGeoRssParser.parseLocations(node);
                 }
 
                 return geometry;
             },
 
+            /**
+             * Parses GeoRSS-GML to geoJSON geometry
+             *
+             * @param {Node} node the GeoRSS node
+             *
+             * @return {Object} a geoJSON geometry object
+             */
             parseGml: function (node) {
                 var geometry = {
                     type: '',
@@ -49,7 +69,7 @@ define([
                         geometry.type = 'Point';
                         var posNode = OpenSearchUtils.getXmlElements(firstChild, 'pos')[0];
                         if (posNode) {
-                            geometry.coordinates = GeoRssParser.parseLocations(posNode);
+                            geometry.coordinates = OpenSearchGeoRssParser.parseLocations(posNode);
                         }
                         break;
 
@@ -57,18 +77,18 @@ define([
                         geometry.type = 'LineString';
                         var posList = OpenSearchUtils.getXmlElements(firstChild, 'posList')[0];
                         if (posList) {
-                            geometry.coordinates = GeoRssParser.parseLocations(posList);
+                            geometry.coordinates = OpenSearchGeoRssParser.parseLocations(posList);
                         }
                         break;
 
                     case 'Polygon':
                         geometry.type = 'Polygon';
-                        geometry.coordinates = GeoRssParser.parseGmlPolygon(firstChild);
+                        geometry.coordinates = OpenSearchGeoRssParser.parseGmlPolygon(firstChild);
                         break;
 
                     case 'MultiSurface':
                         geometry.type = 'MultiPolygon';
-                        geometry.coordinates = [GeoRssParser.parseMultiPolygon(firstChild)];
+                        geometry.coordinates = [OpenSearchGeoRssParser.parseMultiPolygon(firstChild)];
                         break;
 
                     default:
@@ -78,11 +98,25 @@ define([
                 return geometry;
             },
 
+            /**
+             * Parses a GeoRSS box to geoJSON bbox
+             *
+             * @param {Node} node the GeoRSS box node
+             *
+             * @return {Array} a geoJSON bbox array
+             */
             parseBox: function (node) {
-                var locations = GeoRssParser.parseLocations(node);
+                var locations = OpenSearchGeoRssParser.parseLocations(node);
                 return [].concat.apply([], locations);
             },
 
+            /**
+             * Extracts the coordinates of a GeoRSS node as a geoJSON coordinates array.
+             *
+             * @param {Node} node the GeoRSS node
+             *
+             * @return {Array} a geoJSON coordinates array
+             */
             parseLocations: function (node) {
                 var points = node.textContent.trim().replace(/\s+/g, ' ').split(' ');
                 var locations = [];
@@ -94,17 +128,24 @@ define([
                 return locations;
             },
 
+            /**
+             * Extracts the coordinates of a GeoRSS-GML Polygon node as a geoJSON coordinates array.
+             *
+             * @param {Node} node the GeoRSS-GML Polygon node
+             *
+             * @return {Array} a geoJSON coordinates array
+             */
             parseGmlPolygon: function (node) {
                 var exteriorPosList = OpenSearchUtils.getXmlElements(node, 'posList')[0];
                 var interiorNodes = OpenSearchUtils.getXmlElements(node, 'interior');
 
-                var exteriorLocations = GeoRssParser.parseLocations(exteriorPosList);
+                var exteriorLocations = OpenSearchGeoRssParser.parseLocations(exteriorPosList);
 
                 var interiors = [];
                 for (var i = 0; i < interiorNodes.length; i++) {
                     var interiorPosList = OpenSearchUtils.getXmlElements(interiorNodes[i], 'posList')[0];
                     if (interiorPosList) {
-                        var interiorLocations = GeoRssParser.parseLocations(interiorPosList);
+                        var interiorLocations = OpenSearchGeoRssParser.parseLocations(interiorPosList);
                         interiors.push(interiorLocations);
                     }
                 }
@@ -112,6 +153,13 @@ define([
                 return exteriorLocations.concat(interiors);
             },
 
+            /**
+             * Extracts the coordinates of a GeoRSS-GML MultiSurface node as a geoJSON coordinates array.
+             *
+             * @param {Node} node the GeoRSS-GML MultiSurface node
+             *
+             * @return {Array} a geoJSON coordinates array
+             */
             parseMultiPolygon: function (node) {
                 //node can contain a single 'surfaceMembers' element and/or multiple 'surfaceMember' elements
 
@@ -125,11 +173,11 @@ define([
                 }
 
                 return polygons.map(function (polygon) {
-                    return GeoRssParser.parseGmlPolygon(polygon);
+                    return OpenSearchGeoRssParser.parseGmlPolygon(polygon);
                 });
             }
 
         };
 
-        return GeoRssParser;
+        return OpenSearchGeoRssParser;
     });

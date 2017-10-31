@@ -3,8 +3,10 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
-requirejs(['../src/WorldWind',
-        './LayerManager'],
+requirejs([
+        '../src/WorldWind',
+        './LayerManager'
+    ],
     function (ww,
               LayerManager) {
         "use strict";
@@ -17,35 +19,43 @@ requirejs(['../src/WorldWind',
         wwd.addLayer(BMNGLayer);
         wwd.addLayer(openSearchLayer);
 
-        wwd.navigator.lookAtLocation.latitude = 55;
-        wwd.navigator.lookAtLocation.longitude = 0;
-        wwd.navigator.range = 40e5;
-
         openSearchLayer.shapeConfigurationCallback = shapeConfigurationCallback;
         openSearchLayer.currentTimeInterval = [
-            new Date('2002-11-15T10:04:03.000Z'),
-            new Date('2002-11-15T10:04:20.000Z')
+            new Date('2012-04-06T02:29:52.000Z'),
+            new Date('2012-04-07T03:29:52.000Z')
         ];
 
         /*** Using the OpenSearchService to do a two step search search ***/
 
-        var searchParams = [
-            {name: 'count', value: 5}
-        ];
+        var url = 'http://geo.spacebel.be/opensearch/description.xml';
 
-        var openSearchService = new WorldWind.OpenSearchService('http://sxcat.eox.at/opensearch');
+        var openSearchService = new WorldWind.OpenSearchService(url);
         openSearchService.discover()
             .then(function (service) {
-                return service.search(null, {relation: 'collection'});
+
+                //Only interested in collection urls that return an atom response
+                var url = service.descriptionDocument.urls.filter(function (url) {
+                    return (
+                        url.relations.indexOf('collection') >= 0 &&
+                        url.type === 'application/atom+xml'
+                    );
+                })[0];
+                console.log('collection url parameters', url.parameters);
+
+                var searchParams = [
+                    {name: 'parentIdentifier', value: 'EOP:ESA:GPOD-EO'},
+                    {name: 'query', value: 'MERIS'}
+                ];
+                var collectionResults = service.search(searchParams, {relation: 'collection'});
+                return collectionResults;
             })
             .then(function (geoJSONCollection) {
                 console.log('collection results', geoJSONCollection);
 
-                //not all results contain geo products, some are for calibration data
-                var feature = geoJSONCollection.features[25];
+                var feature = geoJSONCollection.features[0];
 
-                var productSearchUrl = feature.properties.links.search[0].href;
-                console.log('search link', feature.properties.links.search[0]);
+                var productSearchUrl = feature.links.search[0].href;
+                console.log('search link', feature.links.search[0]);
                 console.log('feature title', feature.properties.title);
 
                 return openSearchLayer.discover({url: productSearchUrl});
@@ -55,14 +65,20 @@ requirejs(['../src/WorldWind',
                 console.log('search urls', layer.descriptionDocument.urls);
 
                 //Only interested in urls that contain results and return an atom response.
-                var url = layer.descriptionDocument.urls.filter(function(url) {
+                var url = layer.descriptionDocument.urls.filter(function (url) {
                     return (
                         url.relations.indexOf('results') >= 0 &&
                         url.type === 'application/atom+xml'
                     );
                 })[0];
+                console.log('url', url);
                 console.log('searchParams', url.parameters);
-                return layer.search(searchParams);
+
+                var searchParams = [
+                    {name: 'maximumRecords', value: 10}
+                ];
+                var geoJSONProducts = layer.search(searchParams);
+                return geoJSONProducts;
             })
             .then(function (geoJSONCollection) {
                 console.log('products results', geoJSONCollection);
@@ -79,7 +95,7 @@ requirejs(['../src/WorldWind',
             var configuration = {};
 
             if (geometry.isPointType() || geometry.isMultiPointType()) {
-                configuration.attributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
+                configuration.attributes = new WorldWind.PlacemarkAttributes();
 
                 if (properties && (properties.name || properties.Name || properties.NAME)) {
                     configuration.name = properties.name || properties.Name || properties.NAME;

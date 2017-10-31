@@ -7,17 +7,31 @@
  */
 
 define([
+        '../error/ArgumentError',
         '../formats/geojson/GeoJSONParser',
+        '../util/Logger',
         '../ogc/OpenSearch/OpenSearchService',
         './RenderableLayer'
     ],
-    function (GeoJSONParser,
+    function (ArgumentError,
+              GeoJSONParser,
+              Logger,
               OpenSearchService,
               RenderableLayer) {
         'use strict';
 
         /**
          * Constructs a Open search layer.
+         *
+         * For working with OpenSearch this layer exposes two methods:
+         *  - discover used to get the description document
+         *  - search used for querying the search engine
+         *
+         * By default this service can handle Atom for EO and geoJSON responses.
+         * Other types of response formats can by added with the registerParser method.
+         *
+         * Renderables can by filtered by time by setting the currentTimeInterval.
+         *
          * @alias OpenSearchLayer
          * @constructor
          * @augments RenderableLayer
@@ -27,7 +41,7 @@ define([
         var OpenSearchLayer = function (displayName) {
             RenderableLayer.call(this, displayName);
 
-            this._shapeConfigurationCallback = null;
+            this._shapeConfigurationCallback = function() {};
             this._searchService = new OpenSearchService();
             this._currentTimeInterval = [];
         };
@@ -36,7 +50,7 @@ define([
 
         Object.defineProperties(OpenSearchLayer.prototype, {
             /**
-             * URL for the description document.
+             * Url for the description document.
              * @memberof OpenSearchLayer.prototype
              * @type {String}
              */
@@ -50,7 +64,11 @@ define([
             },
 
             /**
-             * A callback function for geoJSON data.
+             * An function called prior to creating a shape for the indicated GeoJSON geometry.
+             * This function can be used to assign attributes to newly created shapes.
+             * The callback function's first argument is the current geometry object.
+             * The second argument to the callback function is the object containing the properties read from
+             * the corresponding GeoJSON properties member, if any.
              * @memberof OpenSearchLayer.prototype
              * @type {Function}
              */
@@ -60,14 +78,16 @@ define([
                 },
                 set: function (value) {
                     if (typeof value !== 'function') {
-                        throw '';
+                        throw new ArgumentError(
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "OpenSearchLayer", "setShapeConfigurationCallback",
+                                "The specified shapeConfigurationCallback is not a function."));
                     }
                     this._shapeConfigurationCallback = value;
                 }
             },
 
             /**
-             * A list with start and wnd time for filtering renderables withing the specified interval.
+             * A list with start and end time for filtering renderables withing the specified interval.
              * @memberof OpenSearchLayer.prototype
              * @type {[Date, Date]}
              */
@@ -82,8 +102,8 @@ define([
             },
 
             /**
-             * The serch servie of this layer.
-             * @memberof v.prototype
+             * The search service of this layer.
+             * @memberof OpenSearchLayer.prototype
              * @type {OpenSearchService}
              */
             searchService: {
@@ -98,7 +118,7 @@ define([
             /**
              * The parsed description document.
              * @memberof OpenSearchLayer.prototype
-             * @type {DescriptionDocument}
+             * @type {OpenSearchDescriptionDocument}
              */
             descriptionDocument: {
                 get: function () {
@@ -109,8 +129,8 @@ define([
 
         /**
          * Fetches and parses an open search description document.
-         * @param {OpenSearchRequest|null} options See OpenSearchRequest for possible options.
-         * @return {Promise} A promise which when resolved return this layer, or an error when rejected
+         * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
+         * @return {Promise} A promise which when resolved returns this layer, or an error when rejected
          * @example openSearchLayer
          *                      .discover({url: 'http://example.com/opensearch'})
          *                      .then(result => console.log(result))
@@ -121,17 +141,13 @@ define([
             return this._searchService.discover(options)
                 .then(function () {
                     return self;
-                })
-                .catch(function (err) {
-                    return Promise.reject(err);
                 });
         };
 
         /**
          * Performs a search query.
          * @param {Array|null} searchParams A list of objects, each object must have a name and value property.
-         * @param {Function|null} shapeConfigurationCallback A callback function for geoJSON data.
-         * @param {OpenSearchRequest|null} options See OpenSearchRequest for possible options.
+         * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
          * @return {Promise} A promise which when resolved returns a geoJSON collection, or an error when rejected.
          * @example openSearchService
          *                      .search([
@@ -140,7 +156,7 @@ define([
          *                      .then(result => console.log(result))
          *                      .catch(err => console.error(err));
          */
-        OpenSearchLayer.prototype.search = function (searchParams, shapeConfigurationCallback, options) {
+        OpenSearchLayer.prototype.search = function (searchParams, options) {
             var self = this;
 
             if (!options || options.replaceShapes !== false) {
@@ -149,15 +165,22 @@ define([
 
             return this._searchService.search(searchParams, options)
                 .then(function (geoJSONCollection) {
-                    self.loadFromGeoJSON(geoJSONCollection, shapeConfigurationCallback);
+                    self.loadFromGeoJSON(geoJSONCollection, self._shapeConfigurationCallback);
                     self.filterByDate();
                     return geoJSONCollection;
-                })
-                .catch(function (err) {
-                    return Promise.reject(err);
                 });
         };
 
+        /**
+         * Loads a geoJSON object in this layer.
+         * @param {Object} geoJSONCollection A geoJSON collection
+         * @param {Function} shapeConfigurationCallback An optional function called prior to creating a shape for
+         * the indicated GeoJSON geometry.
+         * This function can be used to assign attributes to newly created shapes.
+         * The callback function's first argument is the current geometry object.
+         * The second argument to the callback function is the object containing the properties read from
+         * the corresponding GeoJSON properties member, if any.
+         */
         OpenSearchLayer.prototype.loadFromGeoJSON = function (geoJSONCollection, shapeConfigurationCallback) {
             var shapeCb = shapeConfigurationCallback || this._shapeConfigurationCallback || null;
             var polygonGeoJSON = new GeoJSONParser(JSON.stringify(geoJSONCollection));
@@ -186,28 +209,32 @@ define([
         };
 
         /**
-         * @param {{
-         *  mineType: String, a valid mimeType
-         *  rel: 'results', an OpenSearch Url relation with the value: results,
-         *  parser: Object, an object with a parse method, the parse function will be called with the server response
-         *                  and must return a geoJSON object
-         * }} options
+         * Registers a parser to be used for the specified mime type and relation
          *
-         * @example
-         * openSearchLayer.registerParser({
-         *  mimeType: 'application/atom+xml',
-         *  rel: 'results',
-         *  parser: {
-         *      parse: function(response) {
-         *          // parse the response and return a geoJSON Object
-         *      }
-         *  }
-         * });
-         * */
-        OpenSearchLayer.prototype.registerParser = function (options) {
-            this._searchService.registerParser(options);
+         * @param {String} type Mime type for the registered parser
+         * @param {String} rel Open search Url relation for the registered parser
+         * @param {Object} parser An object with a parse method.
+         * The parse method will be called with the response of the server and must return a geoJSON object
+         */
+        OpenSearchLayer.prototype.registerParser = function (type, rel, parser) {
+            this._searchService.registerParser(type, rel, parser);
         };
 
+        /**
+         * Removes a parser for the specified mime type and relation.
+         *
+         * @param {String} type Mime type for the registered parser
+         * @param {String} rel Open search Url relation for the registered parser
+         */
+        OpenSearchLayer.prototype.removeParser = function (type, rel) {
+            this._searchService.removeParser(type, rel);
+        };
+
+        /**
+         * Filters the renderables of this layer by the interval specified by currentTimeInterval.
+         * This method is called automatically when currentTimeInterval is set
+         * or when renderables are added to this layer as a result of a search.
+         */
         OpenSearchLayer.prototype.filterByDate = function () {
             if (!Array.isArray(this._currentTimeInterval) ||
                 !this.isValidDate(this._currentTimeInterval[0]) ||
@@ -225,11 +252,17 @@ define([
          * Shows all the renderables in this layer.
          */
         OpenSearchLayer.prototype.showAll = function () {
-            for (var i = this.renderables.length; i <= 0; i--) {
+            for (var i = this.renderables.length - 1; i >= 0; i--) {
                 this.renderables[i].enabled = true;
             }
         };
 
+        /**
+         * Internal. Applications should not call this method.
+         * Checks if a renderable is within the time limits specified by currentTimeInterval.
+         * @param {Renderable} renderable
+         * @return {Boolean}
+         */
         OpenSearchLayer.prototype.isRenderableWithinTimeLimits = function (renderable) {
             var dcDate = renderable.userProperties.date;
             if (!dcDate) {
@@ -247,6 +280,13 @@ define([
             );
         };
 
+        /**
+         * Internal. Applications should not call this method.
+         * Checks if the provided interval intersects the currentTimeInterval.
+         * @param {Number} startTime
+         * @param {Number} endTime
+         * @return {Boolean}
+         */
         OpenSearchLayer.prototype.timeIntersection = function (startTime, endTime) {
             var startInterval = this._currentTimeInterval[0].getTime();
             var endInterval = this._currentTimeInterval[1].getTime();
@@ -256,12 +296,25 @@ define([
             );
         };
 
+        /**
+         * Internal. Applications should not call this method.
+         * Checks if the provided interval fully included the currentTimeInterval.
+         * @param {Number} startTime
+         * @param {Number} endTime
+         * @return {Boolean}
+         */
         OpenSearchLayer.prototype.timeInclusion = function (startTime, endTime) {
             var startInterval = this._currentTimeInterval[0].getTime();
             var endInterval = this._currentTimeInterval[1].getTime();
             return (startTime <= startInterval && endTime >= endInterval);
         };
 
+        /**
+         * Internal. Applications should not call this method.
+         * Checks if the provided value is a valid javascript Date object.
+         * @param {Date} value
+         * @return {Boolean}
+         */
         OpenSearchLayer.prototype.isValidDate = function (value) {
             if (Object.prototype.toString.call(value) === "[object Date]") {
                 return !isNaN(value.getTime());

@@ -6,9 +6,18 @@
  * @exports OpenSearchRequest
  */
 
-define([],
-    function () {
+define([
+        './OpenSearchConstants'
+    ],
+    function (OpenSearchConstants) {
 
+        /**
+         * Constructs a request object with the specified options.
+         * @alias OpenSearchRequest
+         * @constructor
+         * @classdesc Constructs a request object with the specified options.
+         * @param {Object} options
+         */
         var OpenSearchRequest = function (options) {
             var defaultOptions = OpenSearchRequest.defaultOptions;
             options = options || defaultOptions;
@@ -17,7 +26,7 @@ define([],
             //Only used in the OpenSearchLayer.
             this.replaceShapes = options.replaceShapes || defaultOptions.replaceShapes;
 
-            //Url of the description document.
+            //Url for a resource such as a description document.
             this.url = options.url || defaultOptions.url;
 
             //A valid http method.
@@ -33,12 +42,12 @@ define([],
             this.relation = options.relation || defaultOptions.relation;
 
             //A flag to indicate if the request should include credentials.
-            this.witchCredentials = options.witchCredentials || defaultOptions.witchCredentials;
+            this.withCredentials = options.withCredentials || defaultOptions.withCredentials;
 
             //A timeout in milliseconds for the ajax request
             this.timeout = options.timeout || defaultOptions.timeout;
 
-            //Request headers. Use the AddHeader method.
+            //Request headers. Use the addHeader method.
             this.headers = options.headers || defaultOptions.headers;
 
             //Payload data for POST, PUT requests.
@@ -46,6 +55,10 @@ define([],
 
             //The response type for XHR.
             this.responseType = options.responseType || defaultOptions.responseType;
+
+            //Username and password for authentication purposes.
+            this.user = options.user || defaultOptions.user;
+            this.password = options.password || defaultOptions.user;
         };
 
         OpenSearchRequest.prototype.addHeader = function (name, value) {
@@ -68,12 +81,14 @@ define([],
             method: '',
             encType: 'application/x-www-form-urlencoded',
             type: '',
-            relation: 'results',
-            witchCredentials: false,
+            relation: OpenSearchConstants.RESULTS,
+            withCredentials: false,
             timeout: 0,
             headers: {},
             body: null,
-            responseType: 'text'
+            responseType: 'text',
+            user: null,
+            password: null
         };
 
         return OpenSearchRequest;

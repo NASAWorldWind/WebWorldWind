@@ -3,17 +3,31 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @exports AtomToGeoJSON
+ * @exports OpenSearchAtomParser
  */
 
 define([
-        './GeoRssParser'
+        '../../OpenSearchConstants',
+        './OpenSearchGeoRssParser'
     ],
-    function (GeoRssParser) {
+    function (OpenSearchConstants,
+              OpenSearchGeoRssParser) {
         'use strict';
 
-        var AtomToGeoJSON = {
+        /**
+         * Parses Atom for EO to geoJSON
+         * @exports OpenSearchAtomParser
+         */
+        var OpenSearchAtomParser = {
 
+            /**
+             * Parses Atom for EO to geoJSON
+             *
+             * @param {String} xmlString The Atom response as a string
+             * @param {String} searchType Open search Url relation
+             *
+             * @return {Object} A geoJSON feature collection
+             */
             parse: function (xmlString, searchType) {
                 var root = new DOMParser().parseFromString(xmlString, 'text/xml').documentElement;
                 var featureCollection = {
@@ -24,8 +38,8 @@ define([
                 };
                 var properties = featureCollection.properties;
 
-                for (var i = 0, len = root.children.length; i < len; i++) {
-                    var node = root.children[i];
+                for (var i = 0, len = root.childNodes.length; i < len; i++) {
+                    var node = root.childNodes[i];
 
                     if (node.nodeType !== 1) {
                         continue;
@@ -53,15 +67,15 @@ define([
                             break;
 
                         case 'Query':
-                            properties.query = AtomToGeoJSON.parseAttributesAsString(node);
+                            properties.query = OpenSearchAtomParser.parseAttributesAsString(node);
                             break;
 
                         case 'link':
-                            AtomToGeoJSON.parseFeedLinks(node, properties);
+                            OpenSearchAtomParser.parseFeedLinks(node, properties);
                             break;
 
                         case 'entry':
-                            featureCollection.features.push(AtomToGeoJSON.parseEntry(node, searchType));
+                            featureCollection.features.push(OpenSearchAtomParser.parseEntry(node, searchType));
                             break;
                     }
                 }
@@ -69,14 +83,20 @@ define([
                 return featureCollection;
             },
 
-            parseFeedLinks: function (node, properties) {
-                if (!properties.links) {
-                    properties.links = {};
+            /**
+             * Parses the links in the feed node.
+             *
+             * @param {Node} node The link node to parse
+             * @param {Object} result An object to store the parsed results
+             */
+            parseFeedLinks: function (node, result) {
+                if (!result.links) {
+                    result.links = {};
                 }
 
-                var links = properties.links;
+                var links = result.links;
                 var rel = node.getAttribute('rel') || 'alternate';
-                var link = AtomToGeoJSON.parseLink(node);
+                var link = OpenSearchAtomParser.parseLink(node);
 
                 if (rel === 'first' ||
                     rel === 'next' ||
@@ -94,6 +114,13 @@ define([
                 }
             },
 
+            /**
+             * Parses an Atom link node.
+             *
+             * @param {Node} node The link node to parse
+             *
+             * @return {Object} An object containing the attributes values from the link node
+             */
             parseLink: function (node) {
                 var link = {};
                 var href = node.getAttribute('href');
@@ -115,6 +142,16 @@ define([
                 return link;
             },
 
+            /**
+             * Parses the attributes of a node as a string.
+             * Each attribute is in the format name="value"
+             * The attributes are delimited by a space
+             * Ex: 'name="value" name="value"'
+             *
+             * @param {Node} node The node to parse
+             *
+             * @return {String} A string
+             */
             parseAttributesAsString: function (node) {
                 var attributes = '';
                 for (var i = 0, len = node.attributes.length; i < len; i++) {
@@ -127,6 +164,14 @@ define([
                 return attributes;
             },
 
+            /**
+             * Parses an Atom entry node as a geoJSON feature.
+             *
+             * @param {Node} entryNode The entry node to parse
+             * @param {String} searchType Open search Url relation
+             *
+             * @return {Object} A geoJSON feature object
+             */
             parseEntry: function (entryNode, searchType) {
                 var feature = {
                     id: '',
@@ -137,8 +182,8 @@ define([
                 };
                 var properties = feature.properties;
 
-                for (var i = 0, len = entryNode.children.length; i < len; i++) {
-                    var node = entryNode.children[i];
+                for (var i = 0, len = entryNode.childNodes.length; i < len; i++) {
+                    var node = entryNode.childNodes[i];
 
                     if (node.nodeType !== 1) {
                         continue;
@@ -169,40 +214,47 @@ define([
                             break;
 
                         case 'link':
-                            AtomToGeoJSON.parseEntryLinks(node, feature, searchType);
+                            OpenSearchAtomParser.parseEntryLinks(node, feature, searchType);
                             break;
 
                         case 'polygon':
                         case 'point':
                         case 'line':
-                            feature.geometry = GeoRssParser.parseSimple(node);
+                            feature.geometry = OpenSearchGeoRssParser.parseSimple(node);
                             break;
 
                         case 'where':
-                            feature.geometry = GeoRssParser.parseGml(node);
+                            feature.geometry = OpenSearchGeoRssParser.parseGml(node);
                             break;
 
                         case 'box':
-                            feature.bbox = GeoRssParser.parseBox(node);
+                            feature.bbox = OpenSearchGeoRssParser.parseBox(node);
                     }
                 }
 
                 return feature;
             },
 
-            parseEntryLinks: function (node, feature, searchType) {
-                if (searchType === 'collection') {
-                    if (!feature.links) {
-                        feature.links = {};
+            /**
+             * Parses the links in the entry node.
+             *
+             * @param {Node} node The link node to parse
+             * @param {Object} result An object to store the parsed results
+             * @param {String} searchType Open search Url relation
+             */
+            parseEntryLinks: function (node, result, searchType) {
+                if (searchType === OpenSearchConstants.COLLECTION) {
+                    if (!result.links) {
+                        result.links = {};
                     }
-                    var links = feature.links;
+                    var links = result.links;
                 }
                 else {
                     //searchType === 'results';
-                    if (!feature.properties.links) {
-                        feature.properties.links = {};
+                    if (!result.properties.links) {
+                        result.properties.links = {};
                     }
-                    links = feature.properties.links;
+                    links = result.properties.links;
                 }
                 var rel = node.getAttribute('rel') || 'alternate';
                 if (rel === 'alternate') {
@@ -211,10 +263,10 @@ define([
                 if (!links[rel]) {
                     links[rel] = [];
                 }
-                links[rel].push(AtomToGeoJSON.parseLink(node));
+                links[rel].push(OpenSearchAtomParser.parseLink(node));
             }
         };
 
-        return AtomToGeoJSON;
+        return OpenSearchAtomParser;
 
     });

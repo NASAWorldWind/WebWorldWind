@@ -7,14 +7,42 @@
  */
 
 define([
-    '../OpenSearchUtils'
+        '../OpenSearchUtils'
     ],
     function (OpenSearchUtils) {
         'use strict';
 
-        var OpenSearchParameter = function (type, name, value, required, replaceable, ns, minimum, maximum, pattern, title,
-                                            minExclusive, maxExclusive, minInclusive, maxInclusive, step, options) {
-            this.type = type;
+        /**
+         * Constructs an OpenSearchParameter.
+         * @alias OpenSearchParameter
+         * @constructor
+         * @classdesc Represents an OpenSearchParameter.
+         *
+         * @param {String} type Internal parameter, indicates from where this parameter was generated
+         * (template or parameter extension)
+         * @param {String} name The name of this parameter
+         * @param {String} value The value indicated by the template or parameter extension.
+         * @param {Boolean} required Indicated if this param is required for searches.
+         * @param {Boolean} replaceable Indicates if this param value should be replaced when making a search query.
+         * @param {String} ns The namespace of this param's name.
+         * @param {Number} minimum The minimum number of times this param should appear in a query.
+         * @param {Number|String} maximum The maximum number of times this param should appear in a query.
+         * A value of '*' indicates no limit.
+         * @param {RegExp} pattern A regexp pattern for the param's value
+         * @param {String} title Advisory information for the format and valid values of the parameter,
+         * such as would be appropriate for a tooltip or label.
+         * @param {Number} minExclusive Indicates the minimum value for the element that cannot be reached.
+         * @param {Number} maxExclusive Indicates the maximum value for the element that cannot be reached.
+         * @param {Number} minInclusive Indicates the minimum value for the element that can be reached.
+         * @param {Number} maxInclusive Indicates the maximum value for the element that can be reached.
+         * @param {Number} step Indicates the granularity of the allowed values between the minimal and maximal range.
+         * @param {[{value: String, label: String}]} options A list of objects that describes a value/label pair
+         * suggested to the client for the parent element.
+         */
+        var OpenSearchParameter = function (type, name, value, required, replaceable, ns, minimum, maximum, pattern,
+                                            title, minExclusive, maxExclusive, minInclusive, maxInclusive, step,
+                                            options) {
+            this._internalType = type;
             this.name = name;
             this.value = value;
             this.required = required;
@@ -32,6 +60,12 @@ define([
             this.options = options || [];
         };
 
+        /**
+         * Internal. Applications should call this method.
+         * Creates an OpenSearchParameter from a template queryString
+         * @param {'name={value?}'} query A query string part from the url template.
+         * @return {OpenSearchParameter}
+         */
         OpenSearchParameter.fromQuery = function (query) {
             var queryParts = query.split('=');
             var name = queryParts[0];
@@ -59,9 +93,15 @@ define([
                 value = paramNameParts[1];
             }
 
-            return new OpenSearchParameter('template', name, value, required, replaceable, ns);
+            return new OpenSearchParameter(OpenSearchParameter.types.TEMPLATE, name, value, required, replaceable, ns);
         };
 
+        /**
+         * Internal. Applications should call this method.
+         * Creates an OpenSearchParameter from OpenSearch Parameter node.
+         * @param {Node} node An OpenSearch Parameter node.
+         * @return {OpenSearchParameter}
+         */
         OpenSearchParameter.fromNode = function (node) {
             var name = node.getAttribute('name');
             var queryValue = node.getAttribute('value') || '';
@@ -120,10 +160,33 @@ define([
                     });
                 }
             }
-            return new OpenSearchParameter('node', name, value, required, replaceable, ns, minimum, maximum, pattern, title,
-                minExclusive, maxExclusive, minInclusive, maxInclusive, step, options);
+            return new OpenSearchParameter(
+                OpenSearchParameter.types.NODE,
+                name,
+                value,
+                required,
+                replaceable,
+                ns,
+                minimum,
+                maximum,
+                pattern,
+                title,
+                minExclusive,
+                maxExclusive,
+                minInclusive,
+                maxInclusive,
+                step,
+                options
+            );
         };
 
+        /**
+         * Internal. Applications should call this method.
+         * Merges this param with the supplied param and return a new OpenSearchParameter.
+         * This is done for params that appear in the template and the Parameter node.
+         * @param {OpenSearchParameter} param
+         * @return {OpenSearchParameter}
+         */
         OpenSearchParameter.prototype.merge = function (param) {
             /* In case of inconsistency between the Parameter extension annotations and the <Url>
              * template in the OSDD, the <Url> template prevails.
@@ -135,7 +198,7 @@ define([
             var required = param.required;
             var replaceable = param.replaceable;
             var ns = param.ns;
-            if (this.type === 'template') {
+            if (this._internalType === OpenSearchParameter.types.TEMPLATE) {
                 name = this.name;
                 value = this.value;
                 required = this.required;
@@ -151,7 +214,7 @@ define([
             }
 
             return new OpenSearchParameter(
-                'mix',
+                OpenSearchParameter.types.MIX,
                 name,
                 value,
                 required,
@@ -168,6 +231,16 @@ define([
                 this.step || param.step,
                 options
             );
+        };
+
+        /**
+         * OpenSearchParameter internal constants.
+         * Indicates from where the param was generated.
+         */
+        OpenSearchParameter.types = {
+            TEMPLATE: 'TEMPLATE',
+            NODE: 'NODE',
+            MIX: 'MIX'
         };
 
         return OpenSearchParameter;
