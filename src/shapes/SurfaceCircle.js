@@ -7,22 +7,28 @@
  * @version $Id: SurfaceCircle.js 3014 2015-04-14 01:06:17Z danm $
  */
 define([
+        '../geom/Angle',
         '../error/ArgumentError',
+        '../geom/Location',
         '../util/Logger',
         '../shapes/ShapeAttributes',
-        '../shapes/SurfaceEllipse'
+        '../shapes/SurfaceEllipse',
+        '../util/WWMath'
     ],
-    function (ArgumentError,
+    function (Angle,
+              ArgumentError,
+              Location,
               Logger,
               ShapeAttributes,
-              SurfaceEllipse) {
+              SurfaceShape,
+              WWMath) {
         "use strict";
 
         /**
          * Constructs a surface circle with a specified center and radius and an optional attributes bundle.
          * @alias SurfaceCircle
          * @constructor
-         * @augments SurfaceEllipse
+         * @augments SurfaceShape
          * @classdesc Represents a circle draped over the terrain surface.
          * <p>
          *     SurfaceCircle uses the following attributes from its associated shape attributes bundle:
@@ -53,15 +59,33 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "SurfaceCircle", "constructor", "Radius is negative"));
             }
 
-            SurfaceEllipse.call(this, center, radius, radius, 0, attributes);
+            SurfaceShape.call(this, attributes);
 
             // All these are documented with their property accessors below.
+            this._center = center;
             this._radius = radius;
+            this._intervals = SurfaceCircle.DEFAULT_NUM_INTERVALS;
         };
 
-        SurfaceCircle.prototype = Object.create(SurfaceEllipse.prototype);
+        SurfaceCircle.prototype = Object.create(SurfaceShape.prototype);
 
         Object.defineProperties(SurfaceCircle.prototype, {
+            /**
+             * This shape's center location.
+             * @memberof SurfaceCircle.prototype
+             * @type {Location}
+             */
+            center: {
+                get: function() {
+                    return this._center;
+                },
+                set: function(value) {
+                    this.stateKeyInvalid = true;
+                    this.resetBoundaries();
+                    this._center = value;
+                }
+            },
+
             /**
              * This shape's radius, in meters.
              * @memberof SurfaceCircle.prototype
@@ -75,16 +99,34 @@ define([
                     this.stateKeyInvalid = true;
                     this.resetBoundaries();
                     this._radius = value;
+
                     // Leftovers from SurfaceEllipse inheritance. Should be removed.
-                    this._minorRadius = value;
-                    this._majorRadius = value;
+                    // this._minorRadius = value;
+                    // this._majorRadius = value;
+                }
+            },
+
+            /**
+             * The number of intervals to generate locations for.
+             * @type {Number}
+             * @memberof SurfaceCircle.prototype
+             * @default SurfaceCircle.DEFAULT_NUM_INTERVALS
+             */
+            intervals: {
+                get: function() {
+                    return this._intervals;
+                },
+                set: function(value) {
+                    this.stateKeyInvalid = true;
+                    this.resetBoundaries();
+                    this._intervals = value;
                 }
             }
         });
 
         // Internal use only. Intentionally not documented.
         SurfaceCircle.staticStateKey = function(shape) {
-            var shapeStateKey = SurfaceEllipse.staticStateKey(shape);
+            var shapeStateKey = SurfaceCircle.staticStateKey(shape);
 
             return shapeStateKey +
                     " ra " + shape.radius.toString();
@@ -94,6 +136,42 @@ define([
         SurfaceCircle.prototype.computeStateKey = function() {
             return SurfaceCircle.staticStateKey(this);
         };
+
+        // Internal. Intentionally not documented.
+        SurfaceCircle.prototype.computeBoundaries = function(dc) {
+            if (this.radius === 0) {
+                return null;
+            }
+
+            var globe = dc.globe,
+                numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
+                da = (2 * Math.PI) / (numLocations - 1),
+                globeRadius = globe.radiusAt(this.center.latitude, this.center.longitude);
+
+            this._boundaries = new Array(numLocations);
+
+            for (var i = 0; i < numLocations; i++) {
+                var angle = (i != numLocations - 1) ? i * da : 0,
+                    xLength = this.radius * Math.cos(angle),
+                    yLength = this.radius * Math.sin(angle),
+                    distance = Math.sqrt(xLength * xLength + yLength * yLength);
+
+                this._boundaries[i] = Location.greatCircleLocation(this.center, azimuth * Angle.RADIANS_TO_DEGREES,
+                    distance / globeRadius, new Location(0, 0));
+            }
+        };
+
+        /**
+         * The minimum number of intervals the circle generates.
+         * @type {Number}
+         */
+        SurfaceCircle.MIN_NUM_INTERVALS = 8;
+
+        /**
+         * The default number of intervals the circle generates.
+         * @type {Number}
+         */
+        SurfaceCircle.DEFAULT_NUM_INTERVALS = 64;
 
         return SurfaceCircle;
     });
