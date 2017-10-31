@@ -26,7 +26,8 @@ requirejs(['../src/WorldWind',
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
+            {layer: new WorldWind.FrameStatisticsLayer(wwd), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -119,7 +120,7 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(bigRectangle);
 
         // Create another surface ellipse near the pole to test its changing polar throttling
-        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(85, -110), 300e3, 200e3, 45, attributes);
+        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(89, -110), 300e3, 200e3, 45, attributes);
         polarEllipse.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polarEllipse);
 
@@ -128,8 +129,6 @@ requirejs(['../src/WorldWind',
 
         // Create a highlight controller for highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
-
-        console.log(polarEllipse.polarThrottle);
 
         // Update SurfaceShapes according to a timer
         window.setInterval(function() {
@@ -156,7 +155,8 @@ requirejs(['../src/WorldWind',
             // Great circle, rhumb line (looks straight in Mercator), and linear (looks straight in equirectangular).
             bigPolyline.pathType = cycleThroughPathTypes(bigPolyline);
 
-            polarEllipse.polarThrottle === 10 ? polarEllipse.polarThrottle = 2 : polarEllipse.polarThrottle = 10;
+            polarEllipse.polarThrottle === 10 ? polarEllipse.polarThrottle = 0 : polarEllipse.polarThrottle = 10;
+            console.log(polarEllipse.polarThrottle);
 
             wwd.redraw();
         }, 1000);
