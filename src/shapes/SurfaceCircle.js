@@ -143,21 +143,15 @@ define([
                 return null;
             }
 
-            var globe = dc.globe,
-                numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
-                da = (2 * Math.PI) / (numLocations - 1),
-                globeRadius = globe.radiusAt(this.center.latitude, this.center.longitude);
+            var numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
+                da = 360 / (numLocations - 1),
+                radiusRadians = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude);
 
             this._boundaries = new Array(numLocations);
 
             for (var i = 0; i < numLocations; i++) {
-                var angle = (i != numLocations - 1) ? i * da : 0,
-                    xLength = this.radius * Math.cos(angle),
-                    yLength = this.radius * Math.sin(angle),
-                    distance = Math.sqrt(xLength * xLength + yLength * yLength);
-
-                this._boundaries[i] = Location.greatCircleLocation(this.center, azimuth * Angle.RADIANS_TO_DEGREES,
-                    distance / globeRadius, new Location(0, 0));
+                var azimuthDegrees = (i != numLocations - 1) ? (i * da) : 0;
+                this._boundaries[i] = Location.greatCircleLocation(this.center, azimuthDegrees, radiusRadians, new Location(0, 0));
             }
         };
 
