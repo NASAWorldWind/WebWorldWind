@@ -15,7 +15,7 @@ requirejs([
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // Standard World Wind layers
+        // Standard WorldWind layers
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
@@ -51,7 +51,7 @@ requirejs([
             // Create the WMTS Layer from the configuration object
             var wmtsLayer = new WorldWind.WmtsLayer(wmtsConfig);
 
-            // Add the layers to World Wind and update the layer manager
+            // Add the layers to WorldWind and update the layer manager
             wwd.addLayer(wmtsLayer);
             layerManger.synchronizeLayerList();
         }

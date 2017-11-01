@@ -77,9 +77,9 @@ define([
                             Logger.logMessage(Logger.LEVEL_SEVERE, "SurfacePolyline", "set boundaries",
                                 "The specified value is not an array."));
                     }
+                    this.resetBoundaries();
                     this._boundaries = boundaries;
                     this._stateId = SurfacePolyline.stateId++;
-                    this.isPrepared = false;
                     this.stateKeyInvalid = true;
                 }
             }
@@ -99,6 +99,10 @@ define([
         // Internal use only. Intentionally not documented.
         SurfacePolyline.prototype.computeStateKey = function() {
             return SurfacePolyline.staticStateKey(this);
+        };
+
+        // Internal. Polyline doesn't generate its own boundaries. See SurfaceShape.prototype.computeBoundaries.
+        SurfacePolyline.prototype.computeBoundaries = function(dc) {
         };
 
         return SurfacePolyline;

@@ -19,7 +19,7 @@ define([
          * @alias CompassLayer
          * @constructor
          * @augments RenderableLayer
-         * @classdesc Displays a compass. Compass layers cannot be shared among World Windows. Each World Window if it
+         * @classdesc Displays a compass. Compass layers cannot be shared among WorldWindows. Each WorldWindow if it
          * is to have a compass layer must have its own. See the MultiWindow example for guidance.
          */
         var CompassLayer = function () {

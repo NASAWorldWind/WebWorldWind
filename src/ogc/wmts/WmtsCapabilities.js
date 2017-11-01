@@ -247,10 +247,10 @@ define([
          */
         WmtsCapabilities.sortTileMatrices = function (tileMatrixSet) {
             // This operation is not required by the WMTS specification. The WMTS specification assumes Tile Matrix
-            // selection based on a scale denominator value. Web World Wind currently matches the tile's Level to the
+            // selection based on a scale denominator value. Web WorldWind currently matches the tile's Level to the
             // corresponding Tile Matrix index in the Tile Matrix Set. If the Tile Matrices are not ordered in a
             // typical pyramid fashion, this could result in undefined behavior. Sorting the matrices by the scale
-            // denominator should ensure the World Wind Level will match the Tile Matrix index. This operation will not
+            // denominator should ensure the WorldWind Level will match the Tile Matrix index. This operation will not
             // be required once a system which matches the scale denominator is implemented.
             tileMatrixSet.tileMatrix.sort(function (a, b) {
                 return b.scaleDenominator - a.scaleDenominator;

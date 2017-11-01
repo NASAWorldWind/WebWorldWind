@@ -143,7 +143,7 @@ define(function () {
             missingVector: "The specified vector is null or undefined.",
             missingVertex: "The specified vertex is null or undefined.",
             missingViewport: "The specified viewport is null or undefined.",
-            missingWorldWindow: "The specified World Window is null or undefined.",
+            missingWorldWindow: "The specified WorldWindow is null or undefined.",
             notYetImplemented: "This function is not yet implemented"
         }
     };

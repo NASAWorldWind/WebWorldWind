@@ -22,10 +22,10 @@ define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
               TourManager,
               CommandsPanel)  {
         "use strict";
-        // Tell World Wind to log only warnings.
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -373,7 +373,7 @@ define(['http://worldwindserver.net/webworldwind/worldwind.min.js',
             var layerManger = new LayerManager(wwd);
         });
 
-        // Draw the World Window for the first time.
+        // Draw the WorldWindow for the first time.
         wwd.redraw();
 
         // Create a coordinate controller to update the coordinate overlay elements.

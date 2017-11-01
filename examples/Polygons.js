@@ -14,10 +14,10 @@ requirejs(['../src/WorldWind',
               LayerManager) {
         "use strict";
 
-        // Tell World Wind to log only warnings and errors.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -74,7 +74,7 @@ requirejs(['../src/WorldWind',
         highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.5);
         polygon.highlightAttributes = highlightAttributes;
 
-        // Add the polygon to the layer and the layer to the World Window's layer list.
+        // Add the polygon to the layer and the layer to the WorldWindow's layer list.
         polygonsLayer.addRenderable(polygon);
 
         // Create a textured polygon with extruded and textured sides.

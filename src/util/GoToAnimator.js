@@ -23,8 +23,8 @@ define([
          * @alias GoToAnimator
          * @constructor
          * @classdesc Incrementally and smoothly moves a {@link Navigator} to a specified position.
-         * @param {WorldWindow} worldWindow The World Window in which to perform the animation.
-         * @throws {ArgumentError} If the specified World Window is null or undefined.
+         * @param {WorldWindow} worldWindow The WorldWindow in which to perform the animation.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         var GoToAnimator = function (worldWindow) {
             if (!worldWindow) {
@@ -33,7 +33,7 @@ define([
             }
 
             /**
-             * The World Window associated with this animator.
+             * The WorldWindow associated with this animator.
              * @type {WorldWindow}
              * @readonly
              */
