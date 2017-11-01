@@ -23,7 +23,9 @@ requirejs(['../src/WorldWind',
          * Add imagery layers.
          */
         var layers = [
+            {layer: new WorldWind.BMNGOneImageLayer(), enabled: true},
             {layer: new WorldWind.BMNGLayer(), enabled: true},
+            {layer: new WorldWind.ShowTessellationLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
@@ -120,7 +122,7 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(bigRectangle);
 
         // Create another surface ellipse near the pole to test its changing polar throttling
-        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(89, -110), 300e3, 200e3, 45, attributes);
+        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(90, -110), 1e5, 9e5, 90, attributes);
         polarEllipse.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polarEllipse);
 
