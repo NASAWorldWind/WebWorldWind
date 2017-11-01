@@ -256,7 +256,7 @@ define([
 
         /**
          * Draws this shape during ordered rendering. Implements the {@link OrderedRenderable} interface.
-         * This method is called by the World Window and is not intended to be called by applications.
+         * This method is called by the WorldWindow and is not intended to be called by applications.
          * @param {DrawContext} dc The current draw context.
          */
         AbstractShape.prototype.renderOrdered = function (dc) {

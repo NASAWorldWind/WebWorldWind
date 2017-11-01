@@ -9,17 +9,17 @@
  */
 
 requirejs(['../src/WorldWind',
-        './LayerManager',
-        './CoordinateController'],
+        '../examples/LayerManager',
+        '../examples/CoordinateController'],
     function (ww,
               LayerManager,
               CoordinateController) {
         "use strict";
 
-        // Tell World Wind to log only warnings.
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create the World Window.
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         /**
@@ -195,7 +195,7 @@ requirejs(['../src/WorldWind',
         var surfacePolylineSpanTheGlobe = new WorldWind.SurfacePolyline(shapePolyline, new WorldWind.ShapeAttributes(shapeAttributes));
         shapesLayer.addRenderable(surfacePolylineSpanTheGlobe);
 
-        // Add the shapes layer to the World Window's layer list.
+        // Add the shapes layer to the WorldWindow's layer list.
         wwd.addLayer(shapesLayer);
 
         // Add a polygon for China.
@@ -219,7 +219,7 @@ requirejs(['../src/WorldWind',
         perfTestSponge(shapesPolygonPerfLayer);
         wwd.addLayer(shapesPolygonPerfLayer);
 
-        // Draw the World Window for the first time.
+        // Draw the WorldWindow for the first time.
         wwd.redraw();
 
         // Create a layer manager for controlling layer visibility.
@@ -321,8 +321,7 @@ requirejs(['../src/WorldWind',
         }
 
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-        var tapRecognizer = new WorldWind.TapRecognizer(wwd);
-        tapRecognizer.addGestureListener(handlePick);
+        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     },
 
     perfTestBullseyes = function(layer) {

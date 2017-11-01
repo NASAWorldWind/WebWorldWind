@@ -186,7 +186,7 @@ define(['OpenStreetMapApp',
 					this.backDrop.addEventListener( 'touchstart', function(ev) { ev.preventDefault(); ev.stopPropagation(); form.closeAllFields(); } );
 				},
 				/*
-				 * Start the World Wind window in the background so that it can load the tiles.
+				 * Start the WorldWind window in the background so that it can load the tiles.
 				 * This function loops through all inputs in the form. If the input has an ID, the it passes
 				 * the value of that input into an array which is then passed to the application.
 				 */
@@ -425,7 +425,7 @@ define(['OpenStreetMapApp',
 						this.form._openNextField();
 					}
 
-					//Runs world wind if all fields are filled.
+					//Runs WorldWind if all fields are filled.
 					this.form.runWorldWindIfAllEntriesFilled();
 				}
 			};

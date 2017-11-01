@@ -37,7 +37,7 @@ define([
          * @alias ScreenImage
          * @constructor
          * @augments Renderable
-         * @classdesc Displays an image at a specified screen location in the World Window.
+         * @classdesc Displays an image at a specified screen location in the WorldWindow.
          * The image location is specified by an offset, which causes the image to maintain its relative position
          * when the window size changes.
          * @param {Offset} screenOffset The offset indicating the image's placement on the screen.
@@ -309,8 +309,7 @@ define([
             program.loadModulateColor(gl, dc.pickingMode);
 
             // Turn off depth testing.
-            // tag, 6/17/15: It's not clear why this call was here. It was carried over from WWJ.
-            //gl.disable(WebGLRenderingContext.DEPTH_TEST);
+            gl.disable(gl.DEPTH_TEST);
         };
 
         // Internal. Intentionally not documented.

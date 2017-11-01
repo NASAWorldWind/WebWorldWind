@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * Illustrates the use of multiple World Windows on the same page.
+ * Illustrates the use of multiple WorldWindows on the same page.
  *
  * @version $Id: MultiWindow.js 3314 2015-07-10 18:28:45Z dcollins $
  */
@@ -13,7 +13,7 @@ requirejs(['../src/WorldWind'], function () {
 
     WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-    // Make a layer that shows a Path and is shared among the World Windows.
+    // Make a layer that shows a Path and is shared among the WorldWindows.
     var makePathLayer = function () {
         var pathAttributes = new WorldWind.ShapeAttributes(null);
         pathAttributes.interiorColor = WorldWind.Color.CYAN;
@@ -42,7 +42,7 @@ requirejs(['../src/WorldWind'], function () {
     var wwd1 = new WorldWind.WorldWindow("canvasOne");
     wwd1.addLayer(imageryLayer);
     wwd1.addLayer(pathLayer);
-    // Add a compass layer, view controls layer, and coordinates display layer. Each world window must have its own.
+    // Add a compass layer, view controls layer, and coordinates display layer. Each WorldWindow must have its own.
     wwd1.addLayer(new WorldWind.CompassLayer());
     wwd1.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd1));
     wwd1.addLayer(new WorldWind.ViewControlsLayer(wwd1));

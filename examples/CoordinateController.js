@@ -14,12 +14,12 @@ define(function () {
      * @alias CoordinateController
      * @constructor
      * @classdesc Provides a coordinate controller to interactively update DOM elements indicating the eye position
-     * and terrain position associated with a World Window.
-     * @param {WorldWindow} worldWindow The World Window to associate this coordinate controller with.
+     * and terrain position associated with a WorldWindow.
+     * @param {WorldWindow} worldWindow The WorldWindow to associate this coordinate controller with.
      */
     var CoordinateController = function (worldWindow) {
         /**
-         * The World Window associated with this coordinate controller.
+         * The WorldWindow associated with this coordinate controller.
          * @type {WorldWindow}
          */
         this.worldWindow = worldWindow;
@@ -31,7 +31,7 @@ define(function () {
         this.isTouchDevice = false;
         this.scratchPos = new WorldWind.Position();
 
-        // Setup to update the coordinate elements each time the World Window is repainted.
+        // Setup to update the coordinate elements each time the WorldWindow is repainted.
         var self = this;
         worldWindow.redrawCallbacks.push(function (wwd, stage) {
             if (stage == WorldWind.AFTER_REDRAW) {
@@ -39,7 +39,7 @@ define(function () {
             }
         });
 
-        // Setup to track the cursor position relative to the World Window's canvas. Listen to touch events in order
+        // Setup to track the cursor position relative to the WorldWindow's canvas. Listen to touch events in order
         // to recognize and ignore simulated mouse events in mobile browsers.
         window.addEventListener("mousemove", function (event) {
             self.handleMouseEvent(event);
@@ -73,7 +73,7 @@ define(function () {
             return;
         }
 
-        // Compute the World Window's current eye position.
+        // Compute the WorldWindow's current eye position.
         var wwd = this.worldWindow,
             navigatorState = wwd.navigator.currentState(),
             eyePoint = navigatorState.eyePoint,
@@ -94,7 +94,7 @@ define(function () {
         }
 
         // Pick the terrain at the mouse point when we've received at least one mouse event. Otherwise assume that we're
-        // on a touch device and pick at the center of the World Window's canvas.
+        // on a touch device and pick at the center of the WorldWindow's canvas.
         var wwd = this.worldWindow,
             mousePoint = this.mousePoint,
             centerPoint = new WorldWind.Vec2(wwd.canvas.clientWidth / 2, wwd.canvas.clientHeight / 2),

@@ -34,16 +34,16 @@ define([
          * @constructor
          * @augments {WorldWindow}
          * @classdesc Displays and manages view controls.
-         * @param {WorldWindow} worldWindow The World Window associated with this layer.
-         * This layer may not be associated with more than one World Window. Each World Window must have it's own
+         * @param {WorldWindow} worldWindow The WorldWindow associated with this layer.
+         * This layer may not be associated with more than one WorldWindow. Each WorldWindow must have it's own
          * instance of this layer if each window is to have view controls.
          *
          * <p>
-         *     Placement of the controls within the world window is defined by the
+         *     Placement of the controls within the WorldWindow is defined by the
          *     [placement]{@link ViewControlsLayer#placement} and [alignment]{@link ViewControlsLayer#alignment}
          *     properties. The default values of these properties place the view controls at the lower left corner
-         *     of the world window. The placement property specifies the overall position of the controls within the
-         *     world window. The alignment property specifies the alignment of the controls collection relative to
+         *     of the WorldWindow. The placement property specifies the overall position of the controls within the
+         *     WorldWindow. The alignment property specifies the alignment of the controls collection relative to
          *     the placement position. Some common combinations are:
          *     <table>
          *         <tr>
@@ -78,7 +78,7 @@ define([
          *         </tr>
          *     </table>
          * </p>
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @throws {ArgumentError} If the specified WorldWindow is null or undefined.
          */
         var ViewControlsLayer = function (worldWindow) {
             if (!worldWindow) {
@@ -89,7 +89,7 @@ define([
             Layer.call(this, "View Controls");
 
             /**
-             * The World Window associated with this layer.
+             * The WorldWindow associated with this layer.
              * @type {WorldWindow}
              * @readonly
              */

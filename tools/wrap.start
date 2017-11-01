@@ -1,5 +1,8 @@
 (function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
+    if (typeof exports === "object") {
+        // CommonJS-like
+        module.exports = factory();
+    } else if (typeof define === 'function' && define.amd) {
         // AMD.
         define([], factory);
     } else {
@@ -7,5 +10,4 @@
         root.WorldWind = factory();
     }
 }(this, function () {
-
 
