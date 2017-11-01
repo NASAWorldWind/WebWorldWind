@@ -10,14 +10,12 @@ define([
         '../error/ArgumentError',
         '../util/Logger',
         '../pick/PickedObject',
-        '../render/SurfaceTile',
-        '../util/ResamplingMode'
+        '../render/SurfaceTile'
     ],
     function (ArgumentError,
               Logger,
               PickedObject,
-              SurfaceTile,
-              ResamplingMode) {
+              SurfaceTile) {
         "use strict";
 
         /**
@@ -59,11 +57,15 @@ define([
             this._imageSource = imageSource;
 
             /**
-             * This surface image's resampling mode. When this surface image needs to be magnified for rendering the
-             * this resampling mode will be applied.
-             * @type {ResamplingMode}
+             * This surface image's resampling mode. Indicates the sampling algorithm used to display this image when it
+             * is larger on screen than its native resolution. May be one of:
+             * <ul>
+             *  <li>[WorldWind.FILTER_LINEAR]{@link WorldWind#FILTER_LINEAR}</li>
+             *  <li>[WorldWind.FILTER_NEAREST]{@link WorldWind#FILTER_NEAREST}</li>
+             * </ul>
+             * @default WorldWind.FILTER_LINEAR
              */
-            this.resamplingMode = ResamplingMode.LINEAR;
+            this.resamplingMode = WorldWind.FILTER_LINEAR;
 
             /**
              * This surface image's opacity. When this surface image is drawn, the actual opacity is the product of
@@ -110,25 +112,27 @@ define([
         });
 
         SurfaceImage.prototype.bind = function (dc) {
-            var gl = dc.currentGlContext;
             var texture = dc.gpuResourceCache.resourceForKey(this._imageSource);
             if (texture && !this.imageSourceWasUpdated) {
-                texture.setTexParameter(
-                    gl.TEXTURE_MAG_FILTER,
-                    this.resamplingMode === ResamplingMode.NEAREST ? gl.NEAREST : gl.LINEAR
-                );
-                return texture.bind(dc);
+                return this.bindTexture(dc, texture);
             } else {
-                texture = dc.gpuResourceCache.retrieveTexture(gl, this._imageSource);
+                texture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this._imageSource);
                 this.imageSourceWasUpdated = false;
                 if (texture) {
-                    texture.setTexParameter(
-                        gl.TEXTURE_MAG_FILTER,
-                        this.resamplingMode === ResamplingMode.NEAREST ? gl.NEAREST : gl.LINEAR
-                    );
-                    return texture.bind(dc);
+                    return this.bindTexture(dc, texture);
                 }
             }
+        };
+
+        SurfaceImage.prototype.bindTexture = function (dc, texture) {
+            var gl = dc.currentGlContext;
+
+            texture.setTexParameter(
+                gl.TEXTURE_MAG_FILTER,
+                this.resamplingMode === WorldWind.FILTER_NEAREST ? gl.NEAREST : gl.LINEAR
+            );
+
+            return texture.bind(dc);
         };
 
         SurfaceImage.prototype.applyInternalTransform = function (dc, matrix) {

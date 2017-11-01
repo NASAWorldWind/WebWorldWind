@@ -23,7 +23,7 @@ define([
          * @classdesc Represents a WebGL texture. Applications typically do not interact with this class.
          * @param {WebGLRenderingContext} gl The current WebGL rendering context.
          * @param {Image} image The texture's image.
-         * @param {GL.enum} wrapMode Optional. Specifies the wrap mode of the texture. Defaults to gl.CLAMP_TO_EDGE
+         * @param {GLenum} wrapMode Optional. Specifies the wrap mode of the texture. Defaults to gl.CLAMP_TO_EDGE
          * @throws {ArgumentError} If the specified WebGL context or image is null or undefined.
          */
         var Texture = function (gl, image, wrapMode) {
@@ -90,19 +90,36 @@ define([
              */
             this.creationTime = new Date();
 
-            this._texParameters = {};
-        };
-        
-        Texture.prototype.setTexParameter = function (name, value) {
-            this._texParameters[name] = value;
-        };
-        
-        Texture.prototype.getTexParameter = function (name) {
-            return this._texParameters[name];
+            // Internal use only. Intentionally not documented.
+            this.texParameters = {};
         };
 
+        /**
+         * Sets a texture parameter to apply when binding this texture.
+         *
+         * Currently only gl.TEXTURE_MAG_FILTER has an effect.
+         *
+         * @param {Glenum} name The name of the parameter
+         * @param {GLint} value The value for this parameter
+         */
+        Texture.prototype.setTexParameter = function (name, value) {
+            this.texParameters[name] = value;
+        };
+
+        /**
+         * Returns the value of a texture parameter to be assigned to this texture.
+         * @param {Glenum} name The name of the parameter
+         * @returns {GLint} The value for this parameter
+         */
+        Texture.prototype.getTexParameter = function (name) {
+            return this.texParameters[name];
+        };
+
+        /**
+         * Clears the list of texture parameters to apply when binding this texture.
+         */
         Texture.prototype.clearTexParameters = function () {
-            this._texParameters = {};
+            this.texParameters = {};
         };
 
         /**
@@ -122,12 +139,23 @@ define([
             var gl = dc.currentGlContext;
 
             gl.bindTexture(gl.TEXTURE_2D, this.textureId);
- 
-            var textureMagFilter = this._texParameters[gl.TEXTURE_MAG_FILTER] || gl.LINEAR;
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureMagFilter);
- 
+
+            this.applyTexParameters(dc);
+
             dc.frameStatistics.incrementTextureLoadCount(1);
             return true;
+        };
+
+        /**
+         * Applies the configured texture parameters to the OpenGL context.
+         * @param {DrawContext} dc The current draw context.
+         */
+        Texture.prototype.applyTexParameters = function (dc) {
+            var gl = dc.currentGlContext;
+
+            // Configure the OpenGL texture magnification function. Use linear by default.
+            var textureMagFilter = this.texParameters[gl.TEXTURE_MAG_FILTER] || gl.LINEAR;
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureMagFilter);
         };
 
         /**

@@ -64,7 +64,7 @@ requirejs(['../src/WorldWind',
 
         var surfaceImage3 = new WorldWind.SurfaceImage(new WorldWind.Sector(50, 60, -80, -60),
                                                        "data/surface-image-nearest.png");
-        surfaceImage3.resamplingMode = WorldWind.ResamplingMode.NEAREST; // or LINEAR by default
+        surfaceImage3.resamplingMode = WorldWind.FILTER_NEAREST; // or FILTER_LINEAR by default
 
         // Add the surface images to a layer and the layer to the WorldWindow's layer list.
         var surfaceImageLayer = new WorldWind.RenderableLayer();
