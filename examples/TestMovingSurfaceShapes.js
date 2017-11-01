@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * Illustrates how to move SurfaceShapes while updating their state.
+ * Tests changing the state of SurfaceShape types with a timer.
  *
  */
 
@@ -108,8 +108,7 @@ requirejs(['../src/WorldWind',
         polyline.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polyline);
 
-        // Create another SurfacePolyline that crosses a big portion of the western hemisphere
-        // this one will have its pathTypes changed
+        // Create another SurfacePolyline that crosses a big portion of the western hemisphere.
         var bigPolylineBoundary = [];
         bigPolylineBoundary.push(new WorldWind.Location(-45, -135));
         bigPolylineBoundary.push(new WorldWind.Location(45, -32));
@@ -122,7 +121,7 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(bigRectangle);
 
         // Create another surface ellipse near the pole to test its changing polar throttling
-        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(90, -110), 1e5, 9e5, 90, attributes);
+        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(90, -110), 1e5, 5e6, 90, attributes);
         polarEllipse.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polarEllipse);
 
@@ -147,16 +146,21 @@ requirejs(['../src/WorldWind',
             polygon.boundaries = shiftBoundaries(polygon);
             polyline.boundaries = shiftBoundaries(polyline);
 
-            // Cycle through different sectors
+            // Cycle through sectors in different locations
             surfaceSector.sector = changeSector(surfaceSector);
 
-            // Flip number of edges for the bigger rectangle between 4 and 128
+            // Flip number of edges for the bigger rectangle.
+            // A rougher, lower edge count ban be seen in the lowest setting.
+            // See: SurfaceShape.DEFAULT_NUM_EDGE_INTERVALS
             bigRectangle.maximumNumEdgeIntervals = flipNumberOfEdgeIntervals(bigRectangle);
 
             // Cycle through the three different path types for the larger polyline:
             // Great circle, rhumb line (looks straight in Mercator), and linear (looks straight in equirectangular).
             bigPolyline.pathType = cycleThroughPathTypes(bigPolyline);
 
+            // Switch back and forth the polar throttling boundary rendering for the ellipse in the North Pole.
+            // Straight edges can be seen in equirectangular projection, that look like 'bumps' when reprojected in
+            // the 3D globe.
             polarEllipse.polarThrottle === 10 ? polarEllipse.polarThrottle = 0 : polarEllipse.polarThrottle = 10;
             console.log(polarEllipse.polarThrottle);
 
@@ -177,7 +181,7 @@ requirejs(['../src/WorldWind',
 
         function flipNumberOfEdgeIntervals(shape){
             if (shape.maximumNumEdgeIntervals === 128){ // 128 is the default number of edges
-                return 4;
+                return 4; // Reduce the number of edges
             } else {
                 return 128;
             }
