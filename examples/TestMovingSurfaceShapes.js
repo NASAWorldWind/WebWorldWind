@@ -167,18 +167,6 @@ requirejs(['../src/WorldWind',
             wwd.redraw();
         }, 1000);
 
-        function changePolarThrottling(shape){
-            switch(shape.polarThrottle) {
-                case (shape.polarThrottle <= 10 && shape.polarThrottle > 2): // Default edge interpolation polar throttling
-                    return shape.polarThrottle -= 2;
-                    break;
-                case 2:
-                    return shape.polarThrottle
-                default:
-                    console.log("Error. This should never appear");
-            }
-        }
-
         function flipNumberOfEdgeIntervals(shape){
             if (shape.maximumNumEdgeIntervals === 128){ // 128 is the default number of edges
                 return 4; // Reduce the number of edges
