@@ -159,10 +159,9 @@ requirejs(['../src/WorldWind',
             bigPolyline.pathType = cycleThroughPathTypes(bigPolyline);
 
             // Switch back and forth the polar throttling boundary rendering for the ellipse in the North Pole.
-            // Straight edges can be seen in equirectangular projection, that look like 'bumps' when reprojected in
-            // the 3D globe.
+            // Straight edges can be seen in equirectangular projection, that look like 'bumps' in the SurfaceEllipse
+            // boundary near the pole when reprojected in the 3D globe.
             polarEllipse.polarThrottle === 10 ? polarEllipse.polarThrottle = 0 : polarEllipse.polarThrottle = 10;
-            console.log(polarEllipse.polarThrottle);
 
             wwd.redraw();
         }, 1000);
