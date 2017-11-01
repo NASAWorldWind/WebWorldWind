@@ -33,7 +33,7 @@ define([
          */
         var PlacemarkAttributes = function (attributes) {
             // These are all documented with their property accessors below.
-            this._imageColor = attributes ? attributes._imageColor : new Color(1, 1, 1, 1);
+            this._imageColor = attributes ? attributes._imageColor.clone() : Color.WHITE.clone();
             this._imageOffset = attributes ? attributes._imageOffset
                 : new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
             this._imageScale = attributes ? attributes._imageScale : 1;

@@ -27,7 +27,7 @@ define([
             // These are all documented with their property accessors below.
             this._cornerRadius = attributes ? attributes._cornerRadius : 0;
             this._insets = attributes ? attributes._insets : new Insets(0, 0, 0, 0);
-            this._backgroundColor = attributes ? attributes._backgroundColor : Color.WHITE;
+            this._backgroundColor = attributes ? attributes._backgroundColor.clone() : Color.WHITE.clone();
             this._leaderGapWidth = attributes ? attributes._leaderGapWidth : 40;
             this._leaderGapHeight = attributes ? attributes._leaderGapHeight : 30;
             this._opacity = attributes ? attributes._opacity : 1;
