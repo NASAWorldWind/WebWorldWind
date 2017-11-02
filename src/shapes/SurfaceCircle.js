@@ -143,16 +143,19 @@ define([
                 return null;
             }
 
-            var numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
+            // var numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
+            var numLocations = 9,
                 da = 360 / (numLocations - 1),
-                radiusRadians = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude);
+                tanCircleArc = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude),
+                centerToBoundaryAngle = Math.atan(tanCircleArc); // In radians
 
             this._boundaries = new Array(numLocations);
 
             for (var i = 0; i < numLocations; i++) {
-                var azimuthDegrees = (i != numLocations - 1) ? (i * da) : 0;
-                this._boundaries[i] = Location.greatCircleLocation(this.center, azimuthDegrees, radiusRadians, new Location(0, 0));
-            }
+                var azimuthDegrees = (i !== numLocations - 1) ? (i * da) : 0;
+                console.log(i + " azimuthDegrees: " + azimuthDegrees);
+                this._boundaries[i] = Location.greatCircleLocation(this.center, azimuthDegrees, centerToBoundaryAngle, new Location(0, 0));
+             }
         };
 
         /**
