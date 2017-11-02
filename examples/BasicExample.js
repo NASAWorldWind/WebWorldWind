@@ -6,7 +6,7 @@
  * @version $Id: BasicExample.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim.js',
         './LayerManager'],
     function (ww,
               LayerManager) {
