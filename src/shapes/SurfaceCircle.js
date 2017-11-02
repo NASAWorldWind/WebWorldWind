@@ -140,7 +140,7 @@ define([
 
             var numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
                 da = 360 / (numLocations - 1),
-                tanInnerEarthAngle = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude);
+                arc = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude);
 
             this._boundaries = new Array(numLocations);
 
@@ -148,8 +148,8 @@ define([
                 var azimuth = (i !== numLocations - 1) ? (i * da) : 0;
                 this._boundaries[i] = Location.greatCircleLocation(
                                       this.center,
-                                      azimuth,                       // In degrees
-                                      Math.atan(tanInnerEarthAngle), // In radians
+                                      azimuth,   // In degrees
+                                      arc,       // In radians
                                       new Location(0, 0)
                 );
             }
