@@ -12,16 +12,14 @@ define([
         '../geom/Location',
         '../util/Logger',
         '../shapes/ShapeAttributes',
-        '../shapes/SurfaceEllipse',
-        '../util/WWMath'
+        '../shapes/SurfaceShape'
     ],
     function (Angle,
               ArgumentError,
               Location,
               Logger,
               ShapeAttributes,
-              SurfaceShape,
-              WWMath) {
+              SurfaceShape) {
         "use strict";
 
         /**
@@ -99,10 +97,6 @@ define([
                     this.stateKeyInvalid = true;
                     this.resetBoundaries();
                     this._radius = value;
-
-                    // Leftovers from SurfaceEllipse inheritance. Should be removed.
-                    // this._minorRadius = value;
-                    // this._majorRadius = value;
                 }
             },
 
@@ -126,9 +120,10 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfaceCircle.staticStateKey = function(shape) {
-            var shapeStateKey = SurfaceCircle.staticStateKey(shape);
+            var shapeStateKey = SurfaceShape.staticStateKey(shape);
 
             return shapeStateKey +
+                    " ce " + shape.center.toString() +
                     " ra " + shape.radius.toString();
         };
 
@@ -143,19 +138,21 @@ define([
                 return null;
             }
 
-            // var numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
-            var numLocations = 9,
+            var numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
                 da = 360 / (numLocations - 1),
-                tanCircleArc = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude),
-                centerToBoundaryAngle = Math.atan(tanCircleArc); // In radians
+                tanInnerEarthAngle = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude);
 
             this._boundaries = new Array(numLocations);
 
             for (var i = 0; i < numLocations; i++) {
-                var azimuthDegrees = (i !== numLocations - 1) ? (i * da) : 0;
-                console.log(i + " azimuthDegrees: " + azimuthDegrees);
-                this._boundaries[i] = Location.greatCircleLocation(this.center, azimuthDegrees, centerToBoundaryAngle, new Location(0, 0));
-             }
+                var azimuth = (i !== numLocations - 1) ? (i * da) : 0;
+                this._boundaries[i] = Location.greatCircleLocation(
+                                      this.center,
+                                      azimuth,                       // In degrees
+                                      Math.atan(tanInnerEarthAngle), // In radians
+                                      new Location(0, 0)
+                );
+            }
         };
 
         /**
