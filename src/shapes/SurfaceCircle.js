@@ -6,16 +6,13 @@
  * @exports SurfaceCircle
  * @version $Id: SurfaceCircle.js 3014 2015-04-14 01:06:17Z danm $
  */
-define([
-        '../geom/Angle',
-        '../error/ArgumentError',
+define(['../error/ArgumentError',
         '../geom/Location',
         '../util/Logger',
         '../shapes/ShapeAttributes',
         '../shapes/SurfaceShape'
     ],
-    function (Angle,
-              ArgumentError,
+    function (ArgumentError,
               Location,
               Logger,
               ShapeAttributes,
