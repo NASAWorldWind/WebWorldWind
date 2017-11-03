@@ -71,10 +71,35 @@ module.exports = function (grunt) {
                     {src: ['images/**']}
                 ]
             }
+        },
+
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'examples',
+                        src: ['**'],
+                        dest: 'examplesToPublish/'
+                    },
+                    {
+                        expand: true,
+                        src: ['worldwind.min.js', 'images/**'],
+                        dest: 'examplesToPublish/'
+                    },
+                    {
+                        expand: true,
+                        cwd: 'tools',
+                        src: ['WorldWindShim.js'],
+                        dest: 'examplesToPublish/'
+                    }
+                ]
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
