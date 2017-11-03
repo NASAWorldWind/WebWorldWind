@@ -64,15 +64,6 @@ define([
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMode);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapMode);
 
-            // Setup 4x anisotropic texture filtering when this feature is available.
-            // https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotropic
-            var ext = (
-            gl.getExtension("EXT_texture_filter_anisotropic") ||
-            gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic"));
-            if (ext) {
-                gl.texParameteri(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 4);
-            }
-
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
             gl.texImage2D(gl.TEXTURE_2D, 0,
                 gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
@@ -156,6 +147,20 @@ define([
             // Configure the OpenGL texture magnification function. Use linear by default.
             var textureMagFilter = this.texParameters[gl.TEXTURE_MAG_FILTER] || gl.LINEAR;
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureMagFilter);
+
+            // Try to enable the anisotropic texture filtering only if we have a linear magnification filter.
+            // This can't be enabled all the time because Windows seems to ignore the TEXTURE_MAG_FILTER parameter when
+            // this extension is enabled.
+            if (textureMagFilter === gl.LINEAR) {
+                // Setup 4x anisotropic texture filtering when this feature is available.
+                // https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotrop
+                var ext = (
+                    gl.getExtension("EXT_texture_filter_anisotropic") ||
+                    gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic"));
+                if (ext) {
+                    gl.texParameteri(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+                }
+            }
         };
 
         /**
