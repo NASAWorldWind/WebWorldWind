@@ -1,4 +1,4 @@
-<img src="https://worldwind.arc.nasa.gov/css/images/nasa-logo.svg" height="100"/>
+<img src="https://worldwind.arc.nasa.gov/img/nasa-logo.svg" height="100"/>
 <p>in partnership with the <a href="http://www.esa.int" target="_blank">European Space Agency</a></p>
 
 # Web WorldWind
