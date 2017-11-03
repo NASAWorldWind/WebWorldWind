@@ -485,7 +485,6 @@ define([
             if (!this.currentData) {
                 this.currentData = this.createShapeDataObject();
                 this.resetExpiration(this.currentData);
-                this.currentData.verticalExaggeration = dc.verticalExaggeration;
                 this.shapeDataCache.putEntry(dc.globeStateKey, this.currentData, 1);
             }
 
