@@ -39,7 +39,7 @@ requirejs(['../src/WorldWind',
 
         // Create a surface image using a static image.
         var surfaceImage1 = new WorldWind.SurfaceImage(new WorldWind.Sector(40, 50, -120, -100),
-        "../images/400x230-splash-nww.png");
+        "data/400x230-splash-nww.png");
 
         // Create a surface image using a dynamically created image.
 

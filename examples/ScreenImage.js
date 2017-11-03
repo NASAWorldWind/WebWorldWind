@@ -39,7 +39,7 @@ requirejs(['../src/WorldWind',
 
         // Create a screen image that uses a static image. Place it in the lower-left corner.
         var screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
-        var screenImage1 = new WorldWind.ScreenImage(screenOffset, "../images/400x230-splash-nww.png");
+        var screenImage1 = new WorldWind.ScreenImage(screenOffset, "data/400x230-splash-nww.png");
         screenImage1.imageOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
         screenImage1.imageScale = 0.3;
 
