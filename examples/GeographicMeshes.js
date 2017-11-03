@@ -58,7 +58,7 @@ requirejs(['../src/WorldWind',
         var meshAttributes = new WorldWind.ShapeAttributes(null);
         meshAttributes.outlineColor = WorldWind.Color.BLUE;
         meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
-        meshAttributes.imageSource = "../images/400x230-splash-nww.png";
+        meshAttributes.imageSource = "data/400x230-splash-nww.png";
         meshAttributes.applyLighting = true;
         mesh.attributes = meshAttributes;
 
