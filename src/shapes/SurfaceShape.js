@@ -482,12 +482,14 @@ define([
         // Internal. Intentionally not documented.
         SurfaceShape.prototype.establishCurrentData = function (dc) {
             this.currentData = this.shapeDataCache.entryForKey(dc.globeStateKey);
-            if (!this.currentData || !this.isShapeDataCurrent(dc, this.currentData)) {
+            if (!this.currentData) {
                 this.currentData = this.createShapeDataObject();
                 this.resetExpiration(this.currentData);
                 this.currentData.verticalExaggeration = dc.verticalExaggeration;
                 this.shapeDataCache.putEntry(dc.globeStateKey, this.currentData, 1);
             }
+
+            this.currentData.isExpired = !this.isShapeDataCurrent(dc, this.currentData);
         };
 
         // Internal function. Intentionally not documented.
@@ -499,6 +501,14 @@ define([
             this.layer = dc.currentLayer;
 
             this.prepareBoundaries(dc);
+
+            this.establishCurrentData(dc);
+
+            if (this.currentData.isExpired || !this.currentData.extent) {
+                this.computeExtent(dc);
+                this.currentData.verticalExaggeration = dc.verticalExaggeration;
+                this.resetExpiration(this.currentData);
+            }
 
             // Use the last computed extent to see if this shape is out of view.
             if (this.currentData && this.currentData.extent && !this.intersectsFrustum(dc)) {
@@ -608,9 +618,7 @@ define([
 
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.prepareBoundaries = function (dc) {
-            this.establishCurrentData(dc);
-
-            if (this.currentData.extent && this.boundariesArePrepared) {
+            if (this.boundariesArePrepared) {
                 return;
             }
 
@@ -628,8 +636,6 @@ define([
             this.prepareGeometry(dc, contoursInfo);
 
             this.prepareSectors();
-
-            this.computeExtent(dc);
 
             this.boundariesArePrepared = true;
         };
@@ -716,12 +722,20 @@ define([
                 return null;
             }
 
+            if (!this.currentData) {
+                return null;
+            }
+
+            if (!this.currentData.extent) {
+                this.currentData.extent = new BoundingBox();
+            }
+
+
             var boxPoints;
             // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
             // Return the box which contains that sector.
             if (this._sectors.length === 1) {
                 boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
-                this.currentData.extent = new BoundingBox();
                 this.currentData.extent.setToVec3Points(boxPoints);
             }
             // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
@@ -738,7 +752,6 @@ define([
                         boxCorners.push(corners[j]);
                     }
                 }
-                this.currentData.extent = new BoundingBox();
                 this.currentData.extent.setToVec3Points(boxCorners);
             }
 
