@@ -71,10 +71,10 @@ define(['../error/ArgumentError',
              * @type {Location}
              */
             center: {
-                get: function() {
+                get: function () {
                     return this._center;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this.resetBoundaries();
                     this._center = value;
@@ -87,10 +87,10 @@ define(['../error/ArgumentError',
              * @type {Number}
              */
             radius: {
-                get: function() {
+                get: function () {
                     return this._radius;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this.resetBoundaries();
                     this._radius = value;
@@ -104,10 +104,10 @@ define(['../error/ArgumentError',
              * @default SurfaceCircle.DEFAULT_NUM_INTERVALS
              */
             intervals: {
-                get: function() {
+                get: function () {
                     return this._intervals;
                 },
-                set: function(value) {
+                set: function (value) {
                     this.stateKeyInvalid = true;
                     this.resetBoundaries();
                     this._intervals = value;
@@ -116,21 +116,21 @@ define(['../error/ArgumentError',
         });
 
         // Internal use only. Intentionally not documented.
-        SurfaceCircle.staticStateKey = function(shape) {
+        SurfaceCircle.staticStateKey = function (shape) {
             var shapeStateKey = SurfaceShape.staticStateKey(shape);
 
             return shapeStateKey +
-                    " ce " + shape.center.toString() +
-                    " ra " + shape.radius.toString();
+                " ce " + shape.center.toString() +
+                " ra " + shape.radius.toString();
         };
 
         // Internal use only. Intentionally not documented.
-        SurfaceCircle.prototype.computeStateKey = function() {
+        SurfaceCircle.prototype.computeStateKey = function () {
             return SurfaceCircle.staticStateKey(this);
         };
 
         // Internal. Intentionally not documented.
-        SurfaceCircle.prototype.computeBoundaries = function(dc) {
+        SurfaceCircle.prototype.computeBoundaries = function (dc) {
             if (this.radius === 0) {
                 return null;
             }
@@ -144,10 +144,10 @@ define(['../error/ArgumentError',
             for (var i = 0; i < numLocations; i++) {
                 var azimuth = (i !== numLocations - 1) ? (i * da) : 0;
                 this._boundaries[i] = Location.greatCircleLocation(
-                                      this.center,
-                                      azimuth,   // In degrees
-                                      arcLength, // In radians
-                                      new Location(0, 0)
+                    this.center,
+                    azimuth,   // In degrees
+                    arcLength, // In radians
+                    new Location(0, 0)
                 );
             }
         };
