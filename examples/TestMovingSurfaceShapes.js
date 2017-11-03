@@ -132,7 +132,7 @@ requirejs(['../src/WorldWind',
         var highlightController = new WorldWind.HighlightController(wwd);
 
         // Update SurfaceShapes according to a timer
-        window.setInterval(function() {
+        window.setInterval(function () {
             // Rotate ellipse 10 degrees clockwise
             ellipse.heading += 10;
 
@@ -166,19 +166,19 @@ requirejs(['../src/WorldWind',
             wwd.redraw();
         }, 1000);
 
-        function flipNumberOfEdgeIntervals(shape){
-            if (shape.maximumNumEdgeIntervals === 128){ // 128 is the default number of edges
+        function flipNumberOfEdgeIntervals(shape) {
+            if (shape.maximumNumEdgeIntervals === 128) { // 128 is the default number of edges
                 return 4; // Reduce the number of edges
             } else {
                 return 128;
             }
         }
 
-        function cycleThroughPathTypes(shape){
-            if (shape.pathType === WorldWind.GREAT_CIRCLE){
+        function cycleThroughPathTypes(shape) {
+            if (shape.pathType === WorldWind.GREAT_CIRCLE) {
                 return WorldWind.RHUMB_LINE;
             }
-            else if (shape.pathType === WorldWind.RHUMB_LINE){
+            else if (shape.pathType === WorldWind.RHUMB_LINE) {
                 return WorldWind.LINEAR;
             }
             else {
@@ -186,12 +186,12 @@ requirejs(['../src/WorldWind',
             }
         }
 
-        function shiftBoundaries(shape){
+        function shiftBoundaries(shape) {
 
             // Assuming the shape has two appended properties: shiftCounter and shiftDirection.
             shape.shiftCounter += 1;
 
-            switch(shape.shiftDirection) {
+            switch (shape.shiftDirection) {
                 case "east":
                     shape.boundaries = shiftBoundariesEastward(shape.boundaries);
                     break;
@@ -203,7 +203,7 @@ requirejs(['../src/WorldWind',
             }
 
             // Shift the shape 5 degrees and then change shift direction
-            if (shape.shiftCounter === 5){
+            if (shape.shiftCounter === 5) {
                 shape.shiftDirection === "east" ? shape.shiftDirection = "west" : shape.shiftDirection = "east";
                 shape.shiftCounter = 0;
             }
@@ -211,14 +211,14 @@ requirejs(['../src/WorldWind',
             return shape.boundaries;
         }
 
-        function shiftBoundariesWestward(boundaries){
+        function shiftBoundariesWestward(boundaries) {
             for (var i = 0; i < boundaries.length; i++) {
                 boundaries[i].longitude -= 1;
             }
             return boundaries;
         }
 
-        function shiftBoundariesEastward(boundaries){
+        function shiftBoundariesEastward(boundaries) {
             for (var i = 0; i < boundaries.length; i++) {
                 boundaries[i].longitude += 1;
             }
@@ -233,8 +233,8 @@ requirejs(['../src/WorldWind',
         rotatingSectors.push(new WorldWind.Sector(31, 35, -95, -90));
 
         // Cycle through the previous array and set it to the SurfaceSector
-        function changeSector(surfaceSector){
-            if (surfaceSector.sectorCounter < rotatingSectors.length - 1){
+        function changeSector(surfaceSector) {
+            if (surfaceSector.sectorCounter < rotatingSectors.length - 1) {
                 surfaceSector.sectorCounter += 1;
             }
             else {
