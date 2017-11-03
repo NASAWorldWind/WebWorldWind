@@ -8,7 +8,7 @@
  * @version $Id: MultiWindow.js 3314 2015-07-10 18:28:45Z dcollins $
  */
 
-requirejs(['../src/WorldWind'], function () {
+requirejs(['./WorldWindShim'], function () {
     "use strict";
 
     WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);

@@ -6,9 +6,9 @@
  * @version $Id: BasicExample.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
-requirejs(['./WorldWindShim.js',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 

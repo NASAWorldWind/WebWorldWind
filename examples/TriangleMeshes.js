@@ -6,9 +6,9 @@
  * Illustrates how to display TriangleMesh shapes.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 

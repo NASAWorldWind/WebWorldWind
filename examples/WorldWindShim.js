@@ -1,10 +1,9 @@
-// define(['../src/WorldWind'], function (WorldWind) {
-//    "use strict";
-//
-//    return WorldWind;
-// });
-define(['../worldwind.min.js'], function (WorldWind) {
-    "use strict";
+/**
+ * This shim is used to switch between the individual files of WorldWind source and the minified library. It is
+ * not required for the use of WorldWind.
+ */
+define(['../src/WorldWind'], function (WorldWind) {
+   "use strict";
 
-    return WorldWind;
+   return WorldWind;
 });
