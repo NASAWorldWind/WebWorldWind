@@ -140,7 +140,7 @@ define([
 
             var numLocations = 1 + Math.max(SurfaceCircle.MIN_NUM_INTERVALS, this.intervals),
                 da = 360 / (numLocations - 1),
-                arc = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude);
+                arcLength = this.radius / dc.globe.radiusAt(this.center.latitude, this.center.longitude);
 
             this._boundaries = new Array(numLocations);
 
@@ -149,7 +149,7 @@ define([
                 this._boundaries[i] = Location.greatCircleLocation(
                                       this.center,
                                       azimuth,   // In degrees
-                                      arc,       // In radians
+                                      arcLength, // In radians
                                       new Location(0, 0)
                 );
             }
