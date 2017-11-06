@@ -10,8 +10,10 @@ define([
         '../error/AbstractError',
         '../geom/Angle',
         '../error/ArgumentError',
+        '../geom/BoundingBox',
         '../geom/Location',
         '../util/Logger',
+        '../cache/MemoryCache',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
         '../util/PolygonSplitter',
@@ -24,8 +26,10 @@ define([
     function (AbstractError,
               Angle,
               ArgumentError,
+              BoundingBox,
               Location,
               Logger,
+              MemoryCache,
               NotYetImplementedError,
               PickedObject,
               PolygonSplitter,
@@ -130,7 +134,7 @@ define([
             this._attributesStateKey = null;
 
             // Internal use only. Intentionally not documented.
-            this.isPrepared = false;
+            this.boundariesArePrepared = false;
 
             // Internal use only. Intentionally not documented.
             this.layer = null;
@@ -142,6 +146,23 @@ define([
             this.contours = [];
             this.containsPole = false;
             this.crossesAntiMeridian = false;
+
+            /**
+             * Indicates how long to use terrain-specific shape data before regenerating it, in milliseconds. A value
+             * of zero specifies that shape data should be regenerated every frame. While this causes the shape to
+             * adapt more frequently to the terrain, it decreases performance.
+             * @type {Number}
+             * @default 2000 (milliseconds)
+             */
+            this.expirationInterval = 2000;
+
+            // Internal use only. Intentionally not documented.
+            // Holds the per-globe data
+            this.shapeDataCache = new MemoryCache(3, 2);
+
+            // Internal use only. Intentionally not documented.
+            // The shape-data-cache data that is for the currently active globe.
+            this.currentData = null;
         };
 
         SurfaceShape.prototype = Object.create(Renderable.prototype);
@@ -301,6 +322,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._pathType = value;
                 }
             },
@@ -319,6 +341,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._maximumNumEdgeIntervals = value;
                 }
             },
@@ -337,6 +360,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._polarThrottle = value;
                 }
             },
@@ -409,11 +433,65 @@ define([
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.computeBoundaries = function (globe) {
             // This method is in the base class and should be overridden if the boundaries are generated.
-            // It should be called only if the geometry has been provided by the user and does not need to be generated.
-            // assert(!this._boundaries);
 
             throw new AbstractError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "SurfaceShape", "computeBoundaries", "abstractInvocation"));
+        };
+
+        // Internal. Intentionally not documented.
+        SurfaceShape.prototype.intersectsFrustum = function (dc) {
+            if (this.currentData && this.currentData.extent) {
+                if (dc.pickingMode) {
+                    return this.currentData.extent.intersectsFrustum(dc.pickFrustum);
+                } else {
+                    return this.currentData.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                }
+            } else {
+                return true;
+            }
+        };
+
+        /**
+         * Indicates whether a specified shape data object is current. Subclasses may override this method to add
+         * criteria indicating whether the shape data object is current, but must also call this method on this base
+         * class. Applications do not call this method.
+         * @param {DrawContext} dc The current draw context.
+         * @param {Object} shapeData The object to validate.
+         * @returns {Boolean} true if the object is current, otherwise false.
+         * @protected
+         */
+        SurfaceShape.prototype.isShapeDataCurrent = function (dc, shapeData) {
+            return shapeData.verticalExaggeration === dc.verticalExaggeration
+                && shapeData.expiryTime > Date.now();
+        };
+
+        /**
+         * Creates a new shape data object for the current globe state. Subclasses may override this method to
+         * modify the shape data object that this method creates, but must also call this method on this base class.
+         * Applications do not call this method.
+         * @returns {Object} The shape data object.
+         * @protected
+         */
+        SurfaceShape.prototype.createShapeDataObject = function () {
+            return {};
+        };
+
+        // Intentionally not documented.
+        SurfaceShape.prototype.resetExpiration = function (shapeData) {
+            // The random addition in the line below prevents all shapes from regenerating during the same frame.
+            shapeData.expiryTime = Date.now() + this.expirationInterval + 1e3 * Math.random();
+        };
+
+        // Internal. Intentionally not documented.
+        SurfaceShape.prototype.establishCurrentData = function (dc) {
+            this.currentData = this.shapeDataCache.entryForKey(dc.globeStateKey);
+            if (!this.currentData) {
+                this.currentData = this.createShapeDataObject();
+                this.resetExpiration(this.currentData);
+                this.shapeDataCache.putEntry(dc.globeStateKey, this.currentData, 1);
+            }
+
+            this.currentData.isExpired = !this.isShapeDataCurrent(dc, this.currentData);
         };
 
         // Internal function. Intentionally not documented.
@@ -425,6 +503,19 @@ define([
             this.layer = dc.currentLayer;
 
             this.prepareBoundaries(dc);
+
+            this.establishCurrentData(dc);
+
+            if (this.currentData.isExpired || !this.currentData.extent) {
+                this.computeExtent(dc);
+                this.currentData.verticalExaggeration = dc.verticalExaggeration;
+                this.resetExpiration(this.currentData);
+            }
+
+            // Use the last computed extent to see if this shape is out of view.
+            if (this.currentData && this.currentData.extent && !this.intersectsFrustum(dc)) {
+                return;
+            }
 
             dc.surfaceShapeTileBuilder.insertSurfaceShape(this);
         };
@@ -519,7 +610,7 @@ define([
             var cosLat = Math.cos(location.latitude * Angle.DEGREES_TO_RADIANS);
             cosLat *= cosLat; // Square cos to emphasize poles and de-emphasize equator.
 
-            // Remap polarThrotle:
+            // Remap polarThrottle:
             //  0 .. INF => 0 .. 1
             // This acts as a weight between no throttle and fill throttle.
             var weight = this._polarThrottle / (1 + this._polarThrottle);
@@ -529,16 +620,11 @@ define([
 
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.prepareBoundaries = function (dc) {
-            if (this.isPrepared) {
+            if (this.boundariesArePrepared) {
                 return;
             }
 
-            // Some shapes generate boundaries, such as ellipses and sectors;
-            // others don't, such as polylines and polygons.
-            // Handle the latter below.
-            if (!this._boundaries) {
-                this.computeBoundaries(dc);
-            }
+            this.computeBoundaries(dc);
 
             var newBoundaries = this.formatBoundaries();
             this.normalizeAngles(newBoundaries);
@@ -553,7 +639,7 @@ define([
 
             this.prepareSectors();
 
-            this.isPrepared = true;
+            this.boundariesArePrepared = true;
         };
 
         //Internal. Formats the boundaries of a surface shape to be a multi dimensional array
@@ -570,6 +656,12 @@ define([
                 boundaries = this._boundaries;
             }
             return boundaries;
+        };
+
+        // Internal. Resets boundaries for SurfaceShape recomputing.
+        SurfaceShape.prototype.resetBoundaries = function () {
+            this.boundariesArePrepared = false;
+            this.shapeDataCache.clear(false);
         };
 
         // Internal use only. Intentionally not documented.
@@ -617,6 +709,56 @@ define([
             this.prepareBoundaries(dc);
 
             return this._sectors;
+        };
+
+        /**
+         * Computes the extent for the shape based on its sectors.
+         *
+         * @param {DrawContext} dc The drawing context containing a globe.
+         *
+         * @return {BoundingBox} The extent for the shape.
+         */
+        SurfaceShape.prototype.computeExtent = function (dc) {
+
+            if (!this._sectors || this._sectors.length === 0) {
+                return null;
+            }
+
+            if (!this.currentData) {
+                return null;
+            }
+
+            if (!this.currentData.extent) {
+                this.currentData.extent = new BoundingBox();
+            }
+
+
+            var boxPoints;
+            // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
+            // Return the box which contains that sector.
+            if (this._sectors.length === 1) {
+                boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                this.currentData.extent.setToVec3Points(boxPoints);
+            }
+            // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
+            // Return a box which contains the corners of the boxes bounding each sector.
+            else {
+                var boxCorners = [];
+
+                for (var i = 0; i < this._sectors.length; i++) {
+                    boxPoints = this._sectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                    var box = new BoundingBox();
+                    box.setToVec3Points(boxPoints);
+                    var corners = box.getCorners();
+                    for (var j = 0; j < corners.length; j++) {
+                        boxCorners.push(corners[j]);
+                    }
+                }
+                this.currentData.extent.setToVec3Points(boxCorners);
+            }
+
+            return this.currentData.extent;
+
         };
 
         // Internal use only. Intentionally not documented.

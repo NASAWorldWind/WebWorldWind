@@ -79,6 +79,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlCamera',
         './formats/kml/styles/KmlColorStyle',
         './formats/kml/features/KmlContainer',
+        './formats/kml/controls/KmlControls',
         './formats/kml/features/KmlDocument',
         './formats/kml/KmlElements',
         './formats/kml/features/KmlFeature',
@@ -121,6 +122,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlTimeStamp',
         './formats/kml/features/KmlTour',
         './formats/kml/geom/KmlTrack',
+        './formats/kml/controls/KmlTreeVisibility',
         './layer/LandsatRestLayer',
         './layer/Layer',
         './util/measure/LengthMeasurer',
@@ -216,6 +218,19 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/util/ViewVolume',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
+        './formats/wkt/Wkt',
+        './formats/wkt/WktElements',
+        './formats/wkt/geom/WktGeometryCollection',
+        './formats/wkt/geom/WktLineString',
+        './formats/wkt/geom/WktMultiLineString',
+        './formats/wkt/geom/WktMultiPoint',
+        './formats/wkt/geom/WktMultiPolygon',
+        './formats/wkt/geom/WktObject',
+        './formats/wkt/geom/WktPoint',
+        './formats/wkt/geom/WktPolygon',
+        './formats/wkt/WktTokens',
+        './formats/wkt/geom/WktTriangle',
+        './formats/wkt/WktType',
         './ogc/wms/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/wms/WmsLayerCapabilities',
@@ -300,9 +315,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ItemIcon,
               KmlAbstractView,
               KmlBalloonStyle,
+              KmlCamera,
               KmlColorStyle,
               KmlContainer,
-              KmlCamera,
+              KmlControls,
               KmlDocument,
               KmlElements,
               KmlFeature,
@@ -345,6 +361,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlTimeStamp,
               KmlTour,
               KmlTrack,
+              KmlTreeVisibility,
               LandsatRestLayer,
               Layer,
               LengthMeasurer,
@@ -440,6 +457,19 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ViewVolume,
               WcsTileUrlBuilder,
               WfsCapabilities,
+              Wkt,
+              WktElements,
+              WktGeometryCollection,
+              WktLineString,
+              WktMultiLineString,
+              WktMultiPoint,
+              WktMultiPolygon,
+              WktObject,
+              WktPoint,
+              WktPolygon,
+              WktTokens,
+              WktTriangle,
+              WktType,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
@@ -729,7 +759,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
+        WorldWind['KmlControls'];
         WorldWind['KmlFile'] = KmlFile;
+        WorldWind['KmlTreeVisibility'] = KmlTreeVisibility;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
         WorldWind['LengthMeasurer'] = LengthMeasurer;
@@ -821,6 +853,19 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
+        WorldWind['Wkt'] = Wkt;
+        WorldWind['WktElements'] = WktElements;
+        WorldWind['WktGeometryCollection'] = WktGeometryCollection;
+        WorldWind['WktLineString'] = WktLineString;
+        WorldWind['WktMultiLineString'] = WktMultiLineString;
+        WorldWind['WktMultiPoint'] = WktMultiPoint;
+        WorldWind['WktMultiPolygon'] = WktMultiPolygon;
+        WorldWind['WktObject'] = WktObject;
+        WorldWind['WktPoint'] = WktPoint;
+        WorldWind['WktPolygon'] = WktPolygon;
+        WorldWind['WktTokens'] = WktTokens;
+        WorldWind['WktTriangle'] = WktTriangle;
+        WorldWind['WktType'] = WktType;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;

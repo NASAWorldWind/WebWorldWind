@@ -6,9 +6,9 @@
  * Displays a time series of the 12 months of Blue Marble imagery.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 

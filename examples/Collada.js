@@ -3,7 +3,7 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
-require(['../src/WorldWind', './LayerManager'], function (ww, LayerManager) {
+require(['./WorldWindShim', './LayerManager'], function (WorldWind, LayerManager) {
     "use strict";
 
     WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
