@@ -6,11 +6,9 @@
 
 .idea/workspace.xml
 
-api-doc/
-
 assetsToPublish/
 
-images.zip
+dist/
 
 nasaworldwind-worldwind-*.tgz
 
@@ -19,7 +17,3 @@ node_modules/
 standalonedata/
 
 test-results/
-
-worldwind.js
-
-worldwind.min.js

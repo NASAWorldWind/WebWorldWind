@@ -11,7 +11,7 @@ module.exports = function (grunt) {
             dist: {
                 src: ['src'],
                 options: {
-                    destination: 'api-doc',
+                    destination: 'dist/api-doc',
                     configure: 'config.json',
                     readme: 'README.md',
                     recurse: true
@@ -25,7 +25,7 @@ module.exports = function (grunt) {
                     baseUrl: 'src',
                     name: '../tools/almond',
                     include: ['WorldWind'],
-                    out: 'worldwind.min.js',
+                    out: 'dist/worldwind.min.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
                     name: '../tools/almond',
                     include: ['WorldWind'],
                     optimize: 'none',
-                    out: 'worldwind.js',
+                    out: 'dist/worldwind.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
@@ -65,19 +65,44 @@ module.exports = function (grunt) {
         compress: {
             main: {
                 options: {
-                    archive: 'images.zip'
+                    archive: 'dist/images.zip'
                 },
                 files: [
                     {src: ['images/**']}
+                ]
+            }
+        },
+
+        copy: {
+            main: {
+                files: [
+                    // Copy all of the files in the examples folder except the current shim which uses the sources files
+                    {
+                        expand: true,
+                        src: ['images/**', 'examples/**', '!examples/WorldWindShim\.js', 'README.md', 'LICENSE.txt'],
+                        dest: 'dist/'
+                    },
+                    // Copy and rename the deployment WorldWindShim which uses the minified library
+                    {
+                        expand: true,
+                        cwd: 'tools',
+                        src: ['WorldWindShim.build.js'],
+                        dest: 'dist/examples/',
+                        rename: function (dest, src) {
+                            return dest + src.replace('WorldWindShim.build', 'WorldWindShim');
+                        }
+                    }
                 ]
             }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
 
     grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'compress']);
+    grunt.registerTask('dist', ['jsdoc', 'requirejs', 'copy']);
 };
