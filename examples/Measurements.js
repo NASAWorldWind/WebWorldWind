@@ -5,7 +5,7 @@
 
 requirejs([
         './LayerManager',
-        '../src/WorldWind'
+        './WorldWindShim'
     ],
     function (LayerManager,
               WorldWind) {

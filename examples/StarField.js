@@ -4,10 +4,10 @@
  */
 
 requirejs([
-        '../src/WorldWind',
+        './WorldWindShim',
         './LayerManager'
     ],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         'use strict';
 

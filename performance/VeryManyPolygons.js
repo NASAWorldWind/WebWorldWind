@@ -44,7 +44,7 @@ requirejs(['../src/WorldWind',
             ],
             highlightAttributes, numPolygons;
 
-        attributes.imageSource = "../images/400x230-splash-nww.png";
+        attributes.imageSource = "../examples/data/400x230-splash-nww.png";
         attributes.drawInterior = true;
         attributes.drawOutline = true;
         attributes.interiorColor = WorldWind.Color.WHITE;

@@ -79,6 +79,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlCamera',
         './formats/kml/styles/KmlColorStyle',
         './formats/kml/features/KmlContainer',
+        './formats/kml/controls/KmlControls',
         './formats/kml/features/KmlDocument',
         './formats/kml/KmlElements',
         './formats/kml/features/KmlFeature',
@@ -121,6 +122,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlTimeStamp',
         './formats/kml/features/KmlTour',
         './formats/kml/geom/KmlTrack',
+        './formats/kml/controls/KmlTreeVisibility',
         './layer/LandsatRestLayer',
         './layer/Layer',
         './util/measure/LengthMeasurer',
@@ -313,9 +315,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ItemIcon,
               KmlAbstractView,
               KmlBalloonStyle,
+              KmlCamera,
               KmlColorStyle,
               KmlContainer,
-              KmlCamera,
+              KmlControls,
               KmlDocument,
               KmlElements,
               KmlFeature,
@@ -358,6 +361,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlTimeStamp,
               KmlTour,
               KmlTrack,
+              KmlTreeVisibility,
               LandsatRestLayer,
               Layer,
               LengthMeasurer,
@@ -755,7 +759,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
+        WorldWind['KmlControls'];
         WorldWind['KmlFile'] = KmlFile;
+        WorldWind['KmlTreeVisibility'] = KmlTreeVisibility;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
         WorldWind['LengthMeasurer'] = LengthMeasurer;
