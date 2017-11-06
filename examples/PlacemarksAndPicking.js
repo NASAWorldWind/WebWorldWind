@@ -8,9 +8,9 @@
  * @version $Id: PlacemarksAndPicking.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 

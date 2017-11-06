@@ -8,9 +8,9 @@
  * @version $Id: Polygons.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -95,11 +95,11 @@ requirejs(['../src/WorldWind',
         polygonAttributes = new WorldWind.ShapeAttributes(null);
         // Specify a texture for the polygon and its four extruded sides.
         polygonAttributes.imageSource = [
-            "../images/400x230-splash-nww.png", // polygon texture image
-            "../images/400x230-splash-nww.png", // first-side texture image
-            "../images/400x230-splash-nww.png", // second-side texture image
-            "../images/400x230-splash-nww.png", // third-side texture image
-            "../images/400x230-splash-nww.png"  // fourth-side texture image
+            "data/400x230-splash-nww.png", // polygon texture image
+            "data/400x230-splash-nww.png", // first-side texture image
+            "data/400x230-splash-nww.png", // second-side texture image
+            "data/400x230-splash-nww.png", // third-side texture image
+            "data/400x230-splash-nww.png"  // fourth-side texture image
         ];
         polygonAttributes.drawInterior = true;
         polygonAttributes.drawOutline = true;
@@ -194,7 +194,7 @@ requirejs(['../src/WorldWind',
 
         polygonAttributes = new WorldWind.ShapeAttributes(null);
         polygonAttributes.imageSource = [
-            "../images/400x230-splash-nww.png",
+            "data/400x230-splash-nww.png",
             new WorldWind.ImageSource(canvas)
         ];
         polygonAttributes.drawInterior = true;

@@ -322,6 +322,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._pathType = value;
                 }
             },
@@ -340,6 +341,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._maximumNumEdgeIntervals = value;
                 }
             },
@@ -358,6 +360,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._polarThrottle = value;
                 }
             },
@@ -607,7 +610,7 @@ define([
             var cosLat = Math.cos(location.latitude * Angle.DEGREES_TO_RADIANS);
             cosLat *= cosLat; // Square cos to emphasize poles and de-emphasize equator.
 
-            // Remap polarThrotle:
+            // Remap polarThrottle:
             //  0 .. INF => 0 .. 1
             // This acts as a weight between no throttle and fill throttle.
             var weight = this._polarThrottle / (1 + this._polarThrottle);

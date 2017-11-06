@@ -6,9 +6,9 @@
  * Illustrates how to display TriangleMesh shapes.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -80,7 +80,7 @@ requirejs(['../src/WorldWind',
         var meshAttributes = new WorldWind.ShapeAttributes(null);
         meshAttributes.outlineColor = WorldWind.Color.BLUE;
         meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.7);
-        meshAttributes.imageSource = "../images/400x230-splash-nww.png";
+        meshAttributes.imageSource = "data/400x230-splash-nww.png";
         meshAttributes.applyLighting = true;
 
         // Create the mesh's highlight attributes.

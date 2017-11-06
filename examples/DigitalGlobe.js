@@ -6,9 +6,9 @@
  * @version $Id: DigitalGlobe.js 3418 2015-08-22 00:17:05Z tgaskins $
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
