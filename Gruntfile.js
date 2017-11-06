@@ -71,13 +71,45 @@ module.exports = function (grunt) {
                     {src: ['images/**']}
                 ]
             }
+        },
+
+        copy: {
+            main: {
+                files: [
+                    // Copy all of the files in the examples folder except the current shim which uses the sources files
+                    {
+                        expand: true,
+                        cwd: 'examples',
+                        src: ['**', '!WorldWindShim\.js'],
+                        dest: 'examplesToPublish/'
+                    },
+                    // Copy the minified library and images folder
+                    {
+                        expand: true,
+                        src: ['worldwind.min.js', 'images/**'],
+                        dest: 'examplesToPublish/'
+                    },
+                    // Copy and rename the deployment WorldWindShim which uses the minified library
+                    {
+                        expand: true,
+                        cwd: 'tools',
+                        src: ['DeploymentWorldWindShim.js'],
+                        dest: 'examplesToPublish/',
+                        rename: function (dest, src) {
+                            return dest + src.replace('DeploymentWorldWindShim', 'WorldWindShim');
+                        }
+                    }
+                ]
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
 
     grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'compress']);
+    grunt.registerTask('build-examples', ['requirejs', 'copy']);
 };
