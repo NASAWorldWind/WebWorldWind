@@ -63,7 +63,8 @@ module.exports = function (grunt) {
         },
 
         clean: [
-            'dist/'
+            'dist/',
+            'test-results/'
         ],
 
         compress: {
