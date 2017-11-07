@@ -79,7 +79,7 @@ module.exports = function (grunt) {
                     // Copy all of the files in the examples folder except the current shim which uses the sources files
                     {
                         expand: true,
-                        src: ['images/**', 'examples/**', '!examples/WorldWindShim\.js', 'README.md', 'LICENSE.txt'],
+                        src: ['images/**', 'examples/**', '!examples/WorldWindShim.js', 'README.md', 'LICENSE.txt'],
                         dest: 'dist/'
                     },
                     // Copy and rename the deployment WorldWindShim which uses the minified library
