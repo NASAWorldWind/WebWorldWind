@@ -63,8 +63,7 @@ module.exports = function (grunt) {
         },
 
         clean: [
-            'dist/',
-            'assetsToPublish/'
+            'dist/'
         ],
 
         compress: {
