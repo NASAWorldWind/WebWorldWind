@@ -62,6 +62,11 @@ module.exports = function (grunt) {
             }
         },
 
+        clean: [
+            'dist/',
+            'assetsToPublish/'
+        ],
+
         compress: {
             main: {
                 options: {
@@ -97,6 +102,7 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
