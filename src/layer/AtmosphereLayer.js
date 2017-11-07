@@ -14,6 +14,7 @@ define([
         '../geom/Matrix3',
         '../geom/Sector',
         '../shaders/SkyProgram',
+        '../util/SunPosition',
         '../geom/Vec3',
         '../util/WWUtil'
     ],
@@ -25,6 +26,7 @@ define([
               Matrix3,
               Sector,
               SkyProgram,
+              SunPosition,
               Vec3,
               WWUtil) {
         "use strict";
@@ -80,7 +82,8 @@ define([
         Object.defineProperties(AtmosphereLayer.prototype, {
 
             /**
-             * The geographic location of the light (sun).
+             * The geographic location of the light (sun). If the Layer time property is set, this location will be
+             * overriden to reflect the location of the sun at the specified time.
              * @memberof AtmosphereLayer.prototype
              * @type {Position}
              */
@@ -319,11 +322,14 @@ define([
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.determineLightDirection = function (dc) {
-            if (this.lightLocation != null) {
+            if (this.time !== null) {
+                this.lightLocation = SunPosition.getAsGeographicLocation(this.time);
+            }
+
+            if (this.lightLocation) {
                 dc.globe.computePointFromLocation(this.lightLocation.latitude, this.lightLocation.longitude,
                     this._activeLightDirection);
-            }
-            else {
+            } else {
                 this._activeLightDirection.copy(dc.navigatorState.eyePoint);
             }
             this._activeLightDirection.normalize();
