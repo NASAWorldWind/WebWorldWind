@@ -10,7 +10,7 @@ define([
         '../error/ArgumentError',
         '../formats/geojson/GeoJSONParser',
         '../util/Logger',
-        '../ogc/OpenSearch/OpenSearchService',
+        '../ogc/openSearch/OpenSearchService',
         './RenderableLayer'
     ],
     function (ArgumentError,

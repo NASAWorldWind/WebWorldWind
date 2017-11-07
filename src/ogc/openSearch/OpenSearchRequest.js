@@ -58,7 +58,7 @@ define([
 
             //Username and password for authentication purposes.
             this.user = options.user || defaultOptions.user;
-            this.password = options.password || defaultOptions.user;
+            this.password = options.password || defaultOptions.password;
         };
 
         OpenSearchRequest.prototype.addHeader = function (name, value) {
