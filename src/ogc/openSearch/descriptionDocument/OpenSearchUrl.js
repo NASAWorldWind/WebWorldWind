@@ -94,7 +94,7 @@ define([
             /**
              * A list with the parameters
              * @memberof OpenSearchUrl.prototype
-             * @type {[OpenSearchParameter]}
+             * @type {OpenSearchParameter[]}
              */
             parameters: {
                 get: function () {
@@ -129,7 +129,7 @@ define([
             /**
              * The role of the resource being described in relation to the description document.
              * @memberof OpenSearchUrl.prototype
-             * @type {[String]}
+             * @type {String[]}
              * @default ['results']
              */
             relations: {
@@ -231,7 +231,7 @@ define([
          * Parses an Open Search Url template and extracts the search parameters.
          *
          * @param {String} template The URL template to be processed
-         * @return {[OpenSearchParameter]|undefined}
+         * @return {OpenSearchParameter[]|undefined}
          */
         OpenSearchUrl.prototype.parseTemplate = function (template) {
             if (!template) {
@@ -280,7 +280,7 @@ define([
          *
          * @param {Node} node An Open Search Url node
          *
-         * @return {[OpenSearchParameter]}
+         * @return {OpenSearchParameter[]}
          */
         OpenSearchUrl.prototype.parseNodeParams = function (node) {
             var paramNodes = OpenSearchUtils.getXmlElements(node, 'Parameter');

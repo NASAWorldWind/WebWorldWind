@@ -89,7 +89,7 @@ define([
             /**
              * A list with start and end time for filtering renderables withing the specified interval.
              * @memberof OpenSearchLayer.prototype
-             * @type {[Date, Date]}
+             * @type {Date[]}
              */
             currentTimeInterval: {
                 get: function () {
@@ -189,7 +189,7 @@ define([
 
         /**
          * Returns the Urls of the description document.
-         * @return {[OpenSearchUrl]} A list of OpenSearchUrl.
+         * @return {OpenSearchUrl[]} A list of OpenSearchUrl.
          */
         OpenSearchLayer.prototype.getUrls = function () {
             if (!this._searchService.descriptionDocument) {
@@ -200,7 +200,7 @@ define([
 
         /**
          * Returns a list of search parameters for each url in the description document.
-         * @return {[[OpenSearchParameter], [OpenSearchParameter]]} A list of OpenSearchParameter.
+         * @return {OpenSearchParameter[][]} A list of OpenSearchParameter.
          */
         OpenSearchLayer.prototype.getSearchParams = function () {
             return this.getUrls().map(function (url) {

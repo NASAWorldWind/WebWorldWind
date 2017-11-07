@@ -188,7 +188,7 @@ define([
 
         /**
          * Returns a list with the supported mime types.
-         * @return {[String]} a list of the supported mime types
+         * @return {String[]} a list of the supported mime types
          */
         OpenSearchService.prototype.getSupportedFormats = function () {
             return this.parserRegistry.getFormats();

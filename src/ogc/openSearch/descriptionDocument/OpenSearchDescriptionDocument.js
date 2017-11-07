@@ -86,7 +86,7 @@ define([
              * Describes an interface by which a client can make requests for an external resource,
              * such as search results, or additional description documents.
              * @memberof OpenSearchDescriptionDocument.prototype
-             * @type {[OpenSearchUrl]}
+             * @type {OpenSearchUrl[]}
              */
             urls: {
                 get: function () {
@@ -108,7 +108,7 @@ define([
             /**
              * Contains a set of words that are used as keywords to identify and categorize this search content.
              * @memberof OpenSearchDescriptionDocument.prototype
-             * @type {[String]}
+             * @type {String[]}
              */
             tags: {
                 get: function () {
@@ -131,7 +131,8 @@ define([
              * Contains information that identifies the location of an image that can be used in association with this
              * search content.
              * @memberof OpenSearchDescriptionDocument.prototype
-             * @type {[{height: Number, width: Number, type: String, src: String}]}
+             * @typedef {{height: Number, width: Number, type: String, src: String}} image
+             * @type {image[]}
              */
             images: {
                 get: function () {
@@ -142,7 +143,7 @@ define([
             /**
              * Defines a search query that can be performed by search clients.
              * @memberof OpenSearchDescriptionDocument.prototype
-             * @type {[Object]}
+             * @type {Object[]}
              */
             queries: {
                 get: function () {
@@ -201,7 +202,7 @@ define([
              * Contains a list of strings that indicates that the search engine supports search results in the
              * specified language.
              * @memberof OpenSearchDescriptionDocument.prototype
-             * @type {[String]}
+             * @type {String[]}
              */
             languages: {
                 get: function () {
@@ -213,7 +214,7 @@ define([
              * Contains a list of strings that indicates that the search engine supports search requests encoded with
              * the specified character encoding.
              * @memberof OpenSearchDescriptionDocument.prototype
-             * @type {[String]}
+             * @type {String[]}
              */
             inputEncodings: {
                 get: function () {
@@ -225,7 +226,7 @@ define([
              * Contains a list of strings that indicates that the search engine supports responses encoded with the
              * specified character encoding.
              * @memberof OpenSearchDescriptionDocument.prototype
-             * @type {[String]}
+             * @type {String[]}
              */
             outputEncodings: {
                 get: function () {
@@ -241,7 +242,8 @@ define([
          *
          * @param {Node} node An Open Search Image node.
          *
-         * @return {{height: Number, width: Number, type: String, src: String}}
+         * @typedef {{height: Number, width: Number, type: String, src: String}} image
+         * @return {image}
          */
         OpenSearchDescriptionDocument.prototype.parseImage = function (node) {
             var image = {};
@@ -294,7 +296,7 @@ define([
          * @param {OpenSearchRequest} requestOptions
          * @param {Array} supportedFormats A list with the supported formats that the requesting service can parse.
          *
-         * @return {[OpenSearchUrl]}
+         * @return {OpenSearchUrl[]}
          */
         OpenSearchDescriptionDocument.prototype.findCompatibleUrls = function (searchParams, requestOptions, supportedFormats) {
             var urls = this.urls.filter(function (url) {

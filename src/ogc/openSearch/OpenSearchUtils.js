@@ -54,7 +54,7 @@ define([
              * @param {String} localName The local name (without the namespace) of the child node
              * @param {String|null} namespaceURI The namespaceURI of the child
              *
-             * @return {[Node]} An array of Nodes.
+             * @return {Node[]} An array of Nodes.
              */
             getXmlElements: function (parent, localName, namespaceURI) {
                 var collection;

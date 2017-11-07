@@ -36,7 +36,7 @@ define([
          * @param {Number} minInclusive Indicates the minimum value for the element that can be reached.
          * @param {Number} maxInclusive Indicates the maximum value for the element that can be reached.
          * @param {Number} step Indicates the granularity of the allowed values between the minimal and maximal range.
-         * @param {[{value: String, label: String}]} options A list of objects that describes a value/label pair
+         * @param {Object[]} options A list of objects that describes a value/label pair
          * suggested to the client for the parent element.
          */
         var OpenSearchParameter = function (type, name, value, required, replaceable, ns, minimum, maximum, pattern,

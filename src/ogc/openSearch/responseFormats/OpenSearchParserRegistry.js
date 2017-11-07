@@ -106,7 +106,7 @@ define([
 
         /**
          * Returns a list with the supported mime types.
-         * @return {[String]} a list of the supported mime types
+         * @return {String[]} a list of the supported mime types
          */
         OpenSearchParserRegistry.prototype.getFormats = function () {
             return Object.keys(this._entries);
