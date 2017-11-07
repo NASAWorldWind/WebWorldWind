@@ -109,6 +109,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['karma', 'jsdoc', 'requirejs', 'compress']);
-    grunt.registerTask('dist', ['jsdoc', 'requirejs', 'copy']);
+    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'compress', 'copy']);
 };
