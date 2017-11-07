@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build": "grunt",
+    "clean": "grunt clean",
     "test": "grunt karma",
     "doc": "grunt jsdoc",
     "test:watch": "karma start karma.conf.js"
