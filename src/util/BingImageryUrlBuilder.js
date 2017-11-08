@@ -34,17 +34,22 @@ define([
         var BingImageryUrlBuilder = function (imagerySet, bingMapsKey) {
             var wwBingMapsKey = "AkttWCS8p6qzxvx5RH3qUcCPgwG9nRJ7IwlpFGb14B0rBorB5DvmXr2Y_eCUNIxH";
 
-            if (!bingMapsKey) {
+            // Use key specified for this layer
+            this.bingMapsKey = bingMapsKey;
+
+            // If none, fallback to key specified globally
+            if (!this.bingMapsKey) {
                 this.bingMapsKey = WorldWind.BingMapsKey;
+            }
 
-                if (!bingMapsKey) {
-                    this.bingMapsKey = wwBingMapsKey;
-                }
-
-                if (bingMapsKey === wwBingMapsKey) {
-                    this.bingMapsKey = wwBingMapsKey;
-                    BingImageryUrlBuilder.showBingMapsKeyWarning();
-                }
+            // If none, fallback to default demo key
+            if (!this.bingMapsKey) {
+                this.bingMapsKey = wwBingMapsKey;
+            }
+            
+            // If using WorldWind Bing Maps demo key, show warning
+            if (this.bingMapsKey === wwBingMapsKey) {
+                BingImageryUrlBuilder.showBingMapsKeyWarning();
             }
 
             this.imagerySet = imagerySet;
