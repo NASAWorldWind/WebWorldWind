@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Web WorldWind",
   "main": "dist/worldwind.min.js",
-  "homepage": "https://nasaworldwind.github.io/",
+  "homepage": "https://worldwind.arc.nasa.gov",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
   },

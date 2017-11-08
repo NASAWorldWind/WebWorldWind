@@ -17,7 +17,7 @@ geometric objects.
 
 ## Get Started
 
-The Web WorldWind [Developer's Guide](https://webworldwind.org/developers-guide) has a complete description of Web 
+The Web WorldWind [Developer's Guide](https://worldwind.arc.nasa.gov/web) has a complete description of Web 
 WorldWind's functionality. You'll  also find there links to many Web WorldWind resources, including a user guide. The 
 latest Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
 
@@ -47,7 +47,7 @@ displays an interactive virtual globe in an HTML canvas.
         <meta charset="UTF-8">
         <title>WorldWind Example</title>
         <!-- Include the Web WorldWind library. -->
-        <script src="http://worldwindserver.net/webworldwind/worldwind.min.js" type="text/javascript"></script>
+        <script src="worldwind.min.js" type="text/javascript"></script>
     </head>
     <body>
     <div style="position: absolute; top: 50px; left: 50px;">
