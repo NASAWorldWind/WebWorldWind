@@ -68,13 +68,23 @@ module.exports = function (grunt) {
         ],
 
         compress: {
-            main: {
+            images: {
                 options: {
                     archive: 'dist/images.zip'
                 },
                 files: [
                     {src: ['images/**']}
                 ]
+            },
+            dist: {
+                options: {
+                    archive: 'dist/WebWorldWind.zip'
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'dist/',
+                    src: ['**/*']
+                }]
             }
         },
 
@@ -109,5 +119,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'compress', 'copy']);
+    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'copy', 'compress']);
 };
