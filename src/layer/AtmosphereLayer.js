@@ -210,8 +210,8 @@ define([
 
             program.setScale(gl);
 
-            // Use this layer's night image when the light location is different than the eye location.
-            if (this.nightImageSource && this.time) {
+            // Use this layer's night image when the layer has time value defined
+            if (this.nightImageSource && (this.time !== null)) {
                 
                 this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
                 
