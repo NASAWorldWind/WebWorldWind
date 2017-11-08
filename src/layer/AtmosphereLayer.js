@@ -49,9 +49,6 @@ define([
             this._nightImageSource = nightImageSource ||
                 WorldWind.configuration.baseUrl + 'images/dnb_land_ocean_ice_2012.png';
 
-            //Documented in defineProperties below.
-            this._lightLocation = null;
-
             //Internal use only.
             //The light direction in cartesian space, computed form the lightLocation or defaults to the eyePoint.
             this._activeLightDirection = new Vec3(0, 0, 0);
