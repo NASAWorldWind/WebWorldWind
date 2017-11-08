@@ -34,11 +34,11 @@ deploy:
     on:
       tags: true
   # Create WebWorldWind.zip in the dist/ directory
-    - provider: script
-      script: ./travis/zipDistFolder.sh
-      skip_cleanup: true
-      on:
-        tags: true
+  - provider: script
+    script: ./travis/zipDistFolder.sh
+    skip_cleanup: true
+    on:
+      tags: true
   # Create a GitHub release and publish CHANGELOG.md and WebWorldWind.zip to the release assets
   - provider: releases
     api_key: $GITHUB_API_KEY
