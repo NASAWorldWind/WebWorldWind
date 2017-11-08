@@ -82,21 +82,6 @@ define([
         Object.defineProperties(AtmosphereLayer.prototype, {
 
             /**
-             * The geographic location of the light (sun). If the Layer time property is set, this location will be
-             * overriden to reflect the location of the sun at the specified time.
-             * @memberof AtmosphereLayer.prototype
-             * @type {Position}
-             */
-            lightLocation: {
-                get: function () {
-                    return this._lightLocation;
-                },
-                set: function (value) {
-                    this._lightLocation = value;
-                }
-            },
-
-            /**
              * Url for the night texture.
              * @memberof AtmosphereLayer.prototype
              * @type {URL}
@@ -229,7 +214,7 @@ define([
             program.setScale(gl);
 
             // Use this layer's night image when the light location is different than the eye location.
-            if (this.nightImageSource && this.lightLocation) {
+            if (this.nightImageSource && this.time) {
                 
                 this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
                 
@@ -323,11 +308,8 @@ define([
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.determineLightDirection = function (dc) {
             if (this.time !== null) {
-                this.lightLocation = SunPosition.getAsGeographicLocation(this.time);
-            }
-
-            if (this.lightLocation) {
-                dc.globe.computePointFromLocation(this.lightLocation.latitude, this.lightLocation.longitude,
+                var sunLocation = SunPosition.getAsGeographicLocation(this.time);
+                dc.globe.computePointFromLocation(sunLocation.latitude, sunLocation.longitude,
                     this._activeLightDirection);
             } else {
                 this._activeLightDirection.copy(dc.navigatorState.eyePoint);
