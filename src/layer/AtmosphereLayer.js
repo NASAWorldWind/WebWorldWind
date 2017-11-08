@@ -50,7 +50,7 @@ define([
                 WorldWind.configuration.baseUrl + 'images/dnb_land_ocean_ice_2012.png';
 
             //Internal use only.
-            //The light direction in cartesian space, computed form the lightLocation or defaults to the eyePoint.
+            //The light direction in cartesian space, computed from the layer time or defaults to the eyePoint.
             this._activeLightDirection = new Vec3(0, 0, 0);
 
             this._fullSphereSector = Sector.FULL_SPHERE;
