@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Web WorldWind",
   "main": "dist/worldwind.min.js",
-  "homepage": "https://nasaworldwind.github.io/",
+  "homepage": "https://worldwind.arc.nasa.gov",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
   },
@@ -20,8 +20,8 @@
   "scripts": {
     "build": "grunt",
     "clean": "grunt clean",
-    "test": "grunt karma",
     "doc": "grunt jsdoc",
+    "test": "grunt karma",
     "test:watch": "karma start karma.conf.js"
   },
   "files": [
