@@ -14,6 +14,7 @@ define([
         '../geom/Matrix3',
         '../geom/Sector',
         '../shaders/SkyProgram',
+        '../util/SunPosition',
         '../geom/Vec3',
         '../util/WWUtil'
     ],
@@ -25,6 +26,7 @@ define([
               Matrix3,
               Sector,
               SkyProgram,
+              SunPosition,
               Vec3,
               WWUtil) {
         "use strict";
@@ -47,11 +49,8 @@ define([
             this._nightImageSource = nightImageSource ||
                 WorldWind.configuration.baseUrl + 'images/dnb_land_ocean_ice_2012.png';
 
-            //Documented in defineProperties below.
-            this._lightLocation = null;
-
             //Internal use only.
-            //The light direction in cartesian space, computed form the lightLocation or defaults to the eyePoint.
+            //The light direction in cartesian space, computed from the layer time or defaults to the eyePoint.
             this._activeLightDirection = new Vec3(0, 0, 0);
 
             this._fullSphereSector = Sector.FULL_SPHERE;
@@ -78,20 +77,6 @@ define([
         AtmosphereLayer.prototype = Object.create(Layer.prototype);
 
         Object.defineProperties(AtmosphereLayer.prototype, {
-
-            /**
-             * The geographic location of the light (sun).
-             * @memberof AtmosphereLayer.prototype
-             * @type {Position}
-             */
-            lightLocation: {
-                get: function () {
-                    return this._lightLocation;
-                },
-                set: function (value) {
-                    this._lightLocation = value;
-                }
-            },
 
             /**
              * Url for the night texture.
@@ -225,8 +210,8 @@ define([
 
             program.setScale(gl);
 
-            // Use this layer's night image when the light location is different than the eye location.
-            if (this.nightImageSource && this.lightLocation) {
+            // Use this layer's night image when the layer has time value defined
+            if (this.nightImageSource && (this.time !== null)) {
                 
                 this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
                 
@@ -319,11 +304,11 @@ define([
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.determineLightDirection = function (dc) {
-            if (this.lightLocation != null) {
-                dc.globe.computePointFromLocation(this.lightLocation.latitude, this.lightLocation.longitude,
+            if (this.time !== null) {
+                var sunLocation = SunPosition.getAsGeographicLocation(this.time);
+                dc.globe.computePointFromLocation(sunLocation.latitude, sunLocation.longitude,
                     this._activeLightDirection);
-            }
-            else {
+            } else {
                 this._activeLightDirection.copy(dc.navigatorState.eyePoint);
             }
             this._activeLightDirection.normalize();
