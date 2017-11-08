@@ -6,9 +6,9 @@
  * @version $Id: Shapefiles.js 3361 2015-07-31 19:28:04Z tgaskins $
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 

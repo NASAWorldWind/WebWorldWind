@@ -3,9 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
         
@@ -25,8 +25,9 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
         
-        var lightLocation = new WorldWind.Position(19, 20, 0);
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
+        var timeStamp = Date.now();
+        atmosphereLayer.time = new Date(timeStamp);
         wwd.addLayer(atmosphereLayer);
 
         // Create a layer manager for controlling layer visibility.
@@ -41,7 +42,7 @@ requirejs(['../src/WorldWind',
                 runSunSimulation();
             }
             else {
-                atmosphereLayer.lightLocation = null;
+                atmosphereLayer.time = null;
                 clearInterval(sunInterval);
                 wwd.redraw();
             }
@@ -49,8 +50,8 @@ requirejs(['../src/WorldWind',
 
         function runSunSimulation() {
             sunInterval = setInterval(function () {
-                atmosphereLayer.lightLocation = lightLocation;
-                lightLocation.longitude += 3;
+                timeStamp += 180 * 1000;
+                atmosphereLayer.time = new Date(timeStamp);
                 wwd.redraw();
             }, 64);
         }

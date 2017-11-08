@@ -8,9 +8,9 @@
  * @version $Id: GeographicMeshes.js 3320 2015-07-15 20:53:05Z dcollins $
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -58,7 +58,7 @@ requirejs(['../src/WorldWind',
         var meshAttributes = new WorldWind.ShapeAttributes(null);
         meshAttributes.outlineColor = WorldWind.Color.BLUE;
         meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
-        meshAttributes.imageSource = "../images/400x230-splash-nww.png";
+        meshAttributes.imageSource = "data/400x230-splash-nww.png";
         meshAttributes.applyLighting = true;
         mesh.attributes = meshAttributes;
 
