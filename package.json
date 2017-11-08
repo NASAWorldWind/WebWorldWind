@@ -2,7 +2,7 @@
   "name": "@nasaworldwind/worldwind",
   "version": "0.0.1",
   "description": "Web WorldWind",
-  "main": "worldwind.min.js",
+  "main": "dist/worldwind.min.js",
   "homepage": "https://nasaworldwind.github.io/",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
@@ -13,31 +13,28 @@
     "NASA Project Manager <patrick.hogan@nasa.gov>",
     "ESA Consortium Contact <yann.voumard@solenix.ch>"
   ],
-  "directories": {
-    "lib": "./src",
-    "doc": "./api-doc",
-    "test": "./test",
-    "example": "./examples"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/NASAWorldWind/WebWorldWind.git"
   },
   "scripts": {
     "build": "grunt",
+    "clean": "grunt clean",
     "test": "grunt karma",
     "doc": "grunt jsdoc",
     "test:watch": "karma start karma.conf.js"
   },
   "files": [
-    "images/",
-    "images.zip",
-    "worldwind.js",
-    "worldwind.min.js"
+    "dist/images/",
+    "dist/images.zip",
+    "dist/worldwind.js",
+    "dist/worldwind.min.js"
   ],
   "devDependencies": {
     "grunt": "^1.0.1",
+    "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-compress": "^1.4.3",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-requirejs": "^1.0.0",
     "grunt-jsdoc": "^2.1.0",
     "grunt-karma": "^2.0.0",
