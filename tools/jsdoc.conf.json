@@ -1,7 +1,7 @@
 {
   "templates": {
     "default": {
-      "layoutFile": "./jdsoc.layout.tmpl"
+      "layoutFile": "jsdoc.layout.tmpl"
     }
   }
 }
