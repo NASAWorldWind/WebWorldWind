@@ -14,6 +14,13 @@ script:
 
 # Deploy build artifacts. Travis does not invoke this step for pull request builds
 deploy:
+  # Publish API documentation to GitHub Pages
+  - provider: pages
+    github_token: $GITHUB_API_KEY
+    local_dir: dist/api-doc
+    skip_cleanup: true
+    on:
+      branch: develop
   # Publish release artifacts to the npm repository
   - provider: npm
     email: $NPM_EMAIL
