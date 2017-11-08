@@ -1,7 +1,7 @@
 {
   "templates": {
     "default": {
-      "layoutFile": "./layout.tmpl"
+      "layoutFile": "./jdsoc.layout.tmpl"
     }
   }
 }

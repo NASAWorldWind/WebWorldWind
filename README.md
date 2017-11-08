@@ -21,6 +21,20 @@ The Web WorldWind [Developer's Guide](https://webworldwind.org/developers-guide)
 WorldWind's functionality. You'll  also find there links to many Web WorldWind resources, including a user guide. The 
 latest Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
 
+## Building
+
+[Install NodeJS](https://nodejs.org/download/). The build is known to work with v6.9.2 (LTS).
+
+- `npm install` downloads WorldWind's dependencies
+
+- `npm run build` builds everything
+
+- `npm run doc` generates the WorldWind API documentation
+
+- `npm run test` runs WorldWind's unit tests
+
+- `npm run test:watch` automatically runs WorldWind's unit tests when source code changes
+
 ## Example Usage
 
 Here is a simple web app using Web WorldWind. It is the contents of SimplestExample.html in the example collection. It 

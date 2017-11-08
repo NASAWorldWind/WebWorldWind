@@ -12,7 +12,7 @@ module.exports = function (grunt) {
                 src: ['src'],
                 options: {
                     destination: 'dist/api-doc',
-                    configure: 'config.json',
+                    configure: 'tools/jsdoc.conf.json',
                     readme: 'README.md',
                     recurse: true
                 }
