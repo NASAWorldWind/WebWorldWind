@@ -2,7 +2,7 @@
   "name": "@nasaworldwind/worldwind",
   "version": "0.0.1",
   "description": "Web WorldWind",
-  "main": "dist/worldwind.min.js",
+  "main": "build/dist/worldwind.min.js",
   "homepage": "https://worldwind.arc.nasa.gov",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
@@ -25,10 +25,10 @@
     "test:watch": "karma start karma.conf.js"
   },
   "files": [
-    "dist/images/",
-    "dist/images.zip",
-    "dist/worldwind.js",
-    "dist/worldwind.min.js"
+    "build/dist/images/",
+    "build/dist/images.zip",
+    "build/dist/worldwind.js",
+    "build/dist/worldwind.min.js"
   ],
   "devDependencies": {
     "grunt": "^1.0.1",
