@@ -7,11 +7,13 @@
  */
 module.exports = function (grunt) {
     grunt.initConfig({
+        pkg: grunt.file.readJSON('package.json'),
+
         jsdoc: {
             dist: {
                 src: ['src'],
                 options: {
-                    destination: 'dist/api-doc',
+                    destination: 'build/dist/api-doc',
                     configure: 'tools/jsdoc.conf.json',
                     readme: 'README.md',
                     recurse: true
@@ -25,7 +27,7 @@ module.exports = function (grunt) {
                     baseUrl: 'src',
                     name: '../tools/almond',
                     include: ['WorldWind'],
-                    out: 'dist/worldwind.min.js',
+                    out: 'build/dist/worldwind.min.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
@@ -38,7 +40,7 @@ module.exports = function (grunt) {
                     name: '../tools/almond',
                     include: ['WorldWind'],
                     optimize: 'none',
-                    out: 'dist/worldwind.js',
+                    out: 'build/dist/worldwind.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
@@ -54,27 +56,36 @@ module.exports = function (grunt) {
                 reporters: ['dots', 'junit', 'html'],
                 junitReporter: {
                     outputFile: 'test-results.xml',
-                    outputDir: 'test-results'
+                    outputDir: 'build/test-results'
                 },
                 htmlReporter: {
-                    outputFile: 'test-results/report.html',
+                    outputFile: 'build/test-results/report.html',
                 },
             }
         },
 
         clean: [
-            'dist/',
-            'test-results/'
+            'build/'
         ],
 
         compress: {
-            main: {
+            images: {
                 options: {
-                    archive: 'dist/images.zip'
+                    archive: 'build/dist/images.zip'
                 },
                 files: [
                     {src: ['images/**']}
                 ]
+            },
+            dist: {
+                options: {
+                    archive: 'build/WebWorldWind-Distribution-<%= pkg.version %>.zip'
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'build/dist/',
+                    src: ['**/*']
+                }]
             }
         },
 
@@ -85,14 +96,14 @@ module.exports = function (grunt) {
                     {
                         expand: true,
                         src: ['images/**', 'examples/**', '!examples/WorldWindShim.js', 'README.md', 'LICENSE.txt'],
-                        dest: 'dist/'
+                        dest: 'build/dist/'
                     },
                     // Copy and rename the deployment WorldWindShim which uses the minified library
                     {
                         expand: true,
                         cwd: 'tools',
                         src: ['WorldWindShim.build.js'],
-                        dest: 'dist/examples/',
+                        dest: 'build/dist/examples/',
                         rename: function (dest, src) {
                             return dest + src.replace('WorldWindShim.build', 'WorldWindShim');
                         }
@@ -109,5 +120,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
 
-    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'compress', 'copy']);
+    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'copy', 'compress']);
 };
