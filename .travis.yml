@@ -35,11 +35,11 @@ deploy:
     on:
       tags: true
   # Publish the contents of the dist archive to Artifactory for develop branch updates
-    - provider: script
-      script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/latest
-      skip_cleanup: true
-      on:
-        branch: develop
+  - provider: script
+    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/latest
+    skip_cleanup: true
+    on:
+      branch: develop
   # Create CHANGELOG.md in the current directory
   - provider: script
     script: ./travis/changelog.sh >> CHANGELOG.md
