@@ -26,8 +26,6 @@ requirejs(['./WorldWindShim',
         }
         
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
-        var timeStamp = Date.now();
-        atmosphereLayer.time = new Date(timeStamp);
         wwd.addLayer(atmosphereLayer);
 
         // Create a layer manager for controlling layer visibility.
@@ -35,6 +33,7 @@ requirejs(['./WorldWindShim',
 
         var sunSimulationCheckBox = document.getElementById('sun-simulation');
         var sunInterval = 0;
+        var timeStamp = Date.now();
         sunSimulationCheckBox.addEventListener('change', onSunCheckBoxClick, false);
 
         function onSunCheckBoxClick() {
