@@ -45,7 +45,7 @@ deploy:
     api_key: $GITHUB_API_KEY
     file_glob: true
     file:
-      - build/CHANGELOG.md
+      - CHANGELOG.md
       - build/WebWorldWind-Distribution-*.zip
     skip_cleanup: true
     on:
