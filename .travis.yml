@@ -17,7 +17,7 @@ deploy:
   # Publish API documentation to GitHub Pages
   - provider: pages
     github_token: $GITHUB_API_KEY
-    local_dir: dist/api-doc
+    local_dir: build/dist/api-doc
     skip_cleanup: true
     on:
       branch: develop
