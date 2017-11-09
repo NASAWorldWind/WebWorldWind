@@ -27,7 +27,6 @@ requirejs(['./WorldWindShim',
         
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
         var timeStamp = Date.now();
-        atmosphereLayer.time = new Date(timeStamp);
         wwd.addLayer(atmosphereLayer);
 
         // Create a layer manager for controlling layer visibility.
