@@ -21,6 +21,7 @@ define(['../../error/ArgumentError',
         './GeoJSONGeometryPolygon',
         '../../geom/Location',
         '../../util/Logger',
+        '../../shapes/Path',
         '../../shapes/Placemark',
         '../../shapes/PlacemarkAttributes',
         '../../shapes/Polygon',
@@ -47,6 +48,7 @@ define(['../../error/ArgumentError',
               GeoJSONGeometryPolygon,
               Location,
               Logger,
+              Path,
               Placemark,
               PlacemarkAttributes,
               Polygon,
@@ -654,7 +656,9 @@ define(['../../error/ArgumentError',
         };
 
         /**
-         * Creates a {@link SurfacePolyline} for a LineString geometry.
+         * Creates a {@link Path}s or a {@link SurfacePolyline} for a LineString geometry,
+         *  depending on the altitude optionally returned by the
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback}.
          * Applications typically do not call this method directly. It is called by
          * [addRenderablesForGeometry]{@link GeoJSONParser#addRenderablesForGeometry}.
          * <p>
@@ -685,22 +689,34 @@ define(['../../error/ArgumentError',
                 var positions = [];
                 for (var pointsIndex = 0, points = geometry.coordinates; pointsIndex < points.length; pointsIndex++) {
                     var longitude = points[pointsIndex][0],
-                        latitude = points[pointsIndex][1];
+                        latitude = points[pointsIndex][1],
                     //altitude = points[pointsIndex][2] ?  points[pointsIndex][2] : 0,
+                        altitude = configuration && configuration.altitude ? configuration.altitude : null,
+                        position;
                     var reprojectedCoordinate = this.getReprojectedIfRequired(
                         latitude,
                         longitude,
                         this.crs);
-                    var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+
+                    if (altitude) {
+                        position = new Position(reprojectedCoordinate[1], reprojectedCoordinate[0], altitude);
+                    } else {
+                        position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+                    }
                     positions.push(position);
                 }
 
                 var shape;
-                shape = new SurfacePolyline(
-                    positions,
-                    configuration && configuration.attributes ? configuration.attributes : null);
-                if (configuration.highlightAttributes) {
-                    shape.highlightAttributes = configuration.highlightAttributes;
+                if (altitude) {
+                    shape = new Path(positions, configuration && configuration.attributes ? configuration.attributes : null);
+                    if (configuration && configuration.extrude) {
+                        shape.extrude = configuration.extrude;
+                    }
+                    shape.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                } else {
+                    shape = new SurfacePolyline(
+                        positions,
+                        configuration && configuration.attributes ? configuration.attributes : null);
                 }
                 if (configuration && configuration.pickDelegate) {
                     shape.pickDelegate = configuration.pickDelegate;
@@ -713,7 +729,9 @@ define(['../../error/ArgumentError',
         };
 
         /**
-         * Creates {@link SurfacePolyline}s for a MultiLineString geometry.
+         * Creates a {@link Path}s or {@link SurfacePolyline}s for a MultiLineString geometry,
+         *  depending on the altitude optionally returned by the
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback}.
          * Applications typically do not call this method directly. It is called by
          * [addRenderablesForGeometry]{@link GeoJSONParser#addRenderablesForGeometry}.
          * <p>
@@ -747,20 +765,34 @@ define(['../../error/ArgumentError',
                     for (var positionIndex = 0, points = lines[linesIndex]; positionIndex < points.length;
                          positionIndex++) {
                         var longitude = points[positionIndex][0],
-                            latitude = points[positionIndex][1];
+                            latitude = points[positionIndex][1],
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
+                        altitude = configuration && configuration.altitude ? configuration.altitude : null,
+                        position;
                         var reprojectedCoordinate = this.getReprojectedIfRequired(
                             latitude,
                             longitude,
                             this.crs);
-                        var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+                        if (altitude) {
+                            position = new Position(reprojectedCoordinate[1], reprojectedCoordinate[0], altitude);
+                        } else {
+                            position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+                        }
                         positions.push(position);
                     }
 
                     var shape;
-                    shape = new SurfacePolyline(
-                        positions,
-                        configuration && configuration.attributes ? configuration.attributes : null);
+                    if (altitude) {
+                        shape = new Path(positions, configuration && configuration.attributes ? configuration.attributes : null);
+                        if (configuration && configuration.extrude) {
+                            shape.extrude = configuration.extrude;
+                        }
+                        shape.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                    } else {
+                        shape = new SurfacePolyline(
+                            positions,
+                            configuration && configuration.attributes ? configuration.attributes : null);
+                    }
                     if (configuration.highlightAttributes) {
                         shape.highlightAttributes = configuration.highlightAttributes;
                     }
@@ -776,7 +808,9 @@ define(['../../error/ArgumentError',
         };
 
         /**
-         * Creates a {@link SurfacePolygon} for a Polygon geometry.
+         * Creates a {@link Polygon}s or {@link SurfacePolygon} for a Polygon geometry,
+         * depending on the altitude optionally returned by the
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback}.
          * Applications typically do not call this method directly. It is called by
          * [addRenderablesForGeometry]{@link GeoJSONParser#addRenderablesForGeometry}.
          * <p>
@@ -809,21 +843,35 @@ define(['../../error/ArgumentError',
                     for (var positionIndex = 0, points = boundaries[boundariesIndex];
                          positionIndex < points.length; positionIndex++) {
                         var longitude = points[positionIndex][0],
-                            latitude = points[positionIndex][1];
+                            latitude = points[positionIndex][1],
                         //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,
+                        altitude = configuration && configuration.altitude ? configuration.altitude : null,
+                            position;
                         var reprojectedCoordinate = this.getReprojectedIfRequired(
                             latitude,
                             longitude,
                             this.crs);
-                        var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+                        if (altitude) {
+                            position = new Position(reprojectedCoordinate[1], reprojectedCoordinate[0], altitude);
+                        } else {
+                            position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+                        }
                         positions.push(position);
                     }
 
                     var shape;
-                    shape = new SurfacePolygon(
-                        positions,
-                        configuration && configuration.attributes ? configuration.attributes : null);
-                    if (configuration.highlightAttributes) {
+                    if (altitude) {
+                        shape = new Polygon(positions, configuration && configuration.attributes ? configuration.attributes : null);
+                        if (configuration && configuration.extrude) {
+                            shape.extrude = configuration.extrude;
+                        }
+                        shape.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                    } else {
+                        shape = new SurfacePolygon(
+                            positions,
+                            configuration && configuration.attributes ? configuration.attributes : null);
+                    }
+                   if (configuration.highlightAttributes) {
                         shape.highlightAttributes = configuration.highlightAttributes;
                     }
                     if (configuration && configuration.pickDelegate) {
@@ -837,7 +885,9 @@ define(['../../error/ArgumentError',
         };
 
         /**
-         * Creates {@link SurfacePolygon}s for a MultiPolygon geometry.
+         * Creates {@link Polygon}s or {@link SurfacePolygon}s for a MultiPolygon geometry,
+         * depending on the altitude optionally returned by the
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback}.
          * Applications typically do not call this method directly. It is called by
          * [addRenderablesForGeometry]{@link GeoJSONParser#addRenderablesForGeometry}.
          * <p>
@@ -873,22 +923,36 @@ define(['../../error/ArgumentError',
                         for (var positionIndex = 0, points = polygons[polygonsIndex][boundariesIndex];
                              positionIndex < points.length; positionIndex++) {
                             var longitude = points[positionIndex][0],
-                                latitude = points[positionIndex][1];
+                                latitude = points[positionIndex][1],
                             //altitude = points[positionIndex][2] ?  points[positionIndex][2] : 0,;
+                            altitude = configuration && configuration.altitude ? configuration.altitude : null,
+                            position;
 
                             var reprojectedCoordinate = this.getReprojectedIfRequired(
                                 latitude,
                                 longitude,
                                 this.crs);
-                            var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+                            if (altitude) {
+                                position = new Position(reprojectedCoordinate[1], reprojectedCoordinate[0], altitude);
+                            } else {
+                                position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
+                            }
                             positions.push(position);
                         }
                         boundaries.push(positions);
                     }
                     var shape;
-                    shape = new SurfacePolygon(
-                        boundaries,
-                        configuration && configuration.attributes ? configuration.attributes : null);
+                    if (altitude) {
+                            shape = new Polygon(positions, configuration && configuration.attributes ? configuration.attributes : null);
+                            if (configuration && configuration.extrude) {
+                                shape.extrude = configuration.extrude;
+                            }
+                            shape.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                    } else {
+                            shape = new SurfacePolygon(
+                                positions,
+                                configuration && configuration.attributes ? configuration.attributes : null);
+                    }
                     if (configuration.highlightAttributes) {
                         shape.highlightAttributes = configuration.highlightAttributes;
                     }
