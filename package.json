@@ -26,7 +26,6 @@
   },
   "files": [
     "build/dist/images/",
-    "build/dist/images.zip",
     "build/dist/worldwind.js",
     "build/dist/worldwind.min.js"
   ],
