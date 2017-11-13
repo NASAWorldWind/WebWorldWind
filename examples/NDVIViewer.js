@@ -3,9 +3,9 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 requirejs([
-        '../src/WorldWind',
+        './WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
 
         // Tell WorldWind to log only warnings and errors.

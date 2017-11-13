@@ -3,13 +3,13 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * Illustrates how to move SurfaceShapes while updating their state.
+ * Tests changing the state of SurfaceShape types with a timer.
  *
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -23,10 +23,13 @@ requirejs(['../src/WorldWind',
          * Add imagery layers.
          */
         var layers = [
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            {layer: new WorldWind.BMNGOneImageLayer(), enabled: true},
+            {layer: new WorldWind.BMNGLayer(), enabled: true},
+            {layer: new WorldWind.ShowTessellationLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
+            {layer: new WorldWind.FrameStatisticsLayer(wwd), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -40,8 +43,8 @@ requirejs(['../src/WorldWind',
 
         // Create and set attributes that will be shared with all the shapes.
         var attributes = new WorldWind.ShapeAttributes(null);
-        attributes.outlineWidth = 2;
-        attributes.outlineColor = WorldWind.Color.BLUE;
+        attributes.outlineWidth = 5;
+        attributes.outlineColor = WorldWind.Color.WHITE;
         attributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
 
         // Create highlight attributes that all the shapes will use (except polyline, see below).
@@ -66,7 +69,6 @@ requirejs(['../src/WorldWind',
         shapesLayer.addRenderable(rectangle);
 
         // Surface Sector
-
         var surfaceSector = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
         // Append counter to cycle an array of sectors and set it to this SurfaceSector
         surfaceSector.sectorCounter = 0;
@@ -106,6 +108,23 @@ requirejs(['../src/WorldWind',
         polyline.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polyline);
 
+        // Create another SurfacePolyline that crosses a big portion of the western hemisphere.
+        var bigPolylineBoundary = [];
+        bigPolylineBoundary.push(new WorldWind.Location(-45, -135));
+        bigPolylineBoundary.push(new WorldWind.Location(45, -32));
+        var bigPolyline = new WorldWind.SurfacePolyline(bigPolylineBoundary, attributes);
+        shapesLayer.addRenderable(bigPolyline);
+
+        // Create another bigger SurfaceRectangle that will have its number of edges changed
+        var bigRectangle = new WorldWind.SurfaceRectangle(new WorldWind.Location(0, 0), 200e4, 900e4, 45, attributes);
+        bigRectangle.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(bigRectangle);
+
+        // Create another surface ellipse near the pole to test its changing polar throttling
+        var polarEllipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(90, -110), 1e5, 5e6, 90, attributes);
+        polarEllipse.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(polarEllipse);
+
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
@@ -113,7 +132,7 @@ requirejs(['../src/WorldWind',
         var highlightController = new WorldWind.HighlightController(wwd);
 
         // Update SurfaceShapes according to a timer
-        window.setInterval(function() {
+        window.setInterval(function () {
             // Rotate ellipse 10 degrees clockwise
             ellipse.heading += 10;
 
@@ -123,26 +142,60 @@ requirejs(['../src/WorldWind',
             // Update circle radius size
             circle.radius === 200e3 ? circle.radius += 100e3 : circle.radius = 200e3;
 
-            // Shift polygon and polyline left and right
+            // Shift polygon and polyline eastward and westward
             polygon.boundaries = shiftBoundaries(polygon);
             polyline.boundaries = shiftBoundaries(polyline);
 
-            // Set
+            // Cycle through sectors in different locations
             surfaceSector.sector = changeSector(surfaceSector);
+
+            // Flip number of edges for the bigger rectangle.
+            // A rougher, lower edge count ban be seen in the lowest setting.
+            // See: SurfaceShape.DEFAULT_NUM_EDGE_INTERVALS
+            bigRectangle.maximumNumEdgeIntervals = flipNumberOfEdgeIntervals(bigRectangle);
+
+            // Cycle through the three different path types for the larger polyline:
+            // Great circle, rhumb line (looks straight in Mercator), and linear (looks straight in equirectangular).
+            bigPolyline.pathType = cycleThroughPathTypes(bigPolyline);
+
+            // Switch back and forth the polar throttling boundary rendering for the ellipse in the North Pole.
+            // Straight edges can be seen in equirectangular projection, that look like 'bumps' in the SurfaceEllipse
+            // boundary near the pole when reprojected in the 3D globe.
+            polarEllipse.polarThrottle === 10 ? polarEllipse.polarThrottle = 0 : polarEllipse.polarThrottle = 10;
 
             wwd.redraw();
         }, 1000);
 
-        function shiftBoundaries(shape){
+        function flipNumberOfEdgeIntervals(shape) {
+            if (shape.maximumNumEdgeIntervals === 128) { // 128 is the default number of edges
+                return 4; // Reduce the number of edges
+            } else {
+                return 128;
+            }
+        }
+
+        function cycleThroughPathTypes(shape) {
+            if (shape.pathType === WorldWind.GREAT_CIRCLE) {
+                return WorldWind.RHUMB_LINE;
+            }
+            else if (shape.pathType === WorldWind.RHUMB_LINE) {
+                return WorldWind.LINEAR;
+            }
+            else {
+                return WorldWind.GREAT_CIRCLE;
+            }
+        }
+
+        function shiftBoundaries(shape) {
 
             // Assuming the shape has two appended properties: shiftCounter and shiftDirection.
             shape.shiftCounter += 1;
 
-            switch(shape.shiftDirection) {
-                case shape.shiftDirection = "east":
+            switch (shape.shiftDirection) {
+                case "east":
                     shape.boundaries = shiftBoundariesEastward(shape.boundaries);
                     break;
-                case shape.shiftDirection = "west":
+                case "west":
                     shape.boundaries = shiftBoundariesWestward(shape.boundaries);
                     break;
                 default:
@@ -150,7 +203,7 @@ requirejs(['../src/WorldWind',
             }
 
             // Shift the shape 5 degrees and then change shift direction
-            if (shape.shiftCounter === 5){
+            if (shape.shiftCounter === 5) {
                 shape.shiftDirection === "east" ? shape.shiftDirection = "west" : shape.shiftDirection = "east";
                 shape.shiftCounter = 0;
             }
@@ -158,14 +211,14 @@ requirejs(['../src/WorldWind',
             return shape.boundaries;
         }
 
-        function shiftBoundariesWestward(boundaries){
+        function shiftBoundariesWestward(boundaries) {
             for (var i = 0; i < boundaries.length; i++) {
                 boundaries[i].longitude -= 1;
             }
             return boundaries;
         }
 
-        function shiftBoundariesEastward(boundaries){
+        function shiftBoundariesEastward(boundaries) {
             for (var i = 0; i < boundaries.length; i++) {
                 boundaries[i].longitude += 1;
             }
@@ -180,8 +233,8 @@ requirejs(['../src/WorldWind',
         rotatingSectors.push(new WorldWind.Sector(31, 35, -95, -90));
 
         // Cycle through the previous array and set it to the SurfaceSector
-        function changeSector(surfaceSector){
-            if (surfaceSector.sectorCounter < rotatingSectors.length - 1){
+        function changeSector(surfaceSector) {
+            if (surfaceSector.sectorCounter < rotatingSectors.length - 1) {
                 surfaceSector.sectorCounter += 1;
             }
             else {

@@ -4,10 +4,10 @@
  */
 
 requirejs([
-        '../src/WorldWind',
+        './WorldWindShim',
         './LayerManager'
     ],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         'use strict';
 
@@ -24,8 +24,9 @@ requirejs([
         wwd.addLayer(starFieldLayer);
         wwd.addLayer(atmosphereLayer);
 
-        starFieldLayer.time = new Date();
-        atmosphereLayer.lightLocation = WorldWind.SunPosition.getAsGeographicLocation(starFieldLayer.time);
+        var date = new Date();
+        starFieldLayer.time = date;
+        atmosphereLayer.time = date;
 
         var layerManger = new LayerManager(wwd);
         wwd.redraw();
@@ -42,8 +43,9 @@ requirejs([
         function onSunCheckBoxClick() {
             doRunSimulation = this.checked;
             if (!doRunSimulation) {
-                starFieldLayer.time = new Date();
-                atmosphereLayer.lightLocation = WorldWind.SunPosition.getAsGeographicLocation(starFieldLayer.time);
+                var date = new Date();
+                starFieldLayer.time = date;
+                atmosphereLayer.time = date;
             }
             wwd.redraw();
         }
@@ -51,8 +53,9 @@ requirejs([
         function runSunSimulation(wwd, stage) {
             if (stage === WorldWind.AFTER_REDRAW && doRunSimulation) {
                 timeStamp += (factor * 60 * 1000);
-                starFieldLayer.time = new Date(timeStamp);
-                atmosphereLayer.lightLocation = WorldWind.SunPosition.getAsGeographicLocation(starFieldLayer.time);
+                var date = new Date(timeStamp);
+                starFieldLayer.time = date;
+                atmosphereLayer.time = date;
                 wwd.redraw();
             }
         }

@@ -2,13 +2,9 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-requirejs(['../src/WorldWind',
-        '../src/formats/kml/KmlFile',
-        '../src/formats/kml/controls/KmlTreeVisibility',
+requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
-              KmlFile,
-              KmlTreeVisibility,
               LayerManager) {
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -32,7 +28,7 @@ requirejs(['../src/WorldWind',
             wwd.addLayer(layers[l].layer);
         }
 
-        var kmlFilePromise = new KmlFile('data/KML_Samples.kml', [new KmlTreeVisibility('treeControls', wwd)]);
+        var kmlFilePromise = new WorldWind.KmlFile('data/KML_Samples.kml', [new WorldWind.KmlTreeVisibility('treeControls', wwd)]);
         kmlFilePromise.then(function (kmlFile) {
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
             renderableLayer.currentTimeInterval = [
