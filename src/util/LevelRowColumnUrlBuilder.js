@@ -28,7 +28,7 @@ define([
          * address is <em>https://worldwind32.arc.nasa.gov</em> and the specified path-to-data is
          * <em>../standalonedata/Earth/BlueMarble256</em>, and the requested tile's level, row and column are 0, 5 and 9
          * respectively, and the image format is <em>image/jpeg</em>, the composed URL is
-         * <em>https://worldwind32.arc.nasa.gov/../standalonedata/Earth/BlueMarble256/0/5/5_9.jpg.
+         * <em>https://worldwind32.arc.nasa.gov/standalonedata/Earth/BlueMarble256/0/5/5_9.jpg</em>.
          *
          * @param {String} serverAddress The server address. May be null, in which case the address is assumed to be
          * the current location (see <code>window.location</code>) minus the last path component.
