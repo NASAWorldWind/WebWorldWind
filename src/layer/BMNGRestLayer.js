@@ -70,19 +70,8 @@ define([
             ];
             this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
 
-            // By default if no server address and path are sent as parameters in the constructor,
-            // the layer's data is retrieved from http://worldwindserver.net
-            this.serverAddress = serverAddress || "http://worldwindserver.net/webworldwind/";
-            this.pathToData = pathToData || "/standalonedata/Earth/BlueMarble256/";
-
-            // Alternatively, the data can be retrieved from a local folder as follows.
-            // - Download the file located in:
-            //   http://worldwindserver.net/webworldwind/WebWorldWindStandaloneData.zip
-            // - Unzip it into the Web WorldWind top-level directory so that the "standalonedata" directory is a peer
-            //   of examples, src, apps and worldwind.js.
-            // - Uncomment the following lines or call BMNGRestLayer from the application with these parameters:
-            //this.serverAddress = serverAddress || null;
-            //this.pathToData = pathToData || "../standalonedata/Earth/BlueMarble256/";
+            this.serverAddress = serverAddress;
+            this.pathToData = pathToData;
         };
 
         BMNGRestLayer.prototype = Object.create(Layer.prototype);
