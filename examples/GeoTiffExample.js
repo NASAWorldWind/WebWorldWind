@@ -26,7 +26,7 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        var resourcesUrl = "http://worldwindserver.net/webworldwind/data/black_sea_rgb.tif";
+        var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
 
         var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
 

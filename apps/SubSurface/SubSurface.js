@@ -60,7 +60,7 @@ define(['../../src/WorldWind',
                 WorldWind.OFFSET_FRACTION, 1.0);
             placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/white-dot.png";
 
-            var shapefileLibrary = "http://worldwindserver.net/webworldwind/data/shapefiles/springfield";
+            var shapefileLibrary = "https://worldwind.arc.nasa.gov/web/apps/data/shapefiles/springfield";
 
             var shapeConfigurationCallback = function (attributes, record) {
                 var configuration = {};

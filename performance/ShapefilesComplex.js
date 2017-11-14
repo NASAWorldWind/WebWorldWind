@@ -140,7 +140,7 @@ requirejs(['../src/WorldWind',
             }
         };
 
-        var shapefileLibrary = "http://worldwindserver.net/webworldwind/data/shapefiles/naturalearth";
+        var shapefileLibrary = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/naturalearth";
 
         // Create data for the world.
         var worldLayer = new WorldWind.RenderableLayer("Countries");

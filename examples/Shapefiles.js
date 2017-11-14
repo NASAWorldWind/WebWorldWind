@@ -72,7 +72,7 @@ requirejs(['./WorldWindShim',
             return configuration;
         };
 
-        var shapefileLibrary = "http://worldwindserver.net/webworldwind/data/shapefiles/naturalearth";
+        var shapefileLibrary = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/naturalearth";
 
         // Create data for the world.
         var worldLayer = new WorldWind.RenderableLayer("Countries");
@@ -86,7 +86,7 @@ requirejs(['./WorldWindShim',
         cityShapefile.load(null, shapeConfigurationCallback, cityLayer);
         wwd.addLayer(cityLayer);
 
-        var fortStory = "http://worldwindserver.net/webworldwind/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
+        var fortStory = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
         var fortStoryLayer = new WorldWind.RenderableLayer("Fort Story");
         var fortStoryShapefile = new WorldWind.Shapefile(fortStory);
         fortStoryShapefile.load(null, null, fortStoryLayer);

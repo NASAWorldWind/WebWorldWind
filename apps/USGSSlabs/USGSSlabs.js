@@ -69,7 +69,7 @@ define(['../../src/WorldWind',
         };
 
         USGSSlabs.prototype.loadSlabData = function (name, dataFile, width, color) {
-            var dataLocation = "http://worldwindserver.net/webworldwind/data/usgs/",
+            var dataLocation = "https://worldwind.arc.nasa.gov/web/apps/data/usgs/",
                 url = dataLocation + dataFile;
 
             var xhr = new XMLHttpRequest();
