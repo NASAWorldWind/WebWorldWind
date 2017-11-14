@@ -40,7 +40,7 @@ imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
 
     // Define the event listener to initialize Web WorldWind.
     function eventWindowLoaded() {
-        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_INFO);
+        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create a WorldWindow for the canvas. Use a REST elevation model rather than the default.
         var elevationModel = new WorldWind.EarthRestElevationModel(null, "../standalonedata/Earth/DTED0");
