@@ -1,8 +1,8 @@
 {
   "name": "@nasaworldwind/worldwind",
-  "version": "0.9.0-RC1",
+  "version": "0.9.0-RC2",
   "description": "Web WorldWind",
-  "main": "build/dist/worldwind.min.js",
+  "main": "build/worldwind.min.js",
   "homepage": "https://worldwind.arc.nasa.gov",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
