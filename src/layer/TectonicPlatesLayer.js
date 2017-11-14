@@ -71,7 +71,7 @@ define([
     });
 
     TectonicPlatesLayer.prototype.loadPlateData = function () {
-        var url = "http://worldwindserver.net/webworldwind/data/TectonicPlates.json";
+        var url = WorldWind.configuration.baseUrl + "images/TectonicPlates.json";
 
         var xhr = new XMLHttpRequest();
 
