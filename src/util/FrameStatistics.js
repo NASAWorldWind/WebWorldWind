@@ -4,7 +4,6 @@
  */
 /**
  * @exports FrameStatistics
- * @version $Id: FrameStatistics.js 3343 2015-07-28 18:22:59Z dcollins $
  */
 define([],
     function () {

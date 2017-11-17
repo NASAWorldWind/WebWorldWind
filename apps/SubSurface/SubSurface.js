@@ -2,9 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: SubSurface.js 3320 2015-07-15 20:53:05Z dcollins $
- */
 define(['../../src/WorldWind',
         '../util/GoToBox',
         '../util/LayersPanel',

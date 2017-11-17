@@ -4,7 +4,6 @@
  */
 /**
  * @exports PeriodicTimeSequence
- * @version $Id: PeriodicTimeSequence.js 3362 2015-07-31 19:29:12Z tgaskins $
  */
 define([
         '../error/ArgumentError',

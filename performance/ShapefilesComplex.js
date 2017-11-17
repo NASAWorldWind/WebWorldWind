@@ -2,10 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: ShapefilesComplex.js 3102 2015-05-20 00:20:02Z tgaskins $
- */
-
 requirejs(['../src/WorldWind',
         '../examples/LayerManager',
         '../examples/CoordinateController'],

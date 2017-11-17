@@ -4,7 +4,6 @@
  */
 /**
  * @exports OrderedRenderable
- * @version $Id: OrderedRenderable.js 2694 2015-01-28 02:19:33Z tgaskins $
  */
 define(['../util/Logger',
         '../error/UnsupportedOperationError'

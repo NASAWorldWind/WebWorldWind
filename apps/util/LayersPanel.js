@@ -4,7 +4,6 @@
  */
 /**
  * @exports LayersPanel
- * @version $Id: LayersPanel.js 3362 2015-07-31 19:29:12Z tgaskins $
  */
 define(function () {
     "use strict";

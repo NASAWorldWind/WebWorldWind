@@ -4,7 +4,6 @@
  */
 /**
  * @exports TextAttributes
- * @version $Id: TextAttributes.js 3295 2015-06-30 19:16:37Z tgaskins $
  */
 define([
         '../util/Color',

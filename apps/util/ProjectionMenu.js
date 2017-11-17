@@ -4,7 +4,6 @@
  */
 /**
  * @exports ProjectionMenu
- * @version $Id: ProjectionMenu.js 3185 2015-06-12 19:12:09Z tgaskins $
  */
 define(function () {
     "use strict";

@@ -4,7 +4,6 @@
  */
 /**
  * @exports Tile
- * @version $Id: Tile.js 3125 2015-05-29 14:43:25Z tgaskins $
  */
 define([
         '../error/ArgumentError',

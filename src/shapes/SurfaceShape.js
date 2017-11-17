@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceShape
- * @version $Id: SurfaceShape.js 3191 2015-06-15 19:35:57Z tgaskins $
  */
 define([
         '../error/AbstractError',

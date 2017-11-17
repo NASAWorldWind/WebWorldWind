@@ -4,7 +4,6 @@
  */
 /**
  * @exports TileFactory
- * @version $Id: TileFactory.js 2664 2015-01-21 02:16:16Z tgaskins $
  */
 define(['../util/Logger',
         '../error/UnsupportedOperationError'

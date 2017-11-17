@@ -4,7 +4,6 @@
  */
 /**
  * @exports GeographicText
- * @version $Id: GeographicText.js 3262 2015-06-25 16:50:39Z tgaskins $
  */
 define([
         '../error/ArgumentError',

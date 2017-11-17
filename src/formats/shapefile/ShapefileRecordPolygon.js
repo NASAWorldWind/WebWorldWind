@@ -4,7 +4,6 @@
  */
 /**
  * @exports ShapefileRecordPolygon
- * @version $Id: ShapefileRecordPolygon.js 2984 2015-04-06 23:00:34Z danm $
  */
 define(['../../formats/shapefile/Shapefile',
         '../../formats/shapefile/ShapefileRecord'

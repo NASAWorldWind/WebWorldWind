@@ -4,7 +4,6 @@
  */
 /**
  * @exports Rectangle
- * @version $Id: Rectangle.js 3174 2015-06-10 19:36:49Z tgaskins $
  */
 define([
         '../util/Logger'

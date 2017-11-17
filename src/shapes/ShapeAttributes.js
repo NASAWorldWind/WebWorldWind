@@ -4,7 +4,6 @@
  */
 /**
  * @exports ShapeAttributes
- * @version $Id: ShapeAttributes.js 3270 2015-06-26 01:09:56Z tgaskins $
  */
 define([
         '../util/Color',

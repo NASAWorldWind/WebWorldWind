@@ -4,7 +4,6 @@
  */
 /**
  * @exports ViewControlsLayer
- * @version $Id: ViewControlsLayer.js 3142 2015-06-03 15:37:54Z tgaskins $
  */
 define([
         '../geom/Angle',

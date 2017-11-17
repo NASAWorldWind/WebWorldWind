@@ -4,7 +4,6 @@
  */
 /**
  * @exports DrawContext
- * @version $Id: DrawContext.js 3351 2015-07-28 22:03:20Z dcollins $
  */
 define([
         '../error/ArgumentError',

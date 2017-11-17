@@ -4,10 +4,7 @@
  */
 /**
  * Illustrates how to display SurfaceShapes.
- *
- * @version $Id: SurfaceShapes.js 3189 2015-06-15 19:27:19Z tgaskins $
  */
-
 requirejs(['../src/WorldWind',
         '../examples/LayerManager',
         '../examples/CoordinateController'],

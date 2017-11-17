@@ -4,7 +4,6 @@
  */
 /**
  * @exports Location
- * @version $Id: Location.js 3116 2015-05-27 01:30:07Z tgaskins $
  */
 define([
         '../geom/Angle',

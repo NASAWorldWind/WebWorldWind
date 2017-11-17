@@ -4,7 +4,6 @@
  */
 /**
  * @exports GpuShader
- * @version $Id: GpuShader.js 2906 2015-03-17 18:45:22Z tgaskins $
  */
 define([
         '../error/ArgumentError',

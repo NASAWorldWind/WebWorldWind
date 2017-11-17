@@ -4,7 +4,6 @@
  */
 /**
  * @exports RotationRecognizer
- * @version $Id: RotationRecognizer.js 3239 2015-06-22 23:28:12Z dcollins $
  */
 define([
         '../geom/Angle',

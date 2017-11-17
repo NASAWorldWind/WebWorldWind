@@ -4,7 +4,6 @@
  */
 /**
  * @exports BingWMSLayer
- * @version $Id: BingWMSLayer.js 3403 2015-08-15 02:00:01Z tgaskins $
  */
 define([
         '../geom/Location',

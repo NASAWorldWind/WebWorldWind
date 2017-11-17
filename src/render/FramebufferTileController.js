@@ -4,7 +4,6 @@
  */
 /**
  * @exports FramebufferTileController
- * @version $Id: FramebufferTileController.js 3130 2015-05-29 18:20:15Z dcollins $
  */
 define([
         '../error/ArgumentError',

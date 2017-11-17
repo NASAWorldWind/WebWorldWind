@@ -4,7 +4,6 @@
  */
 /**
  * @exports ProjectionEquirectangular
- * @version $Id: ProjectionEquirectangular.js 2821 2015-02-20 16:59:27Z dcollins $
  */
 define([
         '../geom/Angle',

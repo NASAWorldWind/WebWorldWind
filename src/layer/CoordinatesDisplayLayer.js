@@ -4,7 +4,6 @@
  */
 /**
  * @exports CoordinatesDisplayLayer
- * @version $Id: CoordinatesDisplayLayer.js 3319 2015-07-15 20:45:54Z dcollins $
  */
 define([
         '../error/ArgumentError',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports MemoryCache
- * @version $Id: MemoryCache.js 2911 2015-03-19 18:36:01Z tgaskins $
  */
 define([
         '../error/ArgumentError',

@@ -5,10 +5,7 @@
 /**
  * Illustrates how to use a GoToAnimator to smoothly move the view to a new location. This example listens for
  * terrain picks and moves the view to the location picked.
- *
- * @version $Id: GoToLocation.js 3320 2015-07-15 20:53:05Z dcollins $
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

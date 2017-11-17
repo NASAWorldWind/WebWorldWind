@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceRectangle
- * @version $Id: SurfaceRectangle.js 3195 2015-06-15 23:59:30Z tgaskins $
  */
 define([
         '../geom/Angle',

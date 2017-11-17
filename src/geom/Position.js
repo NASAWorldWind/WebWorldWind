@@ -4,7 +4,6 @@
  */
 /**
  * @exports Position
- * @version $Id: Position.js 2933 2015-03-27 01:18:24Z tgaskins $
  */
 define([
         '../geom/Angle',

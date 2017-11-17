@@ -4,10 +4,7 @@
  */
 /**
  * Illustrates how to display text at screen positions. Uses offsets to align the text relative to its position.
- *
- * @version $Id: ScreenText.js 3320 2015-07-15 20:53:05Z dcollins $
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

@@ -4,7 +4,6 @@
  */
 /**
  * @exports GpuResourceCache
- * @version $Id: GpuResourceCache.js 3023 2015-04-15 20:24:17Z tgaskins $
  */
 define([
         '../util/AbsentResourceList',

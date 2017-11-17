@@ -4,7 +4,6 @@
  */
 /**
  * @exports Level
- * @version $Id: Level.js 2952 2015-04-01 00:33:54Z tgaskins $
  */
 define([
         '../geom/Angle',

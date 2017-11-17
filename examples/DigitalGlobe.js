@@ -2,10 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: DigitalGlobe.js 3418 2015-08-22 00:17:05Z tgaskins $
- */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

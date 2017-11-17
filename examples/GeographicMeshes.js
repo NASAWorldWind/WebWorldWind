@@ -4,10 +4,7 @@
  */
 /**
  * Illustrates how to display GeographicMesh shapes.
- *
- * @version $Id: GeographicMeshes.js 3320 2015-07-15 20:53:05Z dcollins $
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

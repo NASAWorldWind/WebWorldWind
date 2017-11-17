@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceEllipse
- * @version $Id: SurfaceEllipse.js 3014 2015-04-14 01:06:17Z danm $
  */
 define([
         '../geom/Angle',

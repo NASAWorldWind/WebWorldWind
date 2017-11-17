@@ -4,7 +4,6 @@
  */
 /**
  * @exports WorldWindow
- * @version $Id: WorldWindow.js 3402 2015-08-14 17:28:09Z tgaskins $
  */
 define([
         './error/ArgumentError',

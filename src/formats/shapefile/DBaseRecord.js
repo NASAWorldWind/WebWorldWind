@@ -4,7 +4,6 @@
  */
 /**
  * @exports DBaseRecord
- * @version $Id: DBaseRecord.js 2980 2015-04-03 23:45:43Z danm $
  */
 define(['../../error/ArgumentError',
         '../../util/ByteBuffer',

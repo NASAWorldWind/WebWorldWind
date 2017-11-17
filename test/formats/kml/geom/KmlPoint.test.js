@@ -2,9 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: Vec3.test.js 2498 2014-12-01 22:21:09Z danm $
- */
 define([
     'src/util/XmlDocument',
     'src/formats/kml/geom/KmlPoint'

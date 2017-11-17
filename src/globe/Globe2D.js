@@ -4,7 +4,6 @@
  */
 /**
  * @exports Globe2D
- * @version $Id: Globe2D.js 3205 2015-06-17 18:05:23Z tgaskins $
  */
 define([
         '../globe/Globe',

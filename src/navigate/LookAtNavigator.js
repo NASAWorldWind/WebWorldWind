@@ -4,7 +4,6 @@
  */
 /**
  * @exports LookAtNavigator
- * @version $Id: LookAtNavigator.js 3321 2015-07-16 21:34:58Z dcollins $
  */
 define([
         '../geom/Angle',

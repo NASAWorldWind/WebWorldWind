@@ -4,7 +4,6 @@
  */
 /**
  * @exports FrameStatisticsLayer
- * @version $Id: FrameStatisticsLayer.js 3343 2015-07-28 18:22:59Z dcollins $
  */
 define([
         '../error/ArgumentError',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports AbstractError
- * @version $Id: AbstractError.js 2913 2015-03-19 19:01:18Z tgaskins $
  */
 define(function () {
     "use strict";

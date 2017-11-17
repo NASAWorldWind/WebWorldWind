@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfacePolygon
- * @version $Id: SurfacePolygon.js 3193 2015-06-15 22:29:13Z tgaskins $
  */
 define([
         '../error/ArgumentError',

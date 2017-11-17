@@ -4,7 +4,6 @@
  */
 /**
  * @exports EarthRestElevationModel
- * @version $Id: EarthElevationModel.js 2638 2015-01-05 20:44:18Z tgaskins $
  */
 define([
         '../geom/Location',

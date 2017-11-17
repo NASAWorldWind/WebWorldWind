@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfacePolyline
- * @version $Id: SurfacePolyline.js 3014 2015-04-14 01:06:17Z danm $
  */
 define([
         '../error/ArgumentError',

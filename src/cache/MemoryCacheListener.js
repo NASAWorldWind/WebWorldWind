@@ -3,11 +3,8 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 /**
- * @exports MemoryCacheListener
- * @version $Id: MemoryCacheListener.js 2912 2015-03-19 18:49:29Z tgaskins $
- */
-/**
  * Defines an interface for {@link MemoryCache} listeners.
+ * @exports MemoryCacheListener
  * @interface MemoryCacheListener
  */
 define([

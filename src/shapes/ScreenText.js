@@ -4,7 +4,6 @@
  */
 /**
  * @exports ScreenText
- * @version $Id: ScreenText.js 3293 2015-06-30 18:20:17Z dcollins $
  */
 define([
         '../error/ArgumentError',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports NavigatorState
- * @version $Id: NavigatorState.js 3279 2015-06-26 22:42:56Z tgaskins $
  */
 define([
         '../error/ArgumentError',

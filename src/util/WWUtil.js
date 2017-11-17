@@ -2,9 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: WWUtil.js 3402 2015-08-14 17:28:09Z tgaskins $
- */
 define([
         '../error/ArgumentError',
         '../geom/Line',

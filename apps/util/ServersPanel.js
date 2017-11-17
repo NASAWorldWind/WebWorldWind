@@ -4,7 +4,6 @@
  */
 /**
  * @exports ServersPanel
- * @version $Id: ServersPanel.js 3413 2015-08-20 19:08:20Z tgaskins $
  */
 define(function () {
     "use strict";

@@ -2,10 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: Vec2.js 2946 2015-03-31 20:37:33Z dcollins $
- */
-
 define([
         '../util/Logger',
         '../error/ArgumentError',

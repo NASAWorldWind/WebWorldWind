@@ -4,7 +4,6 @@
  */
 /**
  * @exports GestureRecognizer
- * @version $Id: GestureRecognizer.js 3241 2015-06-22 23:52:49Z dcollins $
  */
 define([
         '../error/ArgumentError',

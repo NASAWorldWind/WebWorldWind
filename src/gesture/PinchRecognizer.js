@@ -4,7 +4,6 @@
  */
 /**
  * @exports PinchRecognizer
- * @version $Id: PinchRecognizer.js 3239 2015-06-22 23:28:12Z dcollins $
  */
 define(['../gesture/GestureRecognizer'],
     function (GestureRecognizer) {

@@ -4,7 +4,6 @@
  */
 /**
  * @exports NominatimGeocoder
- * @version $Id: NominatimGeocoder.js 3133 2015-06-02 16:48:25Z tgaskins $
  */
 define([
         '../util/Logger'
