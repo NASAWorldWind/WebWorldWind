@@ -4,7 +4,6 @@
  */
 /**
  * @exports Offset
- * @version $Id: Offset.js 2958 2015-04-01 23:25:29Z tgaskins $
  */
 define(['../geom/Vec2'
     ],

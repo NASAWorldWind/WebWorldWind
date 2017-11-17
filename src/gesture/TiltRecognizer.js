@@ -4,7 +4,6 @@
  */
 /**
  * @exports TiltRecognizer
- * @version $Id: TiltRecognizer.js 3223 2015-06-19 23:16:36Z dcollins $
  */
 define(['../gesture/PanRecognizer'],
     function (PanRecognizer) {

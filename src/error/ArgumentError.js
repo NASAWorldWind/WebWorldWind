@@ -4,7 +4,6 @@
  */
 /**
  * @exports ArgumentError
- * @version $Id: ArgumentError.js 2631 2015-01-02 21:32:32Z tgaskins $
  */
 define(['../error/AbstractError'],
     function (AbstractError) {

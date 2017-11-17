@@ -4,7 +4,6 @@
  */
 /**
  * @exports CompassLayer
- * @version $Id: CompassLayer.js 2978 2015-04-03 22:55:55Z tgaskins $
  */
 define([
         '../shapes/Compass',

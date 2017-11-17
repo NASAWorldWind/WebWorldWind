@@ -4,7 +4,6 @@
  */
 /**
  * @exports UrlBuilder
- * @version $Id: UrlBuilder.js 2938 2015-03-30 15:02:00Z tgaskins $
  */
 define(['../util/Logger',
         '../error/UnsupportedOperationError'

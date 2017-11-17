@@ -5,10 +5,7 @@
 /**
  * Illustrates the WorldWind configuration options and how to set them. In order to have an effect, most configuration
  * options must be set before creating a WorldWindow or any other WorldWind object.
- *
- * @version $Id: Configuration.js 3320 2015-07-15 20:53:05Z dcollins $
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

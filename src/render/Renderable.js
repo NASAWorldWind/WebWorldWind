@@ -4,7 +4,6 @@
  */
 /**
  * @exports Renderable
- * @version $Id: Renderable.js 2951 2015-03-31 23:31:08Z tgaskins $
  */
 define([
         '../util/Logger',

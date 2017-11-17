@@ -4,7 +4,6 @@
  */
 /**
  * @exports Texture
- * @version $Id: Texture.js 3414 2015-08-20 19:09:19Z tgaskins $
  */
 define([
         '../error/ArgumentError',

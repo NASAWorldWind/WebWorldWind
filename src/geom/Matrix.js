@@ -4,9 +4,7 @@
  */
 /**
  * @exports Matrix
- * @version $Id: Matrix.js 3298 2015-07-06 17:28:33Z dcollins $
  */
-
 define([
         '../geom/Angle',
         '../error/ArgumentError',

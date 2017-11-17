@@ -4,7 +4,6 @@
  */
 /**
  * @exports GeographicProjection
- * @version $Id: GeographicProjection.js 2821 2015-02-20 16:59:27Z dcollins $
  */
 define([
         '../error/ArgumentError',

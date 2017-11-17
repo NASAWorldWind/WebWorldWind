@@ -4,10 +4,7 @@
  */
 /**
  * Illustrates how to display and pick Paths.
- *
- * @version $Id: VeryManyPaths.js 3259 2015-06-25 00:53:55Z tgaskins $
  */
-
 requirejs(['../src/WorldWind',
         '../examples/LayerManager'],
     function (ww,

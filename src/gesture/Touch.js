@@ -4,7 +4,6 @@
  */
 /**
  * @exports Touch
- * @version $Id: Touch.js 3221 2015-06-19 22:55:04Z dcollins $
  */
 define([],
     function () {

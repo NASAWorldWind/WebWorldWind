@@ -4,10 +4,7 @@
  */
 /**
  * Illustrates the use of multiple WorldWindows on the same page.
- *
- * @version $Id: MultiWindow.js 3314 2015-07-10 18:28:45Z dcollins $
  */
-
 requirejs(['./WorldWindShim'], function () {
     "use strict";
 

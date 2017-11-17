@@ -4,7 +4,6 @@
  */
 /**
  * @exports Font
- * @version $Id: Font.js 2660 2015-01-20 19:20:11Z danm $
  */
 define([
         '../error/ArgumentError',

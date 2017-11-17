@@ -4,7 +4,6 @@
  */
 /**
  * @exports WWMessage
- * @version $Id: WWMessage.js 3418 2015-08-22 00:17:05Z tgaskins $
  */
 define([],
     function () {

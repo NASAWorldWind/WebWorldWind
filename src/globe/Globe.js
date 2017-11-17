@@ -4,7 +4,6 @@
  */
 /**
  * @exports Globe
- * @version $Id: Globe.js 2940 2015-03-30 17:58:36Z tgaskins $
  */
 define([
         '../geom/Angle',

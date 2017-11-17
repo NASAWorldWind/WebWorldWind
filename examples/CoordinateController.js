@@ -4,7 +4,6 @@
  */
 /**
  * @exports CoordinateController
- * @version $Id: CoordinateController.js 3313 2015-07-10 17:59:29Z dcollins $
  */
 define(function () {
     "use strict";

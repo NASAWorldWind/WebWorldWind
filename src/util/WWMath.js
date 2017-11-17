@@ -2,9 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: WWMath.js 3305 2015-07-07 21:55:51Z dcollins $
- */
 define([
         '../geom/Angle',
         '../error/ArgumentError',

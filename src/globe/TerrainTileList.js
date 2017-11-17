@@ -4,7 +4,6 @@
  */
 /**
  * @exports TerrainTileList
- * @version $Id: TerrainTileList.js 2758 2015-02-09 00:20:46Z tgaskins $
  */
 define(['../error/ArgumentError',
         '../util/Logger',

@@ -2,9 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: Explorer.js 3362 2015-07-31 19:29:12Z tgaskins $
- */
 define(['../../src/WorldWind',
         '../util/GoToBox',
         '../util/LayersPanel',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports DBaseField
- * @version $Id: DBaseField.js 2974 2015-04-03 19:52:11Z tgaskins $
  */
 define(['../../error/ArgumentError',
         '../../util/ByteBuffer',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports Color
- * @version $Id: Color.js 3017 2015-04-14 17:10:31Z dcollins $
  */
 define([
         '../util/Logger'

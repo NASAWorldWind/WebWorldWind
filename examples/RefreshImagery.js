@@ -5,10 +5,7 @@
 /**
  * Shows how to cause an image layer's imagery to be re-retrieved from its origin. You should do this only if you
  * know the imagery is changing at the server.
- *
- * @version $Id: RefreshImagery.js 3320 2015-07-15 20:53:05Z dcollins $
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

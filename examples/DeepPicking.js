@@ -4,10 +4,7 @@
  */
 /**
  * Illustrates how to set up deep picking. See line 117.
- *
- * @version $Id: DeepPicking.js 3320 2015-07-15 20:53:05Z dcollins $
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

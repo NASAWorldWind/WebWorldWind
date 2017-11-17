@@ -4,7 +4,6 @@
  */
 /**
  * @exports Frustum
- * @version $Id: Frustum.js 2919 2015-03-22 20:46:59Z tgaskins $
  */
 define([
         '../error/ArgumentError',

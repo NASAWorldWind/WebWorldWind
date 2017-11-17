@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceShapeTileBuilder
- * @version $Id: SurfaceShapeTileBuilder.js 3048 2015-04-23 23:26:47Z danm $
  */
 define([
         '../error/ArgumentError',

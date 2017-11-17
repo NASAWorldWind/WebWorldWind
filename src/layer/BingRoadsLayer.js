@@ -4,7 +4,6 @@
  */
 /**
  * @exports BingRoadsLayer
- * @version $Id: BingRoadsLayer.js 2883 2015-03-06 19:04:42Z tgaskins $
  */
 define([
         '../geom/Location',

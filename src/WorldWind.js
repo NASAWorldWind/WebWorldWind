@@ -2,9 +2,6 @@
  * Copyright (C) 2014 United States Government as represented by the Administrator of the
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
-/**
- * @version $Id: WorldWind.js 3418 2015-08-22 00:17:05Z tgaskins $
- */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
         './error/AbstractError',
         './geom/Angle',

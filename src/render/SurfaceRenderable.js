@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceRenderable
- * @version $Id: SurfaceRenderable.js 3351 2015-07-28 22:03:20Z dcollins $
  */
 define(['../util/Logger',
         '../error/UnsupportedOperationError'

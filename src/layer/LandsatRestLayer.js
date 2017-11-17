@@ -4,7 +4,6 @@
  */
 /**
  * @exports LandsatRestLayer
- * @version $Id: LandsatRestLayer.js 2939 2015-03-30 16:50:49Z tgaskins $
  */
 define([
         '../error/ArgumentError',

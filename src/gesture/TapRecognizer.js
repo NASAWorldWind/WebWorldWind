@@ -4,7 +4,6 @@
  */
 /**
  * @exports TapRecognizer
- * @version $Id: TapRecognizer.js 3223 2015-06-19 23:16:36Z dcollins $
  */
 define(['../gesture/GestureRecognizer'],
     function (GestureRecognizer) {

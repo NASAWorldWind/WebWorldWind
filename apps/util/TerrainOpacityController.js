@@ -4,7 +4,6 @@
  */
 /**
  * @exports TerrainOpacityController
- * @version $Id: TerrainOpacityController.js 3217 2015-06-19 18:58:03Z tgaskins $
  */
 define(function () {
     "use strict";

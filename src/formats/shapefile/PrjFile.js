@@ -4,7 +4,6 @@
  */
 /**
  * @exports PrjFile
- * @version $Id: PrjFile.js 2960 2015-04-02 01:17:06Z danm $
  */
 define(['../../error/ArgumentError',
         '../../util/Logger',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports Terrain
- * @version $Id: Terrain.js 3018 2015-04-14 17:50:06Z dcollins $
  */
 define([
         '../error/ArgumentError',

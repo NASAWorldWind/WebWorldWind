@@ -4,7 +4,6 @@
  */
 /**
  * @exports BingImageryUrlBuilder
- * @version $Id: BingImageryUrlBuilder.js 3094 2015-05-14 23:02:03Z tgaskins $
  */
 define([
         '../error/ArgumentError',

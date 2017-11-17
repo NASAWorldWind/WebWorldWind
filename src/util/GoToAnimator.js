@@ -4,7 +4,6 @@
  */
 /**
  * @exports GoToAnimator
- * @version $Id: GoToAnimator.js 3164 2015-06-09 15:35:14Z tgaskins $
  */
 define([
         '../geom/Location',

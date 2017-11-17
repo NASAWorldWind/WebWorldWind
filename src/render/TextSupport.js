@@ -4,7 +4,6 @@
  */
 /**
  * @exports TextSupport
- * @version $Id: TextSupport.js 3302 2015-07-06 22:20:36Z dcollins $
  */
 define([
         '../error/ArgumentError',

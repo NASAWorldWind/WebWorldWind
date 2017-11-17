@@ -4,7 +4,6 @@
  */
 /**
  * @exports ByteBuffer
- * @version $Id: ByteBuffer.js 2954 2015-04-01 22:08:16Z danm $
  */
 define(['../error/ArgumentError',
         '../util/Logger'

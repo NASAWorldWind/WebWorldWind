@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceTileRendererProgram
- * @version $Id: SurfaceTileRendererProgram.js 3327 2015-07-21 19:03:39Z dcollins $
  */
 define([
         '../error/ArgumentError',

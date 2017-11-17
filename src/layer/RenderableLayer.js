@@ -4,7 +4,6 @@
  */
 /**
  * @exports RenderableLayer
- * @version $Id: RenderableLayer.js 3334 2015-07-22 19:15:43Z tgaskins $
  */
 define([
         '../error/ArgumentError',

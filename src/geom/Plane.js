@@ -4,7 +4,6 @@
  */
 /**
  * @exports Plane
- * @version $Id: Plane.js 2935 2015-03-27 17:59:48Z tgaskins $
  */
 define([
         '../error/ArgumentError',

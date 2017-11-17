@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceShapeTile
- * @version $Id: SurfaceShapeTile.js 3048 2015-04-23 23:26:47Z danm $
  */
 define([
         '../geom/Angle',

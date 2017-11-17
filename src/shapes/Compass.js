@@ -4,7 +4,6 @@
  */
 /**
  * @exports Compass
- * @version $Id: Compass.js 3114 2015-05-27 01:08:58Z tgaskins $
  */
 define([
         '../error/ArgumentError',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports AbstractShape
- * @version $Id: AbstractShape.js 3259 2015-06-25 00:53:55Z tgaskins $
  */
 define([
         '../error/ArgumentError',

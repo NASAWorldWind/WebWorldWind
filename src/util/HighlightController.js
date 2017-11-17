@@ -4,7 +4,6 @@
  */
 /**
  * @exports HighlightController
- * @version $Id: HighlightController.js 3260 2015-06-25 01:06:21Z tgaskins $
  */
 define([
         '../error/ArgumentError',

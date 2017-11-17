@@ -4,7 +4,6 @@
  */
 /**
  * @exports OpenStreetMapImageLayer
- * @version $Id: OpenStreetMapImageLayer.js 3120 2015-05-28 02:32:45Z tgaskins $
  */
 define([
         '../geom/Angle',

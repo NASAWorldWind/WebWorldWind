@@ -4,7 +4,6 @@
  */
 /**
  * @exports ElevationModel
- * @version $Id: ElevationModel.js 3415 2015-08-20 19:15:57Z tgaskins $
  */
 define([
         '../util/AbsentResourceList',

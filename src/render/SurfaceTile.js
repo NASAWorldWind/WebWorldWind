@@ -4,7 +4,6 @@
  */
 /**
  * @exports SurfaceTile
- * @version $Id: SurfaceTile.js 2941 2015-03-30 21:11:43Z tgaskins $
  */
 define([
         '../error/ArgumentError',

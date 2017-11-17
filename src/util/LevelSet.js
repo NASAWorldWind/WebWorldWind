@@ -4,7 +4,6 @@
  */
 /**
  * @exports LevelSet
- * @version $Id: LevelSet.js 2952 2015-04-01 00:33:54Z tgaskins $
  */
 define([
         '../error/ArgumentError',

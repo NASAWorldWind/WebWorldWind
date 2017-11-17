@@ -4,7 +4,6 @@
  */
 /**
  * @exports ShapefileRecord
- * @version $Id: ShapefileRecord.js 3190 2015-06-15 19:30:14Z tgaskins $
  */
 define([
         '../../geom/Angle',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports BMNGOneImageLayer
- * @version $Id: BMNGOneImageLayer.js 2942 2015-03-30 21:16:36Z tgaskins $
  */
 define([
         '../layer/RenderableLayer',

@@ -4,7 +4,6 @@
  */
 /**
  * @exports ZeroElevationModel
- * @version $Id: ZeroElevationModel.js 2936 2015-03-27 22:04:59Z tgaskins $
  */
 define([
         '../error/ArgumentError',

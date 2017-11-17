@@ -4,7 +4,6 @@
  */
 /**
  * @exports ShapefileRecordMultiPoint
- * @version $Id: ShapefileRecordMultiPoint.js 2984 2015-04-06 23:00:34Z danm $
  */
 define(['../../util/ByteBuffer',
         '../../formats/shapefile/Shapefile',

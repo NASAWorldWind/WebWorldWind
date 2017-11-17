@@ -4,7 +4,6 @@
  */
 /**
  * @exports TimeSeriesPlayer
- * @version $Id: TimeSeriesPlayer.js 3410 2015-08-17 04:23:05Z tgaskins $
  */
 define(function () {
     "use strict";
