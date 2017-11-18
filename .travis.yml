@@ -14,7 +14,7 @@ script:
 
 # Deploy build artifacts. Travis does not invoke this step for pull request builds
 deploy:
-  # Publish the contents of the dist archive to Artifactory instance at Ames
+  # Publish develop branch distributions to the Artifactory apps repository
   - provider: script
     script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/apps/web
     skip_cleanup: true
@@ -34,9 +34,9 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-  # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
+  # Publish release distributions to the Artifactory repository
   - provider: script
-    script: ./travis/publishToArtifactory.sh
+    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/${TRAVIS_TAG#"v"}
     skip_cleanup: true
     on:
       tags: true
