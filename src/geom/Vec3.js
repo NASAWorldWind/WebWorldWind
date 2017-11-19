@@ -520,6 +520,23 @@ define([
         };
 
         /**
+         * Returns the vector that corresponds with a specified line segment.
+         *
+         * @param {Vec3} origin The line's starting point.
+         * @param {Number} t The specified dot product on the segment (representing the
+         * scalar value of a vector equation of line).
+         * @param {Vec3} direction
+         * @returns {Vec3} The vector that corresponds with a specified line segment.
+         */
+        Vec3.fromLine = function(origin, t, direction)
+        {
+            return new Vec3(
+                origin[0] + (direction[0] * t),
+                origin[1] + (direction[1] * t),
+                origin[2] + (direction[2] * t));
+        };
+
+        /**
          * Returns a string representation of this vector.
          * @returns {String} A string representation of this vector, in the form "(x, y, z)".
          */

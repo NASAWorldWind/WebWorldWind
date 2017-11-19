@@ -30,8 +30,8 @@ define([
             this._drawInterior = attributes ? attributes._drawInterior : true;
             this._drawOutline = attributes ? attributes._drawOutline : true;
             this._enableLighting = attributes ? attributes._enableLighting : false;
-            this._interiorColor = attributes ? attributes._interiorColor : Color.WHITE;
-            this._outlineColor = attributes ? attributes._outlineColor : Color.RED;
+            this._interiorColor = attributes ? attributes._interiorColor.clone() : Color.WHITE.clone();
+            this._outlineColor = attributes ? attributes._outlineColor.clone() : Color.RED.clone();
             this._outlineWidth = attributes ? attributes._outlineWidth : 1.0;
             this._outlineStippleFactor = attributes ? attributes._outlineStippleFactor : 0;
             this._outlineStipplePattern = attributes ? attributes._outlineStipplePattern : 0xF0F0;

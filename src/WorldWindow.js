@@ -1021,6 +1021,20 @@ define([
             }
         };
 
+        /**
+         * Returns the index of a layer.
+         * @param {Layer} layer The layer to test.
+         * @returns {Number} Returns the index of the searched layer or -1 if it doesn't exists.
+         */
+        WorldWindow.prototype.indexOfLayer = function (layer) {
+            if (layer == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "indexOfLayer", "missingLayer"));
+            }
+
+            return this.layers.indexOf(layer);
+        };
+
         // Internal function. Intentionally not documented.
         WorldWindow.prototype.drawSurfaceRenderables = function () {
             var dc = this.drawContext,
