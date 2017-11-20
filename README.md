@@ -18,7 +18,7 @@ geometric objects.
 ## Get Started
 
 The Web WorldWind [Developer's Guide](https://worldwind.arc.nasa.gov/web) has a complete description of Web 
-WorldWind's functionality. You'll  also find there links to many Web WorldWind resources, including a user guide. The 
+WorldWind's functionality. You'll also find there links to many Web WorldWind resources, including a user guide. The 
 latest Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
 
 ## Building
@@ -34,49 +34,6 @@ latest Web WorldWind release provides many simple examples showing how to use al
 - `npm run test` runs WorldWind's unit tests
 
 - `npm run test:watch` automatically runs WorldWind's unit tests when source code changes
-
-## Example Usage
-
-Here is a simple web app using Web WorldWind. It is the contents of SimplestExample.html in the example collection. It 
-displays an interactive virtual globe in an HTML canvas.
-
-    <!DOCTYPE html>
-    <!-- This is a very simple example of using Web WorldWind. -->
-    <html>
-    <head lang="en">
-        <meta charset="UTF-8">
-        <title>WorldWind Example</title>
-        <!-- Include the Web WorldWind library. -->
-        <script src="worldwind.min.js" type="text/javascript"></script>
-    </head>
-    <body>
-    <div style="position: absolute; top: 50px; left: 50px;">
-        <!-- Create a canvas for Web WorldWind. -->
-        <canvas id="canvasOne" width="1024" height="768">
-            Your browser does not support HTML5 Canvas.
-        </canvas>
-    </div>
-    <script>
-        // Register an event listener to be called when the page is loaded.
-        window.addEventListener("load", eventWindowLoaded, false);
-
-        // Define the event listener to initialize Web WorldWind.
-        function eventWindowLoaded() {
-            // Create a WorldWindow for the canvas.
-            var wwd = new WorldWind.WorldWindow("canvasOne");
-
-            // Add some image layers to the WorldWindow's globe.
-            wwd.addLayer(new WorldWind.BMNGOneImageLayer());
-            wwd.addLayer(new WorldWind.BingAerialWithLabelsLayer());
-
-            // Add a compass, a coordinates display and some view controls to the WorldWindow.
-            wwd.addLayer(new WorldWind.CompassLayer());
-            wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
-            wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
-        }
-    </script>
-    </body>
-    </html>
 
 ## License
 
