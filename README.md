@@ -23,7 +23,7 @@ latest Web WorldWind release provides many simple examples showing how to use al
 
 ## Building
 
-[Install NodeJS](https://nodejs.org/download/). The build is known to work with v6.9.2 (LTS).
+[Install NodeJS](https://nodejs.org). The build is known to work with v6.9.2 (LTS).
 
 - `npm install` downloads WorldWind's dependencies
 
