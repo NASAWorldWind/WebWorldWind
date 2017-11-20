@@ -3,11 +3,6 @@
  * National Aeronautics and Space Administration. All Rights Reserved.
  */
 
-/*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
- */
-
 require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, ProjectionMenu) {
     "use strict";
 
