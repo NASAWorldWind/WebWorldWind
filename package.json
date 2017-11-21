@@ -7,7 +7,7 @@
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
   },
-  "license": "NASA-1.3",
+  "license": "Apache-2.0",
   "author": "NASA",
   "contributors": [
     "NASA Project Manager <patrick.hogan@nasa.gov>",
