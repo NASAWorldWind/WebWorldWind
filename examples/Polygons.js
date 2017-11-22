@@ -145,7 +145,7 @@ requirejs(['./WorldWindShim',
         ];
 
         polygonAttributes = new WorldWind.ShapeAttributes(null);
-        polygonAttributes.imageSource = "../images/400x230-splash-nww.png";
+        polygonAttributes.imageSource = "../examples/data/400x230-splash-nww.png";
         polygonAttributes.drawInterior = true;
         polygonAttributes.drawOutline = true;
         polygonAttributes.outlineColor = WorldWind.Color.BLUE;
