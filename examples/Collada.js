@@ -37,7 +37,7 @@ require(['./WorldWindShim', './LayerManager'], function (WorldWind, LayerManager
         wwd.addLayer(layers[l].layer);
     }
 
-    var modelLayer = new WorldWind.RenderableLayer("model");
+    var modelLayer = new WorldWind.RenderableLayer("Duck");
     wwd.addLayer(modelLayer);
 
     var position = new WorldWind.Position(45, -100, 1000e3);

@@ -24,7 +24,8 @@ define([
         '../Logger',
         './MeasurerUtils',
         '../../geom/Sector',
-        '../../geom/Vec3'
+        '../../geom/Vec3',
+        '../libtess'
     ],
     function (Angle,
               ArgumentError,
@@ -32,7 +33,8 @@ define([
               Logger,
               MeasurerUtils,
               Sector,
-              Vec3) {
+              Vec3,
+              libtessDummy) {
         'use strict';
 
         /**
@@ -301,7 +303,7 @@ define([
          * @return {Number[]} a list of tessellated vertices
          */
         AreaMeasurer.prototype.tessellatePolygon = function (count, vertices) {
-            var tess = new window.libtess.GluTesselator();
+            var tess = new libtess.GluTesselator();
             var triangles = [];
             var coords;
 
