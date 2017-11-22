@@ -88,9 +88,9 @@ define(function () {
             } else if (projectionName === "South UPS") {
                 this.flatGlobe.projection = new WorldWind.ProjectionUPS("South");
             } else if (projectionName === "North Gnomonic") {
-                this.flatGlobe.projection = new WorldWind.ProjectionUPS("North");
+                this.flatGlobe.projection = new WorldWind.ProjectionGnomonic("North");
             } else if (projectionName === "South Gnomonic") {
-                this.flatGlobe.projection = new WorldWind.ProjectionUPS("South");
+                this.flatGlobe.projection = new WorldWind.ProjectionGnomonic("South");
             }
 
             if (this.wwd.globe !== this.flatGlobe) {

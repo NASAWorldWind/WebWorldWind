@@ -59,7 +59,14 @@ define([
              */
             this.time = initialTime || new Date("2004-01");
 
-            this.pickEnabled = false;
+            // Intentionally not documented.
+            this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
+
+            // Intentionally not documented.
+            this.serverAddress = serverAddress;
+
+            // Intentionally not documented.
+            this.pathToData = pathToData;
 
             // Intentionally not documented.
             this.layers = {}; // holds the layers as they're created.
@@ -79,10 +86,8 @@ define([
                 {month: "BlueMarble-200411", time: BMNGRestLayer.availableTimes[10]},
                 {month: "BlueMarble-200412", time: BMNGRestLayer.availableTimes[11]}
             ];
-            this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
 
-            this.serverAddress = serverAddress;
-            this.pathToData = pathToData;
+            this.pickEnabled = false;
         };
 
         BMNGRestLayer.prototype = Object.create(Layer.prototype);
@@ -177,8 +182,14 @@ define([
         };
 
         BMNGRestLayer.prototype.createSubLayer = function (layerName) {
-            var dataPath = this.pathToData + layerName;
-            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, dataPath, this.displayName);
+            var subLayerPath = "";
+            if (this.pathToData) {
+                subLayerPath = this.pathToData + "/" + layerName;
+            } else {
+                subLayerPath = layerName;
+            }
+
+            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, subLayerPath, this.displayName);
         };
 
         // Intentionally not documented.
