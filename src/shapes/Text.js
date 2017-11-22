@@ -468,6 +468,8 @@ define([
 
             if (dc.pickingMode) {
                 this.pickColor = dc.uniquePickColor();
+                program.loadColor(gl, this.pickColor);
+                program.loadOpacity(gl, 1);
             }
 
             // Compute the effective visibility. Use the current value if picking.
@@ -492,10 +494,7 @@ define([
                 program.loadModelviewProjection(gl, Text.matrix);
 
                 // Set the pick color for picking or the color, opacity and texture if not picking.
-                if (dc.pickingMode) {
-                    program.loadColor(gl, this.pickColor);
-                    program.loadTextureEnabled(gl, false);
-                } else {
+                if (!dc.pickingMode) {
                     program.loadColor(gl, this.activeAttributes.color);
                     program.loadOpacity(gl, this.layer.opacity * this.currentVisibility);
 
@@ -546,10 +545,7 @@ define([
                 Text.matrix.multiplyMatrix(markerTransform);
                 program.loadModelviewProjection(gl, Text.matrix);
 
-                if (dc.pickingMode) {
-                    program.loadColor(gl, this.pickColor);
-                    program.loadTextureEnabled(gl, false);
-                } else {
+                if (!dc.pickingMode) {
                     program.loadColor(gl, this.activeAttributes.color);
                     program.loadOpacity(gl, this.layer.opacity * ( 1 - this.currentVisibility));
 
