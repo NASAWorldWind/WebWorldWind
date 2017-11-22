@@ -212,6 +212,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
                 sliderScale.slider("option", "max", model.maxScale);
                 sliderScale.slider("option", "value", model.initialScale);
                 spanScale.html(model.initialScale);
+
+                wwd.redraw();
             }
 
         });
