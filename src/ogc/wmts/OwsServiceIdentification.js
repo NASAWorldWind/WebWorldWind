@@ -46,7 +46,7 @@ define([
 
             OwsDescription.call(this, element);
 
-            var children = element.children;
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
