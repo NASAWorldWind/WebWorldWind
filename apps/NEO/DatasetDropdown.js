@@ -25,7 +25,7 @@ define(function () {
     };
 
     DatasetDropdown.prototype.attachServer = function () {
-        var serverAddress = location.protocol + "//neowms.sci.gsfc.nasa.gov/wms/wms";
+        var serverAddress = "https://neo.sci.gsfc.nasa.gov/wms/wms";
 
         var self = this,
             request = new XMLHttpRequest(),
