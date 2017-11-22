@@ -69,9 +69,10 @@ define(function () {
 
         serverAddress = serverAddress.trim();
 
-        serverAddress = serverAddress.replace("Http", "http");
-        if (serverAddress.lastIndexOf("http", 0) != 0) {
-            serverAddress = "http://" + serverAddress;
+        // Search for 'http' or 'https' (case insensitive) and substitute it for lowercase 'https'
+        serverAddress = serverAddress.replace(/http|https/i, "https");
+        if (serverAddress.lastIndexOf("https", 0) != 0) {
+            serverAddress = "https://" + serverAddress;
         }
 
         var thisExplorer = this,
