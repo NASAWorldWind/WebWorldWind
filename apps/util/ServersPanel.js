@@ -24,7 +24,7 @@ define(function () {
      * @alias ServersPanel
      * @constructor
      * @classdesc Provides a list of collapsible panels that indicate the layers associated with a WMS or other
-     * image server. Currently on WMS is supported. The user can select a server's layers and they will be added to
+     * image server. Currently only WMS is supported. The user can select a server's layers and they will be added to
      * the WorldWindow's layer list.
      * @param {WorldWindow} worldWindow The WorldWindow to associate this layers panel with.
      * @param {LayersPanel} layersPanel The layers panel managing the specified WorldWindows layer list.
@@ -69,13 +69,11 @@ define(function () {
 
         serverAddress = serverAddress.trim();
 
-        // Search for 'http' or 'https' (case insensitive) and substitute it for lowercase 'https'
-        console.log(serverAddress);
+        // Search for 'https' or 'http' (case insensitive) and substitute it for lowercase 'https'
         serverAddress = serverAddress.replace(/https|http/i, "https");
         if (serverAddress.lastIndexOf("https", 0) != 0) {
             serverAddress = "https://" + serverAddress;
         }
-        console.log(serverAddress);
 
         var thisExplorer = this,
             request = new XMLHttpRequest(),
