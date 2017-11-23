@@ -70,10 +70,12 @@ define(function () {
         serverAddress = serverAddress.trim();
 
         // Search for 'http' or 'https' (case insensitive) and substitute it for lowercase 'https'
-        serverAddress = serverAddress.replace(/http|https/i, "https");
+        console.log(serverAddress);
+        serverAddress = serverAddress.replace(/https|http/i, "https");
         if (serverAddress.lastIndexOf("https", 0) != 0) {
             serverAddress = "https://" + serverAddress;
         }
+        console.log(serverAddress);
 
         var thisExplorer = this,
             request = new XMLHttpRequest(),
