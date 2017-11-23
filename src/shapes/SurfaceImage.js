@@ -132,7 +132,15 @@ define([
          * @param {DrawContext} dc The current draw context.
          */
         SurfaceImage.prototype.render = function (dc) {
-            if (!this.enabled || !this.sector.overlaps(dc.terrain.sector)) {
+            if (!this.enabled) {
+                return;
+            }
+
+            if (!dc.terrain) {
+                return;
+            }
+
+            if (!this.sector.overlaps(dc.terrain.sector)) {
                 return;
             }
 
