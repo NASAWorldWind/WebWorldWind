@@ -37,7 +37,7 @@ requirejs(['./WorldWindShim',
         }
 
         // Example showing the usage of Well Known Text collection in real life.
-        var defaultLayer = new WorldWind.RenderableLayer("Wkt Shapes");
+        var defaultLayer = new WorldWind.RenderableLayer("WKT Geometry Collection");
         new WorldWind.Wkt("" +
             "GEOMETRYCOLLECTION(" +
             "   POLYGON ((40 -70, 45 -80, 40 -90)), " +
@@ -49,10 +49,10 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(defaultLayer);
 
         // Using the callback mechanism presented in the Wkt parser to update the shapes as well as showing the information about the successful rendering.
-        var customCallbackLayer = new WorldWind.RenderableLayer("Wkt Shapes");
+        var customCallbackLayer = new WorldWind.RenderableLayer("WKT Multi Polygon");
         new WorldWind.Wkt("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(
             function completionCallback(wkt, objects){
-            // Once all the shapes are parsed, this function is called.
+                // Once all the shapes are parsed, this function is called.
                 console.log('Parsing of the Wkt was completed');
 
                 wkt.defaultParserCompletionCallback(wkt, objects);
@@ -71,9 +71,9 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(customCallbackLayer);
 
         // Allow for parsing of your own Well known text data
-        var wktLayer = new WorldWind.RenderableLayer('Wkt');
+        var wktLayer = new WorldWind.RenderableLayer('WKT Custom');
         $('#showWkt').click(function(){
-            new WorldWind.WktParser($('#wkt').val()).load(null, null, wktLayer);
+            new WorldWind.Wkt($('#wkt').val()).load(null, null, wktLayer);
         });
         wwd.addLayer(wktLayer);
 
