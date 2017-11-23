@@ -63,7 +63,7 @@ define(['../../src/WorldWind',
 
             this.layersPanel.timeSeriesPlayer = this.timeSeriesPlayer;
 
-            this.serversPanel.attachServer("neowms.sci.gsfc.nasa.gov/wms/wms");
+            this.serversPanel.attachServer("https://neo.sci.gsfc.nasa.gov/wms/wms");
         };
 
         return Explorer;
