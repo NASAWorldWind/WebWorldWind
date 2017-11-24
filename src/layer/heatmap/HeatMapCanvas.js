@@ -31,12 +31,17 @@ define([
         this._width = canvas.width;
         this._height = canvas.height;
 
+        this._sector = options.sector || new Sector(-90, 90, -180, 180);
+
         options = options || {};
         this._data = options.data || [];
-        this._max = options.max || this.getMax(this._data) || 1;
+        this._max = options.max || 1;
 
         this._minOpacity = options.minOpacity || 0.05;
         this._blur = options.blur || 15;
+        if(options.blur === 0) {
+            this._blur = options.blur;
+        }
         this._radius = options.radius || 25;
         this._gradient = options.gradient || {
             0.4: 'blue',
@@ -45,12 +50,12 @@ define([
             0.8: 'yellow',
             1.0: 'red'
         };
-
-        this._sector = options.sector || new Sector(-90, 90, -180, 180);
     };
 
     /**
      * It draws the information from the current HeatMapCanvas on the real canvas.
+     * TODO: What will happen with multiple points at the same location. In preparation handle them as one! But it isn't
+     *   the correct answer as the size of the pixel differs.
      * @return {HeatMapCanvas}
      */
     HeatMapCanvas.prototype.draw = function () {
@@ -65,10 +70,8 @@ define([
         // draw a grayscale heatmap by putting a blurred circle at each data point
         for (var i = 0, len = this._data.length, point; i < len; i++) {
             point = this._data[i];
-            if(point.isInSector(this._sector)) {
-                ctx.globalAlpha = Math.min(Math.max(point.intensity / this._max, this._minOpacity === undefined ? 0.05 : this._minOpacity), 1);
-                ctx.drawImage(radius, point.longitudeInSector(this._sector, this._width) - r, point.latitudeInSector(this._sector, this._height) - r);
-            }
+            ctx.globalAlpha = Math.min(Math.max(point.intensity / this._max, this._minOpacity === undefined ? 0.05 : this._minOpacity), 1); // This needs to be changed to support different distributions in the heatmap.
+            ctx.drawImage(radius, point.longitudeInSector(this._sector, this._width) - r, point.latitudeInSector(this._sector, this._height) - r);
         }
 
         // colorize the heatmap, using opacity value of each pixel to get the right color from our gradient
@@ -84,13 +87,6 @@ define([
         this._height = this._canvas.height;
 
         return this;
-    };
-
-    /**
-     * @private
-     */
-    HeatMapCanvas.prototype.getMax = function () {
-
     };
 
     /**
