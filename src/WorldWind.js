@@ -68,11 +68,15 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GpuShader',
         './shaders/GroundProgram',
         './util/HashMap',
+        './layer/heatmap/HeatMapCanvas',
+        './layer/heatmap/HeatMapLayer',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
         './render/ImageTile',
         './util/Insets',
+        './layer/heatmap/IntensityLocation',
+        './layer/heatmap/IntervalType',
         './formats/kml/util/ItemIcon',
         './formats/kml/KmlAbstractView',
         './formats/kml/styles/KmlBalloonStyle',
@@ -307,11 +311,15 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuShader,
               GroundProgram,
               HashMap,
+              HeatMapCanvas,
+              HeatMapLayer,
               HighlightController,
               ImagePyramid,
               ImageSource,
               ImageTile,
               Insets,
+              IntensityLocation,
+              IntervalType,
               ItemIcon,
               KmlAbstractView,
               KmlBalloonStyle,
@@ -755,10 +763,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuShader'] = GpuShader;
         WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HashMap'] = HashMap;
+        WorldWind['HeatMapCanvas'] = HeatMapCanvas;
+        WorldWind['HeatMapLayer'] = HeatMapLayer;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
+        WorldWind['IntensityLocation'] = IntensityLocation;
+        WorldWind['IntervalType'] = IntervalType;
         WorldWind['KmlControls'];
         WorldWind['KmlFile'] = KmlFile;
         WorldWind['KmlTreeVisibility'] = KmlTreeVisibility;
