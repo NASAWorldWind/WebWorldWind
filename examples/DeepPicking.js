@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to set up deep picking. See line 117.
+ * Illustrates how to set up deep picking. See line 124.
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],
