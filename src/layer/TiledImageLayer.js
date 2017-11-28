@@ -310,17 +310,15 @@ define([
                     // If not fully faded, add the tile to the list of current tiles and request a redraw until all
                     // tiles have faded completely. Note that order in the current tiles list is important:
                     // the non-opaque tiles must be drawn after the opaque tiles.
-                    if (!current[tile.imagePath]) {
-                        if (reducedTileOpacity > 0) {
-                            // Update the opacity
-                            tile.opacity = reducedTileOpacity;
-                            this.currentTiles.push(tile);
-                            this.currentTilesInvalid = true;
-                            dc.redrawRequested = true;
-                        } else {
-                            // reset to the default
-                            tile.opacity = 1;
-                        }
+                    if (!current[tile.imagePath] && reducedTileOpacity > 0) {
+                        // Update the opacity
+                        tile.opacity = reducedTileOpacity;
+                        this.currentTiles.push(tile);
+                        this.currentTilesInvalid = true;
+                        dc.redrawRequested = true;
+                    } else {
+                        // reset to the default
+                        tile.opacity = 1;
                     }
                 }
             }
@@ -398,7 +396,6 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
-                tile.opacity = 1;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
