@@ -59,7 +59,10 @@ define([
                     var keywords = child.children || child.childNodes;
                     for (var i = 0; i < keywords.length; i++) {
                         var keyword = keywords[i];
-                        this.keywords.push(new OwsLanguageString(keyword));
+                        // IE 11 child.childNodes can contain more than just the child Elements, so ignore anything else.
+                        if (keyword instanceof Element) {
+                            this.keywords.push(new OwsLanguageString(keyword));
+                        }
                     }
                 }
             }

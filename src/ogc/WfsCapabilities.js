@@ -226,9 +226,11 @@ define([
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
-
-                metadataUrl.format = child.getAttribute("format");
-                metadataUrl.type = child.getAttribute("type");
+                // IE 11 child.childNodes can contain more than just the child Elements, so ignore anything else.
+                if (child instanceof Element) {
+                    metadataUrl.format = child.getAttribute("format");
+                    metadataUrl.type = child.getAttribute("type");
+                }
             }
 
             return outputFormats;
