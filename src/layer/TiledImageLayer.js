@@ -304,18 +304,21 @@ define([
                 if (this.previousTiles.hasOwnProperty(tileImagePath)) {
                     tile = this.previousTiles[tileImagePath];
 
-                    if (tile.opacity > 0 && !current[tile.imagePath]) {
-                        // Compute the reduced.
-                        tile.opacity = Math.max(0, tile.opacity - visibilityDelta);
+                    // Determine the new fade out opacity
+                    var reducedTileOpacity = Math.max(0, tile.opacity - visibilityDelta);
 
-                        // If not fully faded, add the tile to the list of current tiles and request a redraw so that
-                        // we'll be called continuously until all tiles have faded completely. Note that order in the
-                        // current tiles list is important: the non-opaque tiles must be drawn after the opaque tiles.
-                        if (tile.opacity > 0) {
-                            this.currentTiles.push(tile);
-                            this.currentTilesInvalid = true;
-                            dc.redrawRequested = true;
-                        }
+                    // If not fully faded, add the tile to the list of current tiles and request a redraw until all
+                    // tiles have faded completely. Note that order in the current tiles list is important:
+                    // the non-opaque tiles must be drawn after the opaque tiles.
+                    if (!current[tile.imagePath] && reducedTileOpacity > 0) {
+                        // Update the opacity
+                        tile.opacity = reducedTileOpacity;
+                        this.currentTiles.push(tile);
+                        this.currentTilesInvalid = true;
+                        dc.redrawRequested = true;
+                    } else {
+                        // reset to the default
+                        tile.opacity = 1;
                     }
                 }
             }
@@ -411,7 +414,6 @@ define([
                 if (this.isTileTextureInMemory(dc, this.currentAncestorTile)) {
                     // Set up to map the ancestor tile into the current one.
                     tile.fallbackTile = this.currentAncestorTile;
-                    tile.fallbackTile.opacity = 1;
                     this.currentTiles.push(tile);
                 }
             }
