@@ -37,7 +37,7 @@ define(['../../src/WorldWind',
             * Sinergise for demonstration purposes only. You must obtain your own key at www.sentinel-hub.com before
             * using this layer in your application.
             */
-            var wmtsServer = 'http://services.sentinel-hub.com/v1/wmts/56748ba2-4a88-4854-beea-86f9afc63e35';
+            var wmtsServer = 'https://services.sentinel-hub.com/v1/wmts/56748ba2-4a88-4854-beea-86f9afc63e35';
 
             $.get(wmtsServer + '?REQUEST=GetCapabilities&SERVICE=WMTS', function (response) {
                 wmtsCapabilities = new WorldWind.WmtsCapabilities(response);
