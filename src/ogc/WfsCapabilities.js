@@ -226,7 +226,7 @@ define([
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
-                // IE 11 child.childNodes can contain more than just the child Elements, so ignore anything else.
+                // In IE 11, element.childNodes can contain more than just Element objects, so ignore any other type of child.
                 if (child instanceof Element) {
                     metadataUrl.format = child.getAttribute("format");
                     metadataUrl.type = child.getAttribute("type");
