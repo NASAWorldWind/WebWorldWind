@@ -426,11 +426,6 @@ define([
             // Tell the program which texture unit to use.
             program.loadTextureUnit(gl, gl.TEXTURE0);
 
-            // Turn off texturing in picking mode.
-            if (dc.pickingMode) {
-                program.loadTextureEnabled(gl, false);
-            }
-
             // Turn off color modulation since we want to pick against the text box and not just the text.
             program.loadModulateColor(gl, false);
 
@@ -466,38 +461,36 @@ define([
                 program = dc.currentProgram,
                 textureBound;
 
-            if (dc.pickingMode) {
+            // Compute the text's current visibility, potentially requesting additional frames.
+            if (!dc.pickingMode && this.currentVisibility !== this.targetVisibility) {
+                var visibilityDelta = (dc.timestamp - dc.previousRedrawTimestamp) / dc.fadeTime;
+                if (this.currentVisibility < this.targetVisibility) {
+                    this.currentVisibility = Math.min(1, this.currentVisibility + visibilityDelta);
+                } else {
+                    this.currentVisibility = Math.max(0, this.currentVisibility - visibilityDelta);
+                }
+                dc.redrawRequested = true;
+            }
+
+            // Use the text color and opacity. When picking, use the pick color, 100% opacity and no texture.
+            if (!dc.pickingMode) {
+                program.loadColor(gl, this.activeAttributes.color);
+                program.loadOpacity(gl, this.layer.opacity * this.currentVisibility);
+            } else {
                 this.pickColor = dc.uniquePickColor();
                 program.loadColor(gl, this.pickColor);
                 program.loadOpacity(gl, 1);
+                program.loadTextureEnabled(gl, false);
             }
 
-            // Compute the effective visibility. Use the current value if picking.
-            if (!dc.pickingMode) {
-                if (this.currentVisibility != this.targetVisibility) {
-                    var visibilityDelta = (dc.timestamp - dc.previousRedrawTimestamp) / dc.fadeTime;
-                    if (this.currentVisibility < this.targetVisibility) {
-                        this.currentVisibility = Math.min(1, this.currentVisibility + visibilityDelta);
-                    } else {
-                        this.currentVisibility = Math.max(0, this.currentVisibility - visibilityDelta);
-                    }
-                    dc.redrawRequested = true;
-                }
-            }
-
+            // When the text is visible, draw the text label.
             if (this.currentVisibility > 0) {
-                // Draw the text, with its effective opacity scaled by the current visibility.
-
                 // Compute and specify the MVP matrix.
                 Text.matrix.copy(dc.screenProjection);
                 Text.matrix.multiplyMatrix(this.imageTransform);
                 program.loadModelviewProjection(gl, Text.matrix);
 
-                // Set the pick color for picking or the color, opacity and texture if not picking.
                 if (!dc.pickingMode) {
-                    program.loadColor(gl, this.activeAttributes.color);
-                    program.loadOpacity(gl, this.layer.opacity * this.currentVisibility);
-
                     this.texCoordMatrix.setToIdentity();
                     if (this.activeTexture) {
                         this.texCoordMatrix.multiplyByTextureTransform(this.activeTexture);
@@ -523,9 +516,8 @@ define([
                 }
             }
 
+            // When the text is not visible, draw a marker to indicate that something is there.
             if (this.currentVisibility < 1 && this.markerImageSource) {
-                // Draw an icon at the text's geographic position to indicate that something is there.
-
                 var markerTexture = dc.gpuResourceCache.resourceForKey(this.markerImageSource);
                 if (!markerTexture) {
                     dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.markerImageSource);
@@ -545,8 +537,8 @@ define([
                 Text.matrix.multiplyMatrix(markerTransform);
                 program.loadModelviewProjection(gl, Text.matrix);
 
+                // Use the marker opacity and texture when not picking.
                 if (!dc.pickingMode) {
-                    program.loadColor(gl, this.activeAttributes.color);
                     program.loadOpacity(gl, this.layer.opacity * ( 1 - this.currentVisibility));
 
                     var tcMatrix = Matrix.fromIdentity();
