@@ -226,8 +226,12 @@ define([
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
-                // In IE 11, element.childNodes can contain more than just Element objects, so ignore any other type of child.
-                if (child instanceof Element) {
+                // TODO: This code is currently non-functional and will need upgrades when WFS functionality is addressed.
+                // In IE 11, element.childNodes can contain more than just Element objects. When this code is upgraded, ensure
+                // that the element objects accessed here are actually instances of Element. This is done elsewhere
+                // by checking for an appropriate value in the localName attribute which has the side effect of ensuring
+                // the correct object type.
+                if (child.localName === "MetadataURL") {
                     metadataUrl.format = child.getAttribute("format");
                     metadataUrl.type = child.getAttribute("type");
                 }
