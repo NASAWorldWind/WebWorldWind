@@ -472,7 +472,7 @@ define([
                 }
             }
 
-            if (!config.styleIdentifier) {
+            if (!config.style) {
                 Logger.logMessage(Logger.LEVEL_WARNING, "WmtsLayer", "formLayerConfiguration",
                     "No default style available. A style will not be specified in tile requests.");
             }
