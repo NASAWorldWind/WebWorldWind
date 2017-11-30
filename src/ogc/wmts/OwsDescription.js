@@ -59,7 +59,10 @@ define([
                     var keywords = child.children || child.childNodes;
                     for (var i = 0; i < keywords.length; i++) {
                         var keyword = keywords[i];
-                        this.keywords.push(new OwsLanguageString(keyword));
+                        // In IE 11, child.childNodes can contain more than just Element objects, checking localName has the side effect of ensuring the correct object type.
+                        if (keyword.localName === "Keyword") {
+                            this.keywords.push(new OwsLanguageString(keyword));
+                        }
                     }
                 }
             }
