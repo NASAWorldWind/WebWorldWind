@@ -393,7 +393,7 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
-                tile.opacity = 1;;
+                tile.opacity = 1;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
@@ -411,7 +411,7 @@ define([
                 if (this.isTileTextureInMemory(dc, this.currentAncestorTile)) {
                     // Set up to map the ancestor tile into the current one.
                     tile.fallbackTile = this.currentAncestorTile;
-                    tile.fallbackTile.opacity = 1;
+                    tile.opacity = 1;
                     this.currentTiles.push(tile);
                 }
             }
