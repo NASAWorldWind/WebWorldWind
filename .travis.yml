@@ -36,7 +36,7 @@ deploy:
       tags: true
   # Publish release distributions to the Artifactory repository
   - provider: script
-    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/${TRAVIS_TAG#"v"}
+    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/${TRAVIS_TAG:1}
     skip_cleanup: true
     on:
       tags: true
