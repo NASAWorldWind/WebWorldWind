@@ -76,6 +76,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/ImageTile',
         './util/Insets',
         './layer/heatmap/IntensityLocation',
+        './layer/heatmap/IntensitySector',
         './layer/heatmap/IntervalType',
         './formats/kml/util/ItemIcon',
         './formats/kml/KmlAbstractView',
@@ -319,6 +320,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ImageTile,
               Insets,
               IntensityLocation,
+              IntensitySector,
               IntervalType,
               ItemIcon,
               KmlAbstractView,
@@ -770,6 +772,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
         WorldWind['IntensityLocation'] = IntensityLocation;
+        WorldWind['IntensitySector'] = IntensitySector;
         WorldWind['IntervalType'] = IntervalType;
         WorldWind['KmlControls'];
         WorldWind['KmlFile'] = KmlFile;

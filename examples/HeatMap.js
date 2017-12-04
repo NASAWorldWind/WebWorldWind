@@ -14,10 +14,8 @@ requirejs(['./WorldWindShim',
             var wwd = new WorldWind.WorldWindow("canvasOne");
 
             var data = result.boxes.map(function (box) {
-                return new WorldWind.IntensityLocation((Number(box.bbox1Lat) + Number(box.bbox2Lat)) / 2, (Number(box.bbox1Lon) + Number(box.bbox2Lon)) / 2, box.amount);
+                return new WorldWind.IntensitySector(Number(box.bbox1Lat),Number(box.bbox2Lat), Number(box.bbox1Lon) , Number(box.bbox2Lon), box.amount);
             });
-
-            console.log(data);
 
             /**
              * Add imagery layers.
@@ -29,7 +27,7 @@ requirejs(['./WorldWindShim',
                 {layer: new WorldWind.CompassLayer(), enabled: true},
                 {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
                 {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
-                {layer: new WorldWind.HeatMapLayer("HeatMap, Default version", data, {}), enabled: true}
+                {layer: new WorldWind.HeatMapLayer("HeatMap, Default version", data, {minOpacity: 0.2}), enabled: true}
             ];
 
             for (var l = 0; l < layers.length; l++) {

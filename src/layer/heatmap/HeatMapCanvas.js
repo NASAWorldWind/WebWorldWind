@@ -39,7 +39,7 @@ define([
 
         this._minOpacity = options.minOpacity || 0.05;
         this._blur = options.blur || 15;
-        if(options.blur === 0) {
+        if (options.blur === 0) {
             this._blur = options.blur;
         }
         this._radius = options.radius || 25;
@@ -54,24 +54,27 @@ define([
 
     /**
      * It draws the information from the current HeatMapCanvas on the real canvas.
+     * Expectation is that the size of the Intensity sectors is the same.
      * TODO: What will happen with multiple points at the same location. In preparation handle them as one! But it isn't
      *   the correct answer as the size of the pixel differs.
      * @return {HeatMapCanvas}
      */
     HeatMapCanvas.prototype.draw = function () {
-        var r = this._radius + this._blur;
-        var radius = this.radius(this._radius, this._blur);
+        var rectangle;
         var grad = this.gradient(this._gradient);
 
         var ctx = this._ctx;
 
         ctx.clearRect(0, 0, this._width, this._height);
 
-        // draw a grayscale heatmap by putting a blurred circle at each data point
-        for (var i = 0, len = this._data.length, point; i < len; i++) {
-            point = this._data[i];
-            ctx.globalAlpha = Math.min(Math.max(point.intensity / this._max, this._minOpacity === undefined ? 0.05 : this._minOpacity), 1); // This needs to be changed to support different distributions in the heatmap.
-            ctx.drawImage(radius, point.longitudeInSector(this._sector, this._width) - r, point.latitudeInSector(this._sector, this._height) - r);
+        // draw a grayscale heatmap by putting a rectangle at each data point
+        for (var i = 0, len = this._data.length, bbox; i < len; i++) {
+            bbox = this._data[i];
+            if (!rectangle) {
+                rectangle = this.rectangle(bbox.widthInSector(this._sector, this._width), bbox.heightInSector(this._sector, this._height));
+            }
+            ctx.globalAlpha = Math.min(Math.max(bbox.intensity / this._max, this._minOpacity === undefined ? 0.05 : this._minOpacity), 1); // This needs to be changed to support different distributions in the heatmap.
+            ctx.drawImage(rectangle, bbox.longitudeInSector(this._sector, this._width), bbox.latitudeInSector(this._sector, this._height));
         }
 
         // colorize the heatmap, using opacity value of each pixel to get the right color from our gradient
@@ -91,28 +94,15 @@ define([
 
     /**
      * @private
-     * @param r {Number} Radius of the point itself
-     * @param blur {Number} Radius of the blurring used to calculate the final number
      * @return {Element} It returns canvas relevant for the creation of the data points.
      */
-    HeatMapCanvas.prototype.radius = function (r, blur) {
-        // create a grayscale blurred circle image that we'll use for drawing points
-        var circle = this.createCanvas(),
-            ctx = circle.getContext('2d'),
-            r2 = r + blur;
+    HeatMapCanvas.prototype.rectangle = function (width, height) {
+        var rectangle = this.createCanvas(),
+            ctx = rectangle.getContext('2d');
 
-        circle.width = circle.height = r2 * 2;
+        ctx.fillRect(0, 0, width, height);
 
-        ctx.shadowOffsetX = ctx.shadowOffsetY = r2 * 2;
-        ctx.shadowBlur = blur;
-        ctx.shadowColor = 'black';
-
-        ctx.beginPath();
-        ctx.arc(-r2, -r2, r, 0, Math.PI * 2, true);
-        ctx.closePath();
-        ctx.fill();
-
-        return circle;
+        return rectangle;
     };
 
     /**
