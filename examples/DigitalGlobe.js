@@ -28,8 +28,14 @@ requirejs(['./WorldWindShim',
 
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.DigitalGlobeTiledImageLayer("Digital Globe", "digitalglobe.n6ngnadl", accessToken), enabled: true},
-            {layer: new WorldWind.DigitalGlobeTiledImageLayer("Digital Globe with Roads", "digitalglobe.n6nhclo2", accessToken), enabled: false},
+            {
+                layer: new WorldWind.DigitalGlobeTiledImageLayer("Digital Globe", "digitalglobe.n6ngnadl", accessToken),
+                enabled: true
+            },
+            {
+                layer: new WorldWind.DigitalGlobeTiledImageLayer("Digital Globe with Roads", "digitalglobe.n6nhclo2", accessToken),
+                enabled: false
+            },
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -41,5 +47,5 @@ requirejs(['./WorldWindShim',
         }
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
     });

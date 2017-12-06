@@ -137,7 +137,7 @@ requirejs(['./WorldWindShim',
         shapesLayer.addRenderable(polarEllipse);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Create a highlight controller for highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);

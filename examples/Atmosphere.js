@@ -19,7 +19,7 @@ requirejs(['./WorldWindShim',
     function (WorldWind,
               LayerManager) {
         "use strict";
-        
+
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
@@ -35,12 +35,12 @@ requirejs(['./WorldWindShim',
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
-        
+
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(atmosphereLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         var sunSimulationCheckBox = document.getElementById('sun-simulation');
         var sunInterval = 0;

@@ -96,8 +96,8 @@ requirejs(['./WorldWindShim',
             // Create the placemark and its label.
             placemark = new WorldWind.Placemark(new WorldWind.Position(latitude, longitude + i, 1e2), true, null);
             placemark.label = "Placemark " + i.toString() + "\n"
-            + "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n"
-            + "Lon " + placemark.position.longitude.toPrecision(5).toString();
+                + "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n"
+                + "Lon " + placemark.position.longitude.toPrecision(5).toString();
             placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
 
             // Create the placemark attributes for this placemark. Note that the attributes differ only by their
@@ -121,7 +121,7 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(placemarkLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Now set up to handle picking.
 

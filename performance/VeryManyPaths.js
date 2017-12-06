@@ -95,7 +95,7 @@ requirejs(['../src/WorldWind',
         wwd.redraw();
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Now set up to handle picking.
 
