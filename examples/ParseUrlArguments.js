@@ -66,10 +66,10 @@ requirejs(['./WorldWindShim',
         }
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Now move the view to the requested position.
-        if  (args.position) {
+        if (args.position) {
             wwd.goTo(args.position);
         }
     });

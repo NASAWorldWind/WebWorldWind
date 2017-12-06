@@ -47,13 +47,13 @@ requirejs(['./WorldWindShim',
 
         // Create a surface image using a static image.
         var surfaceImage1 = new WorldWind.SurfaceImage(new WorldWind.Sector(40, 50, -120, -100),
-        "data/400x230-splash-nww.png");
+            "data/400x230-splash-nww.png");
 
         // Create a surface image using a dynamically created image.
 
         var canvas = document.createElement("canvas"),
             ctx2d = canvas.getContext("2d"),
-            size = 64, c = size / 2  - 0.5, innerRadius = 5, outerRadius = 20;
+            size = 64, c = size / 2 - 0.5, innerRadius = 5, outerRadius = 20;
 
         canvas.width = size;
         canvas.height = size;
@@ -78,7 +78,7 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(surfaceImageLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Now set up to handle picking.
 

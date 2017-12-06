@@ -59,22 +59,21 @@ requirejs(['./WorldWindShim',
                     configuration.attributes.imageScale = 0.01 * Math.log(population);
                 }
             }
-            else if (geometry.isLineStringType() || geometry.isMultiLineStringType()){
-                configuration.attributes =  new WorldWind.ShapeAttributes(null);
-            configuration.attributes.drawOutline = true;
-            configuration.attributes.outlineColor = new WorldWind.Color(
-                0.1 * configuration.attributes.interiorColor.red,
-                0.3 * configuration.attributes.interiorColor.green,
-                0.7 * configuration.attributes.interiorColor.blue,
-                1.0);
-            configuration.attributes.outlineWidth = 1.0;
+            else if (geometry.isLineStringType() || geometry.isMultiLineStringType()) {
+                configuration.attributes = new WorldWind.ShapeAttributes(null);
+                configuration.attributes.drawOutline = true;
+                configuration.attributes.outlineColor = new WorldWind.Color(
+                    0.1 * configuration.attributes.interiorColor.red,
+                    0.3 * configuration.attributes.interiorColor.green,
+                    0.7 * configuration.attributes.interiorColor.blue,
+                    1.0);
+                configuration.attributes.outlineWidth = 1.0;
             }
-            else if(geometry.isPolygonType() || geometry.isMultiPolygonType())
-            {
+            else if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
                 configuration.attributes = new WorldWind.ShapeAttributes(null);
 
                 // Fill the polygon with a random pastel color.
-                    configuration.attributes.interiorColor = new WorldWind.Color(
+                configuration.attributes.interiorColor = new WorldWind.Color(
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
@@ -87,10 +86,10 @@ requirejs(['./WorldWindShim',
                     1.0);
             }
 
-        return configuration;
+            return configuration;
         };
 
-        var parserCompletionCallback = function(layer) {
+        var parserCompletionCallback = function (layer) {
             wwd.addLayer(layer);
         };
 
@@ -186,5 +185,5 @@ requirejs(['./WorldWindShim',
 
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
     });

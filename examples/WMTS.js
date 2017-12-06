@@ -44,7 +44,7 @@ requirejs([
         }
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Web Map Tiling Service information from
         var serviceAddress = "https://tiles.geoservice.dlr.de/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0";
@@ -64,8 +64,8 @@ requirejs([
 
             // Add the layers to WorldWind and update the layer manager
             wwd.addLayer(wmtsLayer);
-            layerManger.synchronizeLayerList();
-        }
+            layerManager.synchronizeLayerList();
+        };
 
         // Called if an error occurs during WMTS Capabilities document retrieval
         var logError = function (jqXhr, text, exception) {

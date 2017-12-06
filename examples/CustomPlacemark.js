@@ -61,7 +61,7 @@ requirejs(['./WorldWindShim',
 
         var canvas = document.createElement("canvas"),
             ctx2d = canvas.getContext("2d"),
-            size = 64, c = size / 2  - 0.5, innerRadius = 5, outerRadius = 20;
+            size = 64, c = size / 2 - 0.5, innerRadius = 5, outerRadius = 20;
 
         canvas.width = size;
         canvas.height = size;
@@ -99,7 +99,7 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(placemarkLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Now set up to handle highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);

@@ -79,5 +79,5 @@ requirejs([
             terrainAreaSpan.textContent = (terrainArea / 1e6).toFixed(3);
         }
 
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
     });

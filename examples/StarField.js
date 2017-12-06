@@ -39,7 +39,7 @@ requirejs([
         starFieldLayer.time = date;
         atmosphereLayer.time = date;
 
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
         wwd.redraw();
 
         wwd.redrawCallbacks.push(runSunSimulation);

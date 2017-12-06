@@ -46,7 +46,7 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Ensure that the background and other control layers are displayed while the blue marble layer is
         // being pre-populated.
@@ -67,7 +67,7 @@ requirejs(['./WorldWindShim',
                 blueMarbleTimeSeries.enabled = true;
                 blueMarbleTimeSeries.showSpinner = false;
                 window.clearInterval(prePopulateInterval);
-                layerManger.synchronizeLayerList();
+                layerManager.synchronizeLayerList();
 
                 // Increment the Blue Marble layer's time at a specified frequency.
                 var currentIndex = 0;

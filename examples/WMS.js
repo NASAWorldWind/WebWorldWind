@@ -42,7 +42,7 @@ requirejs(['./WorldWindShim',
         }
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Web Map Service information from NASA's Near Earth Observations WMS
         var serviceAddress = "https://neo.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
@@ -64,7 +64,7 @@ requirejs(['./WorldWindShim',
 
             // Add the layers to WorldWind and update the layer manager
             wwd.addLayer(wmsLayer);
-            layerManger.synchronizeLayerList();
+            layerManager.synchronizeLayerList();
         };
 
         // Called if an error occurs during WMS Capabilities document retrieval
