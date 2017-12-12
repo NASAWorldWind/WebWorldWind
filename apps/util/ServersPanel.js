@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports ServersPanel
- * @version $Id: ServersPanel.js 3413 2015-08-20 19:08:20Z tgaskins $
  */
 define(function () {
     "use strict";
@@ -14,7 +24,7 @@ define(function () {
      * @alias ServersPanel
      * @constructor
      * @classdesc Provides a list of collapsible panels that indicate the layers associated with a WMS or other
-     * image server. Currently on WMS is supported. The user can select a server's layers and they will be added to
+     * image server. Currently only WMS is supported. The user can select a server's layers and they will be added to
      * the WorldWindow's layer list.
      * @param {WorldWindow} worldWindow The WorldWindow to associate this layers panel with.
      * @param {LayersPanel} layersPanel The layers panel managing the specified WorldWindows layer list.
@@ -59,9 +69,10 @@ define(function () {
 
         serverAddress = serverAddress.trim();
 
-        serverAddress = serverAddress.replace("Http", "http");
-        if (serverAddress.lastIndexOf("http", 0) != 0) {
-            serverAddress = "http://" + serverAddress;
+        // Search for 'https' or 'http' (case insensitive) and substitute it for lowercase 'https'
+        serverAddress = serverAddress.replace(/https|http/i, "https");
+        if (serverAddress.lastIndexOf("https", 0) != 0) {
+            serverAddress = "https://" + serverAddress;
         }
 
         var thisExplorer = this,

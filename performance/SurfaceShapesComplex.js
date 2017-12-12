@@ -1,13 +1,21 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * Illustrates how to display SurfaceShapes.
- *
- * @version $Id: SurfaceShapes.js 3189 2015-06-15 19:27:19Z tgaskins $
  */
-
 requirejs(['../src/WorldWind',
         '../examples/LayerManager',
         '../examples/CoordinateController'],
@@ -223,7 +231,7 @@ requirejs(['../src/WorldWind',
         wwd.redraw();
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Create a coordinate controller to update the coordinate overlay elements.
         var coordinateController = new CoordinateController(wwd);
@@ -273,7 +281,7 @@ requirejs(['../src/WorldWind',
 
             var pickList;
 
-            if (isRegionPicking){
+            if (isRegionPicking) {
                 wwd.deepPicking = false;
 
                 // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
@@ -308,7 +316,7 @@ requirejs(['../src/WorldWind',
             }
         };
 
-        var handleMouseDown = function(o) {
+        var handleMouseDown = function (o) {
             firstX = o.clientX;
             firstY = o.clientY;
         };
@@ -324,7 +332,7 @@ requirejs(['../src/WorldWind',
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     },
 
-    perfTestBullseyes = function(layer) {
+    perfTestBullseyes = function (layer) {
         var center = new WorldWind.Location(39.883635, -98.545936);
 
         var shapeAttributesRed = new WorldWind.ShapeAttributes(null);
@@ -359,7 +367,7 @@ requirejs(['../src/WorldWind',
         // console.log("Number of shapeCircles generated: " + numCircles.toString());
     },
 
-    perfTestSpiral = function(layer) {
+    perfTestSpiral = function (layer) {
         var center = new WorldWind.Location(20.395127, -170.264684);
 
         var shapeAttributesRed = new WorldWind.ShapeAttributes(null);
@@ -403,7 +411,7 @@ requirejs(['../src/WorldWind',
         // console.log("Number of ShapeEllipse generated: " + numRectangles.toString());
     },
 
-    perfTestSponge = function(layer) {
+    perfTestSponge = function (layer) {
         var shapeAttributesRed = new WorldWind.ShapeAttributes(null);
         shapeAttributesRed.interiorColor = WorldWind.Color.RED;
         shapeAttributesRed.outlineColor = WorldWind.Color.BLACK;
@@ -424,7 +432,7 @@ requirejs(['../src/WorldWind',
             shapeAttributesRed, shapeAttributesWhite, shapeAttributesYellow);
     },
 
-    perfTestSpongeStep = function(layer, depth, location0, location1, location2, shapeAttributeEven, shapeAttributeOdd, shapeAttributeHighlight) {
+    perfTestSpongeStep = function (layer, depth, location0, location1, location2, shapeAttributeEven, shapeAttributeOdd, shapeAttributeHighlight) {
         var shapeBoundary = [
             location0,
             location1,
@@ -453,7 +461,7 @@ requirejs(['../src/WorldWind',
         perfTestSpongeStep(layer, depth - 1, location2, location20, location12, shapeAttributeOdd, shapeAttributeEven, shapeAttributeHighlight);
     },
 
-    china = function() {
+    china = function () {
         return [
             new WorldWind.Location(27.3208271811, 88.9169272233),
             new WorldWind.Location(27.5424270997, 88.7646362564),

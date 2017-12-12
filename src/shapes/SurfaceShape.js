@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports SurfaceShape
- * @version $Id: SurfaceShape.js 3191 2015-06-15 19:35:57Z tgaskins $
  */
 define([
         '../error/AbstractError',
@@ -13,6 +23,7 @@ define([
         '../geom/BoundingBox',
         '../geom/Location',
         '../util/Logger',
+        '../cache/MemoryCache',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
         '../util/PolygonSplitter',
@@ -28,6 +39,7 @@ define([
               BoundingBox,
               Location,
               Logger,
+              MemoryCache,
               NotYetImplementedError,
               PickedObject,
               PolygonSplitter,
@@ -82,13 +94,6 @@ define([
              * @protected
              */
             this._sectors = [];
-
-            /*
-             * The bounding extent for this shape.
-             * @type {BoundingBox}
-             * @protected
-             */
-            this._extent = null;
 
             /*
              * The raw collection of locations defining this shape and are explicitly specified by the client of this class.
@@ -151,6 +156,23 @@ define([
             this.contours = [];
             this.containsPole = false;
             this.crossesAntiMeridian = false;
+
+            /**
+             * Indicates how long to use terrain-specific shape data before regenerating it, in milliseconds. A value
+             * of zero specifies that shape data should be regenerated every frame. While this causes the shape to
+             * adapt more frequently to the terrain, it decreases performance.
+             * @type {Number}
+             * @default 2000 (milliseconds)
+             */
+            this.expirationInterval = 2000;
+
+            // Internal use only. Intentionally not documented.
+            // Holds the per-globe data
+            this.shapeDataCache = new MemoryCache(3, 2);
+
+            // Internal use only. Intentionally not documented.
+            // The shape-data-cache data that is for the currently active globe.
+            this.currentData = null;
         };
 
         SurfaceShape.prototype = Object.create(Renderable.prototype);
@@ -310,6 +332,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._pathType = value;
                 }
             },
@@ -328,6 +351,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._maximumNumEdgeIntervals = value;
                 }
             },
@@ -346,6 +370,7 @@ define([
                 },
                 set: function (value) {
                     this.stateKeyInvalid = true;
+                    this.resetBoundaries();
                     this._polarThrottle = value;
                 }
             },
@@ -425,15 +450,58 @@ define([
 
         // Internal. Intentionally not documented.
         SurfaceShape.prototype.intersectsFrustum = function (dc) {
-            if (this._extent) {
+            if (this.currentData && this.currentData.extent) {
                 if (dc.pickingMode) {
-                    return this._extent.intersectsFrustum(dc.pickFrustum);
+                    return this.currentData.extent.intersectsFrustum(dc.pickFrustum);
                 } else {
-                    return this._extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                    return this.currentData.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
                 }
             } else {
                 return true;
             }
+        };
+
+        /**
+         * Indicates whether a specified shape data object is current. Subclasses may override this method to add
+         * criteria indicating whether the shape data object is current, but must also call this method on this base
+         * class. Applications do not call this method.
+         * @param {DrawContext} dc The current draw context.
+         * @param {Object} shapeData The object to validate.
+         * @returns {Boolean} true if the object is current, otherwise false.
+         * @protected
+         */
+        SurfaceShape.prototype.isShapeDataCurrent = function (dc, shapeData) {
+            return shapeData.verticalExaggeration === dc.verticalExaggeration
+                && shapeData.expiryTime > Date.now();
+        };
+
+        /**
+         * Creates a new shape data object for the current globe state. Subclasses may override this method to
+         * modify the shape data object that this method creates, but must also call this method on this base class.
+         * Applications do not call this method.
+         * @returns {Object} The shape data object.
+         * @protected
+         */
+        SurfaceShape.prototype.createShapeDataObject = function () {
+            return {};
+        };
+
+        // Intentionally not documented.
+        SurfaceShape.prototype.resetExpiration = function (shapeData) {
+            // The random addition in the line below prevents all shapes from regenerating during the same frame.
+            shapeData.expiryTime = Date.now() + this.expirationInterval + 1e3 * Math.random();
+        };
+
+        // Internal. Intentionally not documented.
+        SurfaceShape.prototype.establishCurrentData = function (dc) {
+            this.currentData = this.shapeDataCache.entryForKey(dc.globeStateKey);
+            if (!this.currentData) {
+                this.currentData = this.createShapeDataObject();
+                this.resetExpiration(this.currentData);
+                this.shapeDataCache.putEntry(dc.globeStateKey, this.currentData, 1);
+            }
+
+            this.currentData.isExpired = !this.isShapeDataCurrent(dc, this.currentData);
         };
 
         // Internal function. Intentionally not documented.
@@ -446,8 +514,16 @@ define([
 
             this.prepareBoundaries(dc);
 
+            this.establishCurrentData(dc);
+
+            if (this.currentData.isExpired || !this.currentData.extent) {
+                this.computeExtent(dc);
+                this.currentData.verticalExaggeration = dc.verticalExaggeration;
+                this.resetExpiration(this.currentData);
+            }
+
             // Use the last computed extent to see if this shape is out of view.
-            if (this._extent && !this.intersectsFrustum(dc)) {
+            if (this.currentData && this.currentData.extent && !this.intersectsFrustum(dc)) {
                 return;
             }
 
@@ -544,7 +620,7 @@ define([
             var cosLat = Math.cos(location.latitude * Angle.DEGREES_TO_RADIANS);
             cosLat *= cosLat; // Square cos to emphasize poles and de-emphasize equator.
 
-            // Remap polarThrotle:
+            // Remap polarThrottle:
             //  0 .. INF => 0 .. 1
             // This acts as a weight between no throttle and fill throttle.
             var weight = this._polarThrottle / (1 + this._polarThrottle);
@@ -573,8 +649,6 @@ define([
 
             this.prepareSectors();
 
-            this.computeExtent(dc);
-
             this.boundariesArePrepared = true;
         };
 
@@ -597,6 +671,7 @@ define([
         // Internal. Resets boundaries for SurfaceShape recomputing.
         SurfaceShape.prototype.resetBoundaries = function () {
             this.boundariesArePrepared = false;
+            this.shapeDataCache.clear(false);
         };
 
         // Internal use only. Intentionally not documented.
@@ -659,13 +734,21 @@ define([
                 return null;
             }
 
+            if (!this.currentData) {
+                return null;
+            }
+
+            if (!this.currentData.extent) {
+                this.currentData.extent = new BoundingBox();
+            }
+
+
             var boxPoints;
             // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
             // Return the box which contains that sector.
             if (this._sectors.length === 1) {
                 boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
-                this._extent = new BoundingBox();
-                this._extent.setToVec3Points(boxPoints);
+                this.currentData.extent.setToVec3Points(boxPoints);
             }
             // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
             // Return a box which contains the corners of the boxes bounding each sector.
@@ -681,11 +764,10 @@ define([
                         boxCorners.push(corners[j]);
                     }
                 }
-                this._extent = new BoundingBox();
-                this._extent.setToVec3Points(boxCorners);
+                this.currentData.extent.setToVec3Points(boxCorners);
             }
 
-            return this._extent;
+            return this.currentData.extent;
 
         };
 
