@@ -76,11 +76,11 @@ define(['../gesture/GestureRecognizer'],
         };
 
         // Documented in superclass.
-        DragRecognizer.prototype.touchStart = function (touch) {
-            if (this.state == WorldWind.POSSIBLE) {
-                this.state = WorldWind.FAILED; // mouse gestures fail upon receiving a touch event
-            }
-        };
+        // DragRecognizer.prototype.touchStart = function (touch) {
+        //     if (this.state == WorldWind.POSSIBLE) {
+        //         this.state = WorldWind.FAILED; // mouse gestures fail upon receiving a touch event
+        //     }
+        // };
 
         /**
          *

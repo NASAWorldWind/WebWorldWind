@@ -59,6 +59,7 @@ define([
             if (!worldWindow) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ViewControlsLayer", "constructor", "missingWorldWindow"));
+                // TODO: Incorrect error class above
             }
 
             Layer.call(this, "Coordinates");

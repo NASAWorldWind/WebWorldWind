@@ -27,7 +27,7 @@ define([
               Position,
               Vec3) {
         "use strict";
-
+// TODO: Navigator refactoring
         /**
          * Constructs a GoTo animator.
          * @alias GoToAnimator

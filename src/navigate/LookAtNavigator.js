@@ -66,21 +66,21 @@ define([
         var LookAtNavigator = function (worldWindow) {
             Navigator.call(this, worldWindow);
 
-            // Prevent the browser's default actions in response to mouse and touch events, which interfere with
-            // navigation. Register these event listeners  before any others to ensure that they're called last.
-            function preventDefaultListener(event) {
-                event.preventDefault();
-            }
-            worldWindow.addEventListener("mousedown", preventDefaultListener);
-            worldWindow.addEventListener("touchstart", preventDefaultListener);
-            worldWindow.addEventListener("contextmenu", preventDefaultListener);
-            worldWindow.addEventListener("wheel", preventDefaultListener);
+            // // Prevent the browser's default actions in response to mouse and touch events, which interfere with
+            // // navigation. Register these event listeners  before any others to ensure that they're called last.
+            // function preventDefaultListener(event) {
+            //     event.preventDefault();
+            // }
+            // worldWindow.addEventListener("mousedown", preventDefaultListener);
+            // worldWindow.addEventListener("touchstart", preventDefaultListener);
+            // worldWindow.addEventListener("contextmenu", preventDefaultListener);
+            // worldWindow.addEventListener("wheel", preventDefaultListener);
 
-            // Prevent the browser's default actions in response to to pointer events, which interfere with navigation.
-            // This CSS style property is configured here to ensure that it's set for all applications.
-            if (window.PointerEvent) {
-                worldWindow.canvas.style.setProperty("touch-action", "none");
-            }
+            // // Prevent the browser's default actions in response to to pointer events, which interfere with navigation.
+            // // This CSS style property is configured here to ensure that it's set for all applications.
+            // if (window.PointerEvent) {
+            //     worldWindow.canvas.style.setProperty("touch-action", "none");
+            // }
 
             /**
              * The geographic location at the center of the viewport.
@@ -98,56 +98,56 @@ define([
             // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
             this.enable2DLimits = true;
 
-            var thisNavigator = this;
-
-            // Intentionally not documented.
-            this.primaryDragRecognizer = new DragRecognizer(worldWindow, function (recognizer) {
-                thisNavigator.handlePanOrDrag(recognizer);
-            });
-
-            // Intentionally not documented.
-            this.secondaryDragRecognizer = new DragRecognizer(worldWindow, function (recognizer) {
-                thisNavigator.handleSecondaryDrag(recognizer);
-            });
-            this.secondaryDragRecognizer.button = 2; // secondary mouse button
-
-            // Intentionally not documented.
-            this.panRecognizer = new PanRecognizer(worldWindow, function (recognizer) {
-                thisNavigator.handlePanOrDrag(recognizer);
-            });
-
-            // Intentionally not documented.
-            this.pinchRecognizer = new PinchRecognizer(worldWindow, function (recognizer) {
-                thisNavigator.handlePinch(recognizer);
-            });
-
-            // Intentionally not documented.
-            this.rotationRecognizer = new RotationRecognizer(worldWindow, function (recognizer) {
-                thisNavigator.handleRotation(recognizer);
-            });
-
-            // Intentionally not documented.
-            this.tiltRecognizer = new TiltRecognizer(worldWindow, function (recognizer) {
-                thisNavigator.handleTilt(recognizer);
-            });
-
-            // Register wheel event listeners on the WorldWindow's canvas.
-            worldWindow.addEventListener("wheel", function (event) {
-                thisNavigator.handleWheelEvent(event);
-            });
-
-            // Establish the dependencies between gesture recognizers. The pan, pinch and rotate gesture may recognize
-            // simultaneously with each other.
-            this.panRecognizer.recognizeSimultaneouslyWith(this.pinchRecognizer);
-            this.panRecognizer.recognizeSimultaneouslyWith(this.rotationRecognizer);
-            this.pinchRecognizer.recognizeSimultaneouslyWith(this.rotationRecognizer);
-
-            // Since the tilt gesture is a subset of the pan gesture, pan will typically recognize before tilt,
-            // effectively suppressing tilt. Establish a dependency between the other touch gestures and tilt to provide
-            // tilt an opportunity to recognize.
-            this.panRecognizer.requireRecognizerToFail(this.tiltRecognizer);
-            this.pinchRecognizer.requireRecognizerToFail(this.tiltRecognizer);
-            this.rotationRecognizer.requireRecognizerToFail(this.tiltRecognizer);
+            // var thisNavigator = this;
+            //
+            // // Intentionally not documented.
+            // this.primaryDragRecognizer = new DragRecognizer(worldWindow, function (recognizer) {
+            //     thisNavigator.handlePanOrDrag(recognizer);
+            // });
+            //
+            // // Intentionally not documented.
+            // this.secondaryDragRecognizer = new DragRecognizer(worldWindow, function (recognizer) {
+            //     thisNavigator.handleSecondaryDrag(recognizer);
+            // });
+            // this.secondaryDragRecognizer.button = 2; // secondary mouse button
+            //
+            // // Intentionally not documented.
+            // this.panRecognizer = new PanRecognizer(worldWindow, function (recognizer) {
+            //     thisNavigator.handlePanOrDrag(recognizer);
+            // });
+            //
+            // // Intentionally not documented.
+            // this.pinchRecognizer = new PinchRecognizer(worldWindow, function (recognizer) {
+            //     thisNavigator.handlePinch(recognizer);
+            // });
+            //
+            // // Intentionally not documented.
+            // this.rotationRecognizer = new RotationRecognizer(worldWindow, function (recognizer) {
+            //     thisNavigator.handleRotation(recognizer);
+            // });
+            //
+            // // Intentionally not documented.
+            // this.tiltRecognizer = new TiltRecognizer(worldWindow, function (recognizer) {
+            //     thisNavigator.handleTilt(recognizer);
+            // });
+            //
+            // // Register wheel event listeners on the WorldWindow's canvas.
+            // worldWindow.addEventListener("wheel", function (event) {
+            //     thisNavigator.handleWheelEvent(event);
+            // });
+            //
+            // // Establish the dependencies between gesture recognizers. The pan, pinch and rotate gesture may recognize
+            // // simultaneously with each other.
+            // this.panRecognizer.recognizeSimultaneouslyWith(this.pinchRecognizer);
+            // this.panRecognizer.recognizeSimultaneouslyWith(this.rotationRecognizer);
+            // this.pinchRecognizer.recognizeSimultaneouslyWith(this.rotationRecognizer);
+            //
+            // // Since the tilt gesture is a subset of the pan gesture, pan will typically recognize before tilt,
+            // // effectively suppressing tilt. Establish a dependency between the other touch gestures and tilt to provide
+            // // tilt an opportunity to recognize.
+            // this.panRecognizer.requireRecognizerToFail(this.tiltRecognizer);
+            // this.pinchRecognizer.requireRecognizerToFail(this.tiltRecognizer);
+            // this.rotationRecognizer.requireRecognizerToFail(this.tiltRecognizer);
 
             // Intentionally not documented.
             this.beginPoint = new Vec2(0, 0);
@@ -161,118 +161,118 @@ define([
         LookAtNavigator.prototype = Object.create(Navigator.prototype);
 
         // Documented in superclass.
-        LookAtNavigator.prototype.currentState = function () {
-            this.applyLimits();
+        // LookAtNavigator.prototype.currentState = function () {
+        //     this.applyLimits();
+        //
+        //     var globe = this.worldWindow.globe,
+        //         lookAtPosition = new Position(this.lookAtLocation.latitude, this.lookAtLocation.longitude, 0),
+        //         modelview = Matrix.fromIdentity();
+        //     modelview.multiplyByLookAtModelview(lookAtPosition, this.range, this.heading, this.tilt, this.roll, globe);
+        //
+        //     return this.currentStateForModelview(modelview);
+        // };
 
-            var globe = this.worldWindow.globe,
-                lookAtPosition = new Position(this.lookAtLocation.latitude, this.lookAtLocation.longitude, 0),
-                modelview = Matrix.fromIdentity();
-            modelview.multiplyByLookAtModelview(lookAtPosition, this.range, this.heading, this.tilt, this.roll, globe);
-
-            return this.currentStateForModelview(modelview);
-        };
-
-        // Intentionally not documented.
-        LookAtNavigator.prototype.handlePanOrDrag = function (recognizer) {
-            if (this.worldWindow.globe.is2D()) {
-                this.handlePanOrDrag2D(recognizer);
-            } else {
-                this.handlePanOrDrag3D(recognizer);
-            }
-        };
-
-        // Intentionally not documented.
-        LookAtNavigator.prototype.handlePanOrDrag3D = function (recognizer) {
-            var state = recognizer.state,
-                tx = recognizer.translationX,
-                ty = recognizer.translationY;
-
-            if (state == WorldWind.BEGAN) {
-                this.lastPoint.set(0, 0);
-            } else if (state == WorldWind.CHANGED) {
-                // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
-                // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
-                // to arc degrees.
-                var canvas = this.worldWindow.canvas,
-                    globe = this.worldWindow.globe,
-                    globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
-                    distance = WWMath.max(1, this.range),
-                    metersPerPixel = WWMath.perspectivePixelSize(canvas.clientWidth, canvas.clientHeight, distance),
-                    forwardMeters = (ty - this.lastPoint[1]) * metersPerPixel,
-                    sideMeters = -(tx - this.lastPoint[0]) * metersPerPixel,
-                    forwardDegrees = (forwardMeters / globeRadius) * Angle.RADIANS_TO_DEGREES,
-                    sideDegrees = (sideMeters / globeRadius) * Angle.RADIANS_TO_DEGREES;
-
-                // Apply the change in latitude and longitude to this navigator, relative to the current heading.
-                var sinHeading = Math.sin(this.heading * Angle.DEGREES_TO_RADIANS),
-                    cosHeading = Math.cos(this.heading * Angle.DEGREES_TO_RADIANS);
-
-                this.lookAtLocation.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
-                this.lookAtLocation.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
-                this.lastPoint.set(tx, ty);
-                this.applyLimits();
-                this.worldWindow.redraw();
-            }
-        };
-
-        // Intentionally not documented.
-        LookAtNavigator.prototype.handlePanOrDrag2D = function (recognizer) {
-            var state = recognizer.state,
-                x = recognizer.clientX,
-                y = recognizer.clientY,
-                tx = recognizer.translationX,
-                ty = recognizer.translationY;
-
-            if (state == WorldWind.BEGAN) {
-                this.beginPoint.set(x, y);
-                this.lastPoint.set(x, y);
-            } else if (state == WorldWind.CHANGED) {
-                var x1 = this.lastPoint[0],
-                    y1 = this.lastPoint[1],
-                    x2 = this.beginPoint[0] + tx,
-                    y2 = this.beginPoint[1] + ty;
-                this.lastPoint.set(x2, y2);
-
-                var navState = this.currentState(),
-                    globe = this.worldWindow.globe,
-                    ray = navState.rayFromScreenPoint(this.worldWindow.canvasCoordinates(x1, y1)),
-                    point1 = new Vec3(0, 0, 0),
-                    point2 = new Vec3(0, 0, 0),
-                    origin = new Vec3(0, 0, 0);
-                if (!globe.intersectsLine(ray, point1)) {
-                    return;
-                }
-
-                ray = navState.rayFromScreenPoint(this.worldWindow.canvasCoordinates(x2, y2));
-                if (!globe.intersectsLine(ray, point2)) {
-                    return;
-                }
-
-                // Transform the original navigator state's modelview matrix to account for the gesture's change.
-                var modelview = Matrix.fromIdentity();
-                modelview.copy(navState.modelview);
-                modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
-
-                // Compute the globe point at the screen center from the perspective of the transformed navigator state.
-                modelview.extractEyePoint(ray.origin);
-                modelview.extractForwardVector(ray.direction);
-                if (!globe.intersectsLine(ray, origin)) {
-                    return;
-                }
-
-                // Convert the transformed modelview matrix to a set of navigator properties, then apply those
-                // properties to this navigator.
-                var params = modelview.extractViewingParameters(origin, this.roll, globe, {});
-                this.lookAtLocation.copy(params.origin);
-                this.range = params.range;
-                this.heading = params.heading;
-                this.tilt = params.tilt;
-                this.roll = params.roll;
-                this.applyLimits();
-                this.worldWindow.redraw();
-            }
-        };
-
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.handlePanOrDrag = function (recognizer) {
+        //     if (this.worldWindow.globe.is2D()) {
+        //         this.handlePanOrDrag2D(recognizer);
+        //     } else {
+        //         this.handlePanOrDrag3D(recognizer);
+        //     }
+        // };
+        //
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.handlePanOrDrag3D = function (recognizer) {
+        //     var state = recognizer.state,
+        //         tx = recognizer.translationX,
+        //         ty = recognizer.translationY;
+        //
+        //     if (state == WorldWind.BEGAN) {
+        //         this.lastPoint.set(0, 0);
+        //     } else if (state == WorldWind.CHANGED) {
+        //         // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
+        //         // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
+        //         // to arc degrees.
+        //         var canvas = this.worldWindow.canvas,
+        //             globe = this.worldWindow.globe,
+        //             globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
+        //             distance = WWMath.max(1, this.range),
+        //             metersPerPixel = WWMath.perspectivePixelSize(canvas.clientWidth, canvas.clientHeight, distance),
+        //             forwardMeters = (ty - this.lastPoint[1]) * metersPerPixel,
+        //             sideMeters = -(tx - this.lastPoint[0]) * metersPerPixel,
+        //             forwardDegrees = (forwardMeters / globeRadius) * Angle.RADIANS_TO_DEGREES,
+        //             sideDegrees = (sideMeters / globeRadius) * Angle.RADIANS_TO_DEGREES;
+        //
+        //         // Apply the change in latitude and longitude to this navigator, relative to the current heading.
+        //         var sinHeading = Math.sin(this.heading * Angle.DEGREES_TO_RADIANS),
+        //             cosHeading = Math.cos(this.heading * Angle.DEGREES_TO_RADIANS);
+        //
+        //         this.lookAtLocation.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
+        //         this.lookAtLocation.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
+        //         this.lastPoint.set(tx, ty);
+        //         this.applyLimits();
+        //         this.worldWindow.redraw();
+        //     }
+        // };
+        //
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.handlePanOrDrag2D = function (recognizer) {
+        //     var state = recognizer.state,
+        //         x = recognizer.clientX,
+        //         y = recognizer.clientY,
+        //         tx = recognizer.translationX,
+        //         ty = recognizer.translationY;
+        //
+        //     if (state == WorldWind.BEGAN) {
+        //         this.beginPoint.set(x, y);
+        //         this.lastPoint.set(x, y);
+        //     } else if (state == WorldWind.CHANGED) {
+        //         var x1 = this.lastPoint[0],
+        //             y1 = this.lastPoint[1],
+        //             x2 = this.beginPoint[0] + tx,
+        //             y2 = this.beginPoint[1] + ty;
+        //         this.lastPoint.set(x2, y2);
+        //
+        //         var navState = this.currentState(),
+        //             globe = this.worldWindow.globe,
+        //             ray = navState.rayFromScreenPoint(this.worldWindow.canvasCoordinates(x1, y1)),
+        //             point1 = new Vec3(0, 0, 0),
+        //             point2 = new Vec3(0, 0, 0),
+        //             origin = new Vec3(0, 0, 0);
+        //         if (!globe.intersectsLine(ray, point1)) {
+        //             return;
+        //         }
+        //
+        //         ray = navState.rayFromScreenPoint(this.worldWindow.canvasCoordinates(x2, y2));
+        //         if (!globe.intersectsLine(ray, point2)) {
+        //             return;
+        //         }
+        //
+        //         // Transform the original navigator state's modelview matrix to account for the gesture's change.
+        //         var modelview = Matrix.fromIdentity();
+        //         modelview.copy(navState.modelview);
+        //         modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
+        //
+        //         // Compute the globe point at the screen center from the perspective of the transformed navigator state.
+        //         modelview.extractEyePoint(ray.origin);
+        //         modelview.extractForwardVector(ray.direction);
+        //         if (!globe.intersectsLine(ray, origin)) {
+        //             return;
+        //         }
+        //
+        //         // Convert the transformed modelview matrix to a set of navigator properties, then apply those
+        //         // properties to this navigator.
+        //         var params = modelview.extractViewingParameters(origin, this.roll, globe, {});
+        //         this.lookAtLocation.copy(params.origin);
+        //         this.range = params.range;
+        //         this.heading = params.heading;
+        //         this.tilt = params.tilt;
+        //         this.roll = params.roll;
+        //         this.applyLimits();
+        //         this.worldWindow.redraw();
+        //     }
+        // };
+        //
         // Intentionally not documented.
         LookAtNavigator.prototype.handleSecondaryDrag = function (recognizer) {
             var state = recognizer.state,
@@ -374,36 +374,36 @@ define([
             this.worldWindow.redraw();
         };
 
-        // Intentionally not documented.
-        LookAtNavigator.prototype.applyLimits = function () {
-            // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
-            this.lookAtLocation.latitude = WWMath.clamp(this.lookAtLocation.latitude, -90, 90);
-            this.lookAtLocation.longitude = Angle.normalizedDegreesLongitude(this.lookAtLocation.longitude);
-
-            // Clamp range to values greater than 1 in order to prevent degenerating to a first-person navigator when
-            // range is zero.
-            this.range = WWMath.clamp(this.range, 1, Number.MAX_VALUE);
-
-            // Normalize heading to between -180 and +180.
-            this.heading = Angle.normalizedDegrees(this.heading);
-
-            // Clamp tilt to between 0 and +90 to prevent the viewer from going upside down.
-            this.tilt = WWMath.clamp(this.tilt, 0, 90);
-
-            // Normalize heading to between -180 and +180.
-            this.roll = Angle.normalizedDegrees(this.roll);
-
-            // Apply 2D limits when the globe is 2D.
-            if (this.worldWindow.globe.is2D() && this.enable2DLimits) {
-                // Clamp range to prevent more than 360 degrees of visible longitude. Assumes a 45 degree horizontal
-                // field of view.
-                var maxRange = 2 * Math.PI * this.worldWindow.globe.equatorialRadius;
-                this.range = WWMath.clamp(this.range, 1, maxRange);
-
-                // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
-                this.tilt = 0;
-            }
-        };
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.applyLimits = function () {
+        //     // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
+        //     this.lookAtLocation.latitude = WWMath.clamp(this.lookAtLocation.latitude, -90, 90);
+        //     this.lookAtLocation.longitude = Angle.normalizedDegreesLongitude(this.lookAtLocation.longitude);
+        //
+        //     // Clamp range to values greater than 1 in order to prevent degenerating to a first-person navigator when
+        //     // range is zero.
+        //     this.range = WWMath.clamp(this.range, 1, Number.MAX_VALUE);
+        //
+        //     // Normalize heading to between -180 and +180.
+        //     this.heading = Angle.normalizedDegrees(this.heading);
+        //
+        //     // Clamp tilt to between 0 and +90 to prevent the viewer from going upside down.
+        //     this.tilt = WWMath.clamp(this.tilt, 0, 90);
+        //
+        //     // Normalize heading to between -180 and +180.
+        //     this.roll = Angle.normalizedDegrees(this.roll);
+        //
+        //     // Apply 2D limits when the globe is 2D.
+        //     if (this.worldWindow.globe.is2D() && this.enable2DLimits) {
+        //         // Clamp range to prevent more than 360 degrees of visible longitude. Assumes a 45 degree horizontal
+        //         // field of view.
+        //         var maxRange = 2 * Math.PI * this.worldWindow.globe.equatorialRadius;
+        //         this.range = WWMath.clamp(this.range, 1, maxRange);
+        //
+        //         // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
+        //         this.tilt = 0;
+        //     }
+        // };
 
         return LookAtNavigator;
     });

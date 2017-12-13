@@ -25,6 +25,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './util/BasicTimeSequence',
+        './BasicWorldWindowController',
         './layer/BingAerialLayer',
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
@@ -248,6 +249,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/WmtsLayer',
         './ogc/wmts/WmtsLayerCapabilities',
         './WorldWindow',
+        './WorldWindowController',
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
@@ -264,6 +266,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BasicProgram,
               BasicTextureProgram,
               BasicTimeSequence,
+              BasicWorldWindowController,
               BingAerialLayer,
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
@@ -487,6 +490,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
+              WorldWindowController,
               WWMath,
               WWMessage,
               WWUtil,
@@ -712,6 +716,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BasicTimeSequence'] = BasicTimeSequence;
+        WorldWind['BasicWorldWindowController'] = BasicWorldWindowController;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
@@ -886,6 +891,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
+        WorldWind['WorldWindowController'] = WorldWindowController;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**
