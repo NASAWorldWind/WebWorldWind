@@ -77,7 +77,20 @@ define([
 
             // Intentionally not documented.
             this.tiltRecognizer = new TiltRecognizer(worldWindow, null);
-            // TODO: Wheel events
+
+            // Establish the dependencies between gesture recognizers. The pan, pinch and rotate gesture may recognize
+            // simultaneously with each other.
+            this.panRecognizer.recognizeSimultaneouslyWith(this.pinchRecognizer);
+            this.panRecognizer.recognizeSimultaneouslyWith(this.rotationRecognizer);
+            this.pinchRecognizer.recognizeSimultaneouslyWith(this.rotationRecognizer);
+
+            // Since the tilt gesture is a subset of the pan gesture, pan will typically recognize before tilt,
+            // effectively suppressing tilt. Establish a dependency between the other touch gestures and tilt to provide
+            // tilt an opportunity to recognize.
+            this.panRecognizer.requireRecognizerToFail(this.tiltRecognizer);
+            this.pinchRecognizer.requireRecognizerToFail(this.tiltRecognizer);
+            this.rotationRecognizer.requireRecognizerToFail(this.tiltRecognizer);
+
             this.allMouseRecognizers = [this.primaryDragRecognizer, this.secondaryDragRecognizer];
             for (var i = 0; i < this.allMouseRecognizers.length; i++) {
                 this.allMouseRecognizers[i].addListener(this);
@@ -92,20 +105,30 @@ define([
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
 
         BasicWorldWindowController.prototype.onMouseEvent = function (e) {
-            var handled = false;
+            var handled = WorldWindowController.prototype.onMouseEvent.call(this, e);
 
-            for (var i = 0; i < this.allMouseRecognizers.length; i++) {
-                handled |= this.allMouseRecognizers[i].onMouseEvent(e); // use or-assignment to indicate if any recognizer handled the event
+            if (!handled) {
+                if (e.type === "wheel") {
+                    handled = true;
+                    this.handleWheelEvent(e);
+                }
+                else {
+                    for (var i = 0; i < this.allMouseRecognizers.length; i++) {
+                        handled |= this.allMouseRecognizers[i].onMouseEvent(e); // use or-assignment to indicate if any recognizer handled the event
+                    }
+                }
             }
 
             return handled;
         };
 
         BasicWorldWindowController.prototype.onTouchEvent = function (e) {
-            var handled = false;
+            var handled = WorldWindowController.prototype.onTouchEvent.call(this, e);
 
-            for (var i = 0; i < this.allTouchRecognizers.length; i++) {
-                handled |= this.allTouchRecognizers[i].onTouchEvent(e); // use or-assignment to indicate if any recognizer handled the event
+            if (!handled) {
+                for (var i = 0; i < this.allTouchRecognizers.length; i++) {
+                    handled |= this.allTouchRecognizers[i].onTouchEvent(e); // use or-assignment to indicate if any recognizer handled the event
+                }
             }
 
             return handled;
@@ -114,6 +137,18 @@ define([
         BasicWorldWindowController.prototype.gestureStateChanged = function (recognizer) {
             if (recognizer === this.primaryDragRecognizer || recognizer === this.panRecognizer) {
                 this.handlePanOrDrag(recognizer);
+            }
+            else if (recognizer === this.secondaryDragRecognizer) {
+                this.handleSecondaryDrag(recognizer);
+            }
+            else if (recognizer === this.pinchRecognizer) {
+                this.handlePinch(recognizer);
+            }
+            else if (recognizer === this.rotationRecognizer) {
+                this.handleRotation(recognizer);
+            }
+            else if (recognizer === this.tiltRecognizer) {
+                this.handleTilt(recognizer);
             }
         };
 
@@ -132,7 +167,7 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var navigator=this.wwd.navigator;
+            var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
                 navigator.lastPoint.set(0, 0);
             } else if (state === WorldWind.CHANGED) {
@@ -169,7 +204,7 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var navigator=this.wwd.navigator;
+            var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
                 navigator.beginPoint.set(x, y);
                 navigator.lastPoint.set(x, y);
@@ -221,8 +256,114 @@ define([
         };
 
         // Intentionally not documented.
+        BasicWorldWindowController.prototype.handleSecondaryDrag = function (recognizer) {
+            var state = recognizer.state,
+                tx = recognizer.translationX,
+                ty = recognizer.translationY;
+
+            var navigator = this.wwd.navigator;
+            if (state === WorldWind.BEGAN) {
+                navigator.beginHeading = navigator.heading;
+                navigator.beginTilt = navigator.tilt;
+            } else if (state === WorldWind.CHANGED) {
+                // Compute the current translation from screen coordinates to degrees. Use the canvas dimensions as a
+                // metric for converting the gesture translation to a fraction of an angle.
+                var headingDegrees = 180 * tx / this.wwd.canvas.clientWidth,
+                    tiltDegrees = 90 * ty / this.wwd.canvas.clientHeight;
+
+                // Apply the change in heading and tilt to this navigator's corresponding properties.
+                navigator.heading = navigator.beginHeading + headingDegrees;
+                navigator.tilt = navigator.beginTilt + tiltDegrees;
+                this.applyLimits();
+                this.wwd.redraw();
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.handlePinch = function (recognizer) {
+            var navigator = this.wwd.navigator;
+            var state = recognizer.state,
+                scale = recognizer.scale;
+
+            if (state === WorldWind.BEGAN) {
+                navigator.beginRange = navigator.range;
+            } else if (state === WorldWind.CHANGED) {
+                if (scale !== 0) {
+                    // Apply the change in pinch scale to this navigator's range, relative to the range when the gesture
+                    // began.
+                    navigator.range = navigator.beginRange / scale;
+                    this.applyLimits();
+                    this.wwd.redraw();
+                }
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.handleRotation = function (recognizer) {
+            var navigator = this.wwd.navigator;
+            var state = recognizer.state,
+                rotation = recognizer.rotation;
+
+            if (state === WorldWind.BEGAN) {
+                navigator.lastRotation = 0;
+            } else if (state === WorldWind.CHANGED) {
+                // Apply the change in gesture rotation to this navigator's current heading. We apply relative to the
+                // current heading rather than the heading when the gesture began in order to work simultaneously with
+                // pan operations that also modify the current heading.
+                navigator.heading -= rotation - navigator.lastRotation;
+                navigator.lastRotation = rotation;
+                this.applyLimits();
+                this.wwd.redraw();
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.handleTilt = function (recognizer) {
+            var navigator = this.wwd.navigator;
+            var state = recognizer.state,
+                ty = recognizer.translationY;
+
+            if (state === WorldWind.BEGAN) {
+                navigator.beginTilt = navigator.tilt;
+            } else if (state === WorldWind.CHANGED) {
+                // Compute the gesture translation from screen coordinates to degrees. Use the canvas dimensions as a
+                // metric for converting the translation to a fraction of an angle.
+                var tiltDegrees = -90 * ty / this.wwd.canvas.clientHeight;
+                // Apply the change in heading and tilt to this navigator's corresponding properties.
+                navigator.tilt = navigator.beginTilt + tiltDegrees;
+                this.applyLimits();
+                this.wwd.redraw();
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.handleWheelEvent = function (event) {
+            var navigator = this.wwd.navigator;
+            // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
+            // browsers and input devices.
+            var normalizedDelta;
+            if (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL) {
+                normalizedDelta = event.deltaY;
+            } else if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+                normalizedDelta = event.deltaY * 40;
+            } else if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+                normalizedDelta = event.deltaY * 400;
+            }
+
+            // Compute a zoom scale factor by adding a fraction of the normalized delta to 1. When multiplied by the
+            // navigator's range, this has the effect of zooming out or zooming in depending on whether the delta is
+            // positive or negative, respectfully.
+            var scale = 1 + (normalizedDelta / 1000);
+
+            // Apply the scale to this navigator's properties.
+            navigator.range *= scale;
+            this.applyLimits();
+            this.wwd.redraw();
+        };
+
+        // Intentionally not documented.
         BasicWorldWindowController.prototype.applyLimits = function () {
-            var navigator=this.wwd.navigator;
+            var navigator = this.wwd.navigator;
 
             // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
             navigator.lookAtLocation.latitude = WWMath.clamp(navigator.lookAtLocation.latitude, -90, 90);
@@ -253,8 +394,9 @@ define([
             }
         };
 
+        // TODO: Refactor into other classes
         BasicWorldWindowController.prototype.currentState = function () {
-            var navigator=this.wwd.navigator;
+            var navigator = this.wwd.navigator;
 
             this.applyLimits();
 

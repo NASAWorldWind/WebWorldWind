@@ -24,8 +24,7 @@ define([
         '../util/Logger',
         '../util/Offset',
         '../shapes/ScreenImage',
-        '../geom/Vec2',
-        '../util/WWUtil'
+        '../geom/Vec2'
     ],
     function (Angle,
               ArgumentError,
@@ -34,8 +33,7 @@ define([
               Logger,
               Offset,
               ScreenImage,
-              Vec2,
-              WWUtil) {
+              Vec2) {
         "use strict";
 
         /**
@@ -225,7 +223,9 @@ define([
             this.pickEnabled = false;
 
             // Establish event handlers.
-            this.setupInteraction();
+            // this.setupInteraction();
+            this.wwd.worldWindowController.addMouseListener(this);
+            this.wwd.worldWindowController.addTouchListener(this);
         };
 
         ViewControlsLayer.prototype = Object.create(Layer.prototype);
@@ -468,106 +468,113 @@ define([
         };
 
         // Intentionally not documented.
-        ViewControlsLayer.prototype.setupInteraction = function () {
-            var wwd = this.wwd,
-                thisLayer = this;
+        // ViewControlsLayer.prototype.setupInteraction = function () {
+        // var wwd = this.wwd,
+        //     thisLayer = this;
 
-            var handleMouseEvent = function (e) {
-                if (!thisLayer.enabled) {
-                    return;
-                }
-                // Prevent handling of simulated mouse events on touch devices.
-                if (thisLayer.isTouchDevice) {
-                    return;
-                }
+        // Add the mouse listeners.
+        // wwd.addEventListener("mousedown", handleMouseEvent);
+        // wwd.addEventListener("mouseup", handleMouseEvent);
+        // wwd.addEventListener("mousemove", handleMouseEvent);
+        // window.addEventListener("mouseup", handleMouseEvent);
+        // window.addEventListener("mousemove", handleMouseEvent);
 
-                var topObject, operation;
+        // wwd.addEventListener("touchstart", handleTouchEvent);
+        // wwd.addEventListener("touchend", handleTouchEvent);
+        // wwd.addEventListener("touchcancel", handleTouchEvent);
+        // wwd.addEventListener("touchmove", handleTouchEvent);
+        // };
 
-                // Turn off any highlight. If a control is in use it will be highlighted later.
-                if (thisLayer.highlightedControl) {
-                    thisLayer.highlight(thisLayer.highlightedControl, false);
-                    thisLayer.wwd.redraw();
-                }
+        ViewControlsLayer.prototype.onMouseEvent = function (e) {
+            var handled = false;
 
-                // Terminate the active operation when the mouse button goes up.
-                if (e.type && (e.type === "mouseup" && e.which === 1) && thisLayer.activeControl) {
-                    thisLayer.activeControl = null;
-                    thisLayer.activeOperation = null;
+            if (!this.enabled) {
+                return handled;
+            }
+            // Prevent handling of simulated mouse events on touch devices.
+            if (this.isTouchDevice) {
+                return handled;
+            }
+
+            var topObject, operation;
+
+            // Turn off any highlight. If a control is in use it will be highlighted later.
+            if (this.highlightedControl) {
+                this.highlight(this.highlightedControl, false);
+                this.wwd.redraw();
+            }
+
+            // Terminate the active operation when the mouse button goes up.
+            if (e.type && (e.type === "mouseup" && e.which === 1) && this.activeControl) {
+                this.activeControl = null;
+                this.activeOperation = null;
+                e.preventDefault();
+            } else {
+                // Perform the active operation, or determine it and then perform it.
+                if (this.activeOperation) {
+                    handled = this.activeOperation.call(this, e, null);
                     e.preventDefault();
                 } else {
-                    // Perform the active operation, or determine it and then perform it.
-                    if (thisLayer.activeOperation) {
-                        thisLayer.activeOperation.call(thisLayer, e, null);
-                        e.preventDefault();
-                    } else {
-                        topObject = thisLayer.pickControl(wwd.canvasCoordinates(e.clientX, e.clientY));
-                        operation = thisLayer.determineOperation(e, topObject);
-                        if (operation) {
-                            operation.call(thisLayer, e, topObject);
-                        }
+                    topObject = this.pickControl(this.wwd.canvasCoordinates(e.clientX, e.clientY));
+                    operation = this.determineOperation(e, topObject);
+                    if (operation) {
+                        handled = operation.call(this, e, topObject);
                     }
-
-                    // Determine and display the new highlight state.
-                    thisLayer.handleHighlight(e, topObject);
-                    thisLayer.wwd.redraw();
                 }
 
-            };
+                // Determine and display the new highlight state.
+                this.handleHighlight(e, topObject);
+                this.wwd.redraw();
+            }
 
-            // Add the mouse listeners.
-            wwd.addEventListener("mousedown", handleMouseEvent);
-            wwd.addEventListener("mouseup", handleMouseEvent);
-            wwd.addEventListener("mousemove", handleMouseEvent);
-            window.addEventListener("mouseup", handleMouseEvent);
-            window.addEventListener("mousemove", handleMouseEvent);
+            return handled;
 
-            var handleTouchEvent = function (e) {
-                this.isTouchDevice = true;
+        };
 
-                if (!thisLayer.enabled) {
-                    return;
+        ViewControlsLayer.prototype.onTouchEvent = function (e) {
+            this.isTouchDevice = true;
+
+            var handled = false;
+            if (!this.enabled) {
+                return handled;
+            }
+
+            // Turn off any highlight. If a button is in use it will be highlighted later.
+            if (this.highlightedControl) {
+                this.highlight(this.highlightedControl, false);
+                this.wwd.redraw();
+            }
+
+            // Terminate the active operation when the touch ends.
+            if (e.type && (e.type === "touchend" || e.type === "touchcancel")) {
+                if (this.activeControl && this.isCurrentTouch(e)) {
+                    this.activeControl = null;
+                    this.activeOperation = null;
+                    e.preventDefault();
                 }
-
-                // Turn off any highlight. If a button is in use it will be highlighted later.
-                if (thisLayer.highlightedControl) {
-                    thisLayer.highlight(thisLayer.highlightedControl, false);
-                    thisLayer.wwd.redraw();
-                }
-
-                // Terminate the active operation when the touch ends.
-                if (e.type && (e.type === "touchend" || e.type === "touchcancel")) {
-                    if (thisLayer.activeControl && thisLayer.isCurrentTouch(e)) {
-                        thisLayer.activeControl = null;
-                        thisLayer.activeOperation = null;
-                        e.preventDefault();
-                    }
+            } else {
+                // Perform the active operation, or determine it and then perform it.
+                if (this.activeOperation) {
+                    handled = this.activeOperation.call(this, e, null);
+                    e.preventDefault();
                 } else {
-                    // Perform the active operation, or determine it and then perform it.
-                    if (thisLayer.activeOperation) {
-                        thisLayer.activeOperation.call(thisLayer, e, null);
-                        e.preventDefault();
-                    } else {
-                        var topObject,
-                            touch = e.changedTouches.item(0),
-                            operation;
+                    var topObject,
+                        touch = e.changedTouches.item(0),
+                        operation;
 
-                        topObject = thisLayer.pickControl(wwd.canvasCoordinates(touch.clientX, touch.clientY));
-                        operation = thisLayer.determineOperation(e, topObject);
-                        if (operation) {
-                            operation.call(thisLayer, e, topObject);
-                        }
+                    topObject = this.pickControl(this.wwd.canvasCoordinates(touch.clientX, touch.clientY));
+                    operation = this.determineOperation(e, topObject);
+                    if (operation) {
+                        handled = operation.call(this, e, topObject);
                     }
                 }
+            }
 
-                // Determine new highlight state.
-                thisLayer.handleHighlight(e, topObject);
-                thisLayer.wwd.redraw();
-            };
+            // Determine new highlight state.
+            this.handleHighlight(e, topObject);
+            this.wwd.redraw();
 
-            wwd.addEventListener("touchstart", handleTouchEvent);
-            wwd.addEventListener("touchend", handleTouchEvent);
-            wwd.addEventListener("touchcancel", handleTouchEvent);
-            wwd.addEventListener("touchmove", handleTouchEvent);
+            return handled;
         };
 
         // Intentionally not documented. Determines whether a picked object is a view control.
@@ -639,6 +646,8 @@ define([
 
         // Intentionally not documented.
         ViewControlsLayer.prototype.handlePan = function (e, control) {
+            var handled = false;
+
             // Capture the current position.
             if (e.type === "mousedown" || e.type === "mousemove") {
                 this.currentEventPoint = this.wwd.canvasCoordinates(e.clientX, e.clientY);
@@ -666,7 +675,7 @@ define([
                                 - (thisLayer.wwd.viewport.height - thisLayer.currentEventPoint[1]),
                             oldLat = thisLayer.wwd.navigator.lookAtLocation.latitude,
                             oldLon = thisLayer.wwd.navigator.lookAtLocation.longitude,
-                        // Scale the increment by a constant and the relative distance of the eye to the surface.
+                            // Scale the increment by a constant and the relative distance of the eye to the surface.
                             scale = thisLayer.panIncrement
                                 * (thisLayer.wwd.navigator.range / thisLayer.wwd.globe.radiusAt(oldLat, oldLon)),
                             heading = thisLayer.wwd.navigator.heading + (Math.atan2(dx, dy) * Angle.RADIANS_TO_DEGREES),
@@ -679,11 +688,17 @@ define([
                     }
                 };
                 setTimeout(setLookAtLocation, 50);
+
+                handled = true;
             }
+
+            return handled;
         };
 
         // Intentionally not documented.
         ViewControlsLayer.prototype.handleZoom = function (e, control) {
+            var handled = false;
+
             // Start an operation on left button down or touch start.
             if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
                 this.activeControl = control;
@@ -708,11 +723,17 @@ define([
                     }
                 };
                 setTimeout(setRange, 50);
+
+                handled = true;
             }
+
+            return handled;
         };
 
         // Intentionally not documented.
         ViewControlsLayer.prototype.handleHeading = function (e, control) {
+            var handled = false;
+
             // Start an operation on left button down or touch start.
             if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
                 this.activeControl = control;
@@ -737,11 +758,16 @@ define([
                     }
                 };
                 setTimeout(setRange, 50);
+                handled = true;
             }
+
+            return handled;
         };
 
         // Intentionally not documented.
         ViewControlsLayer.prototype.handleTilt = function (e, control) {
+            var handled = false;
+
             // Start an operation on left button down or touch start.
             if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
                 this.activeControl = control;
@@ -768,11 +794,17 @@ define([
                     }
                 };
                 setTimeout(setRange, 50);
+
+                handled = true;
             }
+
+            return handled;
         };
 
         // Intentionally not documented.
         ViewControlsLayer.prototype.handleExaggeration = function (e, control) {
+            var handled = false;
+
             // Start an operation on left button down or touch start.
             if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
                 this.activeControl = control;
@@ -798,11 +830,17 @@ define([
                     }
                 };
                 setTimeout(setExaggeration, 50);
+
+                handled = true;
             }
+
+            return handled;
         };
 
         // Intentionally not documented.
         ViewControlsLayer.prototype.handleFov = function (e, control) {
+            var handled = false;
+
             // Start an operation on left button down or touch start.
             if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
                 this.activeControl = control;
@@ -829,7 +867,10 @@ define([
                     }
                 };
                 setTimeout(setRange, 50);
+                handled = true;
             }
+
+            return handled;
         };
 
         // Intentionally not documented. Determines whether to highlight a control.

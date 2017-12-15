@@ -149,6 +149,7 @@ define([
             };
 
         // Intentionally not documented.
+        // TODO: Remove
         GestureRecognizer.allRecognizers = [];
 
         Object.defineProperties(GestureRecognizer.prototype, {
@@ -434,31 +435,31 @@ define([
         GestureRecognizer.prototype.transitionToState = function (newState) {
             this._nextState = null; // clear any pending state transition
 
-            if (newState == WorldWind.FAILED) {
+            if (newState === WorldWind.FAILED) {
                 this._state = newState;
                 this.updateRecognizersWaitingForFailure();
                 this.resetIfEventsEnded();
-            } else if (newState == WorldWind.RECOGNIZED) {
+            } else if (newState === WorldWind.RECOGNIZED) {
                 this.tryToRecognize(newState); // may prevent the transition to Recognized
-                if (this._state == newState) {
+                if (this._state === newState) {
                     this.prepareToRecognize();
                     this.notifyListeners(); // this.callGestureCallbacks();
                     this.resetIfEventsEnded();
                 }
-            } else if (newState == WorldWind.BEGAN) {
+            } else if (newState === WorldWind.BEGAN) {
                 this.tryToRecognize(newState); // may prevent the transition to Began
-                if (this._state == newState) {
+                if (this._state === newState) {
                     this.prepareToRecognize();
                     this.notifyListeners(); // this.callGestureCallbacks();
                 }
-            } else if (newState == WorldWind.CHANGED) {
+            } else if (newState === WorldWind.CHANGED) {
                 this._state = newState;
                 this.notifyListeners(); // this.callGestureCallbacks();
-            } else if (newState == WorldWind.CANCELLED) {
+            } else if (newState === WorldWind.CANCELLED) {
                 this._state = newState;
                 this.notifyListeners(); // this.callGestureCallbacks();
                 this.resetIfEventsEnded();
-            } else if (newState == WorldWind.ENDED) {
+            } else if (newState === WorldWind.ENDED) {
                 this._state = newState;
                 this.notifyListeners(); // this.callGestureCallbacks();
                 this.resetIfEventsEnded();

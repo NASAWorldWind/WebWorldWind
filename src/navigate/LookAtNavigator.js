@@ -273,106 +273,106 @@ define([
         //     }
         // };
         //
-        // Intentionally not documented.
-        LookAtNavigator.prototype.handleSecondaryDrag = function (recognizer) {
-            var state = recognizer.state,
-                tx = recognizer.translationX,
-                ty = recognizer.translationY;
-
-            if (state == WorldWind.BEGAN) {
-                this.beginHeading = this.heading;
-                this.beginTilt = this.tilt;
-            } else if (state == WorldWind.CHANGED) {
-                // Compute the current translation from screen coordinates to degrees. Use the canvas dimensions as a
-                // metric for converting the gesture translation to a fraction of an angle.
-                var headingDegrees = 180 * tx / this.worldWindow.canvas.clientWidth,
-                    tiltDegrees = 90 * ty / this.worldWindow.canvas.clientHeight;
-
-                // Apply the change in heading and tilt to this navigator's corresponding properties.
-                this.heading = this.beginHeading + headingDegrees;
-                this.tilt = this.beginTilt + tiltDegrees;
-                this.applyLimits();
-                this.worldWindow.redraw();
-            }
-        };
-
-        // Intentionally not documented.
-        LookAtNavigator.prototype.handlePinch = function (recognizer) {
-            var state = recognizer.state,
-                scale = recognizer.scale;
-
-            if (state == WorldWind.BEGAN) {
-                this.beginRange = this.range;
-            } else if (state == WorldWind.CHANGED) {
-                if (scale != 0) {
-                    // Apply the change in pinch scale to this navigator's range, relative to the range when the gesture
-                    // began.
-                    this.range = this.beginRange / scale;
-                    this.applyLimits();
-                    this.worldWindow.redraw();
-                }
-            }
-        };
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.handleSecondaryDrag = function (recognizer) {
+        //     var state = recognizer.state,
+        //         tx = recognizer.translationX,
+        //         ty = recognizer.translationY;
+        //
+        //     if (state == WorldWind.BEGAN) {
+        //         this.beginHeading = this.heading;
+        //         this.beginTilt = this.tilt;
+        //     } else if (state == WorldWind.CHANGED) {
+        //         // Compute the current translation from screen coordinates to degrees. Use the canvas dimensions as a
+        //         // metric for converting the gesture translation to a fraction of an angle.
+        //         var headingDegrees = 180 * tx / this.worldWindow.canvas.clientWidth,
+        //             tiltDegrees = 90 * ty / this.worldWindow.canvas.clientHeight;
+        //
+        //         // Apply the change in heading and tilt to this navigator's corresponding properties.
+        //         this.heading = this.beginHeading + headingDegrees;
+        //         this.tilt = this.beginTilt + tiltDegrees;
+        //         this.applyLimits();
+        //         this.worldWindow.redraw();
+        //     }
+        // };
 
         // Intentionally not documented.
-        LookAtNavigator.prototype.handleRotation = function (recognizer) {
-            var state = recognizer.state,
-                rotation = recognizer.rotation;
+        // LookAtNavigator.prototype.handlePinch = function (recognizer) {
+        //     var state = recognizer.state,
+        //         scale = recognizer.scale;
+        //
+        //     if (state == WorldWind.BEGAN) {
+        //         this.beginRange = this.range;
+        //     } else if (state == WorldWind.CHANGED) {
+        //         if (scale != 0) {
+        //             // Apply the change in pinch scale to this navigator's range, relative to the range when the gesture
+        //             // began.
+        //             this.range = this.beginRange / scale;
+        //             this.applyLimits();
+        //             this.worldWindow.redraw();
+        //         }
+        //     }
+        // };
 
-            if (state == WorldWind.BEGAN) {
-                this.lastRotation = 0;
-            } else if (state == WorldWind.CHANGED) {
-                // Apply the change in gesture rotation to this navigator's current heading. We apply relative to the
-                // current heading rather than the heading when the gesture began in order to work simultaneously with
-                // pan operations that also modify the current heading.
-                this.heading -= rotation - this.lastRotation;
-                this.lastRotation = rotation;
-                this.applyLimits();
-                this.worldWindow.redraw();
-            }
-        };
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.handleRotation = function (recognizer) {
+        //     var state = recognizer.state,
+        //         rotation = recognizer.rotation;
+        //
+        //     if (state == WorldWind.BEGAN) {
+        //         this.lastRotation = 0;
+        //     } else if (state == WorldWind.CHANGED) {
+        //         // Apply the change in gesture rotation to this navigator's current heading. We apply relative to the
+        //         // current heading rather than the heading when the gesture began in order to work simultaneously with
+        //         // pan operations that also modify the current heading.
+        //         this.heading -= rotation - this.lastRotation;
+        //         this.lastRotation = rotation;
+        //         this.applyLimits();
+        //         this.worldWindow.redraw();
+        //     }
+        // };
 
-        // Intentionally not documented.
-        LookAtNavigator.prototype.handleTilt = function (recognizer) {
-            var state = recognizer.state,
-                ty = recognizer.translationY;
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.handleTilt = function (recognizer) {
+        //     var state = recognizer.state,
+        //         ty = recognizer.translationY;
+        //
+        //     if (state == WorldWind.BEGAN) {
+        //         this.beginTilt = this.tilt;
+        //     } else if (state == WorldWind.CHANGED) {
+        //         // Compute the gesture translation from screen coordinates to degrees. Use the canvas dimensions as a
+        //         // metric for converting the translation to a fraction of an angle.
+        //         var tiltDegrees = -90 * ty / this.worldWindow.canvas.clientHeight;
+        //         // Apply the change in heading and tilt to this navigator's corresponding properties.
+        //         this.tilt = this.beginTilt + tiltDegrees;
+        //         this.applyLimits();
+        //         this.worldWindow.redraw();
+        //     }
+        // };
 
-            if (state == WorldWind.BEGAN) {
-                this.beginTilt = this.tilt;
-            } else if (state == WorldWind.CHANGED) {
-                // Compute the gesture translation from screen coordinates to degrees. Use the canvas dimensions as a
-                // metric for converting the translation to a fraction of an angle.
-                var tiltDegrees = -90 * ty / this.worldWindow.canvas.clientHeight;
-                // Apply the change in heading and tilt to this navigator's corresponding properties.
-                this.tilt = this.beginTilt + tiltDegrees;
-                this.applyLimits();
-                this.worldWindow.redraw();
-            }
-        };
-
-        // Intentionally not documented.
-        LookAtNavigator.prototype.handleWheelEvent = function (event) {
-            // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
-            // browsers and input devices.
-            var normalizedDelta;
-            if (event.deltaMode == WheelEvent.DOM_DELTA_PIXEL) {
-                normalizedDelta = event.deltaY;
-            } else if (event.deltaMode == WheelEvent.DOM_DELTA_LINE) {
-                normalizedDelta = event.deltaY * 40;
-            } else if (event.deltaMode == WheelEvent.DOM_DELTA_PAGE) {
-                normalizedDelta = event.deltaY * 400;
-            }
-
-            // Compute a zoom scale factor by adding a fraction of the normalized delta to 1. When multiplied by the
-            // navigator's range, this has the effect of zooming out or zooming in depending on whether the delta is
-            // positive or negative, respectfully.
-            var scale = 1 + (normalizedDelta / 1000);
-
-            // Apply the scale to this navigator's properties.
-            this.range *= scale;
-            this.applyLimits();
-            this.worldWindow.redraw();
-        };
+        // // Intentionally not documented.
+        // LookAtNavigator.prototype.handleWheelEvent = function (event) {
+        //     // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
+        //     // browsers and input devices.
+        //     var normalizedDelta;
+        //     if (event.deltaMode == WheelEvent.DOM_DELTA_PIXEL) {
+        //         normalizedDelta = event.deltaY;
+        //     } else if (event.deltaMode == WheelEvent.DOM_DELTA_LINE) {
+        //         normalizedDelta = event.deltaY * 40;
+        //     } else if (event.deltaMode == WheelEvent.DOM_DELTA_PAGE) {
+        //         normalizedDelta = event.deltaY * 400;
+        //     }
+        //
+        //     // Compute a zoom scale factor by adding a fraction of the normalized delta to 1. When multiplied by the
+        //     // navigator's range, this has the effect of zooming out or zooming in depending on whether the delta is
+        //     // positive or negative, respectfully.
+        //     var scale = 1 + (normalizedDelta / 1000);
+        //
+        //     // Apply the scale to this navigator's properties.
+        //     this.range *= scale;
+        //     this.applyLimits();
+        //     this.worldWindow.redraw();
+        // };
 
         // // Intentionally not documented.
         // LookAtNavigator.prototype.applyLimits = function () {

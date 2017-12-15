@@ -75,6 +75,7 @@ define(['../gesture/GestureRecognizer'],
         };
 
         // Documented in superclass.
+        // TODO: Address mouseDown cancellation
         PinchRecognizer.prototype.mouseDown = function (event) {
             if (this.state == WorldWind.POSSIBLE) {
                 this.state = WorldWind.FAILED; // touch gestures fail upon receiving a mouse event

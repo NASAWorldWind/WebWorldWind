@@ -235,7 +235,8 @@ define([
                 thisWindow.onTouchEvent(event);
             }
 
-            if (window.PointerEvent) {
+            var forceTouch=true; // TODO: Remove
+            if (!forceTouch && window.PointerEvent) {
                 // Prevent the browser's default actions in response to pointer events which interfere with navigation.
                 // This CSS style property is configured here to ensure that it's set for all applications.
                 this.canvas.style.setProperty("touch-action", "none");
@@ -253,6 +254,11 @@ define([
                 this.addEventListener("touchend", onTouchEvent, false);
                 this.addEventListener("touchcancel", onTouchEvent, false);
             }
+
+            // Register wheel event listeners on the WorldWindow's canvas.
+            this.addEventListener("wheel", function (event) {
+                onMouseEvent(event);
+            });
 
             // Set up to handle WebGL context lost events.
             function handleContextLost(event) {

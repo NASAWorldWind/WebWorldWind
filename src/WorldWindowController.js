@@ -48,22 +48,45 @@ define([
              * @readonly
              */
             this.wwd = worldWindow;
+            this._allMouseListeners = [];
+            this._allTouchListeners = [];
         };
 
         WorldWindowController.prototype.onMouseEvent = function (event) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "onMouseEvent", "abstractInvocation"));
+            var handled = false;
+
+            for (var i = 0; i < this._allMouseListeners.length && !handled; i++) {
+                handled |= this._allMouseListeners[i].onMouseEvent(event);
+            }
+
+            return handled;
         };
 
         WorldWindowController.prototype.onTouchEvent = function (event) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "onTouchEvent", "abstractInvocation"));
+            var handled = false;
+
+            for (var i = 0; i < this._allTouchListeners.length && !handled; i++) {
+                handled |= this._allTouchListeners[i].onTouchEvent(event);
+            }
+
+            return handled;
         };
 
         WorldWindowController.prototype.gestureStateChanged = function (recognizer) {
             throw new UnsupportedOperationError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "gestureStateChanged", "abstractInvocation"));
         };
+
+        // TODO: Check for dups
+        WorldWindowController.prototype.addMouseListener=function(listener) {
+            this._allMouseListeners.push(listener);
+        };
+
+        WorldWindowController.prototype.addTouchListener=function(listener) {
+            this._allTouchListeners.push(listener);
+        };
+
+        // TODO: Remove listeners
 
         return WorldWindowController;
     }
