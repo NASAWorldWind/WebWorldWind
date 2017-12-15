@@ -43,7 +43,7 @@ define([
             this._scale = attributes ? attributes._scale : 1;
             this._depthTest = attributes ? attributes._depthTest : false;
             this._enableOutline = attributes ? attributes._enableOutline : true;
-            this._outlineWidth = attributes ? attributes._outlineWidth : 2;
+            this._outlineWidth = attributes ? attributes._outlineWidth : 4;
             this._outlineColor = attributes ? attributes._color : new Color(0, 0, 0, 0.5);
 
             /**
