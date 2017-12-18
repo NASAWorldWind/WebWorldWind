@@ -156,6 +156,21 @@ define([
             this.beginTilt = 0;
             this.beginRange = 0;
             this.lastRotation = 0;
+                
+                 
+            // With these changes we can limit the navigation to certain limits. They have a default value of the 
+            // previous version so no change is made unless these variables are set
+            //these do limit the sector where the camera may move around
+            this.minLatitude  = -90;
+            this.maxLatitude  = 90;
+            this.minLongitude = -180;
+            this.maxLongitude = 180;
+            //limit to the camera zoom, so we can avoid the zoom-to-infinity
+            this.minHeight    = 1;
+            this.maxHeight    = Number.MAX_VALUE;
+            //these se the tilt limit
+            this.minTilt      = 0;
+            this.maxTilt      = 90;
         };
 
         LookAtNavigator.prototype = Object.create(Navigator.prototype);
@@ -376,19 +391,21 @@ define([
 
         // Intentionally not documented.
         LookAtNavigator.prototype.applyLimits = function () {
-            // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
-            this.lookAtLocation.latitude = WWMath.clamp(this.lookAtLocation.latitude, -90, 90);
-            this.lookAtLocation.longitude = Angle.normalizedDegreesLongitude(this.lookAtLocation.longitude);
+            // Clamp latitude to between minLatitude and maxLatitude (default -90 and +90), 
+            // and normalize longitude to between minLongitude and maxLongitude (default -180 and +180).
+            this.lookAtLocation.latitude  = WWMath.clamp(this.lookAtLocation.latitude, this.minLatitude, this.maxLatitude);
+            this.lookAtLocation.longitude =  WWMath.clamp(Angle.normalizedDegreesLongitude(this.lookAtLocation.longitude), this.minLongitude, this.maxLongitude);
+            
 
             // Clamp range to values greater than 1 in order to prevent degenerating to a first-person navigator when
             // range is zero.
-            this.range = WWMath.clamp(this.range, 1, Number.MAX_VALUE);
+            this.range = WWMath.clamp(this.range, this.minHeight, this.maxHeight);
 
             // Normalize heading to between -180 and +180.
             this.heading = Angle.normalizedDegrees(this.heading);
 
-            // Clamp tilt to between 0 and +90 to prevent the viewer from going upside down.
-            this.tilt = WWMath.clamp(this.tilt, 0, 90);
+            // Clamp tilt between minTilt and maxTilt (default 0 and +90) to prevent the viewer from going upside down.
+            this.tilt = WWMath.clamp(this.tilt, this.minTilt, this.maxTilt);
 
             // Normalize heading to between -180 and +180.
             this.roll = Angle.normalizedDegrees(this.roll);
