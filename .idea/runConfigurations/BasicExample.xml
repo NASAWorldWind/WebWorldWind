@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="BasicExample" type="JavascriptDebugType" factoryName="JavaScript Debug" engineId="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" uri="http://localhost:63342/WebWorldWind/examples/BasicExample.html">
+  <configuration default="false" name="BasicExample" type="JavascriptDebugType" factoryName="JavaScript Debug" uri="http://localhost:63342/WebWorldWind/examples/BasicExample.html">
     <RunnerSettings RunnerId="JavascriptDebugRunner" />
     <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
     <method />
   </configuration>
 </component>
+
