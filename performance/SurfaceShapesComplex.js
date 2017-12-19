@@ -17,11 +17,9 @@
  * Illustrates how to display SurfaceShapes.
  */
 requirejs(['../src/WorldWind',
-        '../examples/LayerManager',
-        '../examples/CoordinateController'],
+        '../examples/LayerManager'],
     function (ww,
-              LayerManager,
-              CoordinateController) {
+              LayerManager) {
         "use strict";
 
         // Tell WorldWind to log only warnings.
@@ -232,9 +230,6 @@ requirejs(['../src/WorldWind',
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
-
-        // Create a coordinate controller to update the coordinate overlay elements.
-        var coordinateController = new CoordinateController(wwd);
 
         /*
          * Configure various testing modes.

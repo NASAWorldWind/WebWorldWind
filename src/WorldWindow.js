@@ -227,37 +227,32 @@ define([
             var thisWindow = this;
 
             // Redirect various UI interactions to the appropriate handler.
-            function onMouseEvent(event) {
-                thisWindow.onMouseEvent(event);
+            function onGestureEvent(event) {
+                thisWindow.onGestureEvent(event);
             }
 
-            function onTouchEvent(event) {
-                thisWindow.onTouchEvent(event);
-            }
-
-            var forceTouch=true; // TODO: Remove
-            if (!forceTouch && window.PointerEvent) {
+            if (window.PointerEvent) {
                 // Prevent the browser's default actions in response to pointer events which interfere with navigation.
                 // This CSS style property is configured here to ensure that it's set for all applications.
                 this.canvas.style.setProperty("touch-action", "none");
 
-                this.addEventListener("pointerdown", onMouseEvent, false);
-                window.addEventListener("pointermove", onMouseEvent, false); // get pointermove events outside event target
-                window.addEventListener("pointercancel", onMouseEvent, false); // get pointercancel events outside event target
-                window.addEventListener("pointerup", onMouseEvent, false); // get pointerup events outside event target
+                this.addEventListener("pointerdown", onGestureEvent, false);
+                window.addEventListener("pointermove", onGestureEvent, false); // get pointermove events outside event target
+                window.addEventListener("pointercancel", onGestureEvent, false); // get pointercancel events outside event target
+                window.addEventListener("pointerup", onGestureEvent, false); // get pointerup events outside event target
             } else {
-                this.addEventListener("mousedown", onMouseEvent, false);
-                window.addEventListener("mousemove", onMouseEvent, false); // get mousemove events outside event target
-                window.addEventListener("mouseup", onMouseEvent, false); // get mouseup events outside event target
-                this.addEventListener("touchstart", onTouchEvent, false);
-                this.addEventListener("touchmove", onTouchEvent, false);
-                this.addEventListener("touchend", onTouchEvent, false);
-                this.addEventListener("touchcancel", onTouchEvent, false);
+                this.addEventListener("mousedown", onGestureEvent, false);
+                window.addEventListener("mousemove", onGestureEvent, false); // get mousemove events outside event target
+                window.addEventListener("mouseup", onGestureEvent, false); // get mouseup events outside event target
+                this.addEventListener("touchstart", onGestureEvent, false);
+                this.addEventListener("touchmove", onGestureEvent, false);
+                this.addEventListener("touchend", onGestureEvent, false);
+                this.addEventListener("touchcancel", onGestureEvent, false);
             }
 
             // Register wheel event listeners on the WorldWindow's canvas.
             this.addEventListener("wheel", function (event) {
-                onMouseEvent(event);
+                onGestureEvent(event);
             });
 
             // Set up to handle WebGL context lost events.
@@ -339,12 +334,8 @@ define([
             return new Vec2(xc, yc);
         };
 
-        WorldWindow.prototype.onMouseEvent = function (event) {
-            this.worldWindowController.onMouseEvent(event);
-        };
-
-        WorldWindow.prototype.onTouchEvent = function (event) {
-            this.worldWindowController.onTouchEvent(event);
+        WorldWindow.prototype.onGestureEvent = function (event) {
+            this.worldWindowController.onGestureEvent(event);
         };
 
         /**

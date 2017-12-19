@@ -48,25 +48,14 @@ define([
              * @readonly
              */
             this.wwd = worldWindow;
-            this._allMouseListeners = [];
-            this._allTouchListeners = [];
+            this.allGestureListeners = [];
         };
 
-        WorldWindowController.prototype.onMouseEvent = function (event) {
+        WorldWindowController.prototype.onGestureEvent = function (event) {
             var handled = false;
 
-            for (var i = 0; i < this._allMouseListeners.length && !handled; i++) {
-                handled |= this._allMouseListeners[i].onMouseEvent(event);
-            }
-
-            return handled;
-        };
-
-        WorldWindowController.prototype.onTouchEvent = function (event) {
-            var handled = false;
-
-            for (var i = 0; i < this._allTouchListeners.length && !handled; i++) {
-                handled |= this._allTouchListeners[i].onTouchEvent(event);
+            for (var i = 0; i < this.allGestureListeners.length && !handled; i++) {
+                handled |= this.allGestureListeners[i].onGestureEvent(event);
             }
 
             return handled;
@@ -78,12 +67,8 @@ define([
         };
 
         // TODO: Check for dups
-        WorldWindowController.prototype.addMouseListener=function(listener) {
-            this._allMouseListeners.push(listener);
-        };
-
-        WorldWindowController.prototype.addTouchListener=function(listener) {
-            this._allTouchListeners.push(listener);
+        WorldWindowController.prototype.addGestureListener=function(listener) {
+            this.allGestureListeners.push(listener);
         };
 
         // TODO: Remove listeners

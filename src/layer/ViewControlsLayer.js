@@ -217,15 +217,14 @@ define([
 
             // Internal variable to indicate whether the device is a touch device. Set to false until a touch event
             // occurs.
-            this.isTouchDevice = false;
+            // this.isTouchDevice = false;
 
             // No picking for this layer. It performs its own picking.
             this.pickEnabled = false;
 
             // Establish event handlers.
             // this.setupInteraction();
-            this.wwd.worldWindowController.addMouseListener(this);
-            this.wwd.worldWindowController.addTouchListener(this);
+            this.wwd.worldWindowController.addGestureListener(this);
         };
 
         ViewControlsLayer.prototype = Object.create(Layer.prototype);
@@ -468,33 +467,67 @@ define([
         };
 
         // Intentionally not documented.
-        // ViewControlsLayer.prototype.setupInteraction = function () {
-        // var wwd = this.wwd,
-        //     thisLayer = this;
+        ViewControlsLayer.prototype.isPointerDown = function (e) {
+            if (e.type === "pointerdown") {
+                return true;
+            }
+            else if (e.type === "mousedown" && e.which === 1) {
+                return true;
+            }
 
-        // Add the mouse listeners.
-        // wwd.addEventListener("mousedown", handleMouseEvent);
-        // wwd.addEventListener("mouseup", handleMouseEvent);
-        // wwd.addEventListener("mousemove", handleMouseEvent);
-        // window.addEventListener("mouseup", handleMouseEvent);
-        // window.addEventListener("mousemove", handleMouseEvent);
+            return false;
+        };
 
-        // wwd.addEventListener("touchstart", handleTouchEvent);
-        // wwd.addEventListener("touchend", handleTouchEvent);
-        // wwd.addEventListener("touchcancel", handleTouchEvent);
-        // wwd.addEventListener("touchmove", handleTouchEvent);
-        // };
+        // Intentionally not documented.
+        ViewControlsLayer.prototype.isPointerUp = function (e) {
+            if (e.type === "pointerup") {
+                return true;
+            }
+            else if (e.type === "mouseup" && e.which === 1) {
+                return true;
+            }
 
-        ViewControlsLayer.prototype.onMouseEvent = function (e) {
+            return false;
+        };
+
+        // Intentionally not documented.
+        ViewControlsLayer.prototype.isPointerMove = function (e) {
+            if (e.type === "pointermove") {
+                return true;
+            }
+            else if (e.type === "mousemove") {
+                return true;
+            }
+
+            return false;
+        };
+
+        // Intentionally not documented.
+        ViewControlsLayer.prototype.isTouchStart = function (e) {
+            return e.type === "touchstart";
+        };
+
+        // Intentionally not documented.
+        ViewControlsLayer.prototype.isTouchEnd = function (e) {
+            return e.type === "touchend" || e.type === "touchcancel";
+        };
+
+        // Intentionally not documented.
+        ViewControlsLayer.prototype.isTouchMove = function (e) {
+            return e.type === "touchmove";
+        };
+
+        // Intentionally not documented.
+        ViewControlsLayer.prototype.onGestureEvent = function (e) {
             var handled = false;
 
             if (!this.enabled) {
                 return handled;
             }
             // Prevent handling of simulated mouse events on touch devices.
-            if (this.isTouchDevice) {
-                return handled;
-            }
+            // if (this.isTouchDevice) {
+            //     return handled;
+            // }
 
             var topObject, operation;
 
@@ -504,8 +537,25 @@ define([
                 this.wwd.redraw();
             }
 
-            // Terminate the active operation when the mouse button goes up.
-            if (e.type && (e.type === "mouseup" && e.which === 1) && this.activeControl) {
+            var terminateActive = false;
+
+            if (e.type && this.activeControl) {
+                if (this.isPointerUp(e)) {
+                    terminateActive = true;
+                }
+                else if (this.isTouchEnd(e) && this.isCurrentTouch(e)) {
+                    terminateActive = true;
+                }
+                else {
+                    topObject = this.pickControl(e);
+                    if (this.activeControl !== topObject) {
+                        terminateActive = true;
+                    }
+                }
+            }
+
+            // Terminate the active operation when the mouse button goes up or touches end.
+            if (terminateActive) {
                 this.activeControl = null;
                 this.activeOperation = null;
                 e.preventDefault();
@@ -515,7 +565,8 @@ define([
                     handled = this.activeOperation.call(this, e, null);
                     e.preventDefault();
                 } else {
-                    topObject = this.pickControl(this.wwd.canvasCoordinates(e.clientX, e.clientY));
+                    // TODO: Performance optimizations
+                    topObject = this.pickControl(e);
                     operation = this.determineOperation(e, topObject);
                     if (operation) {
                         handled = operation.call(this, e, topObject);
@@ -531,52 +582,6 @@ define([
 
         };
 
-        ViewControlsLayer.prototype.onTouchEvent = function (e) {
-            this.isTouchDevice = true;
-
-            var handled = false;
-            if (!this.enabled) {
-                return handled;
-            }
-
-            // Turn off any highlight. If a button is in use it will be highlighted later.
-            if (this.highlightedControl) {
-                this.highlight(this.highlightedControl, false);
-                this.wwd.redraw();
-            }
-
-            // Terminate the active operation when the touch ends.
-            if (e.type && (e.type === "touchend" || e.type === "touchcancel")) {
-                if (this.activeControl && this.isCurrentTouch(e)) {
-                    this.activeControl = null;
-                    this.activeOperation = null;
-                    e.preventDefault();
-                }
-            } else {
-                // Perform the active operation, or determine it and then perform it.
-                if (this.activeOperation) {
-                    handled = this.activeOperation.call(this, e, null);
-                    e.preventDefault();
-                } else {
-                    var topObject,
-                        touch = e.changedTouches.item(0),
-                        operation;
-
-                    topObject = this.pickControl(this.wwd.canvasCoordinates(touch.clientX, touch.clientY));
-                    operation = this.determineOperation(e, topObject);
-                    if (operation) {
-                        handled = operation.call(this, e, topObject);
-                    }
-                }
-            }
-
-            // Determine new highlight state.
-            this.handleHighlight(e, topObject);
-            this.wwd.redraw();
-
-            return handled;
-        };
-
         // Intentionally not documented. Determines whether a picked object is a view control.
         ViewControlsLayer.prototype.isControl = function (controlCandidate) {
             for (var i = 0; i < this.controls.length; i++) {
@@ -587,10 +592,25 @@ define([
             return false;
         };
 
-        ViewControlsLayer.prototype.pickControl = function (pickPoint) {
+        ViewControlsLayer.prototype.pickControl = function (e) {
+            var cx, cy;
+
+            if (e.changedTouches) {
+                var touch = e.changedTouches.item(0);
+                cx = touch.clientX;
+                cy = touch.clientY;
+            }
+            else {
+                cx = e.clientX;
+                cy = e.clientY;
+            }
+
+            var pickPoint = this.wwd.canvasCoordinates(cx, cy);
+
             var x = pickPoint[0], y = this.wwd.canvas.height - pickPoint[1],
                 control;
 
+            // TODO: Performance optimizations
             for (var i = 0; i < this.controls.length; i++) {
                 control = this.controls[i];
 
@@ -649,20 +669,20 @@ define([
             var handled = false;
 
             // Capture the current position.
-            if (e.type === "mousedown" || e.type === "mousemove") {
+            if (this.isPointerDown(e) || this.isPointerMove(e)) {
                 this.currentEventPoint = this.wwd.canvasCoordinates(e.clientX, e.clientY);
-            } else if (e.type === "touchstart" || e.type === "touchmove") {
+            } else if (this.isTouchStart(e) || this.isTouchMove(e)) {
                 var touch = e.changedTouches.item(0);
                 this.currentEventPoint = this.wwd.canvasCoordinates(touch.clientX, touch.clientY);
             }
 
             // Start an operation on left button down or touch start.
-            if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
+            if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handlePan;
                 e.preventDefault();
 
-                if (e.type === "touchstart") {
+                if (this.isTouchStart(e)) {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
 
@@ -700,12 +720,12 @@ define([
             var handled = false;
 
             // Start an operation on left button down or touch start.
-            if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
+            if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleZoom;
                 e.preventDefault();
 
-                if (e.type === "touchstart") {
+                if (this.isTouchStart(e)) {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
 
@@ -735,12 +755,12 @@ define([
             var handled = false;
 
             // Start an operation on left button down or touch start.
-            if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
+            if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleHeading;
                 e.preventDefault();
 
-                if (e.type === "touchstart") {
+                if (this.isTouchStart(e)) {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
 
@@ -769,12 +789,12 @@ define([
             var handled = false;
 
             // Start an operation on left button down or touch start.
-            if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
+            if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleTilt;
                 e.preventDefault();
 
-                if (e.type === "touchstart") {
+                if (this.isTouchStart(e)) {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
 
@@ -806,12 +826,12 @@ define([
             var handled = false;
 
             // Start an operation on left button down or touch start.
-            if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
+            if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleExaggeration;
                 e.preventDefault();
 
-                if (e.type === "touchstart") {
+                if (this.isTouchStart(e)) {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
 
@@ -842,12 +862,12 @@ define([
             var handled = false;
 
             // Start an operation on left button down or touch start.
-            if ((e.type === "mousedown" && e.which === 1) || (e.type === "touchstart")) {
+            if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleFov;
                 e.preventDefault();
 
-                if (e.type === "touchstart") {
+                if (this.isTouchStart(e)) {
                     this.currentTouchId = e.changedTouches.item(0).identifier; // capture the touch identifier
                 }
 

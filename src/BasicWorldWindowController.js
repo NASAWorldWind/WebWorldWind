@@ -60,23 +60,29 @@ define([
             WorldWindowController.call(this, worldWindow); // base class checks for a valid worldWindow
 
             // Intentionally not documented.
-            this.primaryDragRecognizer = new DragRecognizer(worldWindow, null);
+            this.primaryDragRecognizer = new DragRecognizer(this.wwd, null);
+            this.primaryDragRecognizer.addListener(this);
 
             // Intentionally not documented.
-            this.secondaryDragRecognizer = new DragRecognizer(worldWindow, null);
+            this.secondaryDragRecognizer = new DragRecognizer(this.wwd, null);
+            this.secondaryDragRecognizer.addListener(this);
             this.secondaryDragRecognizer.button = 2; // secondary mouse button
 
             // Intentionally not documented.
-            this.panRecognizer = new PanRecognizer(worldWindow, null);
+            this.panRecognizer = new PanRecognizer(this.wwd, null);
+            this.panRecognizer.addListener(this);
 
             // Intentionally not documented.
-            this.pinchRecognizer = new PinchRecognizer(worldWindow, null);
+            this.pinchRecognizer = new PinchRecognizer(this.wwd, null);
+            this.pinchRecognizer.addListener(this);
 
             // Intentionally not documented.
-            this.rotationRecognizer = new RotationRecognizer(worldWindow, null);
+            this.rotationRecognizer = new RotationRecognizer(this.wwd, null);
+            this.rotationRecognizer.addListener(this);
 
             // Intentionally not documented.
-            this.tiltRecognizer = new TiltRecognizer(worldWindow, null);
+            this.tiltRecognizer = new TiltRecognizer(this.wwd, null);
+            this.tiltRecognizer.addListener(this);
 
             // Establish the dependencies between gesture recognizers. The pan, pinch and rotate gesture may recognize
             // simultaneously with each other.
@@ -90,22 +96,12 @@ define([
             this.panRecognizer.requireRecognizerToFail(this.tiltRecognizer);
             this.pinchRecognizer.requireRecognizerToFail(this.tiltRecognizer);
             this.rotationRecognizer.requireRecognizerToFail(this.tiltRecognizer);
-
-            this.allMouseRecognizers = [this.primaryDragRecognizer, this.secondaryDragRecognizer];
-            for (var i = 0; i < this.allMouseRecognizers.length; i++) {
-                this.allMouseRecognizers[i].addListener(this);
-            }
-
-            this.allTouchRecognizers = [this.panRecognizer, this.pinchRecognizer, this.rotationRecognizer, this.tiltRecognizer];
-            for (i = 0; i < this.allTouchRecognizers.length; i++) {
-                this.allTouchRecognizers[i].addListener(this);
-            }
         };
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
 
-        BasicWorldWindowController.prototype.onMouseEvent = function (e) {
-            var handled = WorldWindowController.prototype.onMouseEvent.call(this, e);
+        BasicWorldWindowController.prototype.onGestureEvent = function (e) {
+            var handled = WorldWindowController.prototype.onGestureEvent.call(this, e);
 
             if (!handled) {
                 if (e.type === "wheel") {
@@ -113,8 +109,8 @@ define([
                     this.handleWheelEvent(e);
                 }
                 else {
-                    for (var i = 0; i < this.allMouseRecognizers.length; i++) {
-                        handled |= this.allMouseRecognizers[i].onMouseEvent(e); // use or-assignment to indicate if any recognizer handled the event
+                    for (var i = 0; i < GestureRecognizer.allRecognizers.length; i++) {
+                        handled |= GestureRecognizer.allRecognizers[i].onGestureEvent(e); // use or-assignment to indicate if any recognizer handled the event
                     }
                 }
             }
@@ -122,18 +118,7 @@ define([
             return handled;
         };
 
-        BasicWorldWindowController.prototype.onTouchEvent = function (e) {
-            var handled = WorldWindowController.prototype.onTouchEvent.call(this, e);
-
-            if (!handled) {
-                for (var i = 0; i < this.allTouchRecognizers.length; i++) {
-                    handled |= this.allTouchRecognizers[i].onTouchEvent(e); // use or-assignment to indicate if any recognizer handled the event
-                }
-            }
-
-            return handled;
-        };
-
+        // Intentionally not documented.
         BasicWorldWindowController.prototype.gestureStateChanged = function (recognizer) {
             if (recognizer === this.primaryDragRecognizer || recognizer === this.panRecognizer) {
                 this.handlePanOrDrag(recognizer);

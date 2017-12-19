@@ -42,7 +42,7 @@ define([
          * e.g., <code>gestureCallback(recognizer)</code>.
          * @throws {ArgumentError} If the specified target is null or undefined.
          */
-            // TODO: remove callback
+            // TODO: evaluate target usage, support callback
         var GestureRecognizer = function (target, callback) {
                 if (!target) {
                     throw new ArgumentError(
@@ -116,11 +116,11 @@ define([
                 this._requiredToFailBy = [];
 
                 // Add the optional gesture callback.
-                // if (callback) {
-                //     this._gestureCallbacks.push(callback);
-                // }
+                if (callback) {
+                    this._gestureCallbacks.push(callback);
+                }
 
-                this._listenerList = [];
+                this.listenerList = [];
 
                 // Add this recognizer to the list of all recognizers.
                 GestureRecognizer.allRecognizers.push(this);
@@ -149,7 +149,6 @@ define([
             };
 
         // Intentionally not documented.
-        // TODO: Remove
         GestureRecognizer.allRecognizers = [];
 
         Object.defineProperties(GestureRecognizer.prototype, {
@@ -443,25 +442,30 @@ define([
                 this.tryToRecognize(newState); // may prevent the transition to Recognized
                 if (this._state === newState) {
                     this.prepareToRecognize();
-                    this.notifyListeners(); // this.callGestureCallbacks();
+                    this.notifyListeners();
+                    this.callGestureCallbacks();
                     this.resetIfEventsEnded();
                 }
             } else if (newState === WorldWind.BEGAN) {
                 this.tryToRecognize(newState); // may prevent the transition to Began
                 if (this._state === newState) {
                     this.prepareToRecognize();
-                    this.notifyListeners(); // this.callGestureCallbacks();
+                    this.notifyListeners();
+                    this.callGestureCallbacks();
                 }
             } else if (newState === WorldWind.CHANGED) {
                 this._state = newState;
-                this.notifyListeners(); // this.callGestureCallbacks();
+                this.notifyListeners();
+                this.callGestureCallbacks();
             } else if (newState === WorldWind.CANCELLED) {
                 this._state = newState;
-                this.notifyListeners(); // this.callGestureCallbacks();
+                this.notifyListeners();
+                this.callGestureCallbacks();
                 this.resetIfEventsEnded();
             } else if (newState === WorldWind.ENDED) {
                 this._state = newState;
-                this.notifyListeners(); // this.callGestureCallbacks();
+                this.notifyListeners();
+                this.callGestureCallbacks();
                 this.resetIfEventsEnded();
             }
         };
@@ -523,59 +527,25 @@ define([
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "addListener", "missingListener"));
             }
-            this._listenerList.push(listener);
+            this.listenerList.push(listener);
         };
-
-        GestureRecognizer.prototype.notifyListeners = function () {
-            for (var i = 0; i < this._listenerList.length; i++) {
-                this._listenerList[i].gestureStateChanged(this);
-            }
-        };
-
 
         // Intentionally not documented.
-        // GestureRecognizer.prototype.callGestureCallbacks = function () {
-        //     for (var i = 0, len = this._gestureCallbacks.length; i < len; i++) {
-        //         this._gestureCallbacks[i](this);
-        //     }
-        // };
-
-        GestureRecognizer.prototype.onMouseEvent = function (event) {
-            if (!this.enabled) {
-                return;
-            }
-
-            if (event.defaultPrevented && this.state == WorldWind.POSSIBLE) {
-                return; // ignore cancelled events while in the Possible state
-            }
-
-            try {
-                if (event.type === "mousedown") {
-                    this.handleMouseDown(event);
-                } else if (event.type === "mousemove") {
-                    this.handleMouseMove(event);
-                } else if (event.type === "mouseup") {
-                    this.handleMouseUp(event);
-                } else if (event.type === "pointerdown" && event.pointerType === "mouse") {
-                    this.handleMouseDown(event);
-                } else if (event.type === "pointermove" && event.pointerType === "mouse") {
-                    this.handleMouseMove(event);
-                } else if (event.type === "pointercancel" && event.pointerType === "mouse") {
-                    // Intentionally left blank. The W3C Pointer Events specification is ambiguous on what cancel means
-                    // for mouse input, and there is no evidence that this event is actually generated (6/19/2015).
-                } else if (event.type === "pointerup" && event.pointerType === "mouse") {
-                    this.handleMouseUp(event);
-                } else {
-                    Logger.logMessage(Logger.LEVEL_INFO, "GestureRecognizer", "handleEvent",
-                        "Unrecognized event type: " + event.type);
-                }
-            } catch (e) {
-                Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "handleEvent",
-                    "Error handling event.\n" + e.toString());
+        GestureRecognizer.prototype.notifyListeners = function () {
+            for (var i = 0; i < this.listenerList.length; i++) {
+                this.listenerList[i].gestureStateChanged(this);
             }
         };
 
-        GestureRecognizer.prototype.onTouchEvent = function (event) {
+        // Intentionally not documented.
+        GestureRecognizer.prototype.callGestureCallbacks = function () {
+            for (var i = 0, len = this._gestureCallbacks.length; i < len; i++) {
+                this._gestureCallbacks[i](this);
+            }
+        };
+
+        // Intentionally not documented.
+        GestureRecognizer.prototype.onGestureEvent = function (event) {
             if (!this.enabled) {
                 return;
             }
@@ -584,10 +554,16 @@ define([
                 return; // ignore cancelled events while in the Possible state
             }
 
-            try {
-                var i, len;
+            var i, len;
 
-                if (event.type === "touchstart") {
+            try {
+                if (event.type === "mousedown") {
+                    this.handleMouseDown(event);
+                } else if (event.type === "mousemove") {
+                    this.handleMouseMove(event);
+                } else if (event.type === "mouseup") {
+                    this.handleMouseUp(event);
+                } else if (event.type === "touchstart") {
                     for (i = 0, len = event.changedTouches.length; i < len; i++) {
                         this.handleTouchStart(event.changedTouches.item(i));
                     }
@@ -603,6 +579,15 @@ define([
                     for (i = 0, len = event.changedTouches.length; i < len; i++) {
                         this.handleTouchEnd(event.changedTouches.item(i));
                     }
+                } else if (event.type === "pointerdown" && event.pointerType === "mouse") {
+                    this.handleMouseDown(event);
+                } else if (event.type === "pointermove" && event.pointerType === "mouse") {
+                    this.handleMouseMove(event);
+                } else if (event.type === "pointercancel" && event.pointerType === "mouse") {
+                    // Intentionally left blank. The W3C Pointer Events specification is ambiguous on what cancel means
+                    // for mouse input, and there is no evidence that this event is actually generated (6/19/2015).
+                } else if (event.type === "pointerup" && event.pointerType === "mouse") {
+                    this.handleMouseUp(event);
                 } else if (event.type === "pointerdown" && event.pointerType === "touch") {
                     this.handleTouchStart(event);
                 } else if (event.type === "pointermove" && event.pointerType === "touch") {
@@ -619,69 +604,6 @@ define([
                 Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "handleEvent",
                     "Error handling event.\n" + e.toString());
             }
-
-        };
-
-        // Intentionally not documented.
-        GestureRecognizer.prototype.handleEvent = function (event) {
-            // if (!this.enabled) {
-            //     return;
-            // }
-            //
-            // if (event.defaultPrevented && this.state == WorldWind.POSSIBLE) {
-            //     return; // ignore cancelled events while in the Possible state
-            // }
-
-            // var i, len;
-            //
-            // try {
-            //     if (event.type == "mousedown") {
-            //         this.handleMouseDown(event);
-            //     } else if (event.type == "mousemove") {
-            //         this.handleMouseMove(event);
-            //     } else if (event.type == "mouseup") {
-            //         this.handleMouseUp(event);
-            //     } else if (event.type == "touchstart") {
-            //         for (i = 0, len = event.changedTouches.length; i < len; i++) {
-            //             this.handleTouchStart(event.changedTouches.item(i));
-            //         }
-            //     } else if (event.type == "touchmove") {
-            //         for (i = 0, len = event.changedTouches.length; i < len; i++) {
-            //             this.handleTouchMove(event.changedTouches.item(i));
-            //         }
-            //     } else if (event.type == "touchcancel") {
-            //         for (i = 0, len = event.changedTouches.length; i < len; i++) {
-            //             this.handleTouchCancel(event.changedTouches.item(i));
-            //         }
-            //     } else if (event.type == "touchend") {
-            //         for (i = 0, len = event.changedTouches.length; i < len; i++) {
-            //             this.handleTouchEnd(event.changedTouches.item(i));
-            //         }
-            //     } else if (event.type == "pointerdown" && event.pointerType == "mouse") {
-            //         this.handleMouseDown(event);
-            //     } else if (event.type == "pointermove" && event.pointerType == "mouse") {
-            //         this.handleMouseMove(event);
-            //     } else if (event.type == "pointercancel" && event.pointerType == "mouse") {
-            //         // Intentionally left blank. The W3C Pointer Events specification is ambiguous on what cancel means
-            //         // for mouse input, and there is no evidence that this event is actually generated (6/19/2015).
-            //     } else if (event.type == "pointerup" && event.pointerType == "mouse") {
-            //         this.handleMouseUp(event);
-            //     } else if (event.type == "pointerdown" && event.pointerType == "touch") {
-            //         this.handleTouchStart(event);
-            //     } else if (event.type == "pointermove" && event.pointerType == "touch") {
-            //         this.handleTouchMove(event);
-            //     } else if (event.type == "pointercancel" && event.pointerType == "touch") {
-            //         this.handleTouchCancel(event);
-            //     } else if (event.type == "pointerup" && event.pointerType == "touch") {
-            //         this.handleTouchEnd(event);
-            //     } else {
-            //         Logger.logMessage(Logger.LEVEL_INFO, "GestureRecognizer", "handleEvent",
-            //             "Unrecognized event type: " + event.type);
-            //     }
-            // } catch (e) {
-            //     Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "handleEvent",
-            //         "Error handling event.\n" + e.toString());
-            // }
         };
 
         // Intentionally not documented.
