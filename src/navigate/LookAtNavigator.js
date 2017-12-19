@@ -21,8 +21,7 @@ define([
         '../navigate/Navigator',
         '../geom/Vec2'
     ],
-    function (
-              Location,
+    function (Location,
               Navigator,
               Vec2) {
         "use strict";

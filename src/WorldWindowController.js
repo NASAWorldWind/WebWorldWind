@@ -71,7 +71,7 @@ define([
         };
 
         /**
-         * Registers an gesture event listener on this controller. Registering event listeners using this function
+         * Registers a gesture event listener on this controller. Registering event listeners using this function
          * enables applications to prevent the controller's default behavior.
          *
          * Listeners must implement an onGestureEvent method to receive event notifications. The onGestureEvent method will
@@ -83,7 +83,7 @@ define([
          * @param listener The function to call when the event occurs.
          * @throws {ArgumentError} If any argument is null or undefined.
          */
-        WorldWindowController.prototype.addGestureListener=function(listener) {
+        WorldWindowController.prototype.addGestureListener = function (listener) {
             if (!listener) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "addGestureListener", "missingListener"));
@@ -100,7 +100,7 @@ define([
          * @param listener The listener to remove. Must be the same object passed to addGestureListener.
          * @throws {ArgumentError} If any argument is null or undefined.
          */
-        WorldWindowController.prototype.removeGestureListener=function(listener) {
+        WorldWindowController.prototype.removeGestureListener = function (listener) {
             if (!listener) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "removeGestureListener", "missingListener"));
