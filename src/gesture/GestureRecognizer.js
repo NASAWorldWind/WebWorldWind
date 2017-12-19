@@ -42,7 +42,7 @@ define([
          * e.g., <code>gestureCallback(recognizer)</code>.
          * @throws {ArgumentError} If the specified target is null or undefined.
          */
-            // TODO: evaluate target usage, support callback
+            // TODO: evaluate target usage
         var GestureRecognizer = function (target, callback) {
                 if (!target) {
                     throw new ArgumentError(
@@ -120,32 +120,11 @@ define([
                     this._gestureCallbacks.push(callback);
                 }
 
+                // Intentionally not documented.
                 this.listenerList = [];
 
                 // Add this recognizer to the list of all recognizers.
                 GestureRecognizer.allRecognizers.push(this);
-
-                // Register listeners on the event target.
-                // var thisRecognizer = this;
-
-                // function eventListener(event) {
-                //     thisRecognizer.handleEvent(event);
-                // }
-
-                // if (window.PointerEvent) {
-                //     target.addEventListener("pointerdown", eventListener, false);
-                //     window.addEventListener("pointermove", eventListener, false); // get pointermove events outside event target
-                //     window.addEventListener("pointercancel", eventListener, false); // get pointercancel events outside event target
-                //     window.addEventListener("pointerup", eventListener, false); // get pointerup events outside event target
-                // } else {
-                //     target.addEventListener("mousedown", eventListener, false);
-                //     window.addEventListener("mousemove", eventListener, false); // get mousemove events outside event target
-                //     window.addEventListener("mouseup", eventListener, false); // get mouseup events outside event target
-                //     target.addEventListener("touchstart", eventListener, false);
-                //     target.addEventListener("touchmove", eventListener, false);
-                //     target.addEventListener("touchend", eventListener, false);
-                //     target.addEventListener("touchcancel", eventListener, false);
-                // }
             };
 
         // Intentionally not documented.
@@ -522,12 +501,42 @@ define([
                 this.requiresRecognizerToFail(that);
         };
 
+        /**
+         * Registers a gesture state listener on this GestureRecognizer. Registering state listeners using this function
+         * enables applications to receive notifications of gesture recognition.
+         *
+         * Listeners must implement a gestureStateChanged method to receive notifications. The gestureStateChanged method will
+         * receive one parameter containing a reference to the recognizer that changed state.
+         *
+         * @param listener The function to call when the event occurs.
+         * @throws {ArgumentError} If any argument is null or undefined.
+         */
         GestureRecognizer.prototype.addListener = function (listener) {
             if (!listener) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "addListener", "missingListener"));
             }
             this.listenerList.push(listener);
+        };
+
+        /**
+         * Removes a gesture state listener from this GestureRecognizer. The listener must be the same object passed to
+         * addListener. Calling removeListener with arguments that do not identify a currently registered
+         * listener has no effect.
+         *
+         * @param listener The listener to remove. Must be the same object passed to addListener.
+         * @throws {ArgumentError} If any argument is null or undefined.
+         */
+        GestureRecognizer.prototype.removeListener = function (listener) {
+            if (!listener) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "removeListener", "missingListener"));
+            }
+
+            var index = this.listenerList.indexOf(listener);
+            if (index !== -1) {
+                this.listenerList.splice(index, 1); // remove the listener from the list
+            }
         };
 
         // Intentionally not documented.

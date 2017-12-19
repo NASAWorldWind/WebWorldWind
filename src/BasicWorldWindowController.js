@@ -100,6 +100,7 @@ define([
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
 
+        // Intentionally not documented.
         BasicWorldWindowController.prototype.onGestureEvent = function (e) {
             var handled = WorldWindowController.prototype.onGestureEvent.call(this, e);
 
@@ -379,6 +380,7 @@ define([
             }
         };
 
+        // Intentionally not documented.
         // TODO: Refactor into other classes
         BasicWorldWindowController.prototype.currentState = function () {
             var navigator = this.wwd.navigator;

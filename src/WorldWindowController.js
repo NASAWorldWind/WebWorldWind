@@ -48,9 +48,12 @@ define([
              * @readonly
              */
             this.wwd = worldWindow;
+
+            // Intentionally not documented.
             this.allGestureListeners = [];
         };
 
+        // Intentionally not documented.
         WorldWindowController.prototype.onGestureEvent = function (event) {
             var handled = false;
 
@@ -61,17 +64,53 @@ define([
             return handled;
         };
 
+        // Intentionally not documented.
         WorldWindowController.prototype.gestureStateChanged = function (recognizer) {
             throw new UnsupportedOperationError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "gestureStateChanged", "abstractInvocation"));
         };
 
-        // TODO: Check for dups
+        /**
+         * Registers an gesture event listener on this controller. Registering event listeners using this function
+         * enables applications to prevent the controller's default behavior.
+         *
+         * Listeners must implement an onGestureEvent method to receive event notifications. The onGestureEvent method will
+         * receive one parameter containing the information about the gesture event. Returning true from onGestureEvent
+         * indicates that the event was processed and will prevent any further handling of the event.
+         *
+         * When an event occurs, application event listeners are called before WorldWindowController event listeners.
+         *
+         * @param listener The function to call when the event occurs.
+         * @throws {ArgumentError} If any argument is null or undefined.
+         */
         WorldWindowController.prototype.addGestureListener=function(listener) {
+            if (!listener) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "addGestureListener", "missingListener"));
+            }
+
             this.allGestureListeners.push(listener);
         };
 
-        // TODO: Remove listeners
+        /**
+         * Removes a gesture event listener from this controller. The listener must be the same object passed to
+         * addGestureListener. Calling removeGestureListener with arguments that do not identify a currently registered
+         * listener has no effect.
+         *
+         * @param listener The listener to remove. Must be the same object passed to addGestureListener.
+         * @throws {ArgumentError} If any argument is null or undefined.
+         */
+        WorldWindowController.prototype.removeGestureListener=function(listener) {
+            if (!listener) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowController", "removeGestureListener", "missingListener"));
+            }
+
+            var index = this.allGestureListeners.indexOf(listener);
+            if (index !== -1) {
+                this.allGestureListeners.splice(index, 1); // remove the listener from the list
+            }
+        };
 
         return WorldWindowController;
     }

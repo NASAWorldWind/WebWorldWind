@@ -215,10 +215,6 @@ define([
             // Internal variable to keep track of pan control center for use during interaction.
             this.panControlCenter = new Vec2(0, 0);
 
-            // Internal variable to indicate whether the device is a touch device. Set to false until a touch event
-            // occurs.
-            // this.isTouchDevice = false;
-
             // No picking for this layer. It performs its own picking.
             this.pickEnabled = false;
 
@@ -519,17 +515,11 @@ define([
 
         // Intentionally not documented.
         ViewControlsLayer.prototype.onGestureEvent = function (e) {
-            var handled = false;
+            var handled = false, topObject;
 
             if (!this.enabled) {
                 return handled;
             }
-            // Prevent handling of simulated mouse events on touch devices.
-            // if (this.isTouchDevice) {
-            //     return handled;
-            // }
-
-            var topObject, operation;
 
             // Turn off any highlight. If a control is in use it will be highlighted later.
             if (this.highlightedControl) {
@@ -565,11 +555,12 @@ define([
                     handled = this.activeOperation.call(this, e, null);
                     e.preventDefault();
                 } else {
-                    // TODO: Performance optimizations
                     topObject = this.pickControl(e);
-                    operation = this.determineOperation(e, topObject);
-                    if (operation) {
-                        handled = operation.call(this, e, topObject);
+                    if (topObject) {
+                        var operation = this.determineOperation(e, topObject);
+                        if (operation) {
+                            handled = operation.call(this, e, topObject);
+                        }
                     }
                 }
 
