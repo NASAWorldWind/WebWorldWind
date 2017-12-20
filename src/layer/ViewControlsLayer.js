@@ -40,7 +40,7 @@ define([
          * Constructs a view controls layer.
          * @alias ViewControlsLayer
          * @constructor
-         * @augments {WorldWindow}
+         * @augments {Layer}
          * @classdesc Displays and manages view controls.
          * @param {WorldWindow} worldWindow The WorldWindow associated with this layer.
          * This layer may not be associated with more than one WorldWindow. Each WorldWindow must have it's own
@@ -219,7 +219,6 @@ define([
             this.pickEnabled = false;
 
             // Establish event handlers.
-            // this.setupInteraction();
             this.wwd.worldWindowController.addGestureListener(this);
         };
 
@@ -583,6 +582,7 @@ define([
             return false;
         };
 
+        // Intentionally not documented.
         ViewControlsLayer.prototype.pickControl = function (e) {
             var cx, cy;
 
