@@ -1,13 +1,13 @@
 {
   "name": "@nasaworldwind/worldwind",
-  "version": "0.0.1",
+  "version": "0.9.0",
   "description": "Web WorldWind",
   "main": "build/dist/worldwind.min.js",
   "homepage": "https://worldwind.arc.nasa.gov",
   "bugs": {
     "url": "https://github.com/NASAWorldWind/WebWorldWind/issues"
   },
-  "license": "NASA-1.3",
+  "license": "Apache-2.0",
   "author": "NASA",
   "contributors": [
     "NASA Project Manager <patrick.hogan@nasa.gov>",
@@ -26,7 +26,6 @@
   },
   "files": [
     "build/dist/images/",
-    "build/dist/images.zip",
     "build/dist/worldwind.js",
     "build/dist/worldwind.min.js"
   ],
