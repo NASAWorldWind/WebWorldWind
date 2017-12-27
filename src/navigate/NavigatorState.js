@@ -132,7 +132,7 @@ define([
             this.frustumInModelCoordinates.normalize();
 
             // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
-            // are used to support operations on navigator state, such as project, unProject, and pixelSizeAtDistance.
+            // are used to support operations on navigator state, such as pixelSizeAtDistance.
             this.modelviewInv = Matrix.fromIdentity();
             this.modelviewInv.invertOrthonormalMatrix(this.modelview);
             this.projectionInv = Matrix.fromIdentity();
@@ -175,73 +175,6 @@ define([
                 frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
             this.pixelSizeScale = frustumWidthScale / viewport.width;
             this.pixelSizeOffset = frustumWidthOffset / viewport.height;
-        };
-
-        /**
-         * Transforms the specified screen point from WebGL screen coordinates to model coordinates.
-         * <p>
-         * The screen point is understood to be in WebGL screen coordinates, with the origin in the bottom-left corner
-         * and axes that extend up and to the right from the origin.
-         * <p>
-         * This function stores the transformed point in the result argument, and returns true or false to indicate whether the
-         * transformation is successful. It returns false if this navigator state's modelview or projection matrices
-         * are malformed, or if the screenPoint is clipped by the near clipping plane or the far clipping plane.
-         *
-         * @param {Vec3} screenPoint The screen coordinate point to un-project.
-         * @param {Vec3} result A pre-allocated vector in which to return the unprojected point.
-         * @returns {boolean} true if the transformation is successful, otherwise false.
-         * @throws {ArgumentError} If either the specified point or result argument is null or undefined.
-         */
-        NavigatorState.prototype.unProject = function (screenPoint, result) {
-            if (!screenPoint) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "NavigatorState", "unProject",
-                    "missingPoint"));
-            }
-
-            if (!result) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "NavigatorState", "unProject",
-                    "missingResult"));
-            }
-
-            var sx = screenPoint[0],
-                sy = screenPoint[1],
-                sz = screenPoint[2],
-                viewport = this.viewport;
-
-            // Convert the XY screen coordinates to coordinates in the range [0, 1]. This enables the XY coordinates to
-            // be converted to clip coordinates.
-            sx = (sx - viewport.x) / viewport.width;
-            sy = (sy - viewport.y) / viewport.height;
-
-            // Convert from coordinates in the range [0, 1] to clip coordinates in the range [-1, 1].
-            sx = sx * 2 - 1;
-            sy = sy * 2 - 1;
-            sz = sz * 2 - 1;
-
-            // Clip the point against the near and far clip planes. In clip coordinates the near and far clip planes are
-            // perpendicular to the Z axis and are located at -1 and 1, respectively.
-            if (sz < -1 || sz > 1) {
-                return false;
-            }
-
-            // Transform the screen point from clip coordinates to model coordinates. This inverts the Z axis and stores
-            // the negative of the eye coordinate Z value in the W coordinate.
-            var m = this.modelviewProjectionInv,
-                x = m[0] * sx + m[1] * sy + m[2] * sz + m[3],
-                y = m[4] * sx + m[5] * sy + m[6] * sz + m[7],
-                z = m[8] * sx + m[9] * sy + m[10] * sz + m[11],
-                w = m[12] * sx + m[13] * sy + m[14] * sz + m[15];
-
-            if (w === 0) {
-                return false;
-            }
-
-            // Complete the conversion from model coordinates to clip coordinates by dividing by W.
-            result[0] = x / w;
-            result[1] = y / w;
-            result[2] = z / w;
-
-            return true;
         };
 
         /**
@@ -332,13 +265,13 @@ define([
                 farPoint = new Vec3(0, 0, 0);
 
             // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
-            if (!this.unProject(screenPoint, nearPoint)) {
+            if (!this.modelviewInv.unProject(screenPoint, this.viewport, nearPoint)) {
                 return null;
             }
 
             // Compute the model coordinate point on the far clip plane with the xy coordinates and depth 1.
             screenPoint[2] = 1;
-            if (!this.unProject(screenPoint, farPoint)) {
+            if (!this.modelviewInv.unProject(screenPoint, this.viewport, farPoint)) {
                 return null;
             }
 

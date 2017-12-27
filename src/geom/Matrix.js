@@ -949,12 +949,12 @@ define([
 
             if (nearDistance === farDistance) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
-                        "Near and far distance are the same."));
+                    "Near and far distance are the same."));
             }
 
             if (nearDistance <= 0 || farDistance <= 0) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
-                        "Near or far distance is less than or equal to zero."));
+                    "Near or far distance is less than or equal to zero."));
             }
 
             // Compute the dimensions of the viewport rectangle at the near distance.
@@ -1462,7 +1462,7 @@ define([
          * @param {Number[]} index Permutation vector of that LU factorization.
          * @param {Number[]} b Vector to be solved.
          */
-            // Method "lubksb" derived from "Numerical Recipes in C", Press et al., 1988
+        // Method "lubksb" derived from "Numerical Recipes in C", Press et al., 1988
         Matrix.lubksb = function (A, index, b) {
             var ii = -1,
                 i,
@@ -1658,8 +1658,8 @@ define([
             // Taken from Mathematics for 3D Game Programming and Computer Graphics, Second Edition, listing 14.6.
 
             var epsilon = 1.0e-10,
-            // Since the matrix is symmetric m12=m21, m13=m31 and m23=m32, therefore we can ignore the values m21,
-            // m32 and m32.
+                // Since the matrix is symmetric m12=m21, m13=m31 and m23=m32, therefore we can ignore the values m21,
+                // m32 and m32.
                 m11 = this[0],
                 m12 = this[1],
                 m13 = this[2],
@@ -1828,6 +1828,81 @@ define([
             result[10] = this[10];
 
             return result;
+        };
+
+
+        /**
+         * Transforms the specified screen point from WebGL screen coordinates to model coordinates. This method assumes
+         * this matrix represents an inverse modelview matrix. The result of this method is
+         * undefined if this matrix is not an inverse modelview matrix.
+         * <p>
+         * The screen point is understood to be in WebGL screen coordinates, with the origin in the bottom-left corner
+         * and axes that extend up and to the right from the origin.
+         * <p>
+         * This function stores the transformed point in the result argument, and returns true or false to indicate whether the
+         * transformation is successful. It returns false if this navigator state's modelview or projection matrices
+         * are malformed, or if the screenPoint is clipped by the near clipping plane or the far clipping plane.
+         *
+         * @param {Vec3} screenPoint The screen coordinate point to un-project.
+         * @param {Rectangle} viewport The viewport defining the screen point's coordinate system
+         * @param {Vec3} result A pre-allocated vector in which to return the unprojected point.
+         * @returns {boolean} true if the transformation is successful, otherwise false.
+         * @throws {ArgumentError} If either the specified point or result argument is null or undefined.
+         */
+        Matrix.prototype.unProject = function (screenPoint, viewport, result) {
+            if (!screenPoint) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "unProject",
+                    "missingPoint"));
+            }
+
+            if (!viewport) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "unProject",
+                    "missingViewport"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "unProject",
+                    "missingResult"));
+            }
+
+            var sx = screenPoint[0],
+                sy = screenPoint[1],
+                sz = screenPoint[2];
+
+            // Convert the XY screen coordinates to coordinates in the range [0, 1]. This enables the XY coordinates to
+            // be converted to clip coordinates.
+            sx = (sx - viewport.x) / viewport.width;
+            sy = (sy - viewport.y) / viewport.height;
+
+            // Convert from coordinates in the range [0, 1] to clip coordinates in the range [-1, 1].
+            sx = sx * 2 - 1;
+            sy = sy * 2 - 1;
+            sz = sz * 2 - 1;
+
+            // Clip the point against the near and far clip planes. In clip coordinates the near and far clip planes are
+            // perpendicular to the Z axis and are located at -1 and 1, respectively.
+            if (sz < -1 || sz > 1) {
+                return false;
+            }
+
+            // Transform the screen point from clip coordinates to model coordinates. This inverts the Z axis and stores
+            // the negative of the eye coordinate Z value in the W coordinate.
+            var
+                x = this[0] * sx + this[1] * sy + this[2] * sz + this[3],
+                y = this[4] * sx + this[5] * sy + this[6] * sz + this[7],
+                z = this[8] * sx + this[9] * sy + this[10] * sz + this[11],
+                w = this[12] * sx + this[13] * sy + this[14] * sz + this[15];
+
+            if (w === 0) {
+                return false;
+            }
+
+            // Complete the conversion from model coordinates to clip coordinates by dividing by W.
+            result[0] = x / w;
+            result[1] = y / w;
+            result[2] = z / w;
+
+            return true;
         };
 
         return Matrix;
