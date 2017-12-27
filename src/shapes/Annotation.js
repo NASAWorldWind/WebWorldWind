@@ -280,7 +280,7 @@ define([
             // Compute the annotation's screen point in the OpenGL coordinate system of the WorldWindow
             // by projecting its model coordinate point onto the viewport. Apply a depth offset in order
             // to cause the annotation to appear above nearby terrain.
-            if (!dc.navigatorState.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
+            if (!dc.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
                 return null;
             }
 

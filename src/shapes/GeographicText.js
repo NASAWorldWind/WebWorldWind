@@ -114,7 +114,7 @@ define([
             // terrain. When text is displayed near the terrain portions of its geometry are often behind the terrain,
             // yet as a screen element the text is expected to be visible. We adjust its depth values rather than moving
             // the text itself to avoid obscuring its actual position.
-            if (!dc.navigatorState.projectWithDepth(GeographicText.placePoint, this.depthOffset, this.screenPoint)) {
+            if (!dc.projectWithDepth(GeographicText.placePoint, this.depthOffset, this.screenPoint)) {
                 return false;
             }
 

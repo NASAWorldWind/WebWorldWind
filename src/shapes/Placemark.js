@@ -439,7 +439,7 @@ define([
             // terrain. When a placemark is displayed near the terrain portions of its geometry are often behind the terrain,
             // yet as a screen element the placemark is expected to be visible. We adjust its depth values rather than moving
             // the placemark itself to avoid obscuring its actual position.
-            if (!dc.navigatorState.projectWithDepth(this.placePoint, this.depthOffset, Placemark.screenPoint)) {
+            if (!dc.projectWithDepth(this.placePoint, this.depthOffset, Placemark.screenPoint)) {
                 return null;
             }
 
