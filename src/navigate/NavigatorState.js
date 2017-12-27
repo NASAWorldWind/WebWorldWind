@@ -265,13 +265,13 @@ define([
                 farPoint = new Vec3(0, 0, 0);
 
             // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
-            if (!this.modelviewInv.unProject(screenPoint, this.viewport, nearPoint)) {
+            if (!this.modelviewProjectionInv.unProject(screenPoint, this.viewport, nearPoint)) {
                 return null;
             }
 
             // Compute the model coordinate point on the far clip plane with the xy coordinates and depth 1.
             screenPoint[2] = 1;
-            if (!this.modelviewInv.unProject(screenPoint, this.viewport, farPoint)) {
+            if (!this.modelviewProjectionInv.unProject(screenPoint, this.viewport, farPoint)) {
                 return null;
             }
 

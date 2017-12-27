@@ -97,18 +97,5 @@ define([
 
             });
         });
-        describe("Correctly converts screen coordinates to model coordinates", function () {
-
-            it("unProjects correctly", function () {
-                var screenPoint = new Vec3(637.5, 839, 0);
-                var result = new Vec3(0, 0, 0);
-                var expectedResult = new Vec3(-11925849.053, 8054028.030, -3946244.954);
-                ns.modelviewInv.unProject(screenPoint, viewport, result);
-                for (var i = 0; i < 3; i++) {
-                    expect(result[i]).toBeCloseTo(expectedResult[i], 3);
-                }
-
-            });
-        });
     });
 });

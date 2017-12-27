@@ -1260,13 +1260,22 @@ define([
                 0, 0, 0, 1
             );
 
-            var modelViewInv = Matrix.fromIdentity();
-            modelViewInv.invertOrthonormalMatrix(modelView);
+            var projection = new Matrix(
+                2, 0, 0, 0,
+                0, 2, 0, 0,
+                0, 0, -1.196, -3254427.538,
+                0, 0, -1, 0
+            );
+
+            var modelviewProjection = Matrix.fromIdentity();
+            modelviewProjection.setToMultiply(projection, modelView);
+            var modelviewProjectionInv = Matrix.fromIdentity();
+            modelviewProjectionInv.invertMatrix(modelviewProjection);
             var viewport = new Rectangle(0, 0, 848, 848);
             var screenPoint = new Vec3(637.5, 839, 0);
             var result = new Vec3(0, 0, 0);
             var expectedResult = new Vec3(-11925849.053, 8054028.030, -3946244.954);
-            modelViewInv.unProject(screenPoint, viewport, result);
+            modelviewProjectionInv.unProject(screenPoint, viewport, result);
             for (var i = 0; i < 3; i++) {
                 expect(result[i]).toBeCloseTo(expectedResult[i], 3);
             }

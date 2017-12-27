@@ -853,42 +853,42 @@ define([
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, lln = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, lln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, llf = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, llf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, lrn = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, lrn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, lrf = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, lrf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, uln = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, uln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, ulf = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, ulf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, urn = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, urn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewInv.unProject(screenPoint, this.navigatorState.viewport, urf = new Vec3(0, 0, 0));
+            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, urf = new Vec3(0, 0, 0));
 
             va = new Vec3(ulf[0] - lln[0], ulf[1] - lln[1], ulf[2] - lln[2]);
             vb.set(uln[0] - llf[0], uln[1] - llf[1], uln[2] - llf[2]);

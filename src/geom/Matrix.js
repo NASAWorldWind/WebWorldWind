@@ -1833,8 +1833,8 @@ define([
 
         /**
          * Transforms the specified screen point from WebGL screen coordinates to model coordinates. This method assumes
-         * this matrix represents an inverse modelview matrix. The result of this method is
-         * undefined if this matrix is not an inverse modelview matrix.
+         * this matrix represents an inverse modelview-projection matrix. The result of this method is
+         * undefined if this matrix is not an inverse modelview-projection matrix.
          * <p>
          * The screen point is understood to be in WebGL screen coordinates, with the origin in the bottom-left corner
          * and axes that extend up and to the right from the origin.
