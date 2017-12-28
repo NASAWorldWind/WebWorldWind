@@ -55,8 +55,9 @@ define([
          * @param {Number} heading The navigator's heading.
          * @param {Number} tilt The navigator's tilt.
          */
-        var NavigatorState = function (modelViewMatrix, projectionMatrix, viewport, heading, tilt) {
+        var NavigatorState = function (modelViewMatrix, projectionMatrix, viewport, heading, tilt, dc) {
 
+            this.dc = dc;
             /**
              * The navigator's model-view matrix. The model-view matrix transforms points from model coordinates to eye
              * coordinates.
@@ -178,68 +179,6 @@ define([
         };
 
         /**
-         * Converts a WebGL screen point to window coordinates.
-         * <p>
-         * The specified point is understood to be in WebGL screen coordinates, with the origin in the bottom-left
-         * corner and axes that extend up and to the right from the origin point.
-         * <p>
-         * The returned point is in the window coordinate system of the WorldWindow, with the origin in the top-left
-         * corner and axes that extend down and to the right from the origin point.
-         *
-         * @param {Vec2} screenPoint The screen point to convert.
-         * @param {Vec2} result A pre-allocated {@link Vec2} in which to return the computed point.
-         * @returns {Vec2} The specified result argument set to the computed point.
-         * @throws {ArgumentError} If either argument is null or undefined.
-         */
-        NavigatorState.prototype.convertPointToWindow = function (screenPoint, result) {
-            if (!screenPoint) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "NavigatorState", "convertPointToWindow",
-                    "missingPoint"));
-            }
-
-            if (!result) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "NavigatorState", "convertPointToWindow",
-                    "missingResult"));
-            }
-
-            result[0] = screenPoint[0];
-            result[1] = this.viewport.height - screenPoint[1];
-
-            return result;
-        };
-
-        /**
-         * Converts a window-coordinate point to WebGL screen coordinates.
-         * <p>
-         * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
-         * in the top-left corner and axes that extend down and to the right from the origin point.
-         * <p>
-         * The returned point is in WebGL screen coordinates, with the origin in the bottom-left corner and axes that
-         * extend up and to the right from the origin point.
-         *
-         * @param {Vec2} point The window-coordinate point to convert.
-         * @param {Vec2} result A pre-allocated {@link Vec2} in which to return the computed point.
-         * @returns {Vec2} The specified result argument set to the computed point.
-         * @throws {ArgumentError} If either argument is null or undefined.
-         */
-        NavigatorState.prototype.convertPointToViewport = function (point, result) {
-            if (!point) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "NavigatorState", "convertPointToViewport",
-                    "missingPoint"));
-            }
-
-            if (!result) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "NavigatorState", "convertPointToViewport",
-                    "missingResult"));
-            }
-
-            result[0] = point[0];
-            result[1] = this.viewport.height - point[1];
-
-            return result;
-        };
-
-        /**
          * Computes a ray originating at the navigator's eyePoint and extending through the specified point in window
          * coordinates.
          * <p>
@@ -260,7 +199,7 @@ define([
             }
 
             // Convert the point's xy coordinates from window coordinates to WebGL screen coordinates.
-            var screenPoint = this.convertPointToViewport(point, new Vec3(0, 0, 0)),
+            var screenPoint = this.dc.convertPointToViewport(point, new Vec3(0, 0, 0)),
                 nearPoint = new Vec3(0, 0, 0),
                 farPoint = new Vec3(0, 0, 0);
 

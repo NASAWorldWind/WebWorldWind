@@ -164,7 +164,7 @@ define([
 
                 if (dc.pickPoint) {
                     if (this.labelBounds.containsPoint(
-                            dc.navigatorState.convertPointToViewport(dc.pickPoint, Annotation.scratchPoint))) {
+                            dc.convertPointToViewport(dc.pickPoint, Annotation.scratchPoint))) {
                         po.labelPicked = true;
                     }
                 }

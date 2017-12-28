@@ -686,7 +686,7 @@ define([
          * @returns {Color} The color at the pick point.
          */
         DrawContext.prototype.readPickColor = function (pickPoint) {
-            var glPickPoint = this.navigatorState.convertPointToViewport(pickPoint, new Vec2(0, 0)),
+            var glPickPoint = this.convertPointToViewport(pickPoint, new Vec2(0, 0)),
                 colorBytes = new Uint8Array(4);
 
             this.currentGlContext.readPixels(glPickPoint[0], glPickPoint[1], 1, 1, this.currentGlContext.RGBA,
@@ -823,7 +823,7 @@ define([
 
             // Compute the pick rectangle if necessary.
             if (!pickRectangle) {
-                pickPoint = this.navigatorState.convertPointToViewport(this.pickPoint, new Vec2(0, 0));
+                pickPoint = this.convertPointToViewport(this.pickPoint, new Vec2(0, 0));
                 pickRectangle = new Rectangle(
                     pickPoint[0] - apertureRadius,
                     pickPoint[1] - apertureRadius,
@@ -1385,6 +1385,37 @@ define([
             result[2] = z;
 
             return true;
+        };
+
+        /**
+         * Converts a window-coordinate point to WebGL screen coordinates.
+         * <p>
+         * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
+         * in the top-left corner and axes that extend down and to the right from the origin point.
+         * <p>
+         * The returned point is in WebGL screen coordinates, with the origin in the bottom-left corner and axes that
+         * extend up and to the right from the origin point.
+         *
+         * @param {Vec2} point The window-coordinate point to convert.
+         * @param {Vec2} result A pre-allocated {@link Vec2} in which to return the computed point.
+         * @returns {Vec2} The specified result argument set to the computed point.
+         * @throws {ArgumentError} If either argument is null or undefined.
+         */
+        DrawContext.prototype.convertPointToViewport = function (point, result) {
+            if (!point) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "convertPointToViewport",
+                    "missingPoint"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "convertPointToViewport",
+                    "missingResult"));
+            }
+
+            result[0] = point[0];
+            result[1] = this.navigatorState.viewport.height - point[1];
+
+            return result;
         };
 
         return DrawContext;

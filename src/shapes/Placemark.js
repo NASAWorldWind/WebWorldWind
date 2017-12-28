@@ -395,7 +395,7 @@ define([
 
                 if (dc.pickPoint && this.mustDrawLabel()) {
                     if (this.labelBounds.containsPoint(
-                            dc.navigatorState.convertPointToViewport(dc.pickPoint, Placemark.scratchPoint))) {
+                            dc.convertPointToViewport(dc.pickPoint, Placemark.scratchPoint))) {
                         po.labelPicked = true;
                     }
                 }

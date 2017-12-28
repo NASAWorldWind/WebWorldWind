@@ -18,9 +18,10 @@ define([
     'src/geom/Matrix',
     'src/navigate/NavigatorState',
     'src/geom/Rectangle',
+    'src/geom/Vec2',
     'src/geom/Vec3',
     'src/WorldWind'
-], function (DrawContext, Matrix, NavigatorState, Rectangle, Vec3, WorldWind) {
+], function (DrawContext, Matrix, NavigatorState, Rectangle, Vec2, Vec3, WorldWind) {
     "use strict";
 
     var modelView = new Matrix(
@@ -93,6 +94,33 @@ define([
                 dc.projectWithDepth(modelPoint, depthOffset, result);
                 for (var i = 0; i < 3; i++) {
                     expect(result[i]).toBeCloseTo(expectedResult[i], 3);
+                }
+
+            });
+        });
+
+        describe("convertPointToViewport rejects null parameters", function () {
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    dc.convertPointToViewport(null, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing output variable", function () {
+                expect(function () {
+                    dc.convertPointToViewport(dummyParam, null);
+                }).toThrow();
+            });
+        });
+
+        describe("Calculates correct WebGL screen coordinates", function () {
+            it("Correctly converts a window coordinate to WebGL screen coordinate", function () {
+                var windowPoint=new Vec2(2.5,69);
+                var result = new Vec2(0, 0);
+                var expectedResult = new Vec2(2.5,779);
+                dc.convertPointToViewport(windowPoint, result);
+                for (var i = 0; i < 2; i++) {
+                    expect(result[i]).toBeCloseTo(expectedResult[i], 2);
                 }
 
             });

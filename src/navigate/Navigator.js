@@ -140,7 +140,7 @@ define([
             // WebGL viewport.
             projectionMatrix.setToPerspectiveProjection(viewport.width, viewport.height, this.nearDistance, this.farDistance);
 
-            return new NavigatorState(modelviewMatrix, projectionMatrix, viewport, this.heading, this.tilt);
+            return new NavigatorState(modelviewMatrix, projectionMatrix, viewport, this.heading, this.tilt, this.worldWindow.drawContext);
         };
 
         return Navigator;
