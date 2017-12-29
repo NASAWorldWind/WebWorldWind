@@ -27,7 +27,6 @@ define([
               Position,
               Vec3) {
         "use strict";
-
         /**
          * Constructs a GoTo animator.
          * @alias GoToAnimator
@@ -119,7 +118,7 @@ define([
             // Determine how high we need to go to give the user context. The max altitude computed is approximately
             // that needed to fit the start and end positions in the same viewport assuming a 45 degree field of view.
             var pA = this.wwd.globe.computePointFromLocation(
-                    this.startPosition.latitude, this.startPosition.longitude, new Vec3(0, 0, 0)),
+                this.startPosition.latitude, this.startPosition.longitude, new Vec3(0, 0, 0)),
                 pB = this.wwd.globe.computePointFromLocation(
                     this.targetPosition.latitude, this.targetPosition.longitude, new Vec3(0, 0, 0));
             this.maxAltitude = pA.distanceTo(pB);
@@ -127,7 +126,7 @@ define([
             // Determine an approximate viewport size in radians in order to determine whether we actually change
             // the range as we pan to the new location. We don't want to change the range if the distance between
             // the start and target positions is small relative to the current viewport.
-            var viewportSize = this.wwd.navigator.currentState().pixelSizeAtDistance(this.startPosition.altitude)
+            var viewportSize = this.wwd.worldWindowController.currentState().pixelSizeAtDistance(this.startPosition.altitude)
                 * this.wwd.canvas.clientWidth / this.wwd.globe.equatorialRadius;
 
             if (panDistance <= 2 * viewportSize) {

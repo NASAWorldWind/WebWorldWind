@@ -85,15 +85,6 @@ define([
         };
 
         /**
-         * Returns the current state of this navigator. Subclasses must override this method.
-         * @returns {NavigatorState} The current state of this navigator.
-         */
-        Navigator.prototype.currentState = function () {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "currentState", "abstractInvocation"));
-        };
-
-        /**
          * Returns the current navigator state for a specified model-view matrix.
          * This method is meant to be called only by subclasses;
          * applications should not call this method.

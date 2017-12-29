@@ -16,6 +16,7 @@
 /**
  * @exports NavigatorState
  */
+// TODO: Refactor into other classes
 define([
         '../error/ArgumentError',
         '../geom/Frustum',
