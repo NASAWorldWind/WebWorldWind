@@ -266,7 +266,7 @@ define([
 
             // Wraps the text based and the width and height that were set for the
             // annotation
-            this.label = dc.textSupport.wrap(
+            this.label = dc.textRenderer.wrap(
                 this.label,
                 this.attributes.width, this.attributes.height,
                 this.attributes.textAttributes.font);
@@ -290,7 +290,7 @@ define([
             this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
 
             if (!this.labelTexture) {
-                this.labelTexture = dc.textSupport.createTexture(dc, this.label, labelFont, false);
+                this.labelTexture = dc.textRenderer.createTexture(dc, this.label, labelFont, false);
                 dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
             }
 

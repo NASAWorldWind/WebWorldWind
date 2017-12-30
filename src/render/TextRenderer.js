@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports TextSupport
+ * @exports TextRenderer
  */
 define([
         '../error/ArgumentError',
@@ -35,14 +35,14 @@ define([
         "use strict";
 
         /**
-         * Constructs a TextSupport instance.
-         * @alias TextSupport
+         * Constructs a TextRenderer instance.
+         * @alias TextRenderer
          * @constructor
          * @classdesc Provides methods useful for displaying text. An instance of this class is attached to the
          * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically do
          * not create instances of this class.
          */
-        var TextSupport = function () {
+        var TextRenderer = function () {
 
             // Internal use only. Intentionally not documented.
             this.canvas2D = document.createElement("canvas");
@@ -67,7 +67,7 @@ define([
          * @param {Boolean} outline Indicates whether the text includes an outline, which increases its width and height.
          * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels.
          */
-        TextSupport.prototype.textSize = function (text, font, outline) {
+        TextRenderer.prototype.textSize = function (text, font, outline) {
             if (text.length === 0) {
                 return new Vec2(0, 0);
             }
@@ -98,7 +98,7 @@ define([
          * @param {Boolean} outline Indicates whether the text is drawn with a thin black outline.
          * @returns {Texture} A texture for the specified text string and font.
          */
-        TextSupport.prototype.createTexture = function (dc, text, font, outline) {
+        TextRenderer.prototype.createTexture = function (dc, text, font, outline) {
             var gl = dc.currentGlContext,
                 ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
@@ -145,25 +145,25 @@ define([
          * @param {Font} font The font to use.
          * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels based on the passed font.
          */
-        TextSupport.prototype.getMaxLineHeight = function(font)
+        TextRenderer.prototype.getMaxLineHeight = function(font)
         {
             // Check underscore + capital E with acute accent
             return this.textSize("_\u00c9", font, 0)[1];
         };
 
         /**
-         * Wraps the text based on width and height using new linew delimiter
+         * Wraps the text based on width and height using new line delimiter
          * @param {String} text The text to wrap.
          * @param {Number} width The width in pixels.
          * @param {Number} height The height in pixels.
          * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextSupport.prototype.wrap = function(text, width, height, font)
+        TextRenderer.prototype.wrap = function(text, width, height, font)
         {
             if (!text) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.WARNING, "TextSupport", "wrap", "missing text"));
+                    Logger.logMessage(Logger.WARNING, "TextRenderer", "wrap", "missing text"));
             }
 
             var i;
@@ -225,7 +225,7 @@ define([
          * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextSupport.prototype.wrapLine = function(text, width, font)
+        TextRenderer.prototype.wrapLine = function(text, width, font)
         {
             var wrappedText = "";
 
@@ -288,5 +288,5 @@ define([
             return wrappedText;
         };
 
-        return TextSupport;
+        return TextRenderer;
     });
