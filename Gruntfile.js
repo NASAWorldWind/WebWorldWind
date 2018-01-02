@@ -1,9 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
- */
-/**
- * @version $Id: Gruntfile.js 3107 2015-05-26 18:22:54Z tgaskins $
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 module.exports = function (grunt) {
     grunt.initConfig({
@@ -95,7 +103,7 @@ module.exports = function (grunt) {
                     // Copy all of the files in the examples folder except the current shim which uses the sources files
                     {
                         expand: true,
-                        src: ['images/**', 'examples/**', '!examples/WorldWindShim.js', 'README.md', 'LICENSE.txt'],
+                        src: ['images/**', 'examples/**', '!examples/WorldWindShim.js', 'README.md', 'LICENSE'],
                         dest: 'build/dist/'
                     },
                     // Copy and rename the deployment WorldWindShim which uses the minified library

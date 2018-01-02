@@ -6,8 +6,6 @@
 
 .idea/workspace.xml
 
-assetsToPublish/
-
 build/
 
 nasaworldwind-worldwind-*.tgz
@@ -15,5 +13,3 @@ nasaworldwind-worldwind-*.tgz
 node_modules/
 
 npm-debug.log
-
-standalonedata/

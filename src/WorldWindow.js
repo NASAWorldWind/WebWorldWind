@@ -1,13 +1,24 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports WorldWindow
- * @version $Id: WorldWindow.js 3402 2015-08-14 17:28:09Z tgaskins $
  */
 define([
         './error/ArgumentError',
+        './BasicWorldWindowController',
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
@@ -24,8 +35,10 @@ define([
         './shapes/SurfaceShape',
         './shapes/SurfaceShapeTileBuilder',
         './globe/Terrain',
-        './geom/Vec2'],
+        './geom/Vec2'
+    ],
     function (ArgumentError,
+              BasicWorldWindowController,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
@@ -131,6 +144,13 @@ define([
             this.navigator = new LookAtNavigator(this);
 
             /**
+             * The controller used to manipulate the globe.
+             * @type {WorldWindowController}
+             * @default [BasicWorldWindowController]{@link BasicWorldWindowController}
+             */
+            this.worldWindowController = new BasicWorldWindowController(this);
+
+            /**
              * The vertical exaggeration to apply to the terrain.
              * @type {Number}
              */
@@ -193,9 +213,49 @@ define([
             // Intentionally not documented.
             this.pixelScale = 1;
 
-            // Set up to handle WebGL context lost events.
+            // Prevent the browser's default actions in response to mouse and touch events, which interfere with
+            // navigation. Register these event listeners  before any others to ensure that they're called last.
+            function preventDefaultListener(event) {
+                event.preventDefault();
+            }
+
+            this.addEventListener("mousedown", preventDefaultListener);
+            this.addEventListener("touchstart", preventDefaultListener);
+            this.addEventListener("contextmenu", preventDefaultListener);
+            this.addEventListener("wheel", preventDefaultListener);
+
             var thisWindow = this;
 
+            // Redirect various UI interactions to the appropriate handler.
+            function onGestureEvent(event) {
+                thisWindow.onGestureEvent(event);
+            }
+
+            if (window.PointerEvent) {
+                // Prevent the browser's default actions in response to pointer events which interfere with navigation.
+                // This CSS style property is configured here to ensure that it's set for all applications.
+                this.canvas.style.setProperty("touch-action", "none");
+
+                this.addEventListener("pointerdown", onGestureEvent, false);
+                window.addEventListener("pointermove", onGestureEvent, false); // get pointermove events outside event target
+                window.addEventListener("pointercancel", onGestureEvent, false); // get pointercancel events outside event target
+                window.addEventListener("pointerup", onGestureEvent, false); // get pointerup events outside event target
+            } else {
+                this.addEventListener("mousedown", onGestureEvent, false);
+                window.addEventListener("mousemove", onGestureEvent, false); // get mousemove events outside event target
+                window.addEventListener("mouseup", onGestureEvent, false); // get mouseup events outside event target
+                this.addEventListener("touchstart", onGestureEvent, false);
+                this.addEventListener("touchmove", onGestureEvent, false);
+                this.addEventListener("touchend", onGestureEvent, false);
+                this.addEventListener("touchcancel", onGestureEvent, false);
+            }
+
+            // Register wheel event listeners on the WorldWindow's canvas.
+            this.addEventListener("wheel", function (event) {
+                onGestureEvent(event);
+            });
+
+            // Set up to handle WebGL context lost events.
             function handleContextLost(event) {
                 thisWindow.handleContextLost(event);
             }
@@ -272,6 +332,10 @@ define([
                 yc = y - (bbox.top + this.canvas.clientTop);// * (this.canvas.height / bbox.height);
 
             return new Vec2(xc, yc);
+        };
+
+        WorldWindow.prototype.onGestureEvent = function (event) {
+            this.worldWindowController.onGestureEvent(event);
         };
 
         /**
@@ -587,7 +651,7 @@ define([
             dc.reset();
             dc.globe = this.globe;
             dc.layers = this.layers;
-            dc.navigatorState = this.navigator.currentState();
+            dc.navigatorState = this.worldWindowController.currentState(); // dc.navigatorState = this.navigator.currentState();
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
             dc.deepPicking = this.deepPicking;
