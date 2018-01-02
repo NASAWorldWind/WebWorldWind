@@ -133,7 +133,7 @@ define([
             this.frustumInModelCoordinates.normalize();
 
             // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
-            // are used to support operations on navigator state, such as pixelSizeAtDistance.
+            // are used to support operations on navigator state.
             this.modelviewInv = Matrix.fromIdentity();
             this.modelviewInv.invertOrthonormalMatrix(this.modelview);
             this.projectionInv = Matrix.fromIdentity();
@@ -176,81 +176,6 @@ define([
                 frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
             this.pixelSizeScale = frustumWidthScale / viewport.width;
             this.pixelSizeOffset = frustumWidthOffset / viewport.height;
-        };
-
-        /**
-         * Computes a ray originating at the navigator's eyePoint and extending through the specified point in window
-         * coordinates.
-         * <p>
-         * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
-         * in the top-left corner and axes that extend down and to the right from the origin point.
-         * <p>
-         * The results of this method are undefined if the specified point is outside of the WorldWindow's
-         * bounds.
-         *
-         * @param {Vec2} point The window coordinates point to compute a ray for.
-         * @returns {Line} A new Line initialized to the origin and direction of the computed ray, or null if the
-         * ray could not be computed.
-         */
-        NavigatorState.prototype.rayFromScreenPoint = function (point) {
-            if (!point) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "NavigatorState", "rayFromScreenPoint",
-                    "missingPoint"));
-            }
-
-            // Convert the point's xy coordinates from window coordinates to WebGL screen coordinates.
-            var screenPoint = this.dc.convertPointToViewport(point, new Vec3(0, 0, 0)),
-                nearPoint = new Vec3(0, 0, 0),
-                farPoint = new Vec3(0, 0, 0);
-
-            // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
-            if (!this.modelviewProjectionInv.unProject(screenPoint, this.viewport, nearPoint)) {
-                return null;
-            }
-
-            // Compute the model coordinate point on the far clip plane with the xy coordinates and depth 1.
-            screenPoint[2] = 1;
-            if (!this.modelviewProjectionInv.unProject(screenPoint, this.viewport, farPoint)) {
-                return null;
-            }
-
-            // Compute a ray originating at the eye point and with direction pointing from the xy coordinate on the near
-            // plane to the same xy coordinate on the far plane.
-            var origin = new Vec3(this.eyePoint[0], this.eyePoint[1], this.eyePoint[2]),
-                direction = new Vec3(farPoint[0], farPoint[1], farPoint[2]);
-
-            direction.subtract(nearPoint);
-            direction.normalize();
-
-            return new Line(origin, direction);
-        };
-
-        /**
-         * Computes the approximate size of a pixel at a specified distance from the navigator's eye point.
-         * <p>
-         * This method assumes rectangular pixels, where pixel coordinates denote
-         * infinitely thin spaces between pixels. The units of the returned size are in model coordinates per pixel
-         * (usually meters per pixel). This returns 0 if the specified distance is zero. The returned size is undefined
-         * if the distance is less than zero.
-         *
-         * @param {Number} distance The distance from the eye point at which to determine pixel size, in model
-         * coordinates.
-         * @returns {Number} The approximate pixel size at the specified distance from the eye point, in model
-         * coordinates per pixel.
-         */
-        NavigatorState.prototype.pixelSizeAtDistance = function (distance) {
-            // Compute the pixel size from the width of a rectangle carved out of the frustum in model coordinates at
-            // the specified distance along the -Z axis and the viewport width in screen coordinates. The pixel size is
-            // expressed in model coordinates per screen coordinate (e.g. meters per pixel).
-            //
-            // The frustum width is determined by noticing that the frustum size is a linear function of distance from
-            // the eye point. The linear equation constants are determined during initialization, then solved for
-            // distance here.
-            //
-            // This considers only the frustum width by assuming that the frustum and viewport share the same aspect
-            // ratio, so that using either the frustum width or height results in the same pixel size.
-
-            return this.pixelSizeScale * distance + this.pixelSizeOffset;
         };
 
         return NavigatorState;

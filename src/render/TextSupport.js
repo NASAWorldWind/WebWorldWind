@@ -159,7 +159,7 @@ define([
          * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextSupport.prototype.wrap = function(text, width, height, font)
+        TextSupport.prototype.wrap = function(textRenderer, text, width, height, font)
         {
             if (!text) {
                 throw new ArgumentError(
@@ -225,7 +225,7 @@ define([
          * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextSupport.prototype.wrapLine = function(text, width, font)
+        TextSupport.prototype.wrapLine = function(textRenderer, text, width, font)
         {
             var wrappedText = "";
 

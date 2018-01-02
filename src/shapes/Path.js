@@ -313,7 +313,7 @@ define([
         // Private. Intentionally not documented.
         Path.prototype.makeTessellatedPositions = function (dc) {
             var tessellatedPositions = [],
-                navState = dc.navigatorState,
+                eyePoint = dc.navigatorState.eyePoint,
                 showVerticals = this.mustDrawVerticals(dc),
                 ptA = new Vec3(0, 0, 0),
                 ptB = new Vec3(0, 0, 0),
@@ -333,8 +333,8 @@ define([
             for (var i = 1, len = this._positions.length; i < len; i++) {
                 posB = this._positions[i];
                 dc.surfacePointForMode(posB.latitude, posB.longitude, posB.altitude, this._altitudeMode, ptB);
-                eyeDistance = navState.eyePoint.distanceTo(ptA);
-                pixelSize = navState.pixelSizeAtDistance(eyeDistance);
+                eyeDistance = eyePoint.distanceTo(ptA);
+                pixelSize = dc.pixelSizeAtDistance(eyeDistance);
                 if (ptA.distanceTo(ptB) < pixelSize * 8 && this.altitudeMode !== WorldWind.ABSOLUTE) {
                     tessellatedPositions.push(posB); // distance is short so no need for sub-segments
                 } else {
@@ -356,8 +356,7 @@ define([
 
         // Private. Intentionally not documented.
         Path.prototype.makeSegment = function (dc, posA, posB, ptA, ptB, tessellatedPositions) {
-            var navState = dc.navigatorState,
-                eyePoint = navState.eyePoint,
+            var eyePoint = dc.navigatorState.eyePoint,
                 pos = new Location(0, 0),
                 height = 0,
                 arcLength, segmentAzimuth, segmentDistance, s, p, distance;
@@ -403,7 +402,7 @@ define([
             this.scratchPoint.copy(ptA);
             for (s = 0, p = 0; s < 1;) {
                 if (this._followTerrain) {
-                    p += this._terrainConformance * navState.pixelSizeAtDistance(this.scratchPoint.distanceTo(eyePoint));
+                    p += this._terrainConformance * dc.pixelSizeAtDistance(this.scratchPoint.distanceTo(eyePoint));
                 } else {
                     p += arcLength / this._numSubSegments;
                 }
