@@ -380,6 +380,7 @@
             <name>Ground Overlays</name>
             <description>Examples of ground overlays</description>
             <NetworkLink>
+                <name>Etna</name>
                 <Link>
                     <href>data/etnaOverlay.kml</href>
                     <refreshMode>onInterval</refreshMode>
@@ -399,8 +400,9 @@
             </NetworkLink>
         </Folder>
         <Folder>
-
+            <name>Sentinels Czech</name>
             <GroundOverlay>
+                <name>S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T32UQB</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T32UQB.tif.png</href>
                 </Icon>
@@ -427,6 +429,7 @@
             </GroundOverlay>
 
             <GroundOverlay>
+                <name>S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UUS</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UUS.tif.png</href>
                 </Icon>
@@ -453,6 +456,7 @@
             </GroundOverlay>
 
             <GroundOverlay>
+                <name>S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UVS</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UVS.tif.png</href>
                 </Icon>
@@ -478,6 +482,7 @@
                 </Region>
             </GroundOverlay>
             <GroundOverlay>
+                <name>S2A_OPER_MTD_L1C_TL_EPA__20150810T100716_A000691_T33UVP</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150810T100716_A000691_T33UVP.tif.png</href>
                 </Icon>
@@ -504,6 +509,7 @@
             </GroundOverlay>
 
             <GroundOverlay>
+                <name>S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQA</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQA.tif.png</href>
                 </Icon>
@@ -530,6 +536,7 @@
             </GroundOverlay>
 
             <GroundOverlay>
+                <name>S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQV</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQV.tif.png</href>
                 </Icon>
