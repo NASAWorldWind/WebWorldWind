@@ -17,14 +17,6 @@
     </div>
     <div class="row">
         <div class="col-sm-3">
-            <h4>Projection</h4>
-            <div class="dropdown" id="projectionDropdown">
-            </div>
-            <br>
-            <h4>Layers</h4>
-            <div class="list-group" id="layerList">
-            </div>
-            <br>
             <h4>Destination</h4>
             <div class="input-group" id="searchBox">
                 <input type="text" class="form-control" placeholder="GoTo" id="searchText"/>
@@ -34,6 +26,14 @@
                     </button>
                 </span>
             </div>
+            <br>
+            <h4>KML Elements Controls</h4>
+            <div>
+                The boxes control visibility of KML Elements from file.
+                <br/>
+                If on hover the cursor changes to pointer, it means you can focus the element by clicking on it.
+            </div>
+            <div id="treeControls" style="height: 600px; overflow-y: auto; overflow-x: hidden;"></div>
         </div>
         <div class="col-sm-9" id="globe">
             <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto">
@@ -41,7 +41,6 @@
             </canvas>
         </div>
     </div>
-    <div class="row" id="treeControls"></div>
 </div>
 </body>
 </html>

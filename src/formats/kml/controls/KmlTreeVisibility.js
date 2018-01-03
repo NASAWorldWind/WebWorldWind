@@ -57,6 +57,9 @@ define([
         var enabled = node.enabled || node.kmlVisibility === true;
 
         var controlsForSingleElement = document.createElement("div");
+        if (node.kmlAbstractView) {
+            controlsForSingleElement.style.cursor = "pointer";
+        }
         var toggleVisibility = document.createElement("input");
         toggleVisibility.setAttribute("type", "checkbox");
         if (enabled) {
