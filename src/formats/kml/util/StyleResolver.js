@@ -44,7 +44,7 @@ define([
         } else if (styleSelector) {
             this.handleStyleSelector(styleSelector, resolve, reject);
         } else {
-            Logger.logMessage(Logger.LEVEL_WARNING, "StyleResolver", "handleRemoteStyle", "Style was null.");
+            Logger.logMessage(Logger.LEVEL_INFO, "StyleResolver", "handleRemoteStyle", "Style was null.");
             resolve(KmlStyle.default());
         }
     };
