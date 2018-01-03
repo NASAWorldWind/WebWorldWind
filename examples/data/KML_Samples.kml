@@ -381,7 +381,7 @@
             <description>Examples of ground overlays</description>
             <NetworkLink>
                 <Link>
-                    <href>data/etnaOverlay.kml</href>
+                    <href>data/etna.kmz</href>
                     <refreshMode>onInterval</refreshMode>
                     <refreshInterval>10</refreshInterval>
                 </Link>
