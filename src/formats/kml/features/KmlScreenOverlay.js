@@ -19,15 +19,13 @@ define([
     './KmlOverlay',
     '../util/NodeTransformers',
     '../../../util/Offset',
-    '../../../shapes/ScreenImage',
-    '../../../util/WWUtil'
+    '../../../shapes/ScreenImage'
 ], function (KmlElements,
              KmlFeature,
              KmlOverlay,
              NodeTransformers,
              Offset,
-             ScreenImage,
-             WWUtil) {
+             ScreenImage) {
     "use strict";
 
     /**

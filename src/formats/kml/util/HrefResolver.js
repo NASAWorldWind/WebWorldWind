@@ -9,6 +9,7 @@ define([
      * @param url {String} Representation of the url of the resource.
      * @param fileCache {KmlFileCache} Cache representing potential links loaded by current KML file.
      * @constructor
+     * @alias HrefResolver
      */
     var HrefResolver = function (url, fileCache) {
         /**

@@ -17,16 +17,12 @@ define([
     './../KmlElements',
     '../KmlObject',
     '../styles/KmlStyleSelector',
-    './NodeTransformers',
-    '../../../util/Promise',
-    '../util/StyleResolver'
+    './NodeTransformers'
 ], function (
     KmlElements,
     KmlObject,
     KmlStyleSelector,
-    NodeTransformers,
-    Promise,
-    StyleResolver
+    NodeTransformers
 ) {
     "use strict";
 

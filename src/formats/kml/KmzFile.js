@@ -15,8 +15,11 @@ define([
     "use strict";
 
     /**
-     * Constructs KmzFile
+     * Constructs KmzFile. It expects binary representation of the file and the Cache to be used.
      * @constructor
+     * @alias KmzFile
+     * @param binary {Object} Binary representation of the file.
+     * @param fileCache {KmlFileCache} Cache for the contents of the file.
      */
     var KmzFile = function (binary, fileCache) {
         this._binary = binary;

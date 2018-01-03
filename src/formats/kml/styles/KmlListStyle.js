@@ -97,7 +97,7 @@ define([
         }
     });
 
-    KmlListStyle.update = function(style) {
+    KmlListStyle.update = function() {
 
     };
 

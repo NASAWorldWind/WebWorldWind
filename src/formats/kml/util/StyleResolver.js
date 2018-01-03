@@ -58,7 +58,7 @@ define([
     StyleResolver.prototype.handleStyleUrl = function (styleUrl) {
         var self = this;
         return this.handlePromiseOfFile(styleUrl).then(function (kmlFile) {
-            return kmlFile.resolveStyle(styleUrl)
+            return kmlFile.resolveStyle(styleUrl);
         }).then(function (style) {
             if (style.isMap) {
                 return style.resolve(self);
@@ -103,7 +103,7 @@ define([
             return new Promise(function(resolve){
                 window.setTimeout(function () {
                     resolve({normal: styleSelector, highlight: null});
-                }, 0)
+                }, 0);
             });
         }
     };
