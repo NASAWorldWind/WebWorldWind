@@ -1,16 +1,24 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * Illustrates how to display and pick Placemarks.
- *
- * @version $Id: PlacemarksAndPicking.js 3320 2015-07-15 20:53:05Z dcollins $
  */
-
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -88,8 +96,8 @@ requirejs(['../src/WorldWind',
             // Create the placemark and its label.
             placemark = new WorldWind.Placemark(new WorldWind.Position(latitude, longitude + i, 1e2), true, null);
             placemark.label = "Placemark " + i.toString() + "\n"
-            + "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n"
-            + "Lon " + placemark.position.longitude.toPrecision(5).toString();
+                + "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n"
+                + "Lon " + placemark.position.longitude.toPrecision(5).toString();
             placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
 
             // Create the placemark attributes for this placemark. Note that the attributes differ only by their
@@ -113,7 +121,7 @@ requirejs(['../src/WorldWind',
         wwd.addLayer(placemarkLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Now set up to handle picking.
 

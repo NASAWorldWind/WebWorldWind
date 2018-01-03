@@ -1,9 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
- */
-/**
- * @version $Id: WorldWind.js 3418 2015-08-22 00:17:05Z tgaskins $
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
         './error/AbstractError',
@@ -17,6 +25,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './util/BasicTimeSequence',
+        './BasicWorldWindowController',
         './layer/BingAerialLayer',
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
@@ -79,6 +88,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlCamera',
         './formats/kml/styles/KmlColorStyle',
         './formats/kml/features/KmlContainer',
+        './formats/kml/controls/KmlControls',
         './formats/kml/features/KmlDocument',
         './formats/kml/KmlElements',
         './formats/kml/features/KmlFeature',
@@ -121,6 +131,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlTimeStamp',
         './formats/kml/features/KmlTour',
         './formats/kml/geom/KmlTrack',
+        './formats/kml/controls/KmlTreeVisibility',
         './layer/LandsatRestLayer',
         './layer/Layer',
         './util/measure/LengthMeasurer',
@@ -238,6 +249,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/WmtsLayer',
         './ogc/wmts/WmtsLayerCapabilities',
         './WorldWindow',
+        './WorldWindowController',
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
@@ -254,6 +266,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BasicProgram,
               BasicTextureProgram,
               BasicTimeSequence,
+              BasicWorldWindowController,
               BingAerialLayer,
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
@@ -313,9 +326,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ItemIcon,
               KmlAbstractView,
               KmlBalloonStyle,
+              KmlCamera,
               KmlColorStyle,
               KmlContainer,
-              KmlCamera,
+              KmlControls,
               KmlDocument,
               KmlElements,
               KmlFeature,
@@ -358,6 +372,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlTimeStamp,
               KmlTour,
               KmlTrack,
+              KmlTreeVisibility,
               LandsatRestLayer,
               Layer,
               LengthMeasurer,
@@ -475,6 +490,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
+              WorldWindowController,
               WWMath,
               WWMessage,
               WWUtil,
@@ -489,10 +505,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         var WorldWind = {
             /**
              * The WorldWind version number.
-             * @default "0.0.0"
+             * @default "0.9.0"
              * @constant
              */
-            VERSION: "0.0.0",
+            VERSION: "0.9.0",
 
             // PLEASE KEEP THE ENTRIES BELOW IN ALPHABETICAL ORDER
             /**
@@ -700,6 +716,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BasicTimeSequence'] = BasicTimeSequence;
+        WorldWind['BasicWorldWindowController'] = BasicWorldWindowController;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
@@ -755,7 +772,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
+        WorldWind['KmlControls'] = KmlControls;
         WorldWind['KmlFile'] = KmlFile;
+        WorldWind['KmlTreeVisibility'] = KmlTreeVisibility;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
         WorldWind['LengthMeasurer'] = LengthMeasurer;
@@ -872,6 +891,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
+        WorldWind['WorldWindowController'] = WorldWindowController;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**

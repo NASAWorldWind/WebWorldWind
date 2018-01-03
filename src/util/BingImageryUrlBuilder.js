@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports BingImageryUrlBuilder
- * @version $Id: BingImageryUrlBuilder.js 3094 2015-05-14 23:02:03Z tgaskins $
  */
 define([
         '../error/ArgumentError',
@@ -34,17 +44,22 @@ define([
         var BingImageryUrlBuilder = function (imagerySet, bingMapsKey) {
             var wwBingMapsKey = "AkttWCS8p6qzxvx5RH3qUcCPgwG9nRJ7IwlpFGb14B0rBorB5DvmXr2Y_eCUNIxH";
 
-            if (!bingMapsKey) {
+            // Use key specified for this layer
+            this.bingMapsKey = bingMapsKey;
+
+            // If none, fallback to key specified globally
+            if (!this.bingMapsKey) {
                 this.bingMapsKey = WorldWind.BingMapsKey;
+            }
 
-                if (!bingMapsKey) {
-                    this.bingMapsKey = wwBingMapsKey;
-                }
-
-                if (bingMapsKey === wwBingMapsKey) {
-                    this.bingMapsKey = wwBingMapsKey;
-                    BingImageryUrlBuilder.showBingMapsKeyWarning();
-                }
+            // If none, fallback to default demo key
+            if (!this.bingMapsKey) {
+                this.bingMapsKey = wwBingMapsKey;
+            }
+            
+            // If using WorldWind Bing Maps demo key, show warning
+            if (this.bingMapsKey === wwBingMapsKey) {
+                BingImageryUrlBuilder.showBingMapsKeyWarning();
             }
 
             this.imagerySet = imagerySet;

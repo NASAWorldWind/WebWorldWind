@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports BMNGRestLayer
@@ -48,7 +59,14 @@ define([
              */
             this.time = initialTime || new Date("2004-01");
 
-            this.pickEnabled = false;
+            // Intentionally not documented.
+            this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
+
+            // Intentionally not documented.
+            this.serverAddress = serverAddress;
+
+            // Intentionally not documented.
+            this.pathToData = pathToData;
 
             // Intentionally not documented.
             this.layers = {}; // holds the layers as they're created.
@@ -68,21 +86,8 @@ define([
                 {month: "BlueMarble-200411", time: BMNGRestLayer.availableTimes[10]},
                 {month: "BlueMarble-200412", time: BMNGRestLayer.availableTimes[11]}
             ];
-            this.timeSequence = new PeriodicTimeSequence("2004-01-01/2004-12-01/P1M");
 
-            // By default if no server address and path are sent as parameters in the constructor,
-            // the layer's data is retrieved from http://worldwindserver.net
-            this.serverAddress = serverAddress || "http://worldwindserver.net/webworldwind/";
-            this.pathToData = pathToData || "/standalonedata/Earth/BlueMarble256/";
-
-            // Alternatively, the data can be retrieved from a local folder as follows.
-            // - Download the file located in:
-            //   http://worldwindserver.net/webworldwind/WebWorldWindStandaloneData.zip
-            // - Unzip it into the Web WorldWind top-level directory so that the "standalonedata" directory is a peer
-            //   of examples, src, apps and worldwind.js.
-            // - Uncomment the following lines or call BMNGRestLayer from the application with these parameters:
-            //this.serverAddress = serverAddress || null;
-            //this.pathToData = pathToData || "../standalonedata/Earth/BlueMarble256/";
+            this.pickEnabled = false;
         };
 
         BMNGRestLayer.prototype = Object.create(Layer.prototype);
@@ -177,8 +182,14 @@ define([
         };
 
         BMNGRestLayer.prototype.createSubLayer = function (layerName) {
-            var dataPath = this.pathToData + layerName;
-            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, dataPath, this.displayName);
+            var subLayerPath = "";
+            if (this.pathToData) {
+                subLayerPath = this.pathToData + "/" + layerName;
+            } else {
+                subLayerPath = layerName;
+            }
+
+            this.layers[layerName] = new RestTiledImageLayer(this.serverAddress, subLayerPath, this.displayName);
         };
 
         // Intentionally not documented.

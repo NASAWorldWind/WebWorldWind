@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports AtmosphereLayer
@@ -14,6 +25,7 @@ define([
         '../geom/Matrix3',
         '../geom/Sector',
         '../shaders/SkyProgram',
+        '../util/SunPosition',
         '../geom/Vec3',
         '../util/WWUtil'
     ],
@@ -25,6 +37,7 @@ define([
               Matrix3,
               Sector,
               SkyProgram,
+              SunPosition,
               Vec3,
               WWUtil) {
         "use strict";
@@ -47,11 +60,8 @@ define([
             this._nightImageSource = nightImageSource ||
                 WorldWind.configuration.baseUrl + 'images/dnb_land_ocean_ice_2012.png';
 
-            //Documented in defineProperties below.
-            this._lightLocation = null;
-
             //Internal use only.
-            //The light direction in cartesian space, computed form the lightLocation or defaults to the eyePoint.
+            //The light direction in cartesian space, computed from the layer time or defaults to the eyePoint.
             this._activeLightDirection = new Vec3(0, 0, 0);
 
             this._fullSphereSector = Sector.FULL_SPHERE;
@@ -78,20 +88,6 @@ define([
         AtmosphereLayer.prototype = Object.create(Layer.prototype);
 
         Object.defineProperties(AtmosphereLayer.prototype, {
-
-            /**
-             * The geographic location of the light (sun).
-             * @memberof AtmosphereLayer.prototype
-             * @type {Position}
-             */
-            lightLocation: {
-                get: function () {
-                    return this._lightLocation;
-                },
-                set: function (value) {
-                    this._lightLocation = value;
-                }
-            },
 
             /**
              * Url for the night texture.
@@ -225,8 +221,8 @@ define([
 
             program.setScale(gl);
 
-            // Use this layer's night image when the light location is different than the eye location.
-            if (this.nightImageSource && this.lightLocation) {
+            // Use this layer's night image when the layer has time value defined
+            if (this.nightImageSource && (this.time !== null)) {
                 
                 this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
                 
@@ -319,11 +315,11 @@ define([
 
         // Internal. Intentionally not documented.
         AtmosphereLayer.prototype.determineLightDirection = function (dc) {
-            if (this.lightLocation != null) {
-                dc.globe.computePointFromLocation(this.lightLocation.latitude, this.lightLocation.longitude,
+            if (this.time !== null) {
+                var sunLocation = SunPosition.getAsGeographicLocation(this.time);
+                dc.globe.computePointFromLocation(sunLocation.latitude, sunLocation.longitude,
                     this._activeLightDirection);
-            }
-            else {
+            } else {
                 this._activeLightDirection.copy(dc.navigatorState.eyePoint);
             }
             this._activeLightDirection.normalize();

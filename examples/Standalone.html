@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<!-- Invokes Web WorldWind without using the internet. Refers to only data stored locally on the web server. -->
-<!-- To deploy:
-        - Download and unzip http://worldwindserver.net/webworldwind/WebWorldWind.zip.
-        - Download http://worldwindserver.net/webworldwind/WebWorldWindStandaloneData.zip and
-          unzip it into the Web WorldWind top-level directory so that the "standalonedata" directory is a peer
-          of examples, src, apps and worldwind.js.
-        - Ensure that your web server is configured to send an HTTP content type of application/octet-stream
-          or application/bil16 for files with a .bil suffix. You can do this for Apache servers by adding bil
-          to the list of application-octet-stream suffixes in the mime.types file and then restarting the server.
-        - Use your browser to invoke this HTML file, the one you're now reading, via the web server. Do not attempt
-          to open it using the browser's File->Open menu. Use an http or https URL with the server address.
-      If deployment was successful then you should see a Web WorldWind globe in the browser. The globe
-      should have blue marble imagery all over it and greenish Landsat imagery over most of North America.
-      If you zoom into a mountainous region you should see the raised mountains. There are no elevations
-      included for the oceans, so they are all flat. -->
-<!-- Be sure that the "../standalonedata" directory exists (relative to this file) and that it
-     contains the Blue Marble imagery, the Landsat imagery and the DTED0 elevations in its Earth directory. -->
+<!--
+Invokes Web WorldWind without using the internet. Refers to only data stored locally on the web server.
+
+To deploy:
+- Download https://worldwind32.arc.nasa.gov/WebWorldWind-StandaloneData.tar.gz and unzip it into the top-level
+  directory so that the "standalonedata" directory is a peer of examples and worldwind.min.js.
+- Ensure that your web server is configured to send an HTTP content type of application/octet-stream
+  or application/bil16 for files with a .bil suffix. You can do this for Apache servers by adding bil
+  to the list of application-octet-stream suffixes in the mime.types file and then restarting the server.
+- Use your browser to invoke this HTML file, the one you're now reading, via the web server. Do not attempt
+  to open it using the browser's File->Open menu. Use an http or https URL with the server address.
+
+If deployment was successful then you should see a Web WorldWind globe in the browser. The globe
+should have blue marble imagery all over it and greenish Landsat imagery over most of North America.
+
+If you zoom into a mountainous region you should see the raised mountains. There are no elevations
+included for the oceans, so they are all flat.
+
+Be sure that the "../standalonedata" directory exists (relative to this file) and that it contains the Blue Marble
+imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
+-->
 <html>
 <head lang="en">
     <meta charset="UTF-8">
@@ -36,22 +40,18 @@
 
     // Define the event listener to initialize Web WorldWind.
     function eventWindowLoaded() {
-        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_INFO);
+        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create a WorldWindow for the canvas. Use a REST elevation model rather than the default.
         var elevationModel = new WorldWind.EarthRestElevationModel(null, "../standalonedata/Earth/DTED0");
         var wwd = new WorldWind.WorldWindow("canvasOne", elevationModel);
 
-        // Add some REST image layers to the WorldWindow's globe:
-
-        // Blue Marble Next Generation 2004
+        // Add the REST Blue Marble layer that retrieves imagery from local standalone data.
         var blueMarble = new WorldWind.BMNGRestLayer(null, "../standalonedata/Earth/BlueMarble256/");
-
-        // Landsat layer (The offline data covers only a sector of the globe in North America)
-        var landSat = new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat", "LandSat");
-
-        // Add all the layers to the WorldWindow's layer list
         wwd.addLayer(blueMarble);
+
+        // Add the REST Landsat layer (this offline data covers only a sector of the globe in North America)
+        var landSat = new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat");
         wwd.addLayer(landSat);
 
         // Add a compass, a coordinates display and some view controls to the WorldWindow.
