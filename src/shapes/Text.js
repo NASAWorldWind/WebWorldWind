@@ -317,7 +317,7 @@ define([
 
             this.activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
             if (!this.activeTexture) {
-                this.activeTexture = dc.textSupport.createTexture(dc, this.text, labelFont, true);
+                this.activeTexture = dc.textRenderer.createTexture(dc, this.text, labelFont, true);
                 dc.gpuResourceCache.putResource(textureKey, this.activeTexture, this.activeTexture.size);
             }
 

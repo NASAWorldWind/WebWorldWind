@@ -485,7 +485,7 @@ define([
 
                 this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
                 if (!this.labelTexture) {
-                    this.labelTexture = dc.textSupport.createTexture(dc, this.label, labelFont, true);
+                    this.labelTexture = dc.textRenderer.createTexture(dc, this.label, labelFont, true);
                     dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
                 }
 
@@ -532,12 +532,12 @@ define([
                 return dc.pickRectangle && (this.imageBounds.intersects(dc.pickRectangle)
                     || (this.mustDrawLabel() && this.labelBounds.intersects(dc.pickRectangle))
                     || (this.mustDrawLeaderLine(dc)
-                    && dc.pickFrustum.intersectsSegment(this.groundPoint, this.placePoint)));
+                        && dc.pickFrustum.intersectsSegment(this.groundPoint, this.placePoint)));
             } else {
                 return this.imageBounds.intersects(dc.navigatorState.viewport)
                     || (this.mustDrawLabel() && this.labelBounds.intersects(dc.navigatorState.viewport))
                     || (this.mustDrawLeaderLine(dc)
-                    && dc.navigatorState.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
+                        && dc.navigatorState.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
             }
         };
 
@@ -714,7 +714,7 @@ define([
             // Perform the tilt before applying the rotation so that the image tilts back from its base into
             // the view volume.
             var actualTilt = this.imageTiltReference === WorldWind.RELATIVE_TO_GLOBE ?
-            dc.navigatorState.tilt + this.imageTilt : this.imageTilt;
+                dc.navigatorState.tilt + this.imageTilt : this.imageTilt;
             Placemark.matrix.multiplyByRotation(-1, 0, 0, actualTilt);
 
             program.loadModelviewProjection(gl, Placemark.matrix);
