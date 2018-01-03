@@ -39,7 +39,7 @@ define([
         '../shapes/SurfaceShape',
         '../shapes/SurfaceShapeTileBuilder',
         '../render/SurfaceTileRenderer',
-        '../render/TextSupport',
+        '../render/TextRenderer',
         '../geom/Vec2',
         '../geom/Vec3',
         '../util/WWMath'
@@ -66,7 +66,7 @@ define([
               SurfaceShape,
               SurfaceShapeTileBuilder,
               SurfaceTileRenderer,
-              TextSupport,
+              TextRenderer,
               Vec2,
               Vec3,
               WWMath) {
@@ -145,10 +145,10 @@ define([
             this.screenCreditController = new ScreenCreditController();
 
             /**
-             * A shared TextSupport instance.
-             * @type {TextSupport}
+             * A shared TextRenderer instance.
+             * @type {TextRenderer}
              */
-            this.textSupport = new TextSupport();
+            this.textRenderer = new TextRenderer();
 
             /**
              * The current WebGL framebuffer. Null indicates that the default WebGL framebuffer is active.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports TextSupport
+ * @exports TextRenderer
  */
 define([
         '../error/ArgumentError',
@@ -35,14 +35,14 @@ define([
         "use strict";
 
         /**
-         * Constructs a TextSupport instance.
-         * @alias TextSupport
+         * Constructs a TextRenderer instance.
+         * @alias TextRenderer
          * @constructor
          * @classdesc Provides methods useful for displaying text. An instance of this class is attached to the
          * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically do
          * not create instances of this class.
          */
-        var TextSupport = function () {
+        var TextRenderer = function () {
 
             // Internal use only. Intentionally not documented.
             this.canvas2D = document.createElement("canvas");
@@ -67,7 +67,7 @@ define([
          * @param {Boolean} outline Indicates whether the text includes an outline, which increases its width and height.
          * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels.
          */
-        TextSupport.prototype.textSize = function (text, font, outline) {
+        TextRenderer.prototype.textSize = function (text, font, outline) {
             if (text.length === 0) {
                 return new Vec2(0, 0);
             }
@@ -98,7 +98,7 @@ define([
          * @param {Boolean} outline Indicates whether the text is drawn with a thin black outline.
          * @returns {Texture} A texture for the specified text string and font.
          */
-        TextSupport.prototype.createTexture = function (dc, text, font, outline) {
+        TextRenderer.prototype.createTexture = function (dc, text, font, outline) {
             var gl = dc.currentGlContext,
                 ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
@@ -145,25 +145,23 @@ define([
          * @param {Font} font The font to use.
          * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels based on the passed font.
          */
-        TextSupport.prototype.getMaxLineHeight = function(font)
-        {
+        TextRenderer.prototype.getMaxLineHeight = function (font) {
             // Check underscore + capital E with acute accent
             return this.textSize("_\u00c9", font, 0)[1];
         };
 
         /**
-         * Wraps the text based on width and height using new linew delimiter
+         * Wraps the text based on width and height using new line delimiter
          * @param {String} text The text to wrap.
          * @param {Number} width The width in pixels.
          * @param {Number} height The height in pixels.
          * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextSupport.prototype.wrap = function(text, width, height, font)
-        {
+        TextRenderer.prototype.wrap = function (text, width, height, font) {
             if (!text) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.WARNING, "TextSupport", "wrap", "missing text"));
+                    Logger.logMessage(Logger.WARNING, "TextRenderer", "wrap", "missing text"));
             }
 
             var i;
@@ -172,8 +170,7 @@ define([
             var wrappedText = "";
 
             // Wrap each line
-            for (i = 0; i < lines.length; i++)
-            {
+            for (i = 0; i < lines.length; i++) {
                 lines[i] = this.wrapLine(lines[i], width, font);
             }
             // Concatenate all lines in one string with new line separators
@@ -182,21 +179,17 @@ define([
             var currentHeight = 0;
             var heightExceeded = false;
             var maxLineHeight = this.getMaxLineHeight(font);
-            for (i = 0; i < lines.length && !heightExceeded; i++)
-            {
+            for (i = 0; i < lines.length && !heightExceeded; i++) {
                 var subLines = lines[i].split("\n");
-                for (var j = 0; j < subLines.length && !heightExceeded; j++)
-                {
-                    if (height <= 0 || currentHeight + maxLineHeight <= height)
-                    {
+                for (var j = 0; j < subLines.length && !heightExceeded; j++) {
+                    if (height <= 0 || currentHeight + maxLineHeight <= height) {
                         wrappedText += subLines[j];
                         currentHeight += maxLineHeight + this.lineSpacing;
                         if (j < subLines.length - 1) {
                             wrappedText += '\n';
                         }
                     }
-                    else
-                    {
+                    else {
                         heightExceeded = true;
                     }
                 }
@@ -206,8 +199,7 @@ define([
                 }
             }
             // Add continuation string if text truncated
-            if (heightExceeded)
-            {
+            if (heightExceeded) {
                 if (wrappedText.length > 0) {
                     wrappedText = wrappedText.substring(0, wrappedText.length - 1);
                 }
@@ -225,21 +217,18 @@ define([
          * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextSupport.prototype.wrapLine = function(text, width, font)
-        {
+        TextRenderer.prototype.wrapLine = function (text, width, font) {
             var wrappedText = "";
 
             // Single line - trim leading and trailing spaces
             var source = text.trim();
             var lineBounds = this.textSize(source, font, 0);
-            if (lineBounds[0] > width)
-            {
+            if (lineBounds[0] > width) {
                 // Split single line to fit preferred width
                 var line = "";
                 var start = 0;
                 var end = source.indexOf(' ', start + 1);
-                while (start < source.length)
-                {
+                while (start < source.length) {
                     if (end == -1) {
                         end = source.length;   // last word
                     }
@@ -247,40 +236,34 @@ define([
                     // Extract a 'word' which is in fact a space and a word
                     var word = source.substring(start, end);
                     var linePlusWord = line + word;
-                    if (this.textSize(linePlusWord, font, 0)[0] <= width)
-                    {
+                    if (this.textSize(linePlusWord, font, 0)[0] <= width) {
                         // Keep adding to the current line
                         line += word;
                     }
-                    else
-                    {
+                    else {
                         // Width exceeded
-                        if (line.length != 0)
-                        {
+                        if (line.length != 0) {
                             // Finish current line and start new one
                             wrappedText += line;
                             wrappedText += '\n';
                             line = "";
                             line += word.trim();  // get read of leading space(s)
                         }
-                        else
-                        {
+                        else {
                             // Line is empty, force at least one word
                             line += word.trim();
                         }
                     }
                     // Move forward in source string
                     start = end;
-                    if (start < source.length - 1)
-                    {
+                    if (start < source.length - 1) {
                         end = source.indexOf(' ', start + 1);
                     }
                 }
                 // Gather last line
                 wrappedText += line;
             }
-            else
-            {
+            else {
                 // Line doesn't need to be wrapped
                 wrappedText += source;
             }
@@ -288,5 +271,5 @@ define([
             return wrappedText;
         };
 
-        return TextSupport;
+        return TextRenderer;
     });
