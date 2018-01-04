@@ -28,6 +28,7 @@ define([
         './cache/GpuResourceCache',
         './util/Logger',
         './navigate/LookAtNavigator',
+        './geom/Matrix',
         './navigate/NavigatorState',
         './pick/PickedObjectList',
         './geom/Rectangle',
@@ -48,6 +49,7 @@ define([
               GpuResourceCache,
               Logger,
               LookAtNavigator,
+              Matrix,
               NavigatorState,
               PickedObjectList,
               Rectangle,
@@ -644,6 +646,14 @@ define([
         };
 
         // Internal. Intentionally not documented.
+        WorldWindow.prototype.computeViewingTransform = function () {
+            var dc = this.drawContext;
+            dc.viewport = this.viewport;
+            dc.navigatorState = this.worldWindowController.currentState();
+            dc.computeViewingTransform();
+        };
+
+        // Internal. Intentionally not documented.
         WorldWindow.prototype.resetDrawContext = function () {
             this.globe.offset = 0;
 
@@ -651,7 +661,7 @@ define([
             dc.reset();
             dc.globe = this.globe;
             dc.layers = this.layers;
-            dc.navigatorState = this.worldWindowController.currentState(); // dc.navigatorState = this.navigator.currentState();
+            this.computeViewingTransform();
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
             dc.deepPicking = this.deepPicking;

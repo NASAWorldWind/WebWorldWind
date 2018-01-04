@@ -546,7 +546,7 @@ define([
 
                 var applyLighting = !dc.pickMode && this.currentData.normals && this.activeAttributes.applyLighting;
                 if (applyLighting) {
-                    dc.currentProgram.loadModelviewInverse(gl, dc.navigatorState.modelviewNormalTransform);
+                    dc.currentProgram.loadModelviewInverse(gl, dc.modelviewNormalTransform);
                 }
             }
 

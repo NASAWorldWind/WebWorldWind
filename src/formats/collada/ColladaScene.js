@@ -760,7 +760,7 @@ define([
 
             var mvpMatrix = Matrix.fromIdentity();
 
-            mvpMatrix.copy(dc.navigatorState.modelviewProjection);
+            mvpMatrix.copy(dc.modelviewProjection);
 
             mvpMatrix.multiplyMatrix(this.transformationMatrix);
 
@@ -772,7 +772,7 @@ define([
 
                 var normalMatrix = Matrix.fromIdentity();
 
-                normalMatrix.copy(dc.navigatorState.modelviewNormalTransform);
+                normalMatrix.copy(dc.modelviewNormalTransform);
 
                 normalMatrix.multiplyMatrix(this.normalMatrix);
 

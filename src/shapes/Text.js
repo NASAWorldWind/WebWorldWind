@@ -363,7 +363,7 @@ define([
             if (dc.pickingMode) {
                 return dc.pickRectangle && this.imageBounds.intersects(dc.pickRectangle);
             } else {
-                return this.imageBounds.intersects(dc.navigatorState.viewport);
+                return this.imageBounds.intersects(dc.viewport);
             }
         };
 

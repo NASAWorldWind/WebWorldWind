@@ -356,6 +356,38 @@ define([
 
             // Intentionally not documented.
             this.pixelScale = 1;
+
+            /**
+             * The concatenation of the DrawContext's model-view and projection matrices. This matrix transforms points
+             * from model coordinates to clip coordinates.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.modelviewProjection = Matrix.fromIdentity();
+
+            /**
+             * The matrix that transforms normal vectors in model coordinates to normal vectors in eye coordinates.
+             * Typically used to transform a shape's normal vectors during lighting calculations.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.modelviewNormalTransform = Matrix.fromIdentity();
+
+            // Intentionally not documented.
+            this.modelviewProjectionInv = Matrix.fromIdentity();
+
+            /**
+             * The current viewport.
+             * @type {Rectangle}
+             * @readonly
+             */
+            this.viewport = new Rectangle(0, 0, 0, 0);
+
+            // Intentionally not documented.
+            this.pixelSizeFactor = 0;
+
+            // Intentionally not documented.
+            this.pixelSizeOffset = 0;
         };
 
         // Internal use. Intentionally not documented.
@@ -821,7 +853,7 @@ define([
                 screenPoint = new Vec3(0, 0, 0),
                 pickPoint,
                 pickRectangle = this.pickRectangle,
-                viewport = this.navigatorState.viewport;
+                viewport = this.viewport;
 
             // Compute the pick rectangle if necessary.
             if (!pickRectangle) {
@@ -855,42 +887,42 @@ define([
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, lln = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, lln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, llf = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, llf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, lrn = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, lrn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, lrf = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, lrf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, uln = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, uln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, ulf = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, ulf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, urn = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, urn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.navigatorState.modelviewProjectionInv.unProject(screenPoint, this.navigatorState.viewport, urf = new Vec3(0, 0, 0));
+            this.modelviewProjectionInv.unProject(screenPoint, viewport, urf = new Vec3(0, 0, 0));
 
             va = new Vec3(ulf[0] - lln[0], ulf[1] - lln[1], ulf[2] - lln[2]);
             vb.set(uln[0] - llf[0], uln[1] - llf[1], uln[2] - llf[2]);
@@ -1248,12 +1280,11 @@ define([
             var mx = modelPoint[0],
                 my = modelPoint[1],
                 mz = modelPoint[2],
-                m = this.navigatorState.modelviewProjection,
+                m = this.modelviewProjection,
                 x = m[0] * mx + m[1] * my + m[2] * mz + m[3],
                 y = m[4] * mx + m[5] * my + m[6] * mz + m[7],
                 z = m[8] * mx + m[9] * my + m[10] * mz + m[11],
-                w = m[12] * mx + m[13] * my + m[14] * mz + m[15],
-                viewport = this.navigatorState.viewport;
+                w = m[12] * mx + m[13] * my + m[14] * mz + m[15];
 
             if (w === 0) {
                 return false;
@@ -1277,8 +1308,8 @@ define([
             z = z * 0.5 + 0.5;
 
             // Convert the X and Y coordinates from the range [0,1] to screen coordinates.
-            x = x * viewport.width + viewport.x;
-            y = y * viewport.height + viewport.y;
+            x = x * this.viewport.width + this.viewport.x;
+            y = y * this.viewport.height + this.viewport.y;
 
             result[0] = x;
             result[1] = y;
@@ -1341,8 +1372,7 @@ define([
                 x = p[0] * ex + p[1] * ey + p[2] * ez + p[3] * ew,
                 y = p[4] * ex + p[5] * ey + p[6] * ez + p[7] * ew,
                 z = p[8] * ex + p[9] * ey + p[10] * ez + p[11] * ew,
-                w = p[12] * ex + p[13] * ey + p[14] * ez + p[15] * ew,
-                viewport = this.navigatorState.viewport;
+                w = p[12] * ex + p[13] * ey + p[14] * ez + p[15] * ew;
 
             if (w === 0) {
                 return false;
@@ -1379,8 +1409,8 @@ define([
             z = z * 0.5 + 0.5;
 
             // Convert the X and Y coordinates from the range [0,1] to screen coordinates.
-            x = x * viewport.width + viewport.x;
-            y = y * viewport.height + viewport.y;
+            x = x * this.viewport.width + this.viewport.x;
+            y = y * this.viewport.height + this.viewport.y;
 
             result[0] = x;
             result[1] = y;
@@ -1415,7 +1445,7 @@ define([
             }
 
             result[0] = point[0];
-            result[1] = this.navigatorState.viewport.height - point[1];
+            result[1] = this.viewport.height - point[1];
 
             return result;
         };
@@ -1446,17 +1476,16 @@ define([
                 nearPoint = new Vec3(0, 0, 0),
                 farPoint = new Vec3(0, 0, 0);
 
-            var mvpInv = this.navigatorState.modelviewProjectionInv;
-            var viewport = this.navigatorState.viewport;
+            var mvpInv = this.modelviewProjectionInv;
 
             // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
-            if (!mvpInv.unProject(screenPoint, viewport, nearPoint)) {
+            if (!mvpInv.unProject(screenPoint, this.viewport, nearPoint)) {
                 return null;
             }
 
             // Compute the model coordinate point on the far clip plane with the xy coordinates and depth 1.
             screenPoint[2] = 1;
-            if (!mvpInv.unProject(screenPoint, viewport, farPoint)) {
+            if (!mvpInv.unProject(screenPoint, this.viewport, farPoint)) {
                 return null;
             }
 
@@ -1498,7 +1527,58 @@ define([
             // This considers only the frustum width by assuming that the frustum and viewport share the same aspect
             // ratio, so that using either the frustum width or height results in the same pixel size.
 
-            return this.navigatorState.pixelSizeScale * distance + this.navigatorState.pixelSizeOffset;
+            return this.pixelSizeFactor * distance + this.pixelSizeOffset;
+        };
+
+        // Internal. Intentionally not documented.
+        DrawContext.prototype.computeViewingTransform = function () {
+            this.modelviewProjection = Matrix.fromIdentity();
+            this.modelviewProjection.setToMultiply(this.navigatorState.projection, this.navigatorState.modelview);
+            this.modelviewProjectionInv = Matrix.fromIdentity();
+            this.modelviewProjectionInv.invertMatrix(this.modelviewProjection);
+            var projectionInv = Matrix.fromIdentity();
+            projectionInv.invertMatrix(this.navigatorState.projection);
+
+            // Compute the eye coordinate rectangles carved out of the frustum by the near and far clipping planes, and
+            // the distance between those planes and the eye point along the -Z axis. The rectangles are determined by
+            // transforming the bottom-left and top-right points of the frustum from clip coordinates to eye
+            // coordinates.
+            var nbl = new Vec3(-1, -1, -1),
+                ntr = new Vec3(+1, +1, -1),
+                fbl = new Vec3(-1, -1, +1),
+                ftr = new Vec3(+1, +1, +1);
+            // Convert each frustum corner from clip coordinates to eye coordinates by multiplying by the inverse
+            // projection matrix.
+            nbl.multiplyByMatrix(projectionInv);
+            ntr.multiplyByMatrix(projectionInv);
+            fbl.multiplyByMatrix(projectionInv);
+            ftr.multiplyByMatrix(projectionInv);
+
+            var nrRectWidth = WWMath.fabs(ntr[0] - nbl[0]),
+                frRectWidth = WWMath.fabs(ftr[0] - fbl[0]),
+                nrDistance = -nbl[2],
+                frDistance = -fbl[2];
+
+            // Compute the scale and offset used to determine the width of a pixel on a rectangle carved out of the
+            // frustum at a distance along the -Z axis in eye coordinates. These values are found by computing the scale
+            // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
+            var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
+                frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
+            this.pixelSizeFactor = frustumWidthScale / this.viewport.width;
+            this.pixelSizeOffset = frustumWidthOffset / this.viewport.height;
+
+            // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
+            // are used to support operations on navigator state.
+            var modelviewInv = Matrix.fromIdentity();
+            modelviewInv.invertOrthonormalMatrix(this.navigatorState.modelview);
+
+            /**
+             * The matrix that transforms normal vectors in model coordinates to normal vectors in eye coordinates.
+             * Typically used to transform a shape's normal vectors during lighting calculations.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.modelviewNormalTransform = Matrix.fromIdentity().setToTransposeOfMatrix(modelviewInv.upper3By3());
         };
 
         return DrawContext;

@@ -25,8 +25,7 @@ define([
         '../geom/Matrix',
         '../geom/Rectangle',
         '../geom/Vec2',
-        '../geom/Vec3',
-        '../util/WWMath'
+        '../geom/Vec3'
     ],
     function (ArgumentError,
               Frustum,
@@ -35,8 +34,7 @@ define([
               Matrix,
               Rectangle,
               Vec2,
-              Vec3,
-              WWMath) {
+              Vec3) {
         "use strict";
 
         /**
@@ -51,11 +49,11 @@ define([
          * a NavigatorState instance has no effect on the Navigator from which they came.
          * @param {Matrix} modelViewMatrix The navigator's model-view matrix.
          * @param {Matrix} projectionMatrix The navigator's projection matrix.
-         * @param {Rectangle} viewport The navigator's viewport.
+         * @param {Rectangle} vp The navigator's vp.
          * @param {Number} heading The navigator's heading.
          * @param {Number} tilt The navigator's tilt.
          */
-        var NavigatorState = function (modelViewMatrix, projectionMatrix, viewport, heading, tilt, dc) {
+        var NavigatorState = function (modelViewMatrix, projectionMatrix, vp, heading, tilt, dc) {
 
             this.dc = dc;
             /**
@@ -73,23 +71,6 @@ define([
              * @readonly
              */
             this.projection = projectionMatrix;
-
-            /**
-             * The concatenation of the navigator's model-view and projection matrices. This matrix transforms points
-             * from model coordinates to clip coordinates.
-             * @type {Matrix}
-             * @readonly
-             */
-            this.modelviewProjection = Matrix.fromIdentity();
-            this.modelviewProjection.setToMultiply(projectionMatrix, modelViewMatrix);
-
-            /**
-             * The navigator's viewport, in WebGL screen coordinates. The viewport places the origin in the bottom-left
-             * corner and has axes that extend up and to the right from the origin.
-             * @type {Rectangle}
-             * @readonly
-             */
-            this.viewport = viewport;
 
             /**
              * Indicates the number of degrees clockwise from north to which the view is directed.
@@ -131,51 +112,6 @@ define([
             this.frustumInModelCoordinates = Frustum.fromProjectionMatrix(this.projection);
             this.frustumInModelCoordinates.transformByMatrix(modelviewTranspose);
             this.frustumInModelCoordinates.normalize();
-
-            // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
-            // are used to support operations on navigator state.
-            this.modelviewInv = Matrix.fromIdentity();
-            this.modelviewInv.invertOrthonormalMatrix(this.modelview);
-            this.projectionInv = Matrix.fromIdentity();
-            this.projectionInv.invertMatrix(this.projection);
-            this.modelviewProjectionInv = Matrix.fromIdentity();
-            this.modelviewProjectionInv.invertMatrix(this.modelviewProjection);
-
-            /**
-             * The matrix that transforms normal vectors in model coordinates to normal vectors in eye coordinates.
-             * Typically used to transform a shape's normal vectors during lighting calculations.
-             * @type {Matrix}
-             * @readonly
-             */
-            this.modelviewNormalTransform = Matrix.fromIdentity().setToTransposeOfMatrix(this.modelviewInv.upper3By3());
-
-            // Compute the eye coordinate rectangles carved out of the frustum by the near and far clipping planes, and
-            // the distance between those planes and the eye point along the -Z axis. The rectangles are determined by
-            // transforming the bottom-left and top-right points of the frustum from clip coordinates to eye
-            // coordinates.
-            var nbl = new Vec3(-1, -1, -1),
-                ntr = new Vec3(+1, +1, -1),
-                fbl = new Vec3(-1, -1, +1),
-                ftr = new Vec3(+1, +1, +1);
-            // Convert each frustum corner from clip coordinates to eye coordinates by multiplying by the inverse
-            // projection matrix.
-            nbl.multiplyByMatrix(this.projectionInv);
-            ntr.multiplyByMatrix(this.projectionInv);
-            fbl.multiplyByMatrix(this.projectionInv);
-            ftr.multiplyByMatrix(this.projectionInv);
-
-            var nrRectWidth = WWMath.fabs(ntr[0] - nbl[0]),
-                frRectWidth = WWMath.fabs(ftr[0] - fbl[0]),
-                nrDistance = -nbl[2],
-                frDistance = -fbl[2];
-
-            // Compute the scale and offset used to determine the width of a pixel on a rectangle carved out of the
-            // frustum at a distance along the -Z axis in eye coordinates. These values are found by computing the scale
-            // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
-            var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
-                frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
-            this.pixelSizeScale = frustumWidthScale / viewport.width;
-            this.pixelSizeOffset = frustumWidthOffset / viewport.height;
         };
 
         return NavigatorState;

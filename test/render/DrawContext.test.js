@@ -42,6 +42,8 @@ define([
     var dummyParam = "dummy";
     var dc = new DrawContext(dummyParam);
     dc.navigatorState = new NavigatorState(modelView, projection, viewport, 0, 0, dc);
+    dc.viewport = viewport;
+    dc.computeViewingTransform();
 
     describe("DrawContext Tests", function () {
 

@@ -251,7 +251,7 @@ define([
                 return;
 
             if (this.currentTilesInvalid
-                || !this.lasTtMVP || !dc.navigatorState.modelviewProjection.equals(this.lasTtMVP)
+                || !this.lasTtMVP || !dc.modelviewProjection.equals(this.lasTtMVP)
                 || dc.globeStateKey != this.lastGlobeStateKey) {
                 this.currentTilesInvalid = false;
 
@@ -275,7 +275,7 @@ define([
 
             }
 
-            this.lasTtMVP = dc.navigatorState.modelviewProjection;
+            this.lasTtMVP = dc.modelviewProjection;
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {

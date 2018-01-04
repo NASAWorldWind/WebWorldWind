@@ -415,7 +415,7 @@ define([
          * @protected
          */
         AbstractShape.prototype.applyMvpMatrix = function (dc) {
-            this.scratchMatrix.copy(dc.navigatorState.modelviewProjection);
+            this.scratchMatrix.copy(dc.modelviewProjection);
             this.scratchMatrix.multiplyMatrix(this.currentData.transformationMatrix);
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, this.scratchMatrix);
         };

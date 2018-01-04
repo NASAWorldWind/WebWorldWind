@@ -186,14 +186,12 @@ define([
                 && this.lastVerticalExaggeration === dc.verticalExaggeration
                 && this.elevationTimestamp === lastElevationsChange
                 && this.lastModelViewProjection
-                && dc.navigatorState.modelviewProjection.equals(this.lastModelViewProjection)) {
+                && dc.modelviewProjection.equals(this.lastModelViewProjection)) {
 
                 return this.lastTerrain;
             }
 
-            var navigatorState = dc.navigatorState;
-
-            this.lastModelViewProjection = navigatorState.modelviewProjection;
+            this.lastModelViewProjection = dc.modelviewProjection;
             this.lastGlobeStateKey = dc.globeStateKey;
             this.elevationTimestamp = lastElevationsChange;
             this.lastVerticalExaggeration = dc.verticalExaggeration;
@@ -317,7 +315,7 @@ define([
             var gl = dc.currentGlContext,
                 gpuResourceCache = dc.gpuResourceCache;
 
-            this.scratchMatrix.setToMultiply(dc.navigatorState.modelviewProjection, terrainTile.transformationMatrix);
+            this.scratchMatrix.setToMultiply(dc.modelviewProjection, terrainTile.transformationMatrix);
             dc.currentProgram.loadModelviewProjection(gl, this.scratchMatrix);
 
             var vboCacheKey = dc.globeStateKey + terrainTile.tileKey,

@@ -534,8 +534,8 @@ define([
                     || (this.mustDrawLeaderLine(dc)
                         && dc.pickFrustum.intersectsSegment(this.groundPoint, this.placePoint)));
             } else {
-                return this.imageBounds.intersects(dc.navigatorState.viewport)
-                    || (this.mustDrawLabel() && this.labelBounds.intersects(dc.navigatorState.viewport))
+                return this.imageBounds.intersects(dc.viewport)
+                    || (this.mustDrawLabel() && this.labelBounds.intersects(dc.viewport))
                     || (this.mustDrawLeaderLine(dc)
                         && dc.navigatorState.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
             }
@@ -671,7 +671,7 @@ define([
                 program.loadColor(gl, dc.pickingMode ? this.pickColor :
                     this.activeAttributes.leaderLineAttributes.outlineColor);
 
-                Placemark.matrix.copy(dc.navigatorState.modelviewProjection);
+                Placemark.matrix.copy(dc.modelviewProjection);
                 program.loadModelviewProjection(gl, Placemark.matrix);
 
                 if (!this.activeAttributes.leaderLineAttributes.depthTest) {

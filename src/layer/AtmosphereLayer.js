@@ -187,7 +187,7 @@ define([
 
             program.loadVertexOrigin(gl, Vec3.ZERO);
 
-            program.loadModelviewProjection(gl, dc.navigatorState.modelviewProjection);
+            program.loadModelviewProjection(gl, dc.modelviewProjection);
 
             program.loadLightDirection(gl, this._activeLightDirection);
 
