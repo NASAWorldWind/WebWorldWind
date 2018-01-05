@@ -103,11 +103,11 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, GeographicText.placePoint);
 
-            if (!dc.navigatorState.frustumInModelCoordinates.containsPoint(GeographicText.placePoint)) {
+            if (!dc.frustumInModelCoordinates.containsPoint(GeographicText.placePoint)) {
                 return false;
             }
 
-            this.eyeDistance = this.alwaysOnTop ? 0 : dc.navigatorState.eyePoint.distanceTo(GeographicText.placePoint);
+            this.eyeDistance = this.alwaysOnTop ? 0 : dc.eyePoint.distanceTo(GeographicText.placePoint);
 
             // Compute the text's screen point in the OpenGL coordinate system of the WorldWindow by projecting its model
             // coordinate point onto the viewport. Apply a depth offset in order to cause the text to appear above nearby

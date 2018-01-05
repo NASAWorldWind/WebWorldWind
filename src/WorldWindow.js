@@ -29,8 +29,8 @@ define([
         './util/Logger',
         './navigate/LookAtNavigator',
         './geom/Matrix',
-        './navigate/NavigatorState',
         './pick/PickedObjectList',
+        './geom/Position',
         './geom/Rectangle',
         './geom/Sector',
         './shapes/SurfaceShape',
@@ -50,8 +50,8 @@ define([
               Logger,
               LookAtNavigator,
               Matrix,
-              NavigatorState,
               PickedObjectList,
+              Position,
               Rectangle,
               Sector,
               SurfaceShape,
@@ -143,7 +143,7 @@ define([
              * @type {LookAtNavigator}
              * @default [LookAtNavigator]{@link LookAtNavigator}
              */
-            this.navigator = new LookAtNavigator(this);
+            this.navigator = new LookAtNavigator();
 
             /**
              * The controller used to manipulate the globe.
@@ -647,10 +647,108 @@ define([
 
         // Internal. Intentionally not documented.
         WorldWindow.prototype.computeViewingTransform = function () {
+            this.worldWindowController.applyLimits();
             var dc = this.drawContext;
+            var navigator = dc.navigator;
+            var lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0);
+            var modelview = Matrix.fromIdentity();
+            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, this.globe);
+
+            dc.modelview = modelview;
             dc.viewport = this.viewport;
-            dc.navigatorState = this.worldWindowController.currentState();
-            dc.computeViewingTransform();
+            dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));
+
+            var globe = dc.globe,
+                globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
+                eyePos = globe.computePositionFromPoint(dc.eyePoint[0], dc.eyePoint[1], dc.eyePoint[2], new Position(0, 0, 0)),
+                eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
+                atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
+                viewport = dc.viewport;
+
+            // Set the far clip distance to the smallest value that does not clip the atmosphere.
+            // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+            // TODO horizon is not in view
+            // TODO parameterize the object altitude for horizon distance
+            var farDistance = eyeHorizon + atmosphereHorizon;
+            if (farDistance < 1e3)
+                farDistance = 1e3;
+
+            // Compute the near clip distance in order to achieve a desired depth resolution at the far clip distance.
+            // This computed distance is limited such that it does not intersect the terrain when possible and is never
+            // less than a predetermined minimum (usually one). The computed near distance automatically scales with the
+            // resolution of the WebGL depth buffer.
+            var nearDistance = WWMath.perspectiveNearDistanceForFarDistance(farDistance, 10, this.depthBits);
+
+            // Prevent the near clip plane from intersecting the terrain.
+            var distanceToSurface = eyePos.altitude - globe.elevationAtLocation(eyePos.latitude, eyePos.longitude);
+            if (distanceToSurface > 0) {
+                var maxNearDistance = WWMath.perspectiveNearDistance(viewport.width, viewport.height, distanceToSurface);
+                if (nearDistance > maxNearDistance) {
+                    nearDistance = maxNearDistance;
+                }
+            }
+
+            if (nearDistance < 1) {
+                nearDistance = 1;
+            }
+
+            // Compute the current projection matrix based on this navigator's perspective properties and the current
+            // WebGL viewport.
+            dc.projection = Matrix.fromIdentity();
+            dc.projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
+
+            dc.modelviewProjection = Matrix.fromIdentity();
+            dc.modelviewProjection.setToMultiply(dc.projection, dc.modelview);
+            dc.modelviewProjectionInv = Matrix.fromIdentity();
+            dc.modelviewProjectionInv.invertMatrix(dc.modelviewProjection);
+            var projectionInv = Matrix.fromIdentity();
+            projectionInv.invertMatrix(dc.projection);
+
+            // Compute the eye coordinate rectangles carved out of the frustum by the near and far clipping planes, and
+            // the distance between those planes and the eye point along the -Z axis. The rectangles are determined by
+            // transforming the bottom-left and top-right points of the frustum from clip coordinates to eye
+            // coordinates.
+            var nbl = new Vec3(-1, -1, -1),
+                ntr = new Vec3(+1, +1, -1),
+                fbl = new Vec3(-1, -1, +1),
+                ftr = new Vec3(+1, +1, +1);
+            // Convert each frustum corner from clip coordinates to eye coordinates by multiplying by the inverse
+            // projection matrix.
+            nbl.multiplyByMatrix(projectionInv);
+            ntr.multiplyByMatrix(projectionInv);
+            fbl.multiplyByMatrix(projectionInv);
+            ftr.multiplyByMatrix(projectionInv);
+
+            var nrRectWidth = WWMath.fabs(ntr[0] - nbl[0]),
+                frRectWidth = WWMath.fabs(ftr[0] - fbl[0]),
+                nrDistance = -nbl[2],
+                frDistance = -fbl[2];
+
+            // Compute the scale and offset used to determine the width of a pixel on a rectangle carved out of the
+            // frustum at a distance along the -Z axis in eye coordinates. These values are found by computing the scale
+            // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
+            var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
+                frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
+            dc.pixelSizeFactor = frustumWidthScale / viewport.width;
+            dc.pixelSizeOffset = frustumWidthOffset / viewport.height;
+
+            // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
+            // are used to support operations on navigator state.
+            var modelviewInv = Matrix.fromIdentity();
+            modelviewInv.invertOrthonormalMatrix(dc.modelview);
+
+            dc.modelviewNormalTransform = Matrix.fromIdentity().setToTransposeOfMatrix(modelviewInv.upper3By3());
+
+            // Compute the frustum in model coordinates. Start by computing the frustum in eye coordinates from the
+            // projection matrix, then transform this frustum to model coordinates by multiplying its planes by the
+            // transpose of the modelview matrix. We use the transpose of the modelview matrix because planes are
+            // transformed by the inverse transpose of a matrix, and we want to transform from eye coordinates to model
+            // coordinates.
+            var modelviewTranspose = Matrix.fromIdentity();
+            modelviewTranspose.setToTransposeOfMatrix(dc.modelview);
+            dc.frustumInModelCoordinates = Frustum.fromProjectionMatrix(dc.projection);
+            dc.frustumInModelCoordinates.transformByMatrix(modelviewTranspose);
+            dc.frustumInModelCoordinates.normalize();
         };
 
         // Internal. Intentionally not documented.
@@ -660,6 +758,7 @@ define([
             var dc = this.drawContext;
             dc.reset();
             dc.globe = this.globe;
+            dc.navigator = this.navigator;
             dc.layers = this.layers;
             this.computeViewingTransform();
             dc.verticalExaggeration = this.verticalExaggeration;
@@ -931,21 +1030,21 @@ define([
             this.terrainCenter = null;
             dc.globe.offset = 0;
             dc.globeStateKey = dc.globe.stateKey;
-            if (dc.globe.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)) {
+            if (dc.globe.intersectsFrustum(dc.frustumInModelCoordinates)) {
                 this.terrainCenter = dc.globe.tessellator.tessellate(dc);
             }
 
             this.terrainRight = null;
             dc.globe.offset = 1;
             dc.globeStateKey = dc.globe.stateKey;
-            if (dc.globe.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)) {
+            if (dc.globe.intersectsFrustum(dc.frustumInModelCoordinates)) {
                 this.terrainRight = dc.globe.tessellator.tessellate(dc);
             }
 
             this.terrainLeft = null;
             dc.globe.offset = -1;
             dc.globeStateKey = dc.globe.stateKey;
-            if (dc.globe.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)) {
+            if (dc.globe.intersectsFrustum(dc.frustumInModelCoordinates)) {
                 this.terrainLeft = dc.globe.tessellator.tessellate(dc);
             }
         };

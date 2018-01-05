@@ -201,8 +201,7 @@ define([
                     y2 = navigator.beginPoint[1] + ty;
                 navigator.lastPoint.set(x2, y2);
 
-                var navState = this.currentState(),
-                    globe = this.wwd.globe,
+                var globe = this.wwd.globe,
                     ray = this.wwd.drawContext.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
                     point1 = new Vec3(0, 0, 0),
                     point2 = new Vec3(0, 0, 0),
@@ -218,7 +217,7 @@ define([
 
                 // Transform the original navigator state's modelview matrix to account for the gesture's change.
                 var modelview = Matrix.fromIdentity();
-                modelview.copy(navState.modelview);
+                modelview.copy(this.wwd.drawContext.modelview);
                 modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
 
                 // Compute the globe point at the screen center from the perspective of the transformed navigator state.
@@ -347,7 +346,7 @@ define([
             this.wwd.redraw();
         };
 
-        // Intentionally not documented.
+        // Documented in super-class.
         BasicWorldWindowController.prototype.applyLimits = function () {
             var navigator = this.wwd.navigator;
 
@@ -378,21 +377,6 @@ define([
                 // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
                 navigator.tilt = 0;
             }
-        };
-
-        // Intentionally not documented.
-        // TODO: Refactor into other classes
-        BasicWorldWindowController.prototype.currentState = function () {
-            var navigator = this.wwd.navigator;
-
-            this.applyLimits();
-
-            var globe = this.wwd.globe,
-                lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0),
-                modelview = Matrix.fromIdentity();
-            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
-
-            return navigator.currentStateForModelview(modelview);
         };
 
         return BasicWorldWindowController;

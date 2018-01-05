@@ -33,10 +33,9 @@ define([
          * @augments Navigator
          * @classdesc Represents a navigator containing the required variables to enable the user to pan, zoom and tilt
          * the globe.
-         * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
-        var LookAtNavigator = function (worldWindow) {
-            Navigator.call(this, worldWindow);
+        var LookAtNavigator = function () {
+            Navigator.call(this);
 
             /**
              * The geographic location at the center of the viewport.

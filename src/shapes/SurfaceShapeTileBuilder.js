@@ -27,7 +27,6 @@ define([
         '../util/Logger',
         '../geom/Matrix',
         '../cache/MemoryCache',
-        '../navigate/NavigatorState',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
         '../geom/Rectangle',
@@ -50,7 +49,6 @@ define([
               Logger,
               Matrix,
               MemoryCache,
-              NavigatorState,
               NotYetImplementedError,
               PickedObject,
               Rectangle,
@@ -507,7 +505,7 @@ define([
 
             tile.update(dc);
 
-            return tile.extent.intersectsFrustum(dc.pickingMode ? dc.pickFrustum : dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.pickingMode ? dc.pickFrustum : dc.frustumInModelCoordinates);
         };
 
         /**

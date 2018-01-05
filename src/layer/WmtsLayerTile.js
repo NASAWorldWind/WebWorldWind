@@ -132,7 +132,7 @@ define([
 
         WmtsLayerTile.prototype.mustSubdivide = function (dc, detailFactor) {
             var cellSize = dc.globe.equatorialRadius * this.texelSize,
-                distance = this.distanceTo(dc.navigatorState.eyePoint),
+                distance = this.distanceTo(dc.eyePoint),
                 pixelSize = dc.pixelSizeAtDistance(distance);
 
             return cellSize > Math.max(detailFactor * pixelSize, 0.5);

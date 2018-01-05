@@ -91,7 +91,7 @@ define([
         var boundingBoxForRegion = new BoundingBox();
         boundingBoxForRegion.setToSector(new Sector(box.kmlSouth, box.kmlNorth, box.kmlWest, box.kmlEast), dc.globe, box.kmlMinAltitude, box.kmlMaxAltitude);
 
-        return boundingBoxForRegion.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)&&
+        return boundingBoxForRegion.intersectsFrustum(dc.frustumInModelCoordinates)&&
             (!box.kmlMinAltitude || dc.eyePosition.altitude > box.kmlMinAltitude) &&
             (!box.kmlMaxAltitude || dc.eyePosition.altitude < box.kmlMaxAltitude);
     };

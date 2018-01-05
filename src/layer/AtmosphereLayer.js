@@ -183,7 +183,7 @@ define([
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
-            program.loadEyePoint(gl, dc.navigatorState.eyePoint);
+            program.loadEyePoint(gl, dc.eyePoint);
 
             program.loadVertexOrigin(gl, Vec3.ZERO);
 
@@ -215,7 +215,7 @@ define([
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
-            program.loadEyePoint(gl, dc.navigatorState.eyePoint);
+            program.loadEyePoint(gl, dc.eyePoint);
 
             program.loadLightDirection(gl, this._activeLightDirection);
 
@@ -320,7 +320,7 @@ define([
                 dc.globe.computePointFromLocation(sunLocation.latitude, sunLocation.longitude,
                     this._activeLightDirection);
             } else {
-                this._activeLightDirection.copy(dc.navigatorState.eyePoint);
+                this._activeLightDirection.copy(dc.eyePoint);
             }
             this._activeLightDirection.normalize();
         };

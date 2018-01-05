@@ -998,7 +998,7 @@ define([
          * into screen coordinates without modification. A point's xy coordinates are interpreted as literal screen
          * coordinates and must be in the viewport to be visible. A point's z coordinate is interpreted as a depth value
          * that ranges from 0 to 1. Additionally, the screen projection matrix preserves the depth value returned by
-         * [NavigatorState.project]{@link NavigatorState#project}.
+         * [DrawContext.project]{@link DrawContext#project}.
          *
          * @param {Number} viewportWidth The viewport width, in screen coordinates.
          * @param {Number} viewportHeight The viewport height, in screen coordinates.
@@ -1222,7 +1222,7 @@ define([
          * it is reasonable to apply a depth offset to an orthographic projection, the effect is most appropriate when
          * applied to the projection used to draw the scene. For example, when an object's coordinates are projected by
          * a perspective projection into screen coordinates then drawn using an orthographic projection, it is best to
-         * apply the offset to the original perspective projection. The method [NavigatorState.project]{@link NavigatorState#project} performs the
+         * apply the offset to the original perspective projection. The method [DrawContext.project]{@link DrawContext#project} performs the
          * correct behavior for the projection type used to draw the scene.
          *
          * @param {Number} depthOffset The amount of offset to apply.

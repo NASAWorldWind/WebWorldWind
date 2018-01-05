@@ -27,7 +27,6 @@ define([
         '../util/Logger',
         '../geom/Matrix',
         '../cache/MemoryCache',
-        '../navigate/NavigatorState',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
         '../geom/Position',
@@ -50,7 +49,6 @@ define([
               Logger,
               Matrix,
               MemoryCache,
-              NavigatorState,
               NotYetImplementedError,
               PickedObject,
               Position,
@@ -942,7 +940,7 @@ define([
                 return false;
             }
 
-            return tile.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.frustumInModelCoordinates);
         };
 
         Tessellator.prototype.tileMeetsRenderCriteria = function (dc, tile) {

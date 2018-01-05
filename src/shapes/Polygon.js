@@ -347,7 +347,7 @@ define([
         // Private. Intentionally not documented.
         Polygon.prototype.computeBoundaryPoints = function (dc, boundaries) {
             var eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 boundaryPoints = [],
                 stride = this._extrude ? 6 : 3,
                 pt = new Vec3(0, 0, 0),

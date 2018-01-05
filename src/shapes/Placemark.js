@@ -427,7 +427,7 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
-            this.eyeDistance = this.alwaysOnTop ? 0 : dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = this.alwaysOnTop ? 0 : dc.eyePoint.distanceTo(this.placePoint);
 
             if (this.mustDrawLeaderLine(dc)) {
                 dc.surfacePointForMode(this.position.latitude, this.position.longitude, 0,
@@ -537,7 +537,7 @@ define([
                 return this.imageBounds.intersects(dc.viewport)
                     || (this.mustDrawLabel() && this.labelBounds.intersects(dc.viewport))
                     || (this.mustDrawLeaderLine(dc)
-                        && dc.navigatorState.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
+                        && dc.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
             }
         };
 
@@ -706,7 +706,7 @@ define([
             Placemark.matrix.multiplyMatrix(this.imageTransform);
 
             var actualRotation = this.imageRotationReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigatorState.heading - this.imageRotation : -this.imageRotation;
+                dc.navigator.heading - this.imageRotation : -this.imageRotation;
             Placemark.matrix.multiplyByTranslation(0.5, 0.5, 0);
             Placemark.matrix.multiplyByRotation(0, 0, 1, actualRotation);
             Placemark.matrix.multiplyByTranslation(-0.5, -0.5, 0);
@@ -714,7 +714,7 @@ define([
             // Perform the tilt before applying the rotation so that the image tilts back from its base into
             // the view volume.
             var actualTilt = this.imageTiltReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigatorState.tilt + this.imageTilt : this.imageTilt;
+                dc.navigator.tilt + this.imageTilt : this.imageTilt;
             Placemark.matrix.multiplyByRotation(-1, 0, 0, actualTilt);
 
             program.loadModelviewProjection(gl, Placemark.matrix);

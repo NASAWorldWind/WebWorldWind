@@ -509,10 +509,10 @@ define([
 
                 if (intersectionPoints.length > 1) {
                     // Find the intersection nearest the eye point.
-                    var distance2 = iPoint.distanceToSquared(dc.navigatorState.eyePoint);
+                    var distance2 = iPoint.distanceToSquared(dc.eyePoint);
 
                     for (var i = 1; i < intersectionPoints.length; i++) {
-                        var d2 = intersectionPoints[i].distanceToSquared(dc.navigatorState.eyePoint);
+                        var d2 = intersectionPoints[i].distanceToSquared(dc.eyePoint);
                         if (d2 < distance2) {
                             distance2 = d2;
                             iPoint = intersectionPoints[i];

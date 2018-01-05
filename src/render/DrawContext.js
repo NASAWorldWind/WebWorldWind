@@ -30,7 +30,6 @@ define([
         '../geom/Line',
         '../util/Logger',
         '../geom/Matrix',
-        '../navigate/NavigatorState',
         '../pick/PickedObjectList',
         '../geom/Plane',
         '../geom/Position',
@@ -58,7 +57,6 @@ define([
               Line,
               Logger,
               Matrix,
-              NavigatorState,
               PickedObjectList,
               Plane,
               Position,
@@ -237,16 +235,17 @@ define([
             this.currentLayer = null;
 
             /**
-             * The current state of the associated navigator.
-             * @type {NavigatorState}
-             */
-            this.navigatorState = null;
-
-            /**
              * The current eye position.
              * @type {Position}
              */
             this.eyePosition = new Position(0, 0, 0);
+
+            /**
+             * The eye point in model coordinates, relative to the globe's center.
+             * @type {Vec3}
+             * @readonly
+             */
+            this.eyePoint = new Vec3(0, 0, 0);
 
             /**
              * The current screen projection matrix.
@@ -357,6 +356,25 @@ define([
             // Intentionally not documented.
             this.pixelScale = 1;
 
+            // TODO: replace with camera in the next phase of navigator refactoring
+            this.navigator = null;
+
+            /**
+             * The navigator's model-view matrix. The model-view matrix transforms points from model coordinates to eye
+             * coordinates.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.modelview = Matrix.fromIdentity();
+
+            /**
+             * The projection matrix. The projection matrix transforms points from eye coordinates to clip
+             * coordinates.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.projection = Matrix.fromIdentity();
+
             /**
              * The concatenation of the DrawContext's model-view and projection matrices. This matrix transforms points
              * from model coordinates to clip coordinates.
@@ -364,6 +382,15 @@ define([
              * @readonly
              */
             this.modelviewProjection = Matrix.fromIdentity();
+
+            /**
+             * The viewing frustum in model coordinates. The frustum originates at the eyePoint and extends
+             * outward along the forward vector. The navigator's near distance and far distance identify the minimum and
+             * maximum distance, respectively, at which an object in the scene is visible.
+             * @type {Frustum}
+             * @readonly
+             */
+            this.frustumInModelCoordinates = null;
 
             /**
              * The matrix that transforms normal vectors in model coordinates to normal vectors in eye coordinates.
@@ -420,7 +447,6 @@ define([
             this.globeStateKey = null;
             this.layers = null;
             this.currentLayer = null;
-            this.navigatorState = null;
             this.terrain = null;
             this.verticalExaggeration = 1;
             this.frameStatistics = null;
@@ -436,6 +462,15 @@ define([
             this.pickFrustum = null;
             this.pickColor = new Color(0, 0, 0, 1);
             this.objectsAtPickPoint.clear();
+
+            this.eyePoint.set(0,0,0);
+            this.modelview.setToIdentity();
+            this.projection.setToIdentity();
+            this.modelviewProjection.setToIdentity();
+            this.frustumInModelCoordinates = null;
+            this.modelviewNormalTransform.setToIdentity();
+            this.modelviewProjectionInv.setToIdentity();
+            this.viewport.set(0, 0, 0, 0);
         };
 
         /**
@@ -444,7 +479,7 @@ define([
          */
         DrawContext.prototype.update = function () {
             var gl = this.currentGlContext,
-                eyePoint = this.navigatorState.eyePoint;
+                eyePoint = this.eyePoint;
 
             this.globeStateKey = this.globe.stateKey;
             this.globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], this.eyePosition);
@@ -977,7 +1012,7 @@ define([
                 return false;
             }
 
-            var distance = this.navigatorState.eyePoint.distanceTo(extent.center),
+            var distance = this.eyePoint.distanceTo(extent.center),
                 pixelSize = this.pixelSizeAtDistance(distance);
 
             return (2 * extent.radius) < (numPixels * pixelSize); // extent diameter less than size of num pixels
@@ -1361,14 +1396,14 @@ define([
             var mx = modelPoint[0],
                 my = modelPoint[1],
                 mz = modelPoint[2],
-                m = this.navigatorState.modelview,
+                m = this.modelview,
                 ex = m[0] * mx + m[1] * my + m[2] * mz + m[3],
                 ey = m[4] * mx + m[5] * my + m[6] * mz + m[7],
                 ez = m[8] * mx + m[9] * my + m[10] * mz + m[11],
                 ew = m[12] * mx + m[13] * my + m[14] * mz + m[15];
 
             // Transform the point from eye coordinates to clip coordinates.
-            var p = this.navigatorState.projection,
+            var p = this.projection,
                 x = p[0] * ex + p[1] * ey + p[2] * ez + p[3] * ew,
                 y = p[4] * ex + p[5] * ey + p[6] * ez + p[7] * ew,
                 z = p[8] * ex + p[9] * ey + p[10] * ez + p[11] * ew,
@@ -1489,7 +1524,7 @@ define([
                 return null;
             }
 
-            var eyePoint = this.navigatorState.eyePoint;
+            var eyePoint = this.eyePoint;
 
             // Compute a ray originating at the eye point and with direction pointing from the xy coordinate on the near
             // plane to the same xy coordinate on the far plane.
@@ -1528,57 +1563,6 @@ define([
             // ratio, so that using either the frustum width or height results in the same pixel size.
 
             return this.pixelSizeFactor * distance + this.pixelSizeOffset;
-        };
-
-        // Internal. Intentionally not documented.
-        DrawContext.prototype.computeViewingTransform = function () {
-            this.modelviewProjection = Matrix.fromIdentity();
-            this.modelviewProjection.setToMultiply(this.navigatorState.projection, this.navigatorState.modelview);
-            this.modelviewProjectionInv = Matrix.fromIdentity();
-            this.modelviewProjectionInv.invertMatrix(this.modelviewProjection);
-            var projectionInv = Matrix.fromIdentity();
-            projectionInv.invertMatrix(this.navigatorState.projection);
-
-            // Compute the eye coordinate rectangles carved out of the frustum by the near and far clipping planes, and
-            // the distance between those planes and the eye point along the -Z axis. The rectangles are determined by
-            // transforming the bottom-left and top-right points of the frustum from clip coordinates to eye
-            // coordinates.
-            var nbl = new Vec3(-1, -1, -1),
-                ntr = new Vec3(+1, +1, -1),
-                fbl = new Vec3(-1, -1, +1),
-                ftr = new Vec3(+1, +1, +1);
-            // Convert each frustum corner from clip coordinates to eye coordinates by multiplying by the inverse
-            // projection matrix.
-            nbl.multiplyByMatrix(projectionInv);
-            ntr.multiplyByMatrix(projectionInv);
-            fbl.multiplyByMatrix(projectionInv);
-            ftr.multiplyByMatrix(projectionInv);
-
-            var nrRectWidth = WWMath.fabs(ntr[0] - nbl[0]),
-                frRectWidth = WWMath.fabs(ftr[0] - fbl[0]),
-                nrDistance = -nbl[2],
-                frDistance = -fbl[2];
-
-            // Compute the scale and offset used to determine the width of a pixel on a rectangle carved out of the
-            // frustum at a distance along the -Z axis in eye coordinates. These values are found by computing the scale
-            // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
-            var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
-                frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
-            this.pixelSizeFactor = frustumWidthScale / this.viewport.width;
-            this.pixelSizeOffset = frustumWidthOffset / this.viewport.height;
-
-            // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
-            // are used to support operations on navigator state.
-            var modelviewInv = Matrix.fromIdentity();
-            modelviewInv.invertOrthonormalMatrix(this.navigatorState.modelview);
-
-            /**
-             * The matrix that transforms normal vectors in model coordinates to normal vectors in eye coordinates.
-             * Typically used to transform a shape's normal vectors during lighting calculations.
-             * @type {Matrix}
-             * @readonly
-             */
-            this.modelviewNormalTransform = Matrix.fromIdentity().setToTransposeOfMatrix(modelviewInv.upper3By3());
         };
 
         return DrawContext;

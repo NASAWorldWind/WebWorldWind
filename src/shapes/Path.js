@@ -313,7 +313,7 @@ define([
         // Private. Intentionally not documented.
         Path.prototype.makeTessellatedPositions = function (dc) {
             var tessellatedPositions = [],
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 showVerticals = this.mustDrawVerticals(dc),
                 ptA = new Vec3(0, 0, 0),
                 ptB = new Vec3(0, 0, 0),
@@ -356,7 +356,7 @@ define([
 
         // Private. Intentionally not documented.
         Path.prototype.makeSegment = function (dc, posA, posB, ptA, ptB, tessellatedPositions) {
-            var eyePoint = dc.navigatorState.eyePoint,
+            var eyePoint = dc.eyePoint,
                 pos = new Location(0, 0),
                 height = 0,
                 arcLength, segmentAzimuth, segmentDistance, s, p, distance;
@@ -440,7 +440,7 @@ define([
         Path.prototype.computeRenderedPath = function (dc, tessellatedPositions) {
             var capturePoles = this.mustDrawInterior(dc) || this.mustDrawVerticals(dc),
                 eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 numPoints = (capturePoles ? 2 : 1) * tessellatedPositions.length,
                 tessellatedPoints = new Float32Array(numPoints * 3),
                 stride = capturePoles ? 6 : 3,

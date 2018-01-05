@@ -72,8 +72,8 @@ define([
          */
         Compass.prototype.render = function (dc) {
             // Capture the navigator's heading and tilt and apply it to the compass' screen image.
-            this.imageRotation = dc.navigatorState.heading;
-            this.imageTilt = dc.navigatorState.tilt;
+            this.imageRotation = dc.navigator.heading;
+            this.imageTilt = dc.navigator.tilt;
 
             var t = this.getActiveTexture(dc);
             if (t) {
