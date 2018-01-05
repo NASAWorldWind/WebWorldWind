@@ -470,7 +470,6 @@ define([
             this.frustumInModelCoordinates = null;
             this.modelviewNormalTransform.setToIdentity();
             this.modelviewProjectionInv.setToIdentity();
-            this.viewport.set(0, 0, 0, 0);
         };
 
         /**

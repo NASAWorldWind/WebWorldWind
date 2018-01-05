@@ -22,6 +22,7 @@ define([
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
+        './geom/Frustum',
         './globe/Globe',
         './globe/Globe2D',
         './util/GoToAnimator',
@@ -36,13 +37,16 @@ define([
         './shapes/SurfaceShape',
         './shapes/SurfaceShapeTileBuilder',
         './globe/Terrain',
-        './geom/Vec2'
+        './geom/Vec2',
+        './geom/Vec3',
+        './util/WWMath'
     ],
     function (ArgumentError,
               BasicWorldWindowController,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
+              Frustum,
               Globe,
               Globe2D,
               GoToAnimator,
@@ -57,7 +61,9 @@ define([
               SurfaceShape,
               SurfaceShapeTileBuilder,
               Terrain,
-              Vec2) {
+              Vec2,
+              Vec3,
+              WWMath) {
         "use strict";
 
         /**
@@ -652,14 +658,14 @@ define([
             var navigator = dc.navigator;
             var lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0);
             var modelview = Matrix.fromIdentity();
-            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, this.globe);
+            var globe = dc.globe;
+            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
 
             dc.modelview = modelview;
             dc.viewport = this.viewport;
             dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));
 
-            var globe = dc.globe,
-                globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
+            var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
                 eyePos = globe.computePositionFromPoint(dc.eyePoint[0], dc.eyePoint[1], dc.eyePoint[2], new Position(0, 0, 0)),
                 eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
                 atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
