@@ -8,6 +8,7 @@ define([
     "use strict";
     describe("TextRenderer tests", function () {
 
+        // Mock TextRenderer.textSize() to avoid 2D context requirement.
         TextRenderer.prototype.textSize = function (text, font, outline) {
             return new Vec2(10, 50);
         };
