@@ -27,20 +27,20 @@ define([
 
         it("Should output '...' due to wrap height being less than textSize height", function () {
             var mockTextRenderer = new TextRenderer();
-            var wrappedText = mockTextRenderer.wrap(testText, testText.length, 15, myFont);
+            var wrappedText = mockTextRenderer.wrap(testText, 92, 15, myFont);
             expect(wrappedText).toEqual("...");
         });
 
         it("Should output 'Lorem ipsum...' due to wrap width being less than textSize width", function () {
             var mockTextRenderer = new TextRenderer();
-            var wrappedText = mockTextRenderer.wrap(testText, testText.length, 16, myFont);
+            var wrappedText = mockTextRenderer.wrap(testText, 90, 16, myFont);
             expect(wrappedText).toEqual("Lorem ipsum...");
         });
 
         it("Should output every word on testText in different lines", function () {
             var mockTextRenderer = new TextRenderer();
             // Wrap line width less than textSize texture width
-            var wrappedLines = mockTextRenderer.wrapLine(testText, 9, null, myFont);
+            var wrappedLines = mockTextRenderer.wrapLine(testText, 0, myFont);
             expect(wrappedLines).toEqual("Lorem\n" +
                 "ipsum\n" +
                 "dolor\n" +
