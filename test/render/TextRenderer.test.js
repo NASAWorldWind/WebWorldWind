@@ -10,7 +10,7 @@ define([
 
         // Mock TextRenderer.textSize() to avoid 2D context requirement.
         TextRenderer.prototype.textSize = function (text, font, outline) {
-            return new Vec2(10, 50);
+            return new Vec2(text.length * 7, 16);
         };
 
         var testText = "Lorem ipsum dolor sit amet, consectetur "
@@ -27,14 +27,14 @@ define([
 
         it("Should output '...' due to wrap height being less than textSize height", function () {
             var mockTextRenderer = new TextRenderer();
-            var wrappedText = mockTextRenderer.wrap(testText, 10, 49, myFont);
+            var wrappedText = mockTextRenderer.wrap(testText, testText.length, 15, myFont);
             expect(wrappedText).toEqual("...");
         });
 
-        it("Should output 'Lorem...' due to wrap width being less than textSize width", function () {
+        it("Should output 'Lorem ipsum...' due to wrap width being less than textSize width", function () {
             var mockTextRenderer = new TextRenderer();
-            var wrappedText = mockTextRenderer.wrap(testText, 9, 50, myFont);
-            expect(wrappedText).toEqual("Lorem...");
+            var wrappedText = mockTextRenderer.wrap(testText, testText.length, 16, myFont);
+            expect(wrappedText).toEqual("Lorem ipsum...");
         });
 
         it("Should output every word on testText in different lines", function () {
