@@ -46,14 +46,6 @@ define([
         expectVec3CloseTo(p1.normal, p2.normal);
     };
 
-    // var modelView = new Matrix(
-    //     -0.342, 0, 0.939, 2.328e-10,
-    //     0.469, 0.866, 0.171, 18504.137,
-    //     -0.813, 0.500, -0.296, -16372797.555,
-    //     0, 0, 0, 1
-    // );
-    //
-
     var MockGlContext=function() {
         this.drawingBufferWidth=800;
         this.drawingBufferHeight=800;
