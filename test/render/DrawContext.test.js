@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 define([
+    'src/BasicWorldWindowController',
     'src/render/DrawContext',
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
     'src/geom/Matrix',
-    'src/navigate/Navigator',
+    'src/navigate/LookAtNavigator',
+    'src/geom/Plane',
     'src/geom/Rectangle',
     'src/geom/Vec2',
     'src/geom/Vec3',
     'src/WorldWind',
     'src/WorldWindow'
-], function (DrawContext, EarthElevationModel, Globe, Matrix, Navigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
+], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Matrix, LookAtNavigator, Plane, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
 
     var expectMatrixCloseTo = function (matrix1, matrix2) {
@@ -44,23 +46,22 @@ define([
         expectVec3CloseTo(p1.normal, p2.normal);
     };
 
-    var modelView = new Matrix(
-        -0.342, 0, 0.939, 2.328e-10,
-        0.469, 0.866, 0.171, 18504.137,
-        -0.813, 0.500, -0.296, -16372797.555,
-        0, 0, 0, 1
-    );
+    // var modelView = new Matrix(
+    //     -0.342, 0, 0.939, 2.328e-10,
+    //     0.469, 0.866, 0.171, 18504.137,
+    //     -0.813, 0.500, -0.296, -16372797.555,
+    //     0, 0, 0, 1
+    // );
+    //
 
-    var projection = new Matrix(
-        2, 0, 0, 0,
-        0, 2, 0, 0,
-        0, 0, -1.196, -3254427.538,
-        0, 0, -1, 0
-    );
+    var MockGlContext=function() {
+        this.drawingBufferWidth=800;
+        this.drawingBufferHeight=800;
+    };
 
     var viewport = new Rectangle(0, 0, 848, 848);
     var dummyParam = "dummy";
-    var dc = new DrawContext(dummyParam);
+    var dc = new DrawContext(new MockGlContext());
     var MockWorldWindow = function () {
     };
 
@@ -73,16 +74,33 @@ define([
     };
     var mockGlobe = new Globe(new EarthElevationModel());
     var wwd = new MockWorldWindow();
-    wwd.globe=mockGlobe;
-    wwd.drawContext=dc;
-    wwd.navigator=new Navigator();
+    wwd.globe = mockGlobe;
+    wwd.drawContext = dc;
+    wwd.navigator = new LookAtNavigator();
+    wwd.worldWindowController = new BasicWorldWindowController(wwd);
+    wwd.viewport = viewport;
     wwd.resetDrawContext();
 
     describe("DrawContext Tests", function () {
 
         describe("Calculates correct view transforms", function () {
             it("Computes the correct transform", function () {
-                // frustum in model coordinates
+                var expectedModelview = new Matrix(
+                    -0.342, 0, 0.939, 2.328e-10,
+                    0.469, 0.866, 0.171, 18504.137,
+                    -0.813, 0.500, -0.296, -16372797.555,
+                    0, 0, 0, 1
+                );
+                expectMatrixCloseTo(dc.modelview, expectedModelview);
+
+                var expectedProjection = new Matrix(
+                    2, 0, 0, 0,
+                    0, 2, 0, 0,
+                    0, 0, -1.196, -3254427.538,
+                    0, 0, -1, 0
+                );
+                expectMatrixCloseTo(dc.projection, expectedProjection);
+
                 var expectedMvp = new Matrix(
                     -0.684, 0, 1.878, 4.656e-10,
                     0.938, 1.732, 0.342, 37008.274,
@@ -104,22 +122,22 @@ define([
                 expect(dc.pixelSizeOffset).toBeCloseTo(0, 5);
 
                 var expectedBottom = new Plane(0.784, 0.551, 0.286, 7345398.414);
-                expectPlaneCloseTo(dc.frustumInModelCoordinates._bottom,expectedBottom);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._bottom, expectedBottom);
 
                 var expectedFar = new Plane(-0.814, 0.5, -0.296, 231588.485);
-                expectPlaneCloseTo(dc.frustumInModelCoordinates._far,expectedFar);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._far, expectedFar);
 
                 var expectedLeft = new Plane(0.058, -0.224, 0.973, 7327329.45);
-                expectPlaneCloseTo(dc.frustumInModelCoordinates._left,expectedLeft);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._left, expectedLeft);
 
                 var expectedNear = new Plane(0.814, -0.5, 0.296, 14901364.249);
-                expectPlaneCloseTo(dc.frustumInModelCoordinates._near,expectedNear);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._near, expectedNear);
 
                 var expectedRight = new Plane(0.67, -0.224, -0.708, 7326730.765);
-                expectPlaneCloseTo(dc.frustumInModelCoordinates._right,expectedRight);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._right, expectedRight);
 
                 var expectedTop = new Plane(-0.056, -0.998, -0.021, 7305904.873);
-                expectPlaneCloseTo(dc.frustumInModelCoordinates._top,expectedTop);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._top, expectedTop);
             });
         });
 
