@@ -46,9 +46,9 @@ define([
         expectVec3CloseTo(p1.normal, p2.normal);
     };
 
-    var MockGlContext=function() {
-        this.drawingBufferWidth=800;
-        this.drawingBufferHeight=800;
+    var MockGlContext = function () {
+        this.drawingBufferWidth = 800;
+        this.drawingBufferHeight = 800;
     };
 
     var viewport = new Rectangle(0, 0, 848, 848);
@@ -78,17 +78,17 @@ define([
         describe("Calculates correct view transforms", function () {
             it("Computes the correct transform", function () {
                 var expectedModelview = new Matrix(
-                    -0.342, 0, 0.939, 2.328e-10,
-                    0.469, 0.866, 0.171, 18504.137,
-                    -0.813, 0.500, -0.296, -16372797.555,
+                    -0.342, 0, 0.940, 2.328e-10,
+                    0.470, 0.866, 0.171, 18504.138,
+                    -0.814, 0.500, -0.296, -16372797.556,
                     0, 0, 0, 1
                 );
                 expectMatrixCloseTo(dc.modelview, expectedModelview);
 
                 var expectedProjection = new Matrix(
                     2, 0, 0, 0,
-                    0, 2, 0, 0,
-                    0, 0, -1.196, -3254427.538,
+                    0, 2.000, 0, 0,
+                    0, 0, -1.197, -3254427.539,
                     0, 0, -1, 0
                 );
                 expectMatrixCloseTo(dc.projection, expectedProjection);
