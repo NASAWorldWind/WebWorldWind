@@ -1222,64 +1222,64 @@ define([
             expect(matrix[14]).toEqual(9);
             expect(matrix[15]).toEqual(10);
         });
-    });
 
-    describe("unProject rejects null parameters", function () {
-        it("Should throw an exception on missing input parameter", function () {
-            expect(function () {
-                var m = Matrix.fromIdentity();
-                var dummyParam = "dummy";
-                m.unProject(null, dummyParam, dummyParam);
-            }).toThrow();
+        describe("unProject rejects null parameters", function () {
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(null, dummyParam, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(dummyParam, null, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing output variable", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(dummyParam, dummyParam, null);
+                }).toThrow();
+            });
         });
 
-        it("Should throw an exception on missing input parameter", function () {
-            expect(function () {
-                var m = Matrix.fromIdentity();
-                var dummyParam = "dummy";
-                m.unProject(dummyParam, null, dummyParam);
-            }).toThrow();
-        });
+        describe("Correctly converts screen coordinates to model coordinates", function () {
 
-        it("Should throw an exception on missing output variable", function () {
-            expect(function () {
-                var m = Matrix.fromIdentity();
-                var dummyParam = "dummy";
-                m.unProject(dummyParam, dummyParam, null);
-            }).toThrow();
-        });
-    });
+            it("unProjects correctly", function () {
+                var modelView = new Matrix(
+                    -0.342, 0, 0.939, 2.328e-10,
+                    0.469, 0.866, 0.171, 18504.137,
+                    -0.813, 0.500, -0.296, -16372797.555,
+                    0, 0, 0, 1
+                );
 
-    describe("Correctly converts screen coordinates to model coordinates", function () {
+                var projection = new Matrix(
+                    2, 0, 0, 0,
+                    0, 2, 0, 0,
+                    0, 0, -1.196, -3254427.538,
+                    0, 0, -1, 0
+                );
 
-        it("unProjects correctly", function () {
-            var modelView = new Matrix(
-                -0.342, 0, 0.939, 2.328e-10,
-                0.469, 0.866, 0.171, 18504.137,
-                -0.813, 0.500, -0.296, -16372797.555,
-                0, 0, 0, 1
-            );
+                var modelviewProjection = Matrix.fromIdentity();
+                modelviewProjection.setToMultiply(projection, modelView);
+                var modelviewProjectionInv = Matrix.fromIdentity();
+                modelviewProjectionInv.invertMatrix(modelviewProjection);
+                var viewport = new Rectangle(0, 0, 848, 848);
+                var screenPoint = new Vec3(637.5, 839, 0);
+                var result = new Vec3(0, 0, 0);
+                var expectedResult = new Vec3(-11925849.053, 8054028.030, -3946244.954);
+                modelviewProjectionInv.unProject(screenPoint, viewport, result);
+                for (var i = 0; i < 3; i++) {
+                    expect(result[i]).toBeCloseTo(expectedResult[i], 3);
+                }
 
-            var projection = new Matrix(
-                2, 0, 0, 0,
-                0, 2, 0, 0,
-                0, 0, -1.196, -3254427.538,
-                0, 0, -1, 0
-            );
-
-            var modelviewProjection = Matrix.fromIdentity();
-            modelviewProjection.setToMultiply(projection, modelView);
-            var modelviewProjectionInv = Matrix.fromIdentity();
-            modelviewProjectionInv.invertMatrix(modelviewProjection);
-            var viewport = new Rectangle(0, 0, 848, 848);
-            var screenPoint = new Vec3(637.5, 839, 0);
-            var result = new Vec3(0, 0, 0);
-            var expectedResult = new Vec3(-11925849.053, 8054028.030, -3946244.954);
-            modelviewProjectionInv.unProject(screenPoint, viewport, result);
-            for (var i = 0; i < 3; i++) {
-                expect(result[i]).toBeCloseTo(expectedResult[i], 3);
-            }
-
+            });
         });
     });
 });

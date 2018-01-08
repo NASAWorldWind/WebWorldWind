@@ -71,6 +71,7 @@ define([
     wwd.navigator = new LookAtNavigator();
     wwd.worldWindowController = new BasicWorldWindowController(wwd);
     wwd.viewport = viewport;
+    wwd.depthBits = 24;
     wwd.resetDrawContext();
 
     describe("DrawContext Tests", function () {
@@ -94,41 +95,41 @@ define([
                 expectMatrixCloseTo(dc.projection, expectedProjection);
 
                 var expectedMvp = new Matrix(
-                    -0.684, 0, 1.878, 4.656e-10,
-                    0.938, 1.732, 0.342, 37008.274,
-                    0.972, -0.598, 0.354, 16327438.338,
-                    0.813, -0.5, 0.296, 16372797.555);
+                    -0.684, 0, 1.879, 4.656e-10,
+                    0.940, 1.732, 0.342, 37008.275,
+                    0.974, -0.598, 0.355, 16343261.657,
+                    0.814, -0.5, 0.296, 16372797.556);
                 expectMatrixCloseTo(dc.modelviewProjection, expectedMvp);
 
-                var expectedEyePoint = new Vec3(-13319762.852, 8170374.195, -4849512.284);
+                var expectedEyePoint = new Vec3(-13332838.774, 8170373.752, -4852756.452);
                 expectVec3CloseTo(dc.eyePoint, expectedEyePoint);
 
                 var expectedMvn = new Matrix(
-                    -0.342, 0, 0.939, 0,
-                    0.469, 0.866, 0.171, 0,
-                    -0.813, 0.5, -0.296, 0,
+                    -0.342, 0, 0.940, 0,
+                    0.470, 0.866, 0.171, 0,
+                    -0.814, 0.5, -0.296, 0,
                     0, 0, 0, 1);
                 expectMatrixCloseTo(dc.modelviewNormalTransform, expectedMvn);
 
-                expect(dc.pixelSizeScale).toBeCloseTo(0.00118, 5);
+                expect(dc.pixelSizeFactor).toBeCloseTo(0.00118, 5);
                 expect(dc.pixelSizeOffset).toBeCloseTo(0, 5);
 
-                var expectedBottom = new Plane(0.784, 0.551, 0.286, 7345398.414);
+                var expectedBottom = new Plane(0.784, 0.551, 0.285, 7338688.267);
                 expectPlaneCloseTo(dc.frustumInModelCoordinates._bottom, expectedBottom);
 
-                var expectedFar = new Plane(-0.814, 0.5, -0.296, 231588.485);
+                var expectedFar = new Plane(-0.814, 0.5, -0.296, 149953.966);
                 expectPlaneCloseTo(dc.frustumInModelCoordinates._far, expectedFar);
 
-                var expectedLeft = new Plane(0.058, -0.224, 0.973, 7327329.45);
+                var expectedLeft = new Plane(0.058, -0.224, 0.973, 7322137.663);
                 expectPlaneCloseTo(dc.frustumInModelCoordinates._left, expectedLeft);
 
-                var expectedNear = new Plane(0.814, -0.5, 0.296, 14901364.249);
+                var expectedNear = new Plane(0.814, -0.5, 0.296, 14891469.721);
                 expectPlaneCloseTo(dc.frustumInModelCoordinates._near, expectedNear);
 
-                var expectedRight = new Plane(0.67, -0.224, -0.708, 7326730.765);
+                var expectedRight = new Plane(0.67, -0.224, -0.708, 7322137.663);
                 expectPlaneCloseTo(dc.frustumInModelCoordinates._right, expectedRight);
 
-                var expectedTop = new Plane(-0.056, -0.998, -0.021, 7305904.873);
+                var expectedTop = new Plane(-0.056, -0.998, -0.021, 7305587.059);
                 expectPlaneCloseTo(dc.frustumInModelCoordinates._top, expectedTop);
             });
         });
@@ -149,12 +150,9 @@ define([
             it("Computes the correct projection", function () {
                 var modelPoint = new Vec3(-1405324.651, 5668987.866, -2535930.346);
                 var result = new Vec3(0, 0, 0);
-                var expectedResult = new Vec3(285.597, 703.273, 0.958);
+                var expectedResult = new Vec3(285.452, 703.234, 0.959);
                 dc.project(modelPoint, result);
-                for (var i = 0; i < 3; i++) {
-                    expect(result[i]).toBeCloseTo(expectedResult[i], 3);
-                }
-
+                expectVec3CloseTo(result, expectedResult);
             });
 
             it("Should throw an exception on missing input parameter", function () {
@@ -172,13 +170,10 @@ define([
             it("Computes the correct projection with depth", function () {
                 var modelPoint = new Vec3(-1405324.651, 5668987.866, -2535930.346);
                 var result = new Vec3(0, 0, 0);
-                var expectedResult = new Vec3(285.597, 703.273, 0.956);
+                var expectedResult = new Vec3(285.452, 703.234, 0.957);
                 var depthOffset = -0.003;
                 dc.projectWithDepth(modelPoint, depthOffset, result);
-                for (var i = 0; i < 3; i++) {
-                    expect(result[i]).toBeCloseTo(expectedResult[i], 3);
-                }
-
+                expectVec3CloseTo(result, expectedResult);
             });
         });
 
@@ -216,17 +211,13 @@ define([
 
             it("Calculates rayThroughScreenPoint correctly", function () {
                 var screenPoint = new Vec2(13.5, 635);
-                var expectedOrigin = new Vec3(-13319762.852, 8170374.195, -4849512.284);
+                var expectedOrigin = new Vec3(-13332838.774, 8170373.752, -4852756.452);
                 var expectedDirection = new Vec3(0.758, -0.628, -0.177);
                 var line = dc.rayThroughScreenPoint(screenPoint);
                 var result = line.origin;
-                for (var i = 0; i < 3; i++) {
-                    expect(result[i]).toBeCloseTo(expectedOrigin[i], 3);
-                }
+                expectVec3CloseTo(result, expectedOrigin);
                 result = line.direction;
-                for (i = 0; i < 3; i++) {
-                    expect(result[i]).toBeCloseTo(expectedDirection[i], 3);
-                }
+                expectVec3CloseTo(result, expectedDirection);
             });
         });
 
