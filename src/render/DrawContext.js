@@ -463,7 +463,7 @@ define([
             this.pickColor = new Color(0, 0, 0, 1);
             this.objectsAtPickPoint.clear();
 
-            this.eyePoint.set(0,0,0);
+            this.eyePoint.set(0, 0, 0);
             this.modelview.setToIdentity();
             this.projection.setToIdentity();
             this.modelviewProjection.setToIdentity();

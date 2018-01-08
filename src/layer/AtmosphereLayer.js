@@ -128,15 +128,15 @@ define([
             }
 
             vboId = dc.gpuResourceCache.resourceForKey(skyData.verticesVboCacheKey);
-            
+
             if (!vboId) {
                 skyPoints = this.assembleVertexPoints(dc, this._skyHeight, this._skyWidth, program.getAltitude());
-                
+
                 vboId = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                 gl.bufferData(gl.ARRAY_BUFFER, skyPoints, gl.STATIC_DRAW);
                 gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-                
+
                 dc.gpuResourceCache.putResource(skyData.verticesVboCacheKey, vboId,
                     skyPoints.length * 4);
                 dc.frameStatistics.incrementVboLoadCount(1);
@@ -159,14 +159,14 @@ define([
             }
 
             vboId = dc.gpuResourceCache.resourceForKey(skyData.indicesVboCacheKey);
-            
+
             if (!vboId) {
                 skyIndices = this.assembleTriStripIndices(this._skyWidth, this._skyHeight);
-                
+
                 vboId = gl.createBuffer();
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, skyIndices, gl.STATIC_DRAW);
-                
+
                 dc.frameStatistics.incrementVboLoadCount(1);
                 dc.gpuResourceCache.putResource(skyData.indicesVboCacheKey, vboId, skyIndices.length * 2);
             }
@@ -223,13 +223,13 @@ define([
 
             // Use this layer's night image when the layer has time value defined
             if (this.nightImageSource && (this.time !== null)) {
-                
+
                 this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
-                
+
                 if (!this._activeTexture) {
                     this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.nightImageSource);
                 }
-                
+
                 textureBound = this._activeTexture && this._activeTexture.bind(dc);
             }
 
@@ -237,7 +237,7 @@ define([
 
             for (var idx = 0, len = terrain.surfaceGeometry.length; idx < len; idx++) {
                 var currentTile = terrain.surfaceGeometry[idx];
-                
+
                 // Use the vertex origin for the terrain tile.
                 var terrainOrigin = currentTile.referencePoint;
                 program.loadVertexOrigin(gl, terrainOrigin);
@@ -309,7 +309,7 @@ define([
             }
 
             this._numIndices = result.length;
-            
+
             return new Uint16Array(result);
         };
 

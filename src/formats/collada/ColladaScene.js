@@ -597,7 +597,7 @@ define([
                 this.applyLighting(dc, buffers);
             }
 
-            this.applyMatrix(dc, hasLighting, hasTexture , nodeWorldMatrix, nodeNormalMatrix);
+            this.applyMatrix(dc, hasLighting, hasTexture, nodeWorldMatrix, nodeNormalMatrix);
 
             if (buffers.indexedRendering) {
                 this.applyIndices(dc, buffers);
@@ -783,7 +783,7 @@ define([
                 dc.currentProgram.loadModelviewInverse(dc.currentGlContext, normalMatrix);
             }
 
-            if (hasTexture && this._activeTexture){
+            if (hasTexture && this._activeTexture) {
                 dc.currentProgram.loadTextureMatrix(dc.currentGlContext, this._texCoordMatrix);
                 this._activeTexture = null;
             }

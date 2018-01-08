@@ -242,7 +242,7 @@ define([
             if (Array.isArray(this.activeAttributes.imageSource)
                 && this.activeAttributes.imageSource[0]
                 && (typeof this.activeAttributes.imageSource[0] === "string"
-                || this.activeAttributes.imageSource instanceof ImageSource)) {
+                    || this.activeAttributes.imageSource instanceof ImageSource)) {
                 return this.activeAttributes.imageSource[0];
             }
 
@@ -391,7 +391,8 @@ define([
                 }
             }
 
-            this.currentData.eyeDistance = 0;/*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
+            this.currentData.eyeDistance = 0;
+            /*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
 
             return boundaryPoints;
         };

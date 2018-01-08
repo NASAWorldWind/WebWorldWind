@@ -393,7 +393,8 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
-                tile.opacity = 1;;
+                tile.opacity = 1;
+                ;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
