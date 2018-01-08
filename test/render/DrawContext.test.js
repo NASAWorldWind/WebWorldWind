@@ -15,14 +15,34 @@
  */
 define([
     'src/render/DrawContext',
+    'src/globe/EarthElevationModel',
+    'src/globe/Globe',
     'src/geom/Matrix',
-    'src/navigate/NavigatorState',
+    'src/navigate/Navigator',
     'src/geom/Rectangle',
     'src/geom/Vec2',
     'src/geom/Vec3',
-    'src/WorldWind'
-], function (DrawContext, Matrix, NavigatorState, Rectangle, Vec2, Vec3, WorldWind) {
+    'src/WorldWind',
+    'src/WorldWindow'
+], function (DrawContext, EarthElevationModel, Globe, Matrix, Navigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
+
+    var expectMatrixCloseTo = function (matrix1, matrix2) {
+        for (var i = 0; i < 16; i++) {
+            expect(matrix1[i]).toBeCloseTo(matrix2[i], 3);
+        }
+    };
+
+    var expectVec3CloseTo = function (v1, v2) {
+        for (var i = 0; i < 3; i++) {
+            expect(v1[i]).toBeCloseTo(v2[i], 3);
+        }
+    };
+
+    var expectPlaneCloseTo = function (p1, p2) {
+        expect(p1.distance).toBeCloseTo(p2.distance, 3);
+        expectVec3CloseTo(p1.normal, p2.normal);
+    };
 
     var modelView = new Matrix(
         -0.342, 0, 0.939, 2.328e-10,
@@ -41,11 +61,67 @@ define([
     var viewport = new Rectangle(0, 0, 848, 848);
     var dummyParam = "dummy";
     var dc = new DrawContext(dummyParam);
-    dc.navigatorState = new NavigatorState(modelView, projection, viewport, 0, 0, dc);
-    dc.viewport = viewport;
-    dc.computeViewingTransform();
+    var MockWorldWindow = function () {
+    };
+
+    MockWorldWindow.prototype = Object.create(WorldWindow.prototype);
+
+    // create a globe that returns mock elevations for a given sector so we don't have to rely on
+    // asynchronous tile calls to finish.
+    Globe.prototype.minAndMaxElevationsForSector = function (sector) {
+        return [125.0, 350.0];
+    };
+    var mockGlobe = new Globe(new EarthElevationModel());
+    var wwd = new MockWorldWindow();
+    wwd.globe=mockGlobe;
+    wwd.drawContext=dc;
+    wwd.navigator=new Navigator();
+    wwd.resetDrawContext();
 
     describe("DrawContext Tests", function () {
+
+        describe("Calculates correct view transforms", function () {
+            it("Computes the correct transform", function () {
+                // frustum in model coordinates
+                var expectedMvp = new Matrix(
+                    -0.684, 0, 1.878, 4.656e-10,
+                    0.938, 1.732, 0.342, 37008.274,
+                    0.972, -0.598, 0.354, 16327438.338,
+                    0.813, -0.5, 0.296, 16372797.555);
+                expectMatrixCloseTo(dc.modelviewProjection, expectedMvp);
+
+                var expectedEyePoint = new Vec3(-13319762.852, 8170374.195, -4849512.284);
+                expectVec3CloseTo(dc.eyePoint, expectedEyePoint);
+
+                var expectedMvn = new Matrix(
+                    -0.342, 0, 0.939, 0,
+                    0.469, 0.866, 0.171, 0,
+                    -0.813, 0.5, -0.296, 0,
+                    0, 0, 0, 1);
+                expectMatrixCloseTo(dc.modelviewNormalTransform, expectedMvn);
+
+                expect(dc.pixelSizeScale).toBeCloseTo(0.00118, 5);
+                expect(dc.pixelSizeOffset).toBeCloseTo(0, 5);
+
+                var expectedBottom = new Plane(0.784, 0.551, 0.286, 7345398.414);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._bottom,expectedBottom);
+
+                var expectedFar = new Plane(-0.814, 0.5, -0.296, 231588.485);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._far,expectedFar);
+
+                var expectedLeft = new Plane(0.058, -0.224, 0.973, 7327329.45);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._left,expectedLeft);
+
+                var expectedNear = new Plane(0.814, -0.5, 0.296, 14901364.249);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._near,expectedNear);
+
+                var expectedRight = new Plane(0.67, -0.224, -0.708, 7326730.765);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._right,expectedRight);
+
+                var expectedTop = new Plane(-0.056, -0.998, -0.021, 7305904.873);
+                expectPlaneCloseTo(dc.frustumInModelCoordinates._top,expectedTop);
+            });
+        });
 
         describe("Calculates correct projections", function () {
             it("Should throw an exception on missing input parameter", function () {
