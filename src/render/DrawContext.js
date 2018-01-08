@@ -360,7 +360,7 @@ define([
             this.navigator = null;
 
             /**
-             * The navigator's model-view matrix. The model-view matrix transforms points from model coordinates to eye
+             * The model-view matrix. The model-view matrix transforms points from model coordinates to eye
              * coordinates.
              * @type {Matrix}
              * @readonly
@@ -385,7 +385,7 @@ define([
 
             /**
              * The viewing frustum in model coordinates. The frustum originates at the eyePoint and extends
-             * outward along the forward vector. The navigator's near distance and far distance identify the minimum and
+             * outward along the forward vector. The near distance and far distance identify the minimum and
              * maximum distance, respectively, at which an object in the scene is visible.
              * @type {Frustum}
              * @readonly
@@ -1289,7 +1289,7 @@ define([
          * axes that extend up and to the right from the origin.
          * <p>
          * This function stores the transformed point in the result argument, and returns true or false to indicate
-         * whether or not the transformation is successful. It returns false if this navigator state's modelview or
+         * whether or not the transformation is successful. It returns false if the modelview or
          * projection matrices are malformed, or if the specified model point is clipped by the near clipping plane or
          * the far clipping plane.
          *
@@ -1360,7 +1360,7 @@ define([
          * that extend up and to the right from the origin.
          * <p>
          * This function stores the transformed point in the result argument, and returns true or false to indicate whether or
-         * not the transformation is successful. It returns false if this navigator state's modelview or projection
+         * not the transformation is successful. It returns false if the modelview or projection
          * matrices are malformed, or if the modelPoint is clipped by the near clipping plane or the far clipping plane,
          * ignoring the depth offset.
          * <p>
@@ -1486,7 +1486,7 @@ define([
 
 
         /**
-         * Computes a ray originating at the navigator's eyePoint and extending through the specified point in window
+         * Computes a ray originating at the eyePoint and extending through the specified point in window
          * coordinates.
          * <p>
          * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
@@ -1537,7 +1537,7 @@ define([
         };
 
         /**
-         * Computes the approximate size of a pixel at a specified distance from the navigator's eye point.
+         * Computes the approximate size of a pixel at a specified distance from the eye point.
          * <p>
          * This method assumes rectangular pixels, where pixel coordinates denote
          * infinitely thin spaces between pixels. The units of the returned size are in model coordinates per pixel

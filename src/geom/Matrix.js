@@ -1840,7 +1840,7 @@ define([
          * and axes that extend up and to the right from the origin.
          * <p>
          * This function stores the transformed point in the result argument, and returns true or false to indicate whether the
-         * transformation is successful. It returns false if this navigator state's modelview or projection matrices
+         * transformation is successful. It returns false if the modelview or projection matrices
          * are malformed, or if the screenPoint is clipped by the near clipping plane or the far clipping plane.
          *
          * @param {Vec3} screenPoint The screen coordinate point to un-project.
