@@ -43,8 +43,15 @@ define([
          * @classdesc Provides methods useful for displaying text. An instance of this class is attached to the
          * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically do
          * not create instances of this class.
+         * @param {drawContext} drawContext The current draw context. Typically the same draw context that TextRenderer
+         * is attached to.
+         * @throws {ArgumentError} If the specified draw context is null or undefined.
          */
-        var TextRenderer = function (dc) {
+        var TextRenderer = function (drawContext) {
+            if (!drawContext) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "TextRenderer", "constructor",
+                    "missingDrawContext"));
+            }
 
             // Internal use only. Intentionally not documented.
             this.canvas2D = document.createElement("canvas");
@@ -52,8 +59,10 @@ define([
             // Internal use only. Intentionally not documented.
             this.ctx2D = this.canvas2D.getContext("2d");
 
-            this.dc = dc;
+            // Internal use only. Intentionally not documented.
+            this.dc = drawContext;
 
+            // Internal use only. Intentionally not documented.
             this.enableOutline = false;
 
             // Internal use only. Intentionally not documented.
@@ -65,6 +74,7 @@ define([
             // Internal use only. Intentionally not documented.
             this.strokeWidth = 4;
 
+            // Internal use only. Intentionally not documented.
             this.typeFace = new Font(14);
         };
 
@@ -99,15 +109,12 @@ define([
         };
 
         /**
-         * Creates a texture for a specified text string, a specified font and an optional outline.
+         * Creates a texture for a specified text string.
          * @param {String} text The text string.
-         * @param {Font} font The font to use.
-         * @param {Boolean} outline Indicates whether the text is drawn with a thin black outline.
          * @returns {Texture} A texture for the specified text string and font.
          */
         TextRenderer.prototype.createTexture = function (text) {
-            var gl = this.dc.currentGlContext,
-                ctx2D = this.ctx2D,
+            var ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
                 textSize = this.textSize(text, this.typeFace, this.enableOutline),
                 lines = text.split("\n"),
@@ -144,7 +151,7 @@ define([
                 ctx2D.translate(0, this.typeFace.size * (1 + this.lineSpacing) + strokeOffset);
             }
 
-            return new Texture(gl, canvas2D);
+            return new Texture(this.dc.currentGlContext, canvas2D);
         };
 
         /**
