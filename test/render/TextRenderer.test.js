@@ -13,32 +13,46 @@ define([
             return new Vec2(text.length * 7, 16);
         };
 
+        // Mocking draw context to avoid WebGL requirements.
+        var DrawContext = function () {
+            this.currentGlContext = "fake GL context";
+            this.pixelScale = 1;
+            this.textRenderer = new TextRenderer(this);
+        }
+        
         var testText = "Lorem ipsum dolor sit amet, consectetur "
             + "adipiscing elit, sed do eiusmod tempor incididunt ut";
 
+        var dc = new DrawContext;
         var myFont = new Font(15);
+
+        it("Should throw an exception on missing constructor draw context", function () {
+            expect(function () {
+                var mockTextRenderer = new TextRenderer(null);
+            }).toThrow();
+        });
 
         it("Should throw an exception on missing text input", function () {
             expect(function () {
-                var mockTextRenderer = new TextRenderer();
+                var mockTextRenderer = new TextRenderer(dc);
                 mockTextRenderer.wrap(null, 20, 100, myFont);
             }).toThrow();
         });
 
         it("Should output '...' due to wrap height being less than textSize height", function () {
-            var mockTextRenderer = new TextRenderer();
+            var mockTextRenderer = new TextRenderer(dc);
             var wrappedText = mockTextRenderer.wrap(testText, 92, 15, myFont);
             expect(wrappedText).toEqual("...");
         });
 
         it("Should output 'Lorem ipsum...' due to wrap width being less than textSize width", function () {
-            var mockTextRenderer = new TextRenderer();
+            var mockTextRenderer = new TextRenderer(dc);
             var wrappedText = mockTextRenderer.wrap(testText, 90, 16, myFont);
             expect(wrappedText).toEqual("Lorem ipsum...");
         });
 
         it("Should output every word on testText in different lines", function () {
-            var mockTextRenderer = new TextRenderer();
+            var mockTextRenderer = new TextRenderer(dc);
             // Wrap line width less than textSize texture width
             var wrappedLines = mockTextRenderer.wrapLine(testText, 0, myFont);
             expect(wrappedLines).toEqual("Lorem\n" +
