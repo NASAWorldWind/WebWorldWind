@@ -51,7 +51,7 @@ define([
             // Internal use only. Intentionally not documented.
             this.ctx2D = this.canvas2D.getContext("2d");
 
-            this.drawContext = dc;
+            this.dc = dc;
 
             this.enableOutline = false;
 
@@ -99,20 +99,19 @@ define([
 
         /**
          * Creates a texture for a specified text string, a specified font and an optional outline.
-         * @param {DrawContext} dc The current draw context.
          * @param {String} text The text string.
          * @param {Font} font The font to use.
          * @param {Boolean} outline Indicates whether the text is drawn with a thin black outline.
          * @returns {Texture} A texture for the specified text string and font.
          */
-        TextRenderer.prototype.createTexture = function (dc, text, font, outline) {
-            var gl = dc.currentGlContext,
+        TextRenderer.prototype.createTexture = function (text, font, outline) {
+            var gl = this.dc.currentGlContext,
                 ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
                 textSize = this.textSize(text, font, outline),
                 lines = text.split("\n"),
                 strokeOffset = outline ? this.strokeWidth / 2 : 0,
-                pixelScale = dc.pixelScale,
+                pixelScale = this.dc.pixelScale,
                 x, y;
 
             canvas2D.width = Math.ceil(textSize[0]) * pixelScale;
