@@ -104,13 +104,13 @@ define([
          * @param {Boolean} outline Indicates whether the text is drawn with a thin black outline.
          * @returns {Texture} A texture for the specified text string and font.
          */
-        TextRenderer.prototype.createTexture = function (text, font, outline) {
+        TextRenderer.prototype.createTexture = function (text) {
             var gl = this.dc.currentGlContext,
                 ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
-                textSize = this.textSize(text, font, outline),
+                textSize = this.textSize(text, this.typeFace, this.enableOutline),
                 lines = text.split("\n"),
-                strokeOffset = outline ? this.strokeWidth / 2 : 0,
+                strokeOffset = this.enableOutline ? this.strokeWidth / 2 : 0,
                 pixelScale = this.dc.pixelScale,
                 x, y;
 
@@ -118,29 +118,29 @@ define([
             canvas2D.height = Math.ceil(textSize[1]) * pixelScale;
 
             ctx2D.scale(pixelScale, pixelScale);
-            ctx2D.font = font.fontString;
+            ctx2D.font = this.typeFace.fontString;
             ctx2D.textBaseline = "top";
-            ctx2D.textAlign = font.horizontalAlignment;
+            ctx2D.textAlign = this.typeFace.horizontalAlignment;
             ctx2D.fillStyle = Color.WHITE.toHexString(false);
             ctx2D.strokeStyle = this.strokeStyle;
             ctx2D.lineWidth = this.strokeWidth;
             ctx2D.lineCap = "round";
             ctx2D.lineJoin = "round";
 
-            if (font.horizontalAlignment === "left") {
+            if (this.typeFace.horizontalAlignment === "left") {
                 ctx2D.translate(strokeOffset, 0);
-            } else if (font.horizontalAlignment === "right") {
+            } else if (this.typeFace.horizontalAlignment === "right") {
                 ctx2D.translate(textSize[0] - strokeOffset, 0);
             } else {
                 ctx2D.translate(textSize[0] / 2, 0);
             }
 
             for (var i = 0; i < lines.length; i++) {
-                if (outline) {
+                if (this.enableOutline) {
                     ctx2D.strokeText(lines[i], 0, 0);
                 }
                 ctx2D.fillText(lines[i], 0, 0);
-                ctx2D.translate(0, font.size * (1 + this.lineSpacing) + strokeOffset);
+                ctx2D.translate(0, this.typeFace.size * (1 + this.lineSpacing) + strokeOffset);
             }
 
             return new Texture(gl, canvas2D);
