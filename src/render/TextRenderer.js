@@ -20,6 +20,7 @@ define([
         '../error/ArgumentError',
         '../shaders/BasicTextureProgram',
         '../util/Color',
+        '../util/Font',
         '../util/Logger',
         '../geom/Matrix',
         '../render/Texture',
@@ -42,13 +43,17 @@ define([
          * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically do
          * not create instances of this class.
          */
-        var TextRenderer = function () {
+        var TextRenderer = function (dc) {
 
             // Internal use only. Intentionally not documented.
             this.canvas2D = document.createElement("canvas");
 
             // Internal use only. Intentionally not documented.
             this.ctx2D = this.canvas2D.getContext("2d");
+
+            this.drawContext = dc;
+
+            this.enableOutline = false;
 
             // Internal use only. Intentionally not documented.
             this.lineSpacing = 0.15; // fraction of font size
@@ -58,6 +63,8 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.strokeWidth = 4;
+
+            this.typeFace = new Font(14);
         };
 
         /**
