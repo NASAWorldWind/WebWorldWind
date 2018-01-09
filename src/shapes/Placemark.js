@@ -485,7 +485,7 @@ define([
 
                 this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
                 if (!this.labelTexture) {
-                    this.labelTexture = dc.textRenderer.createTexture(dc, this.label, labelFont, true);
+                    this.labelTexture = dc.textRenderer.createTexture(this.label);
                     dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
                 }
 

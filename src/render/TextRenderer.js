@@ -29,6 +29,7 @@ define([
     function (ArgumentError,
               BasicTextureProgram,
               Color,
+              Font,
               Logger,
               Matrix,
               Texture,
