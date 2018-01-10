@@ -111,9 +111,23 @@ define([
         /**
          * Creates a texture for a specified text string.
          * @param {String} text The text string.
-         * @returns {Texture} A texture for the specified text string and font.
+         * @returns {Texture} A texture for the specified text string.
          */
         TextRenderer.prototype.renderText = function (text) {
+            if (text !== null && text.length > 0) {
+                var canvas2D = this.drawText(text);
+                return new Texture(this.dc.currentGlContext, canvas2D)
+            } else {
+                return null;
+            }
+        };
+
+        /**
+         * Creates a 2D Canvas for a specified text string.
+         * @param {String} text The text string.
+         * @returns {canvas2D} A 2D Canvas for the specified text string.
+         */
+        TextRenderer.prototype.drawText = function (text) {
             var ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
                 textSize = this.textSize(text, this.typeFace, this.enableOutline),
@@ -151,7 +165,7 @@ define([
                 ctx2D.translate(0, this.typeFace.size * (1 + this.lineSpacing) + strokeOffset);
             }
 
-            return new Texture(this.dc.currentGlContext, canvas2D);
+            return canvas2D;
         };
 
         /**
