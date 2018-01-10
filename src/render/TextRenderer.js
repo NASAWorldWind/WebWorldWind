@@ -63,7 +63,7 @@ define([
             this.dc = drawContext;
 
             // Internal use only. Intentionally not documented.
-            this.enableOutline = false;
+            this.enableOutline = true;
 
             // Internal use only. Intentionally not documented.
             this.lineSpacing = 0.15; // fraction of font size
