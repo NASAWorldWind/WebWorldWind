@@ -202,7 +202,7 @@ define([
                 navigator.lastPoint.set(x2, y2);
 
                 var globe = this.wwd.globe,
-                    ray = this.wwd.drawContext.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
+                    ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
                     point1 = new Vec3(0, 0, 0),
                     point2 = new Vec3(0, 0, 0),
                     origin = new Vec3(0, 0, 0);
@@ -210,7 +210,7 @@ define([
                     return;
                 }
 
-                ray = this.wwd.drawContext.rayThroughScreenPoint(this.wwd.canvasCoordinates(x2, y2));
+                ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x2, y2));
                 if (!globe.intersectsLine(ray, point2)) {
                     return;
                 }

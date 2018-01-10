@@ -107,6 +107,12 @@ define([
             // Internal. Intentionally not documented.
             this.redrawRequestId = null;
 
+            // Internal. Intentionally not documented.
+            this.scratchModelview = Matrix.fromIdentity();
+
+            // Internal. Intentionally not documented.
+            this.scratchProjection = Matrix.fromIdentity();
+
             /**
              * The HTML canvas associated with this WorldWindow.
              * @type {HTMLElement}
@@ -652,24 +658,18 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WorldWindow.prototype.computeViewingTransform = function () {
-            this.worldWindowController.applyLimits();
-            var dc = this.drawContext;
-            var navigator = dc.navigator;
+        WorldWindow.prototype.computeViewingTransform = function (projection, modelview) {
+            var globe = this.globe;
+            var navigator = this.navigator;
             var lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0);
-            var modelview = Matrix.fromIdentity();
-            var globe = dc.globe;
             modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
 
-            dc.modelview = modelview;
-            dc.viewport = this.viewport;
-            dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));
-
             var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
-                eyePos = globe.computePositionFromPoint(dc.eyePoint[0], dc.eyePoint[1], dc.eyePoint[2], new Position(0, 0, 0)),
+                eyePoint = this.eyePoint,
+                eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
                 eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
                 atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
-                viewport = dc.viewport;
+                viewport = this.viewport;
 
             // Set the far clip distance to the smallest value that does not clip the atmosphere.
             // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
@@ -700,13 +700,24 @@ define([
 
             // Compute the current projection matrix based on this navigator's perspective properties and the current
             // WebGL viewport.
-            dc.projection = Matrix.fromIdentity();
-            dc.projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
+            projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
 
-            dc.modelviewProjection = Matrix.fromIdentity();
+        };
+
+        // Internal. Intentionally not documented.
+        WorldWindow.prototype.computeDrawContext = function () {
+            this.worldWindowController.applyLimits();
+            var dc = this.drawContext;
+
+            dc.modelview.setToIdentity();
+            dc.projection.setToIdentity();
+            this.computeViewingTransform(dc.projection, dc.modelview);
+            dc.viewport = this.viewport;
+            dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));
+
+            dc.modelviewProjection.setToIdentity();
             dc.modelviewProjection.setToMultiply(dc.projection, dc.modelview);
-            dc.modelviewProjectionInv = Matrix.fromIdentity();
-            dc.modelviewProjectionInv.invertMatrix(dc.modelviewProjection);
+
             var projectionInv = Matrix.fromIdentity();
             projectionInv.invertMatrix(dc.projection);
 
@@ -766,7 +777,7 @@ define([
             dc.globe = this.globe;
             dc.navigator = this.navigator;
             dc.layers = this.layers;
-            this.computeViewingTransform();
+            this.computeDrawContext();
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
             dc.deepPicking = this.deepPicking;
@@ -1430,6 +1441,62 @@ define([
                     }
                 }
             }
+        };
+
+        /**
+         * Computes a ray originating at the eyePoint and extending through the specified point in window
+         * coordinates.
+         * <p>
+         * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
+         * in the top-left corner and axes that extend down and to the right from the origin point.
+         * <p>
+         * The results of this method are undefined if the specified point is outside of the WorldWindow's
+         * bounds.
+         *
+         * @param {Vec2} point The window coordinates point to compute a ray for.
+         * @returns {Line} A new Line initialized to the origin and direction of the computed ray, or null if the
+         * ray could not be computed.
+         */
+        WorldWindow.prototype.rayThroughScreenPoint = function (point) {
+            if (!point) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "rayThroughScreenPoint",
+                    "missingPoint"));
+            }
+
+            // Convert the point's xy coordinates from window coordinates to WebGL screen coordinates.
+            this.drawContext.viewport = this.viewport;
+            var screenPoint = this.drawContext.convertPointToViewport(point, new Vec3(0, 0, 0)),
+                nearPoint = new Vec3(0, 0, 0),
+                farPoint = new Vec3(0, 0, 0);
+
+            this.computeViewingTransform(this.scratchProjection, this.scratchModelview);
+            var modelviewProjection = Matrix.fromIdentity();
+            modelviewProjection.setToMultiply(this.scratchProjection, this.scratchModelview);
+            var modelviewProjectionInv = Matrix.fromIdentity();
+            modelviewProjectionInv.invertMatrix(mvp);
+
+            // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
+            if (!modelviewProjectionInv.unProject(screenPoint, this.viewport, nearPoint)) {
+                return null;
+            }
+
+            // Compute the model coordinate point on the far clip plane with the xy coordinates and depth 1.
+            screenPoint[2] = 1;
+            if (!modelviewProjectionInv.unProject(screenPoint, this.viewport, farPoint)) {
+                return null;
+            }
+
+            var eyePoint = this.eyePoint;
+
+            // Compute a ray originating at the eye point and with direction pointing from the xy coordinate on the near
+            // plane to the same xy coordinate on the far plane.
+            var origin = new Vec3(eyePoint[0], eyePoint[1], eyePoint[2]),
+                direction = new Vec3(farPoint[0], farPoint[1], farPoint[2]);
+
+            direction.subtract(nearPoint);
+            direction.normalize();
+
+            return new Line(origin, direction);
         };
 
         return WorldWindow;

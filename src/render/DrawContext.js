@@ -400,9 +400,6 @@ define([
              */
             this.modelviewNormalTransform = Matrix.fromIdentity();
 
-            // Intentionally not documented.
-            this.modelviewProjectionInv = Matrix.fromIdentity();
-
             /**
              * The current viewport.
              * @type {Rectangle}
@@ -469,7 +466,6 @@ define([
             this.modelviewProjection.setToIdentity();
             this.frustumInModelCoordinates = null;
             this.modelviewNormalTransform.setToIdentity();
-            this.modelviewProjectionInv.setToIdentity();
         };
 
         /**
@@ -917,46 +913,48 @@ define([
             this.pickRectangle = pickRectangle;
 
             // Compute the pick frustum.
+            var modelviewProjectionInv = Matrix.fromIdentity();
+            modelviewProjectionInv.invertMatrix(this.modelviewProjection);
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, lln = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, lln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, llf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, llf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, lrn = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, lrn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, lrf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, lrf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, uln = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, uln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, ulf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, ulf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, urn = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, urn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.modelviewProjectionInv.unProject(screenPoint, viewport, urf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, urf = new Vec3(0, 0, 0));
 
             va = new Vec3(ulf[0] - lln[0], ulf[1] - lln[1], ulf[2] - lln[2]);
             vb.set(uln[0] - llf[0], uln[1] - llf[1], uln[2] - llf[2]);
@@ -1482,58 +1480,6 @@ define([
             result[1] = this.viewport.height - point[1];
 
             return result;
-        };
-
-
-        /**
-         * Computes a ray originating at the eyePoint and extending through the specified point in window
-         * coordinates.
-         * <p>
-         * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
-         * in the top-left corner and axes that extend down and to the right from the origin point.
-         * <p>
-         * The results of this method are undefined if the specified point is outside of the WorldWindow's
-         * bounds.
-         *
-         * @param {Vec2} point The window coordinates point to compute a ray for.
-         * @returns {Line} A new Line initialized to the origin and direction of the computed ray, or null if the
-         * ray could not be computed.
-         */
-        DrawContext.prototype.rayThroughScreenPoint = function (point) {
-            if (!point) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "rayThroughScreenPoint",
-                    "missingPoint"));
-            }
-
-            // Convert the point's xy coordinates from window coordinates to WebGL screen coordinates.
-            var screenPoint = this.convertPointToViewport(point, new Vec3(0, 0, 0)),
-                nearPoint = new Vec3(0, 0, 0),
-                farPoint = new Vec3(0, 0, 0);
-
-            var mvpInv = this.modelviewProjectionInv;
-
-            // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
-            if (!mvpInv.unProject(screenPoint, this.viewport, nearPoint)) {
-                return null;
-            }
-
-            // Compute the model coordinate point on the far clip plane with the xy coordinates and depth 1.
-            screenPoint[2] = 1;
-            if (!mvpInv.unProject(screenPoint, this.viewport, farPoint)) {
-                return null;
-            }
-
-            var eyePoint = this.eyePoint;
-
-            // Compute a ray originating at the eye point and with direction pointing from the xy coordinate on the near
-            // plane to the same xy coordinate on the far plane.
-            var origin = new Vec3(eyePoint[0], eyePoint[1], eyePoint[2]),
-                direction = new Vec3(farPoint[0], farPoint[1], farPoint[2]);
-
-            direction.subtract(nearPoint);
-            direction.normalize();
-
-            return new Line(origin, direction);
         };
 
         /**
