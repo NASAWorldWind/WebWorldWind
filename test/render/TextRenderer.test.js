@@ -19,7 +19,7 @@ define([
             this.pixelScale = 1;
             this.textRenderer = new TextRenderer(this);
         }
-        
+
         var testText = "Lorem ipsum dolor sit amet, consectetur "
             + "adipiscing elit, sed do eiusmod tempor incididunt ut";
 
@@ -30,6 +30,11 @@ define([
             expect(function () {
                 var mockTextRenderer = new TextRenderer(null);
             }).toThrow();
+        });
+
+        it("Should return null due to empty string input on RenderText", function () {
+            var mockTextRenderer = new TextRenderer(mockDrawContext);
+            expect(mockTextRenderer.renderText("")).toBeNull();
         });
 
         it("Should throw an exception on missing text input", function () {

@@ -114,7 +114,7 @@ define([
          * @returns {Texture} A texture for the specified text string.
          */
         TextRenderer.prototype.renderText = function (text) {
-            if (text !== null && text.length > 0) {
+            if (text && text.length > 0) {
                 var canvas2D = this.drawText(text);
                 return new Texture(this.dc.currentGlContext, canvas2D)
             } else {
