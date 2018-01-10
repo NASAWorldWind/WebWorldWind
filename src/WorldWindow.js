@@ -27,6 +27,7 @@ define([
         './globe/Globe2D',
         './util/GoToAnimator',
         './cache/GpuResourceCache',
+        './geom/Line',
         './util/Logger',
         './navigate/LookAtNavigator',
         './geom/Matrix',
@@ -51,6 +52,7 @@ define([
               Globe2D,
               GoToAnimator,
               GpuResourceCache,
+              Line,
               Logger,
               LookAtNavigator,
               Matrix,
@@ -476,6 +478,7 @@ define([
             this.resetDrawContext();
             this.drawContext.pickingMode = true;
             this.drawContext.pickPoint = pickPoint;
+            this.drawContext.pickRay=this.rayThroughScreenPoint(pickPoint);
             this.drawFrame();
 
             return this.drawContext.objectsAtPickPoint;
@@ -506,6 +509,7 @@ define([
             this.drawContext.pickingMode = true;
             this.drawContext.pickTerrainOnly = true;
             this.drawContext.pickPoint = pickPoint;
+            this.drawContext.pickRay=this.rayThroughScreenPoint(pickPoint);
             this.drawFrame();
 
             return this.drawContext.objectsAtPickPoint;
@@ -665,7 +669,7 @@ define([
             modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
 
             var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
-                eyePoint = this.eyePoint,
+                eyePoint = modelview.extractEyePoint(new Vec3(0, 0, 0)),
                 eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
                 eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
                 atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
@@ -746,8 +750,8 @@ define([
             // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
             var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
                 frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
-            dc.pixelSizeFactor = frustumWidthScale / viewport.width;
-            dc.pixelSizeOffset = frustumWidthOffset / viewport.height;
+            dc.pixelSizeFactor = frustumWidthScale / dc.viewport.width;
+            dc.pixelSizeOffset = frustumWidthOffset / dc.viewport.height;
 
             // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
             // are used to support operations on navigator state.
@@ -1473,7 +1477,7 @@ define([
             var modelviewProjection = Matrix.fromIdentity();
             modelviewProjection.setToMultiply(this.scratchProjection, this.scratchModelview);
             var modelviewProjectionInv = Matrix.fromIdentity();
-            modelviewProjectionInv.invertMatrix(mvp);
+            modelviewProjectionInv.invertMatrix(modelviewProjection);
 
             // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
             if (!modelviewProjectionInv.unProject(screenPoint, this.viewport, nearPoint)) {
@@ -1486,7 +1490,7 @@ define([
                 return null;
             }
 
-            var eyePoint = this.eyePoint;
+            var eyePoint = this.scratchModelview.extractEyePoint(new Vec3(0, 0, 0));
 
             // Compute a ray originating at the eye point and with direction pointing from the xy coordinate on the near
             // plane to the same xy coordinate on the far plane.

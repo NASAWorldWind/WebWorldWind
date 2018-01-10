@@ -324,6 +324,12 @@ define([
             this.pickPoint = null;
 
             /**
+             * The current pick ray originating at the eyePoint and extending through the pick point.
+             * @type {Line}
+             */
+            this.pickRay = null;
+
+            /**
              * The current pick rectangle, in WebGL (lower-left origin) screen coordinates.
              * @type {Rectangle}
              */
@@ -455,6 +461,7 @@ define([
             this.deepPicking = false;
             this.regionPicking = false;
             this.pickPoint = null;
+            this.pickRay = null;
             this.pickRectangle = null;
             this.pickFrustum = null;
             this.pickColor = new Color(0, 0, 0, 1);
