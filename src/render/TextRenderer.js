@@ -113,7 +113,7 @@ define([
          * @param {String} text The text string.
          * @returns {Texture} A texture for the specified text string and font.
          */
-        TextRenderer.prototype.createTexture = function (text) {
+        TextRenderer.prototype.renderText = function (text) {
             var ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
                 textSize = this.textSize(text, this.typeFace, this.enableOutline),
