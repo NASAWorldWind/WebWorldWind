@@ -1281,5 +1281,15 @@ define([
 
             });
         });
+
+        describe("Matrix cloning", function () {
+
+            it("Correctly clones matrices", function () {
+                var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+                var matrixB = matrixA.clone();
+                expect(matrixA.equals(matrixB)).toBe(true);
+            });
+        });
+
     });
 });

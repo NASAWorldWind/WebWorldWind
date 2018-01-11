@@ -189,7 +189,7 @@ define([
                 return this.lastTerrain;
             }
 
-            this.lastModelViewProjection = dc.modelviewProjection;
+            this.lastModelViewProjection = dc.modelviewProjection.clone();
             this.lastGlobeStateKey = dc.globeStateKey;
             this.elevationTimestamp = lastElevationsChange;
             this.lastVerticalExaggeration = dc.verticalExaggeration;

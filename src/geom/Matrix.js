@@ -231,6 +231,17 @@ define([
         };
 
         /**
+         * Creates a new matrix that is a copy of this matrix.
+         * @returns {Matrix} The new matrix.
+         */
+        Matrix.prototype.clone = function () {
+            var clone = Matrix.fromIdentity();
+            clone.copy(this);
+
+            return clone;
+        };
+
+        /**
          * Indicates whether the components of this matrix are equal to those of a specified matrix.
          * @param {Matrix} matrix The matrix to test equality with. May be null or undefined, in which case this
          * function returns false.

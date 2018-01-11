@@ -97,8 +97,23 @@ define([
         };
 
         /**
+         * Indicates whether the components of this line are equal to those of a specified line.
+         * @param {Line} otherLine The line to test equality with. May be null or undefined, in which case this
+         * function returns false.
+         * @returns {boolean} true if all components of this line are equal to the corresponding
+         * components of the specified line, otherwise false.
+         */
+        Line.prototype.equals = function (otherLine) {
+            if (otherLine) {
+                return this.origin.equals(otherLine.origin) && this.direction.equals(otherLine.direction);
+            }
+
+            return false;
+        };
+
+        /**
          * Creates a new line that is a copy of this line.
-         * @returns {Line} The new placemark.
+         * @returns {Line} The new line.
          */
         Line.prototype.clone = function () {
             var clone = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));

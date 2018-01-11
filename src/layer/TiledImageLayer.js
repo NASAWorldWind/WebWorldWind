@@ -275,7 +275,7 @@ define([
 
             }
 
-            this.lasTtMVP = dc.modelviewProjection;
+            this.lasTtMVP = dc.modelviewProjection.clone();
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {
