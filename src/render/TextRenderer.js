@@ -20,6 +20,7 @@ define([
         '../error/ArgumentError',
         '../shaders/BasicTextureProgram',
         '../util/Color',
+        '../util/Font',
         '../util/Logger',
         '../geom/Matrix',
         '../render/Texture',
@@ -28,6 +29,7 @@ define([
     function (ArgumentError,
               BasicTextureProgram,
               Color,
+              Font,
               Logger,
               Matrix,
               Texture,
@@ -41,14 +43,27 @@ define([
          * @classdesc Provides methods useful for displaying text. An instance of this class is attached to the
          * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically do
          * not create instances of this class.
+         * @param {drawContext} drawContext The current draw context. Typically the same draw context that TextRenderer
+         * is attached to.
+         * @throws {ArgumentError} If the specified draw context is null or undefined.
          */
-        var TextRenderer = function () {
+        var TextRenderer = function (drawContext) {
+            if (!drawContext) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "TextRenderer", "constructor",
+                    "missingDrawContext"));
+            }
 
             // Internal use only. Intentionally not documented.
             this.canvas2D = document.createElement("canvas");
 
             // Internal use only. Intentionally not documented.
             this.ctx2D = this.canvas2D.getContext("2d");
+
+            // Internal use only. Intentionally not documented.
+            this.dc = drawContext;
+
+            // Internal use only. Intentionally not documented.
+            this.enableOutline = true;
 
             // Internal use only. Intentionally not documented.
             this.lineSpacing = 0.15; // fraction of font size
@@ -58,6 +73,9 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.strokeWidth = 4;
+
+            // Internal use only. Intentionally not documented.
+            this.typeFace = new Font(14);
         };
 
         /**
@@ -91,53 +109,63 @@ define([
         };
 
         /**
-         * Creates a texture for a specified text string, a specified font and an optional outline.
-         * @param {DrawContext} dc The current draw context.
+         * Creates a texture for a specified text string.
          * @param {String} text The text string.
-         * @param {Font} font The font to use.
-         * @param {Boolean} outline Indicates whether the text is drawn with a thin black outline.
-         * @returns {Texture} A texture for the specified text string and font.
+         * @returns {Texture} A texture for the specified text string.
          */
-        TextRenderer.prototype.createTexture = function (dc, text, font, outline) {
-            var gl = dc.currentGlContext,
-                ctx2D = this.ctx2D,
+        TextRenderer.prototype.renderText = function (text) {
+            if (text && text.length > 0) {
+                var canvas2D = this.drawText(text);
+                return new Texture(this.dc.currentGlContext, canvas2D)
+            } else {
+                return null;
+            }
+        };
+
+        /**
+         * Creates a 2D Canvas for a specified text string.
+         * @param {String} text The text string.
+         * @returns {canvas2D} A 2D Canvas for the specified text string.
+         */
+        TextRenderer.prototype.drawText = function (text) {
+            var ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
-                textSize = this.textSize(text, font, outline),
+                textSize = this.textSize(text, this.typeFace, this.enableOutline),
                 lines = text.split("\n"),
-                strokeOffset = outline ? this.strokeWidth / 2 : 0,
-                pixelScale = dc.pixelScale,
+                strokeOffset = this.enableOutline ? this.strokeWidth / 2 : 0,
+                pixelScale = this.dc.pixelScale,
                 x, y;
 
             canvas2D.width = Math.ceil(textSize[0]) * pixelScale;
             canvas2D.height = Math.ceil(textSize[1]) * pixelScale;
 
             ctx2D.scale(pixelScale, pixelScale);
-            ctx2D.font = font.fontString;
+            ctx2D.font = this.typeFace.fontString;
             ctx2D.textBaseline = "top";
-            ctx2D.textAlign = font.horizontalAlignment;
+            ctx2D.textAlign = this.typeFace.horizontalAlignment;
             ctx2D.fillStyle = Color.WHITE.toHexString(false);
             ctx2D.strokeStyle = this.strokeStyle;
             ctx2D.lineWidth = this.strokeWidth;
             ctx2D.lineCap = "round";
             ctx2D.lineJoin = "round";
 
-            if (font.horizontalAlignment === "left") {
+            if (this.typeFace.horizontalAlignment === "left") {
                 ctx2D.translate(strokeOffset, 0);
-            } else if (font.horizontalAlignment === "right") {
+            } else if (this.typeFace.horizontalAlignment === "right") {
                 ctx2D.translate(textSize[0] - strokeOffset, 0);
             } else {
                 ctx2D.translate(textSize[0] / 2, 0);
             }
 
             for (var i = 0; i < lines.length; i++) {
-                if (outline) {
+                if (this.enableOutline) {
                     ctx2D.strokeText(lines[i], 0, 0);
                 }
                 ctx2D.fillText(lines[i], 0, 0);
-                ctx2D.translate(0, font.size * (1 + this.lineSpacing) + strokeOffset);
+                ctx2D.translate(0, this.typeFace.size * (1 + this.lineSpacing) + strokeOffset);
             }
 
-            return new Texture(gl, canvas2D);
+            return canvas2D;
         };
 
         /**

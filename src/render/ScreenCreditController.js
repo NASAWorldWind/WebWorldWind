@@ -264,7 +264,7 @@ define([
             textureKey = credit.text + this.creditFont.toString();
             activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
             if (!activeTexture) {
-                activeTexture = dc.textRenderer.createTexture(dc, credit.text, this.creditFont, false);
+                activeTexture = dc.textRenderer.renderText(credit.text);
                 dc.gpuResourceCache.putResource(textureKey, activeTexture, activeTexture.size);
             }
 

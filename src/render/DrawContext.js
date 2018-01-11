@@ -148,7 +148,7 @@ define([
              * A shared TextRenderer instance.
              * @type {TextRenderer}
              */
-            this.textRenderer = new TextRenderer();
+            this.textRenderer = new TextRenderer(this);
 
             /**
              * The current WebGL framebuffer. Null indicates that the default WebGL framebuffer is active.
