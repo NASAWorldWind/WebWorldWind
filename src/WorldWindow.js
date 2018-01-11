@@ -739,7 +739,10 @@ define([
             var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
                 frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
 
-            return {pixelSizeFactor: frustumWidthScale / this.viewport.width, pixelSizeOffset: frustumWidthOffset / this.viewport.height};
+            return {
+                pixelSizeFactor: frustumWidthScale / this.viewport.width,
+                pixelSizeOffset: frustumWidthOffset / this.viewport.height
+            };
         };
 
         /**
@@ -757,7 +760,7 @@ define([
          */
         WorldWindow.prototype.pixelSizeAtDistance = function (distance) {
             this.computeViewingTransform(this.scratchProjection, this.scratchModelview);
-            var pixelMetrics=this.computePixelMetrics(this.scratchProjection);
+            var pixelMetrics = this.computePixelMetrics(this.scratchProjection);
             return pixelMetrics.pixelSizeFactor * distance + pixelMetrics.pixelSizeOffset;
         };
 
@@ -775,9 +778,9 @@ define([
             dc.modelviewProjection.setToIdentity();
             dc.modelviewProjection.setToMultiply(dc.projection, dc.modelview);
 
-            var pixelMetrics=this.computePixelMetrics(dc.projection);
-            dc.pixelSizeFactor=pixelMetrics.pixelSizeFactor;
-            dc.pixelSizeOffset=pixelMetrics.pixelSizeOffset;
+            var pixelMetrics = this.computePixelMetrics(dc.projection);
+            dc.pixelSizeFactor = pixelMetrics.pixelSizeFactor;
+            dc.pixelSizeOffset = pixelMetrics.pixelSizeOffset;
 
             // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
             // are used to support operations on navigator state.
