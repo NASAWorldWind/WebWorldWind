@@ -497,7 +497,7 @@ define([
 
         AbstractMesh.prototype.computePickPosition = function (dc) {
             var currentData = this.currentData,
-                line = dc.pickRay,
+                line = dc.pickRay.clone(),
                 localLineOrigin = new Vec3(line.origin[0], line.origin[1], line.origin[2]).subtract(
                     currentData.referencePoint),
                 localLine = new Line(localLineOrigin, line.direction),

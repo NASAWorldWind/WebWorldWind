@@ -478,7 +478,7 @@ define([
             this.resetDrawContext();
             this.drawContext.pickingMode = true;
             this.drawContext.pickPoint = pickPoint;
-            this.drawContext.pickRay=this.rayThroughScreenPoint(pickPoint);
+            this.drawContext.pickRay = this.rayThroughScreenPoint(pickPoint);
             this.drawFrame();
 
             return this.drawContext.objectsAtPickPoint;
@@ -509,7 +509,7 @@ define([
             this.drawContext.pickingMode = true;
             this.drawContext.pickTerrainOnly = true;
             this.drawContext.pickPoint = pickPoint;
-            this.drawContext.pickRay=this.rayThroughScreenPoint(pickPoint);
+            this.drawContext.pickRay = this.rayThroughScreenPoint(pickPoint);
             this.drawFrame();
 
             return this.drawContext.objectsAtPickPoint;
@@ -709,21 +709,9 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WorldWindow.prototype.computeDrawContext = function () {
-            this.worldWindowController.applyLimits();
-            var dc = this.drawContext;
-
-            dc.modelview.setToIdentity();
-            dc.projection.setToIdentity();
-            this.computeViewingTransform(dc.projection, dc.modelview);
-            dc.viewport = this.viewport;
-            dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));
-
-            dc.modelviewProjection.setToIdentity();
-            dc.modelviewProjection.setToMultiply(dc.projection, dc.modelview);
-
+        WorldWindow.prototype.computePixelMetrics = function (projection) {
             var projectionInv = Matrix.fromIdentity();
-            projectionInv.invertMatrix(dc.projection);
+            projectionInv.invertMatrix(projection);
 
             // Compute the eye coordinate rectangles carved out of the frustum by the near and far clipping planes, and
             // the distance between those planes and the eye point along the -Z axis. The rectangles are determined by
@@ -750,8 +738,46 @@ define([
             // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
             var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
                 frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
-            dc.pixelSizeFactor = frustumWidthScale / dc.viewport.width;
-            dc.pixelSizeOffset = frustumWidthOffset / dc.viewport.height;
+
+            return {pixelSizeFactor: frustumWidthScale / this.viewport.width, pixelSizeOffset: frustumWidthOffset / this.viewport.height};
+        };
+
+        /**
+         * Computes the approximate size of a pixel at a specified distance from the eye point.
+         * <p>
+         * This method assumes rectangular pixels, where pixel coordinates denote
+         * infinitely thin spaces between pixels. The units of the returned size are in model coordinates per pixel
+         * (usually meters per pixel). This returns 0 if the specified distance is zero. The returned size is undefined
+         * if the distance is less than zero.
+         *
+         * @param {Number} distance The distance from the eye point at which to determine pixel size, in model
+         * coordinates.
+         * @returns {Number} The approximate pixel size at the specified distance from the eye point, in model
+         * coordinates per pixel.
+         */
+        WorldWindow.prototype.pixelSizeAtDistance = function (distance) {
+            this.computeViewingTransform(this.scratchProjection, this.scratchModelview);
+            var pixelMetrics=this.computePixelMetrics(this.scratchProjection);
+            return pixelMetrics.pixelSizeFactor * distance + pixelMetrics.pixelSizeOffset;
+        };
+
+        // Internal. Intentionally not documented.
+        WorldWindow.prototype.computeDrawContext = function () {
+            this.worldWindowController.applyLimits();
+            var dc = this.drawContext;
+
+            dc.modelview.setToIdentity();
+            dc.projection.setToIdentity();
+            this.computeViewingTransform(dc.projection, dc.modelview);
+            dc.viewport = this.viewport;
+            dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));
+
+            dc.modelviewProjection.setToIdentity();
+            dc.modelviewProjection.setToMultiply(dc.projection, dc.modelview);
+
+            var pixelMetrics=this.computePixelMetrics(dc.projection);
+            dc.pixelSizeFactor=pixelMetrics.pixelSizeFactor;
+            dc.pixelSizeOffset=pixelMetrics.pixelSizeOffset;
 
             // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
             // are used to support operations on navigator state.
@@ -1468,8 +1494,7 @@ define([
             }
 
             // Convert the point's xy coordinates from window coordinates to WebGL screen coordinates.
-            this.drawContext.viewport = this.viewport;
-            var screenPoint = this.drawContext.convertPointToViewport(point, new Vec3(0, 0, 0)),
+            var screenPoint = new Vec3(point[0], this.viewport.height - point[1], 0),
                 nearPoint = new Vec3(0, 0, 0),
                 farPoint = new Vec3(0, 0, 0);
 

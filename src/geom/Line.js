@@ -96,5 +96,34 @@ define([
             return result;
         };
 
+        /**
+         * Creates a new line that is a copy of this line.
+         * @returns {Line} The new placemark.
+         */
+        Line.prototype.clone = function () {
+            var clone = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+            clone.copy(this);
+
+            return clone;
+        };
+
+        /**
+         * Copies the components of a specified line to this line.
+         * @param {Line} copyLine The line to copy.
+         * @returns {Line} A copy of this line equal to otherLine.
+         * @throws {ArgumentError} If the specified line is null or undefined.
+         */
+        Line.prototype.copy = function (copyLine) {
+            if (!copyLine) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Line", "copy", "missingLine"));
+            }
+
+            this.origin.copy(copyLine.origin);
+            this.direction.copy(copyLine.direction);
+
+            return this;
+        };
+
         return Line;
     });

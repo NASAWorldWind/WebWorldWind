@@ -72,6 +72,8 @@ define([
     wwd.worldWindowController = new BasicWorldWindowController(wwd);
     wwd.viewport = viewport;
     wwd.depthBits = 24;
+    wwd.scratchModelview = Matrix.fromIdentity();
+    wwd.scratchProjection = Matrix.fromIdentity();
     wwd.resetDrawContext();
 
     describe("DrawContext Tests", function () {
@@ -199,25 +201,6 @@ define([
                     expect(result[i]).toBeCloseTo(expectedResult[i], 2);
                 }
 
-            });
-        });
-
-        describe("Correctly computes a ray originating at the navigator's eyePoint and extending through the specified point in window coordinates", function () {
-            it("Should throw an exception on missing input parameter", function () {
-                expect(function () {
-                    dc.rayThroughScreenPoint(null);
-                }).toThrow();
-            });
-
-            it("Calculates rayThroughScreenPoint correctly", function () {
-                var screenPoint = new Vec2(13.5, 635);
-                var expectedOrigin = new Vec3(-13332838.774, 8170373.752, -4852756.452);
-                var expectedDirection = new Vec3(0.758, -0.628, -0.177);
-                var line = dc.rayThroughScreenPoint(screenPoint);
-                var result = line.origin;
-                expectVec3CloseTo(result, expectedOrigin);
-                result = line.direction;
-                expectVec3CloseTo(result, expectedDirection);
             });
         });
 
