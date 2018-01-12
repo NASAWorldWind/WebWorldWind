@@ -18,7 +18,7 @@ define([
             this.currentGlContext = "fake GL context";
             this.pixelScale = 1;
             this.textRenderer = new TextRenderer(this);
-        }
+        };
 
         var testText = "Lorem ipsum dolor sit amet, consectetur "
             + "adipiscing elit, sed do eiusmod tempor incididunt ut";
