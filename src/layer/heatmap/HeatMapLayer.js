@@ -122,8 +122,8 @@ define([
                 radius = this._radius(tile.sector, this.tileWidth, this.tileHeight);
             }
 
-            var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude);
-            var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude);
+            var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude) * 0.1;
+            var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude) * 0.1;
             var extendedSector = new Sector(
                 tile.sector.minLatitude - latitudeChange,
                 tile.sector.maxLatitude + latitudeChange,
@@ -137,8 +137,8 @@ define([
             var canvas = new ColoredTile(data, {
                 sector: extendedSector,
 
-                width: 3 * this.tileWidth,
-                height: 3 * this.tileHeight,
+                width: this.tileWidth + 2 * Math.ceil(0.1 * this.tileWidth),
+                height: this.tileHeight + 2 * Math.ceil(0.1 * this.tileHeight),
                 radius: radius,
 
                 intensityGradient: this._gradient,
@@ -147,7 +147,7 @@ define([
             var result = document.createElement('canvas');
             result.height = this.tileHeight;
             result.width = this.tileWidth;
-            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(this.tileWidth, this.tileHeight, this.tileWidth, this.tileHeight), 0, 0);
+            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(Math.ceil(0.1 * this.tileWidth), Math.ceil(0.1 * this.tileHeight), this.tileWidth, this.tileHeight), 0, 0);
             var url = result.toDataURL();
 
             var image = new Image();
