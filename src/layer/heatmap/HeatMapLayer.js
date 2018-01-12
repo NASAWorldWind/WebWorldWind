@@ -1,5 +1,5 @@
 define([
-    './HeatMapCanvas',
+    './ColoredTile',
     '../../util/ImageSource',
     './IntervalType',
     '../../geom/Location',
@@ -7,7 +7,7 @@ define([
     '../TiledImageLayer',
     '../../geom/Sector',
     '../../util/WWUtil'
-], function (HeatMapCanvas,
+], function (ColoredTile,
              ImageSource,
              IntervalType,
              Location,
@@ -27,52 +27,49 @@ define([
      *  layer. Default is ['blue', 'cyan', 'lime', 'yellow', 'red']
      * @param options.intervalType {IntervalType} Optional. Different types of approaches to handling the interval between min
      *  and max values. Default value is Continuous.
-     * @param options.minOpacity {Number} Optional. Minimum opacity of the layer to be generated. It must be number between 0 and 1.
-     *  Default value is 0.05
-     * @param options.blur {Number} Optional. Blurring of the point representing the location internally in the heatmap. Default value is 15
-     * @param options.radius {Number} Optional. Radius of the point to be representing the intensity location. Default value is 25
+     * @param options.radius {Number} Optional. It shoudl also be possible to provide a function. Radius of the point to
+     *  be representing the intensity location. Default value is 25. The size of the radius.
      */
     var HeatMapLayer = function (displayName, data, options) {
-        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 14, 'image/png', 'HeatMap' + WWUtil.guid(), 512, 512);
+        this.tileWidth = 512;
+        this.tileHeight = 512;
+
+        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 14, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
 
         this.displayName = displayName;
 
         this._data = data;
 
-        this._max = this.getMax(data);
-
         this._gradient = this.getGradient(data,
             options.intervalType || IntervalType.CONTINUOUS,
             options.scale || ['blue', 'cyan', 'lime', 'yellow', 'red']);
 
+        // It is necessary
         this._radius = options.radius || 25;
-        this._blur = options.blur || 15;
-        if(options.blur === 0) {
-            this._blur = options.blur;
-        }
-        this._minOpacity = options.minOpacity || 0.05;
     };
 
     HeatMapLayer.prototype = Object.create(TiledImageLayer.prototype);
 
-    HeatMapLayer.prototype.getMax = function(data) {
-        var max = Number.MIN_VALUE;
-        data.forEach(function(point){
-            if(point.intensity > max) {
-                max = point.intensity;
-            }
-        });
-        return max;
-    };
-
+    /**
+     * @private
+     * @param data
+     * @param sector
+     * @returns {IntensityLocation[]}
+     */
     HeatMapLayer.prototype.filterGeographically = function(data, sector) {
         return data.filter(function(point){
             return point.isInSector(sector)
         });
     };
 
-    // It doesn't handle the way the intensity is mapped to colors. It represents default color for the heatmap and then
-    // how the blur is applied
+    /**
+     * Object represented by
+     * 0.2: #ff0000
+     * @param data
+     * @param intervalType
+     * @param scale
+     * @returns {{}}
+     */
     HeatMapLayer.prototype.getGradient = function(data, intervalType, scale) {
         var gradient = {};
         if(intervalType === IntervalType.CONTINUOUS) {
@@ -118,23 +115,41 @@ define([
 
             var imagePath = tile.imagePath,
                 cache = dc.gpuResourceCache,
-                layer = this;
+                layer = this,
+                radius = this._radius;
 
-            var canvas = document.createElement("canvas");
-            canvas.width = 512;
-            canvas.height = 512;
+            if(typeof this._radius === 'function') {
+                radius = this._radius(tile.sector, this.tileWidth, this.tileHeight);
+            }
 
-            new HeatMapCanvas(canvas, {
-                sector: tile.sector,
-                data: this.filterGeographically(this._data, tile.sector),
-                max: this._max,
-                gradient: this._gradient,
-                radius: this._radius,
-                blur: this._blur,
-                minOpacity: this._minOpacity
-            }).draw();
+            var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude);
+            var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude);
+            var extendedSector = new Sector(
+                tile.sector.minLatitude - latitudeChange,
+                tile.sector.maxLatitude + latitudeChange,
+                tile.sector.minLongitude - longitudeChange,
+                tile.sector.maxLongitude + longitudeChange
+            );
+            var data = this.filterGeographically(this._data, extendedSector);
 
-            var url = canvas.toDataURL("image/png");
+            // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
+            // of the tile width / tile height
+            var canvas = new ColoredTile(data, {
+                sector: extendedSector,
+
+                width: 3 * this.tileWidth,
+                height: 3 * this.tileHeight,
+                radius: radius,
+
+                intensityGradient: this._gradient,
+                incrementPerIntensity: 0.008
+            }).canvas();
+            var result = document.createElement('canvas');
+            result.height = this.tileHeight;
+            result.width = this.tileWidth;
+            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(this.tileWidth, this.tileHeight, this.tileWidth, this.tileHeight), 0, 0);
+            var url = result.toDataURL();
+
             var image = new Image();
             image.onload = function() {
                 Logger.log(Logger.LEVEL_INFO, "Image retrieval succeeded: " + url);

@@ -8,14 +8,23 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        $.get('http://eoapps.solenix.ch/stats/sentinel-2a/2017/09.json').then(function (result) {
+        $.get('http://eoapps.solenix.ch/stats/sentinel-2a/2017/10.json').then(function (result) {
             "use strict";
             // Create the WorldWindow.
             var wwd = new WorldWind.WorldWindow("canvasOne");
 
             var data = result.boxes.map(function (box) {
-                return new WorldWind.IntensitySector(Number(box.bbox1Lat),Number(box.bbox2Lat), Number(box.bbox1Lon) , Number(box.bbox2Lon), box.amount);
+                return new WorldWind.IntensityLocation((Number(box.bbox1Lat) + Number(box.bbox2Lat)) / 2, (Number(box.bbox1Lon) + Number(box.bbox2Lon)) / 2, box.amount);
             });
+
+            function calculatePointRadius(sector, tileWidth, tileHeight) {
+                var latitude = Math.abs(sector.maxLatitude - sector.minLatitude);
+                if(latitude < 1) {
+                    return tileHeight;
+                } else {
+                    return tileHeight / latitude;
+                }
+            }
 
             /**
              * Add imagery layers.
@@ -27,7 +36,7 @@ requirejs(['./WorldWindShim',
                 {layer: new WorldWind.CompassLayer(), enabled: true},
                 {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
                 {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
-                {layer: new WorldWind.HeatMapLayer("HeatMap, Default version", data, {minOpacity: 0.2}), enabled: true}
+                {layer: new WorldWind.HeatMapLayer("HeatMap, Default version", data, {radius: calculatePointRadius}), enabled: true}
             ];
 
             for (var l = 0; l < layers.length; l++) {

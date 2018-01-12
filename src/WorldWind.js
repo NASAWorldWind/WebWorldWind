@@ -77,7 +77,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GpuShader',
         './shaders/GroundProgram',
         './util/HashMap',
-        './layer/heatmap/HeatMapCanvas',
         './layer/heatmap/HeatMapLayer',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
@@ -85,7 +84,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/ImageTile',
         './util/Insets',
         './layer/heatmap/IntensityLocation',
-        './layer/heatmap/IntensitySector',
         './layer/heatmap/IntervalType',
         './formats/kml/util/ItemIcon',
         './formats/kml/KmlAbstractView',
@@ -323,7 +321,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuShader,
               GroundProgram,
               HashMap,
-              HeatMapCanvas,
               HeatMapLayer,
               HighlightController,
               ImagePyramid,
@@ -331,7 +328,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ImageTile,
               Insets,
               IntensityLocation,
-              IntensitySector,
               IntervalType,
               ItemIcon,
               KmlAbstractView,
@@ -778,14 +774,12 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuShader'] = GpuShader;
         WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HashMap'] = HashMap;
-        WorldWind['HeatMapCanvas'] = HeatMapCanvas;
         WorldWind['HeatMapLayer'] = HeatMapLayer;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
         WorldWind['IntensityLocation'] = IntensityLocation;
-        WorldWind['IntensitySector'] = IntensitySector;
         WorldWind['IntervalType'] = IntervalType;
         WorldWind['KmlControls'] = KmlControls;
         WorldWind['KmlFile'] = KmlFile;
