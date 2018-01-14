@@ -207,7 +207,7 @@ define([
                     point1 = new Vec3(0, 0, 0),
                     point2 = new Vec3(0, 0, 0),
                     origin = new Vec3(0, 0, 0);
-                // console.log(ray.origin.toString(),ray.direction.toString());
+
                 if (!globe.intersectsLine(ray, point1)) {
                     return;
                 }
