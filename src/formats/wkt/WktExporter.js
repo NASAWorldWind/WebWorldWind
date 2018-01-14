@@ -60,14 +60,16 @@ define(['../../error/ArgumentError',
                             "missingRenderables"));
                 }
 
-                if (renderables.length == 0)
+                if (renderables.length == 0) {
                     return;
+                }
 
                 if (renderables.length > 1) {
                     var sb = WktType.SupportedGeometries.GEOMETRY_COLLECTION + '(';
 
                     for (var i = 0; i < renderables.length; i++) {
-                        var exportedRenderable = this.exportRenderable(renderables[i])
+                        var exportedRenderable = this.exportRenderable(renderables[i]);
+
                         if (exportedRenderable) {
                             sb = sb + exportedRenderable;
                             sb = sb + ',';
