@@ -555,8 +555,9 @@ define([
             // Determine the terrain position at the pick point. If the terrain is picked, add a corresponding picked
             // object to the draw context. Suppress this step in region picking mode.
             if (!dc.regionPicking) {
-                var ray = dc.pickRay.clone(),
+                var ray = dc.pickRay.clone(), // Cloning the pick ray is necessary here due to the fact that Tesselator.computeIntersections modifies ray
                     point = this.computeNearestIntersection(ray, pickableTiles);
+
                 if (point) {
                     dc.globe.computePositionFromPoint(point[0], point[1], point[2], position);
                     position.altitude = dc.globe.elevationAtLocation(position.latitude, position.longitude);

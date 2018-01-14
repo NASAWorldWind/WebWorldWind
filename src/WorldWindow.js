@@ -663,49 +663,56 @@ define([
 
         // Internal. Intentionally not documented.
         WorldWindow.prototype.computeViewingTransform = function (projection, modelview) {
+            if (!modelview) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
+            }
+
+            this.worldWindowController.applyLimits();
             var globe = this.globe;
             var navigator = this.navigator;
             var lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0);
             modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
 
-            var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
-                eyePoint = modelview.extractEyePoint(new Vec3(0, 0, 0)),
-                eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
-                eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
-                atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
-                viewport = this.viewport;
+            if (projection) {
+                var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
+                    eyePoint = modelview.extractEyePoint(new Vec3(0, 0, 0)),
+                    eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
+                    eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
+                    atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
+                    viewport = this.viewport;
 
-            // Set the far clip distance to the smallest value that does not clip the atmosphere.
-            // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
-            // TODO horizon is not in view
-            // TODO parameterize the object altitude for horizon distance
-            var farDistance = eyeHorizon + atmosphereHorizon;
-            if (farDistance < 1e3)
-                farDistance = 1e3;
+                // Set the far clip distance to the smallest value that does not clip the atmosphere.
+                // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+                // TODO horizon is not in view
+                // TODO parameterize the object altitude for horizon distance
+                var farDistance = eyeHorizon + atmosphereHorizon;
+                if (farDistance < 1e3)
+                    farDistance = 1e3;
 
-            // Compute the near clip distance in order to achieve a desired depth resolution at the far clip distance.
-            // This computed distance is limited such that it does not intersect the terrain when possible and is never
-            // less than a predetermined minimum (usually one). The computed near distance automatically scales with the
-            // resolution of the WebGL depth buffer.
-            var nearDistance = WWMath.perspectiveNearDistanceForFarDistance(farDistance, 10, this.depthBits);
+                // Compute the near clip distance in order to achieve a desired depth resolution at the far clip distance.
+                // This computed distance is limited such that it does not intersect the terrain when possible and is never
+                // less than a predetermined minimum (usually one). The computed near distance automatically scales with the
+                // resolution of the WebGL depth buffer.
+                var nearDistance = WWMath.perspectiveNearDistanceForFarDistance(farDistance, 10, this.depthBits);
 
-            // Prevent the near clip plane from intersecting the terrain.
-            var distanceToSurface = eyePos.altitude - globe.elevationAtLocation(eyePos.latitude, eyePos.longitude);
-            if (distanceToSurface > 0) {
-                var maxNearDistance = WWMath.perspectiveNearDistance(viewport.width, viewport.height, distanceToSurface);
-                if (nearDistance > maxNearDistance) {
-                    nearDistance = maxNearDistance;
+                // Prevent the near clip plane from intersecting the terrain.
+                var distanceToSurface = eyePos.altitude - globe.elevationAtLocation(eyePos.latitude, eyePos.longitude);
+                if (distanceToSurface > 0) {
+                    var maxNearDistance = WWMath.perspectiveNearDistance(viewport.width, viewport.height, distanceToSurface);
+                    if (nearDistance > maxNearDistance) {
+                        nearDistance = maxNearDistance;
+                    }
                 }
+
+                if (nearDistance < 1) {
+                    nearDistance = 1;
+                }
+
+                // Compute the current projection matrix based on this navigator's perspective properties and the current
+                // WebGL viewport.
+                projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
             }
-
-            if (nearDistance < 1) {
-                nearDistance = 1;
-            }
-
-            // Compute the current projection matrix based on this navigator's perspective properties and the current
-            // WebGL viewport.
-            projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
-
         };
 
         // Internal. Intentionally not documented.
@@ -766,7 +773,6 @@ define([
 
         // Internal. Intentionally not documented.
         WorldWindow.prototype.computeDrawContext = function () {
-            this.worldWindowController.applyLimits();
             var dc = this.drawContext;
 
             dc.modelview.setToIdentity();

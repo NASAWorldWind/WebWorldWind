@@ -20,6 +20,7 @@ define([
         '../util/AbsentResourceList',
         '../error/ArgumentError',
         '../util/Logger',
+        '../geom/Matrix',
         '../geom/Sector',
         '../layer/Layer',
         '../cache/MemoryCache',
@@ -32,6 +33,7 @@ define([
     function (AbsentResourceList,
               ArgumentError,
               Logger,
+              Matrix,
               Sector,
               Layer,
               MemoryCache,
@@ -119,6 +121,9 @@ define([
              * @readonly
              */
             this.tileMatrixSet = config.tileMatrixSet;
+
+            // Internal. Intentionally not documented.
+            this.lasTtMVP = Matrix.fromIdentity();
 
 
             // Determine the layer's sector if possible. Mandatory for EPSG:4326 tile matrix sets. (Others compute
@@ -545,13 +550,13 @@ define([
                 return;
 
             if (this.currentTilesInvalid
-                || !this.lasTtMVP || !dc.modelviewProjection.equals(this.lasTtMVP)
-                || dc.globeStateKey != this.lastGlobeStateKey) {
+                || !dc.modelviewProjection.equals(this.lasTtMVP)
+                || dc.globeStateKey !== this.lastGlobeStateKey) {
                 this.currentTilesInvalid = false;
                 this.assembleTiles(dc);
             }
 
-            this.lasTtMVP = dc.modelviewProjection.clone();
+            this.lasTtMVP.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {
