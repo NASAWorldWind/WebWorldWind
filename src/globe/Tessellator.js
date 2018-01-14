@@ -106,7 +106,7 @@ define([
             this.tileCache = new MemoryCache(5000000, 4000000); // Holds 316 32x32 tiles.
 
             this.elevationTimestamp = undefined;
-            this.lastModelViewProjection = undefined;
+            this.lastModelViewProjection = Matrix.fromIdentity();
 
             this.vertexPointLocation = -1;
             this.vertexTexCoordLocation = -1;
@@ -183,13 +183,12 @@ define([
             if (this.lastGlobeStateKey === dc.globeStateKey
                 && this.lastVerticalExaggeration === dc.verticalExaggeration
                 && this.elevationTimestamp === lastElevationsChange
-                && this.lastModelViewProjection
                 && dc.modelviewProjection.equals(this.lastModelViewProjection)) {
 
                 return this.lastTerrain;
             }
 
-            this.lastModelViewProjection = dc.modelviewProjection.clone();
+            this.lastModelViewProjection.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
             this.elevationTimestamp = lastElevationsChange;
             this.lastVerticalExaggeration = dc.verticalExaggeration;

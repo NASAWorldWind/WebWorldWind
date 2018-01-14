@@ -668,6 +668,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
             }
 
+            modelview.setToIdentity();
             this.worldWindowController.applyLimits();
             var globe = this.globe;
             var navigator = this.navigator;
@@ -675,6 +676,7 @@ define([
             modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
 
             if (projection) {
+                projection.setToIdentity();
                 var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
                     eyePoint = modelview.extractEyePoint(new Vec3(0, 0, 0)),
                     eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
@@ -775,8 +777,6 @@ define([
         WorldWindow.prototype.computeDrawContext = function () {
             var dc = this.drawContext;
 
-            dc.modelview.setToIdentity();
-            dc.projection.setToIdentity();
             this.computeViewingTransform(dc.projection, dc.modelview);
             dc.viewport = this.viewport;
             dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));

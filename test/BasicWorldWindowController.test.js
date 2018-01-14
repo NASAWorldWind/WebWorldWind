@@ -29,12 +29,6 @@ define([
 ], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Globe2D, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
 
-    var expectVec3CloseTo = function (v1, v2) {
-        for (var i = 0; i < 3; i++) {
-            expect(v1[i]).toBeCloseTo(v2[i], 3);
-        }
-    };
-
     var MockGlContext = function () {
         this.drawingBufferWidth = 800;
         this.drawingBufferHeight = 800;
@@ -55,26 +49,30 @@ define([
     wwd.worldWindowController = new BasicWorldWindowController(wwd);
     wwd.viewport = viewport;
     wwd.depthBits = 24;
-    wwd.canvas={clientLeft: 0, clientTop: 0, getBoundingClientRect: function() {return {left: 339.5, top: 225};}};
-    // wwd.scratchModelview = Matrix.fromIdentity();
-    // wwd.scratchProjection = Matrix.fromIdentity();
-    // wwd.resetDrawContext();
+    wwd.canvas = {
+        clientLeft: 0, clientTop: 0, getBoundingClientRect: function () {
+            return {left: 339.5, top: 225};
+        }
+    };
+    wwd.scratchModelview = Matrix.fromIdentity();
+    wwd.scratchProjection = Matrix.fromIdentity();
+    wwd.resetDrawContext();
 
     describe("BasicWorldWindowController tests", function () {
 
         describe("Calculate 2D drag", function () {
             it("Correctly interprets 2D drag gesture", function () {
-                var recognizer={state: "changed", clientX: 0, clientY: 0, translationX: 0, translationY: 0};
-                wwd.navigator.beginPoint=new Vec2(693,428);
-                wwd.navigator.lastPoint=new Vec2(693.4,429.2);
+                var recognizer = {state: "changed", clientX: 0, clientY: 0, translationX: 0, translationY: 0};
+                wwd.navigator.beginPoint = new Vec2(693, 428);
+                wwd.navigator.lastPoint = new Vec2(693.4, 429.2);
                 wwd.worldWindowController.handlePanOrDrag2D(recognizer);
 
-                var navigator=wwd.navigator;
+                var navigator = wwd.navigator;
                 expect(navigator.range).toEqual(10000000);
                 expect(navigator.tilt).toEqual(0);
                 expect(navigator.roll).toEqual(0);
                 expect(navigator.heading).toEqual(0);
-                expect(navigator.lookAtLocation.latitude).toBeCloseTo(   29.8728799, 7);
+                expect(navigator.lookAtLocation.latitude).toBeCloseTo(29.8728799, 7);
                 expect(navigator.lookAtLocation.longitude).toBeCloseTo(-109.9576266, 7);
             });
         });

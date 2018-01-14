@@ -190,7 +190,6 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            // console.log("foo",x,y,tx,ty);
             var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
                 navigator.beginPoint.set(x, y);
@@ -220,7 +219,7 @@ define([
 
                 // Transform the original navigator state's modelview matrix to account for the gesture's change.
                 var modelview = Matrix.fromIdentity();
-                this.wwd.computeViewingTransform(null,modelview);
+                this.wwd.computeViewingTransform(null, modelview);
                 modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
 
                 // Compute the globe point at the screen center from the perspective of the transformed navigator state.
