@@ -985,6 +985,12 @@ define([
                                     this.metadata.geoDoubleParams,
                                     this.metadata.geoAsciiParams);
                             break;
+                        case GeoTiffConstants.Key.ProjLinearUnitsGeoKey:
+                            this.metadata.projLinearUnits =
+                                new GeoTiffKeyEntry(keyId, tiffTagLocation, count, valueOffset).getGeoKeyValue(
+                                    this.metadata.geoDoubleParams,
+                                    this.metadata.geoAsciiParams);
+                            break;
                         default:
                             Logger.log(Logger.LEVEL_WARNING, "Ignored GeoTiff key: " + keyId);
                             break;
