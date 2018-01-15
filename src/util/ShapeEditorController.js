@@ -748,8 +748,8 @@ define([
 
         /**
          * Computes the average location of a specified array of locations.
-         * @param {Array} locations The locations.
-         * @return {Position} the average of the locations.
+         * @param {Array} locations The array of locations.
+         * @return {Position} the average of the locations specified in the array.
          */
         ShapeEditorController.prototype.getCenter = function (locations) {
             var count = 0;

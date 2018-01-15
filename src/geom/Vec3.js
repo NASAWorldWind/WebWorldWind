@@ -525,7 +525,8 @@ define([
          * @param {Vec3} origin The line's starting point.
          * @param {Number} t The specified dot product on the segment (representing the
          * scalar value of a vector equation of line).
-         * @param {Vec3} direction
+         * @param {Vec3} direction The direction vector of the segment (representing a
+         * scalar value)
          * @returns {Vec3} The vector that corresponds with a specified line segment.
          */
         Vec3.fromLine = function(origin, t, direction)
