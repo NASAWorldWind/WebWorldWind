@@ -32,10 +32,21 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
 
+        // Create GeoTiff layer
+        var geotiffLayer = new WorldWind.RenderableLayer("GeoTiff");
+        geotiffLayer.enabled = false;
+        geotiffLayer.showSpinner = true;
+
         for (var l = 0; l < layers.length; l++) {
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
+
+        // Add GeoTiff to the WorldWindow's layer list. Disabled until its image is loaded.
+        wwd.addLayer(geotiffLayer);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
 
         var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
 
@@ -47,13 +58,14 @@ requirejs(['./WorldWindShim',
                 new WorldWind.ImageSource(canvas)
             );
 
-            var geotiffLayer = new WorldWind.RenderableLayer("GeoTiff");
             geotiffLayer.addRenderable(surfaceGeoTiff);
-            wwd.addLayer(geotiffLayer);
+
+            geotiffLayer.enabled = true;
+            geotiffLayer.showSpinner = false;
+            layerManager.synchronizeLayerList();
+
+            wwd.redraw();
 
             wwd.goTo(new WorldWind.Position(43.69, 28.54, 55000));
-
-            // Create a layer manager for controlling layer visibility.
-            var layerManager = new LayerManager(wwd);
         });
     });
