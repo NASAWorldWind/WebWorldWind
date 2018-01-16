@@ -199,26 +199,27 @@ define([
                     y1 = navigator.lastPoint[1],
                     x2 = navigator.beginPoint[0] + tx,
                     y2 = navigator.beginPoint[1] + ty;
+
                 navigator.lastPoint.set(x2, y2);
 
-                var navState = this.currentState(),
-                    globe = this.wwd.globe,
-                    ray = navState.rayFromScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
+                var globe = this.wwd.globe,
+                    ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
                     point1 = new Vec3(0, 0, 0),
                     point2 = new Vec3(0, 0, 0),
                     origin = new Vec3(0, 0, 0);
+
                 if (!globe.intersectsLine(ray, point1)) {
                     return;
                 }
 
-                ray = navState.rayFromScreenPoint(this.wwd.canvasCoordinates(x2, y2));
+                ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x2, y2));
                 if (!globe.intersectsLine(ray, point2)) {
                     return;
                 }
 
                 // Transform the original navigator state's modelview matrix to account for the gesture's change.
                 var modelview = Matrix.fromIdentity();
-                modelview.copy(navState.modelview);
+                this.wwd.computeViewingTransform(null, modelview);
                 modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
 
                 // Compute the globe point at the screen center from the perspective of the transformed navigator state.
@@ -347,7 +348,7 @@ define([
             this.wwd.redraw();
         };
 
-        // Intentionally not documented.
+        // Documented in super-class.
         BasicWorldWindowController.prototype.applyLimits = function () {
             var navigator = this.wwd.navigator;
 
@@ -378,21 +379,6 @@ define([
                 // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
                 navigator.tilt = 0;
             }
-        };
-
-        // Intentionally not documented.
-        // TODO: Refactor into other classes
-        BasicWorldWindowController.prototype.currentState = function () {
-            var navigator = this.wwd.navigator;
-
-            this.applyLimits();
-
-            var globe = this.wwd.globe,
-                lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0),
-                modelview = Matrix.fromIdentity();
-            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
-
-            return navigator.currentStateForModelview(modelview);
         };
 
         return BasicWorldWindowController;

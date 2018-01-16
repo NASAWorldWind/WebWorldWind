@@ -334,7 +334,7 @@ define([
                 if (dc.pickingMode) {
                     return this.currentData.extent.intersectsFrustum(dc.pickFrustum);
                 } else {
-                    return this.currentData.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                    return this.currentData.extent.intersectsFrustum(dc.frustumInModelCoordinates);
                 }
             } else {
                 return true;
@@ -415,7 +415,7 @@ define([
          * @protected
          */
         AbstractShape.prototype.applyMvpMatrix = function (dc) {
-            this.scratchMatrix.copy(dc.navigatorState.modelviewProjection);
+            this.scratchMatrix.copy(dc.modelviewProjection);
             this.scratchMatrix.multiplyMatrix(this.currentData.transformationMatrix);
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, this.scratchMatrix);
         };
@@ -428,9 +428,9 @@ define([
          */
         AbstractShape.prototype.applyMvpMatrixForOutline = function (dc) {
             // Causes the outline to stand out from the interior.
-            this.scratchMatrix.copy(dc.navigatorState.projection);
+            this.scratchMatrix.copy(dc.projection);
             this.scratchMatrix.offsetProjectionDepth(-0.001);
-            this.scratchMatrix.multiplyMatrix(dc.navigatorState.modelview);
+            this.scratchMatrix.multiplyMatrix(dc.modelview);
             this.scratchMatrix.multiplyMatrix(this.currentData.transformationMatrix);
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, this.scratchMatrix);
         };
