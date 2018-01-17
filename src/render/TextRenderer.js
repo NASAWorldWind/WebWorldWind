@@ -69,10 +69,13 @@ define([
             this.lineSpacing = 0.15; // fraction of font size
 
             // Internal use only. Intentionally not documented.
-            this.strokeStyle = "rgba(0, 0, 0, " + 0.5 + ")";
+            this.outlineColor = new Color(0, 0, 0, 0.5);
 
             // Internal use only. Intentionally not documented.
-            this.strokeWidth = 4;
+            this.outlineWidth = 4;
+
+            // Internal use only. Intentionally not documented.
+            this.textColor = new Color(1, 1, 1, 1);
 
             // Internal use only. Intentionally not documented.
             this.typeFace = new Font(14);
@@ -101,8 +104,8 @@ define([
             }
 
             if (outline) {
-                maxWidth += this.strokeWidth;
-                height += this.strokeWidth;
+                maxWidth += this.outlineWidth;
+                height += this.outlineWidth;
             }
 
             return new Vec2(maxWidth, height);
@@ -132,9 +135,8 @@ define([
                 canvas2D = this.canvas2D,
                 textSize = this.textSize(text, this.typeFace, this.enableOutline),
                 lines = text.split("\n"),
-                strokeOffset = this.enableOutline ? this.strokeWidth / 2 : 0,
-                pixelScale = this.dc.pixelScale,
-                x, y;
+                strokeOffset = this.enableOutline ? this.outlineWidth / 2 : 0,
+                pixelScale = this.dc.pixelScale;
 
             canvas2D.width = Math.ceil(textSize[0]) * pixelScale;
             canvas2D.height = Math.ceil(textSize[1]) * pixelScale;
@@ -143,9 +145,9 @@ define([
             ctx2D.font = this.typeFace.fontString;
             ctx2D.textBaseline = "top";
             ctx2D.textAlign = this.typeFace.horizontalAlignment;
-            ctx2D.fillStyle = Color.WHITE.toHexString(false);
-            ctx2D.strokeStyle = this.strokeStyle;
-            ctx2D.lineWidth = this.strokeWidth;
+            ctx2D.fillStyle = this.textColor.toHexString(false);
+            ctx2D.strokeStyle = this.outlineColor.toRGBAString();
+            ctx2D.lineWidth = this.outlineWidth;
             ctx2D.lineCap = "round";
             ctx2D.lineJoin = "round";
 
@@ -257,7 +259,7 @@ define([
                 var start = 0;
                 var end = source.indexOf(' ', start + 1);
                 while (start < source.length) {
-                    if (end == -1) {
+                    if (end === -1) {
                         end = source.length;   // last word
                     }
 
@@ -270,7 +272,7 @@ define([
                     }
                     else {
                         // Width exceeded
-                        if (line.length != 0) {
+                        if (line.length !== 0) {
                             // Finish current line and start new one
                             wrappedText += line;
                             wrappedText += '\n';
