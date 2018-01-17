@@ -497,7 +497,7 @@ define([
 
         AbstractMesh.prototype.computePickPosition = function (dc) {
             var currentData = this.currentData,
-                line = dc.navigatorState.rayFromScreenPoint(dc.pickPoint),
+                line = dc.pickRay,
                 localLineOrigin = new Vec3(line.origin[0], line.origin[1], line.origin[2]).subtract(
                     currentData.referencePoint),
                 localLine = new Line(localLineOrigin, line.direction),
@@ -509,10 +509,10 @@ define([
 
                 if (intersectionPoints.length > 1) {
                     // Find the intersection nearest the eye point.
-                    var distance2 = iPoint.distanceToSquared(dc.navigatorState.eyePoint);
+                    var distance2 = iPoint.distanceToSquared(dc.eyePoint);
 
                     for (var i = 1; i < intersectionPoints.length; i++) {
-                        var d2 = intersectionPoints[i].distanceToSquared(dc.navigatorState.eyePoint);
+                        var d2 = intersectionPoints[i].distanceToSquared(dc.eyePoint);
                         if (d2 < distance2) {
                             distance2 = d2;
                             iPoint = intersectionPoints[i];
@@ -546,7 +546,7 @@ define([
 
                 var applyLighting = !dc.pickMode && this.currentData.normals && this.activeAttributes.applyLighting;
                 if (applyLighting) {
-                    dc.currentProgram.loadModelviewInverse(gl, dc.navigatorState.modelviewNormalTransform);
+                    dc.currentProgram.loadModelviewInverse(gl, dc.modelviewNormalTransform);
                 }
             }
 

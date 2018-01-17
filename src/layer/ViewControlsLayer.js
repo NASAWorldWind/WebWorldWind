@@ -394,8 +394,8 @@ define([
             }
 
             // Determine the lower-left corner position of the control collection.
-            screenOffset = this.placement.offsetForSize(dc.navigatorState.viewport.width,
-                dc.navigatorState.viewport.height);
+            screenOffset = this.placement.offsetForSize(dc.viewport.width,
+                dc.viewport.height);
             panelOffset = this.alignment.offsetForSize(controlPanelWidth, controlPanelHeight);
             x = screenOffset[0] - panelOffset[0];
             y = screenOffset[1] - panelOffset[1];

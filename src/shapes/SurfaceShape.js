@@ -454,7 +454,7 @@ define([
                 if (dc.pickingMode) {
                     return this.currentData.extent.intersectsFrustum(dc.pickFrustum);
                 } else {
-                    return this.currentData.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                    return this.currentData.extent.intersectsFrustum(dc.frustumInModelCoordinates);
                 }
             } else {
                 return true;

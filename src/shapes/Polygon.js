@@ -242,7 +242,7 @@ define([
             if (Array.isArray(this.activeAttributes.imageSource)
                 && this.activeAttributes.imageSource[0]
                 && (typeof this.activeAttributes.imageSource[0] === "string"
-                || this.activeAttributes.imageSource instanceof ImageSource)) {
+                    || this.activeAttributes.imageSource instanceof ImageSource)) {
                 return this.activeAttributes.imageSource[0];
             }
 
@@ -347,7 +347,7 @@ define([
         // Private. Intentionally not documented.
         Polygon.prototype.computeBoundaryPoints = function (dc, boundaries) {
             var eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 boundaryPoints = [],
                 stride = this._extrude ? 6 : 3,
                 pt = new Vec3(0, 0, 0),
@@ -391,7 +391,8 @@ define([
                 }
             }
 
-            this.currentData.eyeDistance = 0;/*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
+            this.currentData.eyeDistance = 0;
+            /*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
 
             return boundaryPoints;
         };
@@ -910,7 +911,7 @@ define([
 
             var applyLighting = !dc.pickMode && this.activeAttributes.applyLighting;
             if (applyLighting) {
-                dc.currentProgram.loadModelviewInverse(gl, dc.navigatorState.modelviewNormalTransform);
+                dc.currentProgram.loadModelviewInverse(gl, dc.modelviewNormalTransform);
             }
         };
 

@@ -143,7 +143,7 @@ define([
             this.beginDrawingCredits(dc);
 
             // Draw the image credits in a row along the bottom of the window from right to left.
-            var imageX = dc.navigatorState.viewport.width - (this.margin + this.imageCreditSize),
+            var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
                 imageHeight, maxImageHeight = 0;
 
             for (var i = 0; i < this.imageUrls.length; i++) {
@@ -271,7 +271,7 @@ define([
             imageWidth = activeTexture.imageWidth;
             imageHeight = activeTexture.imageHeight;
 
-            x = dc.navigatorState.viewport.width - (imageWidth + this.margin);
+            x = dc.viewport.width - (imageWidth + this.margin);
             ScreenCreditController.imageTransform.setTranslation(x, y, 0);
             ScreenCreditController.imageTransform.setScale(imageWidth, imageHeight, 1);
 
