@@ -136,8 +136,7 @@ define([
                 textSize = this.textSize(text, this.typeFace, this.enableOutline),
                 lines = text.split("\n"),
                 strokeOffset = this.enableOutline ? this.outlineWidth / 2 : 0,
-                pixelScale = this.dc.pixelScale,
-                x, y;
+                pixelScale = this.dc.pixelScale;
 
             canvas2D.width = Math.ceil(textSize[0]) * pixelScale;
             canvas2D.height = Math.ceil(textSize[1]) * pixelScale;
@@ -260,7 +259,7 @@ define([
                 var start = 0;
                 var end = source.indexOf(' ', start + 1);
                 while (start < source.length) {
-                    if (end == -1) {
+                    if (end === -1) {
                         end = source.length;   // last word
                     }
 
@@ -273,7 +272,7 @@ define([
                     }
                     else {
                         // Width exceeded
-                        if (line.length != 0) {
+                        if (line.length !== 0) {
                             // Finish current line and start new one
                             wrappedText += line;
                             wrappedText += '\n';
