@@ -28,6 +28,7 @@ define([
         './geom/Position',
         './gesture/RotationRecognizer',
         './gesture/TiltRecognizer',
+        './geom/Vec2',
         './geom/Vec3',
         './WorldWindowController',
         './util/WWMath'
@@ -43,6 +44,7 @@ define([
               Position,
               RotationRecognizer,
               TiltRecognizer,
+              Vec2,
               Vec3,
               WorldWindowController,
               WWMath) {
@@ -96,6 +98,14 @@ define([
             this.panRecognizer.requireRecognizerToFail(this.tiltRecognizer);
             this.pinchRecognizer.requireRecognizerToFail(this.tiltRecognizer);
             this.rotationRecognizer.requireRecognizerToFail(this.tiltRecognizer);
+
+            // Intentionally not documented.
+            this.beginPoint = new Vec2(0, 0);
+            this.lastPoint = new Vec2(0, 0);
+            this.beginHeading = 0;
+            this.beginTilt = 0;
+            this.beginRange = 0;
+            this.lastRotation = 0;
         };
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
@@ -155,7 +165,7 @@ define([
 
             var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
-                navigator.lastPoint.set(0, 0);
+                this.lastPoint.set(0, 0);
             } else if (state === WorldWind.CHANGED) {
                 // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
                 // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
@@ -165,8 +175,8 @@ define([
                     globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
                     distance = WWMath.max(1, navigator.range),
                     metersPerPixel = WWMath.perspectivePixelSize(canvas.clientWidth, canvas.clientHeight, distance),
-                    forwardMeters = (ty - navigator.lastPoint[1]) * metersPerPixel,
-                    sideMeters = -(tx - navigator.lastPoint[0]) * metersPerPixel,
+                    forwardMeters = (ty - this.lastPoint[1]) * metersPerPixel,
+                    sideMeters = -(tx - this.lastPoint[0]) * metersPerPixel,
                     forwardDegrees = (forwardMeters / globeRadius) * Angle.RADIANS_TO_DEGREES,
                     sideDegrees = (sideMeters / globeRadius) * Angle.RADIANS_TO_DEGREES;
 
@@ -176,7 +186,7 @@ define([
 
                 navigator.lookAtLocation.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
                 navigator.lookAtLocation.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
-                navigator.lastPoint.set(tx, ty);
+                this.lastPoint.set(tx, ty);
                 this.applyLimits();
                 this.wwd.redraw();
             }
@@ -192,15 +202,15 @@ define([
 
             var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
-                navigator.beginPoint.set(x, y);
-                navigator.lastPoint.set(x, y);
+                this.beginPoint.set(x, y);
+                this.lastPoint.set(x, y);
             } else if (state === WorldWind.CHANGED) {
-                var x1 = navigator.lastPoint[0],
-                    y1 = navigator.lastPoint[1],
-                    x2 = navigator.beginPoint[0] + tx,
-                    y2 = navigator.beginPoint[1] + ty;
+                var x1 = this.lastPoint[0],
+                    y1 = this.lastPoint[1],
+                    x2 = this.beginPoint[0] + tx,
+                    y2 = this.beginPoint[1] + ty;
 
-                navigator.lastPoint.set(x2, y2);
+                this.lastPoint.set(x2, y2);
 
                 var globe = this.wwd.globe,
                     ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
@@ -250,8 +260,8 @@ define([
 
             var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
-                navigator.beginHeading = navigator.heading;
-                navigator.beginTilt = navigator.tilt;
+                this.beginHeading = navigator.heading;
+                this.beginTilt = navigator.tilt;
             } else if (state === WorldWind.CHANGED) {
                 // Compute the current translation from screen coordinates to degrees. Use the canvas dimensions as a
                 // metric for converting the gesture translation to a fraction of an angle.
@@ -259,8 +269,8 @@ define([
                     tiltDegrees = 90 * ty / this.wwd.canvas.clientHeight;
 
                 // Apply the change in heading and tilt to this navigator's corresponding properties.
-                navigator.heading = navigator.beginHeading + headingDegrees;
-                navigator.tilt = navigator.beginTilt + tiltDegrees;
+                navigator.heading = this.beginHeading + headingDegrees;
+                navigator.tilt = this.beginTilt + tiltDegrees;
                 this.applyLimits();
                 this.wwd.redraw();
             }
@@ -273,12 +283,12 @@ define([
                 scale = recognizer.scale;
 
             if (state === WorldWind.BEGAN) {
-                navigator.beginRange = navigator.range;
+                this.beginRange = navigator.range;
             } else if (state === WorldWind.CHANGED) {
                 if (scale !== 0) {
                     // Apply the change in pinch scale to this navigator's range, relative to the range when the gesture
                     // began.
-                    navigator.range = navigator.beginRange / scale;
+                    navigator.range = this.beginRange / scale;
                     this.applyLimits();
                     this.wwd.redraw();
                 }
@@ -292,13 +302,13 @@ define([
                 rotation = recognizer.rotation;
 
             if (state === WorldWind.BEGAN) {
-                navigator.lastRotation = 0;
+                this.lastRotation = 0;
             } else if (state === WorldWind.CHANGED) {
                 // Apply the change in gesture rotation to this navigator's current heading. We apply relative to the
                 // current heading rather than the heading when the gesture began in order to work simultaneously with
                 // pan operations that also modify the current heading.
-                navigator.heading -= rotation - navigator.lastRotation;
-                navigator.lastRotation = rotation;
+                navigator.heading -= rotation - this.lastRotation;
+                this.lastRotation = rotation;
                 this.applyLimits();
                 this.wwd.redraw();
             }
@@ -311,13 +321,13 @@ define([
                 ty = recognizer.translationY;
 
             if (state === WorldWind.BEGAN) {
-                navigator.beginTilt = navigator.tilt;
+                this.beginTilt = navigator.tilt;
             } else if (state === WorldWind.CHANGED) {
                 // Compute the gesture translation from screen coordinates to degrees. Use the canvas dimensions as a
                 // metric for converting the translation to a fraction of an angle.
                 var tiltDegrees = -90 * ty / this.wwd.canvas.clientHeight;
                 // Apply the change in heading and tilt to this navigator's corresponding properties.
-                navigator.tilt = navigator.beginTilt + tiltDegrees;
+                navigator.tilt = this.beginTilt + tiltDegrees;
                 this.applyLimits();
                 this.wwd.redraw();
             }

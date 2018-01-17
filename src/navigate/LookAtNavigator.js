@@ -19,11 +19,9 @@
 define([
         '../geom/Location',
         '../navigate/Navigator',
-        '../geom/Vec2'
     ],
     function (Location,
-              Navigator,
-              Vec2) {
+              Navigator) {
         "use strict";
 
         /**
@@ -52,14 +50,6 @@ define([
 
             // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
             this.enable2DLimits = true;
-
-            // Intentionally not documented.
-            this.beginPoint = new Vec2(0, 0);
-            this.lastPoint = new Vec2(0, 0);
-            this.beginHeading = 0;
-            this.beginTilt = 0;
-            this.beginRange = 0;
-            this.lastRotation = 0;
         };
 
         LookAtNavigator.prototype = Object.create(Navigator.prototype);

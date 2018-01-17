@@ -63,8 +63,8 @@ define([
         describe("Calculate 2D drag", function () {
             it("Correctly interprets 2D drag gesture", function () {
                 var recognizer = {state: "changed", clientX: 0, clientY: 0, translationX: 0, translationY: 0};
-                wwd.navigator.beginPoint = new Vec2(693, 428);
-                wwd.navigator.lastPoint = new Vec2(693.4, 429.2);
+                wwd.worldWindowController.beginPoint = new Vec2(693, 428);
+                wwd.worldWindowController.lastPoint = new Vec2(693.4, 429.2);
                 wwd.worldWindowController.handlePanOrDrag2D(recognizer);
 
                 var navigator = wwd.navigator;
