@@ -93,7 +93,7 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layer);
         };
 
-        var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/geojson-data/";
+        var resourcesUrl = "./data/geojson/";
 
         // Polygon test
         var polygonLayer = new WorldWind.RenderableLayer("Polygon");
