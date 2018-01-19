@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports OpenSearchUrl
@@ -157,18 +168,18 @@ define([
 
             //params only in nodes, not in template
             var onlyNodeParams = nodeParams.filter(function (param) {
-                var templateParam = OpenSearchUtils.arrayFind(templateParams, function(templateParam) {
-                    return templateParam.name === param.name;
+                var templateParam = OpenSearchUtils.arrayFind(templateParams, function(templateParamElement) {
+                    return templateParamElement.name === param.name;
                 });
                 return templateParam == null;
             });
 
             var parameters = templateParams.map(function (templateParam) {
-                var nodeParam = OpenSearchUtils.arrayFind(nodeParams, function (nodeParam) {
-                    return nodeParam.name === templateParam.name;
+                var nodeParam = OpenSearchUtils.arrayFind(nodeParams, function (nodeParamElement) {
+                    return nodeParamElement.name === templateParam.name;
                 });
                 if (nodeParam) {
-                    return templateParam.merge(nodeParam)
+                    return templateParam.merge(nodeParam);
                 }
                 return templateParam;
             }).concat(onlyNodeParams);
