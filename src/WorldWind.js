@@ -224,6 +224,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/Touch',
         './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
+        './util/UrlBuilder',
         './geom/Vec2',
         './geom/Vec3',
         './layer/ViewControlsLayer',
@@ -468,6 +469,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Touch,
               TriangleMesh,
               UnsupportedOperationError,
+              UrlBuilder,
               Vec2,
               Vec3,
               ViewControlsLayer,
@@ -870,6 +872,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Touch'] = Touch;
         WorldWind['TriangleMesh'] = TriangleMesh;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
+        WorldWind['UrlBuilder'] = UrlBuilder;
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;

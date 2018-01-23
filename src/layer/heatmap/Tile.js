@@ -64,7 +64,7 @@ define([], function(){
             var location = this._data[i];
             // Get the location in pixels and draw the image.
             ctx.globalAlpha = location.intensity * this._incrementPerIntensity;
-            ctx.drawImage(shape, location.longitudeInSector(this._sector, this._width), location.latitudeInSector(this._sector, this._height));
+            ctx.drawImage(shape, location.longitudeInSector(this._sector, this._width), this._height - location.latitudeInSector(this._sector, this._height));
         }
 
         return this.clip(this._canvas, this._radius, this._radius, this._width, this._height);

@@ -18,7 +18,7 @@ requirejs(['./WorldWindShim',
             });
 
             function calculatePointRadius(sector, tileWidth, tileHeight) {
-                var latitude = Math.abs(sector.maxLatitude - sector.minLatitude);
+                var latitude = Math.ceil(Math.abs(sector.maxLatitude - sector.minLatitude));
                 if(latitude < 1) {
                     return tileHeight;
                 } else {
@@ -26,6 +26,27 @@ requirejs(['./WorldWindShim',
                 }
             }
 
+            var rectangleLayer = new WorldWind.TiledImageLayer(new WorldWind.Sector(-90, 90, -180, 180), new WorldWind.Location(45, 45), 14, 'image/png', 'Rectangle 1', 512, 512);
+            var RectangleUrlBuilder = function() {
+                WorldWind.UrlBuilder.call(this);
+            };
+
+            RectangleUrlBuilder.prototype = Object.create(WorldWind.UrlBuilder.prototype);
+
+            RectangleUrlBuilder.prototype.urlForTile = function() {
+                // Draw the rectangle fo the size of the canvas.
+                var canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+
+                var ctx = canvas.getContext('2d');
+                ctx.globalAlpha = 1;
+                ctx.fillRect(1, 1, 510, 510);
+
+                return canvas.toDataURL();
+            };
+
+            rectangleLayer.urlBuilder = new RectangleUrlBuilder();
             /**
              * Add imagery layers.
              */
@@ -36,7 +57,11 @@ requirejs(['./WorldWindShim',
                 {layer: new WorldWind.CompassLayer(), enabled: true},
                 {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
                 {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
-                {layer: new WorldWind.HeatMapLayer("HeatMap, Default version", data, {radius: calculatePointRadius}), enabled: true}
+                {layer: rectangleLayer, enabled: true},
+                {layer: new WorldWind.HeatMapLayer("HeatMap, Default version", data, {
+                    radius: calculatePointRadius,
+                    scale: ['#7f2704','#8e330b','#9e4012','#ae4d19','#be5a20','#cd6627','#dd732e','#ed8035','#fd8d3c','#fd9a51','#fda767','#fdb47d','#fec193','#fecea9','#fedbbf','#fee8d5', '#fff5eb'].reverse()
+                }), enabled: true}
             ];
 
             for (var l = 0; l < layers.length; l++) {
