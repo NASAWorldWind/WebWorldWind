@@ -77,6 +77,16 @@ define([
             this.is2D = true;
         };
 
+        GeographicProjection.prototype.cartesianToLocalTransform=function(globe,x,y,z,result) {
+            throw new UnsupportedOperationError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeographicProjection", "cartesianToLocalTransform", "abstractInvocation"));
+        };
+
+        GeographicProjection.prototype.geographicToCartesianTransform=function(globe,latitude,longitude,altitude,result) {
+            throw new UnsupportedOperationError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeographicProjection", "geographicToCartesianTransform", "abstractInvocation"));
+        };
+
         /**
          * Converts a geographic position to Cartesian coordinates.
          *

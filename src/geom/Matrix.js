@@ -1097,6 +1097,39 @@ define([
         };
 
         /**
+         * Returns this viewing matrix's heading angle in degrees. The roll argument enables the caller to disambiguate
+         * heading and roll when the two rotation axes for heading and roll are parallel, causing gimbal lock.
+         * <p>
+         * The result of this method is undefined if this matrix is not a viewing matrix.
+         *
+         * @param roll the viewing matrix's roll angle in degrees, or 0 if the roll angle is unknown
+         *
+         * @return {Number} the extracted heading angle in degrees
+         */
+        Matrix.prototype.extractHeading = function (roll) {
+            var rad = roll * Angle.DEGREES_TO_RADIANS;
+            var cr = Math.cos(rad);
+            var sr = Math.sin(rad);
+
+            var ch = (cr * this[0]) - (sr * this[4]);
+            var sh = (sr * this[5]) - (cr * this[1]);
+            return Math.atan2(sh, ch) * Angle.RADIANS_TO_DEGREES;
+        };
+
+        /**
+         * Returns this viewing matrix's tilt angle in degrees.
+         * <p>
+         * The result of this method is undefined if this matrix is not a viewing matrix.
+         *
+         * @return {Number} the extracted heading angle in degrees
+         */
+        Matrix.prototype.extractTilt = function () {
+            var ct = this[10];
+            var st = Math.sqrt(this[2] * this[2] + this[6] * this[6]);
+            return Math.atan2(st, ct) * Angle.RADIANS_TO_DEGREES;
+        };
+
+        /**
          * Returns this viewing matrix's forward vector.
          * <p>
          * This method assumes that this matrix represents a viewing matrix. If this does not represent a viewing matrix the
@@ -1516,7 +1549,7 @@ define([
          */
         Matrix.ludcmp = function (A, index) {
             var TINY = 1.0e-20,
-                vv = [], /* new double[4]; */
+                vv = [], /* new var[4]; */
                 d = 1.0,
                 temp,
                 i,

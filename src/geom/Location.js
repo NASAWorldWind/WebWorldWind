@@ -109,7 +109,7 @@ define([
          * <code>false</code>.
          */
         Location.prototype.equals = function (location) {
-            return location
+            return location // TODO: Validate that this logic is correct for undefined and null
                 && location.latitude === this.latitude && location.longitude === this.longitude;
         };
 

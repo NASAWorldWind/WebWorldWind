@@ -29,6 +29,7 @@ define([
         './cache/GpuResourceCache',
         './geom/Line',
         './util/Logger',
+        './LookAt',
         './navigate/LookAtNavigator',
         './geom/Matrix',
         './pick/PickedObjectList',
@@ -54,6 +55,7 @@ define([
               GpuResourceCache,
               Line,
               Logger,
+              LookAt,
               LookAtNavigator,
               Matrix,
               PickedObjectList,
@@ -157,7 +159,13 @@ define([
              * @type {LookAtNavigator}
              * @default [LookAtNavigator]{@link LookAtNavigator}
              */
-            this.navigator = new LookAtNavigator();
+            this.navigator = new LookAtNavigator(this);
+
+            // Internal use only
+            this._worldWindowView = new LookAt(this);
+
+            // Internal use only
+            this._editWorldWindowView = this._worldWindowView.clone();
 
             /**
              * The controller used to manipulate the globe.
@@ -661,6 +669,33 @@ define([
             }
         };
 
+        WorldWindow.prototype.setView = function (worldWindowView) {
+            if (!worldWindowView) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "addEventListener", "missingView"));
+            }
+            if (this._worldWindowView.viewType === worldWindowView.viewType) {
+                if (!this._worldWindowView.equals(worldWindowView)) {
+                    this._worldWindowView.copy(worldWindowView);
+                    this.redraw();
+                }
+            }
+            else {
+                this._worldWindowView = worldWindowView.clone();
+                this.redraw();
+            }
+        };
+
+        WorldWindow.prototype.getView = function () {
+            if (this._editWorldWindowView.viewType === this._worldWindowView.viewType) {
+                this._editWorldWindowView.copy(this._worldWindowView);
+            }
+            else {
+                this._editWorldWindowView = this._worldWindowView.clone();
+            }
+            return this._editWorldWindowView;
+        };
+
         // Internal. Intentionally not documented.
         WorldWindow.prototype.computeViewingTransform = function (projection, modelview) {
             if (!modelview) {
@@ -668,18 +703,13 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
             }
 
-            modelview.setToIdentity();
-            this.worldWindowController.applyLimits();
-            var globe = this.globe;
-            var navigator = this.navigator;
-            var lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0);
-            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
+            this._worldWindowView.computeViewingTransform(modelview);
 
             if (projection) {
                 projection.setToIdentity();
-                var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
+                var globeRadius = WWMath.max(this.globe.equatorialRadius, this.globe.polarRadius),
                     eyePoint = modelview.extractEyePoint(new Vec3(0, 0, 0)),
-                    eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
+                    eyePos = this.globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
                     eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
                     atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
                     viewport = this.viewport;
@@ -699,7 +729,7 @@ define([
                 var nearDistance = WWMath.perspectiveNearDistanceForFarDistance(farDistance, 10, this.depthBits);
 
                 // Prevent the near clip plane from intersecting the terrain.
-                var distanceToSurface = eyePos.altitude - globe.elevationAtLocation(eyePos.latitude, eyePos.longitude);
+                var distanceToSurface = eyePos.altitude - this.globe.elevationAtLocation(eyePos.latitude, eyePos.longitude);
                 if (distanceToSurface > 0) {
                     var maxNearDistance = WWMath.perspectiveNearDistance(viewport.width, viewport.height, distanceToSurface);
                     if (nearDistance > maxNearDistance) {
@@ -788,8 +818,6 @@ define([
             dc.pixelSizeFactor = pixelMetrics.pixelSizeFactor;
             dc.pixelSizeOffset = pixelMetrics.pixelSizeOffset;
 
-            // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
-            // are used to support operations on navigator state.
             var modelviewInv = Matrix.fromIdentity();
             modelviewInv.invertOrthonormalMatrix(dc.modelview);
 

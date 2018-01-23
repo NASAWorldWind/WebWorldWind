@@ -16,39 +16,82 @@
 /**
  * @exports Navigator
  */
-define([],
-    function () {
+define(['../util/Logger',
+        '../LookAt'
+    ],
+    function (Logger,
+              LookAt) {
         "use strict";
 
         /**
          * Constructs a base navigator.
+         * @deprecated
          * @alias Navigator
          * @constructor
          * @classdesc Provides an abstract base class for navigators. This class is not meant to be instantiated
-         * directly. See {@Link LookAtNavigator} for a concrete navigator.
+         * directly. Deprecated, see {@Link LookAt} and {@Link Camera}.
+         * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
-        var Navigator = function () {
+        var Navigator = function (worldWindow) {
+            if (!worldWindow) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Navigator", "constructor", "missingWorldWindow"));
+            }
+
+            this.wwd = worldWindow;
+
+            this.scratchLookAt=new LookAt(this.wwd);
+        };
+
+        Object.defineProperties(Navigator.prototype, {
             /**
              * This navigator's heading, in degrees clockwise from north.
              * @type {Number}
              * @default 0
              */
-            this.heading = 0;
+            heading: {
+                get: function () {
+                    return this.wwd.getView().asLookAt(this.scratchLookAt).heading;
+                },
+                set: function (value) {
+                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    view.heading = value;
+                    this.wwd.setView(view);
+                }
+            },
 
             /**
              * This navigator's tilt, in degrees.
              * @type {Number}
              * @default 0
              */
-            this.tilt = 0;
+            tilt: {
+                get: function () {
+                    return this.wwd.getView().asLookAt(this.scratchLookAt).tilt;
+                },
+                set: function (value) {
+                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    view.tilt = value;
+                    this.wwd.setView(view);
+                }
+            },
 
             /**
              * This navigator's roll, in degrees.
              * @type {Number}
              * @default 0
              */
-            this.roll = 0;
-        };
+            roll: {
+                get: function () {
+                    return this.wwd.getView().asLookAt(this.scratchLookAt).roll;
+                },
+                set: function (value) {
+                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    view.roll = value;
+                    this.wwd.setView(view);
+                }
+            }
+        });
 
         return Navigator;
     });

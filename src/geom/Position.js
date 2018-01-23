@@ -104,7 +104,7 @@ define([
          * @returns {Boolean} true if this position is equal to the specified one, otherwise false.
          */
         Position.prototype.equals = function (position) {
-            return position
+            return position // TODO: Validate that this logic is correct for undefined and null
                 && position.latitude === this.latitude
                 && position.longitude === this.longitude
                 && position.altitude === this.altitude;

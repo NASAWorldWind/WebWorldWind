@@ -19,40 +19,62 @@
 define([
         '../geom/Location',
         '../navigate/Navigator',
+        '../geom/Position'
     ],
     function (Location,
-              Navigator) {
+              Navigator,
+              Position) {
         "use strict";
 
         /**
          * Constructs a look-at navigator.
+         * @deprecated
          * @alias LookAtNavigator
          * @constructor
          * @augments Navigator
          * @classdesc Represents a navigator containing the required variables to enable the user to pan, zoom and tilt
-         * the globe.
+         * the globe. Deprecated, see {@Link LookAt}.
          */
-        var LookAtNavigator = function () {
-            Navigator.call(this);
+        var LookAtNavigator = function (worldWindow) {
+            Navigator.call(this,worldWindow);
+            // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
+            this.enable2DLimits = true;
+        };
 
+        LookAtNavigator.prototype = Object.create(Navigator.prototype);
+
+        Object.defineProperties(LookAtNavigator.prototype, {
             /**
              * The geographic location at the center of the viewport.
              * @type {Location}
              */
-            this.lookAtLocation = new Location(30, -110);
+            lookAtLocation: {
+                get: function () {
+                    return this.wwd.getView().asLookAt(this.scratchLookAt).lookAtPosition;
+                },
+                set: function (value) {
+                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    view.lookAtPosition = value;
+                    this.wwd.setView(view);
+                }
+            },
 
             /**
              * The distance from this navigator's eye point to its look-at location.
              * @type {Number}
              * @default 10,000 kilometers
              */
-            this.range = 10e6; // TODO: Compute initial range to fit globe in viewport.
-
-            // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
-            this.enable2DLimits = true;
-        };
-
-        LookAtNavigator.prototype = Object.create(Navigator.prototype);
+            range: {
+                get: function () {
+                    return this.wwd.getView().asLookAt(this.scratchLookAt).range;
+                },
+                set: function (value) {
+                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    view.range = value;
+                    this.wwd.setView(view);
+                }
+            }
+        });
 
         return LookAtNavigator;
     });
