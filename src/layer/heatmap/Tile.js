@@ -108,15 +108,18 @@ define([], function(){
      * @returns {HTMLCanvasElement} Canvas representing the circle.
      */
     Tile.prototype.shape = function() {
-        var shape = this.createCanvas(this._width, this._height),
-            ctx = shape.getContext('2d'),
+        var circle = this.createCanvas(this._width, this._height),
+            ctx = circle.getContext('2d'),
             r2 = this._radius + this._radius;
 
-        shape.width = shape.height = r2;
+        circle.width = circle.height = r2;
 
-        ctx.fillRect(0, 0, r2, r2);
+        ctx.beginPath();
+        ctx.arc(this._radius, this._radius, this._radius, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill();
 
-        return shape;
+        return circle;
     };
 
     return Tile;

@@ -41,12 +41,13 @@ requirejs(['./WorldWindShim',
 
                 var ctx = canvas.getContext('2d');
                 ctx.globalAlpha = 1;
-                ctx.fillRect(1, 1, 510, 510);
+                ctx.fillRect(0, 0, 512, 512);
 
                 return canvas.toDataURL();
             };
 
             rectangleLayer.urlBuilder = new RectangleUrlBuilder();
+            rectangleLayer.displayName = "Black background";
             /**
              * Add imagery layers.
              */
