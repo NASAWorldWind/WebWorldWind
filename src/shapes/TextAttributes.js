@@ -71,7 +71,7 @@ define([
                 " dt " + this._depthTest +
                 " eo " + this._enableOutline +
                 " ow " + this._outlineWidth +
-                " oc " + this._outlineColor;
+                " oc " + this._outlineColor.toHexString(true);
         };
 
         Object.defineProperties(TextAttributes.prototype, {
