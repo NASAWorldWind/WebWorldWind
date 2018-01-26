@@ -35,7 +35,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGOneImageLayer',
         './layer/BMNGRestLayer',
         './geom/BoundingBox',
-        './Camera',
+        './CameraView',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
@@ -142,7 +142,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Line',
         './geom/Location',
         './util/Logger',
-        './LookAt',
+        './LookAtView',
         './navigate/LookAtNavigator',
         './geom/Matrix',
         './util/measure/MeasurerUtils',
@@ -278,7 +278,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGOneImageLayer,
               BMNGRestLayer,
               BoundingBox,
-              Camera,
+              CameraView,
               ClickRecognizer,
               ColladaLoader,
               Color,
@@ -385,7 +385,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Line,
               Location,
               Logger,
-              LookAt,
+              LookAtView,
               LookAtNavigator,
               Matrix,
               MeasurerUtils,
@@ -730,7 +730,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BMNGRestLayer'] = BMNGRestLayer;
         WorldWind['BoundingBox'] = BoundingBox;
-        WorldWind['Camera'] = Camera;
+        WorldWind['CameraView'] = CameraView;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
@@ -789,7 +789,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Line'] = Line;
         WorldWind['Location'] = Location;
         WorldWind['Logger'] = Logger;
-        WorldWind['LookAt'] = LookAt;
+        WorldWind['LookAtView'] = LookAtView;
         WorldWind['LookAtNavigator'] = LookAtNavigator;
         WorldWind['Matrix'] = Matrix;
         WorldWind['MeasurerUtils'] = MeasurerUtils;

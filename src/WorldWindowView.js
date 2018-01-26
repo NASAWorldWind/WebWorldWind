@@ -27,7 +27,6 @@ define([
         "use strict";
 
         var WorldWindowView = function (worldWindow) {
-            this.viewType = this.constructor.name;
             this.wwd = worldWindow;
         };
 
@@ -39,16 +38,6 @@ define([
         WorldWindowView.prototype.equals = function (otherView) {
             throw new UnsupportedOperationError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "equals", "abstractInvocation"));
-        };
-
-        WorldWindowView.prototype.asLookAt = function (result) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "asLookAt", "abstractInvocation"));
-        };
-
-        WorldWindowView.prototype.asCamera = function (result) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "asCamera", "abstractInvocation"));
         };
 
         WorldWindowView.prototype.clone = function () {
@@ -63,6 +52,11 @@ define([
             }
 
             this.wwd = copyObject.wwd;
+        };
+
+        WorldWindowView.fromView = function (otherView, result) {
+            throw new UnsupportedOperationError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "fromView", "abstractInvocation"));
         };
 
         return WorldWindowView;

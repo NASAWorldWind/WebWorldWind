@@ -18,12 +18,12 @@
  */
 define([
         '../geom/Location',
-        '../navigate/Navigator',
-        '../geom/Position'
+        '../LookAtView',
+        '../navigate/Navigator'
     ],
     function (Location,
-              Navigator,
-              Position) {
+              LookAtView,
+              Navigator) {
         "use strict";
 
         /**
@@ -33,7 +33,7 @@ define([
          * @constructor
          * @augments Navigator
          * @classdesc Represents a navigator containing the required variables to enable the user to pan, zoom and tilt
-         * the globe. Deprecated, see {@Link LookAt}.
+         * the globe. Deprecated, see {@Link LookAtView}.
          */
         var LookAtNavigator = function (worldWindow) {
             Navigator.call(this,worldWindow);
@@ -50,12 +50,12 @@ define([
              */
             lookAtLocation: {
                 get: function () {
-                    return this.wwd.getView().asLookAt(this.scratchLookAt).lookAtPosition;
+                    return LookAtView.fromView(this.wwd.worldWindowView,this.scratchLookAtView).lookAtPosition;
                 },
                 set: function (value) {
-                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    var view=LookAtView.fromView(this.wwd.worldWindowView,this.scratchLookAtView);
                     view.lookAtPosition = value;
-                    this.wwd.setView(view);
+                    this.wwd.worldWindowView=view;
                 }
             },
 
@@ -66,12 +66,12 @@ define([
              */
             range: {
                 get: function () {
-                    return this.wwd.getView().asLookAt(this.scratchLookAt).range;
+                    return LookAtView.fromView(this.wwd.worldWindowView,this.scratchLookAtView).range;
                 },
                 set: function (value) {
-                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    var view=LookAtView.fromView(this.wwd.worldWindowView,this.scratchLookAtView);
                     view.range = value;
-                    this.wwd.setView(view);
+                    this.wwd.worldWindowView=view;
                 }
             }
         });

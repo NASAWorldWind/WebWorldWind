@@ -18,6 +18,7 @@ define([
     'src/render/DrawContext',
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
+    'src/LookAt',
     'src/geom/Matrix',
     'src/navigate/LookAtNavigator',
     'src/geom/Rectangle',
@@ -25,7 +26,7 @@ define([
     'src/geom/Vec3',
     'src/WorldWind',
     'src/WorldWindow'
-], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
+], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, LookAt, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
 
     var expectVec3CloseTo = function (v1, v2) {
@@ -55,12 +56,14 @@ define([
     var wwd = new MockWorldWindow();
     wwd.globe = mockGlobe;
     wwd.drawContext = dc;
-    wwd.navigator = new LookAtNavigator();
+    wwd.navigator = new LookAtNavigator(wwd);
     wwd.worldWindowController = new BasicWorldWindowController(wwd);
     wwd.viewport = viewport;
     wwd.depthBits = 24;
     wwd.scratchModelview = Matrix.fromIdentity();
     wwd.scratchProjection = Matrix.fromIdentity();
+    wwd._worldWindowView = new LookAt(wwd);
+    wwd._editWorldWindowView = new LookAt(wwd);
     wwd.resetDrawContext();
 
     describe("WorldWindow Tests", function () {

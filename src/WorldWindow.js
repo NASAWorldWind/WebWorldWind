@@ -29,7 +29,7 @@ define([
         './cache/GpuResourceCache',
         './geom/Line',
         './util/Logger',
-        './LookAt',
+        './LookAtView',
         './navigate/LookAtNavigator',
         './geom/Matrix',
         './pick/PickedObjectList',
@@ -55,7 +55,7 @@ define([
               GpuResourceCache,
               Line,
               Logger,
-              LookAt,
+              LookAtView,
               LookAtNavigator,
               Matrix,
               PickedObjectList,
@@ -162,10 +162,7 @@ define([
             this.navigator = new LookAtNavigator(this);
 
             // Internal use only
-            this._worldWindowView = new LookAt(this);
-
-            // Internal use only
-            this._editWorldWindowView = this._worldWindowView.clone();
+            this.worldWindowView = new LookAtView(this);
 
             /**
              * The controller used to manipulate the globe.
@@ -669,33 +666,6 @@ define([
             }
         };
 
-        WorldWindow.prototype.setView = function (worldWindowView) {
-            if (!worldWindowView) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "addEventListener", "missingView"));
-            }
-            if (this._worldWindowView.viewType === worldWindowView.viewType) {
-                if (!this._worldWindowView.equals(worldWindowView)) {
-                    this._worldWindowView.copy(worldWindowView);
-                    this.redraw();
-                }
-            }
-            else {
-                this._worldWindowView = worldWindowView.clone();
-                this.redraw();
-            }
-        };
-
-        WorldWindow.prototype.getView = function () {
-            if (this._editWorldWindowView.viewType === this._worldWindowView.viewType) {
-                this._editWorldWindowView.copy(this._worldWindowView);
-            }
-            else {
-                this._editWorldWindowView = this._worldWindowView.clone();
-            }
-            return this._editWorldWindowView;
-        };
-
         // Internal. Intentionally not documented.
         WorldWindow.prototype.computeViewingTransform = function (projection, modelview) {
             if (!modelview) {
@@ -703,7 +673,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
             }
 
-            this._worldWindowView.computeViewingTransform(modelview);
+            this.worldWindowView.computeViewingTransform(modelview);
 
             if (projection) {
                 projection.setToIdentity();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports LookAt
+ * @exports LookAtView
  */
 define([
         './error/ArgumentError',
@@ -31,10 +31,9 @@ define([
               WorldWindowView) {
         "use strict";
 
-        var LookAt = function (worldWindow) {
+        var LookAtView = function (worldWindow) {
             WorldWindowView.call(this, worldWindow);
 
-            this.viewType="LookAt";
             /**
              * The geographic position at the center of the viewport.
              * @type {Location}
@@ -70,12 +69,12 @@ define([
             this.range = 10e6; // TODO: Compute initial range to fit globe in viewport.
         };
 
-        LookAt.prototype = Object.create(WorldWindowView.prototype);
+        LookAtView.prototype = Object.create(WorldWindowView.prototype);
 
-        LookAt.prototype.computeViewingTransform = function (modelview) {
+        LookAtView.prototype.computeViewingTransform = function (modelview) {
             if (!modelview) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "computeViewingTransform", "missingModelview"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAtView", "computeViewingTransform", "missingModelview"));
             }
 
             modelview.setToIdentity();
@@ -86,48 +85,51 @@ define([
 
         /**
          * Indicates whether the components of this object are equal to those of a specified object.
-         * @param {LookAt} otherLookAt The object to test equality with. May be null or undefined, in which case this
+         * @param {LookAtView} otherLookAtView The object to test equality with. May be null or undefined, in which case this
          * function returns false.
          * @returns {boolean} true if all components of this object are equal to the corresponding
          * components of the specified object, otherwise false.
          */
-        LookAt.prototype.equals = function (otherLookAt) {
-            if (otherLookAt) {
-                return this.lookAtPosition.equals(otherLookAt.lookAtPosition) &&
-                    this.heading === otherLookAt.heading &&
-                    this.tilt === otherLookAt.tilt &&
-                    this.roll === otherLookAt.roll &&
-                    this.range === otherLookAt.range;
+        LookAtView.prototype.equals = function (otherLookAtView) {
+            if (otherLookAtView) {
+                return this.lookAtPosition.equals(otherLookAtView.lookAtPosition) &&
+                    this.heading === otherLookAtView.heading &&
+                    this.tilt === otherLookAtView.tilt &&
+                    this.roll === otherLookAtView.roll &&
+                    this.range === otherLookAtView.range;
             }
 
             return false;
         };
 
-        LookAt.prototype.asLookAt = function (result) {
-            if (!result) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "asLookAt", "missingResult"));
-            }
-
-            return result.copy(this);
+        LookAtView.isLookAtView=function(view) {
+            return view.lookAtPosition !== undefined && view.heading !== undefined && view.tilt !== undefined && view.roll !== undefined && view.range !== undefined;
         };
 
-        LookAt.prototype.asCamera = function (result) {
-            if (!result) {
+        LookAtView.fromView = function (otherView, result) {
+            if (!otherView) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "asLookAt", "missingResult"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAtView", "fromView", "missingOtherView"));
             }
 
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "asCamera", "notImplementedYet"));
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAtView", "fromView", "missingResult"));
+            }
+
+            if (LookAtView.isLookAtView(otherView)) {
+                return result.copy(otherView);
+            }
+
+            return null;
         };
 
         /**
          * Creates a new object that is a copy of this object.
-         * @returns {LookAt} The new object.
+         * @returns {LookAtView} The new object.
          */
-        LookAt.prototype.clone = function () {
-            var clone = new LookAt(this.wwd);
+        LookAtView.prototype.clone = function () {
+            var clone = new LookAtView(this.wwd);
             clone.copy(this);
 
             return clone;
@@ -135,14 +137,14 @@ define([
 
         /**
          * Copies the components of a specified object to this object.
-         * @param {LookAt} copyObject The object to copy.
-         * @returns {LookAt} A copy of this object equal to copyObject.
+         * @param {LookAtView} copyObject The object to copy.
+         * @returns {LookAtView} A copy of this object equal to copyObject.
          * @throws {ArgumentError} If the specified object is null or undefined.
          */
-        LookAt.prototype.copy = function (copyObject) {
+        LookAtView.prototype.copy = function (copyObject) {
             if (!copyObject) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "copy", "missingObject"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAtView", "copy", "missingObject"));
             }
 
             WorldWindowView.prototype.copy.call(this, copyObject);
@@ -156,5 +158,5 @@ define([
             return this;
         };
 
-        return LookAt;
+        return LookAtView;
     });

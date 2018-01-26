@@ -16,11 +16,13 @@
 /**
  * @exports Navigator
  */
-define(['../util/Logger',
-        '../LookAt'
+define(['../error/ArgumentError',
+        '../util/Logger',
+        '../LookAtView'
     ],
-    function (Logger,
-              LookAt) {
+    function (ArgumentError,
+              Logger,
+              LookAtView) {
         "use strict";
 
         /**
@@ -29,7 +31,7 @@ define(['../util/Logger',
          * @alias Navigator
          * @constructor
          * @classdesc Provides an abstract base class for navigators. This class is not meant to be instantiated
-         * directly. Deprecated, see {@Link LookAt} and {@Link Camera}.
+         * directly. Deprecated, see {@Link LookAtView} and {@Link CameraView}.
          * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
         var Navigator = function (worldWindow) {
@@ -40,7 +42,7 @@ define(['../util/Logger',
 
             this.wwd = worldWindow;
 
-            this.scratchLookAt=new LookAt(this.wwd);
+            this.scratchLookAtView = new LookAtView(this.wwd);
         };
 
         Object.defineProperties(Navigator.prototype, {
@@ -51,12 +53,12 @@ define(['../util/Logger',
              */
             heading: {
                 get: function () {
-                    return this.wwd.getView().asLookAt(this.scratchLookAt).heading;
+                    return LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView).heading;
                 },
                 set: function (value) {
-                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    var view = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
                     view.heading = value;
-                    this.wwd.setView(view);
+                    this.wwd.worldWindowView = view;
                 }
             },
 
@@ -67,12 +69,12 @@ define(['../util/Logger',
              */
             tilt: {
                 get: function () {
-                    return this.wwd.getView().asLookAt(this.scratchLookAt).tilt;
+                    return LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView).tilt;
                 },
                 set: function (value) {
-                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    var view = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
                     view.tilt = value;
-                    this.wwd.setView(view);
+                    this.wwd.worldWindowView = view;
                 }
             },
 
@@ -83,12 +85,12 @@ define(['../util/Logger',
              */
             roll: {
                 get: function () {
-                    return this.wwd.getView().asLookAt(this.scratchLookAt).roll;
+                    return LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView).roll;
                 },
                 set: function (value) {
-                    var view=this.wwd.getView().asLookAt(this.scratchLookAt);
+                    var view = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
                     view.roll = value;
-                    this.wwd.setView(view);
+                    this.wwd.worldWindowView = view;
                 }
             }
         });

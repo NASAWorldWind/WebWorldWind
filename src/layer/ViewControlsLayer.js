@@ -13,6 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /**
  * @exports ViewControlsLayer
  */
@@ -22,7 +37,7 @@ define([
         '../layer/Layer',
         '../geom/Location',
         '../util/Logger',
-        '../LookAt',
+        '../LookAtView',
         '../util/Offset',
         '../shapes/ScreenImage',
         '../geom/Vec2'
@@ -32,7 +47,7 @@ define([
               Layer,
               Location,
               Logger,
-              LookAt,
+              LookAtView,
               Offset,
               ScreenImage,
               Vec2) {
@@ -223,7 +238,7 @@ define([
             // Establish event handlers.
             this.wwd.worldWindowController.addGestureListener(this);
 
-            this.scratchLookAt=new LookAt(this.wwd);
+            this.scratchLookAtView = new LookAtView(this.wwd);
         };
 
         ViewControlsLayer.prototype = Object.create(Layer.prototype);
@@ -688,7 +703,7 @@ define([
                         var dx = thisLayer.panControlCenter[0] - thisLayer.currentEventPoint[0],
                             dy = thisLayer.panControlCenter[1]
                                 - (thisLayer.wwd.viewport.height - thisLayer.currentEventPoint[1]),
-                            lookAtView=thisLayer.wwd.getView().asLookAt(thisLayer.scratchLookAt),
+                            lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView),
                             oldLat = lookAtView.lookAtPosition.latitude,
                             oldLon = lookAtView.lookAtPosition.longitude,
                             // Scale the increment by a constant and the relative distance of the eye to the surface.
@@ -699,7 +714,8 @@ define([
 
                         Location.greatCircleLocation(lookAtView.lookAtPosition, heading, -distance,
                             lookAtView.lookAtPosition);
-                        thisLayer.wwd.setView(lookAtView);
+                        thisLayer.wwd.worldWindowView = lookAtView;
+                        thisLayer.wwd.redraw();
                         setTimeout(setLookAtLocation, 50);
                     }
                 };
@@ -729,13 +745,14 @@ define([
                 var thisLayer = this; // capture 'this' for use in the function
                 var setRange = function () {
                     if (thisLayer.activeControl) {
-                        var lookAtView=thisLayer.wwd.getView().asLookAt(thisLayer.scratchLookAt);
+                        var lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView);
                         if (thisLayer.activeControl === thisLayer.zoomInControl) {
                             lookAtView.range *= (1 - thisLayer.zoomIncrement);
                         } else if (thisLayer.activeControl === thisLayer.zoomOutControl) {
                             lookAtView.range *= (1 + thisLayer.zoomIncrement);
                         }
-                        thisLayer.wwd.setView(lookAtView);
+                        thisLayer.wwd.worldWindowView = lookAtView;
+                        thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
                 };
@@ -764,14 +781,15 @@ define([
                 // This function is called by the timer to perform the operation.
                 var thisLayer = this; // capture 'this' for use in the function
                 var setRange = function () {
-                    var lookAtView=thisLayer.wwd.getView().asLookAt(thisLayer.scratchLookAt);
+                    var lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView);
                     if (thisLayer.activeControl) {
                         if (thisLayer.activeControl === thisLayer.headingLeftControl) {
                             lookAtView.heading += thisLayer.headingIncrement;
                         } else if (thisLayer.activeControl === thisLayer.headingRightControl) {
                             lookAtView.heading -= thisLayer.headingIncrement;
                         }
-                        thisLayer.wwd.setView(lookAtView);
+                        thisLayer.wwd.worldWindowView = lookAtView;
+                        thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
                 };
@@ -800,7 +818,7 @@ define([
                 var thisLayer = this; // capture 'this' for use in the function
                 var setRange = function () {
                     if (thisLayer.activeControl) {
-                        var lookAtView=thisLayer.wwd.getView().asLookAt(thisLayer.scratchLookAt);
+                        var lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView);
                         if (thisLayer.activeControl === thisLayer.tiltUpControl) {
                             lookAtView.tilt =
                                 Math.max(0, lookAtView.tilt - thisLayer.tiltIncrement);
@@ -808,7 +826,8 @@ define([
                             lookAtView.tilt =
                                 Math.min(90, lookAtView.tilt + thisLayer.tiltIncrement);
                         }
-                        thisLayer.wwd.setView(lookAtView);
+                        thisLayer.wwd.worldWindowView = lookAtView;
+                        thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
                 };

@@ -15,20 +15,27 @@
  */
 define([
     'src/BasicWorldWindowController',
+    'src/Camera',
     'src/render/DrawContext',
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
     'src/globe/Globe2D',
-    'src/LookAt',
     'src/geom/Matrix',
     'src/navigate/LookAtNavigator',
+    'src/geom/Position',
     'src/geom/Rectangle',
     'src/geom/Vec2',
     'src/geom/Vec3',
     'src/WorldWind',
     'src/WorldWindow'
-], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Globe2D, LookAt, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
+], function (BasicWorldWindowController, Camera, DrawContext, EarthElevationModel, Globe, Globe2D, Matrix, LookAtNavigator, Position, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
+
+    var expectMatrixCloseTo = function (matrix1, matrix2) {
+        for (var i = 0; i < 16; i++) {
+            expect(matrix1[i]).toBeCloseTo(matrix2[i], 3);
+        }
+    };
 
     var MockGlContext = function () {
         this.drawingBufferWidth = 800;
@@ -42,7 +49,7 @@ define([
 
     MockWorldWindow.prototype = Object.create(WorldWindow.prototype);
 
-    var mockGlobe = new Globe2D();
+    var mockGlobe = new Globe(new EarthElevationModel());
     var wwd = new MockWorldWindow();
     wwd.globe = mockGlobe;
     wwd.drawContext = dc;
@@ -57,26 +64,24 @@ define([
     };
     wwd.scratchModelview = Matrix.fromIdentity();
     wwd.scratchProjection = Matrix.fromIdentity();
-    wwd._worldWindowView = new LookAt(wwd);
-    wwd._editWorldWindowView = new LookAt(wwd);
-    wwd.resetDrawContext();
+    wwd._worldWindowView = new Camera(wwd);
+    wwd._editWorldWindowView = new Camera(wwd);
 
-    describe("BasicWorldWindowController tests", function () {
+    describe("Camera tests", function () {
 
-        describe("Calculate 2D drag", function () {
-            it("Correctly interprets 2D drag gesture", function () {
-                var recognizer = {state: "changed", clientX: 0, clientY: 0, translationX: 0, translationY: 0};
-                wwd.worldWindowController.beginPoint = new Vec2(693, 428);
-                wwd.worldWindowController.lastPoint = new Vec2(693.4, 429.2);
-                wwd.worldWindowController.handlePanOrDrag2D(recognizer);
+        describe("View calculations", function () {
+            it("Correctly calculates viewing matrix", function () {
+                var testCamera = new Camera(wwd);
+                testCamera.cameraPosition = new Position(30, -90, 1.1317611996036978E7);
+                var result = Matrix.fromIdentity();
+                testCamera.computeViewingTransform(result);
+                var expectedModelview = new Matrix(
+                    6.123233995736766E-17, -3.0814879110195774E-33, 1.0, 0.0,
+                    0.5000000016807186, 0.8660254028140754, -3.061617008159816E-17, 18504.15964544285,
+                    -0.8660254028140754, 0.5000000016807186, 5.302876187682773E-17, -1.7690409551960476E7,
+                    0.0, 0.0, 0.0, 1.0);
+                expectMatrixCloseTo(result, expectedModelview);
 
-                var navigator = wwd.navigator;
-                expect(navigator.range).toEqual(10000000);
-                expect(navigator.tilt).toEqual(0);
-                expect(navigator.roll).toEqual(0);
-                expect(navigator.heading).toEqual(0);
-                expect(navigator.lookAtLocation.latitude).toBeCloseTo(29.8728799, 7);
-                expect(navigator.lookAtLocation.longitude).toBeCloseTo(-109.9576266, 7);
             });
         });
     });
