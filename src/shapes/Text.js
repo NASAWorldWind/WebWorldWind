@@ -468,7 +468,8 @@ define([
                 gl.disable(gl.DEPTH_TEST);
             }
 
-            // Use the text color and opacity. When picking, use the pick color, 100% opacity and no texture.
+            // Use the text color and opacity. Modulation is done to white to avoid the program's shader from
+            // modifying the text color. When picking, use the pick color, 100% opacity and no texture.
             if (!dc.pickingMode) {
                 program.loadColor(gl, Color.WHITE);
                 program.loadOpacity(gl, this.layer.opacity * this.currentVisibility);
