@@ -748,7 +748,7 @@ define([
 
         /**
          * Computes the average location of a specified array of locations.
-         * @param {Array} locations The array of locations.
+         * @param {Location[]} locations The array of locations for the shape.
          * @return {Position} the average of the locations specified in the array.
          */
         ShapeEditorController.prototype.getCenter = function (locations) {
@@ -1052,7 +1052,7 @@ define([
         /**
          * Rotates a shape's locations.
          * @param {Position} terrainPosition The position selected by the user.
-         * @param {Array} locations The array of locations for the shape.
+         * @param {Location[]} locations The array of locations for the shape.
          */
         ShapeEditorController.prototype.rotateLocations = function (terrainPosition, locations) {
             var center = this.getCenter(locations);
