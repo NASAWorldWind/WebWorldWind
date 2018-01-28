@@ -1,18 +1,18 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2015-2017 WorldWind Contributors
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 define([
         '../util/Logger',
         '../error/ArgumentError'
@@ -528,6 +528,23 @@ define([
             that[2] = tmp;
 
             return this;
+        };
+
+        /**
+         * Returns the vector that corresponds with a specified line segment.
+         *
+         * @param {Vec3} origin The line's starting point.
+         * @param {Number} t The specified dot product on the segment (representing the
+         * scalar value of a vector equation of line).
+         * @param {Vec3} direction The direction vector of the line segment.
+         * @returns {Vec3} The vector that corresponds with a specified line segment.
+         */
+        Vec3.fromLine = function(origin, t, direction)
+        {
+            return new Vec3(
+                origin[0] + (direction[0] * t),
+                origin[1] + (direction[1] * t),
+                origin[2] + (direction[2] * t));
         };
 
         /**
