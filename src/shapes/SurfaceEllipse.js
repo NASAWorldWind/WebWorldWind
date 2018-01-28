@@ -212,6 +212,23 @@ define([
             }
         };
 
+        // Internal use only. Intentionally not documented.
+        SurfaceEllipse.prototype.getReferencePosition = function () {
+            return this.center;
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceEllipse.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
+            var heading = Location.greatCircleAzimuth(oldReferenceLocation,
+                new Location(this.center.latitude, this.center.longitude));
+            var pathLength = Location.greatCircleDistance(oldReferenceLocation,
+                new Location(this.center.latitude, this.center.longitude));
+            var location = new Location(0, 0);
+            Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+
+            this.center = location;
+        };
+
         /**
          * The minimum number of intervals the ellipse generates.
          * @type {Number}

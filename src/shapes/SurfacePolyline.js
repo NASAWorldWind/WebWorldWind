@@ -18,11 +18,13 @@
  */
 define([
         '../error/ArgumentError',
+        '../geom/Location',
         '../util/Logger',
         '../shapes/ShapeAttributes',
         '../shapes/SurfaceShape'
     ],
     function (ArgumentError,
+              Location,
               Logger,
               ShapeAttributes,
               SurfaceShape) {
@@ -113,6 +115,26 @@ define([
 
         // Internal. Polyline doesn't generate its own boundaries. See SurfaceShape.prototype.computeBoundaries.
         SurfacePolyline.prototype.computeBoundaries = function(dc) {
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfacePolyline.prototype.getReferencePosition = function () {
+            return this.boundaries.length > 1 ? this.boundaries[0] : null;
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfacePolyline.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
+            var locations = [];
+            for (var i = 0; i < this.boundaries.length; i++){
+                var heading = Location.greatCircleAzimuth(oldReferenceLocation,
+                    new Location(this.boundaries[i].latitude, this.boundaries[i].longitude));
+                var pathLength = Location.greatCircleDistance(oldReferenceLocation,
+                    new Location(this._boundaries[i].latitude, this._boundaries[i].longitude));
+                var location = new Location(0, 0);
+                Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+                locations.push(new Location(location.latitude, location.longitude));
+            }
+            this.boundaries = locations;
         };
 
         return SurfacePolyline;

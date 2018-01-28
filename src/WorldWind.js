@@ -182,6 +182,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/ScreenText',
         './geom/Sector',
         './shapes/ShapeAttributes',
+        './util/ShapeEditorController',
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
         './shaders/SkyProgram',
@@ -422,6 +423,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ScreenText,
               Sector,
               ShapeAttributes,
+              ShapeEditorController,
               Shapefile,
               ShowTessellationLayer,
               SkyProgram,
@@ -820,6 +822,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ScreenImage'] = ScreenImage;
         WorldWind['Sector'] = Sector;
         WorldWind['ShapeAttributes'] = ShapeAttributes;
+        WorldWind['ShapeEditorController'] = ShapeEditorController;
         WorldWind['Shapefile'] = Shapefile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
         WorldWind['SkyProgram'] = SkyProgram;
