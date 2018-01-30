@@ -22,18 +22,14 @@ requirejs(['./WorldWindShim',
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
-        var camera = new WorldWind.Camera(wwd);
-        wwd.setView(camera);
+        var camera = new WorldWind.CameraView(wwd);
 
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-            {layer: new WorldWind.BingAerialLayer(null), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
             {layer: new WorldWind.CompassLayer(), enabled: true},
-            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true}
-            // {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -41,10 +37,34 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
+        var thisFunction = this;
+        var latitudeSlider = $("#latitudeSlider");
+
         // var lookAt = new WorldWind.LookAt(wwd);
         // var tiltDir = -1;
         // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
+        // var layerManager = new LayerManager(wwd);
+        $("#select-view").change(function () {
+            var str = "";
+            $("select option:selected").each(function () {
+                str += $(this).text();
+            });
+
+            console.log(str);
+        });
+
+        latitudeSlider.slider({
+            value: 30,
+            min: -90,
+            max: 90,
+            step: 1,
+            animate: true,
+            slide: function (event, ui) {
+                $("#latitude").html(ui.value);
+                console.log(ui.value);
+            }
+        });
+
         // window.setInterval(function () {
         //     wwd.getView().asCamera(camera);
         //     // var newLon = camera.cameraPosition.longitude + 1;

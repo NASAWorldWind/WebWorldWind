@@ -29,7 +29,6 @@ define([
         './cache/GpuResourceCache',
         './geom/Line',
         './util/Logger',
-        './LookAtView',
         './navigate/LookAtNavigator',
         './geom/Matrix',
         './pick/PickedObjectList',
@@ -41,6 +40,7 @@ define([
         './globe/Terrain',
         './geom/Vec2',
         './geom/Vec3',
+        './WorldWindowView',
         './util/WWMath'
     ],
     function (ArgumentError,
@@ -55,7 +55,6 @@ define([
               GpuResourceCache,
               Line,
               Logger,
-              LookAtView,
               LookAtNavigator,
               Matrix,
               PickedObjectList,
@@ -67,6 +66,7 @@ define([
               Terrain,
               Vec2,
               Vec3,
+              WorldWindowView,
               WWMath) {
         "use strict";
 
@@ -161,8 +161,7 @@ define([
              */
             this.navigator = new LookAtNavigator(this);
 
-            // Internal use only
-            this.worldWindowView = new LookAtView(this);
+            this.worldWindowView = new WorldWindowView(this);
 
             /**
              * The controller used to manipulate the globe.

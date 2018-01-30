@@ -18,31 +18,111 @@
  */
 define([
         './error/ArgumentError',
+        './geom/Line',
         './util/Logger',
-        './error/UnsupportedOperationError'
+        './geom/Matrix',
+        './geom/Position',
+        './geom/Vec3',
+        './util/WWMath'
     ],
     function (ArgumentError,
+              Line,
               Logger,
-              UnsupportedOperationError) {
+              Matrix,
+              Position,
+              Vec3,
+              WWMath) {
         "use strict";
 
         var WorldWindowView = function (worldWindow) {
+            if (!worldWindow) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "constructor", "missingWorldWindow"));
+            }
+
             this.wwd = worldWindow;
+
+            /**
+             * The geographic location of the camera.
+             * @type {Location}
+             */
+            this.position = new Position(30, -110, 10e6);
+
+            /**
+             * Camera heading, in degrees clockwise from north.
+             * @type {Number}
+             * @default 0
+             */
+            this.heading = 0;
+
+            /**
+             * Camera tilt, in degrees.
+             * @default 0
+             */
+            this.tilt = 0;
+
+            /**
+             * Camera roll, in degrees.
+             * @type {Number}
+             * @default 0
+             */
+            this.roll = 0;
+
+            // Internal. Intentionally not documented.
+            this.scratchModelview = Matrix.fromIdentity();
+
+            // Internal. Intentionally not documented.
+            this.scratchPoint = new Vec3(0, 0, 0);
+
+            // Internal. Intentionally not documented.
+            this.scratchOrigin = Matrix.fromIdentity();
+
+            // Internal. Intentionally not documented.
+            this.scratchPosition = new Position(0, 0, 0);
+
+            // Internal. Intentionally not documented.
+            this.scratchRay = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
         };
 
         WorldWindowView.prototype.computeViewingTransform = function (modelview) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "computeViewingTransform", "abstractInvocation"));
+            if (!modelview) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "computeViewingTransform", "missingModelview"));
+            }
+
+            modelview.setToIdentity();
+
+            // TODO interpret altitude mode other than absolute
+            // Transform by the local cartesian transform at the camera's position.
+            this.wwd.globe.projection.geographicToCartesianTransform(this.wwd.globe, this.position.latitude, this.position.longitude, this.position.altitude, modelview);
+
+            // Transform by the heading, tilt and roll.
+            modelview.multiplyByRotation(0, 0, 1, -this.heading); // rotate clockwise about the Z axis
+            modelview.multiplyByRotation(1, 0, 0, this.tilt); // rotate counter-clockwise about the X axis
+            modelview.multiplyByRotation(0, 0, 1, this.roll); // rotate counter-clockwise about the Z axis (again)
+
+            // Make the transform a viewing matrix.
+            modelview.invertOrthonormal();
+
+            return modelview;
         };
 
         WorldWindowView.prototype.equals = function (otherView) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "equals", "abstractInvocation"));
+            if (otherView) {
+                return this.position.equals(otherView.position) &&
+                    this.heading === otherView.heading &&
+                    this.tilt === otherView.tilt &&
+                    this.roll === otherView.roll;
+            }
+
+            return false;
         };
 
         WorldWindowView.prototype.clone = function () {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "clone", "abstractInvocation"));
+            var clone = new WorldWindowView(this.wwd);
+            clone.copy(this);
+
+            return clone;
         };
 
         WorldWindowView.prototype.copy = function (copyObject) {
@@ -52,11 +132,71 @@ define([
             }
 
             this.wwd = copyObject.wwd;
+            this.position.copy(copyObject.position);
+            this.heading = copyObject.heading;
+            this.tilt = copyObject.tilt;
+            this.roll = copyObject.roll;
+
+            return this;
         };
 
-        WorldWindowView.fromView = function (otherView, result) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "fromView", "abstractInvocation"));
+        WorldWindowView.prototype.setFromLookAt = function (lookAt) {
+            if (!lookAt) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "setFromLookAt", "missingLookAt"));
+            }
+
+            var globe = this.wwd.globe,
+                originPoint = this.scratchPoint,
+                modelview = this.scratchModelview,
+                proj = globe.projection;
+
+            lookAt.computeViewingTransform(globe, modelview);
+            modelview.extractEyePoint(originPoint);
+
+            proj.cartesianToGeographic(globe, originPoint[0], originPoint[1], originPoint[2], Vec3.ZERO, this.position);
+            proj.cartesianToLocalTransform(globe, originPoint[0], originPoint[1], originPoint[2], this.scratchOrigin);
+            modelview.multiplyMatrix(this.scratchOrigin);
+
+            this.heading = modelview.extractHeading(lookAt.roll); // disambiguate heading and roll
+            this.tilt = modelview.extractTilt();
+            this.roll = lookAt.roll; // roll passes straight through
+
+            return this;
+        };
+
+        WorldWindowView.prototype.getAsLookAt = function (result) {
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "getAsLookAt", "missingResult"));
+            }
+
+            var globe = this.wwd.globe,
+                forwardRay = this.scratchRay,
+                modelview = this.scratchModelview,
+                originPoint = this.scratchPoint,
+                originPos = this.scratchPosition;
+            this.computeViewingTransform(modelview);
+            modelview.extractEyePoint(forwardRay.origin);
+            modelview.extractForwardVector(forwardRay.direction);
+
+            if (!globe.intersectsLine(forwardRay, originPoint)) {
+                var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius);
+                var horizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, this.position.altitude);
+                forwardRay.pointAt(horizon, originPoint);
+            }
+
+            globe.computePositionFromPoint(originPoint[0], originPoint[1], originPoint[2], originPos);
+            globe.projection.cartesianToLocalTransform(globe, originPoint[0], originPoint[1], originPoint[2], this.scratchOrigin);
+            modelview.multiplyMatrix(this.scratchOrigin);
+
+            result.lookAtPosition.copy(originPos);
+            result.range = -modelview[11];
+            result.heading = modelview.extractHeading(this.roll); // disambiguate heading and roll
+            result.tilt = modelview.extractTilt();
+            result.roll = this.roll; // roll passes straight through
+
+            return result;
         };
 
         return WorldWindowView;

@@ -25,45 +25,17 @@ define([
     'src/geom/Vec2',
     'src/geom/Vec3',
     'src/WorldWind',
-    'src/WorldWindow'
-], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, LookAt, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
+    'src/WorldWindow',
+    'test/util/TestUtils.test'
+], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, LookAt, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow, TestUtils) {
     "use strict";
-
-    var expectVec3CloseTo = function (v1, v2) {
-        for (var i = 0; i < 3; i++) {
-            expect(v1[i]).toBeCloseTo(v2[i], 3);
-        }
-    };
-
-    var MockGlContext = function () {
-        this.drawingBufferWidth = 800;
-        this.drawingBufferHeight = 800;
-    };
-
-    var viewport = new Rectangle(0, 0, 848, 848);
-    var dc = new DrawContext(new MockGlContext());
-    var MockWorldWindow = function () {
-    };
-
-    MockWorldWindow.prototype = Object.create(WorldWindow.prototype);
 
     // create a globe that returns mock elevations for a given sector so we don't have to rely on
     // asynchronous tile calls to finish.
     Globe.prototype.minAndMaxElevationsForSector = function (sector) {
         return [125.0, 350.0];
     };
-    var mockGlobe = new Globe(new EarthElevationModel());
-    var wwd = new MockWorldWindow();
-    wwd.globe = mockGlobe;
-    wwd.drawContext = dc;
-    wwd.navigator = new LookAtNavigator(wwd);
-    wwd.worldWindowController = new BasicWorldWindowController(wwd);
-    wwd.viewport = viewport;
-    wwd.depthBits = 24;
-    wwd.scratchModelview = Matrix.fromIdentity();
-    wwd.scratchProjection = Matrix.fromIdentity();
-    wwd._worldWindowView = new LookAt(wwd);
-    wwd._editWorldWindowView = new LookAt(wwd);
+    var wwd=TestUtils.getMockWwd();
     wwd.resetDrawContext();
 
     describe("WorldWindow Tests", function () {
@@ -77,13 +49,13 @@ define([
 
             it("Calculates rayThroughScreenPoint correctly", function () {
                 var screenPoint = new Vec2(13.5, 635);
-                var expectedOrigin = new Vec3(-13332838.774, 8170373.752, -4852756.452);
+                var expectedOrigin = new Vec3(-13332838.783, 8170373.735, -4852756.455);
                 var expectedDirection = new Vec3(0.758, -0.628, -0.177);
                 var line = wwd.rayThroughScreenPoint(screenPoint);
                 var result = line.origin;
-                expectVec3CloseTo(result, expectedOrigin);
+                TestUtils.expectVec3CloseTo(result, expectedOrigin);
                 result = line.direction;
-                expectVec3CloseTo(result, expectedDirection);
+                TestUtils.expectVec3CloseTo(result, expectedDirection);
             });
         });
 

@@ -37,7 +37,7 @@ define([
         '../layer/Layer',
         '../geom/Location',
         '../util/Logger',
-        '../LookAtView',
+        '../LookAt',
         '../util/Offset',
         '../shapes/ScreenImage',
         '../geom/Vec2'
@@ -47,7 +47,7 @@ define([
               Layer,
               Location,
               Logger,
-              LookAtView,
+              LookAt,
               Offset,
               ScreenImage,
               Vec2) {
@@ -238,7 +238,7 @@ define([
             // Establish event handlers.
             this.wwd.worldWindowController.addGestureListener(this);
 
-            this.scratchLookAtView = new LookAtView(this.wwd);
+            this.scratchLookAt = new LookAt(this.wwd);
         };
 
         ViewControlsLayer.prototype = Object.create(Layer.prototype);
@@ -703,18 +703,18 @@ define([
                         var dx = thisLayer.panControlCenter[0] - thisLayer.currentEventPoint[0],
                             dy = thisLayer.panControlCenter[1]
                                 - (thisLayer.wwd.viewport.height - thisLayer.currentEventPoint[1]),
-                            lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView),
-                            oldLat = lookAtView.lookAtPosition.latitude,
-                            oldLon = lookAtView.lookAtPosition.longitude,
+                            lookAt = thisLayer.wwd.worldWindowView.getAsLookAt(thisLayer.scratchLookAt),
+                            oldLat = lookAt.lookAtPosition.latitude,
+                            oldLon = lookAt.lookAtPosition.longitude,
                             // Scale the increment by a constant and the relative distance of the eye to the surface.
                             scale = thisLayer.panIncrement
-                                * (lookAtView.range / thisLayer.wwd.globe.radiusAt(oldLat, oldLon)),
-                            heading = lookAtView.heading + (Math.atan2(dx, dy) * Angle.RADIANS_TO_DEGREES),
+                                * (lookAt.range / thisLayer.wwd.globe.radiusAt(oldLat, oldLon)),
+                            heading = lookAt.heading + (Math.atan2(dx, dy) * Angle.RADIANS_TO_DEGREES),
                             distance = scale * Math.sqrt(dx * dx + dy * dy);
 
-                        Location.greatCircleLocation(lookAtView.lookAtPosition, heading, -distance,
-                            lookAtView.lookAtPosition);
-                        thisLayer.wwd.worldWindowView = lookAtView;
+                        Location.greatCircleLocation(lookAt.lookAtPosition, heading, -distance,
+                            lookAt.lookAtPosition);
+                        thisLayer.wwd.worldWindowView.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setLookAtLocation, 50);
                     }
@@ -745,13 +745,13 @@ define([
                 var thisLayer = this; // capture 'this' for use in the function
                 var setRange = function () {
                     if (thisLayer.activeControl) {
-                        var lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView);
+                        var lookAt = thisLayer.wwd.worldWindowView.getAsLookAt(thisLayer.scratchLookAt);
                         if (thisLayer.activeControl === thisLayer.zoomInControl) {
-                            lookAtView.range *= (1 - thisLayer.zoomIncrement);
+                            lookAt.range *= (1 - thisLayer.zoomIncrement);
                         } else if (thisLayer.activeControl === thisLayer.zoomOutControl) {
-                            lookAtView.range *= (1 + thisLayer.zoomIncrement);
+                            lookAt.range *= (1 + thisLayer.zoomIncrement);
                         }
-                        thisLayer.wwd.worldWindowView = lookAtView;
+                        thisLayer.wwd.worldWindowView.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
@@ -781,14 +781,14 @@ define([
                 // This function is called by the timer to perform the operation.
                 var thisLayer = this; // capture 'this' for use in the function
                 var setRange = function () {
-                    var lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView);
+                    var lookAt = thisLayer.wwd.worldWindowView.getAsLookAt(thisLayer.scratchLookAt);
                     if (thisLayer.activeControl) {
                         if (thisLayer.activeControl === thisLayer.headingLeftControl) {
-                            lookAtView.heading += thisLayer.headingIncrement;
+                            lookAt.heading += thisLayer.headingIncrement;
                         } else if (thisLayer.activeControl === thisLayer.headingRightControl) {
-                            lookAtView.heading -= thisLayer.headingIncrement;
+                            lookAt.heading -= thisLayer.headingIncrement;
                         }
-                        thisLayer.wwd.worldWindowView = lookAtView;
+                        thisLayer.wwd.worldWindowView.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
@@ -818,15 +818,15 @@ define([
                 var thisLayer = this; // capture 'this' for use in the function
                 var setRange = function () {
                     if (thisLayer.activeControl) {
-                        var lookAtView = LookAtView.fromView(thisLayer.wwd.worldWindowView, thisLayer.scratchLookAtView);
+                        var lookAt = thisLayer.wwd.worldWindowView.getAsLookAt(thisLayer.scratchLookAt);
                         if (thisLayer.activeControl === thisLayer.tiltUpControl) {
-                            lookAtView.tilt =
-                                Math.max(0, lookAtView.tilt - thisLayer.tiltIncrement);
+                            lookAt.tilt =
+                                Math.max(0, lookAt.tilt - thisLayer.tiltIncrement);
                         } else if (thisLayer.activeControl === thisLayer.tiltDownControl) {
-                            lookAtView.tilt =
-                                Math.min(90, lookAtView.tilt + thisLayer.tiltIncrement);
+                            lookAt.tilt =
+                                Math.min(90, lookAt.tilt + thisLayer.tiltIncrement);
                         }
-                        thisLayer.wwd.worldWindowView = lookAtView;
+                        thisLayer.wwd.worldWindowView.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }

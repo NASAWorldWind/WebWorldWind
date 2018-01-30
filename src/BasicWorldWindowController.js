@@ -22,7 +22,7 @@ define([
         './gesture/DragRecognizer',
         './gesture/GestureRecognizer',
         './util/Logger',
-        './LookAtView',
+        './LookAt',
         './geom/Matrix',
         './gesture/PanRecognizer',
         './gesture/PinchRecognizer',
@@ -40,7 +40,7 @@ define([
               DragRecognizer,
               GestureRecognizer,
               Logger,
-              LookAtView,
+              LookAt,
               Matrix,
               PanRecognizer,
               PinchRecognizer,
@@ -111,7 +111,7 @@ define([
             this.beginRange = 0;
             this.lastRotation = 0;
 
-            this.scratchLookAtView = new LookAtView(this.wwd);
+            this.scratchLookAt = new LookAt(this.wwd);
         };
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
@@ -169,7 +169,7 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAtView = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
+            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
                 this.lastPoint.set(0, 0);
             } else if (state === WorldWind.CHANGED) {
@@ -179,7 +179,7 @@ define([
                 var canvas = this.wwd.canvas,
                     globe = this.wwd.globe,
                     globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
-                    distance = WWMath.max(1, lookAtView.range),
+                    distance = WWMath.max(1, lookAt.range),
                     metersPerPixel = WWMath.perspectivePixelSize(canvas.clientWidth, canvas.clientHeight, distance),
                     forwardMeters = (ty - this.lastPoint[1]) * metersPerPixel,
                     sideMeters = -(tx - this.lastPoint[0]) * metersPerPixel,
@@ -187,14 +187,14 @@ define([
                     sideDegrees = (sideMeters / globeRadius) * Angle.RADIANS_TO_DEGREES;
 
                 // Apply the change in latitude and longitude to the view, relative to the current heading.
-                var sinHeading = Math.sin(lookAtView.heading * Angle.DEGREES_TO_RADIANS),
-                    cosHeading = Math.cos(lookAtView.heading * Angle.DEGREES_TO_RADIANS);
+                var sinHeading = Math.sin(lookAt.heading * Angle.DEGREES_TO_RADIANS),
+                    cosHeading = Math.cos(lookAt.heading * Angle.DEGREES_TO_RADIANS);
 
-                lookAtView.lookAtPosition.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
-                lookAtView.lookAtPosition.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
+                lookAt.lookAtPosition.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
+                lookAt.lookAtPosition.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
                 this.lastPoint.set(tx, ty);
-                this.applyLimits(lookAtView);
-                this.wwd.worldWindowView = lookAtView;
+                this.applyLimits(lookAt);
+                this.wwd.worldWindowView.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
@@ -207,7 +207,7 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAtView = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
+            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
                 this.beginPoint.set(x, y);
                 this.lastPoint.set(x, y);
@@ -236,7 +236,7 @@ define([
 
                 // Transform the original view's modelview matrix to account for the gesture's change.
                 var modelview = Matrix.fromIdentity();
-                lookAtView.computeViewingTransform(modelview);
+                lookAt.computeViewingTransform(modelview);
                 modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
 
                 // Compute the globe point at the screen center from the perspective of the transformed view.
@@ -248,14 +248,14 @@ define([
 
                 // Convert the transformed modelview matrix to a set of view properties, then apply those
                 // properties to this view.
-                var params = modelview.extractViewingParameters(origin, lookAtView.roll, globe, {});
-                lookAtView.lookAtPosition.copy(params.origin);
-                lookAtView.range = params.range;
-                lookAtView.heading = params.heading;
-                lookAtView.tilt = params.tilt;
-                lookAtView.roll = params.roll;
-                this.applyLimits(lookAtView);
-                this.wwd.worldWindowView = lookAtView;
+                var params = modelview.extractViewingParameters(origin, lookAt.roll, globe, {});
+                lookAt.lookAtPosition.copy(params.origin);
+                lookAt.range = params.range;
+                lookAt.heading = params.heading;
+                lookAt.tilt = params.tilt;
+                lookAt.roll = params.roll;
+                this.applyLimits(lookAt);
+                this.wwd.worldWindowView.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
@@ -266,10 +266,10 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAtView = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
+            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
-                this.beginHeading = lookAtView.heading;
-                this.beginTilt = lookAtView.tilt;
+                this.beginHeading = lookAt.heading;
+                this.beginTilt = lookAt.tilt;
             } else if (state === WorldWind.CHANGED) {
                 // Compute the current translation from screen coordinates to degrees. Use the canvas dimensions as a
                 // metric for converting the gesture translation to a fraction of an angle.
@@ -277,29 +277,29 @@ define([
                     tiltDegrees = 90 * ty / this.wwd.canvas.clientHeight;
 
                 // Apply the change in heading and tilt to this view's corresponding properties.
-                lookAtView.heading = this.beginHeading + headingDegrees;
-                lookAtView.tilt = this.beginTilt + tiltDegrees;
-                this.applyLimits(lookAtView);
-                this.wwd.worldWindowView = lookAtView;
+                lookAt.heading = this.beginHeading + headingDegrees;
+                lookAt.tilt = this.beginTilt + tiltDegrees;
+                this.applyLimits(lookAt);
+                this.wwd.worldWindowView.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handlePinch = function (recognizer) {
-            var lookAtView = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
+            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 scale = recognizer.scale;
 
             if (state === WorldWind.BEGAN) {
-                this.beginRange = lookAtView.range;
+                this.beginRange = lookAt.range;
             } else if (state === WorldWind.CHANGED) {
                 if (scale !== 0) {
                     // Apply the change in pinch scale to this view's range, relative to the range when the gesture
                     // began.
-                    lookAtView.range = this.beginRange / scale;
-                    this.applyLimits(lookAtView);
-                    this.wwd.worldWindowView = lookAtView;
+                    lookAt.range = this.beginRange / scale;
+                    this.applyLimits(lookAt);
+                    this.wwd.worldWindowView.setFromLookAt(lookAt);
                     this.wwd.redraw();
                 }
             }
@@ -307,7 +307,7 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleRotation = function (recognizer) {
-            var lookAtView = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
+            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 rotation = recognizer.rotation;
 
@@ -317,37 +317,37 @@ define([
                 // Apply the change in gesture rotation to this view's current heading. We apply relative to the
                 // current heading rather than the heading when the gesture began in order to work simultaneously with
                 // pan operations that also modify the current heading.
-                lookAtView.heading -= rotation - this.lastRotation;
+                lookAt.heading -= rotation - this.lastRotation;
                 this.lastRotation = rotation;
-                this.applyLimits(lookAtView);
-                this.wwd.worldWindowView = lookAtView;
+                this.applyLimits(lookAt);
+                this.wwd.worldWindowView.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleTilt = function (recognizer) {
-            var lookAtView = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
+            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 ty = recognizer.translationY;
 
             if (state === WorldWind.BEGAN) {
-                this.beginTilt = lookAtView.tilt;
+                this.beginTilt = lookAt.tilt;
             } else if (state === WorldWind.CHANGED) {
                 // Compute the gesture translation from screen coordinates to degrees. Use the canvas dimensions as a
                 // metric for converting the translation to a fraction of an angle.
                 var tiltDegrees = -90 * ty / this.wwd.canvas.clientHeight;
                 // Apply the change in heading and tilt to this view's corresponding properties.
-                lookAtView.tilt = this.beginTilt + tiltDegrees;
-                this.applyLimits(lookAtView);
-                this.wwd.worldWindowView = lookAtView;
+                lookAt.tilt = this.beginTilt + tiltDegrees;
+                this.applyLimits(lookAt);
+                this.wwd.worldWindowView.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleWheelEvent = function (event) {
-            var lookAtView = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
+            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
             // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
             // browsers and input devices.
             var normalizedDelta;
@@ -365,41 +365,41 @@ define([
             var scale = 1 + (normalizedDelta / 1000);
 
             // Apply the scale to this view's properties.
-            lookAtView.range *= scale;
-            this.applyLimits(lookAtView);
-            this.wwd.worldWindowView = lookAtView;
+            lookAt.range *= scale;
+            this.applyLimits(lookAt);
+            this.wwd.worldWindowView.setFromLookAt(lookAt);
             this.wwd.redraw();
         };
 
         // Documented in super-class.
-        BasicWorldWindowController.prototype.applyLimits = function (lookAtView) {
+        BasicWorldWindowController.prototype.applyLimits = function (lookAt) {
 
             // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
-            lookAtView.lookAtPosition.latitude = WWMath.clamp(lookAtView.lookAtPosition.latitude, -90, 90);
-            lookAtView.lookAtPosition.longitude = Angle.normalizedDegreesLongitude(lookAtView.lookAtPosition.longitude);
+            lookAt.lookAtPosition.latitude = WWMath.clamp(lookAt.lookAtPosition.latitude, -90, 90);
+            lookAt.lookAtPosition.longitude = Angle.normalizedDegreesLongitude(lookAt.lookAtPosition.longitude);
 
             // Clamp range to values greater than 1 in order to prevent degenerating to a first-person view when
             // range is zero.
-            lookAtView.range = WWMath.clamp(lookAtView.range, 1, Number.MAX_VALUE);
+            lookAt.range = WWMath.clamp(lookAt.range, 1, Number.MAX_VALUE);
 
             // Normalize heading to between -180 and +180.
-            lookAtView.heading = Angle.normalizedDegrees(lookAtView.heading);
+            lookAt.heading = Angle.normalizedDegrees(lookAt.heading);
 
             // Clamp tilt to between 0 and +90 to prevent the viewer from going upside down.
-            lookAtView.tilt = WWMath.clamp(lookAtView.tilt, 0, 90);
+            lookAt.tilt = WWMath.clamp(lookAt.tilt, 0, 90);
 
             // Normalize heading to between -180 and +180.
-            lookAtView.roll = Angle.normalizedDegrees(lookAtView.roll);
+            lookAt.roll = Angle.normalizedDegrees(lookAt.roll);
 
             // Apply 2D limits when the globe is 2D.
             if (this.wwd.globe.is2D()) {
                 // Clamp range to prevent more than 360 degrees of visible longitude. Assumes a 45 degree horizontal
                 // field of view.
                 var maxRange = 2 * Math.PI * this.wwd.globe.equatorialRadius;
-                lookAtView.range = WWMath.clamp(lookAtView.range, 1, maxRange);
+                lookAt.range = WWMath.clamp(lookAt.range, 1, maxRange);
 
                 // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
-                lookAtView.tilt = 0;
+                lookAt.tilt = 0;
             }
         };
 

@@ -18,11 +18,11 @@
  */
 define(['../error/ArgumentError',
         '../util/Logger',
-        '../LookAtView'
+        '../LookAt'
     ],
     function (ArgumentError,
               Logger,
-              LookAtView) {
+              LookAt) {
         "use strict";
 
         /**
@@ -31,7 +31,7 @@ define(['../error/ArgumentError',
          * @alias Navigator
          * @constructor
          * @classdesc Provides an abstract base class for navigators. This class is not meant to be instantiated
-         * directly. Deprecated, see {@Link LookAtView} and {@Link CameraView}.
+         * directly. Deprecated, see  {@Link WorldWindowView}.
          * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
         var Navigator = function (worldWindow) {
@@ -42,7 +42,7 @@ define(['../error/ArgumentError',
 
             this.wwd = worldWindow;
 
-            this.scratchLookAtView = new LookAtView(this.wwd);
+            this.scratchLookAt = new LookAt();
         };
 
         Object.defineProperties(Navigator.prototype, {
@@ -53,12 +53,12 @@ define(['../error/ArgumentError',
              */
             heading: {
                 get: function () {
-                    return LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView).heading;
+                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).heading;
                 },
                 set: function (value) {
-                    var view = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
-                    view.heading = value;
-                    this.wwd.worldWindowView = view;
+                    var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    lookAt.heading = value;
+                    this.wwd.worldWindowView.setFromLookAt(lookAt);
                 }
             },
 
@@ -69,12 +69,12 @@ define(['../error/ArgumentError',
              */
             tilt: {
                 get: function () {
-                    return LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView).tilt;
+                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).tilt;
                 },
                 set: function (value) {
-                    var view = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
-                    view.tilt = value;
-                    this.wwd.worldWindowView = view;
+                    var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    lookAt.tilt = value;
+                    this.wwd.worldWindowView.setFromLookAt(lookAt);
                 }
             },
 
@@ -85,12 +85,12 @@ define(['../error/ArgumentError',
              */
             roll: {
                 get: function () {
-                    return LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView).roll;
+                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).roll;
                 },
                 set: function (value) {
-                    var view = LookAtView.fromView(this.wwd.worldWindowView, this.scratchLookAtView);
-                    view.roll = value;
-                    this.wwd.worldWindowView = view;
+                    var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    lookAt.roll = value;
+                    this.wwd.worldWindowView.setFromLookAt(lookAt);
                 }
             }
         });
