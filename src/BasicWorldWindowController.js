@@ -19,6 +19,7 @@
 define([
         './geom/Angle',
         './error/ArgumentError',
+        './Camera',
         './gesture/DragRecognizer',
         './gesture/GestureRecognizer',
         './util/Logger',
@@ -32,11 +33,11 @@ define([
         './geom/Vec2',
         './geom/Vec3',
         './WorldWindowController',
-        './WorldWindowView',
         './util/WWMath'
     ],
     function (Angle,
               ArgumentError,
+              Camera,
               DragRecognizer,
               GestureRecognizer,
               Logger,
@@ -50,7 +51,6 @@ define([
               Vec2,
               Vec3,
               WorldWindowController,
-              WorldWindowView,
               WWMath) {
         "use strict";
 
@@ -169,7 +169,7 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
                 this.lastPoint.set(0, 0);
             } else if (state === WorldWind.CHANGED) {
@@ -194,7 +194,7 @@ define([
                 lookAt.lookAtPosition.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
                 this.lastPoint.set(tx, ty);
                 this.applyLimits(lookAt);
-                this.wwd.worldWindowView.setFromLookAt(lookAt);
+                this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
@@ -207,7 +207,7 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
                 this.beginPoint.set(x, y);
                 this.lastPoint.set(x, y);
@@ -236,7 +236,7 @@ define([
 
                 // Transform the original view's modelview matrix to account for the gesture's change.
                 var modelview = Matrix.fromIdentity();
-                lookAt.computeViewingTransform(modelview);
+                lookAt.computeViewingTransform(globe, modelview);
                 modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
 
                 // Compute the globe point at the screen center from the perspective of the transformed view.
@@ -255,7 +255,7 @@ define([
                 lookAt.tilt = params.tilt;
                 lookAt.roll = params.roll;
                 this.applyLimits(lookAt);
-                this.wwd.worldWindowView.setFromLookAt(lookAt);
+                this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
@@ -266,7 +266,7 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
                 this.beginHeading = lookAt.heading;
                 this.beginTilt = lookAt.tilt;
@@ -280,14 +280,14 @@ define([
                 lookAt.heading = this.beginHeading + headingDegrees;
                 lookAt.tilt = this.beginTilt + tiltDegrees;
                 this.applyLimits(lookAt);
-                this.wwd.worldWindowView.setFromLookAt(lookAt);
+                this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handlePinch = function (recognizer) {
-            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 scale = recognizer.scale;
 
@@ -299,7 +299,7 @@ define([
                     // began.
                     lookAt.range = this.beginRange / scale;
                     this.applyLimits(lookAt);
-                    this.wwd.worldWindowView.setFromLookAt(lookAt);
+                    this.wwd.camera.setFromLookAt(lookAt);
                     this.wwd.redraw();
                 }
             }
@@ -307,7 +307,7 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleRotation = function (recognizer) {
-            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 rotation = recognizer.rotation;
 
@@ -320,14 +320,14 @@ define([
                 lookAt.heading -= rotation - this.lastRotation;
                 this.lastRotation = rotation;
                 this.applyLimits(lookAt);
-                this.wwd.worldWindowView.setFromLookAt(lookAt);
+                this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleTilt = function (recognizer) {
-            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 ty = recognizer.translationY;
 
@@ -340,14 +340,14 @@ define([
                 // Apply the change in heading and tilt to this view's corresponding properties.
                 lookAt.tilt = this.beginTilt + tiltDegrees;
                 this.applyLimits(lookAt);
-                this.wwd.worldWindowView.setFromLookAt(lookAt);
+                this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleWheelEvent = function (event) {
-            var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
             // browsers and input devices.
             var normalizedDelta;
@@ -367,7 +367,7 @@ define([
             // Apply the scale to this view's properties.
             lookAt.range *= scale;
             this.applyLimits(lookAt);
-            this.wwd.worldWindowView.setFromLookAt(lookAt);
+            this.wwd.camera.setFromLookAt(lookAt);
             this.wwd.redraw();
         };
 

@@ -50,12 +50,12 @@ define([
              */
             lookAtLocation: {
                 get: function () {
-                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).lookAtPosition;
+                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).lookAtPosition;
                 },
                 set: function (value) {
-                    var lookAt=this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
                     lookAt.lookAtPosition = value;
-                    this.wwd.worldWindowView.setFromLookAt(lookAt);
+                    this.wwd.camera.setFromLookAt(lookAt);
                 }
             },
 
@@ -66,12 +66,12 @@ define([
              */
             range: {
                 get: function () {
-                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).range;
+                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).range;
                 },
                 set: function (value) {
-                    var lookAt=this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
                     lookAt.range = value;
-                    this.wwd.worldWindowView.setFromLookAt(lookAt);
+                    this.wwd.camera.setFromLookAt(lookAt);
                 }
             }
         });

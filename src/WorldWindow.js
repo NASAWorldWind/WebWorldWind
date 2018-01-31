@@ -19,6 +19,7 @@
 define([
         './error/ArgumentError',
         './BasicWorldWindowController',
+        './Camera',
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
@@ -40,11 +41,11 @@ define([
         './globe/Terrain',
         './geom/Vec2',
         './geom/Vec3',
-        './WorldWindowView',
         './util/WWMath'
     ],
     function (ArgumentError,
               BasicWorldWindowController,
+              Camera,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
@@ -66,7 +67,6 @@ define([
               Terrain,
               Vec2,
               Vec3,
-              WorldWindowView,
               WWMath) {
         "use strict";
 
@@ -161,7 +161,7 @@ define([
              */
             this.navigator = new LookAtNavigator(this);
 
-            this.worldWindowView = new WorldWindowView(this);
+            this.camera = new Camera(this);
 
             /**
              * The controller used to manipulate the globe.
@@ -672,7 +672,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
             }
 
-            this.worldWindowView.computeViewingTransform(modelview);
+            this.camera.computeViewingTransform(modelview);
 
             if (projection) {
                 projection.setToIdentity();

@@ -18,6 +18,7 @@
  */
 define([
         'src/BasicWorldWindowController',
+        'src/Camera',
         'src/render/DrawContext',
         'src/globe/EarthElevationModel',
         'src/globe/Globe',
@@ -28,9 +29,8 @@ define([
         'src/geom/Vec3',
         'src/WorldWind',
         'src/WorldWindow',
-        'src/WorldWindowView'
     ],
-    function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, LookAtNavigator, Matrix, Rectangle, Vec2, Vec3, WorldWind, WorldWindow, WorldWindowView) {
+    function (BasicWorldWindowController, Camera, DrawContext, EarthElevationModel, Globe, LookAtNavigator, Matrix, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
         "use strict";
 
         var TestUtils = function () {
@@ -81,7 +81,7 @@ define([
             };
             wwd.scratchModelview = Matrix.fromIdentity();
             wwd.scratchProjection = Matrix.fromIdentity();
-            wwd.worldWindowView = new WorldWindowView(wwd);
+            wwd.camera = new Camera(wwd);
             return wwd;
         };
 

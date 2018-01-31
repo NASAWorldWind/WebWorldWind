@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports WorldWindowView
+ * @exports Camera
  */
 define([
         './error/ArgumentError',
@@ -34,10 +34,10 @@ define([
               WWMath) {
         "use strict";
 
-        var WorldWindowView = function (worldWindow) {
+        var Camera = function (worldWindow) {
             if (!worldWindow) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "constructor", "missingWorldWindow"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "constructor", "missingWorldWindow"));
             }
 
             this.wwd = worldWindow;
@@ -84,10 +84,10 @@ define([
             this.scratchRay = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
         };
 
-        WorldWindowView.prototype.computeViewingTransform = function (modelview) {
+        Camera.prototype.computeViewingTransform = function (modelview) {
             if (!modelview) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "computeViewingTransform", "missingModelview"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "computeViewingTransform", "missingModelview"));
             }
 
             modelview.setToIdentity();
@@ -107,7 +107,7 @@ define([
             return modelview;
         };
 
-        WorldWindowView.prototype.equals = function (otherView) {
+        Camera.prototype.equals = function (otherView) {
             if (otherView) {
                 return this.position.equals(otherView.position) &&
                     this.heading === otherView.heading &&
@@ -118,17 +118,17 @@ define([
             return false;
         };
 
-        WorldWindowView.prototype.clone = function () {
-            var clone = new WorldWindowView(this.wwd);
+        Camera.prototype.clone = function () {
+            var clone = new Camera(this.wwd);
             clone.copy(this);
 
             return clone;
         };
 
-        WorldWindowView.prototype.copy = function (copyObject) {
+        Camera.prototype.copy = function (copyObject) {
             if (!copyObject) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "copy", "missingObject"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "copy", "missingObject"));
             }
 
             this.wwd = copyObject.wwd;
@@ -140,10 +140,10 @@ define([
             return this;
         };
 
-        WorldWindowView.prototype.setFromLookAt = function (lookAt) {
+        Camera.prototype.setFromLookAt = function (lookAt) {
             if (!lookAt) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "setFromLookAt", "missingLookAt"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "setFromLookAt", "missingLookAt"));
             }
 
             var globe = this.wwd.globe,
@@ -165,10 +165,10 @@ define([
             return this;
         };
 
-        WorldWindowView.prototype.getAsLookAt = function (result) {
+        Camera.prototype.getAsLookAt = function (result) {
             if (!result) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindowView", "getAsLookAt", "missingResult"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "getAsLookAt", "missingResult"));
             }
 
             var globe = this.wwd.globe,
@@ -199,6 +199,6 @@ define([
             return result;
         };
 
-        return WorldWindowView;
+        return Camera;
     });
 

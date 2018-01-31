@@ -35,6 +35,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/BMNGOneImageLayer',
         './layer/BMNGRestLayer',
         './geom/BoundingBox',
+        './Camera',
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
@@ -250,7 +251,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/wmts/WmtsLayerCapabilities',
         './WorldWindow',
         './WorldWindowController',
-        './WorldWindowView',
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
@@ -277,6 +277,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BMNGOneImageLayer,
               BMNGRestLayer,
               BoundingBox,
+              Camera,
               ClickRecognizer,
               ColladaLoader,
               Color,
@@ -492,7 +493,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsLayerCapabilities,
               WorldWindow,
               WorldWindowController,
-              WorldWindowView,
               WWMath,
               WWMessage,
               WWUtil,
@@ -728,6 +728,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BMNGOneImageLayer'] = BMNGOneImageLayer;
         WorldWind['BMNGRestLayer'] = BMNGRestLayer;
         WorldWind['BoundingBox'] = BoundingBox;
+        WorldWind['Camera'] = Camera;
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
@@ -894,7 +895,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['WorldWindowController'] = WorldWindowController;
-        WorldWind['WorldWindowView'] = WorldWindowView;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**

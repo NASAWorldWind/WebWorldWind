@@ -20,15 +20,12 @@ define([
         './error/ArgumentError',
         './util/Logger',
         './geom/Matrix',
-        './geom/Position',
-        './geom/Vec3',
-        './WorldWindowView'],
+        './geom/Position'
+    ],
     function (ArgumentError,
               Logger,
               Matrix,
-              Position,
-              Vec3,
-              WorldWindowView) {
+              Position) {
         "use strict";
 
         var LookAt = function () {
@@ -126,13 +123,11 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "copy", "missingObject"));
             }
 
-            WorldWindowView.prototype.copy.call(this, copyObject);
-
             this.lookAtPosition.copy(copyObject.lookAtPosition);
-            this.heading=copyObject.heading;
-            this.tilt=copyObject.tilt;
-            this.roll=copyObject.roll;
-            this.range=copyObject.range;
+            this.heading = copyObject.heading;
+            this.tilt = copyObject.tilt;
+            this.roll = copyObject.roll;
+            this.range = copyObject.range;
 
             return this;
         };

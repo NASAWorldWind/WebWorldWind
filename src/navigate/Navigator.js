@@ -31,7 +31,7 @@ define(['../error/ArgumentError',
          * @alias Navigator
          * @constructor
          * @classdesc Provides an abstract base class for navigators. This class is not meant to be instantiated
-         * directly. Deprecated, see  {@Link WorldWindowView}.
+         * directly. Deprecated, see  {@Link Camera}.
          * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
         var Navigator = function (worldWindow) {
@@ -53,12 +53,12 @@ define(['../error/ArgumentError',
              */
             heading: {
                 get: function () {
-                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).heading;
+                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).heading;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
                     lookAt.heading = value;
-                    this.wwd.worldWindowView.setFromLookAt(lookAt);
+                    this.wwd.camera.setFromLookAt(lookAt);
                 }
             },
 
@@ -69,12 +69,12 @@ define(['../error/ArgumentError',
              */
             tilt: {
                 get: function () {
-                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).tilt;
+                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).tilt;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
                     lookAt.tilt = value;
-                    this.wwd.worldWindowView.setFromLookAt(lookAt);
+                    this.wwd.camera.setFromLookAt(lookAt);
                 }
             },
 
@@ -85,12 +85,12 @@ define(['../error/ArgumentError',
              */
             roll: {
                 get: function () {
-                    return this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt).roll;
+                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).roll;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.worldWindowView.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
                     lookAt.roll = value;
-                    this.wwd.worldWindowView.setFromLookAt(lookAt);
+                    this.wwd.camera.setFromLookAt(lookAt);
                 }
             }
         });

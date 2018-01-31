@@ -26,39 +26,11 @@ define([
     'src/geom/Vec3',
     'src/WorldWind',
     'src/WorldWindow',
-    'src/WorldWindowView'
-], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Globe2D, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow, WorldWindowView) {
+    'test/util/TestUtils.test'
+], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Globe2D, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow, TestUtils) {
     "use strict";
-
-    var MockGlContext = function () {
-        this.drawingBufferWidth = 800;
-        this.drawingBufferHeight = 800;
-    };
-
-    var viewport = new Rectangle(0, 0, 848, 848);
-    var dc = new DrawContext(new MockGlContext());
-    var MockWorldWindow = function () {
-    };
-
-    MockWorldWindow.prototype = Object.create(WorldWindow.prototype);
-
-    var mockGlobe = new Globe2D();
-    var wwd = new MockWorldWindow();
-    wwd.globe = mockGlobe;
-    wwd.drawContext = dc;
-    wwd.navigator = new LookAtNavigator(wwd);
-    wwd.worldWindowController = new BasicWorldWindowController(wwd);
-    wwd.viewport = viewport;
-    wwd.depthBits = 24;
-    wwd.canvas = {
-        clientLeft: 0, clientTop: 0, getBoundingClientRect: function () {
-            return {left: 339.5, top: 225};
-        }
-    };
-    wwd.scratchModelview = Matrix.fromIdentity();
-    wwd.scratchProjection = Matrix.fromIdentity();
-    wwd.worldWindowView = new WorldWindowView(wwd);
-//    wwd.resetDrawContext();
+    var wwd = TestUtils.getMockWwd();
+   wwd.resetDrawContext();
 
     describe("BasicWorldWindowController tests", function () {
 
