@@ -268,8 +268,7 @@ define([
             // annotation
             this.label = dc.textRenderer.wrap(
                 this.label,
-                this.attributes.width, this.attributes.height,
-                this.attributes.textAttributes.font);
+                this.attributes.width, this.attributes.height);
 
             // Compute the annotation's model point.
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,

@@ -82,28 +82,26 @@ define([
         };
 
         /**
-         * Returns the width and height of a specified text string upon applying a specified font and optional outline.
+         * Returns the width and height of a specified text string.
          * @param {string} text The text string.
-         * @param {Font} font The font to apply when drawing the text.
-         * @param {Boolean} outline Indicates whether the text includes an outline, which increases its width and height.
          * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels.
          */
-        TextRenderer.prototype.textSize = function (text, font, outline) {
+        TextRenderer.prototype.textSize = function (text) {
             if (text.length === 0) {
                 return new Vec2(0, 0);
             }
 
-            this.ctx2D.font = font.fontString;
+            this.ctx2D.font = this.typeFace.fontString;
 
             var lines = text.split("\n"),
-                height = lines.length * (font.size * (1 + this.lineSpacing)),
+                height = lines.length * (this.typeFace.size * (1 + this.lineSpacing)),
                 maxWidth = 0;
 
             for (var i = 0; i < lines.length; i++) {
                 maxWidth = Math.max(maxWidth, this.ctx2D.measureText(lines[i]).width);
             }
 
-            if (outline) {
+            if (this.enableOutline) {
                 maxWidth += this.outlineWidth;
                 height += this.outlineWidth;
             }
@@ -133,7 +131,7 @@ define([
         TextRenderer.prototype.drawText = function (text) {
             var ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
-                textSize = this.textSize(text, this.typeFace, this.enableOutline),
+                textSize = this.textSize(text),
                 lines = text.split("\n"),
                 strokeOffset = this.enableOutline ? this.outlineWidth / 2 : 0,
                 pixelScale = this.dc.pixelScale;
@@ -171,24 +169,13 @@ define([
         };
 
         /**
-         * Calculates maximum line height based on a font
-         * @param {Font} font The font to use.
-         * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels based on the passed font.
-         */
-        TextRenderer.prototype.getMaxLineHeight = function (font) {
-            // Check underscore + capital E with acute accent
-            return this.textSize("_\u00c9", font, 0)[1];
-        };
-
-        /**
          * Wraps the text based on width and height using new line delimiter
          * @param {String} text The text to wrap.
          * @param {Number} width The width in pixels.
          * @param {Number} height The height in pixels.
-         * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextRenderer.prototype.wrap = function (text, width, height, font) {
+        TextRenderer.prototype.wrap = function (text, width, height) {
             if (!text) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.WARNING, "TextRenderer", "wrap", "missing text"));
@@ -201,14 +188,14 @@ define([
 
             // Wrap each line
             for (i = 0; i < lines.length; i++) {
-                lines[i] = this.wrapLine(lines[i], width, font);
+                lines[i] = this.wrapLine(lines[i], width);
             }
             // Concatenate all lines in one string with new line separators
             // between lines - not at the end
             // Checks for height limit.
             var currentHeight = 0;
             var heightExceeded = false;
-            var maxLineHeight = this.getMaxLineHeight(font);
+            var maxLineHeight = this.textSize("_\u00c9")[1]; // Check underscore + capital E with acute accent
             for (i = 0; i < lines.length && !heightExceeded; i++) {
                 var subLines = lines[i].split("\n");
                 for (var j = 0; j < subLines.length && !heightExceeded; j++) {
@@ -244,15 +231,14 @@ define([
          * Wraps a line of text based on width and height
          * @param {String} text The text to wrap.
          * @param {Number} width The width in pixels.
-         * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextRenderer.prototype.wrapLine = function (text, width, font) {
+        TextRenderer.prototype.wrapLine = function (text, width) {
             var wrappedText = "";
 
             // Single line - trim leading and trailing spaces
             var source = text.trim();
-            var lineBounds = this.textSize(source, font, 0);
+            var lineBounds = this.textSize(source);
             if (lineBounds[0] > width) {
                 // Split single line to fit preferred width
                 var line = "";
@@ -266,7 +252,7 @@ define([
                     // Extract a 'word' which is in fact a space and a word
                     var word = source.substring(start, end);
                     var linePlusWord = line + word;
-                    if (this.textSize(linePlusWord, font, 0)[0] <= width) {
+                    if (this.textSize(linePlusWord)[0] <= width) {
                         // Keep adding to the current line
                         line += word;
                     }
