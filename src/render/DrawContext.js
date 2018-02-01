@@ -1517,5 +1517,19 @@ define([
             return this.pixelSizeFactor * distance + this.pixelSizeOffset;
         };
 
+        DrawContext.prototype.renderText = function (text, textAttributes) {
+
+            if (text != null && textAttributes != null) {
+                this.textRenderer.textColor = textAttributes.color.get();
+                this.textRenderer.typeFace = textAttributes.font.get();
+                this.textRenderer.enableOutline = textAttributes.enableOutline.get();
+                this.textRenderer.outlineColor = textAttributes.outlineColor.get();
+                this.textRenderer.outlineWidth = textAttributes.outlineWidth.get();
+                var texture = this.textRenderer.renderText(text);
+            }
+
+            return texture;
+        };
+
         return DrawContext;
     });
