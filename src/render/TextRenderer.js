@@ -82,7 +82,7 @@ define([
         };
 
         /**
-         * Returns the width and height of a specified text string.
+         * Returns the width and height of a specified text string considering the current typeFace and outline usage.
          * @param {string} text The text string.
          * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels.
          */
@@ -169,6 +169,15 @@ define([
         };
 
         /**
+         * Calculates maximum line height based on the current typeFace and outline usage of TextRenderer.
+         * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels.
+         */
+        TextRenderer.prototype.getMaxLineHeight = function () {
+            // Check underscore + capital E with acute accent
+            return this.textSize("_\u00c9")[1];
+        };
+
+        /**
          * Wraps the text based on width and height using new line delimiter
          * @param {String} text The text to wrap.
          * @param {Number} width The width in pixels.
@@ -195,7 +204,7 @@ define([
             // Checks for height limit.
             var currentHeight = 0;
             var heightExceeded = false;
-            var maxLineHeight = this.textSize("_\u00c9")[1]; // Check underscore + capital E with acute accent
+            var maxLineHeight = this.getMaxLineHeight();
             for (i = 0; i < lines.length && !heightExceeded; i++) {
                 var subLines = lines[i].split("\n");
                 for (var j = 0; j < subLines.length && !heightExceeded; j++) {
