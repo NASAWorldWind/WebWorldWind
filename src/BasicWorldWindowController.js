@@ -193,7 +193,6 @@ define([
                 lookAt.lookAtPosition.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
                 lookAt.lookAtPosition.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
                 this.lastPoint.set(tx, ty);
-                this.applyLimits(lookAt);
                 this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
@@ -254,7 +253,6 @@ define([
                 lookAt.heading = params.heading;
                 lookAt.tilt = params.tilt;
                 lookAt.roll = params.roll;
-                this.applyLimits(lookAt);
                 this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
@@ -279,7 +277,6 @@ define([
                 // Apply the change in heading and tilt to this view's corresponding properties.
                 lookAt.heading = this.beginHeading + headingDegrees;
                 lookAt.tilt = this.beginTilt + tiltDegrees;
-                this.applyLimits(lookAt);
                 this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
@@ -298,7 +295,6 @@ define([
                     // Apply the change in pinch scale to this view's range, relative to the range when the gesture
                     // began.
                     lookAt.range = this.beginRange / scale;
-                    this.applyLimits(lookAt);
                     this.wwd.camera.setFromLookAt(lookAt);
                     this.wwd.redraw();
                 }
@@ -319,7 +315,6 @@ define([
                 // pan operations that also modify the current heading.
                 lookAt.heading -= rotation - this.lastRotation;
                 this.lastRotation = rotation;
-                this.applyLimits(lookAt);
                 this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
@@ -339,7 +334,6 @@ define([
                 var tiltDegrees = -90 * ty / this.wwd.canvas.clientHeight;
                 // Apply the change in heading and tilt to this view's corresponding properties.
                 lookAt.tilt = this.beginTilt + tiltDegrees;
-                this.applyLimits(lookAt);
                 this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
             }
@@ -366,40 +360,36 @@ define([
 
             // Apply the scale to this view's properties.
             lookAt.range *= scale;
-            this.applyLimits(lookAt);
             this.wwd.camera.setFromLookAt(lookAt);
             this.wwd.redraw();
         };
 
         // Documented in super-class.
-        BasicWorldWindowController.prototype.applyLimits = function (lookAt) {
+        BasicWorldWindowController.prototype.applyLimits = function () {
 
+            var camera=this.wwd.camera;
             // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
-            lookAt.lookAtPosition.latitude = WWMath.clamp(lookAt.lookAtPosition.latitude, -90, 90);
-            lookAt.lookAtPosition.longitude = Angle.normalizedDegreesLongitude(lookAt.lookAtPosition.longitude);
-
-            // Clamp range to values greater than 1 in order to prevent degenerating to a first-person view when
-            // range is zero.
-            lookAt.range = WWMath.clamp(lookAt.range, 1, Number.MAX_VALUE);
+            camera.position.latitude = WWMath.clamp(camera.position.latitude, -90, 90);
+            camera.position.longitude = Angle.normalizedDegreesLongitude(camera.position.longitude);
+            camera.position.altitude = WWMath.clamp(camera.position.altitude, 0, Number.MAX_VALUE);
 
             // Normalize heading to between -180 and +180.
-            lookAt.heading = Angle.normalizedDegrees(lookAt.heading);
+            camera.heading = Angle.normalizedDegrees(camera.heading);
 
-            // Clamp tilt to between 0 and +90 to prevent the viewer from going upside down.
-            lookAt.tilt = WWMath.clamp(lookAt.tilt, 0, 90);
+            camera.tilt = WWMath.clamp(camera.tilt, -90, 90);
 
-            // Normalize heading to between -180 and +180.
-            lookAt.roll = Angle.normalizedDegrees(lookAt.roll);
+            // Normalize roll to between -180 and +180.
+            camera.roll = Angle.normalizedDegrees(camera.roll);
 
             // Apply 2D limits when the globe is 2D.
             if (this.wwd.globe.is2D()) {
                 // Clamp range to prevent more than 360 degrees of visible longitude. Assumes a 45 degree horizontal
                 // field of view.
-                var maxRange = 2 * Math.PI * this.wwd.globe.equatorialRadius;
-                lookAt.range = WWMath.clamp(lookAt.range, 1, maxRange);
+                var maxAltitude = 2 * Math.PI * this.wwd.globe.equatorialRadius;
+                camera.position.altitude = WWMath.clamp(camera.position.altitude, 0, maxAltitude);
 
                 // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
-                lookAt.tilt = 0;
+                camera.tilt = 0;
             }
         };
 

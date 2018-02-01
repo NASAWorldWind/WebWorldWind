@@ -38,10 +38,6 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        var thisFunction = this;
-
-        // var lookAt = new WorldWind.LookAt(wwd);
-        // var tiltDir = -1;
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
         var selectedViewType = "Camera";
@@ -67,57 +63,80 @@ requirejs(['./WorldWindShim',
             valueControl.html(defaultValue);
         };
 
+        var latitudeValue = $("#latitude");
         var latitudeSlider = $("#latitudeSlider");
-        addSlider($("#latitude"), latitudeSlider, -90, 90, 1, camera.position.latitude);
+        addSlider(latitudeValue, latitudeSlider, -90, 90, 1, camera.position.latitude);
 
+        var longitudeValue = $("#longitude");
         var longitudeSlider = $("#longitudeSlider");
-        addSlider($("#longitude"), longitudeSlider, -180, 180, 1, camera.position.longitude);
+        addSlider(longitudeValue, longitudeSlider, -180, 180, 1, camera.position.longitude);
 
+        var altitudeValue = $("#altitude");
         var altitudeSlider = $("#altitudeSlider");
-        addSlider($("#altitude"), altitudeSlider, 0, 10e7, 100, camera.position.altitude);
+        addSlider(altitudeValue, altitudeSlider, 1, 10e6, 1, camera.position.altitude);
 
+        var rangeValue = $("#range");
         var rangeSlider = $("#rangeSlider");
-        addSlider($("#range"), rangeSlider, 0, 10e7, 100, lookAt.range);
+        addSlider(rangeValue, rangeSlider, 1, 10e6, 1, lookAt.range);
         rangeSlider.slider("disable");
 
+        var headingValue = $("#heading");
         var headingSlider = $("#headingSlider");
-        addSlider($("#heading"), headingSlider, 0, 360, 1, camera.heading);
+        addSlider(headingValue, headingSlider, -180, 180, 1, camera.heading);
 
+        var tiltValue = $("#tilt");
         var tiltSlider = $("#tiltSlider");
-        addSlider($("#tilt"), tiltSlider, -90, 90, 1, camera.tilt);
+        addSlider(tiltValue, tiltSlider, -90, 90, 1, camera.tilt);
 
+        var rollValue = $("#roll");
         var rollSlider = $("#rollSlider");
-        addSlider($("#roll"), rollSlider, -90, 90, 1, camera.roll);
+        addSlider(rollValue, rollSlider, -90, 90, 1, camera.roll);
+
+        var updateControls = function (pos, selectedView) {
+            latitudeValue.html(Math.round(pos.latitude * 100.0) / 100.0);
+            longitudeValue.html(Math.round(pos.longitude * 100.0) / 100.0);
+            altitudeValue.html(Math.round(pos.altitude * 100.0) / 100.0);
+            headingValue.html(Math.round(selectedView.heading * 100.0) / 100.0);
+            tiltValue.html(Math.round(selectedView.tilt * 100.0) / 100.0);
+            rollValue.html(Math.round(selectedView.roll * 100.0) / 100.0);
+
+            latitudeSlider.slider('value', pos.latitude);
+            longitudeSlider.slider('value', pos.longitude);
+            altitudeSlider.slider('value', pos.altitude);
+            headingSlider.slider('value', selectedView.heading);
+            tiltSlider.slider('value', selectedView.tilt);
+            rollSlider.slider('value', selectedView.roll);
+            if (selectedView === lookAt) {
+                rangeValue.html(Math.round(lookAt.range * 100.0) / 100.0);
+                rangeSlider.slider('value', lookAt.range);
+            }
+        };
 
         var currentViewType = selectedViewType;
         updateView = function () {
-            var pos,view;
+            var pos, view;
             if (selectedViewType !== currentViewType) {
                 currentViewType = selectedViewType;
                 if (currentViewType === "Camera") {
-                    pos=camera.position;
-                    view=camera;
+                    pos = camera.position;
+                    view = camera;
                     rangeSlider.slider("disable");
+                    altitudeSlider.slider("enable");
                 } else {
-                    pos=lookAt.lookAtPosition;
-                    view=lookAt;
-                    rangeSlider.slider("enable");
                     camera.getAsLookAt(lookAt);
-                    rangeSlider.slider('value', lookAt.range);
+                    pos = lookAt.lookAtPosition;
+                    view = lookAt;
+                    rangeSlider.slider("enable");
+                    altitudeSlider.slider("disable");
                 }
-                latitudeSlider.slider('value', pos.latitude);
-                longitudeSlider.slider('value', pos.longitude);
-                altitudeSlider.slider('value', pos.altitude);
-                headingSlider.slider('value', view.heading);
-                tiltSlider.slider('value', view.tilt);
-                rollSlider.slider('value', view.roll);
             } else {
                 if (currentViewType === "Camera") {
-                    pos=camera.position;
-                    view=camera;
+                    pos = camera.position;
+                    view = camera;
                 } else {
-                    pos=lookAt.lookAtPosition;
-                    view=lookAt;
+                    camera.getAsLookAt(lookAt);
+                    pos = lookAt.lookAtPosition;
+                    view = lookAt;
                 }
                 pos.latitude = latitudeSlider.slider("value");
                 pos.longitude = longitudeSlider.slider("value");
@@ -130,48 +149,19 @@ requirejs(['./WorldWindShim',
                     camera.setFromLookAt(lookAt);
                 }
             }
+            updateControls(pos, view);
         };
-// window.setInterval(function () {
-//     wwd.getView().asCamera(camera);
-//     // var newLon = camera.cameraPosition.longitude + 1;
-//     // if (newLon > 180) {
-//     //     newLon = -180;
-//     // }
-//     // else if (newLon < -180) {
-//     //     newLon = 180;
-//     // }
-//     // camera.cameraPosition.longitude = newLon;
-//     var newTilt = camera.tilt + tiltDir*0.5;
-//     if (newTilt > 20) {
-//         newTilt = 20;
-//         tiltDir = -1;
-//     }
-//     else if (newTilt < -20) {
-//         newTilt = -20;
-//         tiltDir = 1;
-//     }
-//     camera.tilt=newTilt;
-//     wwd.setView(camera);
-//
-//     // wwd.getView().asLookAt(lookAt);
-//     // // var newLon = lookAt.lookAtPosition.longitude + 1;
-//     // // if (newLon > 180) {
-//     // //     newLon = -180;
-//     // // }
-//     // // else if (newLon < -180) {
-//     // //     newLon = 180;
-//     // // }
-//     // var newTilt = lookAt.tilt + tiltDir*0.5;
-//     // if (newTilt > 20) {
-//     //     newTilt = 20;
-//     //     tiltDir = -1;
-//     // }
-//     // else if (newTilt < -20) {
-//     //     newTilt = -20;
-//     //     tiltDir = 1;
-//     // }
-//     // lookAt.tilt=newTilt;
-//     // //lookAt.lookAtPosition.longitude = newLon;
-//     // wwd.setView(lookAt);
-// }, 100);
+
+        window.setInterval(function () {
+            var pos, view;
+            camera.getAsLookAt(lookAt);
+            if (currentViewType === "Camera") {
+                pos = camera.position;
+                view = camera;
+            } else {
+                pos = lookAt.lookAtPosition;
+                view = lookAt;
+            }
+            updateControls(pos, view);
+        }, 100);
     });

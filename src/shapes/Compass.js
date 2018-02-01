@@ -19,11 +19,13 @@
 define([
         '../error/ArgumentError',
         '../util/Logger',
+        '../LookAt',
         '../util/Offset',
         '../shapes/ScreenImage'
     ],
     function (ArgumentError,
               Logger,
+              LookAt,
               Offset,
               ScreenImage) {
         "use strict";
@@ -34,7 +36,7 @@ define([
          * @constructor
          * @augments ScreenImage
          * @classdesc Displays a compass image at a specified location in the WorldWindow. The compass image rotates
-         * and tilts to reflect the current navigator's heading and tilt.
+         * and tilts to reflect the current camera's heading and tilt.
          * @param {Offset} screenOffset The offset indicating the image's placement on the screen. If null or undefined
          * the compass is placed at the upper-right corner of the WorldWindow.
          * Use [the image offset property]{@link ScreenImage#imageOffset} to position the image relative to the
@@ -62,18 +64,21 @@ define([
              * @default 0.15
              */
             this.size = 0.15;
+
+            this.scratchLookAt = new LookAt();
         };
 
         Compass.prototype = Object.create(ScreenImage.prototype);
 
         /**
-         * Capture the navigator's heading and tilt and apply it to the compass' screen image.
+         * Capture the camera's heading and tilt and apply it to the compass' screen image.
          * @param {DrawContext} dc The current draw context.
          */
         Compass.prototype.render = function (dc) {
-            // Capture the navigator's heading and tilt and apply it to the compass' screen image.
-            this.imageRotation = dc.navigator.heading;
-            this.imageTilt = dc.navigator.tilt;
+            dc.camera.getAsLookAt(this.scratchLookAt);
+            // Capture the camera's heading and tilt and apply it to the compass' screen image.
+            this.imageRotation = this.scratchLookAt.heading;
+            this.imageTilt = this.scratchLookAt.tilt;
 
             var t = this.getActiveTexture(dc);
             if (t) {
