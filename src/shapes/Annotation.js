@@ -289,9 +289,7 @@ define([
             this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
 
             if (!this.labelTexture) {
-                dc.textRenderer.enableOutline = false; // Temporary, while TextRenderer is refactored
-                this.labelTexture = dc.textRenderer.renderText(this.label);
-                dc.textRenderer.enableOutline = true; // Temporary, while TextRenderer is refactored
+                this.labelTexture = dc.renderText(this.label, this.attributes.textAttributes);
                 dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
             }
 
