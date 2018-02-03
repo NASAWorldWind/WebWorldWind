@@ -520,7 +520,7 @@ define([
             Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
             program.loadTextureMatrix(gl, Annotation.matrix);
 
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : Color.WHITE);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 
