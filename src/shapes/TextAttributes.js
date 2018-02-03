@@ -44,7 +44,7 @@ define([
             this._depthTest = attributes ? attributes._depthTest : false;
             this._enableOutline = attributes ? attributes._enableOutline : true;
             this._outlineWidth = attributes ? attributes._outlineWidth : 4;
-            this._outlineColor = attributes ? attributes._color : new Color(0, 0, 0, 0.5);
+            this._outlineColor = attributes ? attributes._outlineColor : new Color(0, 0, 0, 0.5);
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
