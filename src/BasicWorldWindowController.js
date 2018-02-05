@@ -111,7 +111,7 @@ define([
             this.beginRange = 0;
             this.lastRotation = 0;
 
-            this.scratchLookAt = new LookAt(this.wwd);
+            this.scratchLookAt = new LookAt();
         };
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
