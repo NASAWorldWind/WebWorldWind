@@ -1517,6 +1517,17 @@ define([
             return this.pixelSizeFactor * distance + this.pixelSizeOffset;
         };
 
+        /**
+         * Propagates the values contained in a TextAttributes object to the currently attached TextRenderer
+         * {@link TextRenderer} as to provide format to a string of text. The TextRenderer then produces a
+         * 2D Texture with the aforementioned text and format to be used as a label for a Text {@link Text}
+         * subclass (<i>e.g.</i> Annotation {@link Annotation} or Placemark {@link Placemark}).
+         * @param {String} text The string of text that will be given color, font, and outline
+         * and which the resulting texture will be based on.
+         * @param {TextAttributes} textAttributes Attributes that will be applied to the string.
+         * See TextAttributes {@link TextAttributes}.
+         * @returns {Texture} A texture {@link Texture} with the specified text string, typeface, colors, and outline.
+         */
         DrawContext.prototype.renderText = function (text, textAttributes) {
 
             var texture = null;

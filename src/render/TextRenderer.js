@@ -62,22 +62,38 @@ define([
             // Internal use only. Intentionally not documented.
             this.dc = drawContext;
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * Indicates if the text will feature an outline around its characters.
+             * @type {boolean}
+             */
             this.enableOutline = true;
 
             // Internal use only. Intentionally not documented.
             this.lineSpacing = 0.15; // fraction of font size
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * The color for the Text outline.
+             * Its default has half transparency to avoid visual artifacts that appear while fully opaque.
+             * @type {Color}
+             */
             this.outlineColor = new Color(0, 0, 0, 0.5);
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * Indicates the text outline width (or thickness) in pixels.
+             * @type {number}
+             */
             this.outlineWidth = 4;
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * The text color.
+             * @type {Color}
+             */
             this.textColor = new Color(1, 1, 1, 1);
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * The text size, face and other characteristics, as described in [Font]{@link Font}.
+             * @type {Font}
+             */
             this.typeFace = new Font(14);
         };
 
@@ -110,7 +126,7 @@ define([
         };
 
         /**
-         * Creates a texture for a specified text string.
+         * Creates a texture for a specified text string and current TextRenderer state.
          * @param {String} text The text string.
          * @returns {Texture} A texture for the specified text string.
          */
@@ -124,7 +140,8 @@ define([
         };
 
         /**
-         * Creates a 2D Canvas for a specified text string.
+         * Creates a 2D Canvas for a specified text string while considering current TextRenderer state in
+         * regards to outline usage and color, text color, typeface, and outline width.
          * @param {String} text The text string.
          * @returns {canvas2D} A 2D Canvas for the specified text string.
          */
