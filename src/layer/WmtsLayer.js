@@ -481,7 +481,7 @@ define([
             // set negotiation.
             var supportedTileMatrixSets = wmtsLayerCapabilities.getLayerSupportedTileMatrixSets();
 
-            // Validate that the specified style identifier exists, or determine one if not specified.
+            // Validate that the specified TileMatrixSet exists and is compatible with WebWorldWind
             if (matrixSet) {
                 for (var i = 0, len = supportedTileMatrixSets.length; i < len; i++) {
                     if (supportedTileMatrixSets[i].identifier === matrixSet && WmtsLayer.isTileSubdivisionCompatible(supportedTileMatrixSets[i])) {
