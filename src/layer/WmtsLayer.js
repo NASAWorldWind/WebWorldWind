@@ -158,6 +158,22 @@ define([
                         "No EPSG:4326 bounding box was specified in the layer or tile matrix set capabilities."));
             }
 
+            // Check if the provided TileMatrixSet level division is compatible
+            if (!WmtsLayer.checkTileSubdivision(this.tileMatrixSet)) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
+                        "TileMatrixSet level division not compatible."));
+            }
+
+            // Check if the provided TileMatrixSet coordinate system is compatible
+            var crs = this.tileMatrixSet.supportedCRS;
+            var supportedCrs = WmtsLayer.isEpsg3857Crs(crs) || WmtsLayer.isEpsg4326Crs(crs) || WmtsLayer.isOGCCrs84(crs);
+            if (!supportedCrs) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
+                        "Provided CRS is not compatible."));
+            }
+
             // Form a unique string to identify cache entries.
             this.cachePath = (this.resourceUrl || this.serviceUrl) +
                 this.layerIdentifier + this.styleIdentifier + this.tileMatrixSet.identifier;
