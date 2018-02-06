@@ -51,7 +51,6 @@ requirejs(['./WorldWindShim',
         annotationAttributes.width = 200;
         annotationAttributes.height = 100;
         annotationAttributes.textAttributes.color = WorldWind.Color.WHITE;
-        annotationAttributes.textAttributes.enableOutline = false;
         annotationAttributes.insets = new WorldWind.Insets(10, 10, 10, 10);
 
         // Set a location for the annotation to point to and create it.

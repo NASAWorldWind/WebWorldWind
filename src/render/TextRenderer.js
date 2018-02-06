@@ -41,8 +41,8 @@ define([
          * @alias TextRenderer
          * @constructor
          * @classdesc Provides methods useful for displaying text. An instance of this class is attached to the
-         * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically
-         * do not create instances of this class.
+         * WorldWindow {@link DrawContext} and is not intended to be used independently of that. Applications typically do
+         * not create instances of this class.
          * @param {drawContext} drawContext The current draw context. Typically the same draw context that TextRenderer
          * is attached to.
          * @throws {ArgumentError} If the specified draw context is null or undefined.

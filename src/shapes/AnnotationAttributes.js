@@ -46,7 +46,11 @@ define([
             this._drawLeader = attributes ? attributes._drawLeader : true;
             this._width = attributes ? attributes._width : 200;
             this._height = attributes ? attributes._height : 100;
-            this._textAttributes = attributes ? attributes._textAttributes : new TextAttributes(null);
+
+            // Disabling the Annotation's text outline by default.
+            var defaultAttributes = new TextAttributes(null);
+            defaultAttributes.enableOutline = false;
+            this._textAttributes = attributes ? attributes._textAttributes : defaultAttributes;
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
