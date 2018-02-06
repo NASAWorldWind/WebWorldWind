@@ -158,29 +158,6 @@ define([
                         "No EPSG:4326 bounding box was specified in the layer or tile matrix set capabilities."));
             }
 
-            // Check if tile subdivision is valid
-            var tileMatrix = config.tileMatrixSet.tileMatrix,
-                widthArray = [],
-                heightArray = [],
-                invalidLevel;
-
-            tileMatrix.forEach(function (matrix) {
-                widthArray.push(matrix.matrixWidth);
-                heightArray.push(matrix.matrixHeight);
-            });
-
-            if (WmtsLayer.checkTileSubdivision(widthArray) !== 0) {
-                invalidLevel = WmtsLayer.checkTileSubdivision(widthArray);
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
-                    "Tile subdivision not supported for layer : " + config.identifier + ". Display until level " + (invalidLevel - 1));
-                tileMatrix.splice(invalidLevel);
-            } else if (WmtsLayer.checkTileSubdivision(heightArray) !== 0) {
-                invalidLevel = WmtsLayer.checkTileSubdivision(heightArray);
-                Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
-                    "Tile subdivision not supported for layer : " + config.identifier + ". Display until level " + (invalidLevel - 1));
-                tileMatrix.splice(invalidLevel);
-            }
-
             // Form a unique string to identify cache entries.
             this.cachePath = (this.resourceUrl || this.serviceUrl) +
                 this.layerIdentifier + this.styleIdentifier + this.tileMatrixSet.identifier;
@@ -213,32 +190,28 @@ define([
             this.detailControl = 1.75;
         };
 
-        WmtsLayer.checkTileSubdivision = function (dimensionArray) {
-            if (dimensionArray.length < 1) {
+        WmtsLayer.checkTileSubdivision = function (tileMatrixSet) {
+            if (!tileMatrixSet || !tileMatrixSet.tileMatrix || tileMatrixSet.tileMatrix.length < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "checkTileSubdivision",
-                        "Empty dimension array"));
+                        "Empty tile matrix set"));
             }
 
-            var ratio,
-                invalidLevel = 0,
-                i = 0;
+            var matrixHeightRatio, matrixWidthRatio, tileMatrix, previousTileMatrix = tileMatrixSet.tileMatrix[0];
 
-            while (++i < dimensionArray.length && invalidLevel == 0) {
-                var newRatio = dimensionArray[i] / dimensionArray[i - 1];
+            for (var i = 1, len = tileMatrixSet.tileMatrix.length; i < len; i++) {
+                tileMatrix = tileMatrixSet.tileMatrix[i];
+                matrixHeightRatio = tileMatrix.matrixHeight / previousTileMatrix.matrixHeight;
+                matrixWidthRatio = tileMatrix.matrixWidth / previousTileMatrix.matrixWidth;
+                previousTileMatrix = tileMatrix;
 
-                // If the ratio is not an integer, the level is invalid
-                if ((dimensionArray[i] % dimensionArray[i - 1]) !== 0) {
-                    invalidLevel = i;
-                } else if (ratio && (ratio !== newRatio)) {
-                    // If ratios are different, the level is invalid
-                    invalidLevel = i;
+
+                if (matrixHeightRatio !== 2 || matrixWidthRatio !== 2) {
+                    return false;
                 }
-                ratio = newRatio;
             }
 
-            // Tile subdivision is valid when invalidLevel == 0
-            return invalidLevel;
+            return true;
         };
 
 
@@ -488,16 +461,14 @@ define([
 
             // Validate that the specified style identifier exists, or determine one if not specified.
             if (matrixSet) {
-                var tileMatrixSetFound = false;
                 for (var i = 0, len = supportedTileMatrixSets.length; i < len; i++) {
-                    if (supportedTileMatrixSets[i].identifier === matrixSet) {
-                        tileMatrixSetFound = true;
+                    if (supportedTileMatrixSets[i].identifier === matrixSet && WmtsLayer.checkTileSubdivision(supportedTileMatrixSets[i])) {
                         config.tileMatrixSet = supportedTileMatrixSets[i];
                         break;
                     }
                 }
 
-                if (!tileMatrixSetFound) {
+                if (!config.tileMatrixSet) {
                     Logger.logMessage(Logger.LEVEL_WARNING, "WmtsLayer", "formLayerConfiguration",
                         "The specified tileMatrixSet is not available. Another one will be used.");
                     config.tileMatrixSet = null;
@@ -511,12 +482,15 @@ define([
                 for (var i = 0, len = supportedTileMatrixSets.length; i < len; i++) {
                     tms = supportedTileMatrixSets[i];
 
-                    if (WmtsLayer.isEpsg4326Crs(tms.supportedCRS)) {
-                        tms4326 = tms4326 || tms;
-                    } else if (WmtsLayer.isEpsg3857Crs(tms.supportedCRS)) {
-                        tms3857 = tms3857 || tms;
-                    } else if (WmtsLayer.isOGCCrs84(tms.supportedCRS)) {
-                        tmsCRS84 = tmsCRS84 || tms;
+                    // check for suitable tile division
+                    if (WmtsLayer.checkTileSubdivision(tms)) {
+                        if (WmtsLayer.isEpsg4326Crs(tms.supportedCRS)) {
+                            tms4326 = tms4326 || tms;
+                        } else if (WmtsLayer.isEpsg3857Crs(tms.supportedCRS)) {
+                            tms3857 = tms3857 || tms;
+                        } else if (WmtsLayer.isOGCCrs84(tms.supportedCRS)) {
+                            tmsCRS84 = tmsCRS84 || tms;
+                        }
                     }
                 }
 
