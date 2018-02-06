@@ -158,8 +158,8 @@ define([
                         "No EPSG:4326 bounding box was specified in the layer or tile matrix set capabilities."));
             }
 
-            // Check if the provided TileMatrixSet level division is compatible
-            if (!WmtsLayer.checkTileSubdivision(this.tileMatrixSet)) {
+            // Check if the provided TileMatrixSet tile subdivision is compatible
+            if (!WmtsLayer.isTileSubdivisionCompatible(this.tileMatrixSet)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "constructor",
                         "TileMatrixSet level division not compatible."));
@@ -206,10 +206,16 @@ define([
             this.detailControl = 1.75;
         };
 
-        WmtsLayer.checkTileSubdivision = function (tileMatrixSet) {
+        /**
+         * Determines if the tile subdivision of the provided TileMatrixSet is compatible with WebWorldWind.
+         * @param tileMatrixSet
+         * @returns {boolean} true if this tile subdivision will work with WebWorldWind
+         * @throws {ArgumentError} If the provided TileMatrixSet is null or empty
+         */
+        WmtsLayer.isTileSubdivisionCompatible = function (tileMatrixSet) {
             if (!tileMatrixSet || !tileMatrixSet.tileMatrix || tileMatrixSet.tileMatrix.length < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "checkTileSubdivision",
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmtsLayer", "isTileSubdivisionCompatible",
                         "Empty tile matrix set"));
             }
 
@@ -478,7 +484,7 @@ define([
             // Validate that the specified style identifier exists, or determine one if not specified.
             if (matrixSet) {
                 for (var i = 0, len = supportedTileMatrixSets.length; i < len; i++) {
-                    if (supportedTileMatrixSets[i].identifier === matrixSet && WmtsLayer.checkTileSubdivision(supportedTileMatrixSets[i])) {
+                    if (supportedTileMatrixSets[i].identifier === matrixSet && WmtsLayer.isTileSubdivisionCompatible(supportedTileMatrixSets[i])) {
                         config.tileMatrixSet = supportedTileMatrixSets[i];
                         break;
                     }
@@ -499,7 +505,7 @@ define([
                     tms = supportedTileMatrixSets[i];
 
                     // check for suitable tile division
-                    if (WmtsLayer.checkTileSubdivision(tms)) {
+                    if (WmtsLayer.isTileSubdivisionCompatible(tms)) {
                         if (WmtsLayer.isEpsg4326Crs(tms.supportedCRS)) {
                             tms4326 = tms4326 || tms;
                         } else if (WmtsLayer.isEpsg3857Crs(tms.supportedCRS)) {
