@@ -268,8 +268,7 @@ define([
             // annotation
             this.label = dc.textRenderer.wrap(
                 this.label,
-                this.attributes.width, this.attributes.height,
-                this.attributes.textAttributes.font);
+                this.attributes.width, this.attributes.height);
 
             // Compute the annotation's model point.
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
@@ -290,9 +289,7 @@ define([
             this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
 
             if (!this.labelTexture) {
-                dc.textRenderer.enableOutline = false; // Temporary, while TextRenderer is refactored
-                this.labelTexture = dc.textRenderer.renderText(this.label);
-                dc.textRenderer.enableOutline = true; // Temporary, while TextRenderer is refactored
+                this.labelTexture = dc.renderText(this.label, this.attributes.textAttributes);
                 dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
             }
 
@@ -523,7 +520,7 @@ define([
             Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
             program.loadTextureMatrix(gl, Annotation.matrix);
 
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : Color.WHITE);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 

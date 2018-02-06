@@ -46,7 +46,7 @@ define([
             this._drawLeader = attributes ? attributes._drawLeader : true;
             this._width = attributes ? attributes._width : 200;
             this._height = attributes ? attributes._height : 100;
-            this._textAttributes = attributes ? attributes._textAttributes : new TextAttributes(null);
+            this._textAttributes = attributes ? attributes._textAttributes : this.createDefaultTextAttributes();
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
@@ -77,6 +77,13 @@ define([
                 + " op " + this.opacity
                 + " ta " + this._textAttributes.stateKey
                 + " sc " + this.scale;
+        };
+
+        // Internal use only. Intentionally not documented.
+        AnnotationAttributes.prototype.createDefaultTextAttributes = function() {
+            var attributes = new TextAttributes(null);
+            attributes.enableOutline = false; // Annotations display text without an outline by default
+            return attributes;
         };
 
         Object.defineProperties(AnnotationAttributes.prototype, {
