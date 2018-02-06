@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 /**
- * @exports LookAtLocationProxy
+ * @exports LookAtPositionProxy
  */
 define([
-        '../geom/Location'
+        '../geom/Position'
     ],
     function (Location) {
         "use strict";
@@ -25,27 +25,23 @@ define([
         /**
          * Constructs a look-at location proxy
          * @deprecated
-         * @alias LookAtLocationProxy
+         * @alias LookAtPositionProxy
          * @constructor
-         * @classdesc A Location proxy class that is used for backward compatibility purposes by the deprecated LookAtNavigator class.
+         * @classdesc A Position proxy class that is used for backward compatibility purposes by the deprecated LookAtNavigator class.
          */
-        var LookAtLocationProxy = function (navigator, latitude, longitude) {
-            this.location=new Location(latitude,longitude);
+        var LookAtPositionProxy = function (navigator) {
+            this.position = new Position(0, 0, 0);
             this.navigator = navigator;
         };
 
-        Object.defineProperties(LookAtLocationProxy.prototype, {
-            /**
-             * The geographic location at the center of the viewport.
-             * @type {Location}
-             */
+        Object.defineProperties(LookAtPositionProxy.prototype, {
             latitude: {
                 get: function () {
                     return this.location.latitude;
                 },
                 set: function (value) {
-                    this.location.latitude=value;
-                    navigator.lookAtLocation=this.location;
+                    this.location.latitude = value;
+                    this.navigator.lookAtLocation = this.location;
                 }
             },
 
@@ -54,11 +50,11 @@ define([
                     return this.location.longitude;
                 },
                 set: function (value) {
-                    this.location.longitude=value;
-                    navigator.lookAtLocation=this.location;
+                    this.location.longitude = value;
+                    this.navigator.lookAtLocation = this.location;
                 }
             }
         });
 
-        return LookAtLocationProxy;
+        return LookAtPositionProxy;
     });

@@ -19,12 +19,12 @@
 define([
         '../geom/Location',
         '../LookAt',
-        '../navigate/LookAtLocationProxy',
+        '../navigate/LookAtPositionProxy',
         '../navigate/Navigator'
     ],
     function (Location,
               LookAt,
-              LookAtLocationProxy,
+              LookAtPositionProxy,
               Navigator) {
         "use strict";
 
@@ -40,7 +40,7 @@ define([
         var LookAtNavigator = function (worldWindow) {
             Navigator.call(this,worldWindow);
 
-            this.scratchLookAtLocationProxy=new LookAtLocationProxy(this,0,0);
+            this.scratchLookAtPositionProxy=new LookAtPositionProxy(this);
             // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
             this.enable2DLimits = true;
         };
@@ -55,8 +55,8 @@ define([
             lookAtLocation: {
                 get: function () {
                     this.wwd.camera.getAsLookAt(this.scratchLookAt);
-                    this.scratchLookAtLocationProxy.location.copy(this.scratchLookAt.lookAtPosition);
-                    return this.scratchLookAtLocationProxy;
+                    this.scratchLookAtPositionProxy.position.copy(this.scratchLookAt.lookAtPosition);
+                    return this.scratchLookAtPositionProxy;
                 },
                 set: function (value) {
                     var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
