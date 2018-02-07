@@ -666,12 +666,6 @@ define([
             program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
 
             if (hasSideTextures && !dc.pickingMode) {
-                this.activeTexture = dc.gpuResourceCache.resourceForKey(this.capImageSource());
-                if (!this.activeTexture) {
-                    this.activeTexture =
-                        dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.capImageSource());
-                }
-
                 if (applyLighting) {
                     program.loadApplyLighting(gl, true);
                     gl.enableVertexAttribArray(program.normalVectorLocation);
@@ -696,7 +690,7 @@ define([
                             coordByteOffset + 12);
 
                         this.scratchMatrix.setToIdentity();
-                        this.scratchMatrix.multiplyByTextureTransform(this.activeTexture);
+                        this.scratchMatrix.multiplyByTextureTransform(sideTexture);
 
                         program.loadTextureEnabled(gl, true);
                         program.loadTextureUnit(gl, gl.TEXTURE0);
