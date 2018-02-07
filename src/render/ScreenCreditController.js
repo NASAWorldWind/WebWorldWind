@@ -26,6 +26,7 @@ define([
         '../util/Offset',
         '../pick/PickedObject',
         '../render/Renderable',
+        '../shapes/TextAttributes',
         '../geom/Vec3',
         '../util/WWMath'
     ],
@@ -65,7 +66,7 @@ define([
             this.opacity = 0.5;
 
             // Internal. Intentionally not documented.
-            this.creditFont = new Font(14);
+            this.textAttributes = new TextAttributes(null);
         };
 
         // Internal use only. Intentionally not documented.
@@ -261,10 +262,10 @@ define([
         ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
             var imageWidth, imageHeight, activeTexture, textureKey, gl, program, x;
 
-            textureKey = credit.text + this.creditFont.toString();
+            textureKey = credit.text + this.textAttributes.font.toString();
             activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
             if (!activeTexture) {
-                activeTexture = dc.textRenderer.renderText(credit.text);
+                activeTexture = dc.renderText(credit.text, this.textAttributes);
                 dc.gpuResourceCache.putResource(textureKey, activeTexture, activeTexture.size);
             }
 
