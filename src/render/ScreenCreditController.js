@@ -78,7 +78,7 @@ define([
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.createDefaultTextAttributes = function () {
             var attributes = new TextAttributes(null);
-            attributes.textColor = Color.WHITE; // Annotations display text without an outline by default
+            attributes.enableOutline = false; // Screen credits display text without an outline by default
             return attributes;
         };
 
@@ -144,7 +144,7 @@ define([
             }
 
             // Want to draw only once per frame.
-            if (dc.timestamp == this.lastFrameTimestamp) {
+            if (dc.timestamp === this.lastFrameTimestamp) {
                 return;
             }
             this.lastFrameTimestamp = dc.timestamp;

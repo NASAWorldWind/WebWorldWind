@@ -19,20 +19,18 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
-        // The following access token is expired and it's given as example (2017-05-13).
-        var accessToken = "pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6IjljZjQwNmEyMTNhOWUyMWM5NWUzYWIwOGNhYTY2ZDViIn0.Ju3tOUUUc0C_gcCSAVpFIA";
 
+        // Create any layer that we desire to bind the screen credits to
+        var anyLayer = new WorldWind.BMNGLandsatLayer();
+
+        // Create  and add imagery and WorldWindow UI layers
         var layers = [
-            {layer: new WorldWind.BMNGLayer(), enabled: false},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-            {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: true},
-            {
-                layer: new WorldWind.DigitalGlobeTiledImageLayer("Digital Globe", "digitalglobe.n6ngnadl", accessToken),
-                enabled: false
-            },
+            {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -43,6 +41,62 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
+        // Add the layer thhat will be bound to the screen credits.
+        wwd.addLayer(anyLayer);
+
+        // Bind the screen credits to the desired layer (usually, conditioning their appearance
+        // to the current display status of the layer).
+        var dc = wwd.drawContext;
+        anyLayer.doRender = function () {
+            WorldWind.MercatorTiledImageLayer.prototype.doRender.call(this, dc);
+            if (this.inCurrentFrame) {
+                // Display the desired text if the layer is visible.
+                dc.screenCreditController.addStringCredit(screenCreditText, WorldWind.Color.LIGHT_GRAY);
+            }
+        };
+
+        // Create a layer manager for controlling layer visibility. Note that toggling on and off the
+        // layer bound to the screen credits, toggles the latter on and off as well.
         var layerManager = new LayerManager(wwd);
+
+        var screenCreditText =
+            "Lorem ipsum dolor sit amet, consectetur adipiscing\n" +
+            " elit, sed do eiusmod tempor incididunt ut labore et\n" +
+            " dolore magna aliqua. Ut enim ad minim veniam, quis\n" +
+            "nostrud exercitation ullamco laboris nisi ut aliquip\n" +
+            "ex ea commodo consequat. Duis aute irure dolor in\n" +
+            "reprehenderit in voluptate velit esse cillum dolore eu\n" +
+            "fugiat nulla pariatur. Excepteur sint occaecat cupidatat\n" +
+            "non proident, sunt in culpa qui officia deserunt mollit\n" +
+            "anim id est laborum.\n" +
+            "\n" +
+            "Lorem ipsum dolor sit amet, consectetur adipiscing\n" +
+            " elit, sed do eiusmod tempor incididunt ut labore et\n" +
+            " dolore magna aliqua. Ut enim ad minim veniam, quis\n" +
+            "nostrud exercitation ullamco laboris nisi ut aliquip\n" +
+            "ex ea commodo consequat. Duis aute irure dolor in\n" +
+            "reprehenderit in voluptate velit esse cillum dolore eu\n" +
+            "fugiat nulla pariatur. Excepteur sint occaecat cupidatat\n" +
+            "non proident, sunt in culpa qui officia deserunt mollit\n" +
+            "anim id est laborum.\n" +
+            "\n" +
+            "Lorem ipsum dolor sit amet, consectetur adipiscing\n" +
+            " elit, sed do eiusmod tempor incididunt ut labore et\n" +
+            " dolore magna aliqua. Ut enim ad minim veniam, quis\n" +
+            "nostrud exercitation ullamco laboris nisi ut aliquip\n" +
+            "ex ea commodo consequat. Duis aute irure dolor in\n" +
+            "reprehenderit in voluptate velit esse cillum dolore eu\n" +
+            "fugiat nulla pariatur. Excepteur sint occaecat cupidatat\n" +
+            "non proident, sunt in culpa qui officia deserunt mollit\n" +
+            "anim id est laborum.\n" +
+            "\n" +
+            "Lorem ipsum dolor sit amet, consectetur adipiscing\n" +
+            " elit, sed do eiusmod tempor incididunt ut labore et\n" +
+            " dolore magna aliqua. Ut enim ad minim veniam, quis\n" +
+            "nostrud exercitation ullamco laboris nisi ut aliquip\n" +
+            "ex ea commodo consequat. Duis aute irure dolor in\n" +
+            "reprehenderit in voluptate velit esse cillum dolore eu\n" +
+            "fugiat nulla pariatur. Excepteur sint occaecat cupidatat\n" +
+            "non proident, sunt in culpa qui officia deserunt mollit\n" +
+            "anim id est laborum.\n";
     });
