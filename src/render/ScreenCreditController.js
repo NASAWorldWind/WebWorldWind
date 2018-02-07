@@ -73,7 +73,7 @@ define([
         ScreenCreditController.texCoordMatrix = Matrix.fromIdentity(); // scratch variable
 
         // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.createDefaultTextAttributes = function (textColor) {
+        ScreenCreditController.prototype.createStringCreditTextAttributes = function (textColor) {
             var attributes = new TextAttributes(null);
             attributes.color = textColor ? textColor : Color.WHITE;
             attributes.enableOutline = false; // Screen credits display text without an outline by default
@@ -124,7 +124,7 @@ define([
             if (this.stringCredits.indexOf(stringCredit) === -1) {
                 this.stringCredits.push({
                     text: stringCredit,
-                    textAttributes: this.createDefaultTextAttributes(color)
+                    textAttributes: this.createStringCreditTextAttributes(color)
                 });
             }
         };
