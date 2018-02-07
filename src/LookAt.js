@@ -132,5 +132,13 @@ define([
             return this;
         };
 
+        /**
+         * Returns a string representation of this object.
+         * @returns {String}
+         */
+        LookAt.prototype.toString = function () {
+            return this.lookAtPosition.toString() + "," + this.heading + "\u00b0," + this.tilt + "\u00b0," + this.roll+"\u00b0";
+        };
+
         return LookAt;
     });

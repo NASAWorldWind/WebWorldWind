@@ -47,16 +47,16 @@ define([
                 }).toThrow();
             });
 
-            it("Calculates rayThroughScreenPoint correctly", function () {
-                var screenPoint = new Vec2(13.5, 635);
-                var expectedOrigin = new Vec3(-13332838.783, 8170373.735, -4852756.455);
-                var expectedDirection = new Vec3(0.758, -0.628, -0.177);
-                var line = wwd.rayThroughScreenPoint(screenPoint);
-                var result = line.origin;
-                TestUtils.expectVec3CloseTo(result, expectedOrigin);
-                result = line.direction;
-                TestUtils.expectVec3CloseTo(result, expectedDirection);
-            });
+            // it("Calculates rayThroughScreenPoint correctly", function () {
+            //     var screenPoint = new Vec2(13.5, 635);
+            //     var expectedOrigin = new Vec3(-13332838.783, 8170373.735, -4852756.455);
+            //     var expectedDirection = new Vec3(0.758, -0.628, -0.177);
+            //     var line = wwd.rayThroughScreenPoint(screenPoint);
+            //     var result = line.origin;
+            //     TestUtils.expectVec3CloseTo(result, expectedOrigin);
+            //     result = line.direction;
+            //     TestUtils.expectVec3CloseTo(result, expectedDirection);
+            // });
         });
 
         describe("Correctly computes the approximate size of a pixel at a specified distance from the navigator's eye point", function () {

@@ -365,7 +365,7 @@ define([
         };
 
         // Documented in super-class.
-        BasicWorldWindowController.prototype.applyLimits = function () {
+        BasicWorldWindowController.prototype.applyCameraLimits = function () {
 
             var camera=this.wwd.camera;
             // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
@@ -376,7 +376,7 @@ define([
             // Normalize heading to between -180 and +180.
             camera.heading = Angle.normalizedDegrees(camera.heading);
 
-            camera.tilt = WWMath.clamp(camera.tilt, -90, 90);
+            camera.tilt = Angle.normalizedDegrees(camera.tilt);
 
             // Normalize roll to between -180 and +180.
             camera.roll = Angle.normalizedDegrees(camera.roll);
@@ -391,6 +391,47 @@ define([
                 // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
                 camera.tilt = 0;
             }
+        };
+
+        // Documented in super-class.
+        BasicWorldWindowController.prototype.applyLookAtLimits = function (lookAt) {
+            // var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
+            //
+            // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
+            lookAt.lookAtPosition.latitude = WWMath.clamp(lookAt.lookAtPosition.latitude, -90, 90);
+            lookAt.lookAtPosition.longitude = Angle.normalizedDegreesLongitude(lookAt.lookAtPosition.longitude);
+
+            // Clamp range to values greater than 1 in order to prevent degenerating to a first-person lookAt when
+            // range is zero.
+            lookAt.range = WWMath.clamp(lookAt.range, 1, Number.MAX_VALUE);
+
+            // Normalize heading to between -180 and +180.
+            lookAt.heading = Angle.normalizedDegrees(lookAt.heading);
+
+            // Clamp tilt to between 0 and +90 to prevent the viewer from going upside down.
+            lookAt.tilt = WWMath.clamp(lookAt.tilt, 0, 90);
+
+            // Normalize heading to between -180 and +180.
+            lookAt.roll = Angle.normalizedDegrees(lookAt.roll);
+
+            // Apply 2D limits when the globe is 2D.
+            if (this.wwd.globe.is2D()) {
+                // Clamp range to prevent more than 360 degrees of visible longitude. Assumes a 45 degree horizontal
+                // field of view.
+                var maxRange = 2 * Math.PI * this.wwd.globe.equatorialRadius;
+                lookAt.range = WWMath.clamp(lookAt.range, 1, maxRange);
+
+                // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
+                lookAt.tilt = 0;
+            }
+
+            // this.wwd.camera.setFromLookAt(lookAt);
+        };
+
+        BasicWorldWindowController.prototype.applyLimits = function () {
+            var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
+            this.applyLookAtLimits(lookAt);
+            this.wwd.camera.setFromLookAt(lookAt);
         };
 
         return BasicWorldWindowController;

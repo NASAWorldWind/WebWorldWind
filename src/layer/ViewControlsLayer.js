@@ -826,6 +826,8 @@ define([
                             lookAt.tilt =
                                 Math.min(90, lookAt.tilt + thisLayer.tiltIncrement);
                         }
+                        // console.log(lookAt.tilt);
+                        thisLayer.wwd.worldWindowController.applyLookAtLimits(lookAt);
                         thisLayer.wwd.camera.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);

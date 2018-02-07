@@ -19,11 +19,11 @@
 define([
         '../geom/Position'
     ],
-    function (Location) {
+    function (Position) {
         "use strict";
 
         /**
-         * Constructs a look-at location proxy
+         * Constructs a look-at position proxy
          * @deprecated
          * @alias LookAtPositionProxy
          * @constructor
@@ -31,27 +31,37 @@ define([
          */
         var LookAtPositionProxy = function (navigator) {
             this.position = new Position(0, 0, 0);
-            this.navigator = navigator;
+            this.lookAtNavigator = navigator;
         };
 
         Object.defineProperties(LookAtPositionProxy.prototype, {
             latitude: {
                 get: function () {
-                    return this.location.latitude;
+                    return this.position.latitude;
                 },
                 set: function (value) {
-                    this.location.latitude = value;
-                    this.navigator.lookAtLocation = this.location;
+                    this.position.latitude = value;
+                    this.lookAtNavigator.lookAtLocation = this.position;
                 }
             },
 
             longitude: {
                 get: function () {
-                    return this.location.longitude;
+                    return this.position.longitude;
                 },
                 set: function (value) {
-                    this.location.longitude = value;
-                    this.navigator.lookAtLocation = this.location;
+                    this.position.longitude = value;
+                    this.lookAtNavigator.lookAtLocation = this.position;
+                }
+            },
+
+            altitude: {
+                get: function () {
+                    return this.position.altitude;
+                },
+                set: function (value) {
+                    this.position.altitude = value;
+                    this.lookAtNavigator.lookAtLocation = this.position;
                 }
             }
         });

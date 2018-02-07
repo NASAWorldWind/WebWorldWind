@@ -33,49 +33,62 @@ define([
     describe("View tests", function () {
 
         describe("View calculations", function () {
-            it("Correctly calculates viewing matrix", function () {
-                var testView = wwd.camera;
-                testView.position = new Position(30, -110, 10e6);
-                var result = Matrix.fromIdentity();
-                testView.computeViewingTransform(result);
-                var expectedModelview = new Matrix(
-                    -0.3420201433256687, 0.0, 0.9396926207859083, 0.0,
-                    0.46984631039295405, 0.8660254037844386, 0.17101007166283433, 18504.157,
-                    -0.8137976813493737, 0.4999999999999999, -0.2961981327260238, -1.63727975559594E7,
-                    0.0, 0.0, 0.0, 1.0);
-                TestUtils.expectMatrixCloseTo(result, expectedModelview);
-            });
-
             it("Correctly calculates camera from lookat", function () {
                 var camera = wwd.camera;
                 var lookAt = new LookAt();
-                lookAt.range = 1.131761199603698E7;
-                lookAt.lookAtPosition = new Position(30, -90, 0);
-                camera.setFromLookAt(lookAt);
-                expect(camera.position.latitude).toBeCloseTo(30.0, 6);
-                expect(camera.position.longitude).toBeCloseTo(-90.0, 6);
-                expect(camera.position.altitude).toBeCloseTo(1.131761199603698E7, 6);
-                expect(camera.heading).toBeCloseTo(0, 6);
-                expect(camera.tilt).toBeCloseTo(0, 6);
-                expect(camera.roll).toBeCloseTo(0, 6);
+                for (var a=0; a<90; a++)
+                {
+                    camera.getAsLookAt(lookAt);
+                    console.log(lookAt.toString());
+                    lookAt.heading=a;
+                    camera.setFromLookAt(lookAt);
+                    // wwd.worldWindowController.applyLimits();
+                }
+                console.log('foo');
             });
-
-            it("Correctly calculates camera from transformed lookat", function () {
-                var camera = wwd.camera;
-                var lookAt = new LookAt();
-                lookAt.range = 1.131761199603698E7;
-                lookAt.tilt = 5;
-                lookAt.roll = 5;
-                lookAt.heading = 15;
-                lookAt.lookAtPosition = new Position(30, -90, 0);
-                camera.setFromLookAt(lookAt);
-                expect(camera.position.latitude).toBeCloseTo(26.90254740059172, 6);
-                expect(camera.position.longitude).toBeCloseTo(-90.92754733364956, 6);
-                expect(camera.position.altitude).toBeCloseTo(11302122.347, 3);
-                expect(camera.heading).toBeCloseTo(14.557895813118208, 6);
-                expect(camera.tilt).toBeCloseTo(1.7970369431725128, 6);
-                expect(camera.roll).toBeCloseTo(5, 6);
-            });
+            // it("Correctly calculates viewing matrix", function () {
+            //     var testView = wwd.camera;
+            //     testView.position = new Position(30, -110, 10e6);
+            //     var result = Matrix.fromIdentity();
+            //     testView.computeViewingTransform(result);
+            //     var expectedModelview = new Matrix(
+            //         -0.3420201433256687, 0.0, 0.9396926207859083, 0.0,
+            //         0.46984631039295405, 0.8660254037844386, 0.17101007166283433, 18504.157,
+            //         -0.8137976813493737, 0.4999999999999999, -0.2961981327260238, -1.63727975559594E7,
+            //         0.0, 0.0, 0.0, 1.0);
+            //     TestUtils.expectMatrixCloseTo(result, expectedModelview);
+            // });
+            //
+            // it("Correctly calculates camera from lookat", function () {
+            //     var camera = wwd.camera;
+            //     var lookAt = new LookAt();
+            //     lookAt.range = 1.131761199603698E7;
+            //     lookAt.lookAtPosition = new Position(30, -90, 0);
+            //     camera.setFromLookAt(lookAt);
+            //     expect(camera.position.latitude).toBeCloseTo(30.0, 6);
+            //     expect(camera.position.longitude).toBeCloseTo(-90.0, 6);
+            //     expect(camera.position.altitude).toBeCloseTo(1.131761199603698E7, 6);
+            //     expect(camera.heading).toBeCloseTo(0, 6);
+            //     expect(camera.tilt).toBeCloseTo(0, 6);
+            //     expect(camera.roll).toBeCloseTo(0, 6);
+            // });
+            //
+            // it("Correctly calculates camera from transformed lookat", function () {
+            //     var camera = wwd.camera;
+            //     var lookAt = new LookAt();
+            //     lookAt.range = 1.131761199603698E7;
+            //     lookAt.tilt = 5;
+            //     lookAt.roll = 5;
+            //     lookAt.heading = 15;
+            //     lookAt.lookAtPosition = new Position(30, -90, 0);
+            //     camera.setFromLookAt(lookAt);
+            //     expect(camera.position.latitude).toBeCloseTo(26.90254740059172, 6);
+            //     expect(camera.position.longitude).toBeCloseTo(-90.92754733364956, 6);
+            //     expect(camera.position.altitude).toBeCloseTo(11302122.347, 3);
+            //     expect(camera.heading).toBeCloseTo(14.557895813118208, 6);
+            //     expect(camera.tilt).toBeCloseTo(1.7970369431725128, 6);
+            //     expect(camera.roll).toBeCloseTo(5, 6);
+            // });
         });
     });
 });

@@ -134,6 +134,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "setFromLookAt", "missingLookAt"));
             }
 
+            // this.wwd.worldWindowController.applyLookAtLimits(lookAt);
             var globe = this.wwd.globe,
                 originPoint = this.scratchPoint,
                 modelview = this.scratchModelview,

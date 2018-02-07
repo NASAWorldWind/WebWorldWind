@@ -60,7 +60,7 @@ define([
                 },
                 set: function (value) {
                     var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
-                    lookAt.lookAtPosition = value;
+                    lookAt.lookAtPosition.copy(value);
                     this.wwd.camera.setFromLookAt(lookAt);
                 }
             },
