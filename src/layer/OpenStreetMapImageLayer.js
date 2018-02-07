@@ -58,7 +58,7 @@ define([
             this.urlBuilder = {
                 urlForTile: function (tile, imageFormat) {
                     //var url = "https://a.tile.openstreetmap.org/" +
-                    return "https://otile1.mqcdn.com/tiles/1.0.0/osm/" +
+                    return "https://a.tile.openstreetmap.org/" +
                         (tile.level.levelNumber + 1) + "/" + tile.column + "/" + tile.row + ".png";
                 }
             };

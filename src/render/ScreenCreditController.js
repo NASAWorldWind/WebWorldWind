@@ -39,6 +39,7 @@ define([
               Offset,
               PickedObject,
               Renderable,
+              TextAttributes,
               Vec3,
               WWMath) {
         "use strict";
@@ -66,13 +67,20 @@ define([
             this.opacity = 0.5;
 
             // Internal. Intentionally not documented.
-            this.textAttributes = new TextAttributes(null);
+            this.textAttributes = this.createDefaultTextAttributes();
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.scratchMatrix = Matrix.fromIdentity(); // scratch variable
         ScreenCreditController.imageTransform = Matrix.fromIdentity(); // scratch variable
         ScreenCreditController.texCoordMatrix = Matrix.fromIdentity(); // scratch variable
+
+        // Internal use only. Intentionally not documented.
+        ScreenCreditController.prototype.createDefaultTextAttributes = function () {
+            var attributes = new TextAttributes(null);
+            attributes.textColor = Color.WHITE; // Annotations display text without an outline by default
+            return attributes;
+        };
 
         /**
          * Clears all credits from this controller.
