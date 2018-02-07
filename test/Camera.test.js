@@ -42,9 +42,10 @@ define([
                     console.log(lookAt.toString());
                     lookAt.heading=a;
                     camera.setFromLookAt(lookAt);
+                    console.log(camera.toString());
+                    console.log('===');
                     // wwd.worldWindowController.applyLimits();
                 }
-                console.log('foo');
             });
             // it("Correctly calculates viewing matrix", function () {
             //     var testView = wwd.camera;

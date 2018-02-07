@@ -20,6 +20,7 @@ define([
         './error/ArgumentError',
         './geom/Line',
         './util/Logger',
+        './LookAt',
         './geom/Matrix',
         './geom/Position',
         './geom/Vec3',
@@ -28,6 +29,7 @@ define([
     function (ArgumentError,
               Line,
               Logger,
+              LookAt,
               Matrix,
               Position,
               Vec3,
@@ -179,6 +181,14 @@ define([
                 forwardRay.pointAt(horizon, originPoint);
             }
 
+            var testResult={};
+            modelview.extractViewingParameters(originPoint, this.roll, globe, testResult);
+            var testLookAt=new LookAt();
+            testLookAt.lookAtPosition.copy(testResult.origin);
+            testLookAt.heading=testResult.heading;
+            testLookAt.tilt=testResult.tilt;
+            testLookAt.roll=testResult.roll;
+            // console.log(testResult);
             globe.computePositionFromPoint(originPoint[0], originPoint[1], originPoint[2], originPos);
             origin.setToIdentity();
             origin.multiplyByLocalCoordinateTransform(originPoint,globe);
@@ -189,8 +199,18 @@ define([
             result.heading = modelview.extractHeading(this.roll); // disambiguate heading and roll
             result.tilt = modelview.extractTilt();
             result.roll = this.roll; // roll passes straight through
-
+            // console.log(testLookAt.toString());
+            // console.log(result.toString());
+            // console.log("-----");
             return result;
+        };
+
+        /**
+         * Returns a string representation of this object.
+         * @returns {String}
+         */
+        Camera.prototype.toString = function () {
+            return this.position.toString() + "," + this.heading + "\u00b0," + this.tilt + "\u00b0," + this.roll+"\u00b0";
         };
 
         return Camera;
