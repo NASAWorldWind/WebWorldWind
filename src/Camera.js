@@ -181,13 +181,13 @@ define([
                 forwardRay.pointAt(horizon, originPoint);
             }
 
-            var testResult={};
-            modelview.extractViewingParameters(originPoint, this.roll, globe, testResult);
-            var testLookAt=new LookAt();
-            testLookAt.lookAtPosition.copy(testResult.origin);
-            testLookAt.heading=testResult.heading;
-            testLookAt.tilt=testResult.tilt;
-            testLookAt.roll=testResult.roll;
+            // var testResult={};
+            // modelview.extractViewingParameters(originPoint, this.roll, globe, testResult);
+            // var testLookAt=new LookAt();
+            // testLookAt.lookAtPosition.copy(testResult.origin);
+            // testLookAt.heading=testResult.heading;
+            // testLookAt.tilt=testResult.tilt;
+            // testLookAt.roll=testResult.roll;
             // console.log(testResult);
             globe.computePositionFromPoint(originPoint[0], originPoint[1], originPoint[2], originPos);
             origin.setToIdentity();

@@ -36,16 +36,22 @@ define([
             it("Correctly calculates camera from lookat", function () {
                 var camera = wwd.camera;
                 var lookAt = new LookAt();
-                for (var a=0; a<90; a++)
-                {
-                    camera.getAsLookAt(lookAt);
-                    console.log(lookAt.toString());
-                    lookAt.heading=a;
-                    camera.setFromLookAt(lookAt);
-                    console.log(camera.toString());
-                    console.log('===');
-                    // wwd.worldWindowController.applyLimits();
-                }
+                camera.getAsLookAt(lookAt);
+                console.log(camera.toString());
+                console.log(lookAt.toString());
+                camera.setFromLookAt(lookAt);
+                console.log(camera.toString());
+                console.log('+++');
+                // for (var a=0; a<90; a++)
+                // {
+                //     camera.getAsLookAt(lookAt);
+                //     console.log(lookAt.toString());
+                //     lookAt.heading=a;
+                //     camera.setFromLookAt(lookAt);
+                //     console.log(camera.toString());
+                //     console.log('===');
+                //     // wwd.worldWindowController.applyLimits();
+                // }
             });
             // it("Correctly calculates viewing matrix", function () {
             //     var testView = wwd.camera;
