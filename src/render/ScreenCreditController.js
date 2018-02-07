@@ -65,9 +65,6 @@ define([
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
-
-            // Internal. Intentionally not documented.
-            this.textAttributes = this.createDefaultTextAttributes();
         };
 
         // Internal use only. Intentionally not documented.
@@ -76,8 +73,9 @@ define([
         ScreenCreditController.texCoordMatrix = Matrix.fromIdentity(); // scratch variable
 
         // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.createDefaultTextAttributes = function () {
+        ScreenCreditController.prototype.createDefaultTextAttributes = function (textColor) {
             var attributes = new TextAttributes(null);
+            attributes.color = textColor ? textColor : Color.WHITE;
             attributes.enableOutline = false; // Screen credits display text without an outline by default
             return attributes;
         };
@@ -126,7 +124,7 @@ define([
             if (this.stringCredits.indexOf(stringCredit) === -1) {
                 this.stringCredits.push({
                     text: stringCredit,
-                    color: color || Color.WHITE
+                    textAttributes: this.createDefaultTextAttributes(color)
                 });
             }
         };
@@ -270,10 +268,10 @@ define([
         ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
             var imageWidth, imageHeight, activeTexture, textureKey, gl, program, x;
 
-            textureKey = credit.text + this.textAttributes.font.toString();
+            textureKey = credit.text + credit.textAttributes.font.toString();
             activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
             if (!activeTexture) {
-                activeTexture = dc.renderText(credit.text, this.textAttributes);
+                activeTexture = dc.renderText(credit.text, credit.textAttributes);
                 dc.gpuResourceCache.putResource(textureKey, activeTexture, activeTexture.size);
             }
 
@@ -293,7 +291,7 @@ define([
             program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
 
             program.loadTextureEnabled(gl, true);
-            program.loadColor(gl, credit.color);
+            program.loadColor(gl, Color.WHITE);
             program.loadOpacity(gl, this.opacity);
 
             ScreenCreditController.texCoordMatrix.setToIdentity();
