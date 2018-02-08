@@ -36,22 +36,23 @@ define([
             it("Correctly calculates camera from lookat", function () {
                 var camera = wwd.camera;
                 var lookAt = new LookAt();
-                camera.getAsLookAt(lookAt);
-                console.log(camera.toString());
-                console.log(lookAt.toString());
-                camera.setFromLookAt(lookAt);
-                console.log(camera.toString());
-                console.log('+++');
-                // for (var a=0; a<90; a++)
-                // {
-                //     camera.getAsLookAt(lookAt);
-                //     console.log(lookAt.toString());
-                //     lookAt.heading=a;
-                //     camera.setFromLookAt(lookAt);
-                //     console.log(camera.toString());
-                //     console.log('===');
-                //     // wwd.worldWindowController.applyLimits();
-                // }
+                camera.position = new Position(30, -110, 10000000);
+                // camera.getAsLookAt(lookAt);
+                // console.log(camera.toString());
+                // console.log(lookAt.toString());
+                // camera.setFromLookAt(lookAt);
+                // console.log(camera.toString());
+                // console.log('+++');
+                for (var a=0; a<90; a++)
+                {
+                    camera.getAsLookAt(lookAt);
+                    console.log(lookAt.toString());
+                    lookAt.heading=a;
+                    camera.setFromLookAt(lookAt);
+                    console.log(camera.toString());
+                    console.log('===');
+                    // wwd.worldWindowController.applyLimits();
+                }
             });
             // it("Correctly calculates viewing matrix", function () {
             //     var testView = wwd.camera;
@@ -63,6 +64,31 @@ define([
             //         0.46984631039295405, 0.8660254037844386, 0.17101007166283433, 18504.157,
             //         -0.8137976813493737, 0.4999999999999999, -0.2961981327260238, -1.63727975559594E7,
             //         0.0, 0.0, 0.0, 1.0);
+            //     TestUtils.expectMatrixCloseTo(result, expectedModelview);
+            // });
+            //
+            // it("Correctly calculates viewing matrix from 0,0", function () {
+            //     var testView = wwd.camera;
+            //     testView.position = new Position(0, 0, 10e6);
+            //     var result = Matrix.fromIdentity();
+            //     testView.computeViewingTransform(result);
+            //     var expectedModelview = new Matrix(
+            //         1.0, 0.0, 0.0, -0.0,
+            //         0.0, 1.0, 0.0, -0.0,
+            //         0.0, 0.0, 1.0, -1.6378137E7,
+            //         0.0, 0.0, 0.0, 1.0);
+            //     TestUtils.expectMatrixCloseTo(result, expectedModelview);
+            // });
+            // it("Correctly calculates viewing matrix from 30,0", function () {
+            //     var testView = wwd.camera;
+            //     testView.position = new Position(30, 0, 10e6);
+            //     var result = Matrix.fromIdentity();
+            //     testView.computeViewingTransform(result);
+            //     var expectedModelview = new Matrix(
+            //         1.0,0.0,0.0,-0.0,
+            //         0.0,0.8660254037844387,-0.5,18504.125313225202,
+            //         0.0,0.5,0.8660254037844387,-1.6372797555959404E7,
+            //         0.0,0.0,0.0,1.0);
             //     TestUtils.expectMatrixCloseTo(result, expectedModelview);
             // });
             //
