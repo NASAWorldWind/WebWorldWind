@@ -568,9 +568,11 @@ define([
                 this.activeOperation = null;
                 e.preventDefault();
             } else {
+                var requestRedraw=false;
                 // Perform the active operation, or determine it and then perform it.
                 if (this.activeOperation) {
                     handled = this.activeOperation.call(this, e, null);
+                    requestRedraw=true;
                     e.preventDefault();
                 } else {
                     topObject = this.pickControl(e);
@@ -578,13 +580,16 @@ define([
                         var operation = this.determineOperation(e, topObject);
                         if (operation) {
                             handled = operation.call(this, e, topObject);
+                            requestRedraw=true;
                         }
                     }
                 }
 
                 // Determine and display the new highlight state.
-                this.handleHighlight(e, topObject);
-                this.wwd.redraw();
+                var highlighted=this.handleHighlight(e, topObject);
+                if (requestRedraw || highlighted) {
+                    this.wwd.redraw();
+                }
             }
 
             return handled;
@@ -826,8 +831,6 @@ define([
                             lookAt.tilt =
                                 Math.min(90, lookAt.tilt + thisLayer.tiltIncrement);
                         }
-                        // console.log(lookAt.tilt);
-                        thisLayer.wwd.worldWindowController.applyLookAtLimits(lookAt);
                         thisLayer.wwd.camera.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
@@ -921,10 +924,14 @@ define([
             if (this.activeControl) {
                 // Highlight the active control.
                 this.highlight(this.activeControl, true);
+                return true;
             } else if (topObject && this.isControl(topObject)) {
                 // Highlight the control under the cursor or finger.
                 this.highlight(topObject, true);
+                return true;
             }
+
+            return false;
         };
 
         // Intentionally not documented. Sets the highlight state of a control.

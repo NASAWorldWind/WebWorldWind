@@ -29,7 +29,7 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
-            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+            // {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
 
@@ -93,18 +93,13 @@ requirejs(['./WorldWindShim',
         addSlider(rollValue, rollSlider, -90, 90, 1, camera.roll);
 
         var updateControls = function (pos, selectedView) {
-            // latitudeValue.html(Math.round(pos.latitude * 100.0) / 100.0);
-            // longitudeValue.html(Math.round(pos.longitude * 100.0) / 100.0);
-            // altitudeValue.html(Math.round(pos.altitude * 100.0) / 100.0);
-            // headingValue.html(Math.round(selectedView.heading * 100.0) / 100.0);
-            // tiltValue.html(Math.round(selectedView.tilt * 100.0) / 100.0);
-            // rollValue.html(Math.round(selectedView.roll * 100.0) / 100.0);
-            latitudeValue.html(pos.latitude);
-            longitudeValue.html(pos.longitude);
-            altitudeValue.html(pos.altitude);
-            headingValue.html(selectedView.heading);
-            tiltValue.html(selectedView.tilt);
-            rollValue.html(selectedView.roll);
+            var precision=10000.0;
+            latitudeValue.html(Math.round(pos.latitude * precision) / precision);
+            longitudeValue.html(Math.round(pos.longitude * precision) / precision);
+            altitudeValue.html(Math.round(pos.altitude * precision) / precision);
+            headingValue.html(Math.round(selectedView.heading * precision) / precision);
+            tiltValue.html(Math.round(selectedView.tilt * precision) / precision);
+            rollValue.html(Math.round(selectedView.roll * precision) / precision);
 
             latitudeSlider.slider('value', pos.latitude);
             longitudeSlider.slider('value', pos.longitude);
