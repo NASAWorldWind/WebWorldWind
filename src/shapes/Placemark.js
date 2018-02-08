@@ -476,8 +476,7 @@ define([
 
             this.imageBounds = WWMath.boundingRectForUnitQuad(this.imageTransform);
 
-            // If there's a label, perform these same operations for the label texture, creating that texture if it
-            // doesn't already exist.
+            // If there's a label, perform these same operations for the label texture.
 
             if (this.mustDrawLabel()) {
 
