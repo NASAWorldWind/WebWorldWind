@@ -672,7 +672,6 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
             }
 
-            this.worldWindowController.applyLimits();
             this.camera.computeViewingTransform(modelview);
 
             if (projection) {

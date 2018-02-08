@@ -149,21 +149,18 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "setFromLookAt", "missingLookAt"));
             }
 
-            this.wwd.worldWindowController.applyLookAtLimits(lookAt);
             var globe = this.wwd.globe,
                 originPoint = this.scratchPoint,
                 modelview = this.scratchModelview,
-                proj = globe.projection;
+                origin = this.scratchOrigin;
 
             lookAt.computeViewingTransform(globe, modelview);
             modelview.extractEyePoint(originPoint);
 
-            proj.cartesianToGeographic(globe, originPoint[0], originPoint[1], originPoint[2], Vec3.ZERO, this.position);
-            proj.cartesianToLocalTransform(globe, originPoint[0], originPoint[1], originPoint[2], this.scratchOrigin);
-            modelview.multiplyMatrix(this.scratchOrigin);
-            // origin.setToIdentity();
-            // origin.multiplyByLocalCoordinateTransform(originPoint, globe);
-            // modelview.multiplyMatrix(origin);
+            globe.projection.cartesianToGeographic(globe, originPoint[0], originPoint[1], originPoint[2], Vec3.ZERO, this.position);
+            origin.setToIdentity();
+            origin.multiplyByLocalCoordinateTransform(originPoint, globe);
+            modelview.multiplyMatrix(origin);
 
             this.heading = modelview.extractHeading(lookAt.roll); // disambiguate heading and roll
             this.tilt = modelview.extractTilt();
@@ -182,7 +179,8 @@ define([
                 forwardRay = this.scratchRay,
                 modelview = this.scratchModelview,
                 originPoint = this.scratchPoint,
-                originPos = this.scratchPosition;
+                originPos = this.scratchPosition,
+                origin = this.scratchOrigin;
 
             this.computeViewingTransform(modelview);
             modelview.extractEyePoint(forwardRay.origin);
@@ -194,29 +192,17 @@ define([
                 forwardRay.pointAt(horizon, originPoint);
             }
 
-            // var testResult={};
-            // modelview.extractViewingParameters(originPoint, this.roll, globe, testResult);
-            // var testLookAt=new LookAt();
-            // testLookAt.lookAtPosition.copy(testResult.origin);
-            // testLookAt.heading=testResult.heading;
-            // testLookAt.tilt=testResult.tilt;
-            // testLookAt.roll=testResult.roll;
-            // console.log(testResult);
             globe.computePositionFromPoint(originPoint[0], originPoint[1], originPoint[2], originPos);
-            globe.projection.cartesianToLocalTransform(globe, originPoint[0], originPoint[1], originPoint[2], this.scratchOrigin);
-            modelview.multiplyMatrix(this.scratchOrigin);
-            // origin.setToIdentity();
-            // origin.multiplyByLocalCoordinateTransform(originPoint, globe);
-            // modelview.multiplyMatrix(origin);
+            origin.setToIdentity();
+            origin.multiplyByLocalCoordinateTransform(originPoint, globe);
+            modelview.multiplyMatrix(origin);
 
             result.lookAtPosition.copy(originPos);
             result.range = -modelview[11];
             result.heading = modelview.extractHeading(this.roll); // disambiguate heading and roll
             result.tilt = modelview.extractTilt();
             result.roll = this.roll; // roll passes straight through
-            // console.log(testLookAt.toString());
-            // console.log(result.toString());
-            // console.log("-----");
+
             return result;
         };
 
