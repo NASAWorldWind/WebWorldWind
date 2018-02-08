@@ -1530,10 +1530,12 @@ define([
          */
         DrawContext.prototype.renderText = function (text, textAttributes) {
 
-            var textureKey = text + JSON.stringify(textAttributes);
+            // TODO: Maybe handling an exception to test if textAttributes is typeof TextAttributes
+
+            var textureKey = text + textAttributes.stateKey;
             var texture = this.gpuResourceCache.resourceForKey(textureKey);
 
-            if (text != null && textAttributes != null) {
+            if (text !== null && textAttributes !== null) {
                 this.textRenderer.textColor = textAttributes.color;
                 this.textRenderer.typeFace = textAttributes.font;
                 this.textRenderer.enableOutline = textAttributes.enableOutline;
