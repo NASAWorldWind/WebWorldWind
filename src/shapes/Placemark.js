@@ -480,14 +480,8 @@ define([
             // doesn't already exist.
 
             if (this.mustDrawLabel()) {
-                var labelFont = this.activeAttributes.labelAttributes.font,
-                    labelKey = this.label + labelFont.toString();
 
-                this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-                if (!this.labelTexture) {
-                    this.labelTexture = dc.renderText(this.label, this.activeAttributes.labelAttributes);
-                    dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-                }
+                this.labelTexture = dc.renderText(this.label, this.activeAttributes.labelAttributes);
 
                 w = this.labelTexture.imageWidth;
                 h = this.labelTexture.imageHeight;
