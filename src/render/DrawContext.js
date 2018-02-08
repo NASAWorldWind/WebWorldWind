@@ -1530,7 +1530,8 @@ define([
          */
         DrawContext.prototype.renderText = function (text, textAttributes) {
 
-            var texture = null;
+            var textureKey = text + JSON.stringify(textAttributes);
+            var texture = this.gpuResourceCache.resourceForKey(textureKey);
 
             if (text != null && textAttributes != null) {
                 this.textRenderer.textColor = textAttributes.color;
@@ -1541,6 +1542,7 @@ define([
                 texture = this.textRenderer.renderText(text);
             }
 
+            this.gpuResourceCache.putResource(textureKey, texture, texture.size);
             return texture;
         };
 
