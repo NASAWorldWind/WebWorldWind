@@ -1535,7 +1535,7 @@ define([
             var textureKey = text + textAttributes.stateKey;
             var texture = this.gpuResourceCache.resourceForKey(textureKey);
 
-            if (text !== null && textAttributes !== null) {
+            if (text !== null && textAttributes !== null && !texture) {
                 this.textRenderer.textColor = textAttributes.color;
                 this.textRenderer.typeFace = textAttributes.font;
                 this.textRenderer.enableOutline = textAttributes.enableOutline;
