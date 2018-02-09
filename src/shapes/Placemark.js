@@ -490,7 +490,7 @@ define([
 
                 this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
                 if (!this.labelTexture) {
-                    this.labelTexture = dc.textRenderer.renderText(this.label);
+                    this.labelTexture = dc.renderText(this.label, this.activeAttributes.labelAttributes);
                     dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
                 }
 
@@ -764,7 +764,7 @@ define([
                     this.texCoordMatrix.multiplyByTextureTransform(this.labelTexture);
 
                     program.loadTextureMatrix(gl, this.texCoordMatrix);
-                    program.loadColor(gl, this.activeAttributes.labelAttributes.color);
+                    program.loadColor(gl, Color.WHITE);
 
                     textureBound = this.labelTexture.bind(dc);
                     program.loadTextureEnabled(gl, textureBound);
