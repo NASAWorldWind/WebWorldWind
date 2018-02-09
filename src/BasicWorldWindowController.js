@@ -106,12 +106,10 @@ define([
             // Intentionally not documented.
             this.beginPoint = new Vec2(0, 0);
             this.lastPoint = new Vec2(0, 0);
-            this.beginHeading = 0;
-            this.beginTilt = 0;
-            this.beginRange = 0;
             this.lastRotation = 0;
 
-            this.scratchLookAt = new LookAt();
+            this.beginLookAt = new LookAt();
+            this.lookAt = new LookAt();
         };
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
@@ -169,14 +167,15 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
+                this.gestureDidBegin();
                 this.lastPoint.set(0, 0);
             } else if (state === WorldWind.CHANGED) {
                 // Convert the translation from screen coordinates to arc degrees. Use the view's range as a
                 // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
                 // to arc degrees.
-                var canvas = this.wwd.canvas,
+                var lookAt = this.lookAt,
+                    canvas = this.wwd.canvas,
                     globe = this.wwd.globe,
                     globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
                     distance = WWMath.max(1, lookAt.range),
@@ -207,8 +206,8 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
+                this.gestureDidBegin();
                 this.beginPoint.set(x, y);
                 this.lastPoint.set(x, y);
             } else if (state === WorldWind.CHANGED) {
@@ -219,7 +218,8 @@ define([
 
                 this.lastPoint.set(x2, y2);
 
-                var globe = this.wwd.globe,
+                var lookAt = this.lookAt,
+                    globe = this.wwd.globe,
                     ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
                     point1 = new Vec3(0, 0, 0),
                     point2 = new Vec3(0, 0, 0),
@@ -266,19 +266,18 @@ define([
                 tx = recognizer.translationX,
                 ty = recognizer.translationY;
 
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             if (state === WorldWind.BEGAN) {
-                this.beginHeading = lookAt.heading;
-                this.beginTilt = lookAt.tilt;
+                this.gestureDidBegin();
             } else if (state === WorldWind.CHANGED) {
                 // Compute the current translation from screen coordinates to degrees. Use the canvas dimensions as a
                 // metric for converting the gesture translation to a fraction of an angle.
-                var headingDegrees = 180 * tx / this.wwd.canvas.clientWidth,
+                var lookAt = this.lookAt,
+                    headingDegrees = 180 * tx / this.wwd.canvas.clientWidth,
                     tiltDegrees = 90 * ty / this.wwd.canvas.clientHeight;
 
                 // Apply the change in heading and tilt to this view's corresponding properties.
-                lookAt.heading = this.beginHeading + headingDegrees;
-                lookAt.tilt = this.beginTilt + tiltDegrees;
+                lookAt.heading = this.beginLookAt.heading + headingDegrees;
+                lookAt.tilt = this.beginLookAt.tilt + tiltDegrees;
                 this.applyLookAtLimits(lookAt);
                 this.wwd.camera.setFromLookAt(lookAt);
                 this.wwd.redraw();
@@ -287,17 +286,18 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handlePinch = function (recognizer) {
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 scale = recognizer.scale;
 
             if (state === WorldWind.BEGAN) {
-                this.beginRange = lookAt.range;
+                this.gestureDidBegin();
+                // this.beginRange = lookAt.range;
             } else if (state === WorldWind.CHANGED) {
                 if (scale !== 0) {
                     // Apply the change in pinch scale to this view's range, relative to the range when the gesture
                     // began.
-                    lookAt.range = this.beginRange / scale;
+                    var lookAt = this.lookAt;
+                    lookAt.range = this.beginLookAt.range / scale;
                     this.applyLookAtLimits(lookAt);
                     this.wwd.camera.setFromLookAt(lookAt);
                     this.wwd.redraw();
@@ -307,16 +307,17 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleRotation = function (recognizer) {
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 rotation = recognizer.rotation;
 
             if (state === WorldWind.BEGAN) {
+                this.gestureDidBegin();
                 this.lastRotation = 0;
             } else if (state === WorldWind.CHANGED) {
                 // Apply the change in gesture rotation to this view's current heading. We apply relative to the
                 // current heading rather than the heading when the gesture began in order to work simultaneously with
                 // pan operations that also modify the current heading.
+                var lookAt = this.lookAt;
                 lookAt.heading -= rotation - this.lastRotation;
                 this.lastRotation = rotation;
                 this.applyLookAtLimits(lookAt);
@@ -327,17 +328,18 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleTilt = function (recognizer) {
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
             var state = recognizer.state,
                 ty = recognizer.translationY;
 
             if (state === WorldWind.BEGAN) {
-                this.beginTilt = lookAt.tilt;
+                this.gestureDidBegin();
+                // this.beginTilt = lookAt.tilt;
             } else if (state === WorldWind.CHANGED) {
                 // Compute the gesture translation from screen coordinates to degrees. Use the canvas dimensions as a
                 // metric for converting the translation to a fraction of an angle.
                 var tiltDegrees = -90 * ty / this.wwd.canvas.clientHeight;
                 // Apply the change in heading and tilt to this view's corresponding properties.
+                var lookAt = this.lookAt;
                 lookAt.tilt = this.beginTilt + tiltDegrees;
                 this.applyLookAtLimits(lookAt);
                 this.wwd.camera.setFromLookAt(lookAt);
@@ -347,7 +349,7 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleWheelEvent = function (event) {
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.lookAt);
             // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
             // browsers and input devices.
             var normalizedDelta;
@@ -404,9 +406,14 @@ define([
 
         // Documented in super class.
         BasicWorldWindowController.prototype.applyLimits = function () {
-            var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+            var lookAt = this.wwd.camera.getAsLookAt(this.lookAt);
             this.applyLookAtLimits(lookAt);
             this.wwd.camera.setFromLookAt(lookAt);
+        };
+
+        BasicWorldWindowController.prototype.gestureDidBegin = function () {
+            this.wwd.camera.getAsLookAt(this.beginLookAt);
+            this.lookAt.copy(this.beginLookAt);
         };
 
         return BasicWorldWindowController;

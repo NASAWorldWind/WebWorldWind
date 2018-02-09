@@ -238,7 +238,7 @@ define([
             // Establish event handlers.
             this.wwd.worldWindowController.addGestureListener(this);
 
-            this.scratchLookAt = new LookAt(this.wwd);
+            this.lookAt = new LookAt();
         };
 
         ViewControlsLayer.prototype = Object.create(Layer.prototype);
@@ -568,11 +568,11 @@ define([
                 this.activeOperation = null;
                 e.preventDefault();
             } else {
-                var requestRedraw=false;
+                var requestRedraw = false;
                 // Perform the active operation, or determine it and then perform it.
                 if (this.activeOperation) {
                     handled = this.activeOperation.call(this, e, null);
-                    requestRedraw=true;
+                    requestRedraw = true;
                     e.preventDefault();
                 } else {
                     topObject = this.pickControl(e);
@@ -580,13 +580,13 @@ define([
                         var operation = this.determineOperation(e, topObject);
                         if (operation) {
                             handled = operation.call(this, e, topObject);
-                            requestRedraw=true;
+                            requestRedraw = true;
                         }
                     }
                 }
 
                 // Determine and display the new highlight state.
-                var highlighted=this.handleHighlight(e, topObject);
+                var highlighted = this.handleHighlight(e, topObject);
                 if (requestRedraw || highlighted) {
                     this.wwd.redraw();
                 }
@@ -693,8 +693,7 @@ define([
 
             // Start an operation on left button down or touch start.
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
-                this.activeControl = control;
-                this.activeOperation = this.handlePan;
+                this.operationDidBegin(control, this.handlePan);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -708,7 +707,7 @@ define([
                         var dx = thisLayer.panControlCenter[0] - thisLayer.currentEventPoint[0],
                             dy = thisLayer.panControlCenter[1]
                                 - (thisLayer.wwd.viewport.height - thisLayer.currentEventPoint[1]),
-                            lookAt = thisLayer.wwd.camera.getAsLookAt(thisLayer.scratchLookAt),
+                            lookAt = thisLayer.lookAt,
                             oldLat = lookAt.lookAtPosition.latitude,
                             oldLon = lookAt.lookAtPosition.longitude,
                             // Scale the increment by a constant and the relative distance of the eye to the surface.
@@ -738,8 +737,7 @@ define([
 
             // Start an operation on left button down or touch start.
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
-                this.activeControl = control;
-                this.activeOperation = this.handleZoom;
+                this.operationDidBegin(control, this.handleZoom);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -750,7 +748,7 @@ define([
                 var thisLayer = this; // capture 'this' for use in the function
                 var setRange = function () {
                     if (thisLayer.activeControl) {
-                        var lookAt = thisLayer.wwd.camera.getAsLookAt(thisLayer.scratchLookAt);
+                        var lookAt = thisLayer.lookAt;
                         if (thisLayer.activeControl === thisLayer.zoomInControl) {
                             lookAt.range *= (1 - thisLayer.zoomIncrement);
                         } else if (thisLayer.activeControl === thisLayer.zoomOutControl) {
@@ -775,8 +773,7 @@ define([
 
             // Start an operation on left button down or touch start.
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
-                this.activeControl = control;
-                this.activeOperation = this.handleHeading;
+                this.operationDidBegin(control, this.handleHeading);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -785,8 +782,8 @@ define([
 
                 // This function is called by the timer to perform the operation.
                 var thisLayer = this; // capture 'this' for use in the function
-                var setRange = function () {
-                    var lookAt = thisLayer.wwd.camera.getAsLookAt(thisLayer.scratchLookAt);
+                var setHeading = function () {
+                    var lookAt = thisLayer.lookAt;
                     if (thisLayer.activeControl) {
                         if (thisLayer.activeControl === thisLayer.headingLeftControl) {
                             lookAt.heading += thisLayer.headingIncrement;
@@ -795,10 +792,10 @@ define([
                         }
                         thisLayer.wwd.camera.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
-                        setTimeout(setRange, 50);
+                        setTimeout(setHeading, 50);
                     }
                 };
-                setTimeout(setRange, 50);
+                setTimeout(setHeading, 50);
                 handled = true;
             }
 
@@ -811,8 +808,7 @@ define([
 
             // Start an operation on left button down or touch start.
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
-                this.activeControl = control;
-                this.activeOperation = this.handleTilt;
+                this.operationDidBegin(control, this.handleTilt);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -821,9 +817,9 @@ define([
 
                 // This function is called by the timer to perform the operation.
                 var thisLayer = this; // capture 'this' for use in the function
-                var setRange = function () {
+                var setTilt = function () {
                     if (thisLayer.activeControl) {
-                        var lookAt = thisLayer.wwd.camera.getAsLookAt(thisLayer.scratchLookAt);
+                        var lookAt = thisLayer.lookAt;
                         if (thisLayer.activeControl === thisLayer.tiltUpControl) {
                             lookAt.tilt =
                                 Math.max(0, lookAt.tilt - thisLayer.tiltIncrement);
@@ -833,10 +829,10 @@ define([
                         }
                         thisLayer.wwd.camera.setFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
-                        setTimeout(setRange, 50);
+                        setTimeout(setTilt, 50);
                     }
                 };
-                setTimeout(setRange, 50);
+                setTimeout(setTilt, 50);
 
                 handled = true;
             }
@@ -850,8 +846,7 @@ define([
 
             // Start an operation on left button down or touch start.
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
-                this.activeControl = control;
-                this.activeOperation = this.handleExaggeration;
+                this.operationDidBegin(control, this.handleExaggeration);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -899,7 +894,7 @@ define([
 
                 // This function is called by the timer to perform the operation.
                 var thisLayer = this; // capture 'this' for use in the function
-                var setRange = function () {
+                var setFov = function () {
                     if (thisLayer.activeControl) {
                         if (thisLayer.activeControl === thisLayer.fovWideControl) {
                             thisLayer.wwd.navigator.fieldOfView =
@@ -909,10 +904,10 @@ define([
                                 Math.min(0, thisLayer.wwd.navigator.fieldOfView - thisLayer.fieldOfViewIncrement);
                         }
                         thisLayer.wwd.redraw();
-                        setTimeout(setRange, 50);
+                        setTimeout(setFov, 50);
                     }
                 };
-                setTimeout(setRange, 50);
+                setTimeout(setFov, 50);
                 handled = true;
             }
 
@@ -943,6 +938,12 @@ define([
             } else {
                 this.highlightedControl = null;
             }
+        };
+
+        ViewControlsLayer.prototype.operationDidBegin = function (control, operation) {
+            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.activeControl = control;
+            this.activeOperation = operation;
         };
 
         return ViewControlsLayer;

@@ -76,7 +76,7 @@ define([
             this.cancelled = false;
 
             // Internal use only. Intentionally not documented.
-            this.scratchLookAt = new LookAt();
+            this.lookAt = new LookAt();
         };
 
         // Stop the current animation.
@@ -104,16 +104,16 @@ define([
             // Reset the cancellation flag.
             this.cancelled = false;
 
-            this.wwd.camera.getAsLookAt(this.scratchLookAt);
+            this.wwd.camera.getAsLookAt(this.lookAt);
             // Capture the target position and determine its altitude.
             this.targetPosition = new Position(position.latitude, position.longitude,
-                position.altitude || this.scratchLookAt.range);
+                position.altitude || this.lookAt.range);
 
             // Capture the start position and start time.
             this.startPosition = new Position(
-                this.scratchLookAt.lookAtPosition.latitude,
-                this.scratchLookAt.lookAtPosition.longitude,
-                this.scratchLookAt.range);
+                this.lookAt.lookAtPosition.latitude,
+                this.lookAt.lookAtPosition.longitude,
+                this.lookAt.range);
             this.startTime = Date.now();
 
             // Determination of the pan and range velocities requires the distance to be travelled.
@@ -143,7 +143,7 @@ define([
             // We need to capture the time the max altitude is reached in order to begin decreasing the range
             // midway through the animation. If we're already above the max altitude, then that time is now since
             // we don't back out if the current altitude is above the computed max altitude.
-            this.maxAltitudeReachedTime = this.maxAltitude <= this.scratchLookAt.range ? Date.now() : null;
+            this.maxAltitudeReachedTime = this.maxAltitude <= this.lookAt.range ? Date.now() : null;
 
             // Compute the total range to travel since we need that to compute the range velocity.
             // Note that the range velocity and pan velocity are computed so that the respective animations, which
@@ -199,11 +199,10 @@ define([
         GoToAnimator.prototype.update = function () {
             // This is the timer callback function. It invokes the range animator and the pan animator.
 
-            this.wwd.camera.getAsLookAt(this.scratchLookAt);
             var currentPosition = new Position(
-                this.scratchLookAt.lookAtPosition.latitude,
-                this.scratchLookAt.lookAtPosition.longitude,
-                this.scratchLookAt.range);
+                this.lookAt.lookAtPosition.latitude,
+                this.lookAt.lookAtPosition.longitude,
+                this.lookAt.range);
 
             var continueAnimation = this.updateRange(currentPosition);
             continueAnimation = this.updateLocation(currentPosition) || continueAnimation;
@@ -219,17 +218,16 @@ define([
             var continueAnimation = false,
                 nextRange, elapsedTime;
 
-            this.wwd.camera.getAsLookAt(this.scratchLookAt);
             // If we haven't reached the maximum altitude, then step-wise increase it. Otherwise step-wise change
             // the range towards the target altitude.
             if (!this.maxAltitudeReachedTime) {
                 elapsedTime = Date.now() - this.startTime;
                 nextRange = Math.min(this.startPosition.altitude + this.rangeVelocity * elapsedTime, this.maxAltitude);
                 // We're done if we get withing 1 meter of the desired range.
-                if (Math.abs(this.scratchLookAt.range - nextRange) < 1) {
+                if (Math.abs(this.lookAt.range - nextRange) < 1) {
                     this.maxAltitudeReachedTime = Date.now();
                 }
-                this.scratchLookAt.range = nextRange;
+                this.lookAt.range = nextRange;
                 continueAnimation = true;
             } else {
                 elapsedTime = Date.now() - this.maxAltitudeReachedTime;
@@ -240,12 +238,12 @@ define([
                     nextRange = this.maxAltitude + (this.rangeVelocity * elapsedTime);
                     nextRange = Math.min(nextRange, this.targetPosition.altitude);
                 }
-                this.scratchLookAt.range = nextRange;
+                this.lookAt.range = nextRange;
                 // We're done if we get withing 1 meter of the desired range.
-                continueAnimation = Math.abs(this.scratchLookAt.range - this.targetPosition.altitude) > 1;
+                continueAnimation = Math.abs(this.lookAt.range - this.targetPosition.altitude) > 1;
             }
 
-            this.wwd.camera.setFromLookAt(this.scratchLookAt);
+            this.wwd.camera.setFromLookAt(this.lookAt);
 
             return continueAnimation;
         };
@@ -263,10 +261,9 @@ define([
                     new Location(0, 0)),
                 locationReached = false;
 
-            this.wwd.camera.getAsLookAt(this.scratchLookAt);
-            this.scratchLookAt.lookAtPosition.latitude = nextLocation.latitude;
-            this.scratchLookAt.lookAtPosition.longitude = nextLocation.longitude;
-            this.wwd.camera.setFromLookAt(this.scratchLookAt);
+            this.lookAt.lookAtPosition.latitude = nextLocation.latitude;
+            this.lookAt.lookAtPosition.longitude = nextLocation.longitude;
+            this.wwd.camera.setFromLookAt(this.lookAt);
 
             // We're done if we're within a meter of the desired location.
             if (nextDistance < 1 / this.wwd.globe.equatorialRadius) {
