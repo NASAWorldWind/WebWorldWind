@@ -1550,5 +1550,14 @@ define([
             return texture;
         };
 
+        DrawContext.prototype.textTextureStateKey = function (text, textAttributes) {
+            return text +
+                "c " + textAttributes.color.toHexString(true) +
+                " f " + textAttributes.font.toString() +
+                " eo " + textAttributes.enableOutline +
+                " ow " + textAttributes.outlineWidth +
+                " oc " + textAttributes.outlineColor.toHexString(true);
+        };
+
         return DrawContext;
     });
