@@ -311,8 +311,8 @@ define([
             if (!this.computeScreenPointAndEyeDistance(dc)) {
                 return null;
             }
-            
-            this.activeTexture = dc.renderText(this.text, this.activeAttributes);
+
+            this.activeTexture = dc.createTextTexture(this.text, this.activeAttributes);
 
             w = this.activeTexture.imageWidth;
             h = this.activeTexture.imageHeight;

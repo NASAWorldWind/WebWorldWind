@@ -480,7 +480,7 @@ define([
 
             if (this.mustDrawLabel()) {
 
-                this.labelTexture = dc.renderText(this.label, this.activeAttributes.labelAttributes);
+                this.labelTexture = dc.createTextTexture(this.label, this.activeAttributes.labelAttributes);
 
                 w = this.labelTexture.imageWidth;
                 h = this.labelTexture.imageHeight;

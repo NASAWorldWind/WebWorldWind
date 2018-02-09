@@ -283,7 +283,7 @@ define([
                 return null;
             }
 
-            this.labelTexture = dc.renderText(this.label, this.attributes.textAttributes);
+            this.labelTexture = dc.createTextTexture(this.label, this.attributes.textAttributes);
 
             w = this.labelTexture.imageWidth;
             h = this.labelTexture.imageHeight;

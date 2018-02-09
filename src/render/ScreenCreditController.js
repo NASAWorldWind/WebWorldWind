@@ -268,7 +268,7 @@ define([
         ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
             var imageWidth, imageHeight, activeTexture, gl, program, x;
 
-            activeTexture = dc.renderText(credit.text, credit.textAttributes);
+            activeTexture = dc.createTextTexture(credit.text, credit.textAttributes);
 
             imageWidth = activeTexture.imageWidth;
             imageHeight = activeTexture.imageHeight;
