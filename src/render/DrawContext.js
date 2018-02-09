@@ -39,6 +39,7 @@ define([
         '../shapes/SurfaceShape',
         '../shapes/SurfaceShapeTileBuilder',
         '../render/SurfaceTileRenderer',
+        '../shapes/TextAttributes',
         '../render/TextRenderer',
         '../geom/Vec2',
         '../geom/Vec3',
@@ -66,6 +67,7 @@ define([
               SurfaceShape,
               SurfaceShapeTileBuilder,
               SurfaceTileRenderer,
+              TextAttributes,
               TextRenderer,
               Vec2,
               Vec3,
@@ -1519,33 +1521,36 @@ define([
 
         /**
          * Propagates the values contained in a TextAttributes object to the currently attached TextRenderer
-         * {@link TextRenderer} as to provide format to a string of text. The TextRenderer then produces a
-         * 2D Texture with the aforementioned text and format to be used as a label for a Text {@link Text}
-         * subclass (<i>e.g.</i> Annotation {@link Annotation} or Placemark {@link Placemark}).
+         * {@link TextRenderer} as to provide format to a string of text. It first checks if the 2D texture is not
+         * already cached according to the text string and its attached TextAttributes {@link TextAttributes} state key.
+         * The TextRenderer then produces a 2D Texture with the aforementioned text and format to be used as a label
+         * for a Text {@link Text} subclass (<i>e.g.</i> Annotation {@link Annotation} or Placemark {@link Placemark}).
          * @param {String} text The string of text that will be given color, font, and outline
-         * and which the resulting texture will be based on.
+         * from which the resulting texture will be based on.
          * @param {TextAttributes} textAttributes Attributes that will be applied to the string.
          * See TextAttributes {@link TextAttributes}.
-         * @returns {Texture} A texture {@link Texture} with the specified text string, typeface, colors, and outline.
+         * @returns {Texture} A texture {@link Texture} with the specified text string, font, colors, and outline.
          */
         DrawContext.prototype.renderText = function (text, textAttributes) {
 
-            // TODO: Maybe handling an exception to test if textAttributes is typeof TextAttributes
+            if (!(textAttributes instanceof TextAttributes) || textAttributes === null) {
+                console.log("Error. DrawContext.renderText is receiving a wrong TextAttributes object");
+            } else {
+                var textureKey = text + textAttributes.stateKey;
+                var texture = this.gpuResourceCache.resourceForKey(textureKey);
 
-            var textureKey = text + textAttributes.stateKey;
-            var texture = this.gpuResourceCache.resourceForKey(textureKey);
+                if (text !== null && !texture) {
+                    this.textRenderer.textColor = textAttributes.color;
+                    this.textRenderer.typeFace = textAttributes.font;
+                    this.textRenderer.enableOutline = textAttributes.enableOutline;
+                    this.textRenderer.outlineColor = textAttributes.outlineColor;
+                    this.textRenderer.outlineWidth = textAttributes.outlineWidth;
+                    texture = this.textRenderer.renderText(text);
+                }
 
-            if (text !== null && textAttributes !== null && !texture) {
-                this.textRenderer.textColor = textAttributes.color;
-                this.textRenderer.typeFace = textAttributes.font;
-                this.textRenderer.enableOutline = textAttributes.enableOutline;
-                this.textRenderer.outlineColor = textAttributes.outlineColor;
-                this.textRenderer.outlineWidth = textAttributes.outlineWidth;
-                texture = this.textRenderer.renderText(text);
+                this.gpuResourceCache.putResource(textureKey, texture, texture.size);
+                return texture;
             }
-
-            this.gpuResourceCache.putResource(textureKey, texture, texture.size);
-            return texture;
         };
 
         return DrawContext;
