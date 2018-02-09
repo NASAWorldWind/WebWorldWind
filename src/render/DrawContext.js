@@ -1559,6 +1559,10 @@ define([
          * with texture rendering.
          */
         DrawContext.prototype.computeTextTextureStateKey = function (text, attributes) {
+            if (!text || !attributes) {
+                return null;
+            }
+
             return text +
                 "c " + attributes.color.toHexString(true) +
                 " f " + attributes.font.toString() +
