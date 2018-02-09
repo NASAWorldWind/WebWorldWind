@@ -1534,7 +1534,7 @@ define([
                 return null;
             }
 
-            var textureKey = this.textTextureStateKey(text, textAttributes);
+            var textureKey = this.computeTextTextureStateKey(text, textAttributes);
             var texture = this.gpuResourceCache.resourceForKey(textureKey);
 
             if (!texture) {
@@ -1550,13 +1550,21 @@ define([
             return texture;
         };
 
-        DrawContext.prototype.textTextureStateKey = function (text, textAttributes) {
+        /**
+         * Computes a state key that relates to a text label, foregoing the TextAttributes {@link TextAttributes}
+         * properties that are not related to texture rendering (offset, scale, and depthTest).
+         * @param {String} text The label's string of text.
+         * @param {TextAttributes} attributes The TextAttributes object associated with the text label to render.
+         * @returns {String} A state key composed of the original string of text plus the TextAttributes associated
+         * with texture rendering.
+         */
+        DrawContext.prototype.computeTextTextureStateKey = function (text, attributes) {
             return text +
-                "c " + textAttributes.color.toHexString(true) +
-                " f " + textAttributes.font.toString() +
-                " eo " + textAttributes.enableOutline +
-                " ow " + textAttributes.outlineWidth +
-                " oc " + textAttributes.outlineColor.toHexString(true);
+                "c " + attributes.color.toHexString(true) +
+                " f " + attributes.font.toString() +
+                " eo " + attributes.enableOutline +
+                " ow " + attributes.outlineWidth +
+                " oc " + attributes.outlineColor.toHexString(true);
         };
 
         return DrawContext;
