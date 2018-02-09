@@ -39,7 +39,6 @@ define([
         '../shapes/SurfaceShape',
         '../shapes/SurfaceShapeTileBuilder',
         '../render/SurfaceTileRenderer',
-        '../shapes/TextAttributes',
         '../render/TextRenderer',
         '../geom/Vec2',
         '../geom/Vec3',
@@ -67,7 +66,6 @@ define([
               SurfaceShape,
               SurfaceShapeTileBuilder,
               SurfaceTileRenderer,
-              TextAttributes,
               TextRenderer,
               Vec2,
               Vec3,
@@ -1533,24 +1531,20 @@ define([
          */
         DrawContext.prototype.renderText = function (text, textAttributes) {
 
-            if (!(textAttributes instanceof TextAttributes) || textAttributes === null) {
-                console.log("Error. DrawContext.renderText is receiving a wrong TextAttributes object");
-            } else {
-                var textureKey = text + textAttributes.stateKey;
-                var texture = this.gpuResourceCache.resourceForKey(textureKey);
+            var textureKey = text + textAttributes.stateKey;
+            var texture = this.gpuResourceCache.resourceForKey(textureKey);
 
-                if (text !== null && !texture) {
-                    this.textRenderer.textColor = textAttributes.color;
-                    this.textRenderer.typeFace = textAttributes.font;
-                    this.textRenderer.enableOutline = textAttributes.enableOutline;
-                    this.textRenderer.outlineColor = textAttributes.outlineColor;
-                    this.textRenderer.outlineWidth = textAttributes.outlineWidth;
-                    texture = this.textRenderer.renderText(text);
-                }
-
-                this.gpuResourceCache.putResource(textureKey, texture, texture.size);
-                return texture;
+            if (text !== null && !texture && textAttributes !== null) {
+                this.textRenderer.textColor = textAttributes.color;
+                this.textRenderer.typeFace = textAttributes.font;
+                this.textRenderer.enableOutline = textAttributes.enableOutline;
+                this.textRenderer.outlineColor = textAttributes.outlineColor;
+                this.textRenderer.outlineWidth = textAttributes.outlineWidth;
+                texture = this.textRenderer.renderText(text);
             }
+
+            this.gpuResourceCache.putResource(textureKey, texture, texture.size);
+            return texture;
         };
 
         return DrawContext;
