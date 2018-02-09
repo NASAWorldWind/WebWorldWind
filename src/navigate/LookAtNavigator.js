@@ -38,9 +38,9 @@ define([
          * the globe. Deprecated, see {@Link LookAt}.
          */
         var LookAtNavigator = function (worldWindow) {
-            Navigator.call(this,worldWindow);
+            Navigator.call(this, worldWindow);
 
-            this.scratchLookAtPositionProxy=new LookAtPositionProxy(this);
+            this.scratchLookAtPositionProxy = new LookAtPositionProxy(this);
             // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
             this.enable2DLimits = true;
         };
@@ -59,8 +59,15 @@ define([
                     return this.scratchLookAtPositionProxy;
                 },
                 set: function (value) {
-                    var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
-                    lookAt.lookAtPosition.copy(value);
+                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    lookAt.lookAtPosition.latitude = value.latitude;
+                    lookAt.lookAtPosition.longitude = value.longitude;
+                    if (value.altitude) {
+                        lookAt.lookAtPosition.altitude = value.altitude;
+                    }
+                    else {
+                        lookAt.lookAtPosition.altitude = 0;
+                    }
                     this.wwd.camera.setFromLookAt(lookAt);
                 }
             },
@@ -75,7 +82,7 @@ define([
                     return this.wwd.camera.getAsLookAt(this.scratchLookAt).range;
                 },
                 set: function (value) {
-                    var lookAt=this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
                     lookAt.range = value;
                     this.wwd.camera.setFromLookAt(lookAt);
                 }
