@@ -1530,14 +1530,14 @@ define([
          * @returns {Texture} A texture {@link Texture} with the specified text string, font, colors, and outline.
          */
         DrawContext.prototype.createTextTexture = function (text, textAttributes) {
-            if (text === null || textAttributes === null) {
+            if (!text || !textAttributes) {
                 return null;
             }
 
-            var textureKey = text + textAttributes.stateKey;
+            var textureKey = this.textTextureStateKey(text, textAttributes);
             var texture = this.gpuResourceCache.resourceForKey(textureKey);
 
-            if (text !== null && !texture && textAttributes !== null) {
+            if (!texture) {
                 this.textRenderer.textColor = textAttributes.color;
                 this.textRenderer.typeFace = textAttributes.font;
                 this.textRenderer.enableOutline = textAttributes.enableOutline;
