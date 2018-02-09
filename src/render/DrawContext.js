@@ -1530,6 +1530,9 @@ define([
          * @returns {Texture} A texture {@link Texture} with the specified text string, font, colors, and outline.
          */
         DrawContext.prototype.createTextTexture = function (text, textAttributes) {
+            if (text === null || textAttributes === null) {
+                return null;
+            }
 
             var textureKey = text + textAttributes.stateKey;
             var texture = this.gpuResourceCache.resourceForKey(textureKey);
