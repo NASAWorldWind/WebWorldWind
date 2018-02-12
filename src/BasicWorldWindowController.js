@@ -108,7 +108,18 @@ define([
             this.lastPoint = new Vec2(0, 0);
             this.lastRotation = 0;
 
+            /**
+             * Internal use only.
+             * A copy of the viewing parameters at the start of a gesture as a look at view.
+             * @ignore
+             */
             this.beginLookAt = new LookAt();
+
+            /**
+             * Internal use only.
+             * The current state of the viewing parameters during a gesture as a look at view.
+             * @ignore
+             */
             this.lookAt = new LookAt();
         };
 
@@ -373,7 +384,11 @@ define([
             this.wwd.redraw();
         };
 
-        // Intentionally not documented.
+        /**
+         * Internal use only.
+         * Limits the properties of a look at view to prevent unwanted navigation behaviour.
+         * @ignore
+         */
         BasicWorldWindowController.prototype.applyLookAtLimits = function (lookAt) {
             // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
             lookAt.lookAtPosition.latitude = WWMath.clamp(lookAt.lookAtPosition.latitude, -90, 90);
@@ -404,13 +419,21 @@ define([
             }
         };
 
-        // Documented in super class.
+        /**
+         * Documented in super-class.
+         * @ignore
+         */
         BasicWorldWindowController.prototype.applyLimits = function () {
             var lookAt = this.wwd.camera.getAsLookAt(this.lookAt);
             this.applyLookAtLimits(lookAt);
             this.wwd.camera.setFromLookAt(lookAt);
         };
 
+        /**
+         * Internal use only.
+         * Sets common variables at the beginning of gesture.
+         * @ignore
+         */
         BasicWorldWindowController.prototype.gestureDidBegin = function () {
             this.wwd.camera.getAsLookAt(this.beginLookAt);
             this.lookAt.copy(this.beginLookAt);

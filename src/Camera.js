@@ -42,6 +42,11 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "constructor", "missingWorldWindow"));
             }
 
+            /**
+             * The WorldWindow associated with this camera.
+             * @type {WorldWindow}
+             * @readonly
+             */
             this.wwd = worldWindow;
 
             /**
@@ -70,22 +75,52 @@ define([
              */
             this.roll = 0;
 
-            // Internal. Intentionally not documented.
+            /**
+             * Internal use only.
+             * A temp variable used to hold model view matrices during calculations. Using an object level temp property
+             * negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.scratchModelview = Matrix.fromIdentity();
 
-            // Internal. Intentionally not documented.
+            /**
+             * Internal use only.
+             * A temp variable used to hold points during calculations. Using an object level temp property
+             * negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.scratchPoint = new Vec3(0, 0, 0);
 
-            // Internal. Intentionally not documented.
+            /**
+             * Internal use only.
+             * A temp variable used to hold origin matrices during calculations. Using an object level temp property
+             * negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.scratchOrigin = Matrix.fromIdentity();
 
-            // Internal. Intentionally not documented.
+            /**
+             * Internal use only.
+             * A temp variable used to hold positions during calculations. Using an object level temp property
+             * negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.scratchPosition = new Position(0, 0, 0);
 
-            // Internal. Intentionally not documented.
+            /**
+             * Internal use only.
+             * A temp variable used to hold lines during calculations. Using an object level temp property
+             * negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.scratchRay = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
         };
 
+        /**
+         * Internal use only.
+         * Computes the model view matrix for this camera.
+         * @ignore
+         */
         Camera.prototype.computeViewingTransform = function (modelview) {
             if (!modelview) {
                 throw new ArgumentError(
@@ -110,6 +145,13 @@ define([
             return modelview;
         };
 
+        /**
+         * Indicates whether the components of this object are equal to those of a specified object.
+         * @param {Camera} otherView The object to test equality with. May be null or undefined, in which case this
+         * function returns false.
+         * @returns {boolean} true if all components of this object are equal to the corresponding
+         * components of the specified object, otherwise false.
+         */
         Camera.prototype.equals = function (otherView) {
             if (otherView) {
                 return this.position.equals(otherView.position) &&
@@ -121,6 +163,10 @@ define([
             return false;
         };
 
+        /**
+         * Creates a new object that is a copy of this object.
+         * @returns {Camera} The new object.
+         */
         Camera.prototype.clone = function () {
             var clone = new Camera(this.wwd);
             clone.copy(this);
@@ -128,6 +174,12 @@ define([
             return clone;
         };
 
+        /**
+         * Copies the components of a specified object to this object.
+         * @param {Camera} copyObject The object to copy.
+         * @returns {Camera} A copy of this object equal to copyObject.
+         * @throws {ArgumentError} If the specified object is null or undefined.
+         */
         Camera.prototype.copy = function (copyObject) {
             if (!copyObject) {
                 throw new ArgumentError(
@@ -143,6 +195,13 @@ define([
             return this;
         };
 
+        /**
+         * Sets the properties of this Camera such that it mimics the supplied look at view. Note that repeated conversions
+         * between a look at and a camera view may result in view errors due to rounding.
+         * @param {LookAt} lookAt The look at view to mimic.
+         * @returns {Camera} This camera set to mimic the supplied look at view.
+         * @throws {ArgumentError} If the specified look at view is null or undefined.
+         */
         Camera.prototype.setFromLookAt = function (lookAt) {
             if (!lookAt) {
                 throw new ArgumentError(
@@ -169,6 +228,13 @@ define([
             return this;
         };
 
+        /**
+         * Converts the properties of this Camera to those of a look at view. Note that repeated conversions
+         * between a look at and a camera view may result in view errors due to rounding.
+         * @param {LookAt} result The look at view to hold the converted properties.
+         * @returns {Camera} A reference to the result parameter.
+         * @throws {ArgumentError} If the specified result object is null or undefined.
+         */
         Camera.prototype.getAsLookAt = function (result) {
             if (!result) {
                 throw new ArgumentError(
