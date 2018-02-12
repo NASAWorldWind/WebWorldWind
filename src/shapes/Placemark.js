@@ -476,18 +476,11 @@ define([
 
             this.imageBounds = WWMath.boundingRectForUnitQuad(this.imageTransform);
 
-            // If there's a label, perform these same operations for the label texture, creating that texture if it
-            // doesn't already exist.
+            // If there's a label, perform these same operations for the label texture.
 
             if (this.mustDrawLabel()) {
-                var labelFont = this.activeAttributes.labelAttributes.font,
-                    labelKey = this.label + labelFont.toString();
 
-                this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-                if (!this.labelTexture) {
-                    this.labelTexture = dc.renderText(this.label, this.activeAttributes.labelAttributes);
-                    dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-                }
+                this.labelTexture = dc.createTextTexture(this.label, this.activeAttributes.labelAttributes);
 
                 w = this.labelTexture.imageWidth;
                 h = this.labelTexture.imageHeight;

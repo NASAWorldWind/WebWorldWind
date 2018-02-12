@@ -266,14 +266,9 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
-            var imageWidth, imageHeight, activeTexture, textureKey, gl, program, x;
+            var imageWidth, imageHeight, activeTexture, gl, program, x;
 
-            textureKey = credit.text + credit.textAttributes.font.toString();
-            activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
-            if (!activeTexture) {
-                activeTexture = dc.renderText(credit.text, credit.textAttributes);
-                dc.gpuResourceCache.putResource(textureKey, activeTexture, activeTexture.size);
-            }
+            activeTexture = dc.createTextTexture(credit.text, credit.textAttributes);
 
             imageWidth = activeTexture.imageWidth;
             imageHeight = activeTexture.imageHeight;
