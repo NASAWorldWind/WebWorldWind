@@ -365,7 +365,11 @@ define([
             // Intentionally not documented.
             this.navigator = null;
 
-            // Intentionally not documented.
+            /**
+             * The viewing point as a camera.
+             * @type {Camera}
+             * @readonly
+             */
             this.camera = null;
 
             /**

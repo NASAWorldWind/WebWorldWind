@@ -75,7 +75,12 @@ define([
              */
             this.cancelled = false;
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * Internal use only.
+             * A temp variable used to hold the current view as a look at during calculations. Using an object level temp property
+             * negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.lookAt = new LookAt();
         };
 

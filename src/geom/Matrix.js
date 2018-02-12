@@ -1104,7 +1104,7 @@ define([
          * <p>
          * The result of this method is undefined if this matrix is not a viewing matrix.
          *
-         * @param roll the viewing matrix's roll angle in degrees, or 0 if the roll angle is unknown
+         * @param {Number} roll the viewing matrix's roll angle in degrees, or 0 if the roll angle is unknown
          *
          * @return {Number} the extracted heading angle in degrees
          */
@@ -1636,7 +1636,7 @@ define([
          * The result of this method is undefined if this matrix's values are not consistent with those of an orthonormal
          * transform.
          *
-         * @return this matrix, inverted
+         * @returns {Matrix} this matrix, inverted
          */
         Matrix.prototype.invertOrthonormal = function () {
 

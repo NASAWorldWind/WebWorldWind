@@ -232,7 +232,7 @@ define([
          * Converts the properties of this Camera to those of a look at view. Note that repeated conversions
          * between a look at and a camera view may result in view errors due to rounding.
          * @param {LookAt} result The look at view to hold the converted properties.
-         * @returns {Camera} A reference to the result parameter.
+         * @returns {LookAt} A reference to the result parameter.
          * @throws {ArgumentError} If the specified result object is null or undefined.
          */
         Camera.prototype.getAsLookAt = function (result) {

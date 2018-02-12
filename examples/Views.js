@@ -29,7 +29,7 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
-            // {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
 
@@ -93,7 +93,7 @@ requirejs(['./WorldWindShim',
         addSlider(rollValue, rollSlider, -90, 90, 1, camera.roll);
 
         var updateControls = function (pos, selectedView) {
-            var precision=10000.0;
+            var precision = 10000.0;
             latitudeValue.html(Math.round(pos.latitude * precision) / precision);
             longitudeValue.html(Math.round(pos.longitude * precision) / precision);
             altitudeValue.html(Math.round(pos.altitude * precision) / precision);

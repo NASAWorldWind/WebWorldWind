@@ -301,9 +301,9 @@ define([
             endLatRadians = Math.asin(Math.sin(latRadians) * Math.cos(pathLengthRadians) +
                 Math.cos(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
             endLonRadians = lonRadians + Math.atan2(
-                    Math.sin(pathLengthRadians) * Math.sin(azimuthRadians),
-                    Math.cos(latRadians) * Math.cos(pathLengthRadians) -
-                    Math.sin(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
+                Math.sin(pathLengthRadians) * Math.sin(azimuthRadians),
+                Math.cos(latRadians) * Math.cos(pathLengthRadians) -
+                Math.sin(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
 
             if (isNaN(endLatRadians) || isNaN(endLonRadians)) {
                 result.latitude = location.latitude;
@@ -937,20 +937,20 @@ define([
          * @return {number | null} latitude The intersection latitude along the meridian
          * or null if the line is collinear with the meridian
          */
-        Location.meridianIntersection = function(p1, p2, meridian){
-                // y = mx + b case after normalizing negative angles.
-                var lon1 = p1.longitude < 0 ? p1.longitude + 360 : p1.longitude;
-                var lon2 = p2.longitude < 0 ? p2.longitude + 360 : p2.longitude;
-                if (lon1 === lon2) {
-                    //infinite solutions, the line is collinear with the anti-meridian
-                    return null;
-                }
+        Location.meridianIntersection = function (p1, p2, meridian) {
+            // y = mx + b case after normalizing negative angles.
+            var lon1 = p1.longitude < 0 ? p1.longitude + 360 : p1.longitude;
+            var lon2 = p2.longitude < 0 ? p2.longitude + 360 : p2.longitude;
+            if (lon1 === lon2) {
+                //infinite solutions, the line is collinear with the anti-meridian
+                return null;
+            }
 
-                var med = meridian < 0 ? meridian + 360 : meridian;
-                var slope = (p2.latitude - p1.latitude) / (lon2 - lon1);
-                var lat = p1.latitude + slope * (med - lon1);
+            var med = meridian < 0 ? meridian + 360 : meridian;
+            var slope = (p2.latitude - p1.latitude) / (lon2 - lon1);
+            var lat = p1.latitude + slope * (med - lon1);
 
-                return lat;
+            return lat;
         };
 
         /**

@@ -40,7 +40,15 @@ define([
         var LookAtNavigator = function (worldWindow) {
             Navigator.call(this, worldWindow);
 
+
+            /**
+             * Internal use only.
+             * A temp variable used to hold the position during calculations and property retrieval. Using an object
+             * level temp property negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.scratchLookAtPositionProxy = new LookAtPositionProxy(this);
+
             // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
             this.enable2DLimits = true;
         };

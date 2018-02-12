@@ -42,6 +42,12 @@ define(['../error/ArgumentError',
 
             this.wwd = worldWindow;
 
+            /**
+             * Internal use only.
+             * A temp variable used to hold the look view during calculations. Using an object level temp property
+             * negates the need for ad-hoc allocations and reduces load on the garbage collector.
+             * @ignore
+             */
             this.scratchLookAt = new LookAt();
         };
 
