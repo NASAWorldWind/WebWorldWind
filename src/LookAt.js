@@ -57,13 +57,18 @@ define([
             this.roll = 0;
 
             /**
-             * The distance from the eye point to its look-at location.
+             * The distance from the eye point to its look at location.
              * @type {Number}
              * @default 10,000 kilometers
              */
             this.range = 10e6; // TODO: Compute initial range to fit globe in viewport.
         };
 
+        /**
+         * Internal use only.
+         * Computes the model view matrix for this look at view.
+         * @ignore
+         */
         LookAt.prototype.computeViewingTransform = function (globe, modelview) {
             if (!globe) {
                 throw new ArgumentError(
