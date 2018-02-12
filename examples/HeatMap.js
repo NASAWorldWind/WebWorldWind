@@ -22,9 +22,67 @@ requirejs(['./WorldWindShim',
                 if(latitude < 1) {
                     return tileHeight;
                 } else {
-                    return tileHeight / latitude;
+                    return Math.ceil(tileHeight / latitude);
                 }
             }
+
+
+            function drawHeatmap(){
+                var currentShape = $('#shapeToDisplay').find(":selected").val();
+                var tile = WorldWind.ColoredSquareTile;
+                var scale = colors;
+                if(currentShape === 'circle') {
+                    tile = WorldWind.ColoredTile;
+                }
+
+                return new WorldWind.HeatMapLayer("HeatMap, Default version", data, {
+                    radius: calculatePointRadius,
+                    tile: tile,
+                    incrementPerIntensity: $('#colorDensityIncrement').val(),
+                    scale: scale
+                })
+            }
+
+            var heatmapLayer = drawHeatmap();
+
+            function replaceHeatmap() {
+                wwd.removeLayer(heatmapLayer);
+
+                heatmapLayer = drawHeatmap();
+
+                wwd.addLayer(heatmapLayer);
+            }
+
+            // Adapt the HeatMap Layer on Change by throwing away the old one and building again the new one.
+            $('#colorDensityIncrement').on('change', replaceHeatmap);
+            $('#shapeToDisplay').on('change', replaceHeatmap);
+
+            var colors = ['#0000ff','#00ffff', '#00ff00', '#ffff00', '#ff0000'];
+            $('#addColor').on('click', function(){
+                colors.push('#000000');
+                rebuildColors();
+            });
+
+            function rebuildColors() {
+                $('#colorsList').empty();
+
+                colors.forEach(function(color, index) {
+                    var colorHtml = $('<div><input type="color" id="color'+index+'" value="'+color+'"/><input type="button" id="removeColor'+index+'" data-index="'+index+'" class="colorRemoval" value="Remove Color"/></div>');
+                    $('#colorsList').append(colorHtml);
+                    $('#color'+index).on('change', function(){
+                        colors[index] = $('#color'+index).val();
+                        replaceHeatmap();
+                    });
+                });
+
+                $('.colorRemoval').on('click', function(){
+                    colors.splice($(this).get('data-index'), 1);
+                    rebuildColors();
+                });
+
+                replaceHeatmap();
+            }
+            rebuildColors();
 
             var rectangleLayer = new WorldWind.TiledImageLayer(new WorldWind.Sector(-90, 90, -180, 180), new WorldWind.Location(45, 45), 14, 'image/png', 'Rectangle 1', 512, 512);
             var RectangleUrlBuilder = function() {
@@ -48,21 +106,14 @@ requirejs(['./WorldWindShim',
 
             rectangleLayer.urlBuilder = new RectangleUrlBuilder();
             rectangleLayer.displayName = "Black background";
+
             /**
              * Add imagery layers.
              */
             var layers = [
                 {layer: new WorldWind.BMNGLayer(), enabled: true},
-                {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-                {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-                {layer: new WorldWind.CompassLayer(), enabled: true},
-                {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
                 {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
-                {layer: rectangleLayer, enabled: true},
-                {layer: new WorldWind.HeatMapLayer("HeatMap, Default version", data, {
-                    radius: calculatePointRadius,
-                    scale: ['#7f2704','#8e330b','#9e4012','#ae4d19','#be5a20','#cd6627','#dd732e','#ed8035','#fd8d3c','#fd9a51','#fda767','#fdb47d','#fec193','#fecea9','#fedbbf','#fee8d5', '#fff5eb'].reverse()
-                }), enabled: true}
+                {layer: rectangleLayer, enabled: true}
             ];
 
             for (var l = 0; l < layers.length; l++) {
@@ -70,6 +121,7 @@ requirejs(['./WorldWindShim',
                 wwd.addLayer(layers[l].layer);
             }
 
+            wwd.addLayer(heatmapLayer);
             wwd.navigator.lookAtLocation = new WorldWind.Location(50, 20);
             wwd.redraw();
 

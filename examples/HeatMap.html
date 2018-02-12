@@ -26,15 +26,16 @@
             <div class="list-group" id="layerList">
             </div>
             <br>
-            <h4>Destination</h4>
-            <div class="input-group" id="searchBox">
-                <input type="text" class="form-control" placeholder="GoTo" id="searchText"/>
-                <span class="input-group-btn">
-                    <button id="searchButton" class="btn btn-primary" type="button">
-                        <span class="glyphicon glyphicon-search"></span>
-                    </button>
-                </span>
-            </div>
+            <h4>Colors</h4>
+            <div id="colorsList"></div>
+            <input type="button" id="addColor" value="Add color"/>
+            <h4>Density per one in value</h4>
+            <input type="text" id="colorDensityIncrement" value="0.025"/>
+            <h4>Shape to visualize</h4>
+            <select id="shapeToDisplay">
+                <option value="square">Square</option>
+                <option value="circle">Circle</option>
+            </select>
         </div>
         <div class="col-sm-9" id="globe">
             <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto">

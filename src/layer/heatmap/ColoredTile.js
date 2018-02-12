@@ -70,6 +70,7 @@ define([
     };
 
     /**
+     * this takes relatively long. Is it possible to improve?
      * @private
      */
     ColoredTile.prototype.colorize = function (pixels, gradient) {

@@ -38,6 +38,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
+        './layer/heatmap/ColoredSquareTile',
         './shapes/Compass',
         './layer/CompassLayer',
         './layer/CoordinatesDisplayLayer',
@@ -283,6 +284,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ClickRecognizer,
               ColladaLoader,
               Color,
+              ColoredSquareTile,
               Compass,
               CompassLayer,
               CoordinatesDisplayLayer,
@@ -737,6 +739,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
+        WorldWind['ColoredSquareTile'] = ColoredSquareTile;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
         WorldWind['CoordinatesDisplayLayer'] = CoordinatesDisplayLayer;

@@ -29,6 +29,8 @@ define([
      *  and max values. Default value is Continuous.
      * @param options.radius {Number} Optional. It shoudl also be possible to provide a function. Radius of the point to
      *  be representing the intensity location. Default value is 25. The size of the radius.
+     * @param options.tile {Tile} Tile used to display the information.
+     * @param options.incrementPerIntensity {Number} Increment per intensity.
      */
     var HeatMapLayer = function (displayName, data, options) {
         this.tileWidth = 512;
@@ -46,6 +48,10 @@ define([
 
         // It is necessary
         this._radius = options.radius || 25;
+
+        this._tile = options.tile || ColoredTile;
+
+        this._incrementPerIntensity = options.incrementPerIntensity || 0.025;
     };
 
     HeatMapLayer.prototype = Object.create(TiledImageLayer.prototype);
@@ -134,7 +140,7 @@ define([
 
             // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
             // of the tile width / tile height
-            var canvas = new ColoredTile(data, {
+            var canvas = new this._tile(data, {
                 sector: extendedSector,
 
                 width: this.tileWidth + 2 * Math.ceil(0.1 * this.tileWidth),
@@ -142,37 +148,30 @@ define([
                 radius: radius,
 
                 intensityGradient: this._gradient,
-                incrementPerIntensity: 0.008
+                incrementPerIntensity: this._incrementPerIntensity
             }).canvas();
+
             var result = document.createElement('canvas');
             result.height = this.tileHeight;
             result.width = this.tileWidth;
             result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(Math.ceil(0.1 * this.tileWidth), Math.ceil(0.1 * this.tileHeight), this.tileWidth, this.tileHeight), 0, 0);
-            var url = result.toDataURL();
 
-            var image = new Image();
-            image.onload = function() {
-                Logger.log(Logger.LEVEL_INFO, "Image retrieval succeeded: " + url);
+            var texture = layer.createTexture(dc, tile, result);
+            layer.removeFromCurrentRetrievals(imagePath);
 
-                var texture = layer.createTexture(dc, tile, image);
-                layer.removeFromCurrentRetrievals(imagePath);
+            if (texture) {
+                cache.putResource(imagePath, texture, texture.size);
 
-                if (texture) {
-                    cache.putResource(imagePath, texture, texture.size);
+                layer.currentTilesInvalid = true;
+                layer.absentResourceList.unmarkResourceAbsent(imagePath);
 
-                    layer.currentTilesInvalid = true;
-                    layer.absentResourceList.unmarkResourceAbsent(imagePath);
-
-                    if (!suppressRedraw) {
-                        // Send an event to request a redraw.
-                        var e = document.createEvent('Event');
-                        e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
-                        canvas.dispatchEvent(e);
-                    }
+                if (!suppressRedraw) {
+                    // Send an event to request a redraw.
+                    var e = document.createEvent('Event');
+                    e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                    canvas.dispatchEvent(e);
                 }
-            };
-
-            image.src = url;
+            }
         }
     };
 
