@@ -9,6 +9,15 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script data-main="KmlExample"
             src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.min.js"></script>
+    <style>
+        #treeControls input {
+            margin-right: 1em;
+        }
+
+        #treeControls a:hover {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -27,12 +36,12 @@
                 </span>
             </div>
             <br>
-            <h4>KML Elements Controls</h4>
-            <div>
-                The boxes control visibility of KML Elements from file.
-                <br/>
-                If on hover the cursor changes to pointer, it means you can focus the element by clicking on it.
-            </div>
+            <h4>KML Elements</h4>
+            <p>
+                The list below shows all elements parsed from the KML file.
+                <br />
+                The checkboxes control visibility. The links move the camera to the elements that have a defined camera destination.
+            </p>
             <div id="treeControls" style="height: 600px; overflow-y: auto; overflow-x: hidden;"></div>
         </div>
         <div class="col-sm-9" id="globe">

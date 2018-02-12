@@ -57,9 +57,7 @@ define([
         var enabled = node.enabled || node.kmlVisibility === true;
 
         var controlsForSingleElement = document.createElement("div");
-        if (node.kmlAbstractView) {
-            controlsForSingleElement.style.cursor = "pointer";
-        }
+
         var toggleVisibility = document.createElement("input");
         toggleVisibility.setAttribute("type", "checkbox");
         if (enabled) {
@@ -69,9 +67,15 @@ define([
 
         controlsForSingleElement.appendChild(toggleVisibility);
 
-        var lookAtName = document.createElement("span");
+        var lookAtName;
+        if (node.kmlAbstractView) {
+            lookAtName = document.createElement("a");
+        } else {
+            lookAtName = document.createElement("span");
+        }
         lookAtName.appendChild(document.createTextNode(name));
         lookAtName.addEventListener("click", lookAt, true);
+
         controlsForSingleElement.appendChild(lookAtName);
 
         document.getElementById(this._visualElementId).appendChild(controlsForSingleElement);
