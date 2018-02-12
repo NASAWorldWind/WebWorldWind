@@ -1,12 +1,21 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports Matrix
- * @version $Id: Matrix.js 3298 2015-07-06 17:28:33Z dcollins $
  */
-
 define([
         '../geom/Angle',
         '../error/ArgumentError',
@@ -219,6 +228,17 @@ define([
             this[13] = matrix[13];
             this[14] = matrix[14];
             this[15] = matrix[15];
+        };
+
+        /**
+         * Creates a new matrix that is a copy of this matrix.
+         * @returns {Matrix} The new matrix.
+         */
+        Matrix.prototype.clone = function () {
+            var clone = Matrix.fromIdentity();
+            clone.copy(this);
+
+            return clone;
         };
 
         /**
@@ -940,12 +960,12 @@ define([
 
             if (nearDistance === farDistance) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
-                        "Near and far distance are the same."));
+                    "Near and far distance are the same."));
             }
 
             if (nearDistance <= 0 || farDistance <= 0) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "setToPerspectiveProjection",
-                        "Near or far distance is less than or equal to zero."));
+                    "Near or far distance is less than or equal to zero."));
             }
 
             // Compute the dimensions of the viewport rectangle at the near distance.
@@ -989,7 +1009,7 @@ define([
          * into screen coordinates without modification. A point's xy coordinates are interpreted as literal screen
          * coordinates and must be in the viewport to be visible. A point's z coordinate is interpreted as a depth value
          * that ranges from 0 to 1. Additionally, the screen projection matrix preserves the depth value returned by
-         * [NavigatorState.project]{@link NavigatorState#project}.
+         * [DrawContext.project]{@link DrawContext#project}.
          *
          * @param {Number} viewportWidth The viewport width, in screen coordinates.
          * @param {Number} viewportHeight The viewport height, in screen coordinates.
@@ -1213,7 +1233,7 @@ define([
          * it is reasonable to apply a depth offset to an orthographic projection, the effect is most appropriate when
          * applied to the projection used to draw the scene. For example, when an object's coordinates are projected by
          * a perspective projection into screen coordinates then drawn using an orthographic projection, it is best to
-         * apply the offset to the original perspective projection. The method [NavigatorState.project]{@link NavigatorState#project} performs the
+         * apply the offset to the original perspective projection. The method [DrawContext.project]{@link DrawContext#project} performs the
          * correct behavior for the projection type used to draw the scene.
          *
          * @param {Number} depthOffset The amount of offset to apply.
@@ -1453,7 +1473,7 @@ define([
          * @param {Number[]} index Permutation vector of that LU factorization.
          * @param {Number[]} b Vector to be solved.
          */
-            // Method "lubksb" derived from "Numerical Recipes in C", Press et al., 1988
+        // Method "lubksb" derived from "Numerical Recipes in C", Press et al., 1988
         Matrix.lubksb = function (A, index, b) {
             var ii = -1,
                 i,
@@ -1649,8 +1669,8 @@ define([
             // Taken from Mathematics for 3D Game Programming and Computer Graphics, Second Edition, listing 14.6.
 
             var epsilon = 1.0e-10,
-            // Since the matrix is symmetric m12=m21, m13=m31 and m23=m32, therefore we can ignore the values m21,
-            // m32 and m32.
+                // Since the matrix is symmetric m12=m21, m13=m31 and m23=m32, therefore we can ignore the values m21,
+                // m32 and m32.
                 m11 = this[0],
                 m12 = this[1],
                 m13 = this[2],
@@ -1819,6 +1839,81 @@ define([
             result[10] = this[10];
 
             return result;
+        };
+
+
+        /**
+         * Transforms the specified screen point from WebGL screen coordinates to model coordinates. This method assumes
+         * this matrix represents an inverse modelview-projection matrix. The result of this method is
+         * undefined if this matrix is not an inverse modelview-projection matrix.
+         * <p>
+         * The screen point is understood to be in WebGL screen coordinates, with the origin in the bottom-left corner
+         * and axes that extend up and to the right from the origin.
+         * <p>
+         * This function stores the transformed point in the result argument, and returns true or false to indicate whether the
+         * transformation is successful. It returns false if the modelview or projection matrices
+         * are malformed, or if the screenPoint is clipped by the near clipping plane or the far clipping plane.
+         *
+         * @param {Vec3} screenPoint The screen coordinate point to un-project.
+         * @param {Rectangle} viewport The viewport defining the screen point's coordinate system
+         * @param {Vec3} result A pre-allocated vector in which to return the unprojected point.
+         * @returns {boolean} true if the transformation is successful, otherwise false.
+         * @throws {ArgumentError} If either the specified point or result argument is null or undefined.
+         */
+        Matrix.prototype.unProject = function (screenPoint, viewport, result) {
+            if (!screenPoint) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "unProject",
+                    "missingPoint"));
+            }
+
+            if (!viewport) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "unProject",
+                    "missingViewport"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Matrix", "unProject",
+                    "missingResult"));
+            }
+
+            var sx = screenPoint[0],
+                sy = screenPoint[1],
+                sz = screenPoint[2];
+
+            // Convert the XY screen coordinates to coordinates in the range [0, 1]. This enables the XY coordinates to
+            // be converted to clip coordinates.
+            sx = (sx - viewport.x) / viewport.width;
+            sy = (sy - viewport.y) / viewport.height;
+
+            // Convert from coordinates in the range [0, 1] to clip coordinates in the range [-1, 1].
+            sx = sx * 2 - 1;
+            sy = sy * 2 - 1;
+            sz = sz * 2 - 1;
+
+            // Clip the point against the near and far clip planes. In clip coordinates the near and far clip planes are
+            // perpendicular to the Z axis and are located at -1 and 1, respectively.
+            if (sz < -1 || sz > 1) {
+                return false;
+            }
+
+            // Transform the screen point from clip coordinates to model coordinates. This inverts the Z axis and stores
+            // the negative of the eye coordinate Z value in the W coordinate.
+            var
+                x = this[0] * sx + this[1] * sy + this[2] * sz + this[3],
+                y = this[4] * sx + this[5] * sy + this[6] * sz + this[7],
+                z = this[8] * sx + this[9] * sy + this[10] * sz + this[11],
+                w = this[12] * sx + this[13] * sy + this[14] * sz + this[15];
+
+            if (w === 0) {
+                return false;
+            }
+
+            // Complete the conversion from model coordinates to clip coordinates by dividing by W.
+            result[0] = x / w;
+            result[1] = y / w;
+            result[2] = z / w;
+
+            return true;
         };
 
         return Matrix;

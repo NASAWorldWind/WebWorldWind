@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2017 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -31,7 +42,7 @@ requirejs(['../src/WorldWind',
         }
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Web Map Service information from NASA's Near Earth Observations WMS
         var serviceAddress = "https://neo.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
@@ -53,7 +64,7 @@ requirejs(['../src/WorldWind',
 
             // Add the layers to WorldWind and update the layer manager
             wwd.addLayer(wmsLayer);
-            layerManger.synchronizeLayerList();
+            layerManager.synchronizeLayerList();
         };
 
         // Called if an error occurs during WMS Capabilities document retrieval

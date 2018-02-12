@@ -1,14 +1,25 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * Displays a time series of the 12 months of Blue Marble imagery.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -20,8 +31,8 @@ requirejs(['../src/WorldWind',
         backgroundLayer.hide = true; // Don't show it in the layer manager.
         wwd.addLayer(backgroundLayer);
 
-        // Create the Blue Marble time series layer.
-        var blueMarbleTimeSeries = new WorldWind.BMNGRestLayer(null);
+        // Create the Blue Marble time series layer using REST tiles hosted at worldwind32.arc.nasa.gov.
+        var blueMarbleTimeSeries = new WorldWind.BMNGRestLayer("https://worldwind32.arc.nasa.gov/standalonedata/Earth/BlueMarble256");
         blueMarbleTimeSeries.enabled = false;
         blueMarbleTimeSeries.showSpinner = true;
 
@@ -35,7 +46,7 @@ requirejs(['../src/WorldWind',
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         // Ensure that the background and other control layers are displayed while the blue marble layer is
         // being pre-populated.
@@ -56,7 +67,7 @@ requirejs(['../src/WorldWind',
                 blueMarbleTimeSeries.enabled = true;
                 blueMarbleTimeSeries.showSpinner = false;
                 window.clearInterval(prePopulateInterval);
-                layerManger.synchronizeLayerList();
+                layerManager.synchronizeLayerList();
 
                 // Increment the Blue Marble layer's time at a specified frequency.
                 var currentIndex = 0;

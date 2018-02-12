@@ -1,14 +1,25 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
-        
+
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
@@ -24,16 +35,16 @@ requirejs(['../src/WorldWind',
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
-        
-        var lightLocation = new WorldWind.Position(19, 20, 0);
+
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(atmosphereLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
 
         var sunSimulationCheckBox = document.getElementById('sun-simulation');
         var sunInterval = 0;
+        var timeStamp = Date.now();
         sunSimulationCheckBox.addEventListener('change', onSunCheckBoxClick, false);
 
         function onSunCheckBoxClick() {
@@ -41,7 +52,7 @@ requirejs(['../src/WorldWind',
                 runSunSimulation();
             }
             else {
-                atmosphereLayer.lightLocation = null;
+                atmosphereLayer.time = null;
                 clearInterval(sunInterval);
                 wwd.redraw();
             }
@@ -49,8 +60,8 @@ requirejs(['../src/WorldWind',
 
         function runSunSimulation() {
             sunInterval = setInterval(function () {
-                atmosphereLayer.lightLocation = lightLocation;
-                lightLocation.longitude += 3;
+                timeStamp += 180 * 1000;
+                atmosphereLayer.time = new Date(timeStamp);
                 wwd.redraw();
             }, 64);
         }

@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2017 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -26,7 +37,7 @@ requirejs(['../src/WorldWind',
         }
 
         // Example showing the usage of Well Known Text collection in real life.
-        var defaultLayer = new WorldWind.RenderableLayer("Wkt Shapes");
+        var defaultLayer = new WorldWind.RenderableLayer("WKT Geometry Collection");
         new WorldWind.Wkt("" +
             "GEOMETRYCOLLECTION(" +
             "   POLYGON ((40 -70, 45 -80, 40 -90)), " +
@@ -38,15 +49,15 @@ requirejs(['../src/WorldWind',
         wwd.addLayer(defaultLayer);
 
         // Using the callback mechanism presented in the Wkt parser to update the shapes as well as showing the information about the successful rendering.
-        var customCallbackLayer = new WorldWind.RenderableLayer("Wkt Shapes");
+        var customCallbackLayer = new WorldWind.RenderableLayer("WKT Multi Polygon");
         new WorldWind.Wkt("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(
-            function completionCallback(wkt, objects){
-            // Once all the shapes are parsed, this function is called.
+            function completionCallback(wkt, objects) {
+                // Once all the shapes are parsed, this function is called.
                 console.log('Parsing of the Wkt was completed');
 
                 wkt.defaultParserCompletionCallback(wkt, objects);
             },
-            function shapeConfigurationCallback(shape){
+            function shapeConfigurationCallback(shape) {
                 if (shape.type == WorldWind.WktType.SupportedGeometries.MULTI_POLYGON) {
                     var shapeAttributes = new WorldWind.ShapeAttributes(null);
                     shapeAttributes.interiorColor = WorldWind.Color.GREEN;
@@ -60,12 +71,12 @@ requirejs(['../src/WorldWind',
         wwd.addLayer(customCallbackLayer);
 
         // Allow for parsing of your own Well known text data
-        var wktLayer = new WorldWind.RenderableLayer('Wkt');
-        $('#showWkt').click(function(){
-            new WorldWind.WktParser($('#wkt').val()).load(null, null, wktLayer);
+        var wktLayer = new WorldWind.RenderableLayer('WKT Custom');
+        $('#showWkt').click(function () {
+            new WorldWind.Wkt($('#wkt').val()).load(null, null, wktLayer);
         });
         wwd.addLayer(wktLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
     });
