@@ -1,14 +1,21 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-/**
- * @version $Id: Shapefiles.js 3361 2015-07-31 19:28:04Z tgaskins $
- */
-
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -72,7 +79,7 @@ requirejs(['../src/WorldWind',
             return configuration;
         };
 
-        var shapefileLibrary = "http://worldwindserver.net/webworldwind/data/shapefiles/naturalearth";
+        var shapefileLibrary = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/naturalearth";
 
         // Create data for the world.
         var worldLayer = new WorldWind.RenderableLayer("Countries");
@@ -86,12 +93,12 @@ requirejs(['../src/WorldWind',
         cityShapefile.load(null, shapeConfigurationCallback, cityLayer);
         wwd.addLayer(cityLayer);
 
-        var fortStory = "http://worldwindserver.net/webworldwind/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
+        var fortStory = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
         var fortStoryLayer = new WorldWind.RenderableLayer("Fort Story");
         var fortStoryShapefile = new WorldWind.Shapefile(fortStory);
         fortStoryShapefile.load(null, null, fortStoryLayer);
         wwd.addLayer(fortStoryLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
     });

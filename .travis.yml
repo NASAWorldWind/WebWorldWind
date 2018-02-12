@@ -14,6 +14,19 @@ script:
 
 # Deploy build artifacts. Travis does not invoke this step for pull request builds
 deploy:
+  # Publish develop branch distributions to the Artifactory apps repository
+  - provider: script
+    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/apps/web
+    skip_cleanup: true
+    on:
+      branch: develop
+  # Publish API documentation to GitHub Pages
+  - provider: pages
+    github_token: $GITHUB_API_KEY
+    local_dir: build/dist/api-doc
+    skip_cleanup: true
+    on:
+      branch: develop
   # Publish release artifacts to the npm repository
   - provider: npm
     email: $NPM_EMAIL
@@ -21,9 +34,9 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-  # Create the npm tarball, extract, and publish files to Artifactory for tagged release builds
+  # Publish release distributions to the Artifactory repository
   - provider: script
-    script: ./travis/publishToArtifactory.sh
+    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/${TRAVIS_TAG:1}
     skip_cleanup: true
     on:
       tags: true
@@ -33,10 +46,13 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-  # Create a GitHub release and publish CHANGELOG.md to the release assets
+  # Create a GitHub release and publish CHANGELOG.md and WebWorldWind.zip to the release assets
   - provider: releases
     api_key: $GITHUB_API_KEY
-    file: CHANGELOG.md
+    file_glob: true
+    file:
+      - CHANGELOG.md
+      - build/WebWorldWind-Distribution-*.zip
     skip_cleanup: true
     on:
       tags: true

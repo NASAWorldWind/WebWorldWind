@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 requirejs([
-        '../src/WorldWind',
+        './WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
 
         // Tell WorldWind to log only warnings and errors.
@@ -13,7 +24,7 @@ requirejs([
 
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
-        var layerManger;
+        var layerManager;
 
         // Add imagery layers
         var layers = [
@@ -29,16 +40,16 @@ requirejs([
 
         var dataJsonUrl = './data/analyticalSurfaces.json';
         var colorPaletteArray = [
-            0.0,25.5,0.701,0.921,1.0, 1.0,
-            25.5,51.0,1.0000,1.0000,0.9412, 1.0,
-            51.0,76.5,1.0000,1.0000,0.8980, 1.0,
-            76.5,102.0,0.9686,0.9882,0.7255, 1.0,
-            102.0,127.5,0.8510,0.9412,0.6392, 1.0,
-            127.5,153.0,0.6784,0.8667,0.5569, 1.0,
-            153.0,175.5,0.2549,0.6706,0.3647, 1.0,
-            175.5,204.0,0.1373,0.5176,0.2627, 1.0,
-            204.0,229.5,0.0000,0.3529,0.1608, 1.0,
-            229.5,255.0,0.0000,0.2706,0.1608, 1.0
+            0.0, 25.5, 0.701, 0.921, 1.0, 1.0,
+            25.5, 51.0, 1.0000, 1.0000, 0.9412, 1.0,
+            51.0, 76.5, 1.0000, 1.0000, 0.8980, 1.0,
+            76.5, 102.0, 0.9686, 0.9882, 0.7255, 1.0,
+            102.0, 127.5, 0.8510, 0.9412, 0.6392, 1.0,
+            127.5, 153.0, 0.6784, 0.8667, 0.5569, 1.0,
+            153.0, 175.5, 0.2549, 0.6706, 0.3647, 1.0,
+            175.5, 204.0, 0.1373, 0.5176, 0.2627, 1.0,
+            204.0, 229.5, 0.0000, 0.3529, 0.1608, 1.0,
+            229.5, 255.0, 0.0000, 0.2706, 0.1608, 1.0
         ];
 
         var sceneCounter = 0,
@@ -59,11 +70,11 @@ requirejs([
                     if (xhr.status === 200) {
                         analyticalSurfaceDataObject = JSON.parse(xhr.response);
 
-                        $( "#scene-date" ).val(getStringDateFormat(analyticalSurfaceDataObject[0].filenameList[0]));
+                        $("#scene-date").val(getStringDateFormat(analyticalSurfaceDataObject[0].filenameList[0]));
 
                         //console.log(analyticalSurfaceDataObject);
                         //show globe after loading first scene of each region (synchronous)
-                        for(var i=0; i < analyticalSurfaceDataObject.length; i++) {
+                        for (var i = 0; i < analyticalSurfaceDataObject.length; i++) {
                             analyticalSurfaceDataObject[i].paragraphId = "p" + analyticalSurfaceDataObject[i].regionName;
                             analyticalSurfaceDataObject[i].loadingStatus = 0;
                             addLoadingStatusParagraph(
@@ -71,7 +82,6 @@ requirejs([
                                 analyticalSurfaceDataObject[i].regionName,
                                 analyticalSurfaceDataObject[i].loadingStatus,
                                 analyticalSurfaceDataObject[i].filenameList.length
-
                             );
                             getNDVIData(
                                 analyticalSurfaceDataObject[i].url,
@@ -97,24 +107,24 @@ requirejs([
             xhr.send(null);
         };
 
-        function addLoadingStatusParagraph(paragraphId, regionName, loadingStatus, totalNoOfScenes){
+        function addLoadingStatusParagraph(paragraphId, regionName, loadingStatus, totalNoOfScenes) {
             var newParagraph = document.createElement('p');
             newParagraph.setAttribute("id", paragraphId)
             newParagraph.textContent = "Loading " + regionName + ": " + loadingStatus + "/" + totalNoOfScenes;
             document.getElementById("surfacesStatus").appendChild(newParagraph);
         }
 
-        function updateLoadingStatus(paragraphId, regionName, loadingStatus, totalNoOfScenes){
+        function updateLoadingStatus(paragraphId, regionName, loadingStatus, totalNoOfScenes) {
             $("#" + paragraphId).text("Loading " + regionName + ": " + loadingStatus + "/" + totalNoOfScenes);
         }
 
         function getNDVIData(url, regionName, filename, isFirstScene) {
             var url = url + filename;
             var xhr = new XMLHttpRequest();
-            if (isFirstScene){
+            if (isFirstScene) {
                 xhr.open("GET", url, false);
             }
-            else{
+            else {
                 xhr.open("GET", url, true);
             }
 
@@ -124,13 +134,13 @@ requirejs([
                         var dataArray = xhr.response.split('\n');
 
                         if (analyticalSurfaceObjectArray.filter(
-                                function(e) {
-                                    return e.regionName === regionName}
-                            ).length === 0)
-                        {
+                                function (e) {
+                                    return e.regionName === regionName
+                                }
+                            ).length === 0) {
                             // Parse ESRI Grid file
                             var ncols = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
-                            var nrows =  Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
+                            var nrows = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
                             var xllcorner = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
                             var yllcorner = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
                             var cellsize = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
@@ -146,22 +156,22 @@ requirejs([
 
                             analyticalSurfaceObjectArray.push(
                                 {
-                                    "regionName" : regionName,
-                                    "width" : ncols,
-                                    "height" : nrows,
-                                    "referenceX" : xllcorner,
-                                    "referenceY" : ytlcorner,
-                                    "cellSize" : cellsize,
-                                    "noDataValue" : NODATA_value,
-                                    "imageList" : [
+                                    "regionName": regionName,
+                                    "width": ncols,
+                                    "height": nrows,
+                                    "referenceX": xllcorner,
+                                    "referenceY": ytlcorner,
+                                    "cellSize": cellsize,
+                                    "noDataValue": NODATA_value,
+                                    "imageList": [
                                         {
-                                            "filename" : filename,
-                                            "dataArray" : dataArray,
-                                            "imageData" : imageData
+                                            "filename": filename,
+                                            "dataArray": dataArray,
+                                            "imageData": imageData
                                         }],
-                                    "canvas" : canvas,
-                                    "context2d" : context2d,
-                                    "loadingStatus:" : 0
+                                    "canvas": canvas,
+                                    "context2d": context2d,
+                                    "loadingStatus:": 0
                                 }
                             );
 
@@ -173,11 +183,10 @@ requirejs([
                                 imageData,
                                 NODATA_value);
                         }
-                        else
-                        {
+                        else {
                             dataArray.splice(0, 6);
 
-                            var index =  getIndexOfObjectsArrayByAttribute(
+                            var index = getIndexOfObjectsArrayByAttribute(
                                 analyticalSurfaceObjectArray,
                                 "regionName",
                                 regionName);
@@ -188,9 +197,9 @@ requirejs([
 
                             analyticalSurfaceObjectArray[index].imageList.push(
                                 {
-                                    "filename" : filename,
-                                    "dataArray" : dataArray,
-                                    "imageData" : imageData
+                                    "filename": filename,
+                                    "dataArray": dataArray,
+                                    "imageData": imageData
                                 }
                             );
 
@@ -223,7 +232,7 @@ requirejs([
             xhr.send(null);
         };
 
-        function compareFilename(a,b) {
+        function compareFilename(a, b) {
             if (a.filename < b.filename)
                 return -1;
             if (a.filename > b.filename)
@@ -233,7 +242,7 @@ requirejs([
 
         function createAnalyticalSurfaceLayer(analyticalSurfaceArray) {
             var surfaceLayerArray = [];
-            for (var i = 0; i < analyticalSurfaceArray.length; i++){
+            for (var i = 0; i < analyticalSurfaceArray.length; i++) {
                 var analyticalSurfaceLayer = new WorldWind.RenderableLayer();
                 analyticalSurfaceLayer.displayName = analyticalSurfaceArray[i].regionName;
 
@@ -254,8 +263,8 @@ requirejs([
             return surfaceLayerArray;
         }
 
-        function doGetNDVIDataAsync(j, k){
-            setTimeout(function() {
+        function doGetNDVIDataAsync(j, k) {
+            setTimeout(function () {
                 getNDVIData(
                     analyticalSurfaceDataObject[j].url,
                     analyticalSurfaceDataObject[j].regionName,
@@ -267,7 +276,7 @@ requirejs([
         function getImage(dataArray, regionName, filename, context2d, imageData, noDataValue) {
             var worker = new Worker('CanvasWorker.js');
 
-            worker.onmessage = function(e) {
+            worker.onmessage = function (e) {
 
                 sceneCounter++;
 
@@ -296,13 +305,13 @@ requirejs([
                     analyticalSurfaceDataObject[regionIndex].filenameList.length
                 );
 
-                if (sceneCounter === analyticalSurfaceDataObject.length && !isFirstSceneDraw){
+                if (sceneCounter === analyticalSurfaceDataObject.length && !isFirstSceneDraw) {
                     context2d.putImageData(e.data.imageData, 0, 0);
 
                     surfaceLayerArrayGlobal = createAnalyticalSurfaceLayer(analyticalSurfaceObjectArray);
 
                     //add regions to select control
-                    for(var i=0; i< surfaceLayerArrayGlobal.length; i++){
+                    for (var i = 0; i < surfaceLayerArrayGlobal.length; i++) {
                         $('#select-region').append($('<option>', {
                             value: surfaceLayerArrayGlobal[i].displayName,
                             text: surfaceLayerArrayGlobal[i].displayName
@@ -310,22 +319,22 @@ requirejs([
                         wwd.addLayer(surfaceLayerArrayGlobal[i]);
                     }
 
-                    layerManger = new LayerManager(wwd);
-                    layerManger.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
+                    layerManager = new LayerManager(wwd);
+                    layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
                     isFirstSceneDraw = true;
 
                     //start load async other scenes
-                    for(var j = 0; j < analyticalSurfaceDataObject.length; j++){
-                        for(var k = 1; k < analyticalSurfaceDataObject[j].filenameList.length; k++){
+                    for (var j = 0; j < analyticalSurfaceDataObject.length; j++) {
+                        for (var k = 1; k < analyticalSurfaceDataObject[j].filenameList.length; k++) {
                             doGetNDVIDataAsync(j, k);
                         }
                     }
-                }else if (sceneCounter < analyticalSurfaceDataObject.length && !isFirstSceneDraw){
+                } else if (sceneCounter < analyticalSurfaceDataObject.length && !isFirstSceneDraw) {
                     context2d.putImageData(e.data.imageData, 0, 0);
                 }
             };
 
-            worker.onerror = function(e) {
+            worker.onerror = function (e) {
                 alert('Error: Line ' + e.lineno + ' in ' + e.filename + ': ' + e.message);
             };
 
@@ -334,35 +343,37 @@ requirejs([
                 'imageData': imageData,
                 'dataArray': dataArray,
                 'colorPaletteArray': colorPaletteArray,
-                'regionName' : regionName,
-                'filename' : filename,
-                'noDataValue' : noDataValue
+                'regionName': regionName,
+                'filename': filename,
+                'noDataValue': noDataValue
             });
         }
 
-        function getStringDateFormat(filename){
+        function getStringDateFormat(filename) {
             var dataField = filename.split("_")[4];
-            return dataField.substring(0,4) + "/" + dataField.substring(4,6) + "/" + dataField.substring(6,8);
+            return dataField.substring(0, 4) + "/" + dataField.substring(4, 6) + "/" + dataField.substring(6, 8);
         }
 
-        function changeTransparencyValue(value){
-            for (var i=0; i < wwd.layers.length; i++ ){
-                if (wwd.layers[i].displayName === ($( "#select-region" ).val())) {
-                    for(var j=0; j < wwd.layers[i].renderables.length; j++){
+        function changeTransparencyValue(value) {
+            for (var i = 0; i < wwd.layers.length; i++) {
+                if (wwd.layers[i].displayName === ($("#select-region").val())) {
+                    for (var j = 0; j < wwd.layers[i].renderables.length; j++) {
                         wwd.layers[i].renderables[j].opacity = value;
                     }
                 }
             }
-            $( "#transparency" ).val( value );
+            $("#transparency").val(value);
         }
 
-        function getIndexOfObjectsArrayByAttribute(array, attribute, attributeValue){
-            return array.map(function(e) { return e[attribute]; }).indexOf(attributeValue);
+        function getIndexOfObjectsArrayByAttribute(array, attribute, attributeValue) {
+            return array.map(function (e) {
+                return e[attribute];
+            }).indexOf(attributeValue);
         }
 
-        function changeParamValues(value){
-            for (var i=0; i < wwd.layers.length; i++ ){
-                if (wwd.layers[i].displayName === ($( "#select-region" ).val())) {
+        function changeParamValues(value) {
+            for (var i = 0; i < wwd.layers.length; i++) {
+                if (wwd.layers[i].displayName === ($("#select-region").val())) {
                     var regionIndex = getIndexOfObjectsArrayByAttribute(
                         analyticalSurfaceObjectArray,
                         "regionName",
@@ -375,7 +386,7 @@ requirejs([
                         analyticalSurfaceObjectArray[regionIndex].canvas);
 
                     var filename = analyticalSurfaceObjectArray[regionIndex].imageList[value].filename;
-                    $( "#scene-date" ).val( getStringDateFormat(filename));
+                    $("#scene-date").val(getStringDateFormat(filename));
 
                     wwd.redraw();
                     break;
@@ -398,7 +409,7 @@ requirejs([
             if (pickList.objects.length > 0) {
                 for (var p = 0; p < pickList.objects.length; p++) {
                     if (pickList.objects[p].userObject instanceof WorldWind.SurfaceImage) {
-                        if (pickList.objects[p].userObject.displayName === ($( "#select-region" ).val())){
+                        if (pickList.objects[p].userObject.displayName === ($("#select-region").val())) {
                             var index = getIndexOfObjectsArrayByAttribute(
                                 analyticalSurfaceObjectArray,
                                 "regionName",
@@ -423,12 +434,12 @@ requirejs([
                             var data = [];
                             var xLabels = [];
 
-                            for(var i=0; i < analyticalSurfaceObjectArray[index].imageList.length;i++ ){
+                            for (var i = 0; i < analyticalSurfaceObjectArray[index].imageList.length; i++) {
                                 if (analyticalSurfaceObjectArray[index].imageList[i].dataArray[indexParam] ===
-                                    analyticalSurfaceObjectArray[index].noDataValue){
+                                    analyticalSurfaceObjectArray[index].noDataValue) {
                                     data.push(0);
                                 }
-                                else{
+                                else {
                                     data.push(analyticalSurfaceObjectArray[index].imageList[i].dataArray[indexParam]);
                                 }
                                 xLabels.push(
@@ -442,7 +453,7 @@ requirejs([
                             var step = w / data.length;
 
                             var domainArray = [];
-                            for (var i = 0; i < data.length; i ++){
+                            for (var i = 0; i < data.length; i++) {
                                 domainArray.push(i * step);
                             }
 
@@ -451,10 +462,10 @@ requirejs([
                             var y = d3.scale.linear().domain([0, 255]).range([h, 0]);
 
                             var line = d3.svg.line()
-                                .x(function(d,i) {
+                                .x(function (d, i) {
                                     return x(i);
                                 })
-                                .y(function(d) {
+                                .y(function (d) {
                                     return y(d);
                                 });
 
@@ -476,7 +487,7 @@ requirejs([
                                 .style("text-anchor", "end")
                                 .attr("dx", "-.8em")
                                 .attr("dy", ".15em")
-                                .attr("transform", "rotate(-65)" );;
+                                .attr("transform", "rotate(-65)");
 
                             var yAxisLeft = d3.svg.axis().scale(y).ticks(4).orient("left");
                             svg.append("svg:g")
@@ -497,45 +508,45 @@ requirejs([
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
 
-        $( "#scene-slider" ).slider({
+        $("#scene-slider").slider({
             orientation: "horizontal",
             range: "min",
             min: 0,
             max: 12,
             value: 0,
-            slide: function( event, ui ) {
+            slide: function (event, ui) {
                 changeParamValues(ui.value);
             }
         });
 
-        $( "#transparency-slider" ).slider({
+        $("#transparency-slider").slider({
             orientation: "horizontal",
             range: "min",
             min: 0.0,
             max: 1.0,
             step: 0.01,
             value: 1.0,
-            slide: function( event, ui ) {
+            slide: function (event, ui) {
                 changeTransparencyValue(ui.value);
             }
         });
-        $( "#transparency" ).val( 1.0 );
+        $("#transparency").val(1.0);
 
-        $( "#select-region" ).change(function() {
+        $("#select-region").change(function () {
             var str = "";
-            $( "select option:selected" ).each(function() {
-                str += $( this ).text();
+            $("select option:selected").each(function () {
+                str += $(this).text();
             });
 
-            if (str === "Sicily"){
-                layerManger.goToAnimator.goTo(new WorldWind.Position(37.51, 14.00, 400000));
-            }else if (str === "Rome"){
-                layerManger.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
+            if (str === "Sicily") {
+                layerManager.goToAnimator.goTo(new WorldWind.Position(37.51, 14.00, 400000));
+            } else if (str === "Rome") {
+                layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
             }
 
-            for (var i=0; i < analyticalSurfaceObjectArray.length; i++){
-                if (analyticalSurfaceObjectArray[i].regionName === str){
-                    $( "#scene-slider" ).slider("option", "max", analyticalSurfaceObjectArray[i].imageList.length - 1);
+            for (var i = 0; i < analyticalSurfaceObjectArray.length; i++) {
+                if (analyticalSurfaceObjectArray[i].regionName === str) {
+                    $("#scene-slider").slider("option", "max", analyticalSurfaceObjectArray[i].imageList.length - 1);
                     break;
                 }
             }

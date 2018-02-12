@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports TiledImageLayer
@@ -12,6 +23,7 @@ define([
         '../layer/Layer',
         '../util/LevelSet',
         '../util/Logger',
+        '../geom/Matrix',
         '../cache/MemoryCache',
         '../render/Texture',
         '../util/Tile',
@@ -23,6 +35,7 @@ define([
               Layer,
               LevelSet,
               Logger,
+              Matrix,
               MemoryCache,
               Texture,
               Tile,
@@ -114,6 +127,17 @@ define([
              */
             this.detailControl = 1.75;
 
+            /**
+             * Indicates whether credentials are sent when requesting images from a different origin.
+             *
+             * Allowed values are anonymous and use-credentials.
+             *
+             * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-crossorigin
+             * @type {string}
+             * @default anonymous
+             */
+            this.crossOrigin = 'anonymous';
+
             /* Intentionally not documented.
              * Indicates the time at which this layer's imagery expire. Expired images are re-retrieved
              * when the current time exceeds the specified expiry time. If null, images do not expire.
@@ -128,6 +152,9 @@ define([
             this.absentResourceList = new AbsentResourceList(3, 50e3);
 
             this.pickEnabled = false;
+
+            // Internal. Intentionally not documented.
+            this.lasTtMVP = Matrix.fromIdentity();
         };
 
         TiledImageLayer.prototype = Object.create(Layer.prototype);
@@ -229,8 +256,8 @@ define([
                 return;
 
             if (this.currentTilesInvalid
-                || !this.lasTtMVP || !dc.navigatorState.modelviewProjection.equals(this.lasTtMVP)
-                || dc.globeStateKey != this.lastGlobeStateKey) {
+                || !dc.modelviewProjection.equals(this.lasTtMVP)
+                || dc.globeStateKey !== this.lastGlobeStateKey) {
                 this.currentTilesInvalid = false;
 
                 // Tile fading works visually only when the surface tiles are opaque, otherwise the surface flashes
@@ -253,7 +280,7 @@ define([
 
             }
 
-            this.lasTtMVP = dc.navigatorState.modelviewProjection;
+            this.lasTtMVP.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {
@@ -371,7 +398,8 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
-                tile.opacity = 1;;
+                tile.opacity = 1;
+                ;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
@@ -401,7 +429,7 @@ define([
                 return false;
             }
 
-            return tile.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.frustumInModelCoordinates);
         };
 
         // Intentionally not documented.
@@ -477,7 +505,7 @@ define([
                 };
 
                 this.currentRetrievals.push(imagePath);
-                image.crossOrigin = 'anonymous';
+                image.crossOrigin = this.crossOrigin;
                 image.src = url;
             }
         };
