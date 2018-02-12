@@ -947,43 +947,60 @@ define([
          */
         SurfaceShape.prototype.renderToTexture = function (dc, ctx2D, xScale, yScale, dx, dy) {
             var attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
-            var drawInterior = (!this._isInteriorInhibited && attributes.drawInterior);
-            var drawOutline = (attributes.drawOutline && attributes.outlineWidth > 0);
+            var c, r, g, b, a, fillStyle, strokeStyle, drawInterior, drawOutline, pickColor;
 
+            if (!attributes) {
+                return;
+            }
+
+            drawInterior = (!this._isInteriorInhibited && attributes.drawInterior);
+            drawOutline = (attributes.drawOutline && attributes.outlineWidth > 0);
             if (!drawInterior && !drawOutline) {
                 return;
             }
 
-            if (dc.pickingMode && !this.pickColor) {
-                this.pickColor = dc.uniquePickColor();
-            }
-
-            if (dc.pickingMode) {
-                var pickColor = this.pickColor.toHexString();
+            if (!dc.pickingMode) {
+                if (drawInterior) {
+                    c = attributes.interiorColor;
+                    r = Math.round(c.red * 255), g = Math.round(c.green * 255), b = Math.round(c.blue * 255),
+                        a = c.alpha * this.layer.opacity;
+                    fillStyle = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
+                }
+                if (drawOutline) {
+                    c = attributes.outlineColor;
+                    r = Math.round(c.red * 255), g = Math.round(c.green * 255), b = Math.round(c.blue * 255),
+                        a = c.alpha * this.layer.opacity;
+                    strokeStyle = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
+                }
+            } else {
+                if (!this.pickColor) {
+                    this.pickColor = dc.uniquePickColor();
+                }
+                pickColor = this.pickColor.toHexString();
             }
 
             if (this.crossesAntiMeridian || this.containsPole) {
                 if (drawInterior) {
                     this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
-                    ctx2D.fillStyle = dc.pickingMode ? pickColor : attributes.interiorColor.toRGBAString();
+                    ctx2D.fillStyle = dc.pickingMode ? pickColor : fillStyle;
                     ctx2D.fill();
                 }
                 if (drawOutline) {
                     this.draw(this._outlineGeometry, ctx2D, xScale, yScale, dx, dy);
                     ctx2D.lineWidth = attributes.outlineWidth;
-                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
+                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : strokeStyle;
                     ctx2D.stroke();
                 }
             }
             else {
                 this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
                 if (drawInterior) {
-                    ctx2D.fillStyle = dc.pickingMode ? pickColor : attributes.interiorColor.toRGBAString();
+                    ctx2D.fillStyle = dc.pickingMode ? pickColor : fillStyle;
                     ctx2D.fill();
                 }
                 if (drawOutline) {
                     ctx2D.lineWidth = attributes.outlineWidth;
-                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
+                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : strokeStyle;
                     ctx2D.stroke();
                 }
             }
