@@ -244,7 +244,7 @@ define([
                 return tile.extent.intersectsFrustum(dc.pickFrustum);
             }
 
-            return tile.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.frustumInModelCoordinates);
         };
 
         // Internal. Intentionally not documented.

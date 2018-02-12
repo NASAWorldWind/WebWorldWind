@@ -27,9 +27,9 @@ define([
         '../shaders/GpuProgram',
         '../cache/GpuResourceCache',
         '../layer/Layer',
+        '../geom/Line',
         '../util/Logger',
         '../geom/Matrix',
-        '../navigate/NavigatorState',
         '../pick/PickedObjectList',
         '../geom/Plane',
         '../geom/Position',
@@ -39,7 +39,7 @@ define([
         '../shapes/SurfaceShape',
         '../shapes/SurfaceShapeTileBuilder',
         '../render/SurfaceTileRenderer',
-        '../render/TextSupport',
+        '../render/TextRenderer',
         '../geom/Vec2',
         '../geom/Vec3',
         '../util/WWMath'
@@ -54,9 +54,9 @@ define([
               GpuProgram,
               GpuResourceCache,
               Layer,
+              Line,
               Logger,
               Matrix,
-              NavigatorState,
               PickedObjectList,
               Plane,
               Position,
@@ -66,7 +66,7 @@ define([
               SurfaceShape,
               SurfaceShapeTileBuilder,
               SurfaceTileRenderer,
-              TextSupport,
+              TextRenderer,
               Vec2,
               Vec3,
               WWMath) {
@@ -145,10 +145,10 @@ define([
             this.screenCreditController = new ScreenCreditController();
 
             /**
-             * A shared TextSupport instance.
-             * @type {TextSupport}
+             * A shared TextRenderer instance.
+             * @type {TextRenderer}
              */
-            this.textSupport = new TextSupport();
+            this.textRenderer = new TextRenderer(this);
 
             /**
              * The current WebGL framebuffer. Null indicates that the default WebGL framebuffer is active.
@@ -179,12 +179,6 @@ define([
              * @type {Array}
              */
             this.orderedRenderables = [];
-
-            /**
-             * The list of screen renderables.
-             * @type {Array}
-             */
-            this.screeRenderables = [];
 
             // Internal. Intentionally not documented. Provides ordinal IDs to ordered renderables.
             this.orderedRenderablesCounter = 0; // Number
@@ -241,16 +235,17 @@ define([
             this.currentLayer = null;
 
             /**
-             * The current state of the associated navigator.
-             * @type {NavigatorState}
-             */
-            this.navigatorState = null;
-
-            /**
              * The current eye position.
              * @type {Position}
              */
             this.eyePosition = new Position(0, 0, 0);
+
+            /**
+             * The eye point in model coordinates, relative to the globe's center.
+             * @type {Vec3}
+             * @readonly
+             */
+            this.eyePoint = new Vec3(0, 0, 0);
 
             /**
              * The current screen projection matrix.
@@ -329,6 +324,12 @@ define([
             this.pickPoint = null;
 
             /**
+             * The current pick ray originating at the eyePoint and extending through the pick point.
+             * @type {Line}
+             */
+            this.pickRay = null;
+
+            /**
              * The current pick rectangle, in WebGL (lower-left origin) screen coordinates.
              * @type {Rectangle}
              */
@@ -360,6 +361,63 @@ define([
 
             // Intentionally not documented.
             this.pixelScale = 1;
+
+            // TODO: replace with camera in the next phase of navigator refactoring
+            this.navigator = null;
+
+            /**
+             * The model-view matrix. The model-view matrix transforms points from model coordinates to eye
+             * coordinates.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.modelview = Matrix.fromIdentity();
+
+            /**
+             * The projection matrix. The projection matrix transforms points from eye coordinates to clip
+             * coordinates.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.projection = Matrix.fromIdentity();
+
+            /**
+             * The concatenation of the DrawContext's model-view and projection matrices. This matrix transforms points
+             * from model coordinates to clip coordinates.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.modelviewProjection = Matrix.fromIdentity();
+
+            /**
+             * The viewing frustum in model coordinates. The frustum originates at the eyePoint and extends
+             * outward along the forward vector. The near distance and far distance identify the minimum and
+             * maximum distance, respectively, at which an object in the scene is visible.
+             * @type {Frustum}
+             * @readonly
+             */
+            this.frustumInModelCoordinates = null;
+
+            /**
+             * The matrix that transforms normal vectors in model coordinates to normal vectors in eye coordinates.
+             * Typically used to transform a shape's normal vectors during lighting calculations.
+             * @type {Matrix}
+             * @readonly
+             */
+            this.modelviewNormalTransform = Matrix.fromIdentity();
+
+            /**
+             * The current viewport.
+             * @type {Rectangle}
+             * @readonly
+             */
+            this.viewport = new Rectangle(0, 0, 0, 0);
+
+            // Intentionally not documented.
+            this.pixelSizeFactor = 0;
+
+            // Intentionally not documented.
+            this.pixelSizeOffset = 0;
         };
 
         // Internal use. Intentionally not documented.
@@ -392,7 +450,6 @@ define([
             this.globeStateKey = null;
             this.layers = null;
             this.currentLayer = null;
-            this.navigatorState = null;
             this.terrain = null;
             this.verticalExaggeration = 1;
             this.frameStatistics = null;
@@ -404,10 +461,18 @@ define([
             this.deepPicking = false;
             this.regionPicking = false;
             this.pickPoint = null;
+            this.pickRay = null;
             this.pickRectangle = null;
             this.pickFrustum = null;
             this.pickColor = new Color(0, 0, 0, 1);
             this.objectsAtPickPoint.clear();
+
+            this.eyePoint.set(0, 0, 0);
+            this.modelview.setToIdentity();
+            this.projection.setToIdentity();
+            this.modelviewProjection.setToIdentity();
+            this.frustumInModelCoordinates = null;
+            this.modelviewNormalTransform.setToIdentity();
         };
 
         /**
@@ -416,7 +481,7 @@ define([
          */
         DrawContext.prototype.update = function () {
             var gl = this.currentGlContext,
-                eyePoint = this.navigatorState.eyePoint;
+                eyePoint = this.eyePoint;
 
             this.globeStateKey = this.globe.stateKey;
             this.globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], this.eyePosition);
@@ -692,7 +757,7 @@ define([
          * @returns {Color} The color at the pick point.
          */
         DrawContext.prototype.readPickColor = function (pickPoint) {
-            var glPickPoint = this.navigatorState.convertPointToViewport(pickPoint, new Vec2(0, 0)),
+            var glPickPoint = this.convertPointToViewport(pickPoint, new Vec2(0, 0)),
                 colorBytes = new Uint8Array(4);
 
             this.currentGlContext.readPixels(glPickPoint[0], glPickPoint[1], 1, 1, this.currentGlContext.RGBA,
@@ -825,11 +890,11 @@ define([
                 screenPoint = new Vec3(0, 0, 0),
                 pickPoint,
                 pickRectangle = this.pickRectangle,
-                viewport = this.navigatorState.viewport;
+                viewport = this.viewport;
 
             // Compute the pick rectangle if necessary.
             if (!pickRectangle) {
-                pickPoint = this.navigatorState.convertPointToViewport(this.pickPoint, new Vec2(0, 0));
+                pickPoint = this.convertPointToViewport(this.pickPoint, new Vec2(0, 0));
                 pickRectangle = new Rectangle(
                     pickPoint[0] - apertureRadius,
                     pickPoint[1] - apertureRadius,
@@ -855,46 +920,48 @@ define([
             this.pickRectangle = pickRectangle;
 
             // Compute the pick frustum.
+            var modelviewProjectionInv = Matrix.fromIdentity();
+            modelviewProjectionInv.invertMatrix(this.modelviewProjection);
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.navigatorState.unProject(screenPoint, lln = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, lln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.navigatorState.unProject(screenPoint, llf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, llf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 0;
-            this.navigatorState.unProject(screenPoint, lrn = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, lrn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y;
             screenPoint[2] = 1;
-            this.navigatorState.unProject(screenPoint, lrf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, lrf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.navigatorState.unProject(screenPoint, uln = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, uln = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.navigatorState.unProject(screenPoint, ulf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, ulf = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 0;
-            this.navigatorState.unProject(screenPoint, urn = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, urn = new Vec3(0, 0, 0));
 
             screenPoint[0] = pickRectangle.x + pickRectangle.width;
             screenPoint[1] = pickRectangle.y + pickRectangle.height;
             screenPoint[2] = 1;
-            this.navigatorState.unProject(screenPoint, urf = new Vec3(0, 0, 0));
+            modelviewProjectionInv.unProject(screenPoint, viewport, urf = new Vec3(0, 0, 0));
 
             va = new Vec3(ulf[0] - lln[0], ulf[1] - lln[1], ulf[2] - lln[2]);
             vb.set(uln[0] - llf[0], uln[1] - llf[1], uln[2] - llf[2]);
@@ -949,8 +1016,8 @@ define([
                 return false;
             }
 
-            var distance = this.navigatorState.eyePoint.distanceTo(extent.center),
-                pixelSize = this.navigatorState.pixelSizeAtDistance(distance);
+            var distance = this.eyePoint.distanceTo(extent.center),
+                pixelSize = this.pixelSizeAtDistance(distance);
 
             return (2 * extent.radius) < (numPixels * pixelSize); // extent diameter less than size of num pixels
         };
@@ -1218,6 +1285,263 @@ define([
             }
 
             return result;
+        };
+
+        /**
+         * Transforms the specified model point from model coordinates to WebGL screen coordinates.
+         * <p>
+         * The resultant screen point is in WebGL screen coordinates, with the origin in the bottom-left corner and
+         * axes that extend up and to the right from the origin.
+         * <p>
+         * This function stores the transformed point in the result argument, and returns true or false to indicate
+         * whether or not the transformation is successful. It returns false if the modelview or
+         * projection matrices are malformed, or if the specified model point is clipped by the near clipping plane or
+         * the far clipping plane.
+         *
+         * @param {Vec3} modelPoint The model coordinate point to project.
+         * @param {Vec3} result A pre-allocated vector in which to return the projected point.
+         * @returns {boolean} true if the transformation is successful, otherwise false.
+         * @throws {ArgumentError} If either the specified point or result argument is null or undefined.
+         */
+        DrawContext.prototype.project = function (modelPoint, result) {
+            if (!modelPoint) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "project",
+                    "missingPoint"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "project",
+                    "missingResult"));
+            }
+
+            // Transform the model point from model coordinates to eye coordinates then to clip coordinates. This
+            // inverts the Z axis and stores the negative of the eye coordinate Z value in the W coordinate.
+            var mx = modelPoint[0],
+                my = modelPoint[1],
+                mz = modelPoint[2],
+                m = this.modelviewProjection,
+                x = m[0] * mx + m[1] * my + m[2] * mz + m[3],
+                y = m[4] * mx + m[5] * my + m[6] * mz + m[7],
+                z = m[8] * mx + m[9] * my + m[10] * mz + m[11],
+                w = m[12] * mx + m[13] * my + m[14] * mz + m[15];
+
+            if (w === 0) {
+                return false;
+            }
+
+            // Complete the conversion from model coordinates to clip coordinates by dividing by W. The resultant X, Y
+            // and Z coordinates are in the range [-1,1].
+            x /= w;
+            y /= w;
+            z /= w;
+
+            // Clip the point against the near and far clip planes.
+            if (z < -1 || z > 1) {
+                return false;
+            }
+
+            // Convert the point from clip coordinate to the range [0,1]. This enables the X and Y coordinates to be
+            // converted to screen coordinates, and the Z coordinate to represent a depth value in the range[0,1].
+            x = x * 0.5 + 0.5;
+            y = y * 0.5 + 0.5;
+            z = z * 0.5 + 0.5;
+
+            // Convert the X and Y coordinates from the range [0,1] to screen coordinates.
+            x = x * this.viewport.width + this.viewport.x;
+            y = y * this.viewport.height + this.viewport.y;
+
+            result[0] = x;
+            result[1] = y;
+            result[2] = z;
+
+            return true;
+        };
+
+        /**
+         * Transforms the specified model point from model coordinates to WebGL screen coordinates, applying an offset
+         * to the modelPoint's projected depth value.
+         * <p>
+         * The resultant screen point is in WebGL screen coordinates, with the origin in the bottom-left corner and axes
+         * that extend up and to the right from the origin.
+         * <p>
+         * This function stores the transformed point in the result argument, and returns true or false to indicate whether or
+         * not the transformation is successful. It returns false if the modelview or projection
+         * matrices are malformed, or if the modelPoint is clipped by the near clipping plane or the far clipping plane,
+         * ignoring the depth offset.
+         * <p>
+         * The depth offset may be any real number and is typically used to move the screenPoint slightly closer to the
+         * user's eye in order to give it visual priority over nearby objects or terrain. An offset of zero has no effect.
+         * An offset less than zero brings the screenPoint closer to the eye, while an offset greater than zero pushes the
+         * projected screen point away from the eye.
+         * <p>
+         * Applying a non-zero depth offset has no effect on whether the model point is clipped by this method or by
+         * WebGL. Clipping is performed on the original model point, ignoring the depth offset. The final depth value
+         * after applying the offset is clamped to the range [0,1].
+         *
+         * @param {Vec3} modelPoint The model coordinate point to project.
+         * @param {Number} depthOffset The amount of offset to apply.
+         * @param {Vec3} result A pre-allocated vector in which to return the projected point.
+         * @returns {boolean} true if the transformation is successful, otherwise false.
+         * @throws {ArgumentError} If either the specified point or result argument is null or undefined.
+         */
+        DrawContext.prototype.projectWithDepth = function (modelPoint, depthOffset, result) {
+            if (!modelPoint) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "projectWithDepth",
+                    "missingPoint"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "projectWithDepth",
+                    "missingResult"));
+            }
+
+            // Transform the model point from model coordinates to eye coordinates. The eye coordinate and the clip
+            // coordinate are transformed separately in order to reuse the eye coordinate below.
+            var mx = modelPoint[0],
+                my = modelPoint[1],
+                mz = modelPoint[2],
+                m = this.modelview,
+                ex = m[0] * mx + m[1] * my + m[2] * mz + m[3],
+                ey = m[4] * mx + m[5] * my + m[6] * mz + m[7],
+                ez = m[8] * mx + m[9] * my + m[10] * mz + m[11],
+                ew = m[12] * mx + m[13] * my + m[14] * mz + m[15];
+
+            // Transform the point from eye coordinates to clip coordinates.
+            var p = this.projection,
+                x = p[0] * ex + p[1] * ey + p[2] * ez + p[3] * ew,
+                y = p[4] * ex + p[5] * ey + p[6] * ez + p[7] * ew,
+                z = p[8] * ex + p[9] * ey + p[10] * ez + p[11] * ew,
+                w = p[12] * ex + p[13] * ey + p[14] * ez + p[15] * ew;
+
+            if (w === 0) {
+                return false;
+            }
+
+            // Complete the conversion from model coordinates to clip coordinates by dividing by W. The resultant X, Y
+            // and Z coordinates are in the range [-1,1].
+            x /= w;
+            y /= w;
+            z /= w;
+
+            // Clip the point against the near and far clip planes.
+            if (z < -1 || z > 1) {
+                return false;
+            }
+
+            // Transform the Z eye coordinate to clip coordinates again, this time applying a depth offset. The depth
+            // offset is applied only to the matrix element affecting the projected Z coordinate, so we inline the
+            // computation here instead of re-computing X, Y, Z and W in order to improve performance. See
+            // Matrix.offsetProjectionDepth for more information on the effect of this offset.
+            z = p[8] * ex + p[9] * ey + p[10] * ez * (1 + depthOffset) + p[11] * ew;
+            z /= w;
+
+            // Clamp the point to the near and far clip planes. We know the point's original Z value is contained within
+            // the clip planes, so we limit its offset z value to the range [-1, 1] in order to ensure it is not clipped
+            // by WebGL. In clip coordinates the near and far clip planes are perpendicular to the Z axis and are
+            // located at -1 and 1, respectively.
+            z = WWMath.clamp(z, -1, 1);
+
+            // Convert the point from clip coordinates to the range [0, 1]. This enables the XY coordinates to be
+            // converted to screen coordinates, and the Z coordinate to represent a depth value in the range [0, 1].
+            x = x * 0.5 + 0.5;
+            y = y * 0.5 + 0.5;
+            z = z * 0.5 + 0.5;
+
+            // Convert the X and Y coordinates from the range [0,1] to screen coordinates.
+            x = x * this.viewport.width + this.viewport.x;
+            y = y * this.viewport.height + this.viewport.y;
+
+            result[0] = x;
+            result[1] = y;
+            result[2] = z;
+
+            return true;
+        };
+
+        /**
+         * Converts a window-coordinate point to WebGL screen coordinates.
+         * <p>
+         * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
+         * in the top-left corner and axes that extend down and to the right from the origin point.
+         * <p>
+         * The returned point is in WebGL screen coordinates, with the origin in the bottom-left corner and axes that
+         * extend up and to the right from the origin point.
+         *
+         * @param {Vec2} point The window-coordinate point to convert.
+         * @param {Vec2} result A pre-allocated {@link Vec2} in which to return the computed point.
+         * @returns {Vec2} The specified result argument set to the computed point.
+         * @throws {ArgumentError} If either argument is null or undefined.
+         */
+        DrawContext.prototype.convertPointToViewport = function (point, result) {
+            if (!point) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "convertPointToViewport",
+                    "missingPoint"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "convertPointToViewport",
+                    "missingResult"));
+            }
+
+            result[0] = point[0];
+            result[1] = this.viewport.height - point[1];
+
+            return result;
+        };
+
+        /**
+         * Computes the approximate size of a pixel at a specified distance from the eye point.
+         * <p>
+         * This method assumes rectangular pixels, where pixel coordinates denote
+         * infinitely thin spaces between pixels. The units of the returned size are in model coordinates per pixel
+         * (usually meters per pixel). This returns 0 if the specified distance is zero. The returned size is undefined
+         * if the distance is less than zero.
+         *
+         * @param {Number} distance The distance from the eye point at which to determine pixel size, in model
+         * coordinates.
+         * @returns {Number} The approximate pixel size at the specified distance from the eye point, in model
+         * coordinates per pixel.
+         */
+        DrawContext.prototype.pixelSizeAtDistance = function (distance) {
+            // Compute the pixel size from the width of a rectangle carved out of the frustum in model coordinates at
+            // the specified distance along the -Z axis and the viewport width in screen coordinates. The pixel size is
+            // expressed in model coordinates per screen coordinate (e.g. meters per pixel).
+            //
+            // The frustum width is determined by noticing that the frustum size is a linear function of distance from
+            // the eye point. The linear equation constants are determined during initialization, then solved for
+            // distance here.
+            //
+            // This considers only the frustum width by assuming that the frustum and viewport share the same aspect
+            // ratio, so that using either the frustum width or height results in the same pixel size.
+
+            return this.pixelSizeFactor * distance + this.pixelSizeOffset;
+        };
+
+        /**
+         * Propagates the values contained in a TextAttributes object to the currently attached TextRenderer
+         * {@link TextRenderer} as to provide format to a string of text. The TextRenderer then produces a
+         * 2D Texture with the aforementioned text and format to be used as a label for a Text {@link Text}
+         * subclass (<i>e.g.</i> Annotation {@link Annotation} or Placemark {@link Placemark}).
+         * @param {String} text The string of text that will be given color, font, and outline
+         * and which the resulting texture will be based on.
+         * @param {TextAttributes} textAttributes Attributes that will be applied to the string.
+         * See TextAttributes {@link TextAttributes}.
+         * @returns {Texture} A texture {@link Texture} with the specified text string, typeface, colors, and outline.
+         */
+        DrawContext.prototype.renderText = function (text, textAttributes) {
+
+            var texture = null;
+
+            if (text != null && textAttributes != null) {
+                this.textRenderer.textColor = textAttributes.color;
+                this.textRenderer.typeFace = textAttributes.font;
+                this.textRenderer.enableOutline = textAttributes.enableOutline;
+                this.textRenderer.outlineColor = textAttributes.outlineColor;
+                this.textRenderer.outlineWidth = textAttributes.outlineWidth;
+                texture = this.textRenderer.renderText(text);
+            }
+
+            return texture;
         };
 
         return DrawContext;

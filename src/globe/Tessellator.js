@@ -27,7 +27,6 @@ define([
         '../util/Logger',
         '../geom/Matrix',
         '../cache/MemoryCache',
-        '../navigate/NavigatorState',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
         '../geom/Position',
@@ -50,7 +49,6 @@ define([
               Logger,
               Matrix,
               MemoryCache,
-              NavigatorState,
               NotYetImplementedError,
               PickedObject,
               Position,
@@ -108,7 +106,7 @@ define([
             this.tileCache = new MemoryCache(5000000, 4000000); // Holds 316 32x32 tiles.
 
             this.elevationTimestamp = undefined;
-            this.lastModelViewProjection = undefined;
+            this.lastModelViewProjection = Matrix.fromIdentity();
 
             this.vertexPointLocation = -1;
             this.vertexTexCoordLocation = -1;
@@ -185,15 +183,12 @@ define([
             if (this.lastGlobeStateKey === dc.globeStateKey
                 && this.lastVerticalExaggeration === dc.verticalExaggeration
                 && this.elevationTimestamp === lastElevationsChange
-                && this.lastModelViewProjection
-                && dc.navigatorState.modelviewProjection.equals(this.lastModelViewProjection)) {
+                && dc.modelviewProjection.equals(this.lastModelViewProjection)) {
 
                 return this.lastTerrain;
             }
 
-            var navigatorState = dc.navigatorState;
-
-            this.lastModelViewProjection = navigatorState.modelviewProjection;
+            this.lastModelViewProjection.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
             this.elevationTimestamp = lastElevationsChange;
             this.lastVerticalExaggeration = dc.verticalExaggeration;
@@ -317,7 +312,7 @@ define([
             var gl = dc.currentGlContext,
                 gpuResourceCache = dc.gpuResourceCache;
 
-            this.scratchMatrix.setToMultiply(dc.navigatorState.modelviewProjection, terrainTile.transformationMatrix);
+            this.scratchMatrix.setToMultiply(dc.modelviewProjection, terrainTile.transformationMatrix);
             dc.currentProgram.loadModelviewProjection(gl, this.scratchMatrix);
 
             var vboCacheKey = dc.globeStateKey + terrainTile.tileKey,
@@ -559,8 +554,9 @@ define([
             // Determine the terrain position at the pick point. If the terrain is picked, add a corresponding picked
             // object to the draw context. Suppress this step in region picking mode.
             if (!dc.regionPicking) {
-                var ray = dc.navigatorState.rayFromScreenPoint(dc.pickPoint),
+                var ray = dc.pickRay.clone(), // Cloning the pick ray is necessary here due to the fact that Tesselator.computeIntersections modifies ray
                     point = this.computeNearestIntersection(ray, pickableTiles);
+
                 if (point) {
                     dc.globe.computePositionFromPoint(point[0], point[1], point[2], position);
                     position.altitude = dc.globe.elevationAtLocation(position.latitude, position.longitude);
@@ -944,7 +940,7 @@ define([
                 return false;
             }
 
-            return tile.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.frustumInModelCoordinates);
         };
 
         Tessellator.prototype.tileMeetsRenderCriteria = function (dc, tile) {

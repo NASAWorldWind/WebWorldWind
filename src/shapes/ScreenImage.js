@@ -258,8 +258,8 @@ define([
             h = this.activeTexture.imageHeight;
             s = this.imageScale;
             iOffset = this.imageOffset.offsetForSize(w, h);
-            ws = dc.navigatorState.viewport.width;
-            hs = dc.navigatorState.viewport.height;
+            ws = dc.viewport.width;
+            hs = dc.viewport.height;
             sOffset = this.screenOffset.offsetForSize(ws, hs);
 
             this.imageTransform.setTranslation(
@@ -283,7 +283,7 @@ define([
             if (dc.pickingMode) {
                 return dc.pickRectangle && (this.imageBounds.intersects(dc.pickRectangle));
             } else {
-                return this.imageBounds.intersects(dc.navigatorState.viewport);
+                return this.imageBounds.intersects(dc.viewport);
             }
         };
 
