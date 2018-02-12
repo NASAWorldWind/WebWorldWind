@@ -36,7 +36,7 @@ define([
          * in which case the new instance contains default attributes.
          */
         var TextAttributes = function (attributes) {
-            this._color = attributes ? attributes._color : new Color(1, 1, 1, 1);
+            this._color = attributes ? attributes._color.clone() : Color.WHITE.clone();
             this._font = attributes ? attributes._font : new Font(14);
             this._offset = attributes ? attributes._offset
                 : new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
