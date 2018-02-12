@@ -27,7 +27,6 @@ requirejs(['./WorldWindShim',
          */
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
@@ -51,9 +50,6 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(renderableLayer);
             wwd.redraw();
         });
-
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
 
         // Now set up to handle highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
