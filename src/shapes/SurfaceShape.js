@@ -962,13 +962,13 @@ define([
             if (!dc.pickingMode) {
                 if (drawInterior) {
                     c = attributes.interiorColor;
-                    r = Math.round(c.red * 255), g = Math.round(c.green * 255), b = Math.round(c.blue * 255),
+                    r = Math.floor(c.red * 255), g = Math.floor(c.green * 255), b = Math.floor(c.blue * 255),
                         a = c.alpha * this.layer.opacity;
                     fillStyle = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
                 }
                 if (drawOutline) {
                     c = attributes.outlineColor;
-                    r = Math.round(c.red * 255), g = Math.round(c.green * 255), b = Math.round(c.blue * 255),
+                    r = Math.floor(c.red * 255), g = Math.floor(c.green * 255), b = Math.floor(c.blue * 255),
                         a = c.alpha * this.layer.opacity;
                     strokeStyle = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
                 }
@@ -976,7 +976,7 @@ define([
                 if (!this.pickColor) {
                     this.pickColor = dc.uniquePickColor();
                 }
-                pickColor = this.pickColor.toHexString();
+                pickColor = this.pickColor.toRGBAString();
             }
 
             if (this.crossesAntiMeridian || this.containsPole) {
