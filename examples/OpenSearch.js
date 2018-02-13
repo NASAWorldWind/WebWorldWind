@@ -45,12 +45,12 @@ requirejs([
             .then(function (service) {
 
                 //Only interested in collection urls that return an atom response
-                var url = service.descriptionDocument.urls.filter(function (url) {
+                var url = service.findUrl(function(url) {
                     return (
                         url.relations.indexOf('collection') >= 0 &&
                         url.type === 'application/atom+xml'
                     );
-                })[0];
+                });
                 console.log('collection url parameters', url.parameters);
 
                 var searchParams = [
@@ -75,12 +75,12 @@ requirejs([
                 console.log('search urls', layer.descriptionDocument.urls);
 
                 //Only interested in urls that contain results and return an atom response.
-                var url = layer.descriptionDocument.urls.filter(function (url) {
+                var url = layer.findUrl(function(url) {
                     return (
                         url.relations.indexOf('results') >= 0 &&
                         url.type === 'application/atom+xml'
                     );
-                })[0];
+                });
                 console.log('url', url);
                 console.log('searchParams', url.parameters);
 

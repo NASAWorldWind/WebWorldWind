@@ -186,6 +186,22 @@ define([
         };
 
         /**
+         * Finds an OpenSearchUrl that satisfies the provided testing function.
+         *
+         * @param {Function} predicate Function to execute on each value in the description document urls array,
+         * taking three arguments:
+         * element The current element being processed in the array.
+         * index The index of the current element being processed in the array.
+         * array The array find was called upon.
+         * @param {Object|null} context Object to use as "this" when executing the predicate function.
+         * @return {OpenSearchUrl|undefined} the first OpenSearchUrl in the array that satisfies the provided testing
+         * function. Otherwise undefined is returned.
+         */
+        OpenSearchService.prototype.findUrl = function(predicate, context) {
+            return OpenSearchUtils.arrayFind(this._descriptionDocument.urls, predicate, context);
+        };
+
+        /**
          * Registers a parser to be used for the specified mime type and relation
          *
          * @param {String} type Mime type for the registered parser
