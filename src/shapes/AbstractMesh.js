@@ -353,12 +353,10 @@ define([
                 }
 
                 color = this.activeAttributes.interiorColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
-
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(opacity >= 1 || dc.pickingMode);
+                gl.depthMask(opacity >= 1 || dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
                 if (hasTexture && (!dc.pickingMode || !this.pickTransparentImagePixels)) {
                     this.activeTexture = dc.gpuResourceCache.resourceForKey(this.activeAttributes.imageSource);
@@ -459,7 +457,7 @@ define([
                 // semi-transparent.
                 gl.depthMask(opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 

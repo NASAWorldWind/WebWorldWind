@@ -451,7 +451,7 @@ define([
                 this.pickColor = dc.uniquePickColor();
             }
 
-            program.loadOpacity(gl, this.attributes.opacity);
+            program.loadOpacity(gl, this.attributes.opacity * dc.currentLayer.opacity);
 
             // Attributes have changed. We need to track this because the callout vbo data may
             // have changed if scaled or text wrapping changes callout dimensions
