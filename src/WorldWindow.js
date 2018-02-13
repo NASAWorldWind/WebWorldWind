@@ -161,6 +161,11 @@ define([
              */
             this.navigator = new LookAtNavigator(this);
 
+            /**
+             * The camera used to view the globe.
+             * @type {Camera}
+             * @default [Camera]{@link Camera}
+             */
             this.camera = new Camera(this);
 
             /**

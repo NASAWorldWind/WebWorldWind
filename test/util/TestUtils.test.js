@@ -47,9 +47,19 @@ define([
             }
         };
 
-        TestUtils.expectMatrixCloseTo = function (matrix1, matrix2) {
+        TestUtils.expectMatrixEquality = function (matrix1, matrix2) {
             for (var i = 0; i < 16; i++) {
-                expect(matrix1[i]).toBeCloseTo(matrix2[i], 3);
+                expect(matrix1[i]).toEqual(matrix2[i]);
+            }
+        };
+
+        TestUtils.expectMatrixCloseTo = function (matrix1, matrix2, precision) {
+            if (precision === undefined) {
+                precision = 3;
+            }
+
+            for (var i = 0; i < 16; i++) {
+                expect(matrix1[i]).toBeCloseTo(matrix2[i], precision);
             }
         };
 
