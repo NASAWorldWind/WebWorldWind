@@ -963,7 +963,7 @@ define([
                 if (!this.pickColor) {
                     this.pickColor = dc.uniquePickColor();
                 }
-                ctx2D.fillStyle = this.pickColor.toHexString();
+                ctx2D.fillStyle = this.pickColor.toHexString(false);
                 ctx2D.strokeStyle = ctx2D.fillStyle;
                 ctx2D.lineWidth = attributes.outlineWidth;
             } else {
