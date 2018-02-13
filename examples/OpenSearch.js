@@ -32,8 +32,8 @@ requirejs([
 
         openSearchLayer.shapeConfigurationCallback = shapeConfigurationCallback;
         openSearchLayer.currentTimeInterval = [
-            new Date('2012-04-06T02:29:52.000Z'),
-            new Date('2012-04-07T03:29:52.000Z')
+            new Date('2013-03-06T00:00:00.000Z'),
+            new Date('2013-03-12T00:00:00.000Z')
         ];
 
         /*** Using the OpenSearchService to do a two step search search ***/
@@ -54,8 +54,7 @@ requirejs([
                 console.log('collection url parameters', url.parameters);
 
                 var searchParams = [
-                    {name: 'parentIdentifier', value: 'EOP:ESA:GPOD-EO'},
-                    {name: 'query', value: 'MERIS'}
+                    {name: 'platform', value: 'smos'}
                 ];
                 var collectionResults = service.search(searchParams, {relation: 'collection'});
                 return collectionResults;
@@ -63,7 +62,7 @@ requirejs([
             .then(function (geoJSONCollection) {
                 console.log('collection results', geoJSONCollection);
 
-                var feature = geoJSONCollection.features[0];
+                var feature = geoJSONCollection.features[1];
 
                 var productSearchUrl = feature.links.search[0].href;
                 console.log('search link', feature.links.search[0]);
@@ -86,7 +85,7 @@ requirejs([
                 console.log('searchParams', url.parameters);
 
                 var searchParams = [
-                    {name: 'maximumRecords', value: 10}
+                    {name: 'productType', value: '{MIR_SCLF1C,MIR_SCSF1C,MIR_SCLD1C,MIR_SCSD1C}'}
                 ];
                 var geoJSONProducts = layer.search(searchParams);
                 return geoJSONProducts;
