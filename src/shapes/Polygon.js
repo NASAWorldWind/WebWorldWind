@@ -532,7 +532,7 @@ define([
                 hasCapTexture = !!this.hasCapTexture(),
                 applyLighting = this.activeAttributes.applyLighting,
                 numCapVertices = currentData.capTriangles.length / (hasCapTexture ? 5 : 3),
-                vboId, opacity, color, stride, textureBound, capBuffer;
+                vboId, color, stride, textureBound, capBuffer;
 
             // Assume no cap texture.
             program.loadTextureEnabled(gl, false);
@@ -559,7 +559,7 @@ define([
 
             color = this.activeAttributes.interiorColor;
             // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-            gl.depthMask(color.alpha >= 1 || dc.currentLayer.opacity >= 1 || dc.pickingMode);
+            gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? pickColor : color);
             program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
@@ -659,7 +659,7 @@ define([
 
             color = this.activeAttributes.interiorColor;
             // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-            gl.depthMask(color.alpha >= 1 || dc.currentLayer.opacity >= 1 || dc.pickingMode);
+            gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? pickColor : color);
             program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
@@ -864,7 +864,7 @@ define([
 
                 color = this.activeAttributes.outlineColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(color.alpha >= 1 || dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
                 program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 

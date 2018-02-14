@@ -511,7 +511,7 @@ define([
                 program = dc.currentProgram,
                 currentData = this.currentData,
                 numPoints = currentData.tessellatedPoints.length / 3,
-                vboId, opacity, color, pickColor, stride, nPts;
+                vboId, color, pickColor, stride, nPts;
 
             this.applyMvpMatrix(dc);
 
@@ -546,7 +546,7 @@ define([
             if (this.mustDrawInterior(dc)) {
                 color = this.activeAttributes.interiorColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(color.alpha >= 1 || dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
                 program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
@@ -563,7 +563,7 @@ define([
 
                 color = this.activeAttributes.outlineColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(color.alpha >= 1 || dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
                 program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 

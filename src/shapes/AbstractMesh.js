@@ -294,7 +294,7 @@ define([
                 program = dc.currentProgram,
                 currentData = this.currentData,
                 hasTexture = this.texCoords && !!this.activeAttributes.imageSource,
-                vboId, opacity, color, pickColor, textureBound;
+                vboId, color, pickColor, textureBound;
 
             if (dc.pickingMode) {
                 pickColor = dc.uniquePickColor();
@@ -354,7 +354,7 @@ define([
 
                 color = this.activeAttributes.interiorColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(opacity >= 1 || dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
                 program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
@@ -451,11 +451,9 @@ define([
                 this.applyMvpMatrixForOutline(dc);
 
                 color = this.activeAttributes.outlineColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
-
                 // Disable writing the shape's fragments to the depth buffer when the interior is
                 // semi-transparent.
-                gl.depthMask(opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
                 program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
