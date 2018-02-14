@@ -102,7 +102,7 @@ define([
             // Internal. Intentionally not documented.
             this.drawContext = new DrawContext(gl);
 
-            // Internal. Intentionally not documented. Must be initialized before the navigator is created.
+            // Internal. Intentionally not documented.
             this.eventListeners = {};
 
             // Internal. Intentionally not documented. Initially true in order to redraw at least once.
@@ -155,7 +155,8 @@ define([
             this.layers = [];
 
             /**
-             * The navigator used to manipulate the globe.
+             * The deprecated navigator that can be used to manipulate the globe. See the {@link Camera} and {@link LookAt}
+             * classes for replacement functionality.
              * @type {LookAtNavigator}
              * @default [LookAtNavigator]{@link LookAtNavigator}
              */
@@ -369,13 +370,7 @@ define([
          * arguments, see the W3C [EventTarget]{@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget}
          * documentation.
          *
-         * Registering event listeners using this function enables applications to prevent the WorldWindow's default
-         * navigation behavior. To prevent default navigation behavior, call the [Event]{@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event}'s
-         * preventDefault method from within an event listener for any events the navigator should not respond to.
-         *
-         * When an event occurs, this calls the registered event listeners in order of reverse registration. Since the
-         * WorldWindow registers its navigator event listeners first, application event listeners are called before
-         * navigator event listeners.
+         * When an event occurs, this calls the registered event listeners in order of reverse registration.
          *
          * @param type The event type to listen for.
          * @param listener The function to call when the event occurs.
@@ -689,7 +684,7 @@ define([
                     viewport = this.viewport;
 
                 // Set the far clip distance to the smallest value that does not clip the atmosphere.
-                // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+                // TODO adjust the clip plane distances based on the camera's orientation - shorter distances when the
                 // TODO horizon is not in view
                 // TODO parameterize the object altitude for horizon distance
                 var farDistance = eyeHorizon + atmosphereHorizon;
@@ -715,7 +710,7 @@ define([
                     nearDistance = 1;
                 }
 
-                // Compute the current projection matrix based on this navigator's perspective properties and the current
+                // Compute the current projection matrix based on this camera's perspective properties and the current
                 // WebGL viewport.
                 projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
             }
@@ -1425,10 +1420,10 @@ define([
         };
 
         /**
-         * Moves this WorldWindow's navigator to a specified location or position.
-         * @param {Location | Position} position The location or position to move the navigator to. If this
+         * Moves this WorldWindow's camera to a specified look at location or position.
+         * @param {Location | Position} position The location or position to move the look at to. If this
          * argument contains an "altitude" property, as {@link Position} does, the end point of the navigation is
-         * at the specified altitude. Otherwise the end point is at the current altitude of the navigator.
+         * at the specified altitude. Otherwise the end point is at the current altitude of the camera.
          *
          * This function uses this WorldWindow's {@link GoToAnimator} property to perform the move. That object's
          * properties can be specified by the application to modify its behavior during calls to this function.

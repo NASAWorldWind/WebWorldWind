@@ -15,6 +15,7 @@
  */
 define([
     'src/BasicWorldWindowController',
+    'src/Camera',
     'src/render/DrawContext',
     'src/globe/EarthElevationModel',
     'src/globe/Globe',
@@ -25,7 +26,7 @@ define([
     'src/geom/Position',
     'src/geom/Rectangle',
     'test/util/TestUtils.test'
-], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Globe2D, LookAt, Matrix, LookAtNavigator, Position, Rectangle, TestUtils) {
+], function (BasicWorldWindowController, Camera, DrawContext, EarthElevationModel, Globe, Globe2D, LookAt, Matrix, LookAtNavigator, Position, Rectangle, TestUtils) {
     "use strict";
 
     var wwd = TestUtils.getMockWwd();
@@ -43,11 +44,10 @@ define([
                 // camera.setFromLookAt(lookAt);
                 // console.log(camera.toString());
                 // console.log('+++');
-                for (var a=0; a<90; a++)
-                {
+                for (var a = 0; a < 90; a++) {
                     camera.getAsLookAt(lookAt);
                     console.log(lookAt.toString());
-                    lookAt.heading=a;
+                    lookAt.heading = a;
                     camera.setFromLookAt(lookAt);
                     console.log(camera.toString());
                     console.log('===');
@@ -122,6 +122,65 @@ define([
             //     expect(camera.tilt).toBeCloseTo(1.7970369431725128, 6);
             //     expect(camera.roll).toBeCloseTo(5, 6);
             // });
+        });
+
+        describe("Indicates whether the components of two cameras are equal", function () {
+
+            it("Equal cameras", function () {
+                var c1 = new Camera("test");
+                var c2 = new Camera("test");
+                expect(c1.equals(c2)).toBe(true);
+            });
+
+            it("Not equal cameras", function () {
+                var c1 = new Camera("test");
+                var c2 = new Camera("test");
+                c2.heading = c1.heading + 1;
+                expect(c1.equals(c2)).toBe(false);
+                c2.heading = c1.heading;
+                expect(c1.equals(c2)).toBe(true);
+                c2.tilt = c1.tilt + 1;
+                expect(c1.equals(c2)).toBe(false);
+                c2.tilt = c1.tilt;
+                expect(c1.equals(c2)).toBe(true);
+                c2.roll = c1.roll + 1;
+                expect(c1.equals(c2)).toBe(false);
+                c2.roll = c1.roll;
+                expect(c1.equals(c2)).toBe(true);
+                c2.position.latitude = c1.position.latitude + 1;
+                expect(c1.equals(c2)).toBe(false);
+                c2.position.latitude = c1.position.latitude;
+                expect(c1.equals(c2)).toBe(true);
+            });
+
+            it("Null comparison", function () {
+                var c1 = new Camera("test");
+                expect(c1.equals(null)).toBe(false);
+                expect(c1.equals(undefined)).toBe(false);
+            });
+        });
+
+        describe("Camera cloning and copying", function () {
+            it("Correctly copy cameras", function () {
+                var c1 = new Camera("test");
+                var c2 = new Camera("test");
+                c2.heading = c1.heading + 1;
+                c2.tilt = c1.tilt + 1;
+                c2.roll = c1.roll + 1;
+                c2.position.latitude = c1.position.latitude + 1;
+                c1.copy(c2);
+                expect(c1.equals(c2)).toBe(true);
+            });
+
+            it("Correctly clones cameras", function () {
+                var c1 = new Camera("test");
+                c1.heading = c1.heading + 1;
+                c1.tilt = c1.tilt + 1;
+                c1.roll = c1.roll + 1;
+                c1.position.latitude = c1.position.latitude + 1;
+                var c2 = c1.clone();
+                expect(c1.equals(c2)).toBe(true);
+            });
         });
     });
 });

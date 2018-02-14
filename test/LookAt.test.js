@@ -40,6 +40,65 @@ define([
                 TestUtils.expectMatrixCloseTo(result, expectedModelview);
             });
         });
+
+        describe("Indicates whether the components of two lookats are equal", function () {
+
+            it("Equal lookats", function () {
+                var l1 = new LookAt();
+                var l2 = new LookAt();
+                expect(l1.equals(l2)).toBe(true);
+            });
+
+            it("Not equal lookats", function () {
+                var l1 = new LookAt();
+                var l2 = new LookAt();
+                l2.heading = l1.heading + 1;
+                expect(l1.equals(l2)).toBe(false);
+                l2.heading = l1.heading;
+                expect(l1.equals(l2)).toBe(true);
+                l2.tilt = l1.tilt + 1;
+                expect(l1.equals(l2)).toBe(false);
+                l2.tilt = l1.tilt;
+                expect(l1.equals(l2)).toBe(true);
+                l2.roll = l1.roll + 1;
+                expect(l1.equals(l2)).toBe(false);
+                l2.roll = l1.roll;
+                expect(l1.equals(l2)).toBe(true);
+                l2.lookAtPosition.latitude = l1.lookAtPosition.latitude + 1;
+                expect(l1.equals(l2)).toBe(false);
+                l2.lookAtPosition.latitude = l1.lookAtPosition.latitude;
+                expect(l1.equals(l2)).toBe(true);
+            });
+
+            it("Null comparison", function () {
+                var l1 = new LookAt();
+                expect(l1.equals(null)).toBe(false);
+                expect(l1.equals(undefined)).toBe(false);
+            });
+        });
+
+        describe("LookAt cloning and copying", function () {
+            it("Correctly copy lookats", function () {
+                var l1 = new LookAt();
+                var l2 = new LookAt();
+                l2.heading = l1.heading + 1;
+                l2.tilt = l1.tilt + 1;
+                l2.roll = l1.roll + 1;
+                l2.lookAtPosition.latitude = l1.lookAtPosition.latitude + 1;
+                l1.copy(l2);
+                expect(l1.equals(l2)).toBe(true);
+            });
+
+            it("Correctly clones lookats", function () {
+                var l1 = new LookAt();
+                l1.heading = l1.heading + 1;
+                l1.tilt = l1.tilt + 1;
+                l1.roll = l1.roll + 1;
+                l1.lookAtPosition.latitude = l1.lookAtPosition.latitude + 1;
+                var l2 = l1.clone();
+                expect(l1.equals(l2)).toBe(true);
+            });
+        });
     });
 });
 

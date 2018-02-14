@@ -410,7 +410,7 @@ define([
         };
 
         /**
-         * Apply the current navigator's model-view-projection matrix.
+         * Apply the current camera's model-view-projection matrix.
          * @param {DrawContext} dc The current draw context.
          * @protected
          */
@@ -421,7 +421,7 @@ define([
         };
 
         /**
-         * Apply the current navigator's model-view-projection matrix with an offset to make this shape's outline
+         * Apply the current camera's model-view-projection matrix with an offset to make this shape's outline
          * stand out.
          * @param {DrawContext} dc The current draw context.
          * @protected

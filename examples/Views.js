@@ -166,4 +166,85 @@ requirejs(['./WorldWindShim',
             }
             updateControls(pos, view);
         }, 100);
+
+        var canyonCheckBox = document.getElementById('canyon');
+        var canyonInterval = 0;
+        canyonCheckBox.addEventListener('change', onCanyonCheckBoxClick, false);
+
+        var canyonStartPos=new WorldWind.Position(36.17,-112.04,3000);
+        var canyonTour=[];
+        canyonTour.push({position: canyonStartPos, heading: -100, tilt: 60});
+        canyonTour.push({position: new WorldWind.Position(36.10,-112.22,3000), heading: -100, tilt: 60});
+        function goToCanyonStartComplete() {
+            runCanyonSimulation();
+        }
+
+        var canyonFrames=120;
+        var canyonLatInc=(canyonEndPos.latitude-canyonStartPos.latitude)/canyonFrames;
+        var canyonLonInc=(canyonEndPos.longitude-canyonStartPos.longitude)/canyonFrames;
+        function onCanyonCheckBoxClick() {
+            if (this.checked) {
+                wwd.goTo(canyonStartPos,goToCanyonStartComplete);
+            }
+            else {
+                clearInterval(canyonInterval);
+                wwd.redraw();
+            }
+        }
+
+        function runCanyonSimulation() {
+            canyonInterval = setInterval(function () {
+                camera.tilt=60;
+                camera.heading=-110;
+                camera.position.latitude+=canyonLatInc;
+                camera.position.longitude+=canyonLonInc;
+                if ((canyonLatInc>0 && camera.position.latitude>canyonEndPos.latitude) ||
+                    (canyonLatInc<0 && camera.position.latitude<canyonEndPos.latitude)) {
+                    clearInterval(canyonInterval);
+                }
+                //wwd.goTo(canyonEndPos,null);
+                // camera.position.latitude = orbitStartPos.latitude;
+                // camera.position.longitude -= 0.1;
+                // camera.position.altitude = orbitStartPos.altitude;
+                //
+                // if (camera.position.longitude < -180) {
+                //     camera.position.longitude = 180;
+                // }
+
+                wwd.redraw();
+            }, 25);
+        }
+
+        var orbitCheckBox = document.getElementById('orbit');
+        var orbitInterval = 0;
+        orbitCheckBox.addEventListener('change', onOrbitCheckBoxClick, false);
+
+        function goToOrbitStartComplete() {
+            runOrbitSimulation();
+        }
+
+        var orbitStartPos=new WorldWind.Position(30,-70,5e6);
+        function onOrbitCheckBoxClick() {
+            if (this.checked) {
+                wwd.goTo(orbitStartPos,goToOrbitStartComplete);
+            }
+            else {
+                clearInterval(orbitInterval);
+                wwd.redraw();
+            }
+        }
+
+        function runOrbitSimulation() {
+            orbitInterval = setInterval(function () {
+                camera.position.latitude = orbitStartPos.latitude;
+                camera.position.longitude -= 0.1;
+                camera.position.altitude = orbitStartPos.altitude;
+
+                if (camera.position.longitude < -180) {
+                    camera.position.longitude = 180;
+                }
+
+                wwd.redraw();
+            }, 25);
+        }
     });
