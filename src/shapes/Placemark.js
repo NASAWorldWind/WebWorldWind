@@ -634,7 +634,7 @@ define([
                 }
             }
 
-            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity * this.currentVisibility);
 
             // Draw the leader line first so that the image and label have visual priority.
             if (this.mustDrawLeaderLine(dc)) {
