@@ -28,7 +28,7 @@ define(['../../geom/Location'], function(Location){
 
         /**
          * Arbitrary number representing the intensity of the source for this position.
-         * @type {Number} Arbitrary number
+         * @type {Number}
          */
         this.intensity = intensity;
     };

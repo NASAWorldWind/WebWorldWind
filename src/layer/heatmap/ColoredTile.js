@@ -51,7 +51,7 @@ define([
      *
      * @private
      * @param grad {Object}
-     * @return
+     * @return {Uint8ClampedArray} Array of the gradient data
      */
     ColoredTile.prototype.gradient = function (grad) {
         // create a 256x1 gradient that we'll use to turn a grayscale heatmap into a colored one
