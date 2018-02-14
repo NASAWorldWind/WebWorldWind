@@ -54,7 +54,7 @@ define([
     // For internal use only.
     KmlTreeVisibility.prototype.createControls = function (node) {
         var name = node.kmlName || node.id || WWUtil.guid();
-        var enabled = node.enabled || node.kmlVisibility === true;
+        var enabled = node.enabled && node.kmlVisibility === true;
 
         var controlsForSingleElement = document.createElement("div");
         var toggleVisibility = document.createElement("input");
