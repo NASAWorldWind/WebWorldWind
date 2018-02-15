@@ -27,8 +27,9 @@ define([
      *  layer. Default is ['blue', 'cyan', 'lime', 'yellow', 'red']
      * @param options.intervalType {IntervalType} Optional. Different types of approaches to handling the interval between min
      *  and max values. Default value is Continuous.
-     * @param options.radius {Number} Optional. It shoudl also be possible to provide a function. Radius of the point to
+     * @param options.radius {Number|Function} Optional. It is also possible to provide a function. Radius of the point to
      *  be representing the intensity location. Default value is 25. The size of the radius.
+     * @param options.blur {Number} Optional. Amount of pixels used for blur.
      * @param options.tile {Tile} Tile used to display the information.
      * @param options.incrementPerIntensity {Number} Increment per intensity.
      */
@@ -48,6 +49,8 @@ define([
 
         // It is necessary
         this._radius = options.radius || 25;
+
+        this._blur = options.blur || 10;
 
         this._tile = options.tile || ColoredTile;
 
@@ -146,6 +149,7 @@ define([
                 width: this.tileWidth + 2 * Math.ceil(0.1 * this.tileWidth),
                 height: this.tileHeight + 2 * Math.ceil(0.1 * this.tileHeight),
                 radius: radius,
+                blur: this._blur,
 
                 intensityGradient: this._gradient,
                 incrementPerIntensity: this._incrementPerIntensity

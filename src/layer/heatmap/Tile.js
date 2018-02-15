@@ -25,6 +25,7 @@ define([], function(){
      * @param options.width {Number} Width of the Canvas to be created in pixels.
      * @param options.height {Number} Height of the Canvas to be created in pixels.
      * @param options.radius {Number} Radius of the data point in pixels.
+     * @param options.blur {Number} Blur of the heatmap element in the pixels.
      * @param options.incrementPerIntensity {Number}
      */
     var Tile = function(data, options) {
@@ -37,6 +38,7 @@ define([], function(){
         this._height = options.height;
 
         this._radius = options.radius;
+        this._blur = options.blur;
 
         this._incrementPerIntensity = options.incrementPerIntensity;
     };
@@ -113,6 +115,9 @@ define([], function(){
             r2 = this._radius + this._radius;
 
         circle.width = circle.height = r2;
+
+        ctx.shadowBlur = this._blur;
+        ctx.shadowColor = 'black';
 
         ctx.beginPath();
         ctx.arc(this._radius, this._radius, this._radius, 0, Math.PI * 2, true);

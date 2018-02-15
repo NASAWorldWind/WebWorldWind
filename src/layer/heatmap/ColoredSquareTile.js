@@ -10,6 +10,9 @@ define(['./ColoredTile'], function(ColoredTile){
             ctx = shape.getContext('2d'),
             r2 = this._radius + this._radius;
 
+        ctx.shadowBlur = this._blur;
+        ctx.shadowColor = 'black';
+
         shape.width = shape.height = r2;
 
         ctx.fillRect(0, 0, r2, r2);
