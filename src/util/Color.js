@@ -318,7 +318,7 @@ define([
          * because some uses reject a four-component color specification.
          * @param {Boolean} isUsingAlpha Enable the use of an alpha component.
          * @returns {string} A color string suitable for CSS.
-         * @deprecated since version 0.10.0
+         * @deprecated since version 0.10.0, use toCSSString for valid CSS color strings
          */
         Color.prototype.toHexString = function(isUsingAlpha) {
             // Use Math.ceil() to get 0.75 to map to 0xc0. This is important if the display is dithering.
@@ -339,13 +339,13 @@ define([
         };
 
         /**
-         * Create a rgba color string that CSS can use.
+         * Create a rgba color string that conforms to CSS Module Level 3 specification.
          * @returns {string} A color string suitable for CSS.
          */
-        Color.prototype.toRGBAString = function () {
-            var red = Math.floor(this.red * 255),
-                green = Math.floor(this.green * 255),
-                blue = Math.floor(this.blue * 255);
+        Color.prototype.toCSSString = function () {
+            var red = Math.round(this.red * 255),
+                green = Math.round(this.green * 255),
+                blue = Math.round(this.blue * 255);
 
             return 'rgba(' + red + ' ,' + green + ' ,' + blue + ' ,' + this.alpha + ')';
         };
