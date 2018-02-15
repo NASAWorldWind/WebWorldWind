@@ -318,6 +318,7 @@ define([
          * because some uses reject a four-component color specification.
          * @param {Boolean} isUsingAlpha Enable the use of an alpha component.
          * @returns {string} A color string suitable for CSS.
+         * @deprecated since version 0.10.0
          */
         Color.prototype.toHexString = function(isUsingAlpha) {
             // Use Math.ceil() to get 0.75 to map to 0xc0. This is important if the display is dithering.
