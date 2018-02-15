@@ -15,10 +15,10 @@
  */
 
 requirejs([
-        '../src/WorldWind',
+        './WorldWindShim',
         './LayerManager'
     ],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -62,7 +62,9 @@ requirejs([
             .then(function (geoJSONCollection) {
                 console.log('collection results', geoJSONCollection);
 
-                var feature = geoJSONCollection.features[1];
+                var feature = geoJSONCollection.features.filter(function (feature) {
+                    return !!feature.links.search;
+                })[0];
 
                 var productSearchUrl = feature.links.search[0].href;
                 console.log('search link', feature.links.search[0]);
