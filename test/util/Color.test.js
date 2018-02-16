@@ -49,9 +49,6 @@ require([
                 while ((match = re.exec(cssString)) != null) {
                     bytes.push(match[0]);
                 }
-                for (var i = bytes.length; i < 4; i++) {
-                    bytes.push(0);
-                }
 
                 return bytes;
             };
