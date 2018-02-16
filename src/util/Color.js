@@ -222,7 +222,7 @@ define([
             return new Color(redByte / 255, greenByte / 255, blueByte / 255, alphaByte / 255);
         };
 
-        Color.colorFromHex = function(color) {
+        Color.colorFromHex = function (color) {
             var red = parseInt(color.substring(0, 2), 16);
             var green = parseInt(color.substring(2, 4), 16);
             var blue = parseInt(color.substring(4, 6), 16);
@@ -230,7 +230,7 @@ define([
             return Color.colorFromBytes(red, green, blue, alpha);
         };
 
-        Color.colorFromKmlHex = function(color) {
+        Color.colorFromKmlHex = function (color) {
             var alpha = parseInt(color.substring(0, 2), 16);
             var blue = parseInt(color.substring(2, 4), 16);
             var green = parseInt(color.substring(4, 6), 16);
@@ -320,7 +320,7 @@ define([
          * @returns {string} A color string suitable for CSS.
          * @deprecated since version 0.10.0, use toCssColorString for valid CSS color strings
          */
-        Color.prototype.toHexString = function(isUsingAlpha) {
+        Color.prototype.toHexString = function (isUsingAlpha) {
             // Use Math.ceil() to get 0.75 to map to 0xc0. This is important if the display is dithering.
             var redHex = Math.ceil(this.red * 255).toString(16),
                 greenHex = Math.ceil(this.green * 255).toString(16),
