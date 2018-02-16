@@ -29,5 +29,13 @@ require([
             var result = Color.colorFromHex("000000ff");
             expect(result.equals(new Color(0,0,0,1))).toBe(true);
         });
-    })
+    });
+
+    describe("Color-CssColorString", function() {
+        it("testCssColorStringConversionRounding", function() {
+            var r = 0.25, g = 0.07, b = 0.75, a = 0.5; // values which test the rounding scheme
+            var result = new Color(r, g, b, a).toCssColorString();
+            expect(result === "rgba(64, 18, 191, 0.5)");
+        });
+    });
 });
