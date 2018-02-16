@@ -33,25 +33,34 @@ require([
         it("should round to the same integer values", function () {
             var r = 0.25, g = 0.07, b = 0.75, a = 0.5; // values which test the rounding scheme
             var result = new Color(r, g, b, a).toCssColorString();
-            expect(result === "rgba(64, 18, 191, 0.5)");
+            expect(result === "rgba(64, 18, 191, 0.5)").toBe(true);
         });
 
         it("should convert from CSS String to the matching byte value", function () {
             var color = new Color(0, 0, 0, 1); // initial color to start testing (similar to DrawContext pickColor)
-            var re = /\d+(\.\d+)?/; // pattern to extract CSS color values from a string
+            var re = /\d+(\.\d+)?/g; // pattern to extract CSS color values from a string
             var tests = 256 * 256; // test two bands of unique pick colors
 
             // convert CSS Color string to byte array
             var cssStringToByte = function (cssString) {
                 // parse the integer values from the css string
-                return re.exec(cssString);
+                var bytes = [];
+                var match;
+                while ((match = re.exec(cssString)) != null) {
+                    bytes.push(match[0]);
+                }
+                for (var i = bytes.length; i < 4; i++) {
+                    bytes.push(0);
+                }
+
+                return bytes;
             };
 
             for (var i = 0; i < tests; i++) {
                 var startColor = color.nextColor().clone();
                 var colorBytes = cssStringToByte(startColor.toCssColorString());
-                var convertedColor = Color.colorFromBytes(colorBytes[0], colorBytes[1], colorBytes[2], colorBytes[3]);
-                expect(startColor.equals(convertedColor));
+                var convertedColor = Color.colorFromBytes(colorBytes[0], colorBytes[1], colorBytes[2], colorBytes[3] * 255);
+                expect(startColor.equals(convertedColor)).toBe(true);
             }
         });
     });

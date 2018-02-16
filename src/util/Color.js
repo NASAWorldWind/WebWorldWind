@@ -348,7 +348,7 @@ define([
                 blue = Math.round(this.blue * 255);
 
             // Per the CSS Color Module Level 3 specification, alpha is expressed as floating point value between 0 - 1
-            return 'rgba(' + red + ' ,' + green + ' ,' + blue + ' ,' + this.alpha + ')';
+            return 'rgba(' + red + ', ' + green + ', ' + blue + ', ' + this.alpha + ')';
         };
 
         return Color;
