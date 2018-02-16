@@ -963,14 +963,14 @@ define([
                 if (!this.pickColor) {
                     this.pickColor = dc.uniquePickColor();
                 }
-                ctx2D.fillStyle = this.pickColor.toCSSString();
+                ctx2D.fillStyle = this.pickColor.toCssColorString();
                 ctx2D.strokeStyle = ctx2D.fillStyle;
                 ctx2D.lineWidth = attributes.outlineWidth;
             } else {
                 var ic = attributes.interiorColor,
                     oc = attributes.outlineColor;
-                ctx2D.fillStyle = new Color(ic.red, ic.green, ic.blue, ic.alpha * this.layer.opacity).toCSSString();
-                ctx2D.strokeStyle = new Color(oc.red, oc.green, oc.blue, oc.alpha * this.layer.opacity).toCSSString();
+                ctx2D.fillStyle = new Color(ic.red, ic.green, ic.blue, ic.alpha * this.layer.opacity).toCssColorString();
+                ctx2D.strokeStyle = new Color(oc.red, oc.green, oc.blue, oc.alpha * this.layer.opacity).toCssColorString();
                 ctx2D.lineWidth = attributes.outlineWidth;
             }
 

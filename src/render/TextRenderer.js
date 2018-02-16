@@ -160,8 +160,8 @@ define([
             ctx2D.font = this.typeFace.fontString;
             ctx2D.textBaseline = "top";
             ctx2D.textAlign = this.typeFace.horizontalAlignment;
-            ctx2D.fillStyle = this.textColor.toCSSString();
-            ctx2D.strokeStyle = this.outlineColor.toCSSString();
+            ctx2D.fillStyle = this.textColor.toCssColorString();
+            ctx2D.strokeStyle = this.outlineColor.toCssColorString();
             ctx2D.lineWidth = this.outlineWidth;
             ctx2D.lineCap = "round";
             ctx2D.lineJoin = "round";
