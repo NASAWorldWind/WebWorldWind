@@ -38,12 +38,6 @@ define([
                 var camera = wwd.camera;
                 var lookAt = new LookAt();
                 camera.position = new Position(30, -110, 10000000);
-                // camera.getAsLookAt(lookAt);
-                // console.log(camera.toString());
-                // console.log(lookAt.toString());
-                // camera.setFromLookAt(lookAt);
-                // console.log(camera.toString());
-                // console.log('+++');
                 for (var a = 0; a < 90; a++) {
                     camera.getAsLookAt(lookAt);
                     console.log(lookAt.toString());
@@ -51,7 +45,6 @@ define([
                     camera.setFromLookAt(lookAt);
                     console.log(camera.toString());
                     console.log('===');
-                    // wwd.worldWindowController.applyLimits();
                 }
             });
             // it("Correctly calculates viewing matrix", function () {

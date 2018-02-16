@@ -38,6 +38,9 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
+        var atmosphereLayer = new WorldWind.AtmosphereLayer();
+        wwd.addLayer(atmosphereLayer);
+
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
         var selectedViewType = "Camera";
@@ -171,20 +174,52 @@ requirejs(['./WorldWindShim',
         var canyonInterval = 0;
         canyonCheckBox.addEventListener('change', onCanyonCheckBoxClick, false);
 
-        var canyonStartPos=new WorldWind.Position(36.17,-112.04,3000);
-        var canyonTour=[];
-        canyonTour.push({position: canyonStartPos, heading: -100, tilt: 60});
-        canyonTour.push({position: new WorldWind.Position(36.10,-112.22,3000), heading: -100, tilt: 60});
+        var canyonTour = [];
+        canyonTour.push({
+            position: new WorldWind.Position(36.17, -112.04, 2000),
+            heading: -150,
+            tilt: 70,
+            finished: false
+        });
+        canyonTour.push({
+            position: new WorldWind.Position(36.10, -112.10, 2000),
+            heading: 90,
+            tilt: 70,
+            finished: false
+        });
+        canyonTour.push({
+            position: new WorldWind.Position(36.10, -112.08, 2000),
+            heading: 120,
+            tilt: 70,
+            finished: false
+        });
+        canyonTour.push({
+            position: new WorldWind.Position(36.05, -111.98, 2000),
+            heading: 120,
+            tilt: 70,
+            finished: false
+        });
+
+        var canyonLatInc;
+        var canyonLonInc;
+        var headingInc;
+        var tiltInc;
+        var segmentStart = true;
+        var fromIndex = 0;
+        var toIndex = 1;
+        var fromNode = canyonTour[fromIndex];
+        var toNode = canyonTour[toIndex];
+        var traversalDir = 1, segHeading, segCompassHeading, headingSteps;
+
         function goToCanyonStartComplete() {
             runCanyonSimulation();
         }
 
-        var canyonFrames=120;
-        var canyonLatInc=(canyonEndPos.latitude-canyonStartPos.latitude)/canyonFrames;
-        var canyonLonInc=(canyonEndPos.longitude-canyonStartPos.longitude)/canyonFrames;
         function onCanyonCheckBoxClick() {
             if (this.checked) {
-                wwd.goTo(canyonStartPos,goToCanyonStartComplete);
+                wwd.goTo(fromNode.position, goToCanyonStartComplete);
+                // camera.position.copy(fromNode.position);
+                // goToCanyonStartComplete();
             }
             else {
                 clearInterval(canyonInterval);
@@ -194,23 +229,73 @@ requirejs(['./WorldWindShim',
 
         function runCanyonSimulation() {
             canyonInterval = setInterval(function () {
-                camera.tilt=60;
-                camera.heading=-110;
-                camera.position.latitude+=canyonLatInc;
-                camera.position.longitude+=canyonLonInc;
-                if ((canyonLatInc>0 && camera.position.latitude>canyonEndPos.latitude) ||
-                    (canyonLatInc<0 && camera.position.latitude<canyonEndPos.latitude)) {
-                    clearInterval(canyonInterval);
+                if (toNode.finished) {
+                    fromIndex = toIndex;
+                    toIndex += traversalDir;
+                    var reset = false;
+                    if (toIndex === canyonTour.length) {
+                        traversalDir = -1;
+                        reset = true;
+                    }
+                    else if (toIndex < 0) {
+                        traversalDir = 1;
+                        reset = true;
+                    }
+                    if (reset) {
+                        toIndex = fromIndex + traversalDir;
+                        for (var i = 0; i < canyonTour.length; i++) {
+                            canyonTour[i].finished = false;
+                        }
+                    }
+                    fromNode = canyonTour[fromIndex];
+                    toNode = canyonTour[toIndex];
+                    segmentStart = true;
                 }
-                //wwd.goTo(canyonEndPos,null);
-                // camera.position.latitude = orbitStartPos.latitude;
-                // camera.position.longitude -= 0.1;
-                // camera.position.altitude = orbitStartPos.altitude;
-                //
-                // if (camera.position.longitude < -180) {
-                //     camera.position.longitude = 180;
-                // }
 
+                var camCompassHeading;
+                if (segmentStart) {
+                    segmentStart = false;
+                    var radiansPerFrame = 0.001 / 480
+                    var numFrames = Math.ceil(WorldWind.Location.greatCircleDistance(fromNode.position, toNode.position) / radiansPerFrame);
+                    canyonLatInc = (toNode.position.latitude - fromNode.position.latitude) / numFrames;
+                    canyonLonInc = (toNode.position.longitude - fromNode.position.longitude) / numFrames;
+                    segHeading = traversalDir < 0 ? WorldWind.Angle.normalizedDegrees(toNode.heading + 180) : fromNode.heading;
+                    segCompassHeading = segHeading < 0 ? segHeading + 360 : segHeading;
+                    camCompassHeading = camera.heading < 0 ? camera.heading + 360 : camera.heading;
+                    var headingDiff = segCompassHeading - camCompassHeading;
+                    if (Math.abs(headingDiff) >= 180) {
+                        headingDiff = headingDiff < 0 ? headingDiff + 360 : headingDiff - 360;
+                    }
+                    var angleInc = 0.25;
+                    headingSteps = Math.floor(Math.abs(headingDiff) / angleInc);
+                    headingInc = Math.sign(headingDiff) * angleInc;
+                    tiltInc = Math.sign(fromNode.tilt - camera.tilt) * angleInc;
+                    camera.position.altitude = fromNode.position.altitude;
+                }
+                if (headingSteps > 0 || tiltInc !== 0) {
+                    camCompassHeading = camera.heading < 0 ? camera.heading + 360 : camera.heading;
+                    camera.heading = WorldWind.Angle.normalizedDegrees(camCompassHeading + headingInc);
+                    camera.tilt += tiltInc;
+                    headingSteps--;
+                    if (headingSteps <= 0) {
+                        headingInc = 0;
+                        camera.heading = segHeading;
+                    }
+                    if ((tiltInc > 0 && camera.tilt >= fromNode.tilt) ||
+                        (tiltInc < 0 && camera.tilt <= fromNode.tilt)) {
+                        tiltInc = 0;
+                        camera.tilt = fromNode.tilt;
+                    }
+                } else {
+                    camera.position.latitude += canyonLatInc;
+                    camera.position.longitude += canyonLonInc;
+                    if ((canyonLatInc > 0 && camera.position.latitude > toNode.position.latitude) ||
+                        (canyonLatInc < 0 && camera.position.latitude < toNode.position.latitude) ||
+                        (canyonLonInc > 0 && camera.position.longitude > toNode.position.longitude) ||
+                        (canyonLonInc < 0 && camera.position.longitude < toNode.position.longitude)) {
+                        toNode.finished = true;
+                    }
+                }
                 wwd.redraw();
             }, 25);
         }
@@ -223,10 +308,11 @@ requirejs(['./WorldWindShim',
             runOrbitSimulation();
         }
 
-        var orbitStartPos=new WorldWind.Position(30,-70,5e6);
+        var orbitStartPos = new WorldWind.Position(30, -70, 5e6);
+
         function onOrbitCheckBoxClick() {
             if (this.checked) {
-                wwd.goTo(orbitStartPos,goToOrbitStartComplete);
+                wwd.goTo(orbitStartPos, goToOrbitStartComplete);
             }
             else {
                 clearInterval(orbitInterval);
