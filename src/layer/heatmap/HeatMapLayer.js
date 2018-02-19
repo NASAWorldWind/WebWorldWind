@@ -131,8 +131,9 @@ define([
                 radius = this._radius(tile.sector, this.tileWidth, this.tileHeight);
             }
 
-            var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude) * 0.1;
-            var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude) * 0.1;
+            var extensionFactor = 0.5;
+            var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude) * extensionFactor;
+            var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude) * extensionFactor;
             var extendedSector = new Sector(
                 tile.sector.minLatitude - latitudeChange,
                 tile.sector.maxLatitude + latitudeChange,
@@ -146,8 +147,8 @@ define([
             var canvas = new this._tile(data, {
                 sector: extendedSector,
 
-                width: this.tileWidth + 2 * Math.ceil(0.1 * this.tileWidth),
-                height: this.tileHeight + 2 * Math.ceil(0.1 * this.tileHeight),
+                width: this.tileWidth + 2 * Math.ceil(extensionFactor * this.tileWidth),
+                height: this.tileHeight + 2 * Math.ceil(extensionFactor * this.tileHeight),
                 radius: radius,
                 blur: this._blur,
 
@@ -158,7 +159,7 @@ define([
             var result = document.createElement('canvas');
             result.height = this.tileHeight;
             result.width = this.tileWidth;
-            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(Math.ceil(0.1 * this.tileWidth), Math.ceil(0.1 * this.tileHeight), this.tileWidth, this.tileHeight), 0, 0);
+            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(Math.ceil(extensionFactor * this.tileWidth), Math.ceil(extensionFactor * this.tileHeight), this.tileWidth, this.tileHeight), 0, 0);
 
             var texture = layer.createTexture(dc, tile, result);
             layer.removeFromCurrentRetrievals(imagePath);

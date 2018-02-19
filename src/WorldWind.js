@@ -80,6 +80,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GroundProgram',
         './util/HashMap',
         './layer/heatmap/HeatMapLayer',
+        './layer/heatmap/Tile',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
@@ -327,6 +328,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GroundProgram,
               HashMap,
               HeatMapLayer,
+              HeatMapTile,
               HighlightController,
               ImagePyramid,
               ImageSource,
@@ -783,6 +785,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HashMap'] = HashMap;
         WorldWind['HeatMapLayer'] = HeatMapLayer;
+        WorldWind['HeatMapTile'] = HeatMapTile;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
