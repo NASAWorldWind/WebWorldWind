@@ -39,6 +39,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/collada/ColladaLoader',
         './util/Color',
         './layer/heatmap/ColoredSquareTile',
+        './layer/heatmap/ColoredTile',
         './shapes/Compass',
         './layer/CompassLayer',
         './layer/CoordinatesDisplayLayer',
@@ -285,6 +286,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ColladaLoader,
               Color,
               ColoredSquareTile,
+              ColoredTile,
               Compass,
               CompassLayer,
               CoordinatesDisplayLayer,
@@ -740,6 +742,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
         WorldWind['ColoredSquareTile'] = ColoredSquareTile;
+        WorldWind['ColoredTile'] = ColoredTile;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
         WorldWind['CoordinatesDisplayLayer'] = CoordinatesDisplayLayer;
