@@ -46,14 +46,6 @@ requirejs([
         // Use the service for getting and parsing the OpenSearch description document
         openSearchService.discover()
             .then(function (service) {
-                // Get the first URL that returns an ATOM result
-                var url = service.findUrl(function(url) {
-                    return (
-                        url.relations.indexOf('collection') >= 0 &&
-                        url.type === 'application/atom+xml'
-                    );
-                });
-
                 var searchParams = [
                     {name: 'platform', value: 'smos'}
                 ];
@@ -73,14 +65,6 @@ requirejs([
                 return openSearchLayer.discover({url: productSearchUrl});
             })
             .then(function (layer) {
-                // Get the first URL that returns an ATOM result
-                var url = layer.findUrl(function(url) {
-                    return (
-                        url.relations.indexOf('results') >= 0 &&
-                        url.type === 'application/atom+xml'
-                    );
-                });
-
                 var searchParams = [
                     {name: 'productType', value: '{MIR_SCLF1C,MIR_SCSF1C,MIR_SCLD1C,MIR_SCSD1C}'}
                 ];
