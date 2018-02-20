@@ -131,7 +131,7 @@ define([
                 radius = this._radius(tile.sector, this.tileWidth, this.tileHeight);
             }
 
-            var extensionFactor = 0.5;
+            var extensionFactor = 1;
             var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude) * extensionFactor;
             var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude) * extensionFactor;
             var extendedSector = new Sector(
@@ -143,7 +143,7 @@ define([
             var data = this.filterGeographically(this._data, extendedSector);
 
             // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
-            // of the tile width / tile height
+            // of the tile width / tile height. The size you need to actually take into account differs.
             var canvas = new this._tile(data, {
                 sector: extendedSector,
 
