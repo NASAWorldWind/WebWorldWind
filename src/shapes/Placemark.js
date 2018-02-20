@@ -476,18 +476,11 @@ define([
 
             this.imageBounds = WWMath.boundingRectForUnitQuad(this.imageTransform);
 
-            // If there's a label, perform these same operations for the label texture, creating that texture if it
-            // doesn't already exist.
+            // If there's a label, perform these same operations for the label texture.
 
             if (this.mustDrawLabel()) {
-                var labelFont = this.activeAttributes.labelAttributes.font,
-                    labelKey = this.label + labelFont.toString();
 
-                this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-                if (!this.labelTexture) {
-                    this.labelTexture = dc.textRenderer.renderText(this.label);
-                    dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-                }
+                this.labelTexture = dc.createTextTexture(this.label, this.activeAttributes.labelAttributes);
 
                 w = this.labelTexture.imageWidth;
                 h = this.labelTexture.imageHeight;
@@ -641,7 +634,7 @@ define([
                 }
             }
 
-            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity * this.currentVisibility);
 
             // Draw the leader line first so that the image and label have visual priority.
             if (this.mustDrawLeaderLine(dc)) {
@@ -758,7 +751,7 @@ define([
                     this.texCoordMatrix.multiplyByTextureTransform(this.labelTexture);
 
                     program.loadTextureMatrix(gl, this.texCoordMatrix);
-                    program.loadColor(gl, this.activeAttributes.labelAttributes.color);
+                    program.loadColor(gl, Color.WHITE);
 
                     textureBound = this.labelTexture.bind(dc);
                     program.loadTextureEnabled(gl, textureBound);

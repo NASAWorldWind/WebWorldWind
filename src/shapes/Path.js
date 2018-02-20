@@ -511,7 +511,7 @@ define([
                 program = dc.currentProgram,
                 currentData = this.currentData,
                 numPoints = currentData.tessellatedPoints.length / 3,
-                vboId, opacity, color, pickColor, stride, nPts;
+                vboId, color, pickColor, stride, nPts;
 
             this.applyMvpMatrix(dc);
 
@@ -545,13 +545,10 @@ define([
 
             if (this.mustDrawInterior(dc)) {
                 color = this.activeAttributes.interiorColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                if (opacity < 1 && !dc.pickingMode) {
-                    gl.depthMask(false);
-                }
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
                 gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, numPoints);
@@ -565,13 +562,10 @@ define([
                 }
 
                 color = this.activeAttributes.outlineColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                if (opacity < 1 && !dc.pickingMode) {
-                    gl.depthMask(false);
-                }
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 

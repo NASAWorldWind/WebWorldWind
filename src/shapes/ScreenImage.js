@@ -367,6 +367,7 @@ define([
             if (dc.pickingMode) {
                 this.pickColor = dc.uniquePickColor();
                 program.loadColor(gl, this.pickColor);
+                program.loadOpacity(gl, 1);
             } else {
                 program.loadColor(gl, this.imageColor);
                 program.loadOpacity(gl, this.opacity * this.layer.opacity);

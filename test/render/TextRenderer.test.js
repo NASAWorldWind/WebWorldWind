@@ -24,7 +24,6 @@ define([
             + "adipiscing elit, sed do eiusmod tempor incididunt ut";
 
         var mockDrawContext = new DrawContext;
-        var myFont = new Font(15);
 
         it("Should throw an exception on missing constructor draw context", function () {
             expect(function () {
@@ -40,26 +39,26 @@ define([
         it("Should throw an exception on missing text input", function () {
             expect(function () {
                 var mockTextRenderer = new TextRenderer(mockDrawContext);
-                mockTextRenderer.wrap(null, 20, 100, myFont);
+                mockTextRenderer.wrap(null, 20, 100);
             }).toThrow();
         });
 
         it("Should output '...' due to wrap height being less than textSize height", function () {
             var mockTextRenderer = new TextRenderer(mockDrawContext);
-            var wrappedText = mockTextRenderer.wrap(testText, 92, 15, myFont);
+            var wrappedText = mockTextRenderer.wrap(testText, 92, 15);
             expect(wrappedText).toEqual("...");
         });
 
         it("Should output 'Lorem ipsum...' due to wrap width being less than textSize width", function () {
             var mockTextRenderer = new TextRenderer(mockDrawContext);
-            var wrappedText = mockTextRenderer.wrap(testText, 90, 16, myFont);
+            var wrappedText = mockTextRenderer.wrap(testText, 90, 16);
             expect(wrappedText).toEqual("Lorem ipsum...");
         });
 
         it("Should output every word on testText in different lines", function () {
             var mockTextRenderer = new TextRenderer(mockDrawContext);
             // Wrap line width less than textSize texture width
-            var wrappedLines = mockTextRenderer.wrapLine(testText, 0, myFont);
+            var wrappedLines = mockTextRenderer.wrapLine(testText, 0);
             expect(wrappedLines).toEqual("Lorem\n" +
                 "ipsum\n" +
                 "dolor\n" +

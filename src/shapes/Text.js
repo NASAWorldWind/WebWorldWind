@@ -255,7 +255,7 @@ define([
             // Create an ordered renderable for this text. If one has already been created this frame then we're
             // in 2D-continuous mode and another needs to be created for one of the alternate globe offsets.
             var orderedText;
-            if (this.lastFrameTime != dc.timestamp) {
+            if (this.lastFrameTime !== dc.timestamp) {
                 orderedText = this.makeOrderedRenderable(dc);
             } else {
                 var textCopy = this.clone();
@@ -312,14 +312,7 @@ define([
                 return null;
             }
 
-            var labelFont = this.activeAttributes.font,
-                textureKey = this.text + labelFont.toString();
-
-            this.activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
-            if (!this.activeTexture) {
-                this.activeTexture = dc.textRenderer.renderText(this.text);
-                dc.gpuResourceCache.putResource(textureKey, this.activeTexture, this.activeTexture.size);
-            }
+            this.activeTexture = dc.createTextTexture(this.text, this.activeAttributes);
 
             w = this.activeTexture.imageWidth;
             h = this.activeTexture.imageHeight;
@@ -468,9 +461,10 @@ define([
                 gl.disable(gl.DEPTH_TEST);
             }
 
-            // Use the text color and opacity. When picking, use the pick color, 100% opacity and no texture.
+            // Use the text color and opacity. Modulation is done to white to avoid the program's shader from
+            // modifying the text color. When picking, use the pick color, 100% opacity and no texture.
             if (!dc.pickingMode) {
-                program.loadColor(gl, this.activeAttributes.color);
+                program.loadColor(gl, Color.WHITE);
                 program.loadOpacity(gl, this.layer.opacity * this.currentVisibility);
             } else {
                 this.pickColor = dc.uniquePickColor();
