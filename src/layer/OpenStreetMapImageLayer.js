@@ -39,12 +39,9 @@ define([
          * null or undefined.
          */
         var OpenStreetMapImageLayer = function (displayName) {
-            displayName = displayName || "Open Street Map";
+            var xhr = new XMLHttpRequest(), url = "https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml",
+                self = this;
 
-            var xhr = new XMLHttpRequest();
-            var url = "https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml";
-
-            var self = this;
             xhr.open("GET", url, true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
@@ -52,7 +49,7 @@ define([
                         var wmtsCapabilities = new WmtsCapabilities(xhr.responseXML);
                         var wmtsLayerCapabilities = wmtsCapabilities.getLayer("osm");
                         var wmtsConfig = WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
-                        wmtsConfig.title = "Open Street Map";
+                        wmtsConfig.title = displayName || "Open Street Map";
                         WmtsLayer.call(self, wmtsConfig);
                     } else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -80,8 +77,8 @@ define([
         OpenStreetMapImageLayer.prototype.doRender = function (dc) {
             WmtsLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
-                dc.screenCreditController.addStringCredit("(Contains modified Copernicus Sentinel data 2016 & 2017)", Color.DARK_GRAY);
-                dc.screenCreditController.addStringCredit("Sentinel-2 cloudless - https://s2maps.eu by EOX IT Services GmbH ", Color.DARK_GRAY);
+                dc.screenCreditController.addStringCredit("http://www.openstreetmap.org/copyright, http://maps.eox.at/#data, and http://eox.at", Color.DARK_GRAY);
+                dc.screenCreditController.addStringCredit("OpenStreetMap { Data © OpenStreetMap contributers, Rendering © MapServer and EOX }", Color.DARK_GRAY);
             }
         };
 
