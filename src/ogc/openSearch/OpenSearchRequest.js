@@ -26,7 +26,7 @@ define([
          * Constructs a request object with the specified options.
          * @alias OpenSearchRequest
          * @constructor
-         * @classdesc Constructs a request object with the specified options.
+         * @classdesc Object representing an OpenSearch request.
          * @param {Object} options
          */
         var OpenSearchRequest = function (options) {

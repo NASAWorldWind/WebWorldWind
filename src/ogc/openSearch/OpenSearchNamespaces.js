@@ -18,11 +18,11 @@
  */
 
 define([],
-    function() {
+    function () {
         'use strict';
 
         /**
-         * Provides namespace URIs used for open search.
+         * Provides namespace URIs used for OpenSearch.
          * @exports OpenSearchNamespaces
          */
         var OpenSearchNamespaces = {

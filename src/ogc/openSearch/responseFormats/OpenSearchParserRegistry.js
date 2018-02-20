@@ -29,25 +29,29 @@ define([
 
         /**
          * Constructs a parser registry.
-         * Parses are stored by the provided mime type and relation.
-         * The mime type indicates the file format that the parser should expect.
-         * The relation specifies the role of the resource being described in relation to the description document
-         * Services can register or retrieve a parser by specifying the mime type and relation.
+         *
          * @alias OpenSearchParserRegistry
          * @constructor
          * @classdesc Provides a parser registry.
+         *
+         * Parsers are stored for the provided mime type and relation.
+         * The mime type indicates the file format that the parser can handle.
+         * The relation specifies the role of the resource being parsed, and as specified in the description document.
+         * Services can register or retrieve a parser by specifying the mime type and relation.
          */
         var OpenSearchParserRegistry = function () {
             this._entries = Object.create(null);
         };
 
         /**
-         * Registers a parser to be used for the specified mime type and relation
+         * Registers a parser for the specified mime type and relation.
          *
-         * @param {String} type Mime type for the registered parser
-         * @param {String} rel Open search Url relation for the registered parser
+         * The parse method of the parser will be called with the response of the server when the mime type and
+         * relation type matches.
+         *
+         * @param {String} type Mime type of the parser to register.
+         * @param {String} rel Relation type of the parser to register.
          * @param {Object} parser An object with a parse method.
-         * The parse method will be called with the response of the server and must return a geoJSON object
          */
         OpenSearchParserRegistry.prototype.registerParser = function (type, rel, parser) {
             if (!type) {
@@ -93,12 +97,12 @@ define([
         };
 
         /**
-         * Gets the parser for the specified mime type and relation.
+         * Returns the parser for the specified mime type and relation.
          *
-         * @param {String} type Mime type for parser
-         * @param {String} rel Open search Url relation for the parser
+         * @param {String} type Mime type of the parser.
+         * @param {String} rel Relation type of the parser.
          *
-         * @return {Object|undefined} the parser
+         * @return {Object|undefined} The parser.
          */
         OpenSearchParserRegistry.prototype.getParser = function (type, rel) {
             if (!type || typeof type !== 'string') {
@@ -117,7 +121,8 @@ define([
 
         /**
          * Returns a list with the supported mime types.
-         * @return {String[]} a list of the supported mime types
+         *
+         * @return {String[]} The list of supported mime types.
          */
         OpenSearchParserRegistry.prototype.getFormats = function () {
             return Object.keys(this._entries);
@@ -126,8 +131,8 @@ define([
         /**
          * Removes a parser for the specified mime type and relation.
          *
-         * @param {String} type Mime type for the registered parser
-         * @param {String} rel Open search Url relation for the registered parser
+         * @param {String} type Mime type of the registered parser.
+         * @param {String} rel Relation type of the registered parser.
          */
         OpenSearchParserRegistry.prototype.removeParser = function (type, rel) {
             if (!this._entries[type]) {

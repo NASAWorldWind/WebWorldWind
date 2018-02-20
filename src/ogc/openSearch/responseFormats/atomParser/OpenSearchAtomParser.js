@@ -26,18 +26,19 @@ define([
         'use strict';
 
         /**
-         * Parses Atom for EO to geoJSON
+         * Parses Atom for EO to GeoJSON.
+         *
          * @exports OpenSearchAtomParser
          */
         var OpenSearchAtomParser = {
 
             /**
-             * Parses Atom for EO to geoJSON
+             * Parses Atom for EO as GeoJSON feature collection.
              *
-             * @param {String} xmlString The Atom response as a string
-             * @param {String} searchType Open search Url relation
+             * @param {String} xmlString The Atom response as a string.
+             * @param {String} searchType The relation type.
              *
-             * @return {Object} A geoJSON feature collection
+             * @return {Object} The resulting GeoJSON feature collection.
              */
             parse: function (xmlString, searchType) {
                 var root = new DOMParser().parseFromString(xmlString, 'text/xml').documentElement;
@@ -100,8 +101,8 @@ define([
             /**
              * Parses the links in the feed node.
              *
-             * @param {Node} node The link node to parse
-             * @param {Object} result An object to store the parsed results
+             * @param {Node} node The link node to parse.
+             * @param {Object} result The object to store the parsed results.
              */
             parseFeedLinks: function (node, result) {
                 if (!result.links) {
@@ -131,9 +132,9 @@ define([
             /**
              * Parses an Atom link node.
              *
-             * @param {Node} node The link node to parse
+             * @param {Node} node The link node to parse.
              *
-             * @return {Object} An object containing the attributes values from the link node
+             * @return {Object} The object containing the attributes values from the link node.
              */
             parseLink: function (node) {
                 var link = {};
@@ -158,13 +159,14 @@ define([
 
             /**
              * Parses the attributes of a node as a string.
-             * Each attribute is in the format name="value"
-             * The attributes are delimited by a space
-             * Ex: 'name="value" name="value"'
              *
-             * @param {Node} node The node to parse
+             * Each attribute is in the format name="value".
+             * The attributes are delimited by a space.
+             * Example: 'name="value" name="value"'
              *
-             * @return {String} A string
+             * @param {Node} node The node to parse.
+             *
+             * @return {String} The resulting string.
              */
             parseAttributesAsString: function (node) {
                 var attributes = '';
@@ -179,12 +181,12 @@ define([
             },
 
             /**
-             * Parses an Atom entry node as a geoJSON feature.
+             * Parses an Atom entry node as a GeoJSON feature.
              *
-             * @param {Node} entryNode The entry node to parse
-             * @param {String} searchType Open search Url relation
+             * @param {Node} entryNode The entry node to parse.
+             * @param {String} searchType The relation type.
              *
-             * @return {Object} A geoJSON feature object
+             * @return {Object} The resulting GeoJSON feature.
              */
             parseEntry: function (entryNode, searchType) {
                 var feature = {
@@ -256,9 +258,9 @@ define([
             /**
              * Parses the links in the entry node.
              *
-             * @param {Node} node The link node to parse
-             * @param {Object} result An object to store the parsed results
-             * @param {String} searchType Open search Url relation
+             * @param {Node} node The link node to parse.
+             * @param {Object} result The object to store the parsed results.
+             * @param {String} searchType The relation type.
              */
             parseEntryLinks: function (node, result, searchType) {
                 if (searchType === OpenSearchConstants.COLLECTION) {

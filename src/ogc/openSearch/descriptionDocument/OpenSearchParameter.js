@@ -29,26 +29,26 @@ define([
          * @constructor
          * @classdesc Represents an OpenSearchParameter.
          *
-         * @param {String} type Internal parameter, indicates from where this parameter was generated
-         * (template or parameter extension)
-         * @param {String} name The name of this parameter
+         * @param {String} type Internal parameter, indicates from where this parameter was generated (template or
+         * parameter extension).
+         * @param {String} name The name of this parameter.
          * @param {String} value The value indicated by the template or parameter extension.
          * @param {Boolean} required Indicated if this param is required for searches.
          * @param {Boolean} replaceable Indicates if this param value should be replaced when making a search query.
          * @param {String} ns The namespace of this param's name.
          * @param {Number} minimum The minimum number of times this param should appear in a query.
-         * @param {Number|String} maximum The maximum number of times this param should appear in a query.
-         * A value of '*' indicates no limit.
-         * @param {RegExp} pattern A regexp pattern for the param's value
-         * @param {String} title Advisory information for the format and valid values of the parameter,
-         * such as would be appropriate for a tooltip or label.
+         * @param {Number|String} maximum The maximum number of times this param should appear in a query. A value of
+         * '*' indicates no limit.
+         * @param {RegExp} pattern A regexp pattern for the param's value.
+         * @param {String} title Advisory information for the format and valid values of the parameter, such as would be
+         * appropriate for a tooltip or label.
          * @param {Number} minExclusive Indicates the minimum value for the element that cannot be reached.
          * @param {Number} maxExclusive Indicates the maximum value for the element that cannot be reached.
          * @param {Number} minInclusive Indicates the minimum value for the element that can be reached.
          * @param {Number} maxInclusive Indicates the maximum value for the element that can be reached.
          * @param {Number} step Indicates the granularity of the allowed values between the minimal and maximal range.
-         * @param {Object[]} options A list of objects that describes a value/label pair
-         * suggested to the client for the parent element.
+         * @param {Object[]} options A list of objects that describes a value/label pair suggested to the client for the
+         * parent element.
          */
         var OpenSearchParameter = function (type, name, value, required, replaceable, ns, minimum, maximum, pattern,
                                             title, minExclusive, maxExclusive, minInclusive, maxInclusive, step,
@@ -72,10 +72,11 @@ define([
         };
 
         /**
-         * Internal. Applications should call this method.
-         * Creates an OpenSearchParameter from a template queryString
-         * @param {'name={value?}'} query A query string part from the url template.
-         * @return {OpenSearchParameter}
+         * Internal. Applications should not call this method.
+         * Creates an OpenSearchParameter from a template query string.
+         *
+         * @param {'name={value?}'} query The query string part from the URL template.
+         * @return {OpenSearchParameter} The resulting OpenSearchParameter.
          */
         OpenSearchParameter.fromQuery = function (query) {
             var queryParts = query.split('=');
@@ -108,10 +109,11 @@ define([
         };
 
         /**
-         * Internal. Applications should call this method.
-         * Creates an OpenSearchParameter from OpenSearch Parameter node.
-         * @param {Node} node An OpenSearch Parameter node.
-         * @return {OpenSearchParameter}
+         * Internal. Applications should not call this method.
+         * Creates an OpenSearchParameter from a Parameter node.
+         *
+         * @param {Node} node The Parameter node.
+         * @return {OpenSearchParameter} The resulting OpenSearchParameter.
          */
         OpenSearchParameter.fromNode = function (node) {
             var name = node.getAttribute('name');
@@ -192,11 +194,12 @@ define([
         };
 
         /**
-         * Internal. Applications should call this method.
-         * Merges this param with the supplied param and return a new OpenSearchParameter.
-         * This is done for params that appear in the template and the Parameter node.
-         * @param {OpenSearchParameter} param
-         * @return {OpenSearchParameter}
+         * Internal. Applications should not call this method.
+         * Merges this parameter with the specified parameter and returns a new OpenSearchParameter object.
+         * This is done for parameters that appear in the template and the Parameter node.
+         *
+         * @param {OpenSearchParameter} param The parameter to merge from.
+         * @return {OpenSearchParameter} The merged parameter.
          */
         OpenSearchParameter.prototype.merge = function (param) {
             /* In case of inconsistency between the Parameter extension annotations and the <Url>
@@ -245,8 +248,8 @@ define([
         };
 
         /**
-         * OpenSearchParameter internal constants.
-         * Indicates from where the param was generated.
+         * Internal constants for OpenSearchParameter.
+         * Indicates from where the parameter was generated.
          */
         OpenSearchParameter.types = {
             TEMPLATE: 'TEMPLATE',

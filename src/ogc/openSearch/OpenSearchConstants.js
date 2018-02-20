@@ -22,7 +22,7 @@ define([],
         'use strict';
 
         /**
-         * Provides open search string constants.
+         * Provides OpenSearch string constants.
          * @exports OpenSearchConstants
          */
         var OpenSearchConstants = {

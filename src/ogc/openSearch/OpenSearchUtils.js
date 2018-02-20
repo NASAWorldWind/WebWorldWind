@@ -24,20 +24,20 @@ define([
         'use strict';
 
         /**
-         * Provides utilities for the OpenSearch.
+         * Provides utilities for handling OpenSearch responses and requests.
          * @exports OpenSearchUtils
          */
         var OpenSearchUtils = {
 
             /**
-             * Gets the trimmed text content of the first child node starting from a root node
+             * Gets the trimmed text content of the first child node starting from a root node.
              *
-             * @param {Node} parent The root node from which to start the search
+             * @param {Node} parent The root node from which to start the search.
              * @param {String} localName The local name (without the namespace) of the child node which contains the
-             * text content
-             * @param {String|null} namespaceURI The namespaceURI of the child
+             * text content.
+             * @param {String|null} namespaceURI The namespace URI of the child node.
              *
-             * @return {String} The text content of the specified child node
+             * @return {String} The text content of the specified child node.
              */
             getChildTextContent: function (parent, localName, namespaceURI) {
                 var collection = this.getXmlElements(parent, localName, namespaceURI);
@@ -50,22 +50,22 @@ define([
             /**
              * Gets the trimmed text content of node.
              *
-             * @param {Node} node The node from which to get the text content
+             * @param {Node} node The node from which to get the text content.
              *
-             * @return {String} The text content of the specified child node
+             * @return {String} The text content of the specified node.
              */
             getTextContent: function (node) {
                 return node.textContent.trim();
             },
 
             /**
-             * Finds all the child nodes, that match the localName and namespaceURI, starting from a root node.
+             * Finds all child nodes that match the localName and namespaceURI, starting from a root node.
              *
-             * @param {Node} parent The root node from which to start the search
-             * @param {String} localName The local name (without the namespace) of the child node
-             * @param {String|null} namespaceURI The namespaceURI of the child
+             * @param {Node} parent The root node from which to start the search.
+             * @param {String} localName The local name (without the namespace) of the child node.
+             * @param {String|null} namespaceURI The namespace URI of the child node.
              *
-             * @return {Node[]} An array of Nodes.
+             * @return {Node[]} An array of XML nodes.
              */
             getXmlElements: function (parent, localName, namespaceURI) {
                 var collection;
@@ -86,12 +86,12 @@ define([
             },
 
             /**
-             * Gets the attributes of a Node and stores them in an Object
+             * Gets the attributes of an XML node and stores them in an object.
              *
-             * @param {Node} node
-             * @param {Object} result An object to store the attributes
+             * @param {Node} node The XML node to read from.
+             * @param {Object} result An object to store the attributes.
              *
-             * @return {Object}
+             * @return {Object} The resulting object.
              */
             getNodeAttributes: function (node, result) {
                 for (var i = 0, len = node.attributes.length; i < len; i++) {
@@ -102,7 +102,7 @@ define([
             },
 
             /**
-             * Finds a value in an array that satisfies the provided testing function.
+             * Finds a value in an array that satisfies the provided predicate function.
              *
              * @param {Array} array The array to search in.
              * @param {Function} predicate Function to execute on each value in the array, taking three arguments:
@@ -111,8 +111,8 @@ define([
              * array The array find was called upon.
              * @param {Object|null} context Object to use as "this" when executing the predicate function.
              *
-             * @return {Any|undefined} the value of the first element in the array that satisfies the provided testing
-             * function. Otherwise undefined is returned.
+             * @return {Any|undefined} The value of the first element in the array that satisfies the provided predicate
+             * function. Otherwise, undefined is returned.
              */
             arrayFind: function (array, predicate, context) {
                 if (!Array.isArray(array)) {
@@ -130,10 +130,10 @@ define([
             },
 
             /**
-             * Parses a xml string and return the root element.
+             * Parses an XML string and returns its root element.
              *
-             * @param {String} xmlString The xml to parse
-             * @return {Element} The root element of the parsed document
+             * @param {String} xmlString The XML string to parse.
+             * @return {Element} The root element of the parsed document.
              */
             parseXml: function (xmlString) {
                 var xmlDOM = new DOMParser().parseFromString(xmlString, 'text/xml');
@@ -141,10 +141,10 @@ define([
             },
 
             /**
-             * Provides an interface for fetching resources.
+             * Provides a standard method for fetching resources.
              *
              * @param {OpenSearchRequest} options
-             * @return {Promise} A promise that resolves with the response or rejects with an error
+             * @return {Promise} A promise that resolves with the response or rejects with an error.
              */
             fetch: function (options) {
                 return new Promise(function (resolve, reject) {

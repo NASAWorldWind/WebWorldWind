@@ -33,14 +33,16 @@ define([
 
         /**
          * Constructs an OpenSearchDescriptionDocument from a XML DOM.
+         *
          * @alias OpenSearchDescriptionDocument
          * @constructor
-         * @classdesc Represents an Open Search Description Document.
-         * This object holds as properties the fields specified in the Open Search Description Document.
-         * Most fields can be accessed as properties named according to their document names converted to camel case.
-         * For example, "shortName" and "urls".
          * @param {Node} xmlRoot An XML DOM representing the Open Search Description Document.
          * @throws {ArgumentError} If the specified XML DOM is null or undefined.
+         * @classdesc Represents an Open Search Description Document.
+         *
+         * This object holds as properties the fields specified in the Open Search Description Document.
+         * Most fields can be accessed as properties named according to their document names converted to camel case.
+         * For example: "shortName" and "urls".
          */
         var OpenSearchDescriptionDocument = function (xmlRoot) {
             if (!xmlRoot) {
@@ -249,12 +251,11 @@ define([
 
         /**
          * Internal use. Applications should not call this method.
-         * Parses an Open Search Image node.
+         * Parses an Image node.
          *
-         * @param {Node} node An Open Search Image node.
-         *
-         * @typedef {{height: Number, width: Number, type: String, src: String}} image
-         * @return {image}
+         * @param {Node} node The Image node to parse.
+         * @typedef {{height: Number, width: Number, type: String, src: String}} Image
+         * @return {Image}
          */
         OpenSearchDescriptionDocument.prototype.parseImage = function (node) {
             var image = {};
@@ -265,11 +266,10 @@ define([
 
         /**
          * Internal use. Applications should not call this method.
-         * Parses an Open Search Query node.
+         * Parses an Query node.
          *
-         * @param {Node} node An Open Search Query node.
-         *
-         * @return {Object}
+         * @param {Node} node The Query node to parse.
+         * @return {Object} The resulting object.
          */
         OpenSearchDescriptionDocument.prototype.parseQuery = function (node) {
             var query = {};
@@ -279,14 +279,12 @@ define([
 
         /**
          * Internal use. Applications should not call this method.
-         * Finds a compatible Open Search Url for a search request based on the supplied arguments.
+         * Finds the first compatible URL for a search request based on the specified arguments.
          *
-         * @param {Array|null} searchParams A list of search parameters for the query
-         * @param {OpenSearchRequest} requestOptions
-         * @param {Array} supportedFormats A list with the supported formats (mime types) that the requesting service
-         * can parse.
-         *
-         * @return {OpenSearchUrl|null} If possible, an Atom Url will be returned.
+         * @param {Array|null} searchParams The list of search parameters for the query.
+         * @param {OpenSearchRequest} requestOptions The request options.
+         * @param {Array} supportedFormats The list of formats (mime types) that the requesting service can parse.
+         * @return {OpenSearchUrl|null} The first matching URL or null.
          */
         OpenSearchDescriptionDocument.prototype.findCompatibleUrl = function (searchParams, requestOptions, supportedFormats) {
             var compatibleUrls = this.findCompatibleUrls(searchParams, requestOptions, supportedFormats);
@@ -301,13 +299,13 @@ define([
 
         /**
          * Internal use. Applications should not call this method.
-         * Finds a list of compatible Open Search Urls for a search request based on the supplied arguments.
+         * Finds a list of compatible URLs for a search request based on the specified arguments.
          *
-         * @param {Array|null} searchParams A list of search parameters for the query
-         * @param {OpenSearchRequest} requestOptions
-         * @param {Array} supportedFormats A list with the supported formats that the requesting service can parse.
+         * @param {Array|null} searchParams The list of search parameters for the query.
+         * @param {OpenSearchRequest} requestOptions The request options.
+         * @param {Array} supportedFormats The list of formats (mime types) that the requesting service can parse.
          *
-         * @return {OpenSearchUrl[]}
+         * @return {OpenSearchUrl[]} The list of matching URLs.
          */
         OpenSearchDescriptionDocument.prototype.findCompatibleUrls = function (searchParams, requestOptions, supportedFormats) {
             var urls = this.urls.filter(function (url) {

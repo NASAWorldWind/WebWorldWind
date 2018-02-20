@@ -40,19 +40,20 @@ define([
         'use strict';
 
         /**
-         * Constructs a service for open search queries.
-         *
-         * The service exposes two methods:
-         *  - discover used to get the description document
-         *  - search used for querying the search engine
-         *
-         * By default this service can handle Atom for EO and geoJSON responses.
-         * Other types of response formats can by added with the registerParser method.
+         * Constructs a service for interacting with OpenSearch servers.
          *
          * @alias OpenSearchService
          * @constructor
-         * @classdesc Provides a search service for working with open search queries.
-         * @param {String} url The url for the description document.
+         * @classdesc Provides a service for interacting with OpenSearch servers.
+         *
+         * The service exposes two methods:
+         *  - discover used to get the description document;
+         *  - search used for querying the search engine.
+         *
+         * By default, this service can handle Atom for EO and GeoJSON responses.
+         * Other types of response formats can by added using the registerParser method.
+         *
+         * @param {String} url The URL of the OpenSearch description document.
          */
         var OpenSearchService = function (url) {
             this._url = url;
@@ -64,7 +65,7 @@ define([
 
         Object.defineProperties(OpenSearchService.prototype, {
             /**
-             * Url for the description document.
+             * URL of the OpenSearch description document.
              * @memberof OpenSearchService.prototype
              * @type {String}
              */
@@ -83,7 +84,7 @@ define([
             },
 
             /**
-             * The parsed description document.
+             * The latest parsed OpenSearch description document.
              * @memberof OpenSearchService.prototype
              * @type {OpenSearchDescriptionDocument}
              */
@@ -94,7 +95,7 @@ define([
             },
 
             /**
-             * A registry of parsers (Atom, geoJSON) to be used with this service.
+             * A registry of parsers (Atom, GeoJSON) to be used by this service.
              * @memberof OpenSearchService.prototype
              * @type {OpenSearchParserRegistry}
              */
@@ -109,7 +110,7 @@ define([
         });
 
         /**
-         * Fetches and parses an open search description document.
+         * Fetches and parses an OpenSearch description document.
          * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
          * @return {Promise} A promise which when resolved returns this service, or an error when rejected
          * @example openSearchService
@@ -135,9 +136,10 @@ define([
 
         /**
          * Performs a search query.
+         *
          * @param {Array|null} searchParams A list of objects, each object must have a name and value property.
          * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
-         * @return {Promise} A promise which when resolved returns a geoJSON collection, or an error when rejected.
+         * @return {Promise} A promise which when resolved returns a GeoJSON collection, or an error when rejected.
          * @example openSearchService
          *                      .search([
          *                          {name: 'count', value: 10}, {name: 'lat', value: 50}, {name: 'lon', value: 20}
@@ -177,7 +179,7 @@ define([
 
             return OpenSearchUtils.fetch(requestOptions)
                 .then(function (response) {
-                    var responseParser = self.getResponseParser(openSearchUrl.type, requestOptions.relation);
+                    var responseParser = self.getParser(openSearchUrl.type, requestOptions.relation);
                     if (!responseParser) {
                         throw new Error('OpenSearchService search - no suitable response parser found');
                     }
@@ -186,72 +188,75 @@ define([
         };
 
         /**
-         * Finds an OpenSearchUrl that satisfies the provided testing function.
+         * Finds an URL that satisfies the provided predicate function.
          *
-         * @param {Function} predicate Function to execute on each value in the description document urls array,
+         * @param {Function} predicate Function to execute on each value in the description document URLs array,
          * taking three arguments:
          * element The current element being processed in the array.
          * index The index of the current element being processed in the array.
          * array The array find was called upon.
          * @param {Object|null} context Object to use as "this" when executing the predicate function.
-         * @return {OpenSearchUrl|undefined} the first OpenSearchUrl in the array that satisfies the provided testing
-         * function. Otherwise undefined is returned.
+         * @return {OpenSearchUrl|undefined} The first URL in the array that satisfies the provided predicate
+         * function. Otherwise, undefined is returned.
          */
         OpenSearchService.prototype.findUrl = function(predicate, context) {
             return OpenSearchUtils.arrayFind(this._descriptionDocument.urls, predicate, context);
         };
 
         /**
-         * Registers a parser to be used for the specified mime type and relation
+         * Registers a parser for the specified mime type and relation.
          *
-         * @param {String} type Mime type for the registered parser
-         * @param {String} rel Open search Url relation for the registered parser
+         * The parse method of the parser will be called with the response of the server when the mime type and
+         * relation type matches.
+         *
+         * @param {String} type Mime type of the parser to register.
+         * @param {String} rel Relation type of the parser to register.
          * @param {Object} parser An object with a parse method.
-         * The parse method will be called with the response of the server.
          */
         OpenSearchService.prototype.registerParser = function (type, rel, parser) {
             this.parserRegistry.registerParser(type, rel, parser);
         };
 
         /**
-         * Returns a list with the supported mime types.
-         * @return {String[]} a list of the supported mime types
+         * Returns the list of supported mime types.
+         *
+         * @return {String[]} The list of supported mime types.
          */
         OpenSearchService.prototype.getSupportedFormats = function () {
             return this.parserRegistry.getFormats();
         };
 
         /**
-         * Gets the response parser for the specified mime type and relation.
+         * Returns the response parser for the specified mime type and relation.
          *
-         * @param {String} type Mime type for parser
-         * @param {String} rel Open search Url relation for the parser
+         * @param {String} type Mime type of the parser.
+         * @param {String} rel Relation type of the parser.
          *
-         * @return {Object|undefined} the parser
+         * @return {Object|undefined} The response parser.
          */
-        OpenSearchService.prototype.getResponseParser = function (type, rel) {
+        OpenSearchService.prototype.getParser = function (type, rel) {
             return this.parserRegistry.getParser(type, rel);
         };
 
         /**
-         * Removes a parser for the specified mime type and relation.
+         * Removes the response parser for the specified mime type and relation.
          *
-         * @param {String} type Mime type for the registered parser
-         * @param {String} rel Open search Url relation for the registered parser
+         * @param {String} type Mime type of the registered parser.
+         * @param {String} rel Relation type of the registered parser.
          */
         OpenSearchService.prototype.removeParser = function (type, rel) {
             this.parserRegistry.removeParser(type, rel);
         };
 
         /**
-         * Internal. applications should not call this function.
+         * Internal. Applications should not call this function.
          * Registers the default parsers for an OpenSearchService.
          */
         OpenSearchService.prototype.registerDefaultParsers = function () {
             this.registerParser('application/atom+xml', OpenSearchConstants.RESULTS, OpenSearchAtomParser);
             this.registerParser('application/atom+xml', OpenSearchConstants.COLLECTION, OpenSearchAtomParser);
 
-            /** There can be 3 mimeTypes for geoJSON **/
+            /** There are 3 accepted mime types for GeoJSON **/
             this.registerParser('application/vnd.geo+json', OpenSearchConstants.RESULTS, window.JSON);
             this.registerParser('application/vnd.geo+json', OpenSearchConstants.COLLECTION, window.JSON);
 
