@@ -42,6 +42,8 @@ define([
             var xhr = new XMLHttpRequest(), url = "https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml",
                 self = this;
 
+            this.displayName = displayName || "Open Street Map";
+
             xhr.open("GET", url, true);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
@@ -49,7 +51,7 @@ define([
                         var wmtsCapabilities = new WmtsCapabilities(xhr.responseXML);
                         var wmtsLayerCapabilities = wmtsCapabilities.getLayer("osm");
                         var wmtsConfig = WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
-                        wmtsConfig.title = displayName || "Open Street Map";
+                        wmtsConfig.title = self.displayName;
                         WmtsLayer.call(self, wmtsConfig);
                     } else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -68,7 +70,6 @@ define([
 
             xhr.send(null);
 
-            this.displayName = displayName;
             this.pickEnabled = false;
         };
 
