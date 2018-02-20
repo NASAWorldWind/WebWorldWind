@@ -1209,41 +1209,34 @@ define([
 
         /**
          * Adds a specified layer to the end of this WorldWindow.
-         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not modified.
+         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not
+         * modified.
          */
         WorldWindow.prototype.addLayer = function (layer) {
-            this.layers.push(layer);
+            if (layer) {
+                this.layers.push(layer);
+            }
         };
 
         /**
          * Removes the first instance of a specified layer from this WorldWindow.
          * @param {Layer} layer The layer to remove. May be null or undefined, in which case this WorldWindow is not
-         * modified. This WorldWindow is also not modified if the specified layer does not exist in this world
-         * window's layer list.
+         * modified. This WorldWindow is also not modified if the specified layer does not exist in this WorldWindow's
+         * layer list.
          */
         WorldWindow.prototype.removeLayer = function (layer) {
-            if (!layer)
-                return;
-
-            var index = -1;
-            for (var i = 0, len = this.layers.length; i < len; i++) {
-                if (this.layers[i] == layer) {
-                    index = i;
-                    break;
-                }
-            }
-
+            var index = this.indexOfLayer(layer);
             if (index >= 0) {
                 this.layers.splice(index, 1);
             }
         };
 
         /**
-         * Inserts a specified layer at a specified position in this WorldWindow's layer list.
-         * @param {number} index The index at which to insert the layer. May be negative to specify the position
+         * Inserts a specified layer at a specified position in this WorldWindow.
+         * @param {Number} index The index at which to insert the layer. May be negative to specify the position
          * from the end of the array.
-         * @param {Layer} layer The layer to insert. This WorldWindow's layer list is not changed if the specified
-         * layer is null or undefined.
+         * @param {Layer} layer The layer to insert. May be null or undefined, in which case this WorldWindow is not
+         * modified.
          */
         WorldWindow.prototype.insertLayer = function (index, layer) {
             if (layer) {
@@ -1252,16 +1245,11 @@ define([
         };
 
         /**
-         * Returns the index of a layer.
-         * @param {Layer} layer The layer to test.
-         * @returns {Number} Returns the index of the searched layer or -1 if it doesn't exists.
+         * Returns the index of a specified layer in this WorldWindow.
+         * @param {Layer} layer The layer to search for.
+         * @returns {Number} The index of the specified layer or -1 if it doesn't exist in this WorldWindow.
          */
         WorldWindow.prototype.indexOfLayer = function (layer) {
-            if (layer == null) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "indexOfLayer", "missingLayer"));
-            }
-
             return this.layers.indexOf(layer);
         };
 
