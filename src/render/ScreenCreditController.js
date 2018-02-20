@@ -56,7 +56,10 @@ define([
          */
         var ScreenCreditController = function () {
             // Internal. Intentionally not documented.
-            this.imageUrls = [];
+            this.screenImages = [];
+
+            // Internal. Intentionally not documented.
+            this.stringCredits = [];
 
             // Internal. Intentionally not documented.
             this.imageCreditSize = 64;
@@ -66,10 +69,6 @@ define([
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
-
-            this.screenImage = {};
-
-            this.screenText = {};
 
             this.textAttributes = new TextAttributes(null);
         };
@@ -97,7 +96,7 @@ define([
          * Clears all credits from this controller.
          */
         ScreenCreditController.prototype.clear = function () {
-            this.imageUrls = [];
+            this.screenImages = [];
             this.stringCredits = [];
         };
 
@@ -115,8 +114,8 @@ define([
             var screenOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
             var screenImage = new ScreenImage(screenOffset, imageUrl);
 
-            if (this.imageUrls.indexOf(imageUrl) === -1) {
-                this.imageUrls.push(imageUrl);
+            if (this.screenImages.indexOf(screenImage) === -1) {
+                this.screenImages.push(screenImage);
             }
         };
 
@@ -139,21 +138,18 @@ define([
 
             this.textAttributes = this.createStringCreditAttributes(color);
 
-            this.screenText = new ScreenText(this.textAttributes.offset, stringCredit);
+            var screenText = new ScreenText(this.textAttributes.offset, stringCredit);
 
 
-            // if (this.stringCredits.indexOf(stringCredit) === -1) {
-            //     this.stringCredits.push({
-            //         text: stringCredit,
-            //         textAttributes: this.createStringCreditTextAttributes(color)
-            //     });
-            // }
+            if (this.stringCredits.indexOf(screenText) === -1) {
+                this.stringCredits.push(screenText);
+            }
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.drawCredits = function (dc) {
             // Check to see if there's anything to draw.
-            if ((this.imageUrls.length === 0 && this.stringCredits.length === 0)) {
+            if ((this.screenImages.length === 0 && this.stringCredits.length === 0)) {
                 return;
             }
 
@@ -168,26 +164,37 @@ define([
             }
             this.lastFrameTimestamp = dc.timestamp;
 
-            //this.beginDrawingCredits(dc);
+            console.log(this.stringCredits);
 
-            // Draw the image credits in a row along the bottom of the window from right to left.
-            var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
-                imageHeight, maxImageHeight = 0;
+            // //this.beginDrawingCredits(dc);
+            //
+            // // Draw the image credits in a row along the bottom of the window from right to left.
+            // // var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
+            // //     imageHeight, maxImageHeight = 0;
+            // //
+            // // for (var i = 0; i < this.screenImages.length; i++) {
+            // //     imageHeight = this.drawImageCredit(dc, this.screenImages[i], imageX, this.margin);
+            // //     if (imageHeight > 0) {
+            // //         imageX -= (this.margin + this.imageCreditSize);
+            // //         maxImageHeight = WWMath.max(imageHeight, maxImageHeight);
+            // //     }
+            // // }
+            //
+            // for (var i = 0; i < this.screenImages.length; i++) {
+            //     this.screenImages[i].render();
+            // }
+            //
+            // for (var indx = 0; indx < this.screenCredits.length; indx++) {
+            //     this.screenCredits[indx].render();
+            // }
 
-            for (var i = 0; i < this.imageUrls.length; i++) {
-                imageHeight = this.drawImageCredit(dc, this.imageUrls[i], imageX, this.margin);
-                if (imageHeight > 0) {
-                    imageX -= (this.margin + this.imageCreditSize);
-                    maxImageHeight = WWMath.max(imageHeight, maxImageHeight);
-                }
-            }
-
-            // Draw the string credits above the image credits and progressing from bottom to top.
-            var stringY = maxImageHeight + this.margin;
-            for (var j = 0; j < this.stringCredits.length; j++) {
-                this.drawStringCredit(dc, this.stringCredits[j], stringY);
-                stringY += this.margin + 15; // margin + string height
-            }
+            //
+            // // Draw the string credits above the image credits and progressing from bottom to top.
+            // var stringY = maxImageHeight + this.margin;
+            // for (var j = 0; j < this.stringCredits.length; j++) {
+            //     this.drawStringCredit(dc, this.stringCredits[j], stringY);
+            //     stringY += this.margin + 15; // margin + string height
+            // }
 
             //this.endDrawingCredits(dc);
         };
