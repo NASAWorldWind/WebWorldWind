@@ -463,16 +463,16 @@
                     <west>13.560547850100555</west>
                 </LatLonBox>
                 <TimeStamp>
-                    <when>2015-08-03T10:10:10</when>
+                    <when>2015-08-10T10:10:10</when>
                 </TimeStamp>
                 <Region>
                     <LatLonAltBox>
-                        <north>51.451117795210315</north>
-                        <south>50.45526533911891</south>
-                        <east>15.140457957690417</east>
-                        <west>13.560547850100555</west>
+                        <north>30</north>
+                        <south>29</south>
+                        <east>1</east>
+                        <west>0</west>
                         <minAltitude>0</minAltitude>
-                        <maxAltitude>1000000</maxAltitude>
+                        <maxAltitude>10000000</maxAltitude>
                         <altitudeMode>clampToGround</altitudeMode>
                     </LatLonAltBox>
                 </Region>
