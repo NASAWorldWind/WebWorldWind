@@ -63,14 +63,13 @@ require([
         });
 
         it("should convert from CSS back to the original value within css 8 bit precision", function () {
-            var err = 1 / 512;
+            var err = 1 / 510;
 
             for (var red = 0; red <= 1; red += 0.0001) {
                 var initialColor = new Color(red, 0, 0, 1);
                 var colorCssString = initialColor.toCssColorString();
                 var colorValues = cssStringParse(colorCssString);
-                var resultColor = new Color(colorValues[0] / 255, colorValues[1] / 255, colorValues[2] / 255, colorValues[3]);
-                var val = Math.abs(resultColor.red - initialColor.red);
+                var resultColor = Color.colorFromBytes(colorValues[0], colorValues[1], colorValues[2], colorValues[3] * 255);
                 expect(Math.abs(resultColor.red - initialColor.red) <= err).toBe(true);
             }
         });
