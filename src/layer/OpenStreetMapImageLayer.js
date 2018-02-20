@@ -44,28 +44,22 @@ define([
             var xhr = new XMLHttpRequest();
             var url = "https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml";
 
-            var capabilitiesDocument = function (ctx) {
-                var that = ctx;
-                return {
-                    retrieveAndParse: function () {
-                        if (xhr.readyState === 4) {
-                            if (xhr.status === 200) {
-                                var wmtsCapabilities = new WmtsCapabilities(xhr.responseXML);
-                                var wmtsLayerCapabilities = wmtsCapabilities.getLayer("osm");
-                                var wmtsConfig = WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
-                                wmtsConfig.title = "Open Street Map";
-                                WmtsLayer.call(that, wmtsConfig);
-                            } else {
-                                Logger.log(Logger.LEVEL_WARNING,
-                                    "OSM retrieval failed (" + xhr.statusText + "): " + url);
-                            }
-                        }
+            var self = this;
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var wmtsCapabilities = new WmtsCapabilities(xhr.responseXML);
+                        var wmtsLayerCapabilities = wmtsCapabilities.getLayer("osm");
+                        var wmtsConfig = WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
+                        wmtsConfig.title = "Open Street Map";
+                        WmtsLayer.call(self, wmtsConfig);
+                    } else {
+                        Logger.log(Logger.LEVEL_WARNING,
+                            "OSM retrieval failed (" + xhr.statusText + "): " + url);
                     }
                 }
             };
-
-            xhr.open("GET", url, true);
-            xhr.onreadystatechange = capabilitiesDocument(this).retrieveAndParse;
 
             xhr.onerror = function () {
                 Logger.log(Logger.LEVEL_WARNING, "OSM retrieval failed: " + url);
