@@ -935,6 +935,52 @@
                         </outerBoundaryIs>
                     </Polygon>
                 </Placemark>
+
+                <Placemark>
+                    <name>Example of MultiGeometry</name>
+                    <visibility>1</visibility>
+                    <LookAt>
+                        <longitude>17</longitude>
+                        <latitude>50</latitude>
+                        <altitude>0</altitude>
+                        <heading>-55.42811560891606</heading>
+                        <tilt>56.10280503739589</tilt>
+                        <range>10000</range>
+                    </LookAt>
+                    <styleUrl>#transYellowPoly</styleUrl>
+                    <MultiGeometry>
+                        <Polygon>
+                            <extrude>1</extrude>
+                            <altitudeMode>relativeToGround</altitudeMode>
+                            <outerBoundaryIs>
+                                <LinearRing>
+                                    <coordinates>
+                                    17,52,1000
+                                    18,52,1000
+                                    18,51,1000
+                                    17,51,1000
+                                    17,52,1000
+                                    </coordinates>
+                                </LinearRing>
+                            </outerBoundaryIs>
+                        </Polygon>
+                        <Polygon>
+                            <extrude>1</extrude>
+                            <altitudeMode>relativeToGround</altitudeMode>
+                            <outerBoundaryIs>
+                                <LinearRing>
+                                    <coordinates>
+                                    17,50,1000
+                                    18,50,1000
+                                    18,49,1000
+                                    17,49,1000
+                                    17,50,1000
+                                    </coordinates>
+                                </LinearRing>
+                            </outerBoundaryIs>
+                        </Polygon>
+                    </MultiGeometry>
+                </Placemark>
             </Folder>
         </Folder>
     </Document>
