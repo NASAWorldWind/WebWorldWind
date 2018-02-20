@@ -25,9 +25,9 @@ requirejs([
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
-        var BMNGLayer = new WorldWind.BMNGLayer();
+        var bmngLayer = new WorldWind.BMNGLayer();
         var openSearchLayer = new WorldWind.OpenSearchLayer('Open Search');
-        wwd.addLayer(BMNGLayer);
+        wwd.addLayer(bmngLayer);
         wwd.addLayer(openSearchLayer);
 
         openSearchLayer.shapeConfigurationCallback = shapeConfigurationCallback;
@@ -36,69 +36,68 @@ requirejs([
             new Date('2013-03-12T00:00:00.000Z')
         ];
 
-        /*** Using the OpenSearchService to do a two step search search ***/
+        // ************************************************************************************************************
+        // This performs a 2-step search for Earth Observation products using the OpenSearch service and layer.
 
         var url = 'http://geo.spacebel.be/opensearch/description.xml';
 
         var openSearchService = new WorldWind.OpenSearchService(url);
+
+        // Use the service for getting and parsing the OpenSearch description document
         openSearchService.discover()
             .then(function (service) {
-
-                //Only interested in collection urls that return an atom response
+                // Get the first URL that returns an ATOM result
                 var url = service.findUrl(function(url) {
                     return (
                         url.relations.indexOf('collection') >= 0 &&
                         url.type === 'application/atom+xml'
                     );
                 });
-                console.log('collection url parameters', url.parameters);
 
                 var searchParams = [
                     {name: 'platform', value: 'smos'}
                 ];
-                var collectionResults = service.search(searchParams, {relation: 'collection'});
-                return collectionResults;
-            })
-            .then(function (geoJSONCollection) {
-                console.log('collection results', geoJSONCollection);
 
-                var feature = geoJSONCollection.features.filter(function (feature) {
+                // Search for collections using the given parameters
+                return service.search(searchParams, {relation: 'collection'});
+            })
+            .then(function (response) {
+                // Get the first feature with one or more search links
+                var feature = response.features.filter(function (feature) {
                     return !!feature.links.search;
                 })[0];
 
                 var productSearchUrl = feature.links.search[0].href;
-                console.log('search link', feature.links.search[0]);
-                console.log('feature title', feature.properties.title);
 
+                // Use the layer for the second step so that the results are display on the globe
                 return openSearchLayer.discover({url: productSearchUrl});
             })
             .then(function (layer) {
-                console.log('description document', layer.descriptionDocument);
-                console.log('search urls', layer.descriptionDocument.urls);
-
-                //Only interested in urls that contain results and return an atom response.
+                // Get the first URL that returns an ATOM result
                 var url = layer.findUrl(function(url) {
                     return (
                         url.relations.indexOf('results') >= 0 &&
                         url.type === 'application/atom+xml'
                     );
                 });
-                console.log('url', url);
-                console.log('searchParams', url.parameters);
 
                 var searchParams = [
                     {name: 'productType', value: '{MIR_SCLF1C,MIR_SCSF1C,MIR_SCLD1C,MIR_SCSD1C}'}
                 ];
-                var geoJSONProducts = layer.search(searchParams);
-                return geoJSONProducts;
+
+                // Search for products using the given parameters
+                return layer.search(searchParams);
             })
             .then(function (geoJSONCollection) {
-                console.log('products results', geoJSONCollection);
+                // Refresh the globe after the search has completed
                 wwd.redraw();
             })
             .catch(function (err) {
+                // Handle errors
                 console.error(err);
             });
+
+        // ************************************************************************************************************
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
@@ -129,7 +128,6 @@ requirejs([
             }
             else if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
                 configuration.attributes = new WorldWind.ShapeAttributes(null);
-
                 // Fill the polygon with a random pastel color.
                 configuration.attributes.interiorColor = new WorldWind.Color(
                     0.375 + 0.5 * Math.random(),
