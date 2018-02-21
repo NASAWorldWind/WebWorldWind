@@ -77,6 +77,10 @@ define([
 
         OpenStreetMapImageLayer.prototype.doRender = function (dc) {
             WmtsLayer.prototype.doRender.call(this, dc);
+
+            // Add a screen credit to attribute the data source to OSM and EOX
+            // The pattern for this attribute is described in the WMTS Capabilities document and demonstrated at EOX
+            // Maps site: http://maps.eox.at/
             if (this.inCurrentFrame) {
                 dc.screenCreditController.addStringCredit("http://www.openstreetmap.org/copyright, http://maps.eox.at/#data, and http://eox.at", Color.DARK_GRAY);
                 dc.screenCreditController.addStringCredit("OpenStreetMap { Data © OpenStreetMap contributers, Rendering © MapServer and EOX }", Color.DARK_GRAY);
