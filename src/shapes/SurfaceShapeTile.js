@@ -129,7 +129,7 @@ define([
          */
         SurfaceShapeTile.prototype.addSurfaceShape = function (surfaceShape) {
             this.surfaceShapes.push(surfaceShape);
-            this.surfaceShapeStateKeys.push(surfaceShape.stateKey);
+            this.surfaceShapeStateKeys.push(surfaceShape.stateKey + " lo " + surfaceShape.layer.opacity); // combine the shape state key with layer opacity
         };
 
         // Internal use only. Intentionally not documented.

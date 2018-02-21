@@ -25,6 +25,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './util/BasicTimeSequence',
+        './BasicWorldWindowController',
         './layer/BingAerialLayer',
         './layer/BingAerialWithLabelsLayer',
         './layer/BingRoadsLayer',
@@ -147,7 +148,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/MemoryCacheListener',
         './layer/MercatorTiledImageLayer',
         './navigate/Navigator',
-        './navigate/NavigatorState',
         './util/NominatimGeocoder',
         './error/NotYetImplementedError',
         './util/Offset',
@@ -210,7 +210,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './globe/Tessellator',
         './shapes/Text',
         './shapes/TextAttributes',
-        './render/TextSupport',
+        './render/TextRenderer',
         './render/Texture',
         './render/TextureTile',
         './util/Tile',
@@ -248,6 +248,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/WmtsLayer',
         './ogc/wmts/WmtsLayerCapabilities',
         './WorldWindow',
+        './WorldWindowController',
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
@@ -264,6 +265,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BasicProgram,
               BasicTextureProgram,
               BasicTimeSequence,
+              BasicWorldWindowController,
               BingAerialLayer,
               BingAerialWithLabelsLayer,
               BingRoadsLayer,
@@ -386,7 +388,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               MemoryCacheListener,
               MercatorTiledImageLayer,
               Navigator,
-              NavigatorState,
               NominatimGeocoder,
               NotYetImplementedError,
               Offset,
@@ -449,7 +450,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Tessellator,
               Text,
               TextAttributes,
-              TextSupport,
+              TextRenderer,
               Texture,
               TextureTile,
               Tile,
@@ -487,6 +488,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsLayer,
               WmtsLayerCapabilities,
               WorldWindow,
+              WorldWindowController,
               WWMath,
               WWMessage,
               WWUtil,
@@ -724,6 +726,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BasicTimeSequence'] = BasicTimeSequence;
+        WorldWind['BasicWorldWindowController'] = BasicWorldWindowController;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
@@ -798,7 +801,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
         WorldWind['MercatorTiledImageLayer'] = MercatorTiledImageLayer;
         WorldWind['Navigator'] = Navigator;
-        WorldWind['NavigatorState'] = NavigatorState;
         WorldWind['NominatimGeocoder'] = NominatimGeocoder;
         WorldWind['NotYetImplementedError'] = NotYetImplementedError;
         WorldWind['Offset'] = Offset;
@@ -858,7 +860,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Tessellator'] = Tessellator;
         WorldWind['Text'] = Text;
         WorldWind['TextAttributes'] = TextAttributes;
-        WorldWind['TextSupport'] = TextSupport;
+        WorldWind['TextRenderer'] = TextRenderer;
         WorldWind['Texture'] = Texture;
         WorldWind['TextureTile'] = TextureTile;
         WorldWind['Tile'] = Tile;
@@ -898,6 +900,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
+        WorldWind['WorldWindowController'] = WorldWindowController;
         WorldWind['ZeroElevationModel'] = ZeroElevationModel;
 
         /**

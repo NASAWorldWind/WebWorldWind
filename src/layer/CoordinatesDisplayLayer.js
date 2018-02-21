@@ -58,7 +58,7 @@ define([
         var CoordinatesDisplayLayer = function (worldWindow) {
             if (!worldWindow) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ViewControlsLayer", "constructor", "missingWorldWindow"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "CoordinatesDisplayLayer", "constructor", "missingWorldWindow"));
             }
 
             Layer.call(this, "Coordinates");

@@ -124,7 +124,6 @@ define(function () {
             missingListener: "The specified listener is null or undefined",
             missingLocation: "The specified location is null or undefined.",
             missingMatrix: "The specified matrix is null or undefined.",
-            missingNavigatorState: "The specified navigator state is null or undefined.",
             missingOffset: "The specified offset is null or undefined.",
             missingPath: "The specified path is null or undefined.",
             missingPlacename: "The specified place name is null or undefined.",

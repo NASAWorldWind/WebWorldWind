@@ -36,12 +36,15 @@ define([
          * in which case the new instance contains default attributes.
          */
         var TextAttributes = function (attributes) {
-            this._color = attributes ? attributes._color : new Color(1, 1, 1, 1);
+            this._color = attributes ? attributes._color.clone() : Color.WHITE.clone();
             this._font = attributes ? attributes._font : new Font(14);
             this._offset = attributes ? attributes._offset
                 : new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
             this._scale = attributes ? attributes._scale : 1;
             this._depthTest = attributes ? attributes._depthTest : false;
+            this._enableOutline = attributes ? attributes._enableOutline : true;
+            this._outlineWidth = attributes ? attributes._outlineWidth : 4;
+            this._outlineColor = attributes ? attributes._outlineColor : new Color(0, 0, 0, 0.5);
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
@@ -65,7 +68,10 @@ define([
                 " f " + this._font.toString() +
                 " o " + this._offset.toString() +
                 " s " + this._scale +
-                " dt " + this._depthTest;
+                " dt " + this._depthTest +
+                " eo " + this._enableOutline +
+                " ow " + this._outlineWidth +
+                " oc " + this._outlineColor.toHexString(true);
         };
 
         Object.defineProperties(TextAttributes.prototype, {
@@ -167,6 +173,54 @@ define([
                 },
                 set: function (value) {
                     this._depthTest = value;
+                    this.stateKeyInvalid = true;
+                }
+            },
+
+            /**
+             * Indicates if the text will feature an outline around its characters.
+             * @type {Boolean}
+             * @default true
+             * @memberof TextAttributes.prototype
+             */
+            enableOutline: {
+                get: function () {
+                    return this._enableOutline;
+                },
+                set: function (value) {
+                    this._enableOutline = value;
+                    this.stateKeyInvalid = true;
+                }
+            },
+
+            /**
+             * Indicates the text outline width (or thickness) in pixels.
+             * @type {Number}
+             * @default 4
+             * @memberof TextAttributes.prototype
+             */
+            outlineWidth: {
+                get: function () {
+                    return this._outlineWidth;
+                },
+                set: function (value) {
+                    this._outlineWidth = value;
+                    this.stateKeyInvalid = true;
+                }
+            },
+
+            /**
+             * The color of the outline.
+             * @type {Color}
+             * @default Half-transparent black (0, 0, 0, 0.5)
+             * @memberof TextAttributes.prototype
+             */
+            outlineColor: {
+                get: function () {
+                    return this._outlineColor;
+                },
+                set: function (value) {
+                    this._outlineColor = value;
                     this.stateKeyInvalid = true;
                 }
             }
