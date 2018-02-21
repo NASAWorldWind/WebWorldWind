@@ -93,6 +93,11 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.texParameters = {};
+
+            // Internal use only. Intentionally not documented.
+            // https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotrop
+            this.anisotropicFilterExt = (gl.getExtension("EXT_texture_filter_anisotropic") ||
+                                         gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic"));
         };
 
         /**
@@ -163,12 +168,8 @@ define([
             // this extension is enabled.
             if (textureMagFilter === gl.LINEAR) {
                 // Setup 4x anisotropic texture filtering when this feature is available.
-                // https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotrop
-                var ext = (
-                    gl.getExtension("EXT_texture_filter_anisotropic") ||
-                    gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic"));
-                if (ext) {
-                    gl.texParameteri(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+                if (this.anisotropicFilterExt) {
+                    gl.texParameteri(gl.TEXTURE_2D, this.anisotropicFilterExt.TEXTURE_MAX_ANISOTROPY_EXT, 4);
                 }
             }
         };
