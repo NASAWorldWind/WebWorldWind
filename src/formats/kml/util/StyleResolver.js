@@ -95,7 +95,6 @@ define([
      * @private
      */
     StyleResolver.prototype.handleStyleSelector = function (styleSelector) {
-        console.log(styleSelector);
         if (styleSelector.isMap) {
             return styleSelector.resolve(this);
         } else {

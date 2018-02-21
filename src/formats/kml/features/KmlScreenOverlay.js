@@ -42,8 +42,6 @@ define([
      */
     var KmlScreenOverlay = function (options) {
         KmlOverlay.call(this, options);
-
-        console.log("Create Screen Overlay", this);
     };
 
     KmlScreenOverlay.prototype = Object.create(KmlOverlay.prototype);

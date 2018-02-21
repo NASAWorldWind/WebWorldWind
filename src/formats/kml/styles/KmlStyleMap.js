@@ -91,7 +91,6 @@ define([
                 results['highlight'] =  null;
             }
 
-            console.log(results);
             return results;
         });
     };
