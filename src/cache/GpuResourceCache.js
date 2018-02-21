@@ -173,7 +173,8 @@ define([
 
             var resource = entry ? entry.resource : null;
 
-            if (resource instanceof Texture) {
+            // This is faster than checking if the resource is a texture using instanceof.
+            if (resource !== null && typeof resource.clearTexParameters === "function") {
                 resource.clearTexParameters();
             }
 
