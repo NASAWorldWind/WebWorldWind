@@ -232,6 +232,7 @@ define([
         attributes._offset = attributes._offset || new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
         attributes._scale = attributes._scale || 1;
         attributes._depthTest = attributes._depthTest || false;
+        attributes._outlineColor = attributes._outlineColor || Color.RED;
 
         return attributes;
     };

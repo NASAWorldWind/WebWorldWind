@@ -128,7 +128,7 @@ define([
         }));
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes = new ShapeAttributes(KmlStyle.shapeAttributes({
-            outlineColor: Color.RED
+            _outlineColor: Color.RED
         }));
 
         return placemarkAttributes;

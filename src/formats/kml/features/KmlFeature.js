@@ -278,9 +278,14 @@ define([
         var timeBasedVisibility = this.solveTimeVisibility(dc);
         var regionVisibility = this.solveRegion(dc);
         var myVisibility = this.kmlVisibility !== false;
-        var controlledVisibility = this.controlledVisibility !== false;
 
-        this.enabled = parentVisibility && timeBasedVisibility && regionVisibility && (myVisibility || controlledVisibility);
+        if(this.controlledVisibility === true) {
+            this.enabled = true;
+        } else if(this.controlledVisibility === false) {
+            this.enabled = false;
+        } else {
+            this.enabled = parentVisibility && timeBasedVisibility && regionVisibility && myVisibility;
+        }
 
         kmlOptions.lastVisibility = this.enabled;
         if(this._renderable) {
