@@ -151,12 +151,10 @@ define([
                 textSize = this.textSize(text),
                 lines = text.split("\n"),
                 strokeOffset = this.enableOutline ? this.outlineWidth / 2 : 0,
-                canvasLineHeight,
                 pixelScale = this.dc.pixelScale;
 
             canvas2D.width = Math.ceil(textSize[0]) * pixelScale;
             canvas2D.height = Math.ceil(textSize[1]) * pixelScale;
-            canvasLineHeight = (canvas2D.height - 1) / lines.length;
 
             ctx2D.scale(pixelScale, pixelScale);
             ctx2D.font = this.typeFace.fontString;
@@ -177,7 +175,6 @@ define([
             }
 
             for (var i = 0; i < lines.length; i++) {
-                var yTranslate = canvasLineHeight * (i + 1) - this.typeFace.size * (1 + this.lineSpacing) + strokeOffset;
                 ctx2D.translate(0, this.typeFace.size * (1 + this.lineSpacing) + strokeOffset);
                 if (this.enableOutline) {
                     ctx2D.strokeText(lines[i], 0, 0);
