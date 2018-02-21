@@ -550,7 +550,7 @@ define([
             try {
                 // Setup to transform unit cube coordinates to this bounding box's local coordinates, as viewed by the
                 // current navigator state.
-                matrix.copy(dc.navigatorState.modelviewProjection);
+                matrix.copy(dc.modelviewProjection);
                 matrix.multiply(
                     this.r[0], this.s[0], this.t[0], this.center[0],
                     this.r[1], this.s[1], this.t[1], this.center[1],

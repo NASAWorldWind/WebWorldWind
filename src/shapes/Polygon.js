@@ -242,7 +242,7 @@ define([
             if (Array.isArray(this.activeAttributes.imageSource)
                 && this.activeAttributes.imageSource[0]
                 && (typeof this.activeAttributes.imageSource[0] === "string"
-                || this.activeAttributes.imageSource instanceof ImageSource)) {
+                    || this.activeAttributes.imageSource instanceof ImageSource)) {
                 return this.activeAttributes.imageSource[0];
             }
 
@@ -347,7 +347,7 @@ define([
         // Private. Intentionally not documented.
         Polygon.prototype.computeBoundaryPoints = function (dc, boundaries) {
             var eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 boundaryPoints = [],
                 stride = this._extrude ? 6 : 3,
                 pt = new Vec3(0, 0, 0),
@@ -391,7 +391,8 @@ define([
                 }
             }
 
-            this.currentData.eyeDistance = 0;/*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
+            this.currentData.eyeDistance = 0;
+            /*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
 
             return boundaryPoints;
         };
@@ -531,7 +532,7 @@ define([
                 hasCapTexture = !!this.hasCapTexture(),
                 applyLighting = this.activeAttributes.applyLighting,
                 numCapVertices = currentData.capTriangles.length / (hasCapTexture ? 5 : 3),
-                vboId, opacity, color, stride, textureBound, capBuffer;
+                vboId, color, stride, textureBound, capBuffer;
 
             // Assume no cap texture.
             program.loadTextureEnabled(gl, false);
@@ -557,11 +558,10 @@ define([
             }
 
             color = this.activeAttributes.interiorColor;
-            opacity = color.alpha * dc.currentLayer.opacity;
             // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-            gl.depthMask(opacity >= 1 || dc.pickingMode);
+            gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? pickColor : color);
-            program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
             stride = 12 + (hasCapTexture ? 8 : 0) + (applyLighting ? 12 : 0);
 
@@ -658,19 +658,12 @@ define([
             }
 
             color = this.activeAttributes.interiorColor;
-            opacity = color.alpha * dc.currentLayer.opacity;
             // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-            gl.depthMask(opacity >= 1 || dc.pickingMode);
+            gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? pickColor : color);
-            program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
             if (hasSideTextures && !dc.pickingMode) {
-                this.activeTexture = dc.gpuResourceCache.resourceForKey(this.capImageSource());
-                if (!this.activeTexture) {
-                    this.activeTexture =
-                        dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.capImageSource());
-                }
-
                 if (applyLighting) {
                     program.loadApplyLighting(gl, true);
                     gl.enableVertexAttribArray(program.normalVectorLocation);
@@ -695,7 +688,7 @@ define([
                             coordByteOffset + 12);
 
                         this.scratchMatrix.setToIdentity();
-                        this.scratchMatrix.multiplyByTextureTransform(this.activeTexture);
+                        this.scratchMatrix.multiplyByTextureTransform(sideTexture);
 
                         program.loadTextureEnabled(gl, true);
                         program.loadTextureUnit(gl, gl.TEXTURE0);
@@ -870,12 +863,10 @@ define([
                 }
 
                 color = this.activeAttributes.outlineColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
-                // Disable writing the shape's fragments to the depth buffer when the outline is
-                // semi-transparent.
-                gl.depthMask(opacity >= 1 || dc.pickingMode);
+                // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
+                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 
@@ -910,7 +901,7 @@ define([
 
             var applyLighting = !dc.pickMode && this.activeAttributes.applyLighting;
             if (applyLighting) {
-                dc.currentProgram.loadModelviewInverse(gl, dc.navigatorState.modelviewNormalTransform);
+                dc.currentProgram.loadModelviewInverse(gl, dc.modelviewNormalTransform);
             }
         };
 

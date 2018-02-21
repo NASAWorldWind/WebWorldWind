@@ -395,7 +395,7 @@ define([
 
                 if (dc.pickPoint && this.mustDrawLabel()) {
                     if (this.labelBounds.containsPoint(
-                            dc.navigatorState.convertPointToViewport(dc.pickPoint, Placemark.scratchPoint))) {
+                            dc.convertPointToViewport(dc.pickPoint, Placemark.scratchPoint))) {
                         po.labelPicked = true;
                     }
                 }
@@ -427,7 +427,7 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
-            this.eyeDistance = this.alwaysOnTop ? 0 : dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = this.alwaysOnTop ? 0 : dc.eyePoint.distanceTo(this.placePoint);
 
             if (this.mustDrawLeaderLine(dc)) {
                 dc.surfacePointForMode(this.position.latitude, this.position.longitude, 0,
@@ -439,7 +439,7 @@ define([
             // terrain. When a placemark is displayed near the terrain portions of its geometry are often behind the terrain,
             // yet as a screen element the placemark is expected to be visible. We adjust its depth values rather than moving
             // the placemark itself to avoid obscuring its actual position.
-            if (!dc.navigatorState.projectWithDepth(this.placePoint, this.depthOffset, Placemark.screenPoint)) {
+            if (!dc.projectWithDepth(this.placePoint, this.depthOffset, Placemark.screenPoint)) {
                 return null;
             }
 
@@ -476,18 +476,11 @@ define([
 
             this.imageBounds = WWMath.boundingRectForUnitQuad(this.imageTransform);
 
-            // If there's a label, perform these same operations for the label texture, creating that texture if it
-            // doesn't already exist.
+            // If there's a label, perform these same operations for the label texture.
 
             if (this.mustDrawLabel()) {
-                var labelFont = this.activeAttributes.labelAttributes.font,
-                    labelKey = this.label + labelFont.toString();
 
-                this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-                if (!this.labelTexture) {
-                    this.labelTexture = dc.textSupport.createTexture(dc, this.label, labelFont, true);
-                    dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-                }
+                this.labelTexture = dc.createTextTexture(this.label, this.activeAttributes.labelAttributes);
 
                 w = this.labelTexture.imageWidth;
                 h = this.labelTexture.imageHeight;
@@ -532,12 +525,12 @@ define([
                 return dc.pickRectangle && (this.imageBounds.intersects(dc.pickRectangle)
                     || (this.mustDrawLabel() && this.labelBounds.intersects(dc.pickRectangle))
                     || (this.mustDrawLeaderLine(dc)
-                    && dc.pickFrustum.intersectsSegment(this.groundPoint, this.placePoint)));
+                        && dc.pickFrustum.intersectsSegment(this.groundPoint, this.placePoint)));
             } else {
-                return this.imageBounds.intersects(dc.navigatorState.viewport)
-                    || (this.mustDrawLabel() && this.labelBounds.intersects(dc.navigatorState.viewport))
+                return this.imageBounds.intersects(dc.viewport)
+                    || (this.mustDrawLabel() && this.labelBounds.intersects(dc.viewport))
                     || (this.mustDrawLeaderLine(dc)
-                    && dc.navigatorState.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
+                        && dc.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
             }
         };
 
@@ -641,7 +634,7 @@ define([
                 }
             }
 
-            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity * this.currentVisibility);
 
             // Draw the leader line first so that the image and label have visual priority.
             if (this.mustDrawLeaderLine(dc)) {
@@ -671,7 +664,7 @@ define([
                 program.loadColor(gl, dc.pickingMode ? this.pickColor :
                     this.activeAttributes.leaderLineAttributes.outlineColor);
 
-                Placemark.matrix.copy(dc.navigatorState.modelviewProjection);
+                Placemark.matrix.copy(dc.modelviewProjection);
                 program.loadModelviewProjection(gl, Placemark.matrix);
 
                 if (!this.activeAttributes.leaderLineAttributes.depthTest) {
@@ -706,7 +699,7 @@ define([
             Placemark.matrix.multiplyMatrix(this.imageTransform);
 
             var actualRotation = this.imageRotationReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigatorState.heading - this.imageRotation : -this.imageRotation;
+                dc.navigator.heading - this.imageRotation : -this.imageRotation;
             Placemark.matrix.multiplyByTranslation(0.5, 0.5, 0);
             Placemark.matrix.multiplyByRotation(0, 0, 1, actualRotation);
             Placemark.matrix.multiplyByTranslation(-0.5, -0.5, 0);
@@ -714,7 +707,7 @@ define([
             // Perform the tilt before applying the rotation so that the image tilts back from its base into
             // the view volume.
             var actualTilt = this.imageTiltReference === WorldWind.RELATIVE_TO_GLOBE ?
-            dc.navigatorState.tilt + this.imageTilt : this.imageTilt;
+                dc.navigator.tilt + this.imageTilt : this.imageTilt;
             Placemark.matrix.multiplyByRotation(-1, 0, 0, actualTilt);
 
             program.loadModelviewProjection(gl, Placemark.matrix);
@@ -758,7 +751,7 @@ define([
                     this.texCoordMatrix.multiplyByTextureTransform(this.labelTexture);
 
                     program.loadTextureMatrix(gl, this.texCoordMatrix);
-                    program.loadColor(gl, this.activeAttributes.labelAttributes.color);
+                    program.loadColor(gl, Color.WHITE);
 
                     textureBound = this.labelTexture.bind(dc);
                     program.loadTextureEnabled(gl, textureBound);
