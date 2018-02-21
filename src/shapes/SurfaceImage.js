@@ -70,8 +70,8 @@ define([
              * This surface image's resampling mode. Indicates the sampling algorithm used to display this image when it
              * is larger on screen than its native resolution. May be one of:
              * <ul>
-             *  <li>[WorldWind.FILTER_LINEAR]{@link WorldWind#FILTER_LINEAR}</li>
-             *  <li>[WorldWind.FILTER_NEAREST]{@link WorldWind#FILTER_NEAREST}</li>
+             *  <li>WorldWind.FILTER_LINEAR</li>
+             *  <li>WorldWind.FILTER_NEAREST</li>
              * </ul>
              * @default WorldWind.FILTER_LINEAR
              */
