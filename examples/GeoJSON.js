@@ -1,11 +1,22 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -48,22 +59,21 @@ requirejs(['../src/WorldWind',
                     configuration.attributes.imageScale = 0.01 * Math.log(population);
                 }
             }
-            else if (geometry.isLineStringType() || geometry.isMultiLineStringType()){
-                configuration.attributes =  new WorldWind.ShapeAttributes(null);
-            configuration.attributes.drawOutline = true;
-            configuration.attributes.outlineColor = new WorldWind.Color(
-                0.1 * configuration.attributes.interiorColor.red,
-                0.3 * configuration.attributes.interiorColor.green,
-                0.7 * configuration.attributes.interiorColor.blue,
-                1.0);
-            configuration.attributes.outlineWidth = 1.0;
+            else if (geometry.isLineStringType() || geometry.isMultiLineStringType()) {
+                configuration.attributes = new WorldWind.ShapeAttributes(null);
+                configuration.attributes.drawOutline = true;
+                configuration.attributes.outlineColor = new WorldWind.Color(
+                    0.1 * configuration.attributes.interiorColor.red,
+                    0.3 * configuration.attributes.interiorColor.green,
+                    0.7 * configuration.attributes.interiorColor.blue,
+                    1.0);
+                configuration.attributes.outlineWidth = 1.0;
             }
-            else if(geometry.isPolygonType() || geometry.isMultiPolygonType())
-            {
+            else if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
                 configuration.attributes = new WorldWind.ShapeAttributes(null);
 
                 // Fill the polygon with a random pastel color.
-                    configuration.attributes.interiorColor = new WorldWind.Color(
+                configuration.attributes.interiorColor = new WorldWind.Color(
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
@@ -76,14 +86,14 @@ requirejs(['../src/WorldWind',
                     1.0);
             }
 
-        return configuration;
+            return configuration;
         };
 
-        var parserCompletionCallback = function(layer) {
+        var parserCompletionCallback = function (layer) {
             wwd.addLayer(layer);
         };
 
-        var resourcesUrl = "http://worldwindserver.net/webworldwind/data/geojson-data/";
+        var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/geojson-data/";
 
         // Polygon test
         var polygonLayer = new WorldWind.RenderableLayer("Polygon");
@@ -175,5 +185,5 @@ requirejs(['../src/WorldWind',
 
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        var layerManager = new LayerManager(wwd);
     });

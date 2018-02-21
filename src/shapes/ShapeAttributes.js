@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports ShapeAttributes
- * @version $Id: ShapeAttributes.js 3270 2015-06-26 01:09:56Z tgaskins $
  */
 define([
         '../util/Color',
@@ -31,8 +41,8 @@ define([
             this._drawInterior = attributes ? attributes._drawInterior : true;
             this._drawOutline = attributes ? attributes._drawOutline : true;
             this._enableLighting = attributes ? attributes._enableLighting : false;
-            this._interiorColor = attributes ? attributes._interiorColor : Color.WHITE;
-            this._outlineColor = attributes ? attributes._outlineColor : Color.RED;
+            this._interiorColor = attributes ? attributes._interiorColor.clone() : Color.WHITE.clone();
+            this._outlineColor = attributes ? attributes._outlineColor.clone() : Color.RED.clone();
             this._outlineWidth = attributes ? attributes._outlineWidth : 1.0;
             this._outlineStippleFactor = attributes ? attributes._outlineStippleFactor : 0;
             this._outlineStipplePattern = attributes ? attributes._outlineStipplePattern : 0xF0F0;

@@ -1,16 +1,24 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
- * Illustrates how to set up deep picking. See line 117.
- *
- * @version $Id: DeepPicking.js 3320 2015-07-15 20:53:05Z dcollins $
+ * Illustrates how to set up deep picking.
  */
-
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -19,6 +27,75 @@ requirejs(['../src/WorldWind',
 
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
+
+        // Tell the WorldWindow that we want deep picking.
+        wwd.deepPicking = true;
+
+        // Now set up to handle picking.
+
+        var highlightedItems = [];
+
+        // The common pick-handling function.
+        var handlePick = function (o) {
+            // The input argument is either an Event or a TapRecognizer. Both have the same properties for determining
+            // the mouse or tap location.
+            var x = o.clientX,
+                y = o.clientY;
+
+            var redrawRequired = highlightedItems.length > 0; // must redraw if we de-highlight previously picked items
+
+            // De-highlight any previously highlighted placemarks.
+            for (var h = 0; h < highlightedItems.length; h++) {
+                highlightedItems[h].highlighted = false;
+            }
+            highlightedItems = [];
+
+            // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
+            // relative to the upper left corner of the canvas rather than the upper left corner of the page.
+            var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
+            if (pickList.objects.length > 0) {
+                redrawRequired = true;
+            }
+
+            // Highlight the items picked by simply setting their highlight flag to true.
+            if (pickList.objects.length > 0) {
+                var numShapesPicked = 0;
+                for (var p = 0; p < pickList.objects.length; p++) {
+                    pickList.objects[p].userObject.highlighted = true;
+
+                    // Keep track of highlighted items in order to de-highlight them later.
+                    highlightedItems.push(pickList.objects[p].userObject);
+
+                    // Detect whether the placemark's label was picked. If so, the "labelPicked" property is true.
+                    // If instead the user picked the placemark's image, the "labelPicked" property is false.
+                    // Applications might use this information to determine whether the user wants to edit the label
+                    // or is merely picking the placemark as a whole.
+                    if (pickList.objects[p].labelPicked) {
+                        console.log("Label picked");
+                    }
+
+                    // Increment the number of items picked if a shape is picked.
+                    if (!pickList.objects[p].isTerrain) {
+                        ++numShapesPicked;
+                    }
+                }
+
+                if (numShapesPicked > 0) {
+                    console.log(numShapesPicked + " shapes picked");
+                }
+            }
+
+            // Update the window if we changed anything.
+            if (redrawRequired) {
+                wwd.redraw(); // redraw to make the highlighting changes take effect on the screen
+            }
+        };
+
+        // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
+        wwd.addEventListener("mousemove", handlePick);
+
+        // Listen for taps on mobile devices and highlight the placemarks that the user taps.
+        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
 
         /**
          * Added imagery layers.
@@ -88,8 +165,8 @@ requirejs(['../src/WorldWind',
             // Create the placemark and its label.
             placemark = new WorldWind.Placemark(new WorldWind.Position(latitude, longitude + i, 1e2), false, null);
             placemark.label = "Placemark " + i.toString() + "\n"
-            + "Lat " + latitude.toPrecision(4).toString() + "\n"
-            + "Lon " + longitude.toPrecision(5).toString();
+                + "Lat " + latitude.toPrecision(4).toString() + "\n"
+                + "Lon " + longitude.toPrecision(5).toString();
             placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
 
             // Create the placemark attributes for this placemark. Note that the attributes differ only by their
@@ -112,75 +189,6 @@ requirejs(['../src/WorldWind',
         // Add the placemarks layer to the WorldWindow's layer list.
         wwd.addLayer(placemarkLayer);
 
-        // Tell the WorldWindow that we want deep picking.
-        wwd.deepPicking = true;
-
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
-
-        // Now set up to handle picking.
-
-        var highlightedItems = [];
-
-        // The common pick-handling function.
-        var handlePick = function (o) {
-            // The input argument is either an Event or a TapRecognizer. Both have the same properties for determining
-            // the mouse or tap location.
-            var x = o.clientX,
-                y = o.clientY;
-
-            var redrawRequired = highlightedItems.length > 0; // must redraw if we de-highlight previously picked items
-
-            // De-highlight any previously highlighted placemarks.
-            for (var h = 0; h < highlightedItems.length; h++) {
-                highlightedItems[h].highlighted = false;
-            }
-            highlightedItems = [];
-
-            // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
-            // relative to the upper left corner of the canvas rather than the upper left corner of the page.
-            var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
-            if (pickList.objects.length > 0) {
-                redrawRequired = true;
-            }
-
-            // Highlight the items picked by simply setting their highlight flag to true.
-            if (pickList.objects.length > 0) {
-                var numShapesPicked = 0;
-                for (var p = 0; p < pickList.objects.length; p++) {
-                    pickList.objects[p].userObject.highlighted = true;
-
-                    // Keep track of highlighted items in order to de-highlight them later.
-                    highlightedItems.push(pickList.objects[p].userObject);
-
-                    // Detect whether the placemark's label was picked. If so, the "labelPicked" property is true.
-                    // If instead the user picked the placemark's image, the "labelPicked" property is false.
-                    // Applications might use this information to determine whether the user wants to edit the label
-                    // or is merely picking the placemark as a whole.
-                    if (pickList.objects[p].labelPicked) {
-                        console.log("Label picked");
-                    }
-
-                    // Increment the number of items picked if a shape is picked.
-                    if (!pickList.objects[p].isTerrain) {
-                        ++numShapesPicked;
-                    }
-                }
-
-                if (numShapesPicked > 0) {
-                    console.log(numShapesPicked + " shapes picked");
-                }
-            }
-
-            // Update the window if we changed anything.
-            if (redrawRequired) {
-                wwd.redraw(); // redraw to make the highlighting changes take effect on the screen
-            }
-        };
-
-        // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
-        wwd.addEventListener("mousemove", handlePick);
-
-        // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
+        var layerManager = new LayerManager(wwd);
     });

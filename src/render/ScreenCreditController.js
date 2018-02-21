@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2015 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports ScreenCreditController
- * @version $Id: ScreenCreditController.js 3345 2015-07-28 20:28:35Z dcollins $
  */
 define([
         '../error/ArgumentError',
@@ -16,6 +26,7 @@ define([
         '../util/Offset',
         '../pick/PickedObject',
         '../render/Renderable',
+        '../shapes/TextAttributes',
         '../geom/Vec3',
         '../util/WWMath'
     ],
@@ -28,6 +39,7 @@ define([
               Offset,
               PickedObject,
               Renderable,
+              TextAttributes,
               Vec3,
               WWMath) {
         "use strict";
@@ -53,15 +65,20 @@ define([
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
-
-            // Internal. Intentionally not documented.
-            this.creditFont = new Font(14);
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.scratchMatrix = Matrix.fromIdentity(); // scratch variable
         ScreenCreditController.imageTransform = Matrix.fromIdentity(); // scratch variable
         ScreenCreditController.texCoordMatrix = Matrix.fromIdentity(); // scratch variable
+
+        // Internal use only. Intentionally not documented.
+        ScreenCreditController.prototype.createStringCreditTextAttributes = function (textColor) {
+            var attributes = new TextAttributes(null);
+            attributes.color = textColor ? textColor : Color.WHITE;
+            attributes.enableOutline = false; // Screen credits display text without an outline by default
+            return attributes;
+        };
 
         /**
          * Clears all credits from this controller.
@@ -107,7 +124,7 @@ define([
             if (this.stringCredits.indexOf(stringCredit) === -1) {
                 this.stringCredits.push({
                     text: stringCredit,
-                    color: color || Color.WHITE
+                    textAttributes: this.createStringCreditTextAttributes(color)
                 });
             }
         };
@@ -125,7 +142,7 @@ define([
             }
 
             // Want to draw only once per frame.
-            if (dc.timestamp == this.lastFrameTimestamp) {
+            if (dc.timestamp === this.lastFrameTimestamp) {
                 return;
             }
             this.lastFrameTimestamp = dc.timestamp;
@@ -133,7 +150,7 @@ define([
             this.beginDrawingCredits(dc);
 
             // Draw the image credits in a row along the bottom of the window from right to left.
-            var imageX = dc.navigatorState.viewport.width - (this.margin + this.imageCreditSize),
+            var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
                 imageHeight, maxImageHeight = 0;
 
             for (var i = 0; i < this.imageUrls.length; i++) {
@@ -249,19 +266,14 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
-            var imageWidth, imageHeight, activeTexture, textureKey, gl, program, x;
+            var imageWidth, imageHeight, activeTexture, gl, program, x;
 
-            textureKey = credit.text + this.creditFont.toString();
-            activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
-            if (!activeTexture) {
-                activeTexture = dc.textSupport.createTexture(dc, credit.text, this.creditFont, false);
-                dc.gpuResourceCache.putResource(textureKey, activeTexture, activeTexture.size);
-            }
+            activeTexture = dc.createTextTexture(credit.text, credit.textAttributes);
 
             imageWidth = activeTexture.imageWidth;
             imageHeight = activeTexture.imageHeight;
 
-            x = dc.navigatorState.viewport.width - (imageWidth + this.margin);
+            x = dc.viewport.width - (imageWidth + this.margin);
             ScreenCreditController.imageTransform.setTranslation(x, y, 0);
             ScreenCreditController.imageTransform.setScale(imageWidth, imageHeight, 1);
 
@@ -274,7 +286,7 @@ define([
             program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
 
             program.loadTextureEnabled(gl, true);
-            program.loadColor(gl, credit.color);
+            program.loadColor(gl, Color.WHITE);
             program.loadOpacity(gl, this.opacity);
 
             ScreenCreditController.texCoordMatrix.setToIdentity();
