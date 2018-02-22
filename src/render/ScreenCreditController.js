@@ -72,7 +72,6 @@ define([
         ScreenCreditController.prototype.createStringCreditAttributes = function (textColor) {
             var attributes = new TextAttributes(null);
             attributes.color = textColor ? textColor : new Color(1, 1, 1, 0);
-            attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
             attributes.enableOutline = false; // Screen credits display text without an outline by default
             return attributes;
         };
@@ -119,12 +118,11 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
             }
 
-            this.textAttributes = this.createStringCreditAttributes(color);
-
-            var screenText = new ScreenText(this.textAttributes.offset, stringCredit);
-
-            if (this.stringCredits.indexOf(screenText) === -1) {
-                this.stringCredits.push(screenText);
+            if (this.stringCredits.indexOf(stringCredit) === -1) {
+                this.stringCredits.push({
+                    text: stringCredit,
+                    textAttributes: this.createStringCreditAttributes(color)
+                });
             }
         };
 
@@ -159,21 +157,12 @@ define([
                 }
             }
 
-            // // Draw the string credits above the image credits and progressing from bottom to top.
-            // var stringY = maxImageHeight + this.margin;
-            // for (var j = 0; j < this.stringCredits.length; j++) {
-            //     this.drawStringCredit(this.stringCredits[j], stringY);
-            //     stringY += this.margin + 15; // margin + string height
-            // }
-
-            //////////////////////////////////
-
-            //
-            // if (this.stringCredits.length !== 0) {
-            //     for (var l = 0; l < this.stringCredits.length; l++) {
-            //         this.stringCredits[l].render(dc);
-            //     }
-            // }
+            // Draw the string credits above the image credits and progressing from bottom to top.
+            var stringY = maxImageHeight + this.margin;
+            for (var j = 0; j < this.stringCredits.length; j++) {
+                this.drawStringCredit(dc, this.stringCredits[j], stringY);
+                stringY += this.margin + 15; // margin + string height
+            }
         };
 
         // Internal use only. Intentionally not documented.
@@ -197,8 +186,8 @@ define([
                 scale = this.imageCreditSize / imageHeight;
             }
 
-            offsetX = x + ((imageWidth / 2) * scale);
-            offsetY = y + ((imageHeight / 2) * scale);
+            offsetX = x + (imageWidth * scale) / 2;
+            offsetY = y + (imageHeight * scale) / 2;
 
             screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
             screenImage = new ScreenImage(screenOffset, creditUrl);
@@ -209,41 +198,23 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        // ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
-        //     var imageWidth, imageHeight, activeTexture, gl, program, x;
-        //
-        //     activeTexture = dc.createTextTexture(credit.text, credit.textAttributes);
-        //
-        //     imageWidth = activeTexture.imageWidth;
-        //     imageHeight = activeTexture.imageHeight;
-        //
-        //     x = dc.viewport.width - (imageWidth + this.margin);
-        //     ScreenCreditController.imageTransform.setTranslation(x, y, 0);
-        //     ScreenCreditController.imageTransform.setScale(imageWidth, imageHeight, 1);
-        //
-        //     gl = dc.currentGlContext;
-        //     program = dc.currentProgram;
-        //
-        //     // Compute and specify the MVP matrix.
-        //     ScreenCreditController.scratchMatrix.copy(dc.screenProjection);
-        //     ScreenCreditController.scratchMatrix.multiplyMatrix(ScreenCreditController.imageTransform);
-        //     program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
-        //
-        //     program.loadTextureEnabled(gl, true);
-        //     program.loadColor(gl, Color.WHITE);
-        //     program.loadOpacity(gl, this.opacity);
-        //
-        //     ScreenCreditController.texCoordMatrix.setToIdentity();
-        //     ScreenCreditController.texCoordMatrix.multiplyByTextureTransform(activeTexture);
-        //     program.loadTextureMatrix(gl, ScreenCreditController.texCoordMatrix);
-        //
-        //     if (activeTexture.bind(dc)) { // returns false if active texture cannot be bound
-        //         // Draw the image quad.
-        //         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        //     }
-        //
-        //     return true;
-        // };
+        ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
+            var imageWidth, imageHeight, scratchTexture, screenText, screenOffset, offsetX, offsetY;
+
+            scratchTexture = dc.createTextTexture(credit.text, credit.textAttributes);
+            imageWidth = scratchTexture.imageWidth;
+            imageHeight = scratchTexture.imageHeight;
+            offsetX = dc.viewport.width - (imageWidth + this.margin);
+            offsetY = y + imageHeight;
+
+            screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
+
+            screenText = new ScreenText(screenOffset, credit);
+
+            screenText.render(dc);
+
+            return true;
+        };
 
         return ScreenCreditController;
     });
