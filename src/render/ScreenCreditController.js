@@ -66,31 +66,17 @@ define([
 
             // Internal. Intentionally not documented.
             this.margin = 5;
-
-            // Internal. Intentionally not documented.
-            this.opacity = 0.5;
-
-            this.textAttributes = new TextAttributes(null);
         };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.scratchMatrix = Matrix.fromIdentity(); // scratch variable
-        ScreenCreditController.imageTransform = Matrix.fromIdentity(); // scratch variable
-        ScreenCreditController.texCoordMatrix = Matrix.fromIdentity(); // scratch variable
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.createStringCreditAttributes = function (textColor) {
             var attributes = new TextAttributes(null);
-            attributes.color = textColor ? this.setDefaultOpacity(textColor) : new Color(1, 1, 1, 0.5);
+            attributes.color = textColor ? textColor : new Color(1, 1, 1, 0);
             attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
             attributes.enableOutline = false; // Screen credits display text without an outline by default
             return attributes;
         };
 
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.setDefaultOpacity = function (textColor) {
-            return new Color(textColor.red, textColor.green, textColor.blue, 0.5) // Set half transparency as default
-        };
 
         /**
          * Clears all credits from this controller.
