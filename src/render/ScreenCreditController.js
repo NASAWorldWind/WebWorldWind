@@ -111,7 +111,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
             }
 
-            var screenOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
+            var screenOffset = new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
             var screenImage = new ScreenImage(screenOffset, imageUrl);
 
             if (this.imageCredits.indexOf(screenImage) === -1) {
@@ -164,17 +164,108 @@ define([
             }
             this.lastFrameTimestamp = dc.timestamp;
 
-            if (this.imageCredits.length !== 0) {
-                for (var i = 0; i < this.imageCredits.length; i++) {
-                    this.imageCredits[i].render(dc);
+            //////////////////////////////////////
+
+            // Draw the image credits in a row along the bottom of the window from right to left.
+            var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
+                imageHeight, maxImageHeight = 0;
+
+            for (var i = 0; i < this.imageCredits.length; i++) {
+                imageHeight = this.drawImageCredit(dc, this.imageCredits[i], imageX, this.margin);
+                if (imageHeight > 0) {
+                    imageX -= (this.margin + this.imageCreditSize);
+                    maxImageHeight = WWMath.max(imageHeight, maxImageHeight);
                 }
             }
 
-            if (this.stringCredits.length !== 0) {
-                for (var j = 0; j < this.stringCredits.length; j++) {
-                    this.stringCredits[j].render(dc);
-                }
+            // // Draw the string credits above the image credits and progressing from bottom to top.
+            // var stringY = maxImageHeight + this.margin;
+            // for (var j = 0; j < this.stringCredits.length; j++) {
+            //     this.drawStringCredit(this.stringCredits[j], stringY);
+            //     stringY += this.margin + 15; // margin + string height
+            // }
+
+            //////////////////////////////////
+
+            // if (this.imageCredits.length !== 0) {
+            //     for (var k = 0; k < this.imageCredits.length; k++) {
+            //         this.imageCredits[k].screenOffset = new Offset(WorldWind.OFFSET_FRACTION, 0.75, WorldWind.OFFSET_FRACTION, 0.25);
+            //         this.imageCredits[k].render(dc);
+            //         console.log(this.imageCredits[k]);
+            //     }
+            // }
+            //
+            // if (this.stringCredits.length !== 0) {
+            //     for (var l = 0; l < this.stringCredits.length; l++) {
+            //         this.stringCredits[l].render(dc);
+            //     }
+            // }
+        };
+
+        // Internal use only. Intentionally not documented.
+        ScreenCreditController.prototype.drawImageCredit = function (dc, imageCredit, x, y) {
+            var imageWidth, imageHeight, scale, activeTexture;
+
+            imageCredit.render(dc);
+
+            // Scale the image to fit within a constrained size.
+            activeTexture = imageCredit.getActiveTexture(dc);
+            console.log(imageCredit);
+
+            if (activeTexture) {
+                imageWidth = activeTexture.imageWidth;
+                imageHeight = activeTexture.imageHeight;
             }
+
+            if (imageWidth <= this.imageCreditSize && this.imageHeight <= this.imageCreditSize) {
+                scale = 1;
+            } else if (imageWidth >= imageHeight) {
+                scale = this.imageCreditSize / imageWidth;
+            } else {
+                scale = this.imageCreditSize / imageHeight;
+            }
+
+            imageCredit.scale = scale;
+            imageCredit.screenOffset = new Offset(WorldWind.OFFSET_FRACTION, x, WorldWind.OFFSET_FRACTION, y);
+
+            return imageHeight;
+        };
+
+        // Internal use only. Intentionally not documented.
+        ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
+            var imageWidth, imageHeight, activeTexture, gl, program, x;
+
+            activeTexture = dc.createTextTexture(credit.text, credit.textAttributes);
+
+            imageWidth = activeTexture.imageWidth;
+            imageHeight = activeTexture.imageHeight;
+
+            x = dc.viewport.width - (imageWidth + this.margin);
+            ScreenCreditController.imageTransform.setTranslation(x, y, 0);
+            ScreenCreditController.imageTransform.setScale(imageWidth, imageHeight, 1);
+
+            gl = dc.currentGlContext;
+            program = dc.currentProgram;
+
+            // Compute and specify the MVP matrix.
+            ScreenCreditController.scratchMatrix.copy(dc.screenProjection);
+            ScreenCreditController.scratchMatrix.multiplyMatrix(ScreenCreditController.imageTransform);
+            program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
+
+            program.loadTextureEnabled(gl, true);
+            program.loadColor(gl, Color.WHITE);
+            program.loadOpacity(gl, this.opacity);
+
+            ScreenCreditController.texCoordMatrix.setToIdentity();
+            ScreenCreditController.texCoordMatrix.multiplyByTextureTransform(activeTexture);
+            program.loadTextureMatrix(gl, ScreenCreditController.texCoordMatrix);
+
+            if (activeTexture.bind(dc)) { // returns false if active texture cannot be bound
+                // Draw the image quad.
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            }
+
+            return true;
         };
 
         return ScreenCreditController;
