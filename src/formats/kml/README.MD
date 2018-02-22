@@ -99,6 +99,20 @@ implemented.
 * LatLonAltBox - Parsed, but ignored for rendering.
 * LatLonQuad - Parsed, but ignored for rendering.
 
+### KMZ Support
+
+- Load KMZ file
+
+#### Embedded KML Resources
+
+- Load imagery from KMZ file
+- Load other KML files from KMZ file
+
+#### Multiple KMZ files in one parsing
+
+- Load external KMZ file
+- Load resources from the external kmz file.
+
 ## Examples
 
 ### Displaying a KML file

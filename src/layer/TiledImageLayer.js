@@ -23,6 +23,7 @@ define([
         '../layer/Layer',
         '../util/LevelSet',
         '../util/Logger',
+        '../geom/Matrix',
         '../cache/MemoryCache',
         '../render/Texture',
         '../util/Tile',
@@ -34,6 +35,7 @@ define([
               Layer,
               LevelSet,
               Logger,
+              Matrix,
               MemoryCache,
               Texture,
               Tile,
@@ -150,6 +152,9 @@ define([
             this.absentResourceList = new AbsentResourceList(3, 50e3);
 
             this.pickEnabled = false;
+
+            // Internal. Intentionally not documented.
+            this.lasTtMVP = Matrix.fromIdentity();
         };
 
         TiledImageLayer.prototype = Object.create(Layer.prototype);
@@ -251,8 +256,8 @@ define([
                 return;
 
             if (this.currentTilesInvalid
-                || !this.lasTtMVP || !dc.navigatorState.modelviewProjection.equals(this.lasTtMVP)
-                || dc.globeStateKey != this.lastGlobeStateKey) {
+                || !dc.modelviewProjection.equals(this.lasTtMVP)
+                || dc.globeStateKey !== this.lastGlobeStateKey) {
                 this.currentTilesInvalid = false;
 
                 // Tile fading works visually only when the surface tiles are opaque, otherwise the surface flashes
@@ -275,7 +280,7 @@ define([
 
             }
 
-            this.lasTtMVP = dc.navigatorState.modelviewProjection;
+            this.lasTtMVP.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {
@@ -393,7 +398,8 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
-                tile.opacity = 1;;
+                tile.opacity = 1;
+                ;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
@@ -423,7 +429,7 @@ define([
                 return false;
             }
 
-            return tile.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.frustumInModelCoordinates);
         };
 
         // Intentionally not documented.

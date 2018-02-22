@@ -96,5 +96,49 @@ define([
             return result;
         };
 
+        /**
+         * Indicates whether the components of this line are equal to those of a specified line.
+         * @param {Line} otherLine The line to test equality with. May be null or undefined, in which case this
+         * function returns false.
+         * @returns {boolean} true if all components of this line are equal to the corresponding
+         * components of the specified line, otherwise false.
+         */
+        Line.prototype.equals = function (otherLine) {
+            if (otherLine) {
+                return this.origin.equals(otherLine.origin) && this.direction.equals(otherLine.direction);
+            }
+
+            return false;
+        };
+
+        /**
+         * Creates a new line that is a copy of this line.
+         * @returns {Line} The new line.
+         */
+        Line.prototype.clone = function () {
+            var clone = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+            clone.copy(this);
+
+            return clone;
+        };
+
+        /**
+         * Copies the components of a specified line to this line.
+         * @param {Line} copyLine The line to copy.
+         * @returns {Line} A copy of this line equal to otherLine.
+         * @throws {ArgumentError} If the specified line is null or undefined.
+         */
+        Line.prototype.copy = function (copyLine) {
+            if (!copyLine) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Line", "copy", "missingLine"));
+            }
+
+            this.origin.copy(copyLine.origin);
+            this.direction.copy(copyLine.direction);
+
+            return this;
+        };
+
         return Line;
     });

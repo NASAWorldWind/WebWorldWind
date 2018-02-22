@@ -22,40 +22,50 @@ define([
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
+        './geom/Frustum',
         './globe/Globe',
         './globe/Globe2D',
         './util/GoToAnimator',
         './cache/GpuResourceCache',
+        './geom/Line',
         './util/Logger',
         './navigate/LookAtNavigator',
-        './navigate/NavigatorState',
+        './geom/Matrix',
         './pick/PickedObjectList',
+        './geom/Position',
         './geom/Rectangle',
         './geom/Sector',
         './shapes/SurfaceShape',
         './shapes/SurfaceShapeTileBuilder',
         './globe/Terrain',
-        './geom/Vec2'
+        './geom/Vec2',
+        './geom/Vec3',
+        './util/WWMath'
     ],
     function (ArgumentError,
               BasicWorldWindowController,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
+              Frustum,
               Globe,
               Globe2D,
               GoToAnimator,
               GpuResourceCache,
+              Line,
               Logger,
               LookAtNavigator,
-              NavigatorState,
+              Matrix,
               PickedObjectList,
+              Position,
               Rectangle,
               Sector,
               SurfaceShape,
               SurfaceShapeTileBuilder,
               Terrain,
-              Vec2) {
+              Vec2,
+              Vec3,
+              WWMath) {
         "use strict";
 
         /**
@@ -99,6 +109,12 @@ define([
             // Internal. Intentionally not documented.
             this.redrawRequestId = null;
 
+            // Internal. Intentionally not documented.
+            this.scratchModelview = Matrix.fromIdentity();
+
+            // Internal. Intentionally not documented.
+            this.scratchProjection = Matrix.fromIdentity();
+
             /**
              * The HTML canvas associated with this WorldWindow.
              * @type {HTMLElement}
@@ -141,7 +157,7 @@ define([
              * @type {LookAtNavigator}
              * @default [LookAtNavigator]{@link LookAtNavigator}
              */
-            this.navigator = new LookAtNavigator(this);
+            this.navigator = new LookAtNavigator();
 
             /**
              * The controller used to manipulate the globe.
@@ -462,6 +478,7 @@ define([
             this.resetDrawContext();
             this.drawContext.pickingMode = true;
             this.drawContext.pickPoint = pickPoint;
+            this.drawContext.pickRay = this.rayThroughScreenPoint(pickPoint);
             this.drawFrame();
 
             return this.drawContext.objectsAtPickPoint;
@@ -492,6 +509,7 @@ define([
             this.drawContext.pickingMode = true;
             this.drawContext.pickTerrainOnly = true;
             this.drawContext.pickPoint = pickPoint;
+            this.drawContext.pickRay = this.rayThroughScreenPoint(pickPoint);
             this.drawFrame();
 
             return this.drawContext.objectsAtPickPoint;
@@ -644,14 +662,161 @@ define([
         };
 
         // Internal. Intentionally not documented.
+        WorldWindow.prototype.computeViewingTransform = function (projection, modelview) {
+            if (!modelview) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
+            }
+
+            modelview.setToIdentity();
+            this.worldWindowController.applyLimits();
+            var globe = this.globe;
+            var navigator = this.navigator;
+            var lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0);
+            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
+
+            if (projection) {
+                projection.setToIdentity();
+                var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
+                    eyePoint = modelview.extractEyePoint(new Vec3(0, 0, 0)),
+                    eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
+                    eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
+                    atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
+                    viewport = this.viewport;
+
+                // Set the far clip distance to the smallest value that does not clip the atmosphere.
+                // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+                // TODO horizon is not in view
+                // TODO parameterize the object altitude for horizon distance
+                var farDistance = eyeHorizon + atmosphereHorizon;
+                if (farDistance < 1e3)
+                    farDistance = 1e3;
+
+                // Compute the near clip distance in order to achieve a desired depth resolution at the far clip distance.
+                // This computed distance is limited such that it does not intersect the terrain when possible and is never
+                // less than a predetermined minimum (usually one). The computed near distance automatically scales with the
+                // resolution of the WebGL depth buffer.
+                var nearDistance = WWMath.perspectiveNearDistanceForFarDistance(farDistance, 10, this.depthBits);
+
+                // Prevent the near clip plane from intersecting the terrain.
+                var distanceToSurface = eyePos.altitude - globe.elevationAtLocation(eyePos.latitude, eyePos.longitude);
+                if (distanceToSurface > 0) {
+                    var maxNearDistance = WWMath.perspectiveNearDistance(viewport.width, viewport.height, distanceToSurface);
+                    if (nearDistance > maxNearDistance) {
+                        nearDistance = maxNearDistance;
+                    }
+                }
+
+                if (nearDistance < 1) {
+                    nearDistance = 1;
+                }
+
+                // Compute the current projection matrix based on this navigator's perspective properties and the current
+                // WebGL viewport.
+                projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        WorldWindow.prototype.computePixelMetrics = function (projection) {
+            var projectionInv = Matrix.fromIdentity();
+            projectionInv.invertMatrix(projection);
+
+            // Compute the eye coordinate rectangles carved out of the frustum by the near and far clipping planes, and
+            // the distance between those planes and the eye point along the -Z axis. The rectangles are determined by
+            // transforming the bottom-left and top-right points of the frustum from clip coordinates to eye
+            // coordinates.
+            var nbl = new Vec3(-1, -1, -1),
+                ntr = new Vec3(+1, +1, -1),
+                fbl = new Vec3(-1, -1, +1),
+                ftr = new Vec3(+1, +1, +1);
+            // Convert each frustum corner from clip coordinates to eye coordinates by multiplying by the inverse
+            // projection matrix.
+            nbl.multiplyByMatrix(projectionInv);
+            ntr.multiplyByMatrix(projectionInv);
+            fbl.multiplyByMatrix(projectionInv);
+            ftr.multiplyByMatrix(projectionInv);
+
+            var nrRectWidth = WWMath.fabs(ntr[0] - nbl[0]),
+                frRectWidth = WWMath.fabs(ftr[0] - fbl[0]),
+                nrDistance = -nbl[2],
+                frDistance = -fbl[2];
+
+            // Compute the scale and offset used to determine the width of a pixel on a rectangle carved out of the
+            // frustum at a distance along the -Z axis in eye coordinates. These values are found by computing the scale
+            // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
+            var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
+                frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
+
+            return {
+                pixelSizeFactor: frustumWidthScale / this.viewport.width,
+                pixelSizeOffset: frustumWidthOffset / this.viewport.height
+            };
+        };
+
+        /**
+         * Computes the approximate size of a pixel at a specified distance from the eye point.
+         * <p>
+         * This method assumes rectangular pixels, where pixel coordinates denote
+         * infinitely thin spaces between pixels. The units of the returned size are in model coordinates per pixel
+         * (usually meters per pixel). This returns 0 if the specified distance is zero. The returned size is undefined
+         * if the distance is less than zero.
+         *
+         * @param {Number} distance The distance from the eye point at which to determine pixel size, in model
+         * coordinates.
+         * @returns {Number} The approximate pixel size at the specified distance from the eye point, in model
+         * coordinates per pixel.
+         */
+        WorldWindow.prototype.pixelSizeAtDistance = function (distance) {
+            this.computeViewingTransform(this.scratchProjection, this.scratchModelview);
+            var pixelMetrics = this.computePixelMetrics(this.scratchProjection);
+            return pixelMetrics.pixelSizeFactor * distance + pixelMetrics.pixelSizeOffset;
+        };
+
+        // Internal. Intentionally not documented.
+        WorldWindow.prototype.computeDrawContext = function () {
+            var dc = this.drawContext;
+
+            this.computeViewingTransform(dc.projection, dc.modelview);
+            dc.viewport = this.viewport;
+            dc.eyePoint = dc.modelview.extractEyePoint(new Vec3(0, 0, 0));
+
+            dc.modelviewProjection.setToIdentity();
+            dc.modelviewProjection.setToMultiply(dc.projection, dc.modelview);
+
+            var pixelMetrics = this.computePixelMetrics(dc.projection);
+            dc.pixelSizeFactor = pixelMetrics.pixelSizeFactor;
+            dc.pixelSizeOffset = pixelMetrics.pixelSizeOffset;
+
+            // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
+            // are used to support operations on navigator state.
+            var modelviewInv = Matrix.fromIdentity();
+            modelviewInv.invertOrthonormalMatrix(dc.modelview);
+
+            dc.modelviewNormalTransform = Matrix.fromIdentity().setToTransposeOfMatrix(modelviewInv.upper3By3());
+
+            // Compute the frustum in model coordinates. Start by computing the frustum in eye coordinates from the
+            // projection matrix, then transform this frustum to model coordinates by multiplying its planes by the
+            // transpose of the modelview matrix. We use the transpose of the modelview matrix because planes are
+            // transformed by the inverse transpose of a matrix, and we want to transform from eye coordinates to model
+            // coordinates.
+            var modelviewTranspose = Matrix.fromIdentity();
+            modelviewTranspose.setToTransposeOfMatrix(dc.modelview);
+            dc.frustumInModelCoordinates = Frustum.fromProjectionMatrix(dc.projection);
+            dc.frustumInModelCoordinates.transformByMatrix(modelviewTranspose);
+            dc.frustumInModelCoordinates.normalize();
+        };
+
+        // Internal. Intentionally not documented.
         WorldWindow.prototype.resetDrawContext = function () {
             this.globe.offset = 0;
 
             var dc = this.drawContext;
             dc.reset();
             dc.globe = this.globe;
+            dc.navigator = this.navigator;
             dc.layers = this.layers;
-            dc.navigatorState = this.worldWindowController.currentState(); // dc.navigatorState = this.navigator.currentState();
+            this.computeDrawContext();
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
             dc.deepPicking = this.deepPicking;
@@ -921,21 +1086,21 @@ define([
             this.terrainCenter = null;
             dc.globe.offset = 0;
             dc.globeStateKey = dc.globe.stateKey;
-            if (dc.globe.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)) {
+            if (dc.globe.intersectsFrustum(dc.frustumInModelCoordinates)) {
                 this.terrainCenter = dc.globe.tessellator.tessellate(dc);
             }
 
             this.terrainRight = null;
             dc.globe.offset = 1;
             dc.globeStateKey = dc.globe.stateKey;
-            if (dc.globe.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)) {
+            if (dc.globe.intersectsFrustum(dc.frustumInModelCoordinates)) {
                 this.terrainRight = dc.globe.tessellator.tessellate(dc);
             }
 
             this.terrainLeft = null;
             dc.globe.offset = -1;
             dc.globeStateKey = dc.globe.stateKey;
-            if (dc.globe.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)) {
+            if (dc.globe.intersectsFrustum(dc.frustumInModelCoordinates)) {
                 this.terrainLeft = dc.globe.tessellator.tessellate(dc);
             }
         };
@@ -1044,46 +1209,48 @@ define([
 
         /**
          * Adds a specified layer to the end of this WorldWindow.
-         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not modified.
+         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not
+         * modified.
          */
         WorldWindow.prototype.addLayer = function (layer) {
-            this.layers.push(layer);
+            if (layer) {
+                this.layers.push(layer);
+            }
         };
 
         /**
          * Removes the first instance of a specified layer from this WorldWindow.
          * @param {Layer} layer The layer to remove. May be null or undefined, in which case this WorldWindow is not
-         * modified. This WorldWindow is also not modified if the specified layer does not exist in this world
-         * window's layer list.
+         * modified. This WorldWindow is also not modified if the specified layer does not exist in this WorldWindow's
+         * layer list.
          */
         WorldWindow.prototype.removeLayer = function (layer) {
-            if (!layer)
-                return;
-
-            var index = -1;
-            for (var i = 0, len = this.layers.length; i < len; i++) {
-                if (this.layers[i] == layer) {
-                    index = i;
-                    break;
-                }
-            }
-
+            var index = this.indexOfLayer(layer);
             if (index >= 0) {
                 this.layers.splice(index, 1);
             }
         };
 
         /**
-         * Inserts a specified layer at a specified position in this WorldWindow's layer list.
-         * @param {number} index The index at which to insert the layer. May be negative to specify the position
+         * Inserts a specified layer at a specified position in this WorldWindow.
+         * @param {Number} index The index at which to insert the layer. May be negative to specify the position
          * from the end of the array.
-         * @param {Layer} layer The layer to insert. This WorldWindow's layer list is not changed if the specified
-         * layer is null or undefined.
+         * @param {Layer} layer The layer to insert. May be null or undefined, in which case this WorldWindow is not
+         * modified.
          */
         WorldWindow.prototype.insertLayer = function (index, layer) {
             if (layer) {
                 this.layers.splice(index, 0, layer);
             }
+        };
+
+        /**
+         * Returns the index of a specified layer in this WorldWindow.
+         * @param {Layer} layer The layer to search for.
+         * @returns {Number} The index of the specified layer or -1 if it doesn't exist in this WorldWindow.
+         */
+        WorldWindow.prototype.indexOfLayer = function (layer) {
+            return this.layers.indexOf(layer);
         };
 
         // Internal function. Intentionally not documented.
@@ -1315,6 +1482,61 @@ define([
                     }
                 }
             }
+        };
+
+        /**
+         * Computes a ray originating at the eyePoint and extending through the specified point in window
+         * coordinates.
+         * <p>
+         * The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
+         * in the top-left corner and axes that extend down and to the right from the origin point.
+         * <p>
+         * The results of this method are undefined if the specified point is outside of the WorldWindow's
+         * bounds.
+         *
+         * @param {Vec2} point The window coordinates point to compute a ray for.
+         * @returns {Line} A new Line initialized to the origin and direction of the computed ray, or null if the
+         * ray could not be computed.
+         */
+        WorldWindow.prototype.rayThroughScreenPoint = function (point) {
+            if (!point) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "rayThroughScreenPoint",
+                    "missingPoint"));
+            }
+
+            // Convert the point's xy coordinates from window coordinates to WebGL screen coordinates.
+            var screenPoint = new Vec3(point[0], this.viewport.height - point[1], 0),
+                nearPoint = new Vec3(0, 0, 0),
+                farPoint = new Vec3(0, 0, 0);
+
+            this.computeViewingTransform(this.scratchProjection, this.scratchModelview);
+            var modelviewProjection = Matrix.fromIdentity();
+            modelviewProjection.setToMultiply(this.scratchProjection, this.scratchModelview);
+            var modelviewProjectionInv = Matrix.fromIdentity();
+            modelviewProjectionInv.invertMatrix(modelviewProjection);
+
+            // Compute the model coordinate point on the near clip plane with the xy coordinates and depth 0.
+            if (!modelviewProjectionInv.unProject(screenPoint, this.viewport, nearPoint)) {
+                return null;
+            }
+
+            // Compute the model coordinate point on the far clip plane with the xy coordinates and depth 1.
+            screenPoint[2] = 1;
+            if (!modelviewProjectionInv.unProject(screenPoint, this.viewport, farPoint)) {
+                return null;
+            }
+
+            var eyePoint = this.scratchModelview.extractEyePoint(new Vec3(0, 0, 0));
+
+            // Compute a ray originating at the eye point and with direction pointing from the xy coordinate on the near
+            // plane to the same xy coordinate on the far plane.
+            var origin = new Vec3(eyePoint[0], eyePoint[1], eyePoint[2]),
+                direction = new Vec3(farPoint[0], farPoint[1], farPoint[2]);
+
+            direction.subtract(nearPoint);
+            direction.normalize();
+
+            return new Line(origin, direction);
         };
 
         return WorldWindow;

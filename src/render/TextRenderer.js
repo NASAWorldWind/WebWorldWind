@@ -50,7 +50,7 @@ define([
         var TextRenderer = function (drawContext) {
             if (!drawContext) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "TextRenderer", "constructor",
-                    "missingDrawContext"));
+                    "missingDc"));
             }
 
             // Internal use only. Intentionally not documented.
@@ -62,79 +62,96 @@ define([
             // Internal use only. Intentionally not documented.
             this.dc = drawContext;
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * Indicates if the text will feature an outline around its characters.
+             * @type {boolean}
+             */
             this.enableOutline = true;
 
             // Internal use only. Intentionally not documented.
             this.lineSpacing = 0.15; // fraction of font size
 
-            // Internal use only. Intentionally not documented.
-            this.strokeStyle = "rgba(0, 0, 0, " + 0.5 + ")";
+            /**
+             * The color for the Text outline.
+             * Its default has half transparency to avoid visual artifacts that appear while fully opaque.
+             * @type {Color}
+             */
+            this.outlineColor = new Color(0, 0, 0, 0.5);
 
-            // Internal use only. Intentionally not documented.
-            this.strokeWidth = 4;
+            /**
+             * Indicates the text outline width (or thickness) in pixels.
+             * @type {number}
+             */
+            this.outlineWidth = 4;
 
-            // Internal use only. Intentionally not documented.
+            /**
+             * The text color.
+             * @type {Color}
+             */
+            this.textColor = new Color(1, 1, 1, 1);
+
+            /**
+             * The text size, face and other characteristics, as described in [Font]{@link Font}.
+             * @type {Font}
+             */
             this.typeFace = new Font(14);
         };
 
         /**
-         * Returns the width and height of a specified text string upon applying a specified font and optional outline.
+         * Returns the width and height of a specified text string considering the current typeFace and outline usage.
          * @param {string} text The text string.
-         * @param {Font} font The font to apply when drawing the text.
-         * @param {Boolean} outline Indicates whether the text includes an outline, which increases its width and height.
          * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels.
          */
-        TextRenderer.prototype.textSize = function (text, font, outline) {
+        TextRenderer.prototype.textSize = function (text) {
             if (text.length === 0) {
                 return new Vec2(0, 0);
             }
 
-            this.ctx2D.font = font.fontString;
+            this.ctx2D.font = this.typeFace.fontString;
 
             var lines = text.split("\n"),
-                height = lines.length * (font.size * (1 + this.lineSpacing)),
+                height = lines.length * (this.typeFace.size * (1 + this.lineSpacing)),
                 maxWidth = 0;
 
             for (var i = 0; i < lines.length; i++) {
                 maxWidth = Math.max(maxWidth, this.ctx2D.measureText(lines[i]).width);
             }
 
-            if (outline) {
-                maxWidth += this.strokeWidth;
-                height += this.strokeWidth;
+            if (this.enableOutline) {
+                maxWidth += this.outlineWidth;
+                height += this.outlineWidth;
             }
 
             return new Vec2(maxWidth, height);
         };
 
         /**
-         * Creates a texture for a specified text string.
+         * Creates a texture for a specified text string and current TextRenderer state.
          * @param {String} text The text string.
          * @returns {Texture} A texture for the specified text string.
          */
         TextRenderer.prototype.renderText = function (text) {
             if (text && text.length > 0) {
                 var canvas2D = this.drawText(text);
-                return new Texture(this.dc.currentGlContext, canvas2D)
+                return new Texture(this.dc.currentGlContext, canvas2D);
             } else {
                 return null;
             }
         };
 
         /**
-         * Creates a 2D Canvas for a specified text string.
+         * Creates a 2D Canvas for a specified text string while considering current TextRenderer state in
+         * regards to outline usage and color, text color, typeface, and outline width.
          * @param {String} text The text string.
          * @returns {canvas2D} A 2D Canvas for the specified text string.
          */
         TextRenderer.prototype.drawText = function (text) {
             var ctx2D = this.ctx2D,
                 canvas2D = this.canvas2D,
-                textSize = this.textSize(text, this.typeFace, this.enableOutline),
+                textSize = this.textSize(text),
                 lines = text.split("\n"),
-                strokeOffset = this.enableOutline ? this.strokeWidth / 2 : 0,
-                pixelScale = this.dc.pixelScale,
-                x, y;
+                strokeOffset = this.enableOutline ? this.outlineWidth / 2 : 0,
+                pixelScale = this.dc.pixelScale;
 
             canvas2D.width = Math.ceil(textSize[0]) * pixelScale;
             canvas2D.height = Math.ceil(textSize[1]) * pixelScale;
@@ -143,9 +160,9 @@ define([
             ctx2D.font = this.typeFace.fontString;
             ctx2D.textBaseline = "top";
             ctx2D.textAlign = this.typeFace.horizontalAlignment;
-            ctx2D.fillStyle = Color.WHITE.toHexString(false);
-            ctx2D.strokeStyle = this.strokeStyle;
-            ctx2D.lineWidth = this.strokeWidth;
+            ctx2D.fillStyle = this.textColor.toCssColorString();
+            ctx2D.strokeStyle = this.outlineColor.toCssColorString();
+            ctx2D.lineWidth = this.outlineWidth;
             ctx2D.lineCap = "round";
             ctx2D.lineJoin = "round";
 
@@ -169,13 +186,12 @@ define([
         };
 
         /**
-         * Calculates maximum line height based on a font
-         * @param {Font} font The font to use.
-         * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels based on the passed font.
+         * Calculates maximum line height based on the current typeFace and outline usage of TextRenderer.
+         * @returns {Vec2} A vector indicating the text's width and height, respectively, in pixels.
          */
-        TextRenderer.prototype.getMaxLineHeight = function (font) {
+        TextRenderer.prototype.getMaxLineHeight = function () {
             // Check underscore + capital E with acute accent
-            return this.textSize("_\u00c9", font, 0)[1];
+            return this.textSize("_\u00c9")[1];
         };
 
         /**
@@ -183,10 +199,9 @@ define([
          * @param {String} text The text to wrap.
          * @param {Number} width The width in pixels.
          * @param {Number} height The height in pixels.
-         * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextRenderer.prototype.wrap = function (text, width, height, font) {
+        TextRenderer.prototype.wrap = function (text, width, height) {
             if (!text) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.WARNING, "TextRenderer", "wrap", "missing text"));
@@ -199,14 +214,14 @@ define([
 
             // Wrap each line
             for (i = 0; i < lines.length; i++) {
-                lines[i] = this.wrapLine(lines[i], width, font);
+                lines[i] = this.wrapLine(lines[i], width);
             }
             // Concatenate all lines in one string with new line separators
             // between lines - not at the end
             // Checks for height limit.
             var currentHeight = 0;
             var heightExceeded = false;
-            var maxLineHeight = this.getMaxLineHeight(font);
+            var maxLineHeight = this.getMaxLineHeight();
             for (i = 0; i < lines.length && !heightExceeded; i++) {
                 var subLines = lines[i].split("\n");
                 for (var j = 0; j < subLines.length && !heightExceeded; j++) {
@@ -242,35 +257,34 @@ define([
          * Wraps a line of text based on width and height
          * @param {String} text The text to wrap.
          * @param {Number} width The width in pixels.
-         * @param {Font} font The font to use.
          * @returns {String} The wrapped text.
          */
-        TextRenderer.prototype.wrapLine = function (text, width, font) {
+        TextRenderer.prototype.wrapLine = function (text, width) {
             var wrappedText = "";
 
             // Single line - trim leading and trailing spaces
             var source = text.trim();
-            var lineBounds = this.textSize(source, font, 0);
+            var lineBounds = this.textSize(source);
             if (lineBounds[0] > width) {
                 // Split single line to fit preferred width
                 var line = "";
                 var start = 0;
                 var end = source.indexOf(' ', start + 1);
                 while (start < source.length) {
-                    if (end == -1) {
+                    if (end === -1) {
                         end = source.length;   // last word
                     }
 
                     // Extract a 'word' which is in fact a space and a word
                     var word = source.substring(start, end);
                     var linePlusWord = line + word;
-                    if (this.textSize(linePlusWord, font, 0)[0] <= width) {
+                    if (this.textSize(linePlusWord)[0] <= width) {
                         // Keep adding to the current line
                         line += word;
                     }
                     else {
                         // Width exceeded
-                        if (line.length != 0) {
+                        if (line.length !== 0) {
                             // Finish current line and start new one
                             wrappedText += line;
                             wrappedText += '\n';

@@ -245,7 +245,7 @@ define([
         // Overridden from AbstractShape base class.
         TriangleMesh.prototype.computeMeshPoints = function (dc, currentData) {
             var eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 meshPoints = new Float32Array(this._positions.length * 3),
                 pt = new Vec3(0, 0, 0),
                 k = 0,
