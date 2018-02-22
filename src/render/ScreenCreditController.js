@@ -201,7 +201,6 @@ define([
             screenImage = new ScreenImage(screenOffset, creditUrl);
             screenImage.scale = scale;
             screenImage.render(dc);
-            // this.addRenderable(screenImage);
 
             return (imageHeight * scale);
         };
@@ -210,9 +209,6 @@ define([
         ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
             var imageWidth, imageHeight, scratchTexture, screenText, screenOffset, offsetX, offsetY;
 
-            console.log("credit is " + credit);
-            console.log("credit.text is " + credit.text);
-            console.log("credit.textAttributes is " + credit.textAttributes);
             scratchTexture = dc.createTextTexture(credit.text, credit.textAttributes);
 
             imageWidth = scratchTexture.imageWidth;
@@ -222,10 +218,9 @@ define([
 
             screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
 
-            screenText = new ScreenText(screenOffset, credit);
+            screenText = new ScreenText(screenOffset, credit.text);
 
             screenText.render(dc);
-            // this.addRenderable(screenText);
 
             return true;
         };
