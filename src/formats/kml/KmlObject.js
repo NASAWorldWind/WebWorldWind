@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ define([
         this._cache = {};
         
         this._controls = options.controls || [];
+        // It should be possible to keep the context here?
         this._factory = new KmlElementsFactoryCached({controls: this._controls});
         
         this.hook(this._controls, options);

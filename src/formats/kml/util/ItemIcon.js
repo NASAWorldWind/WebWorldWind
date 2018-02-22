@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 define([
+    './HrefResolver',
     './../KmlElements',
     '../KmlObject',
     './NodeTransformers'
-], function (KmlElements,
+], function (HrefResolver,
+             KmlElements,
              KmlObject,
              NodeTransformers) {
     "use strict";
@@ -53,20 +55,19 @@ define([
             get: function () {
                 return this._factory.specific(this, {name: 'state', transformer: NodeTransformers.string});
             }
-        },
-
-        /**
-         * Specifies the URI of the image used in the List View for the Feature.
-         * @memberof ItemIcon.prototype
-         * @readonly
-         * @type {String}
-         */
-        kmlHref: {
-            get: function () {
-                return this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string});
-            }
         }
     });
+
+    /**
+     * It returns valid URL usable for remote resources.
+     * @param fileCache {KmlFileCache} Cache needed to retrieve data urls from remote locations.
+     * @returns {String} URL to use.
+     */
+    ItemIcon.prototype.kmlHref = function(fileCache) {
+        return new HrefResolver(
+            this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string}), fileCache
+        ).url();
+    };
 
     /**
      * @inheritDoc
