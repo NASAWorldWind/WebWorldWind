@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 requirejs(['./WorldWindShim',
-        './LayerManager'],
+           './LayerManager'],
     function (WorldWind,
               LayerManager) {
         "use strict";
@@ -33,9 +33,9 @@ requirejs(['./WorldWindShim',
         ];
 
         // Create GeoTiff layer
-        var geotiffLayer = new WorldWind.RenderableLayer("GeoTiff");
-        geotiffLayer.enabled = false;
-        geotiffLayer.showSpinner = true;
+        var geoTiffLayer = new WorldWind.RenderableLayer("GeoTiff");
+        geoTiffLayer.enabled = false;
+        geoTiffLayer.showSpinner = true;
 
         for (var l = 0; l < layers.length; l++) {
             layers[l].layer.enabled = layers[l].enabled;
@@ -43,25 +43,25 @@ requirejs(['./WorldWindShim',
         }
 
         // Add GeoTiff to the WorldWindow's layer list. Disabled until its image is loaded.
-        wwd.addLayer(geotiffLayer);
+        wwd.addLayer(geoTiffLayer);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
         var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
 
-        var geotiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
+        var geoTiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
 
-        var geoTiffImage = geotiffObject.readAsImage(function (canvas) {
+        var geoTiffImage = geoTiffObject.readAsImage(function (canvas) {
             var surfaceGeoTiff = new WorldWind.SurfaceImage(
-                geotiffObject.metadata.bbox,
+                geoTiffObject.metadata.bbox,
                 new WorldWind.ImageSource(canvas)
             );
 
-            geotiffLayer.addRenderable(surfaceGeoTiff);
+            geoTiffLayer.addRenderable(surfaceGeoTiff);
 
-            geotiffLayer.enabled = true;
-            geotiffLayer.showSpinner = false;
+            geoTiffLayer.enabled = true;
+            geoTiffLayer.showSpinner = false;
             layerManager.synchronizeLayerList();
 
             wwd.redraw();
