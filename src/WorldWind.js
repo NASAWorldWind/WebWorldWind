@@ -148,7 +148,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/MemoryCacheListener',
         './layer/MercatorTiledImageLayer',
         './navigate/Navigator',
-        './navigate/NavigatorState',
         './util/NominatimGeocoder',
         './error/NotYetImplementedError',
         './util/Offset',
@@ -211,7 +210,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './globe/Tessellator',
         './shapes/Text',
         './shapes/TextAttributes',
-        './render/TextSupport',
+        './render/TextRenderer',
         './render/Texture',
         './render/TextureTile',
         './util/Tile',
@@ -389,7 +388,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               MemoryCacheListener,
               MercatorTiledImageLayer,
               Navigator,
-              NavigatorState,
               NominatimGeocoder,
               NotYetImplementedError,
               Offset,
@@ -452,7 +450,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Tessellator,
               Text,
               TextAttributes,
-              TextSupport,
+              TextRenderer,
               Texture,
               TextureTile,
               Tile,
@@ -581,6 +579,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
              * @constant
              */
             FAILED: "failed",
+
+            /**
+             * Indicates a linear filter.
+             * @constant
+             */
+            FILTER_LINEAR: "filter_linear",
+
+            /**
+             * Indicates a nearest neighbor filter.
+             * @constant
+             */
+            FILTER_NEAREST: "filter_nearest",
 
             /**
              * Indicates a great circle path.
@@ -791,7 +801,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
         WorldWind['MercatorTiledImageLayer'] = MercatorTiledImageLayer;
         WorldWind['Navigator'] = Navigator;
-        WorldWind['NavigatorState'] = NavigatorState;
         WorldWind['NominatimGeocoder'] = NominatimGeocoder;
         WorldWind['NotYetImplementedError'] = NotYetImplementedError;
         WorldWind['Offset'] = Offset;
@@ -851,7 +860,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Tessellator'] = Tessellator;
         WorldWind['Text'] = Text;
         WorldWind['TextAttributes'] = TextAttributes;
-        WorldWind['TextSupport'] = TextSupport;
+        WorldWind['TextRenderer'] = TextRenderer;
         WorldWind['Texture'] = Texture;
         WorldWind['TextureTile'] = TextureTile;
         WorldWind['Tile'] = Tile;

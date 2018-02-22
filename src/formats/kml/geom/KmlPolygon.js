@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,16 +138,16 @@ define([
      * @param styles.normal {KmlStyle} Style to apply when not highlighted
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
-    KmlPolygon.prototype.createPolygon = function(styles) {
+    KmlPolygon.prototype.createPolygon = function(styles, fileCache) {
         if(this.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND ||
             (this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND) ||
             (this.kmlOuterBoundary && this.kmlOuterBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND)) {
-            this._renderable = new SurfacePolygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this._renderable = new SurfacePolygon(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         } else {
-            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         }
         if(styles.highlight) {
-            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight);
+            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight, fileCache);
         }
         this.moveValidProperties();
     };
@@ -159,7 +159,7 @@ define([
         KmlGeometry.prototype.render.call(this, dc, kmlOptions);
 
         if(kmlOptions.lastStyle && !this._renderable) {
-            this.createPolygon(kmlOptions.lastStyle);
+            this.createPolygon(kmlOptions.lastStyle, kmlOptions.fileCache);
             dc.redrawRequested = true;
         }
 
@@ -178,8 +178,8 @@ define([
     /**
      * @inheritDoc
      */
-    KmlPolygon.prototype.prepareAttributes = function (style) {
-        var shapeOptions = style && style.generate() || {};
+    KmlPolygon.prototype.prepareAttributes = function (style, fileCache) {
+        var shapeOptions = style && style.generate(fileCache) || {};
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
         shapeOptions._applyLighting = true;
