@@ -70,6 +70,9 @@ define([
 
             // Internal. Intentionally not documented.
             this.margin = 5;
+
+            // Internal. Intentionally not documented.
+            this.opacity = 0.5;
         };
 
         ScreenCreditController.prototype = Object.create(RenderableLayer.prototype);
