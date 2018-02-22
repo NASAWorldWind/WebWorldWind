@@ -56,7 +56,7 @@ define([
          */
         var ScreenCreditController = function () {
             // Internal. Intentionally not documented.
-            this.imageCredits = [];
+            this.imageUrls = [];
 
             // Internal. Intentionally not documented.
             this.stringCredits = [];
@@ -96,7 +96,7 @@ define([
          * Clears all credits from this controller.
          */
         ScreenCreditController.prototype.clear = function () {
-            this.imageCredits = [];
+            this.imageUrls = [];
             this.stringCredits = [];
         };
 
@@ -111,11 +111,8 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
             }
 
-            var screenOffset = new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
-            var screenImage = new ScreenImage(screenOffset, imageUrl);
-
-            if (this.imageCredits.indexOf(screenImage) === -1) {
-                this.imageCredits.push(screenImage);
+            if (this.imageUrls.indexOf(imageUrl) === -1) {
+                this.imageUrls.push(imageUrl);
             }
         };
 
@@ -149,7 +146,7 @@ define([
         ScreenCreditController.prototype.drawCredits = function (dc) {
 
             // Check to see if there's anything to draw.
-            if ((this.imageCredits.length === 0 && this.stringCredits.length === 0)) {
+            if ((this.imageUrls.length === 0 && this.stringCredits.length === 0)) {
                 return;
             }
 
@@ -164,14 +161,12 @@ define([
             }
             this.lastFrameTimestamp = dc.timestamp;
 
-            //////////////////////////////////////
-
             // Draw the image credits in a row along the bottom of the window from right to left.
             var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
                 imageHeight, maxImageHeight = 0;
 
-            for (var i = 0; i < this.imageCredits.length; i++) {
-                imageHeight = this.drawImageCredit(dc, this.imageCredits[i], imageX, this.margin);
+            for (var i = 0; i < this.imageUrls.length; i++) {
+                imageHeight = this.drawImageCredit(dc, this.imageUrls[i], imageX, this.margin);
                 if (imageHeight > 0) {
                     imageX -= (this.margin + this.imageCreditSize);
                     maxImageHeight = WWMath.max(imageHeight, maxImageHeight);
@@ -187,13 +182,6 @@ define([
 
             //////////////////////////////////
 
-            // if (this.imageCredits.length !== 0) {
-            //     for (var k = 0; k < this.imageCredits.length; k++) {
-            //         this.imageCredits[k].screenOffset = new Offset(WorldWind.OFFSET_FRACTION, 0.75, WorldWind.OFFSET_FRACTION, 0.25);
-            //         this.imageCredits[k].render(dc);
-            //         console.log(this.imageCredits[k]);
-            //     }
-            // }
             //
             // if (this.stringCredits.length !== 0) {
             //     for (var l = 0; l < this.stringCredits.length; l++) {
@@ -203,20 +191,18 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawImageCredit = function (dc, imageCredit, x, y) {
-            var imageWidth, imageHeight, scale, activeTexture;
+        ScreenCreditController.prototype.drawImageCredit = function (dc, creditUrl, x, y) {
+            var imageWidth, imageHeight, scale, activeTexture, screenOffset, offsetX, offsetY;
 
-            imageCredit.render(dc);
-
-            // Scale the image to fit within a constrained size.
-            activeTexture = imageCredit.getActiveTexture(dc);
-            console.log(imageCredit);
-
-            if (activeTexture) {
-                imageWidth = activeTexture.imageWidth;
-                imageHeight = activeTexture.imageHeight;
+            activeTexture = dc.gpuResourceCache.resourceForKey(creditUrl);
+            if (!activeTexture) {
+                dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, creditUrl);
+                return 0;
             }
 
+            // Scale the image to fit within a constrained size.
+            imageWidth = activeTexture.imageWidth;
+            imageHeight = activeTexture.imageHeight;
             if (imageWidth <= this.imageCreditSize && this.imageHeight <= this.imageCreditSize) {
                 scale = 1;
             } else if (imageWidth >= imageHeight) {
@@ -225,48 +211,54 @@ define([
                 scale = this.imageCreditSize / imageHeight;
             }
 
-            imageCredit.scale = scale;
-            imageCredit.screenOffset = new Offset(WorldWind.OFFSET_FRACTION, x, WorldWind.OFFSET_FRACTION, y);
+            offsetX = x / dc.viewport.width;
+            offsetY = y / dc.viewport.height;
+
+            screenOffset = new Offset(WorldWind.OFFSET_FRACTION, offsetX, WorldWind.OFFSET_FRACTION, offsetY);
+            var screenImage = new ScreenImage(screenOffset, creditUrl);
+            screenImage.scale = scale;
+            console.log(screenImage);
+            screenImage.render(dc);
 
             return imageHeight;
         };
 
         // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
-            var imageWidth, imageHeight, activeTexture, gl, program, x;
-
-            activeTexture = dc.createTextTexture(credit.text, credit.textAttributes);
-
-            imageWidth = activeTexture.imageWidth;
-            imageHeight = activeTexture.imageHeight;
-
-            x = dc.viewport.width - (imageWidth + this.margin);
-            ScreenCreditController.imageTransform.setTranslation(x, y, 0);
-            ScreenCreditController.imageTransform.setScale(imageWidth, imageHeight, 1);
-
-            gl = dc.currentGlContext;
-            program = dc.currentProgram;
-
-            // Compute and specify the MVP matrix.
-            ScreenCreditController.scratchMatrix.copy(dc.screenProjection);
-            ScreenCreditController.scratchMatrix.multiplyMatrix(ScreenCreditController.imageTransform);
-            program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
-
-            program.loadTextureEnabled(gl, true);
-            program.loadColor(gl, Color.WHITE);
-            program.loadOpacity(gl, this.opacity);
-
-            ScreenCreditController.texCoordMatrix.setToIdentity();
-            ScreenCreditController.texCoordMatrix.multiplyByTextureTransform(activeTexture);
-            program.loadTextureMatrix(gl, ScreenCreditController.texCoordMatrix);
-
-            if (activeTexture.bind(dc)) { // returns false if active texture cannot be bound
-                // Draw the image quad.
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            }
-
-            return true;
-        };
+        // ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
+        //     var imageWidth, imageHeight, activeTexture, gl, program, x;
+        //
+        //     activeTexture = dc.createTextTexture(credit.text, credit.textAttributes);
+        //
+        //     imageWidth = activeTexture.imageWidth;
+        //     imageHeight = activeTexture.imageHeight;
+        //
+        //     x = dc.viewport.width - (imageWidth + this.margin);
+        //     ScreenCreditController.imageTransform.setTranslation(x, y, 0);
+        //     ScreenCreditController.imageTransform.setScale(imageWidth, imageHeight, 1);
+        //
+        //     gl = dc.currentGlContext;
+        //     program = dc.currentProgram;
+        //
+        //     // Compute and specify the MVP matrix.
+        //     ScreenCreditController.scratchMatrix.copy(dc.screenProjection);
+        //     ScreenCreditController.scratchMatrix.multiplyMatrix(ScreenCreditController.imageTransform);
+        //     program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
+        //
+        //     program.loadTextureEnabled(gl, true);
+        //     program.loadColor(gl, Color.WHITE);
+        //     program.loadOpacity(gl, this.opacity);
+        //
+        //     ScreenCreditController.texCoordMatrix.setToIdentity();
+        //     ScreenCreditController.texCoordMatrix.multiplyByTextureTransform(activeTexture);
+        //     program.loadTextureMatrix(gl, ScreenCreditController.texCoordMatrix);
+        //
+        //     if (activeTexture.bind(dc)) { // returns false if active texture cannot be bound
+        //         // Draw the image quad.
+        //         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        //     }
+        //
+        //     return true;
+        // };
 
         return ScreenCreditController;
     });
