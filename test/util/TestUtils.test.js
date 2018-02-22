@@ -92,6 +92,7 @@ define([
             wwd.scratchModelview = Matrix.fromIdentity();
             wwd.scratchProjection = Matrix.fromIdentity();
             wwd.camera = new Camera(wwd);
+            wwd.layers = [];
             return wwd;
         };
 
