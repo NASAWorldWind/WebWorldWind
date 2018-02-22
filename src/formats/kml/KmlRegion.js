@@ -61,7 +61,10 @@ define([
          */
         kmlLatLonAltBox: {
             get: function () {
-                return this._factory.specific(this, {name: KmlLatLonAltBox.prototype.getTagNames(), transformer: NodeTransformers.kmlObject});
+                return this._factory.specific(this, {
+                    name: KmlLatLonAltBox.prototype.getTagNames(),
+                    transformer: NodeTransformers.kmlObject
+                });
             }
         },
 
@@ -76,22 +79,25 @@ define([
          */
         kmlLod: {
             get: function () {
-                return this._factory.specific(this, {name: KmlLod.prototype.getTagNames(), transformer: NodeTransformers.kmlObject});
+                return this._factory.specific(this, {
+                    name: KmlLod.prototype.getTagNames(),
+                    transformer: NodeTransformers.kmlObject
+                });
             }
         }
     });
 
-	/**
-	 * It tests whether the region intersects the visible area.
+    /**
+     * It tests whether the region intersects the visible area.
      * @param dc {DrawContext} Frustum to test for intersection.
      */
-    KmlRegion.prototype.intersectsVisible = function(dc) {
+    KmlRegion.prototype.intersectsVisible = function (dc) {
         var box = this.kmlLatLonAltBox;
 
         var boundingBoxForRegion = new BoundingBox();
         boundingBoxForRegion.setToSector(new Sector(box.kmlSouth, box.kmlNorth, box.kmlWest, box.kmlEast), dc.globe, box.kmlMinAltitude, box.kmlMaxAltitude);
 
-        return boundingBoxForRegion.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)&&
+        return boundingBoxForRegion.intersectsFrustum(dc.frustumInModelCoordinates) &&
             (!box.kmlMinAltitude || dc.eyePosition.altitude > box.kmlMinAltitude) &&
             (!box.kmlMaxAltitude || dc.eyePosition.altitude < box.kmlMaxAltitude);
     };

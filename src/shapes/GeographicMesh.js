@@ -284,7 +284,7 @@ define([
             // Unwrap the mesh row arrays into one long array.
 
             var eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 meshPoints = new Float32Array((this.numRows * this.numColumns) * 3),
                 pt = new Vec3(0, 0, 0),
                 k = 0,

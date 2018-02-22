@@ -19,11 +19,9 @@
 define([
         '../geom/Location',
         '../navigate/Navigator',
-        '../geom/Vec2'
     ],
     function (Location,
-              Navigator,
-              Vec2) {
+              Navigator) {
         "use strict";
 
         /**
@@ -33,10 +31,9 @@ define([
          * @augments Navigator
          * @classdesc Represents a navigator containing the required variables to enable the user to pan, zoom and tilt
          * the globe.
-         * @param {WorldWindow} worldWindow The WorldWindow to associate with this navigator.
          */
-        var LookAtNavigator = function (worldWindow) {
-            Navigator.call(this, worldWindow);
+        var LookAtNavigator = function () {
+            Navigator.call(this);
 
             /**
              * The geographic location at the center of the viewport.
@@ -53,14 +50,6 @@ define([
 
             // Development testing only. Set this to false to suppress default navigator limits on 2D globes.
             this.enable2DLimits = true;
-
-            // Intentionally not documented.
-            this.beginPoint = new Vec2(0, 0);
-            this.lastPoint = new Vec2(0, 0);
-            this.beginHeading = 0;
-            this.beginTilt = 0;
-            this.beginRange = 0;
-            this.lastRotation = 0;
         };
 
         LookAtNavigator.prototype = Object.create(Navigator.prototype);
