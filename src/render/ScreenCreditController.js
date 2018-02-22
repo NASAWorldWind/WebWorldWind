@@ -26,6 +26,7 @@ define([
         '../util/Offset',
         '../pick/PickedObject',
         '../render/Renderable',
+        '../layer/RenderableLayer',
         '../shapes/ScreenImage',
         '../shapes/ScreenText',
         '../shapes/TextAttributes',
@@ -41,6 +42,7 @@ define([
               Offset,
               PickedObject,
               Renderable,
+              RenderableLayer,
               ScreenImage,
               ScreenText,
               TextAttributes,
@@ -55,6 +57,8 @@ define([
          * @classdesc Collects and displays screen credits.
          */
         var ScreenCreditController = function () {
+            RenderableLayer.call(this, "ScreenCreditController");
+
             // Internal. Intentionally not documented.
             this.imageUrls = [];
 
@@ -66,7 +70,10 @@ define([
 
             // Internal. Intentionally not documented.
             this.margin = 5;
+
         };
+
+        ScreenCreditController.prototype = Object.create(RenderableLayer.prototype);
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.createStringCreditAttributes = function (textColor) {
@@ -83,6 +90,7 @@ define([
         ScreenCreditController.prototype.clear = function () {
             this.imageUrls = [];
             this.stringCredits = [];
+            this.removeAllRenderables();
         };
 
         /**
@@ -192,16 +200,21 @@ define([
             screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
             screenImage = new ScreenImage(screenOffset, creditUrl);
             screenImage.scale = scale;
-            screenImage.render(dc);
+            //screenImage.render(dc);
+            this.addRenderable(screenImage);
 
-            return imageHeight;
+            return (imageHeight * scale);
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
             var imageWidth, imageHeight, scratchTexture, screenText, screenOffset, offsetX, offsetY;
 
+            console.log("credit is " + credit);
+            console.log("credit.text is " + credit.text);
+            console.log("credit.textAttributes is " + credit.textAttributes);
             scratchTexture = dc.createTextTexture(credit.text, credit.textAttributes);
+
             imageWidth = scratchTexture.imageWidth;
             imageHeight = scratchTexture.imageHeight;
             offsetX = dc.viewport.width - (imageWidth + this.margin);
@@ -211,7 +224,8 @@ define([
 
             screenText = new ScreenText(screenOffset, credit);
 
-            screenText.render(dc);
+            // screenText.render(dc);
+            this.addRenderable(screenText);
 
             return true;
         };

@@ -119,7 +119,7 @@ define([
 
             if (this.enableOutline) {
                 maxWidth += this.outlineWidth;
-                height += this.outlineWidth;
+                height += = this.outlineWidth;
             }
 
             return new Vec2(maxWidth, height);
@@ -131,10 +131,13 @@ define([
          * @returns {Texture} A texture for the specified text string.
          */
         TextRenderer.prototype.renderText = function (text) {
+            // TODO: Here's the issue. Text length results in 'undefined'.
+            console.log("The text length is " + text.length);
             if (text && text.length > 0) {
                 var canvas2D = this.drawText(text);
                 return new Texture(this.dc.currentGlContext, canvas2D);
             } else {
+                console.log("I shouldn't be here, something is missing");
                 return null;
             }
         };
