@@ -119,7 +119,7 @@ define([
 
             if (this.enableOutline) {
                 maxWidth += this.outlineWidth;
-                height += = this.outlineWidth;
+                height += this.outlineWidth;
             }
 
             return new Vec2(maxWidth, height);

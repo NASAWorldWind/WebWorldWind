@@ -70,7 +70,6 @@ define([
 
             // Internal. Intentionally not documented.
             this.margin = 5;
-
         };
 
         ScreenCreditController.prototype = Object.create(RenderableLayer.prototype);
@@ -87,10 +86,10 @@ define([
         /**
          * Clears all credits from this controller.
          */
-        ScreenCreditController.prototype.clear = function () {
+        ScreenCreditController.prototype.clear = function (dc) {
             this.imageUrls = [];
             this.stringCredits = [];
-            this.removeAllRenderables();
+            // this.removeAllRenderables();
         };
 
         /**
@@ -135,7 +134,8 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawCredits = function (dc) {
+        ScreenCreditController.prototype.doRender = function (dc) {
+            RenderableLayer.prototype.doRender.call(this, dc);
 
             // Check to see if there's anything to draw.
             if ((this.imageUrls.length === 0 && this.stringCredits.length === 0)) {
@@ -200,8 +200,8 @@ define([
             screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
             screenImage = new ScreenImage(screenOffset, creditUrl);
             screenImage.scale = scale;
-            //screenImage.render(dc);
-            this.addRenderable(screenImage);
+            screenImage.render(dc);
+            // this.addRenderable(screenImage);
 
             return (imageHeight * scale);
         };
@@ -224,8 +224,8 @@ define([
 
             screenText = new ScreenText(screenOffset, credit);
 
-            // screenText.render(dc);
-            this.addRenderable(screenText);
+            screenText.render(dc);
+            // this.addRenderable(screenText);
 
             return true;
         };
