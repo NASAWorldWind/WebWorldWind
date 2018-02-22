@@ -813,6 +813,7 @@ define(['../../error/ArgumentError',
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
             if (!this.crs || this.crs.isCRSSupported()) {
+                var pBoundaries = [];
                 for (var boundariesIndex = 0, boundaries = geometry.coordinates;
                      boundariesIndex < boundaries.length; boundariesIndex++) {
                     var positions = [];
@@ -829,10 +830,12 @@ define(['../../error/ArgumentError',
                         var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
                         positions.push(position);
                     }
+                    pBoundaries.push(positions);
+                }
 
                     var shape;
                     shape = new SurfacePolygon(
-                        positions,
+                        pBoundaries,
                         configuration && configuration.attributes ? configuration.attributes : null);
                     if (configuration.highlightAttributes) {
                         shape.highlightAttributes = configuration.highlightAttributes;
@@ -843,7 +846,6 @@ define(['../../error/ArgumentError',
                     if (configuration && configuration.userProperties) {
                         shape.userProperties = configuration.userProperties;
                     }                    layer.addRenderable(shape);
-                }
             }
         };
 
