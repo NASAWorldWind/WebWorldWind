@@ -192,7 +192,7 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.drawImageCredit = function (dc, creditUrl, x, y) {
-            var imageWidth, imageHeight, scale, activeTexture, screenOffset, offsetX, offsetY;
+            var imageWidth, imageHeight, scale, activeTexture, screenOffset, screenImage, offsetX, offsetY;
 
             activeTexture = dc.gpuResourceCache.resourceForKey(creditUrl);
             if (!activeTexture) {
@@ -211,13 +211,12 @@ define([
                 scale = this.imageCreditSize / imageHeight;
             }
 
-            offsetX = x / dc.viewport.width;
-            offsetY = y / dc.viewport.height;
+            offsetX = x + ((imageWidth / 2) * scale);
+            offsetY = y + ((imageHeight / 2) * scale);
 
-            screenOffset = new Offset(WorldWind.OFFSET_FRACTION, offsetX, WorldWind.OFFSET_FRACTION, offsetY);
-            var screenImage = new ScreenImage(screenOffset, creditUrl);
+            screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
+            screenImage = new ScreenImage(screenOffset, creditUrl);
             screenImage.scale = scale;
-            console.log(screenImage);
             screenImage.render(dc);
 
             return imageHeight;
