@@ -815,7 +815,8 @@ define([
             dc.reset();
             dc.globe = this.globe;
             dc.navigator = this.navigator;
-            dc.layers = this.layers;
+            dc.layers = this.layers.slice();
+            dc.layers.push(dc.screenCreditController);
             this.computeDrawContext();
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
@@ -974,8 +975,6 @@ define([
                     this.drawContext.currentGlContext.stencilOp(
                         this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE);
                     this.drawOrderedRenderables();
-
-                    this.drawContext.screenCreditController.drawCredits(this.drawContext);
                 }
             } else {
                 this.drawContext.surfaceShapeTileBuilder.clear();
@@ -987,8 +986,6 @@ define([
                     this.drawOrderedRenderables();
                     this.drawScreenRenderables();
                 }
-
-                this.drawContext.screenCreditController.drawCredits(this.drawContext);
             }
         };
 
@@ -1203,6 +1200,7 @@ define([
                 }
             }
 
+            dc.currentLayer = null;
             var now = Date.now();
             dc.frameStatistics.layerRenderingTime = now - beginTime;
         };
