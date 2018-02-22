@@ -89,7 +89,6 @@ define([
         ScreenCreditController.prototype.clear = function (dc) {
             this.imageUrls = [];
             this.stringCredits = [];
-            // this.removeAllRenderables();
         };
 
         /**
@@ -202,7 +201,7 @@ define([
             screenImage.scale = scale;
             screenImage.render(dc);
 
-            return (imageHeight * scale);
+            return (imageHeight * scale) / 2;
         };
 
         // Internal use only. Intentionally not documented.
@@ -211,14 +210,15 @@ define([
 
             scratchTexture = dc.createTextTexture(credit.text, credit.textAttributes);
 
-            imageWidth = scratchTexture.imageWidth;
+            imageWidth = scratchTexture.imageWidth / 2;
             imageHeight = scratchTexture.imageHeight;
             offsetX = dc.viewport.width - (imageWidth + this.margin);
             offsetY = y + imageHeight;
 
             screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
-
             screenText = new ScreenText(screenOffset, credit.text);
+            screenText.attributes.enableOutline = credit.textAttributes.enableOutline;
+            screenText.attributes.color = credit.textAttributes.color;
 
             screenText.render(dc);
 
