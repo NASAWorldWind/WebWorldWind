@@ -17,7 +17,7 @@
  * Basic example for GeoJSON Exporter
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
     function (ww,
               LayerManager) {
