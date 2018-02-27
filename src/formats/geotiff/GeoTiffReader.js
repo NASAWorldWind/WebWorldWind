@@ -506,7 +506,7 @@ define([
         /**
          * Reads the provided GeoTiff contents array buffer, parses the data, and creates a typed array of its content.
          *
-         * @param {Function} callback A function called when GeoTiff parsing is complete.
+         * @param {ArrayBuffer} arrayBuffer The raw array buffer representing the GeoTiff
          */
         GeoTiffReader.prototype.readArrayBuffer = function (arrayBuffer) {
             if (!arrayBuffer) {
