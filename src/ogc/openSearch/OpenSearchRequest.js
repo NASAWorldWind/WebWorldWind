@@ -33,45 +33,92 @@ define([
             var defaultOptions = OpenSearchRequest.defaultOptions;
             options = options || defaultOptions;
 
-            //A flag to indicate if the current shapes in the layer should be replaced.
-            //Only used in the OpenSearchLayer.
+            /**
+             * A flag to indicate if the current shapes in the layer should be replaced.
+             * Only used in the OpenSearchLayer.
+             * @type {Boolean}
+             */
             this.replaceShapes = options.replaceShapes || defaultOptions.replaceShapes;
 
-            //Url for a resource such as a description document.
+            /**
+             * Url for a resource such as a description document.
+             * @type {String}
+             */
             this.url = options.url || defaultOptions.url;
 
-            //A valid http method.
+            /**
+             * A valid http method.
+             * @type {String}
+             */
             this.method = options.method || defaultOptions.method;
 
-            //A valid encoding for POST, PUT requests.
+            /**
+             * A valid encoding for POST, PUT requests.
+             * @type {String}
+             */
             this.encType = options.encType || defaultOptions.encType;
 
-            //A valid mime type.
+            /**
+             * A valid mime type.
+             * @type {String}
+             */
             this.type = options.type || defaultOptions.type;
 
-            //A valid open search rel. Possible values are 'collection' or 'results'.
+            /**
+             * A valid open search rel. Possible values are 'collection' or 'results'.
+             * @type {String}
+             */
             this.relation = options.relation || defaultOptions.relation;
 
-            //A flag to indicate if the request should include credentials.
+            /**
+             * A flag to indicate if the request should include credentials.
+             * @type {Boolean}
+             */
             this.withCredentials = options.withCredentials || defaultOptions.withCredentials;
 
-            //A timeout in milliseconds for the ajax request
+            /**
+             * A timeout in milliseconds for the ajax request.
+             * @type {Number}
+             */
             this.timeout = options.timeout || defaultOptions.timeout;
 
-            //Request headers. Use the addHeader method.
+            /**
+             * Request headers.
+             * Use the addHeader method.
+             * @type {Object}
+             */
             this.headers = options.headers || defaultOptions.headers;
 
-            //Payload data for POST, PUT requests.
+            /**
+             * Payload data for POST, PUT requests.
+             * @type {FormData|Object}
+             */
             this.body = options.body || defaultOptions.body;
 
-            //The response type for XHR.
+            /**
+             * The response type for XHR.
+             * @type {String}
+             */
             this.responseType = options.responseType || defaultOptions.responseType;
 
-            //Username and password for authentication purposes.
+            /**
+             * Username for authentication purposes.
+             * @type {String}
+             */
             this.user = options.user || defaultOptions.user;
+
+            /**
+             * Password for authentication purposes.
+             * @type {String}
+             */
             this.password = options.password || defaultOptions.password;
         };
 
+        /**
+         * Adds a header to an OpenSearchRequest request object
+         * @param {String} name The name of the header
+         * @param {String} value The value of the header
+         */
         OpenSearchRequest.prototype.addHeader = function (name, value) {
             var header = this.getHeader(name);
             if (header) {
@@ -82,10 +129,20 @@ define([
             }
         };
 
+        /**
+         * Gets the value of a header
+         * @param {String} name The name of the header
+         * @return {String|undefined} The value of the header or undefined if the header does not exist
+         */
         OpenSearchRequest.prototype.getHeader = function (name) {
             return this.headers[name];
         };
 
+        /**
+         * Internal. Applications should not modify these values.
+         * Default values for an OpenSearchRequest
+         * @static
+         */
         OpenSearchRequest.defaultOptions = {
             replaceShapes: true,
             url: '',
