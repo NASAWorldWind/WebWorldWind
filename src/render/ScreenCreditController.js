@@ -1,21 +1,3 @@
-/*
- * Copyright 2015-2017 WorldWind Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/**
- * @exports ScreenCreditController
- */
 define([
         '../error/ArgumentError',
         '../shaders/BasicTextureProgram',
@@ -60,38 +42,21 @@ define([
             RenderableLayer.call(this, "ScreenCreditController");
 
             // Internal. Intentionally not documented.
-            this.imageUrls = [];
+            this.imageCredits = [];
 
             // Internal. Intentionally not documented.
-            this.stringCredits = [];
-
-            // Internal. Intentionally not documented.
-            this.imageCreditSize = 64;
-
-            // Internal. Intentionally not documented.
-            this.margin = 5;
-
-            // Internal. Intentionally not documented.
-            this.opacity = 0.5;
+            this.textCredits = [];
         };
 
         ScreenCreditController.prototype = Object.create(RenderableLayer.prototype);
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.createStringCreditAttributes = function (textColor) {
-            var attributes = new TextAttributes(null);
-            attributes.color = textColor ? textColor : new Color(1, 1, 1, 0);
-            attributes.enableOutline = false; // Screen credits display text without an outline by default
-            return attributes;
-        };
-
 
         /**
          * Clears all credits from this controller.
          */
         ScreenCreditController.prototype.clear = function (dc) {
-            this.imageUrls = [];
-            this.stringCredits = [];
+            this.imageCredits = [];
+            this.textCredits = [];
+            this.removeAllRenderables();
         };
 
         /**
@@ -100,14 +65,10 @@ define([
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
         ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
-            if (!imageUrl) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
-            }
-
-            if (this.imageUrls.indexOf(imageUrl) === -1) {
-                this.imageUrls.push(imageUrl);
-            }
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
+            var credit = new ScreenImage(screenOffset, imageUrl);
+            this.imageCredits.push(credit);
+            this.addRenderable(credit);
         };
 
         /**
@@ -117,115 +78,31 @@ define([
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
         ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
-            if (!stringCredit) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
-            }
-
-            if (!color) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
-            }
-
-            if (this.stringCredits.indexOf(stringCredit) === -1) {
-                this.stringCredits.push({
-                    text: stringCredit,
-                    textAttributes: this.createStringCreditAttributes(color)
-                });
-            }
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
+            var credit = new ScreenText(screenOffset, "Test");
+            this.textCredits.push(credit);
+            this.addRenderable(credit);
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            RenderableLayer.prototype.doRender.call(this, dc);
-
-            // Check to see if there's anything to draw.
-            if ((this.imageUrls.length === 0 && this.stringCredits.length === 0)) {
-                return;
+            var w, h;
+            for (var i = 0; i < this.textCredits.length; i++) {
+                this.textCredits[i].makeOrderedRenderable(dc);
+                w = this.textCredits[i].activeTexture.imageWidth;
+                h = this.textCredits[i].activeTexture.imageHeight;
+                this.textCredits[i].screenOffset.x = dc.viewport.width - w;
+                this.textCredits[i].screenOffset.y = 100 + (i * 50);
             }
-
-            // Picking not provided.
-            if (dc.pickingMode) {
-                return;
-            }
-
-            // Want to draw only once per frame.
-            if (dc.timestamp === this.lastFrameTimestamp) {
-                return;
-            }
-            this.lastFrameTimestamp = dc.timestamp;
-
-            // Draw the image credits in a row along the bottom of the window from right to left.
-            var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
-                imageHeight, maxImageHeight = 0;
-
-            for (var i = 0; i < this.imageUrls.length; i++) {
-                imageHeight = this.drawImageCredit(dc, this.imageUrls[i], imageX, this.margin);
-                if (imageHeight > 0) {
-                    imageX -= (this.margin + this.imageCreditSize);
-                    maxImageHeight = WWMath.max(imageHeight, maxImageHeight);
+            for (i = 0; i < this.imageCredits.length; i++) {
+                if (this.imageCredits[i].makeOrderedRenderable(dc) != null) {
+                    w = this.imageCredits[i].activeTexture.imageWidth;
+                    h = this.imageCredits[i].activeTexture.imageHeight;
+                    this.imageCredits[i].screenOffset.x = dc.viewport.width - w;
+                    this.imageCredits[i].screenOffset.y = 100 + i * 100;
                 }
             }
-
-            // Draw the string credits above the image credits and progressing from bottom to top.
-            var stringY = maxImageHeight + this.margin;
-            for (var j = 0; j < this.stringCredits.length; j++) {
-                this.drawStringCredit(dc, this.stringCredits[j], stringY);
-                stringY += this.margin + 15; // margin + string height
-            }
-        };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawImageCredit = function (dc, creditUrl, x, y) {
-            var imageWidth, imageHeight, scale, activeTexture, screenOffset, screenImage, offsetX, offsetY;
-
-            activeTexture = dc.gpuResourceCache.resourceForKey(creditUrl);
-            if (!activeTexture) {
-                dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, creditUrl);
-                return 0;
-            }
-
-            // Scale the image to fit within a constrained size.
-            imageWidth = activeTexture.imageWidth;
-            imageHeight = activeTexture.imageHeight;
-            if (imageWidth <= this.imageCreditSize && this.imageHeight <= this.imageCreditSize) {
-                scale = 1;
-            } else if (imageWidth >= imageHeight) {
-                scale = this.imageCreditSize / imageWidth;
-            } else {
-                scale = this.imageCreditSize / imageHeight;
-            }
-
-            offsetX = x + (imageWidth * scale) / 2;
-            offsetY = y + (imageHeight * scale) / 2;
-
-            screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
-            screenImage = new ScreenImage(screenOffset, creditUrl);
-            screenImage.scale = scale;
-            screenImage.render(dc);
-
-            return (imageHeight * scale) / 2;
-        };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
-            var imageWidth, imageHeight, scratchTexture, screenText, screenOffset, offsetX, offsetY;
-
-            scratchTexture = dc.createTextTexture(credit.text, credit.textAttributes);
-
-            imageWidth = scratchTexture.imageWidth / 2;
-            imageHeight = scratchTexture.imageHeight;
-            offsetX = dc.viewport.width - (imageWidth + this.margin);
-            offsetY = y + imageHeight;
-
-            screenOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
-            screenText = new ScreenText(screenOffset, credit.text);
-            screenText.attributes.enableOutline = credit.textAttributes.enableOutline;
-            screenText.attributes.color = credit.textAttributes.color;
-
-            screenText.render(dc);
-
-            return true;
+            RenderableLayer.prototype.doRender.call(this, dc);
         };
 
         return ScreenCreditController;
