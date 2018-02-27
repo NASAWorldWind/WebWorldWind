@@ -52,11 +52,9 @@ define([
          *
          * By default, this service can handle Atom for EO and GeoJSON responses.
          * Other types of response formats can by added using the registerParser method.
-         *
-         * @param {String} url The URL of the OpenSearch description document.
          */
-        var OpenSearchService = function (url) {
-            this._url = url;
+        var OpenSearchService = function () {
+            this._url = '';
             this._descriptionDocument = null;
             this._parserRegistry = new OpenSearchParserRegistry();
 
@@ -72,14 +70,6 @@ define([
             url: {
                 get: function () {
                     return this._url;
-                },
-                set: function (value) {
-                    if (!value || typeof value !== 'string') {
-                        throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "OpenSearchService", "setUrl",
-                                "The specified url is missing or is not a string."));
-                    }
-                    this._url = value;
                 }
             },
 
@@ -111,7 +101,7 @@ define([
 
         /**
          * Fetches and parses an OpenSearch description document.
-         * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
+         * @param {OpenSearchRequest} options See {@link OpenSearchRequest} for possible options. A url is required.
          * @return {Promise} A promise which when resolved returns this service, or an error when rejected
          * @example openSearchService
          *                      .discover({url: 'http://example.com/opensearch'})
@@ -121,11 +111,11 @@ define([
         OpenSearchService.prototype.discover = function (options) {
             var self = this;
             var requestOptions = new OpenSearchRequest(options);
-            requestOptions.url = requestOptions.url || this._url;
             requestOptions.method = requestOptions.method || 'GET';
             if (!requestOptions.url) {
                 return Promise.reject(new Error('OpenSearchService discover - no url provided'));
             }
+            this._url = requestOptions.url;
             return OpenSearchUtils.fetch(requestOptions)
                 .then(function (responseText) {
                     var xmlRoot = OpenSearchUtils.parseXml(responseText);

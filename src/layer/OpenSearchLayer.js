@@ -69,9 +69,6 @@ define([
             url: {
                 get: function () {
                     return this.searchService.url;
-                },
-                set: function (value) {
-                    this.searchService.url = value;
                 }
             },
 
@@ -144,7 +141,7 @@ define([
         /**
          * Fetches and parses an OpenSearch description document.
          *
-         * @param {OpenSearchRequest|null} options See {@link OpenSearchRequest} for possible options.
+         * @param {OpenSearchRequest} options See {@link OpenSearchRequest} for possible options. A url is required.
          * @return {Promise} A promise which when resolved returns this layer, or an error when rejected
          * @example openSearchLayer
          *                      .discover({url: 'http://example.com/opensearch'})
