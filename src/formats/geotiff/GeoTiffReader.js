@@ -57,10 +57,6 @@ define([
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
         var GeoTiffReader = function (url) {
-            if (!url) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missingUrl"));
-            }
 
             // Documented in defineProperties below.
             this._url = url;
@@ -243,6 +239,11 @@ define([
          * @param {Function} callback A function called when GeoTiff parsing is complete.
          */
         GeoTiffReader.prototype.readAsImage = function (callback) {
+            if (!this.url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missingUrl"));
+            }
+
             this.requestUrl(this.url, (function () {
                 var bitsPerSample = this.metadata.bitsPerSample;
                 var samplesPerPixel = this.metadata.samplesPerPixel;
@@ -453,7 +454,7 @@ define([
                     else {
                         typedElevationArray = new Uint8Array(elevationArray);
                     }
-                    break
+                    break;
                 case 16:
                     if (sampleFormat === TiffConstants.SampleFormat.SIGNED) {
                         typedElevationArray = new Int16Array(elevationArray);
@@ -490,11 +491,32 @@ define([
          * @param {Function} callback A function called when GeoTiff parsing is complete.
          */
         GeoTiffReader.prototype.readAsData = function (callback) {
+            if (!this.url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "readAsData", "missingUrl"));
+            }
+
             this.requestUrl(this.url, (function () {
                 callback(
                     this.createTypedElevationArray()
                 );
             }).bind(this));
+        };
+
+        /**
+         * Reads the provided GeoTiff contents array buffer, parses the data, and creates a typed array of its content.
+         *
+         * @param {Function} callback A function called when GeoTiff parsing is complete.
+         */
+        GeoTiffReader.prototype.readArrayBuffer = function (arrayBuffer) {
+            if (!arrayBuffer) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "readAsArrayBuffer", "missing array buffer"));
+            }
+
+            this.parse(arrayBuffer);
+
+            return this.createTypedElevationArray();
         };
 
         // Parse geotiff strips. Internal use only

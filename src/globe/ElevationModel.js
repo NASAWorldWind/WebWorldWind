@@ -22,6 +22,7 @@ define([
         '../error/ArgumentError',
         '../globe/ElevationImage',
         '../globe/ElevationTile',
+        '../formats/geotiff/GeoTiffReader',
         '../util/LevelSet',
         '../util/Logger',
         '../cache/MemoryCache',
@@ -33,6 +34,7 @@ define([
               ArgumentError,
               ElevationImage,
               ElevationTile,
+              GeoTiffReader,
               LevelSet,
               Logger,
               MemoryCache,
@@ -669,12 +671,16 @@ define([
         ElevationModel.prototype.loadElevationImage = function (tile, xhr) {
             var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight);
 
-            if (this.retrievalImageFormat == "application/bil16") {
+            if (this.retrievalImageFormat === "application/bil16") {
                 elevationImage.imageData = new Int16Array(xhr.response);
                 elevationImage.size = elevationImage.imageData.length * 2;
-            } else if (this.retrievalImageFormat == "application/bil32") {
+            } else if (this.retrievalImageFormat === "application/bil32") {
                 elevationImage.imageData = new Float32Array(xhr.response);
                 elevationImage.size = elevationImage.imageData.length * 4;
+            } else if (this.retrievalImageFormat === "image/tiff") {
+                var geoTiff = new GeoTiffReader();
+                elevationImage.imageData = geoTiff.readArrayBuffer(xhr.response);
+                elevationImage.size = elevationImage.imageData.length * geoTiff.metadata.bitsPerSample[0] / 8;
             }
 
             if (elevationImage.imageData) {
@@ -685,5 +691,4 @@ define([
         };
 
         return ElevationModel;
-
     });
