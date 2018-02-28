@@ -54,7 +54,7 @@ define([
             this.margin = 5;
 
             // Internal. Intentionally not documented.
-            this.opacity = 0.5;
+            // this.opacity = 0.5;
         };
 
         ScreenCreditController.prototype = Object.create(RenderableLayer.prototype);
@@ -155,7 +155,7 @@ define([
             screenTextOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
             textCredit.screenOffset = screenTextOffset;
 
-            return true;
+            // return true;
         };
 
         return ScreenCreditController;
