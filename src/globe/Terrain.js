@@ -55,7 +55,7 @@ define([
 
             /**
              * The tessellator used to generate this terrain.
-             * @type {Tessellator}
+             * @type {BasicTessellator}
              */
             this.tessellator = tessellator;
 

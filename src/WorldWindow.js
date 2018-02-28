@@ -18,6 +18,7 @@
  */
 define([
         './error/ArgumentError',
+        './globe/BasicElevationCoverage',
         './BasicWorldWindowController',
         './render/DrawContext',
         './globe/EarthElevationModel',
@@ -140,7 +141,12 @@ define([
              * The globe displayed.
              * @type {Globe}
              */
-            this.globe = new Globe(elevationModel || new EarthElevationModel());
+            if (!elevationModel)
+            {
+                elevationModel=new ElevationModel();
+                elevationModel.addCoverage(new BasicElevationCoverage());
+            }
+            this.globe = new Globe(elevationModel);
 
             /**
              * The layers to display in this WorldWindow.

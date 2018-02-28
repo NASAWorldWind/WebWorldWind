@@ -27,7 +27,7 @@ define([
         '../geom/Position',
         '../projections/ProjectionWgs84',
         '../geom/Sector',
-        '../globe/Tessellator',
+        '../globe/BasicTessellator',
         '../geom/Vec3',
         '../util/WWMath'],
     function (Angle,
@@ -40,7 +40,7 @@ define([
               Position,
               ProjectionWgs84,
               Sector,
-              Tessellator,
+              BasicTessellator,
               Vec3,
               WWMath) {
         "use strict";
@@ -99,9 +99,9 @@ define([
 
             /**
              * The tessellator used to create this globe's terrain.
-             * @type {Tessellator}
+             * @type {BasicTessellator}
              */
-            this.tessellator = new Tessellator();
+            this.tessellator = new BasicTessellator();
 
             // Internal. Intentionally not documented.
             this._projection = projection || new ProjectionWgs84();
@@ -166,7 +166,7 @@ define([
                     }
 
                     if (this.projection != projection) {
-                        this.tessellator = new Tessellator();
+                        this.tessellator = new BasicTessellator();
                     }
                     this._projection = projection;
                 }
