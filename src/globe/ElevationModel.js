@@ -56,6 +56,8 @@ define(['../error/ArgumentError',
              */
             this.coverages = [];
 
+            this.computeStateKey();
+
         };
 
         Object.defineProperties(ElevationModel.prototype, {
@@ -143,7 +145,7 @@ define(['../error/ArgumentError',
             }
 
             var index = this.coverages.indexOf(coverage);
-            if (index !== -1) {
+            if (index < 0) {
                 this.coverages.push(coverage);
                 this.computeStateKey();
                 return true;
@@ -226,13 +228,13 @@ define(['../error/ArgumentError',
             }
 
             var resolution = Number.MAX_VALUE;
-            var coverageResult=new Float64Array(result.length);
+            var coverageResult = new Float64Array(result.length);
             for (var i = 0; i < this.coverages.length; i++) {
                 var coverageResolution = this.coverages[i].elevationsForGrid(sector, numLat, numLon, targetResolution, coverageResult);
                 if (coverageResolution < Number.MAX_VALUE) {
-                    resolution=coverageResolution;
-                    for (var j=0; j<result.length; j++) {
-                        result[j]=coverageResult[j];
+                    resolution = coverageResolution;
+                    for (var j = 0; j < result.length; j++) {
+                        result[j] = coverageResult[j];
                     }
                 }
             }

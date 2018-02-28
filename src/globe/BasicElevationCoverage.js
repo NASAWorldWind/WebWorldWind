@@ -39,7 +39,7 @@ define([
             TiledElevationCoverage.call(this,
                 Sector.FULL_SPHERE, new Location(45, 45), 12, "application/bil16", "EarthElevations256", 256, 256);
 
-            this.displayName = "Earth Elevation Model";
+            this.displayName = "Basic Earth Elevation Coverage";
             this.minElevation = -11000; // Depth of Marianas Trench, in meters
             this.maxElevation = 8850; // Height of Mt. Everest
             this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images

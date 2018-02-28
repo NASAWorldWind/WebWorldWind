@@ -19,6 +19,7 @@
 define([
         '../geom/Angle',
         '../error/ArgumentError',
+        '../globe/BasicTessellator',
         '../geom/BoundingBox',
         '../globe/ElevationModel',
         '../geom/Line',
@@ -27,11 +28,10 @@ define([
         '../geom/Position',
         '../projections/ProjectionWgs84',
         '../geom/Sector',
-        '../globe/BasicTessellator',
-        '../geom/Vec3',
-        '../util/WWMath'],
+        '../geom/Vec3'],
     function (Angle,
               ArgumentError,
+              BasicTessellator,
               BoundingBox,
               ElevationModel,
               Line,
@@ -40,9 +40,7 @@ define([
               Position,
               ProjectionWgs84,
               Sector,
-              BasicTessellator,
-              Vec3,
-              WWMath) {
+              Vec3) {
         "use strict";
 
         /**
@@ -70,6 +68,8 @@ define([
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Globe",
                     "constructor", "Elevation model is null or undefined."));
             }
+
+            var test=new ElevationModel();
             /**
              * This globe's elevation model.
              * @type {ElevationModel}
