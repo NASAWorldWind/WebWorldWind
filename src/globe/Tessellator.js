@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports BasicTessellator
+ * @exports Tessellator
  */
 define([
         '../error/ArgumentError',
@@ -63,12 +63,12 @@ define([
         "use strict";
 
         /**
-         * Constructs a BasicTessellator.
-         * @alias BasicTessellator
+         * Constructs a Tessellator.
+         * @alias Tessellator
          * @constructor
          * @classdesc Provides terrain tessellation for a globe.
          */
-        var BasicTessellator = function () {
+        var Tessellator = function () {
             // Parameterize top level subdivision in one place.
 
             // TilesInTopLevel describes the most coarse tile structure.
@@ -173,10 +173,10 @@ define([
          * @returns {Terrain} The computed terrain, or null if terrain could not be computed.
          * @throws {ArgumentError} If the dc is null or undefined.
          */
-        BasicTessellator.prototype.tessellate = function (dc) {
+        Tessellator.prototype.tessellate = function (dc) {
             if (!dc) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BasicTessellator", "tessellate", "missingDC"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "tessellate", "missingDC"));
             }
 
             var lastElevationsChange = dc.globe.elevationTimestamp();
@@ -221,7 +221,7 @@ define([
             return this.lastTerrain;
         };
 
-        BasicTessellator.prototype.createTile = function (tileSector, level, row, column) {
+        Tessellator.prototype.createTile = function (tileSector, level, row, column) {
             if (!tileSector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Tile", "constructor", "missingSector"));
@@ -246,10 +246,10 @@ define([
          * Initializes rendering state to draw a succession of terrain tiles.
          * @param {DrawContext} dc The draw context.
          */
-        BasicTessellator.prototype.beginRendering = function (dc) {
+        Tessellator.prototype.beginRendering = function (dc) {
             var program = dc.currentProgram; // use the current program; the caller configures other program state
             if (!program) {
-                Logger.logMessage(Logger.LEVEL_INFO, "BasicTessellator", "beginRendering", "Current Program is empty");
+                Logger.logMessage(Logger.LEVEL_INFO, "Tessellator", "beginRendering", "Current Program is empty");
                 return;
             }
 
@@ -281,7 +281,7 @@ define([
          * Restores rendering state after drawing a succession of terrain tiles.
          * @param {DrawContext} dc The draw context.
          */
-        BasicTessellator.prototype.endRendering = function (dc) {
+        Tessellator.prototype.endRendering = function (dc) {
             var gl = dc.currentGlContext;
 
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -303,10 +303,10 @@ define([
          * @param {TerrainTile} terrainTile The terrain tile subsequently drawn via this tessellator's render function.
          * @throws {ArgumentError} If the specified tile is null or undefined.
          */
-        BasicTessellator.prototype.beginRenderingTile = function (dc, terrainTile) {
+        Tessellator.prototype.beginRenderingTile = function (dc, terrainTile) {
             if (!terrainTile) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BasicTessellator", "beginRenderingTile", "missingTile"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "beginRenderingTile", "missingTile"));
             }
 
             var gl = dc.currentGlContext,
@@ -339,12 +339,12 @@ define([
 
         /**
          * Restores rendering state after drawing the most recent tile specified to
-         * [beginRenderingTile]{@link BasicTessellator#beginRenderingTile}.
+         * [beginRenderingTile]{@link Tessellator#beginRenderingTile}.
          * @param {DrawContext} dc The draw context.
          * @param {TerrainTile} terrainTile The terrain tile most recently rendered.
          * @throws {ArgumentError} If the specified tile is null or undefined.
          */
-        BasicTessellator.prototype.endRenderingTile = function (dc, terrainTile) {
+        Tessellator.prototype.endRenderingTile = function (dc, terrainTile) {
             // Intentionally empty until there's some reason to add code here.
         };
 
@@ -354,10 +354,10 @@ define([
          * @param {TerrainTile} terrainTile The terrain tile to render.
          * @throws {ArgumentError} If the specified tile is null or undefined.
          */
-        BasicTessellator.prototype.renderTile = function (dc, terrainTile) {
+        Tessellator.prototype.renderTile = function (dc, terrainTile) {
             if (!terrainTile) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BasicTessellator", "renderTile", "missingTile"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "renderTile", "missingTile"));
             }
 
             var gl = dc.currentGlContext,
@@ -462,10 +462,10 @@ define([
          * @param {TerrainTile} terrainTile The tile to draw.
          * @throws {ArgumentError} If the specified tile is null or undefined.
          */
-        BasicTessellator.prototype.renderWireframeTile = function (dc, terrainTile) {
+        Tessellator.prototype.renderWireframeTile = function (dc, terrainTile) {
             if (!terrainTile) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BasicTessellator", "renderWireframeTile", "missingTile"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "renderWireframeTile", "missingTile"));
             }
 
             var gl = dc.currentGlContext;
@@ -488,10 +488,10 @@ define([
          * @param {TerrainTile} terrainTile The tile whose outer boundary to draw.
          * @throws {ArgumentError} If the specified tile is null or undefined.
          */
-        BasicTessellator.prototype.renderTileOutline = function (dc, terrainTile) {
+        Tessellator.prototype.renderTileOutline = function (dc, terrainTile) {
             if (!terrainTile) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BasicTessellator", "renderTileOutline", "missingTile"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "renderTileOutline", "missingTile"));
             }
 
             var gl = dc.currentGlContext;
@@ -519,15 +519,15 @@ define([
          * If null, then this tessellator is used as the <code>userObject</code>.
          * @throws {ArgumentError} If either the draw context or the tile list are null or undefined.
          */
-        BasicTessellator.prototype.pick = function (dc, tileList, pickDelegate) {
+        Tessellator.prototype.pick = function (dc, tileList, pickDelegate) {
             if (!dc) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BasicTessellator", "pick", "missingDc"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "pick", "missingDc"));
             }
 
             if (!tileList) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "BasicTessellator", "pick", "missingList"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "pick", "missingList"));
             }
 
             var color = null,
@@ -566,7 +566,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        BasicTessellator.prototype.drawPickTiles = function (dc, tileList, color) {
+        Tessellator.prototype.drawPickTiles = function (dc, tileList, color) {
             var gl = dc.currentGlContext;
 
             try {
@@ -586,7 +586,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        BasicTessellator.prototype.computeNearestIntersection = function (line, tileList) {
+        Tessellator.prototype.computeNearestIntersection = function (line, tileList) {
             // Compute all intersections between the specified line and tile list.
             var results = [];
             for (var i = 0, len = tileList.length; i < len; i++) {
@@ -612,7 +612,7 @@ define([
         };
 
         // Internal function. Intentionally not documented.
-        BasicTessellator.prototype.computeIntersections = function (line, tile, results) {
+        Tessellator.prototype.computeIntersections = function (line, tile, results) {
             var level = tile.level,
                 neighborLevel,
                 points = tile.points,
@@ -660,12 +660,12 @@ define([
          * Internal methods - assume that arguments have been validated already.
          ***********************************************************************/
 
-        BasicTessellator.prototype.createTopLevelTiles = function (dc) {
+        Tessellator.prototype.createTopLevelTiles = function (dc) {
             this.topLevelTiles[dc.globeStateKey] = [];
             Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles[dc.globeStateKey]);
         };
 
-        BasicTessellator.prototype.addTileOrDescendants = function (dc, tile) {
+        Tessellator.prototype.addTileOrDescendants = function (dc, tile) {
             if (this.tileMeetsRenderCriteria(dc, tile)) {
                 this.addTile(dc, tile);
                 return;
@@ -674,7 +674,7 @@ define([
             this.addTileDescendants(dc, tile);
         };
 
-        BasicTessellator.prototype.addTileDescendants = function (dc, tile) {
+        Tessellator.prototype.addTileDescendants = function (dc, tile) {
             var nextLevel = tile.level.nextLevel();
             var subTiles = tile.subdivideToCache(nextLevel, this, this.tileCache);
             for (var index = 0; index < subTiles.length; index += 1) {
@@ -688,7 +688,7 @@ define([
             }
         };
 
-        BasicTessellator.prototype.addTile = function (dc, tile) {
+        Tessellator.prototype.addTile = function (dc, tile) {
             // Insert tile at index idx.
             var idx = this.tiles.length;
             this.tiles.push(tile);
@@ -740,7 +740,7 @@ define([
             }
         };
 
-        BasicTessellator.prototype.refineNeighbors = function (dc) {
+        Tessellator.prototype.refineNeighbors = function (dc) {
             var tileRefinementSet = {};
 
             for (var idx = 0, len = this.tiles.length; idx < len; idx += 1) {
@@ -873,7 +873,7 @@ define([
             }
         };
 
-        BasicTessellator.prototype.finishTessellating = function (dc) {
+        Tessellator.prototype.finishTessellating = function (dc) {
             for (var idx = 0, len = this.tiles.length; idx < len; idx += 1) {
                 var tile = this.tiles[idx];
                 this.setNeighbors(tile);
@@ -882,7 +882,7 @@ define([
             }
         };
 
-        BasicTessellator.prototype.setNeighbors = function (tile) {
+        Tessellator.prototype.setNeighbors = function (tile) {
             var sector = tile.sector;
 
             // Corners of the tile.
@@ -935,7 +935,7 @@ define([
             tile.setNeighborLevel(WorldWind.WEST, (westIdx >= 0) ? this.tiles[westIdx].level : null);
         };
 
-        BasicTessellator.prototype.isTileVisible = function (dc, tile) {
+        Tessellator.prototype.isTileVisible = function (dc, tile) {
             if (dc.globe.projectionLimits && !tile.sector.overlaps(dc.globe.projectionLimits)) {
                 return false;
             }
@@ -943,7 +943,7 @@ define([
             return tile.extent.intersectsFrustum(dc.frustumInModelCoordinates);
         };
 
-        BasicTessellator.prototype.tileMeetsRenderCriteria = function (dc, tile) {
+        Tessellator.prototype.tileMeetsRenderCriteria = function (dc, tile) {
             var s = this.detailControl;
             if (tile.sector.minLatitude >= 75 || tile.sector.maxLatitude <= -75) {
                 s *= 2;
@@ -951,7 +951,7 @@ define([
             return tile.level.isLastLevel() || !tile.mustSubdivide(dc, s);
         };
 
-        BasicTessellator.prototype.regenerateTileGeometryIfNeeded = function (dc, tile) {
+        Tessellator.prototype.regenerateTileGeometryIfNeeded = function (dc, tile) {
             var stateKey = dc.globeStateKey + tile.stateKey + dc.verticalExaggeration;
 
             if (!tile.points || tile.pointsStateKey != stateKey) {
@@ -960,7 +960,7 @@ define([
             }
         };
 
-        BasicTessellator.prototype.regenerateTileGeometry = function (dc, tile) {
+        Tessellator.prototype.regenerateTileGeometry = function (dc, tile) {
             var numLat = tile.tileHeight + 1, // num points in each dimension is 1 more than the number of tile cells
                 numLon = tile.tileWidth + 1,
                 refPoint = tile.referencePoint,
@@ -994,7 +994,7 @@ define([
             tile.transformationMatrix.setTranslation(refPoint[0], refPoint[1], refPoint[2]);
         };
 
-        BasicTessellator.prototype.mustAlignNeighborElevations = function (dc, tile) {
+        Tessellator.prototype.mustAlignNeighborElevations = function (dc, tile) {
             var level = tile.level,
                 northLevel = tile.neighborLevel(WorldWind.NORTH),
                 southLevel = tile.neighborLevel(WorldWind.SOUTH),
@@ -1007,7 +1007,7 @@ define([
                 (westLevel && westLevel.compare(level) < 0);
         };
 
-        BasicTessellator.prototype.alignNeighborElevations = function (dc, tile, elevations) {
+        Tessellator.prototype.alignNeighborElevations = function (dc, tile, elevations) {
             var numLat = tile.tileHeight + 1, // num points in each dimension is 1 more than the number of tile cells
                 numLon = tile.tileWidth + 1,
                 level = tile.level,
@@ -1081,7 +1081,7 @@ define([
             }
         };
 
-        BasicTessellator.prototype.buildSharedGeometry = function () {
+        Tessellator.prototype.buildSharedGeometry = function () {
             // TODO: put all indices into a single buffer
             var tileWidth = this.levels.tileWidth,
                 tileHeight = this.levels.tileHeight;
@@ -1095,7 +1095,7 @@ define([
             }
         };
 
-        BasicTessellator.prototype.buildTexCoords = function (tileWidth, tileHeight) {
+        Tessellator.prototype.buildTexCoords = function (tileWidth, tileHeight) {
             var numCols = tileWidth + 1,
                 numRows = tileHeight + 1,
                 colDelta = 1 / tileWidth,
@@ -1121,7 +1121,7 @@ define([
             this.texCoords = buffer;
         };
 
-        BasicTessellator.prototype.buildIndices = function (tileWidth, tileHeight) {
+        Tessellator.prototype.buildIndices = function (tileWidth, tileHeight) {
             var vertexIndex; // The index of the vertex in the sample grid.
 
             // The number of vertices in each dimension is 1 more than the number of cells.
@@ -1417,7 +1417,7 @@ define([
             this.indices = new Uint16Array(indices);
         };
 
-        BasicTessellator.prototype.buildWireframeIndices = function (tileWidth, tileHeight) {
+        Tessellator.prototype.buildWireframeIndices = function (tileWidth, tileHeight) {
             // The wireframe representation draws the vertices that appear on the surface.
 
             // The number of vertices in each dimension is 1 more than the number of cells.
@@ -1459,7 +1459,7 @@ define([
             return indices;
         };
 
-        BasicTessellator.prototype.buildOutlineIndices = function (tileWidth, tileHeight) {
+        Tessellator.prototype.buildOutlineIndices = function (tileWidth, tileHeight) {
             // The outline representation traces the tile's outer edge on the surface.
 
             // The number of vertices in each dimension is 1 more than the number of cells.
@@ -1513,7 +1513,7 @@ define([
             return indices;
         };
 
-        BasicTessellator.prototype.cacheSharedGeometryVBOs = function (dc) {
+        Tessellator.prototype.cacheSharedGeometryVBOs = function (dc) {
             var gl = dc.currentGlContext,
                 gpuResourceCache = dc.gpuResourceCache;
 
@@ -1536,5 +1536,5 @@ define([
             }
         };
 
-        return BasicTessellator;
+        return Tessellator;
     });

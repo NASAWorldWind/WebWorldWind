@@ -19,7 +19,6 @@
 define([
         '../geom/Angle',
         '../error/ArgumentError',
-        '../globe/BasicTessellator',
         '../geom/BoundingBox',
         '../globe/ElevationModel',
         '../geom/Line',
@@ -28,10 +27,10 @@ define([
         '../geom/Position',
         '../projections/ProjectionWgs84',
         '../geom/Sector',
+        '../globe/Tessellator',
         '../geom/Vec3'],
     function (Angle,
               ArgumentError,
-              BasicTessellator,
               BoundingBox,
               ElevationModel,
               Line,
@@ -40,6 +39,7 @@ define([
               Position,
               ProjectionWgs84,
               Sector,
+              Tessellator,
               Vec3) {
         "use strict";
 
@@ -69,7 +69,6 @@ define([
                     "constructor", "Elevation model is null or undefined."));
             }
 
-            var test=new ElevationModel();
             /**
              * This globe's elevation model.
              * @type {ElevationModel}
@@ -99,9 +98,9 @@ define([
 
             /**
              * The tessellator used to create this globe's terrain.
-             * @type {BasicTessellator}
+             * @type {Tessellator}
              */
-            this.tessellator = new BasicTessellator();
+            this.tessellator = new Tessellator();
 
             // Internal. Intentionally not documented.
             this._projection = projection || new ProjectionWgs84();
@@ -166,7 +165,7 @@ define([
                     }
 
                     if (this.projection != projection) {
-                        this.tessellator = new BasicTessellator();
+                        this.tessellator = new Tessellator();
                     }
                     this._projection = projection;
                 }

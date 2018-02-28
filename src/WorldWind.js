@@ -25,7 +25,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/AtmosphereProgram',
         './globe/BasicElevationCoverage',
         './shaders/BasicProgram',
-        './globe/BasicTessellator',
         './shaders/BasicTextureProgram',
         './util/BasicTimeSequence',
         './BasicWorldWindowController',
@@ -210,6 +209,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './globe/Terrain',
         './globe/TerrainTile',
         './globe/TerrainTileList',
+        './globe/Tessellator',
         './shapes/Text',
         './shapes/TextAttributes',
         './render/TextRenderer',
@@ -268,7 +268,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               AtmosphereProgram,
               BasicElevationCoverage,
               BasicProgram,
-              BasicTessellator,
               BasicTextureProgram,
               BasicTimeSequence,
               BasicWorldWindowController,
@@ -453,6 +452,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Terrain,
               TerrainTile,
               TerrainTileList,
+              Tessellator,
               Text,
               TextAttributes,
               TextRenderer,
@@ -732,7 +732,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['AtmosphereProgram'] = AtmosphereProgram;
         WorldWind['BasicElevationCoverage'] = BasicElevationCoverage;
         WorldWind['BasicProgram'] = BasicProgram;
-        WorldWind['BasicTessellator'] = BasicTessellator;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BasicTimeSequence'] = BasicTimeSequence;
         WorldWind['BasicWorldWindowController'] = BasicWorldWindowController;
@@ -866,6 +865,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Terrain'] = Terrain;
         WorldWind['TerrainTile'] = TerrainTile;
         WorldWind['TerrainTileList'] = TerrainTileList;
+        WorldWind['Tessellator'] = Tessellator;
         WorldWind['Text'] = Text;
         WorldWind['TextAttributes'] = TextAttributes;
         WorldWind['TextRenderer'] = TextRenderer;
