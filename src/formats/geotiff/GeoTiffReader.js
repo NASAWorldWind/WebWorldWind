@@ -53,17 +53,17 @@ define([
          * @alias GeoTiffReader
          * @constructor
          * @classdesc Parses a geotiff and creates an image or an elevation array representing its contents.
-         * @param {String} url The location of the geotiff.
+         * @param {String} dataSource The URL or ArrayBuffer of the GeoTiff
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
-        var GeoTiffReader = function (url) {
-            if (!url) {
+        var GeoTiffReader = function (dataSource) {
+            if (!dataSource) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missingUrl"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missing data source"));
             }
 
-            // Documented in defineProperties below.
-            this._url = url;
+            // The URL or ArrayBuffer of the GeoTiff
+            this._dataSource = dataSource;
 
             // Documented in defineProperties below.
             this._isLittleEndian = false;
@@ -81,14 +81,18 @@ define([
         Object.defineProperties(GeoTiffReader.prototype, {
 
             /**
-             * The geotiff URL as specified to this GeoTiffReader's constructor.
+             * The geotiff URL as specified to this GeoTiffReader's constructor or null if none is provided.
              * @memberof GeoTiffReader.prototype
              * @type {String}
              * @readonly
              */
             url: {
                 get: function () {
-                    return this._url;
+                    if (this.isDataSourceArrayBuffer()) {
+                        return null;
+                    } else {
+                        return this._dataSource;
+                    }
                 }
             },
 
@@ -243,78 +247,60 @@ define([
          * @param {Function} callback A function called when GeoTiff parsing is complete.
          */
         GeoTiffReader.prototype.readAsImage = function (callback) {
-            this.requestUrl(this.url, (function () {
-                var bitsPerSample = this.metadata.bitsPerSample;
-                var samplesPerPixel = this.metadata.samplesPerPixel;
-                var photometricInterpretation = this.metadata.photometricInterpretation;
-                var imageLength = this.metadata.imageLength;
-                var imageWidth = this.metadata.imageWidth;
+            if (this.isDataSourceArrayBuffer()) {
+                this.parse(this._dataSource);
+                callback(this.createImage());
+            } else {
+                this.requestUrl(this.url, (function () {
+                    callback(this.createImage());
+                }).bind(this));
+            }
+        };
 
-                if (this.metadata.colorMap) {
-                    var colorMapValues = this.metadata.colorMap;
-                    var colorMapSampleSize = Math.pow(2, bitsPerSample[0]);
+        // Generate a canvas image. Internal use only.
+        GeoTiffReader.prototype.createImage = function () {
+            var bitsPerSample = this.metadata.bitsPerSample;
+            var samplesPerPixel = this.metadata.samplesPerPixel;
+            var photometricInterpretation = this.metadata.photometricInterpretation;
+            var imageLength = this.metadata.imageLength;
+            var imageWidth = this.metadata.imageWidth;
+
+            if (this.metadata.colorMap) {
+                var colorMapValues = this.metadata.colorMap;
+                var colorMapSampleSize = Math.pow(2, bitsPerSample[0]);
+            }
+
+            var canvas = document.createElement('canvas');
+            canvas.width = imageWidth;
+            canvas.height = imageLength;
+            var ctx = canvas.getContext("2d");
+
+            if (this.metadata.stripOffsets) {
+                var strips = this.parseStrips(false);
+                if (this.metadata.rowsPerStrip) {
+                    var rowsPerStrip = this.metadata.rowsPerStrip;
+                } else {
+                    var rowsPerStrip = imageLength;
                 }
+                var numOfStrips = strips.length;
+                var numRowsInPreviousStrip = 0;
+                var numRowsInStrip = rowsPerStrip;
+                var imageLengthModRowsPerStrip = imageLength % rowsPerStrip;
+                var rowsInLastStrip = (imageLengthModRowsPerStrip === 0) ? rowsPerStrip :
+                    imageLengthModRowsPerStrip;
 
-                var canvas = document.createElement('canvas');
-                canvas.width = imageWidth;
-                canvas.height = imageLength;
-                var ctx = canvas.getContext("2d");
-
-                if (this.metadata.stripOffsets) {
-                    var strips = this.parseStrips(false);
-                    if (this.metadata.rowsPerStrip) {
-                        var rowsPerStrip = this.metadata.rowsPerStrip;
-                    } else {
-                        var rowsPerStrip = imageLength;
+                for (var i = 0; i < numOfStrips; i++) {
+                    if ((i + 1) === numOfStrips) {
+                        numRowsInStrip = rowsInLastStrip;
                     }
-                    var numOfStrips = strips.length;
-                    var numRowsInPreviousStrip = 0;
-                    var numRowsInStrip = rowsPerStrip;
-                    var imageLengthModRowsPerStrip = imageLength % rowsPerStrip;
-                    var rowsInLastStrip = (imageLengthModRowsPerStrip === 0) ? rowsPerStrip :
-                        imageLengthModRowsPerStrip;
 
-                    for (var i = 0; i < numOfStrips; i++) {
-                        if ((i + 1) === numOfStrips) {
-                            numRowsInStrip = rowsInLastStrip;
-                        }
+                    var numOfPixels = strips[i].length;
+                    var yPadding = numRowsInPreviousStrip * i;
 
-                        var numOfPixels = strips[i].length;
-                        var yPadding = numRowsInPreviousStrip * i;
+                    for (var y = 0, j = 0; y < numRowsInStrip, j < numOfPixels; y++) {
+                        for (var x = 0; x < imageWidth; x++, j++) {
+                            var pixelSamples = strips[i][j];
 
-                        for (var y = 0, j = 0; y < numRowsInStrip, j < numOfPixels; y++) {
-                            for (var x = 0; x < imageWidth; x++, j++) {
-                                var pixelSamples = strips[i][j];
-
-                                ctx.fillStyle = this.getFillStyle(
-                                    pixelSamples,
-                                    photometricInterpretation,
-                                    bitsPerSample,
-                                    samplesPerPixel,
-                                    colorMapValues,
-                                    colorMapSampleSize
-                                );
-                                ctx.fillRect(x, yPadding + y, 1, 1);
-                            }
-                        }
-                        numRowsInPreviousStrip = rowsPerStrip;
-                    }
-                }
-                else if (this.metadata.tileOffsets) {
-                    var tiles = this.parseTiles(false);
-                    var tileWidth = this.metadata.tileWidth;
-                    var tileLength = this.metadata.tileLength;
-                    var tilesAcross = Math.ceil(imageWidth / tileWidth);
-
-                    for (var y = 0; y < imageLength; y++) {
-                        for (var x = 0; x < imageWidth; x++) {
-                            var tileAcross = Math.floor(x / tileWidth);
-                            var tileDown = Math.floor(y / tileLength);
-                            var tileIndex = tileDown * tilesAcross + tileAcross;
-                            var xInTile = x % tileWidth;
-                            var yInTile = y % tileLength;
-                            var sampleIndex = yInTile * tileWidth + xInTile;
-                            var pixelSamples = tiles[tileIndex][sampleIndex];
                             ctx.fillStyle = this.getFillStyle(
                                 pixelSamples,
                                 photometricInterpretation,
@@ -323,14 +309,43 @@ define([
                                 colorMapValues,
                                 colorMapSampleSize
                             );
-                            ctx.fillRect(x, y, 1, 1);
+                            ctx.fillRect(x, yPadding + y, 1, 1);
                         }
                     }
+                    numRowsInPreviousStrip = rowsPerStrip;
                 }
+            }
+            else if (this.metadata.tileOffsets) {
+                var tiles = this.parseTiles(false);
+                var tileWidth = this.metadata.tileWidth;
+                var tileLength = this.metadata.tileLength;
+                var tilesAcross = Math.ceil(imageWidth / tileWidth);
 
-                this._geoTiffData = null;
-                callback(canvas);
-            }).bind(this));
+                for (var y = 0; y < imageLength; y++) {
+                    for (var x = 0; x < imageWidth; x++) {
+                        var tileAcross = Math.floor(x / tileWidth);
+                        var tileDown = Math.floor(y / tileLength);
+                        var tileIndex = tileDown * tilesAcross + tileAcross;
+                        var xInTile = x % tileWidth;
+                        var yInTile = y % tileLength;
+                        var sampleIndex = yInTile * tileWidth + xInTile;
+                        var pixelSamples = tiles[tileIndex][sampleIndex];
+                        ctx.fillStyle = this.getFillStyle(
+                            pixelSamples,
+                            photometricInterpretation,
+                            bitsPerSample,
+                            samplesPerPixel,
+                            colorMapValues,
+                            colorMapSampleSize
+                        );
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+            }
+
+            this._geoTiffData = null;
+
+            return canvas;
         };
 
         // Get pixel fill style. Internal use only.
@@ -490,11 +505,14 @@ define([
          * @param {Function} callback A function called when GeoTiff parsing is complete.
          */
         GeoTiffReader.prototype.readAsData = function (callback) {
-            this.requestUrl(this.url, (function () {
-                callback(
-                    this.createTypedElevationArray()
-                );
-            }).bind(this));
+            if (this.isDataSourceArrayBuffer()) {
+                this.parse(this._dataSource);
+                callback(this.createTypedElevationArray());
+            } else {
+                this.requestUrl(this.url, (function () {
+                    callback(this.createTypedElevationArray());
+                }).bind(this));
+            }
         };
 
         // Parse geotiff strips. Internal use only
@@ -1053,7 +1071,11 @@ define([
             }
 
             return null;
-        }
+        };
+
+        GeoTiffReader.prototype.isDataSourceArrayBuffer = function () {
+            return this._dataSource instanceof ArrayBuffer;
+        };
 
         return GeoTiffReader;
     }

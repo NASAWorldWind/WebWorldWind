@@ -669,7 +669,8 @@ define([
 
         // Intentionally not documented.
         ElevationModel.prototype.loadElevationImage = function (tile, xhr) {
-            var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight);
+            var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight),
+                geoTiff, that = this;
 
             if (this.retrievalImageFormat === "application/bil16") {
                 elevationImage.imageData = new Int16Array(xhr.response);
@@ -678,12 +679,25 @@ define([
                 elevationImage.imageData = new Float32Array(xhr.response);
                 elevationImage.size = elevationImage.imageData.length * 4;
             } else if (this.retrievalImageFormat === "image/tiff") {
-                var geoTiff = new GeoTiffReader();
-                elevationImage.imageData = geoTiff.readArrayBuffer(xhr.response);
-                elevationImage.size = elevationImage.imageData.length * geoTiff.metadata.bitsPerSample[0] / 8;
+                geoTiff = new GeoTiffReader(xhr.response);
+                geoTiff.readAsData(function(geoTiffData) {
+                    elevationImage.imageData = geoTiffData;
+                    elevationImage.size = elevationImage.imageData.length * geoTiff.metadata.bitsPerSample[0] / 8;
+
+                    if (elevationImage.imageData) {
+                        elevationImage.findMinAndMaxElevation();
+                        that.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
+                        that.timestamp = Date.now();
+                    }
+
+                    // Send an event to request a redraw.
+                    var e = document.createEvent('Event');
+                    e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                    window.dispatchEvent(e);
+                });
             }
 
-            if (elevationImage.imageData) {
+            if (elevationImage.imageData && !geoTiff) {
                 elevationImage.findMinAndMaxElevation();
                 this.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
                 this.timestamp = Date.now();
