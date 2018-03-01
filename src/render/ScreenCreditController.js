@@ -107,7 +107,7 @@ define([
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
             }
-            
+
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenText(screenOffset, stringCredit);
 
@@ -122,16 +122,14 @@ define([
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
 
-            for (var i = 0, j = 1; i < this.imageCredits.length; i++) {
+            for (var i = 0, j = 1; i < this.imageCredits.length; i++, j++) {
                 this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.imageCredits[i].screenOffset.y = j * this.creditSpacing;
-                j++;
             }
-
-            for (i = 0; i < this.textCredits.length; i++) {
+            // The 'j' index value after the images is used for the text credits as well
+            for (i = 0; i < this.textCredits.length; i++, j++) {
                 this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.textCredits[i].screenOffset.y = j * this.creditSpacing;
-                j++;
             }
 
             RenderableLayer.prototype.doRender.call(this, dc);
