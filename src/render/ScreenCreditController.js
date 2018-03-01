@@ -77,8 +77,9 @@ define([
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
         ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, this.creditSpacing);
             var credit = new ScreenImage(screenOffset, imageUrl);
+            //this.creditSpacing += 29;
             this.imageCredits.push(credit);
             this.addRenderable(credit);
         };
@@ -90,75 +91,17 @@ define([
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
         ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
-            var credit = new ScreenText(screenOffset, "Test");
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, this.creditSpacing);
+            var credit = new ScreenText(screenOffset, stringCredit);
+            credit.attributes.color = color;
+            //this.creditSpacing += 29;
             this.textCredits.push(credit);
             this.addRenderable(credit);
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var imageX = dc.viewport.width - (this.margin + this.imageCreditSize),
-                imageHeight, maxImageHeight = 0;
-            // var w, h;
-            for (var i = 0; i < this.imageCredits.length; i++) {
-                if (this.imageCredits[i].makeOrderedRenderable(dc) != null) {
-                    imageHeight = this.computeImageCreditPlacement(this.imageCredits[i], imageX, this.margin);
-                    if (imageHeight > 0) {
-                        imageX -= (this.margin + this.imageCreditSize);
-                        maxImageHeight = WWMath.max(imageHeight, maxImageHeight);
-                    }
-                }
-            }
-
-            // Draw the string credits above the image credits and progressing from bottom to top.
-            var stringY = maxImageHeight + this.margin;
-
-            for (i = 0; i < this.textCredits.length; i++) {
-                this.textCredits[i].makeOrderedRenderable(dc);
-                this.computeTextCreditPlacement(this.textCredits[i], stringY, dc.viewport.width);
-                stringY += this.margin + 15; // margin + string height
-            }
-
             RenderableLayer.prototype.doRender.call(this, dc);
-        };
-
-        ScreenCreditController.prototype.computeImageCreditPlacement = function (imageCredit, x, y) {
-            var imageWidth, imageHeight, scale, screenImageOffset, offsetX, offsetY;
-
-            // Scale the image to fit within a constrained size.
-            imageWidth = imageCredit.activeTexture.imageWidth;
-            imageHeight = imageCredit.activeTexture.imageHeight;
-            if (imageWidth <= this.imageCreditSize && this.imageHeight <= this.imageCreditSize) {
-                scale = 1;
-            } else if (imageWidth >= imageHeight) {
-                scale = this.imageCreditSize / imageWidth;
-            } else {
-                scale = this.imageCreditSize / imageHeight;
-            }
-
-            offsetX = x + (imageWidth * scale) / 2;
-            offsetY = y + (imageHeight * scale) / 2;
-
-            screenImageOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
-            imageCredit.screenOffset = screenImageOffset;
-            imageCredit.scale = scale;
-
-            return (imageHeight * scale) / 2;
-        };
-
-        ScreenCreditController.prototype.computeTextCreditPlacement = function (textCredit, y, viewportWidth) {
-            var imageWidth, imageHeight, screenTextOffset, offsetX, offsetY;
-
-            imageWidth = textCredit.imageWidth / 2;
-            imageHeight = textCredit.imageHeight;
-            offsetX = viewportWidth - (imageWidth + this.margin);
-            offsetY = y + imageHeight;
-
-            screenTextOffset = new Offset(WorldWind.OFFSET_PIXELS, offsetX, WorldWind.OFFSET_PIXELS, offsetY);
-            textCredit.screenOffset = screenTextOffset;
-
-            // return true;
         };
 
         return ScreenCreditController;
