@@ -51,7 +51,7 @@ define([
             this.imageCreditSize = 64;
 
             // Internal. Intentionally not documented.
-            this.margin = 5;
+            this.margin = 45;
 
             // Internal. Intentionally not documented.
             this.creditSpacing = 29;
@@ -77,9 +77,9 @@ define([
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
         ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, this.creditSpacing);
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
-            //this.creditSpacing += 29;
+            credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0);
             this.imageCredits.push(credit);
             this.addRenderable(credit);
         };
@@ -91,25 +91,30 @@ define([
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
         ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, this.creditSpacing);
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenText(screenOffset, stringCredit);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
-            //this.creditSpacing += 29;
             this.textCredits.push(credit);
             this.addRenderable(credit);
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            for (var i = 0; i < this.textCredits.length; i++) {
-                this.textCredits[i].screenOffset.x = 100 + i * 50;
-                this.textCredits[i].screenOffset.y = 100 + i * 50;
+
+
+            for (var i = 0, j = 1; i < this.imageCredits.length; i++) {
+                this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
+                this.imageCredits[i].screenOffset.y = j * this.creditSpacing;
+                j++;
             }
-            for (i = 0; i < this.imageCredits.length; i++) {
-                this.imageCredits[i].screenOffset.x = 100 + i * 100;
-                this.imageCredits[i].screenOffset.y = 100 + i * 100;
+
+            for (i = 0; i < this.textCredits.length; i++) {
+                this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
+                this.textCredits[i].screenOffset.y = j * this.creditSpacing;
+                j++;
             }
+
             RenderableLayer.prototype.doRender.call(this, dc);
         };
 
