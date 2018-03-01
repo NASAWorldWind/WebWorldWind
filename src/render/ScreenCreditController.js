@@ -70,16 +70,23 @@ define([
             this.textCredits = [];
             this.removeAllRenderables();
         };
-        
+
         /**
          * Adds an image credit to this controller.
          * @param {String} imageUrl The URL of the image to display in the credits area.
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
         ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
+            if (!imageUrl) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
+            }
+
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
+
             credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+
             this.imageCredits.push(credit);
             this.addRenderable(credit);
         };
@@ -91,11 +98,23 @@ define([
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
         ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
+            if (!stringCredit) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
+            }
+
+            if (!color) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
+            }
+            
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenText(screenOffset, stringCredit);
+
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
             credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+
             this.textCredits.push(credit);
             this.addRenderable(credit);
         };
