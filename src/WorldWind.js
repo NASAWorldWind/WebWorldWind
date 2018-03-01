@@ -581,6 +581,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             FAILED: "failed",
 
             /**
+             * Indicates a linear filter.
+             * @constant
+             */
+            FILTER_LINEAR: "filter_linear",
+
+            /**
+             * Indicates a nearest neighbor filter.
+             * @constant
+             */
+            FILTER_NEAREST: "filter_nearest",
+
+            /**
              * Indicates a great circle path.
              * @constant
              */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -278,9 +278,14 @@ define([
         var timeBasedVisibility = this.solveTimeVisibility(dc);
         var regionVisibility = this.solveRegion(dc);
         var myVisibility = this.kmlVisibility !== false;
-        var controlledVisibility = this.controlledVisibility !== false;
 
-        this.enabled = parentVisibility && timeBasedVisibility && regionVisibility && myVisibility && controlledVisibility;
+        if(this.controlledVisibility === true) {
+            this.enabled = true;
+        } else if(this.controlledVisibility === false) {
+            this.enabled = false;
+        } else {
+            this.enabled = parentVisibility && timeBasedVisibility && regionVisibility && myVisibility;
+        }
 
         kmlOptions.lastVisibility = this.enabled;
         if(this._renderable) {
@@ -327,12 +332,7 @@ define([
         }
 
         var self = this;
-        new Promise(function (resolve, reject) {
-            window.setTimeout(function () {
-                // TODO: Refactor handle Remote Style.
-                kmlOptions.styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
-            }, 0);
-        }).then(function(styles){
+        return kmlOptions.styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector).then(function(styles){
             self._pStyle = styles;
             dc.redrawRequested = true;
         });

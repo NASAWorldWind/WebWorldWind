@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,13 @@ define([
     './KmlOverlay',
     '../util/NodeTransformers',
     '../../../util/Offset',
-    '../../../shapes/ScreenImage',
-    '../../../util/WWUtil'
+    '../../../shapes/ScreenImage'
 ], function (KmlElements,
              KmlFeature,
              KmlOverlay,
              NodeTransformers,
              Offset,
-             ScreenImage,
-             WWUtil) {
+             ScreenImage) {
     "use strict";
 
     /**
@@ -44,8 +42,6 @@ define([
      */
     var KmlScreenOverlay = function (options) {
         KmlOverlay.call(this, options);
-
-        console.log("Create Screen Overlay", this);
     };
 
     KmlScreenOverlay.prototype = Object.create(KmlOverlay.prototype);
@@ -301,7 +297,7 @@ define([
                         this.kmlScreenXYyunits,
                         this.kmlScreenXYy
                     ),
-                    this.kmlIcon.kmlHref
+                    this.kmlIcon.kmlHref(kmlOptions.fileCache)
                 );
                 this._renderable.imageOffset = new Offset(
                     this.kmlOverlayXYxunits,

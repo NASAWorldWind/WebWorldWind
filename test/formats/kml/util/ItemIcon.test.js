@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
  */
 define([
     'src/formats/kml/util/ItemIcon',
+    'src/formats/kml/KmlFileCache',
     'src/util/XmlDocument'
 ], function (
     ItemIcon,
+    KmlFileCache,
     XmlDocument
 ) {
     "use strict";
@@ -34,7 +36,7 @@ define([
                 kmlRepresentation.getElementsByTagName("ItemIcon")[0]});
         it ('should have the State and Href properties', function(){
             expect(scale.kmlState).toEqual("open");
-            expect(scale.kmlHref).toEqual("validUrl");
+            expect(scale.kmlHref(new KmlFileCache())).toEqual("validUrl");
         });
 
 
