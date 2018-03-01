@@ -94,6 +94,7 @@ define([
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, this.creditSpacing);
             var credit = new ScreenText(screenOffset, stringCredit);
             credit.attributes.color = color;
+            credit.attributes.enableOutline = false;
             //this.creditSpacing += 29;
             this.textCredits.push(credit);
             this.addRenderable(credit);
@@ -101,6 +102,14 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
+            for (var i = 0; i < this.textCredits.length; i++) {
+                this.textCredits[i].screenOffset.x = 100 + i * 50;
+                this.textCredits[i].screenOffset.y = 100 + i * 50;
+            }
+            for (i = 0; i < this.imageCredits.length; i++) {
+                this.imageCredits[i].screenOffset.x = 100 + i * 100;
+                this.imageCredits[i].screenOffset.y = 100 + i * 100;
+            }
             RenderableLayer.prototype.doRender.call(this, dc);
         };
 

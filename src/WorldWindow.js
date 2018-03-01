@@ -1200,7 +1200,7 @@ define([
                 }
             }
 
-            dc.currentLayer = null;
+            // dc.currentLayer = null;
             var now = Date.now();
             dc.frameStatistics.layerRenderingTime = now - beginTime;
         };
