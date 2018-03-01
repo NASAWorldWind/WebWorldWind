@@ -195,6 +195,8 @@ define(['../error/ArgumentError',
                     result = elevation;
                 }
             }
+
+            return result;
         };
 
         /**
