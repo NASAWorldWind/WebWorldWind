@@ -50,12 +50,10 @@ requirejs(['./WorldWindShim',
 
         var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
 
-        var geoTiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
-
-        var geoTiffImage = geoTiffObject.readAsImage(function (canvas) {
+        GeoTiffReader.fromUrl(resourcesUrl, function(geoTiffReader) {
             var surfaceGeoTiff = new WorldWind.SurfaceImage(
-                geoTiffObject.metadata.bbox,
-                new WorldWind.ImageSource(canvas)
+                geoTiffReader.metadata.bbox,
+                new WorldWind.ImageSource(geoTiffReader.image)
             );
 
             geoTiffLayer.addRenderable(surfaceGeoTiff);

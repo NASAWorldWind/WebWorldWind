@@ -53,17 +53,14 @@ define([
          * @alias GeoTiffReader
          * @constructor
          * @classdesc Parses a geotiff and creates an image or an elevation array representing its contents.
-         * @param {String} dataSource The URL or ArrayBuffer of the GeoTiff
+         * @param {String} ArrayBuffer The ArrayBuffer of the GeoTiff
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
-        var GeoTiffReader = function (dataSource) {
-            if (!dataSource) {
+        var GeoTiffReader = function (arrayBuffer) {
+            if (!arrayBuffer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missing data source"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missing ArrayBuffer"));
             }
-
-            // The URL or ArrayBuffer of the GeoTiff
-            this._dataSource = dataSource;
 
             // Documented in defineProperties below.
             this._isLittleEndian = false;
@@ -72,29 +69,15 @@ define([
             this._imageFileDirectories = [];
 
             // Documented in defineProperties below.
-            this._geoTiffData = null;
+            this._geoTiffData = new DataView(arrayBuffer);
 
             // Documented in defineProperties below.
             this._metadata = new GeoTiffMetadata();
+
+            this.parse();
         };
 
         Object.defineProperties(GeoTiffReader.prototype, {
-
-            /**
-             * The geotiff URL as specified to this GeoTiffReader's constructor or null if none is provided.
-             * @memberof GeoTiffReader.prototype
-             * @type {String}
-             * @readonly
-             */
-            url: {
-                get: function () {
-                    if (this.isDataSourceArrayBuffer()) {
-                        return null;
-                    } else {
-                        return this._dataSource;
-                    }
-                }
-            },
 
             /**
              *Indicates whether the geotiff byte order is little endian..
@@ -142,11 +125,22 @@ define([
                 get: function () {
                     return this._metadata;
                 }
+            },
+
+            image: {
+                get: function () {
+                    return this.createImage();
+                }
+            },
+
+            data: {
+                get: function () {
+                    return this.createTypedElevationArray();
+                }
             }
         });
 
-        // Get geotiff file as an array buffer using XMLHttpRequest. Internal use only.
-        GeoTiffReader.prototype.requestUrl = function (url, callback) {
+        GeoTiffReader.fromUrl = function (url, success, failure) {
             var xhr = new XMLHttpRequest();
 
             xhr.open("GET", url, true);
@@ -156,31 +150,67 @@ define([
                     if (xhr.status === 200) {
                         var arrayBuffer = xhr.response;
                         if (arrayBuffer) {
-                            this.parse(arrayBuffer);
-                            callback();
+                            success(new GeoTiffReader(arrayBuffer));
                         }
                     }
                     else {
-                        Logger.log(Logger.LEVEL_WARNING,
-                            "GeoTiff retrieval failed (" + xhr.statusText + "): " + url);
+                        failure(xhr);
                     }
                 }
             }).bind(this);
 
             xhr.onerror = function () {
-                Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed: " + url);
+                failure(xhr);
             };
 
             xhr.ontimeout = function () {
-                Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval timed out: " + url);
+                failure(xhr);
             };
 
             xhr.send(null);
         };
 
+        // // Get geotiff file as an array buffer using XMLHttpRequest. Internal use only.
+        // GeoTiffReader.prototype.requestUrl = function (url, callback) {
+        //     var xhr = new XMLHttpRequest();
+        //
+        //     xhr.open("GET", url, true);
+        //     xhr.responseType = 'arraybuffer';
+        //     xhr.onreadystatechange = (function () {
+        //         if (xhr.readyState === 4) {
+        //             if (xhr.status === 200) {
+        //                 var arrayBuffer = xhr.response;
+        //                 if (arrayBuffer) {
+        //                     this.parse(arrayBuffer);
+        //                     callback();
+        //                 }
+        //             }
+        //             else {
+        //                 Logger.log(Logger.LEVEL_WARNING,
+        //                     "GeoTiff retrieval failed (" + xhr.statusText + "): " + url);
+        //             }
+        //         }
+        //     }).bind(this);
+        //
+        //     xhr.onerror = function () {
+        //         Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed: " + url);
+        //     };
+        //
+        //     xhr.ontimeout = function () {
+        //         Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval timed out: " + url);
+        //     };
+        //
+        //     xhr.send(null);
+        // };
+
         // Parse geotiff file. Internal use only
-        GeoTiffReader.prototype.parse = function (arrayBuffer) {
-            this._geoTiffData = new DataView(arrayBuffer);
+        GeoTiffReader.prototype.parse = function () {
+
+            // check if it's been parsed before
+            if (this._imageFileDirectories.length) {
+                return;
+            }
+
             this.getEndianness();
 
             if (!this.isTiffFileType()) {
@@ -198,7 +228,7 @@ define([
 
         // Get byte order of the geotiff file. Internal use only.
         GeoTiffReader.prototype.getEndianness = function () {
-            var byteOrderValue = GeoTiffUtil.getBytes(this.geoTiffData, 0, 2, this.isLittleEndian);
+            var byteOrderValue = GeoTiffUtil.getBytes(this._geoTiffData, 0, 2, this.isLittleEndian);
             if (byteOrderValue === 0x4949) {
                 this._isLittleEndian = true;
             }
@@ -240,22 +270,22 @@ define([
             }
         };
 
-        /**
-         * Retrieves the GeoTiff file, parses it and creates a canvas of its content. The canvas is passed
-         * to the callback function as a parameter.
-         *
-         * @param {Function} callback A function called when GeoTiff parsing is complete.
-         */
-        GeoTiffReader.prototype.readAsImage = function (callback) {
-            if (this.isDataSourceArrayBuffer()) {
-                this.parse(this._dataSource);
-                callback(this.createImage());
-            } else {
-                this.requestUrl(this.url, (function () {
-                    callback(this.createImage());
-                }).bind(this));
-            }
-        };
+        // /**
+        //  * Retrieves the GeoTiff file, parses it and creates a canvas of its content. The canvas is passed
+        //  * to the callback function as a parameter.
+        //  *
+        //  * @param {Function} callback A function called when GeoTiff parsing is complete.
+        //  */
+        // GeoTiffReader.prototype.readAsImage = function (callback) {
+        //     if (this.isDataSourceArrayBuffer()) {
+        //         this.parse(this._dataSource);
+        //         callback(this.createImage());
+        //     } else {
+        //         this.requestUrl(this.url, (function () {
+        //             callback(this.createImage());
+        //         }).bind(this));
+        //     }
+        // };
 
         // Generate a canvas image. Internal use only.
         GeoTiffReader.prototype.createImage = function () {
@@ -498,22 +528,22 @@ define([
             return typedElevationArray;
         }
 
-        /**
-         * Retrieves the GeoTiff file, parses it and creates a typed array of its content. The array is passed
-         * to the callback function as a parameter.
-         *
-         * @param {Function} callback A function called when GeoTiff parsing is complete.
-         */
-        GeoTiffReader.prototype.readAsData = function (callback) {
-            if (this.isDataSourceArrayBuffer()) {
-                this.parse(this._dataSource);
-                callback(this.createTypedElevationArray());
-            } else {
-                this.requestUrl(this.url, (function () {
-                    callback(this.createTypedElevationArray());
-                }).bind(this));
-            }
-        };
+        // /**
+        //  * Retrieves the GeoTiff file, parses it and creates a typed array of its content. The array is passed
+        //  * to the callback function as a parameter.
+        //  *
+        //  * @param {Function} callback A function called when GeoTiff parsing is complete.
+        //  */
+        // GeoTiffReader.prototype.readAsData = function (callback) {
+        //     if (this.isDataSourceArrayBuffer()) {
+        //         this.parse(this._dataSource);
+        //         callback(this.createTypedElevationArray());
+        //     } else {
+        //         this.requestUrl(this.url, (function () {
+        //             callback(this.createTypedElevationArray());
+        //         }).bind(this));
+        //     }
+        // };
 
         // Parse geotiff strips. Internal use only
         GeoTiffReader.prototype.parseStrips = function (returnElevation) {
@@ -1071,10 +1101,6 @@ define([
             }
 
             return null;
-        };
-
-        GeoTiffReader.prototype.isDataSourceArrayBuffer = function () {
-            return this._dataSource instanceof ArrayBuffer;
         };
 
         return GeoTiffReader;
