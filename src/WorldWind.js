@@ -47,7 +47,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/DigitalGlobeTiledImageLayer',
         './gesture/DragRecognizer',
         './render/DrawContext',
-        './globe/EarthElevationModel',
         './globe/EarthRestElevationModel',
         './globe/ElevationModel',
         './util/Font',
@@ -290,7 +289,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               DigitalGlobeTiledImageLayer,
               DragRecognizer,
               DrawContext,
-              EarthElevationModel,
               EarthRestElevationModel,
               ElevationModel,
               Font,
@@ -754,7 +752,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['DigitalGlobeTiledImageLayer'] = DigitalGlobeTiledImageLayer;
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
-        WorldWind['EarthElevationModel'] = EarthElevationModel;
         WorldWind['EarthRestElevationModel'] = EarthRestElevationModel;
         WorldWind['ElevationModel'] = ElevationModel;
         WorldWind['Font'] = Font;
