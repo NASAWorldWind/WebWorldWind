@@ -51,10 +51,10 @@ define([
             this.imageCreditSize = 64;
 
             // Internal. Intentionally not documented.
-            this.margin = 45;
+            this.margin = 5;
 
             // Internal. Intentionally not documented.
-            this.creditSpacing = 29;
+            this.creditSpacing = 22;
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
@@ -70,14 +70,7 @@ define([
             this.textCredits = [];
             this.removeAllRenderables();
         };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.obtainCreditWidth = function (textCredit) {
-            // Obtaining approximate width of text credit based in its font
-            return (textCredit.attributes.font.size / 2) * textCredit.text.length;
-        }
-
-
+        
         /**
          * Adds an image credit to this controller.
          * @param {String} imageUrl The URL of the image to display in the credits area.
@@ -86,7 +79,7 @@ define([
         ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
-            credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 1);
+            credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
             this.imageCredits.push(credit);
             this.addRenderable(credit);
         };
@@ -102,6 +95,7 @@ define([
             var credit = new ScreenText(screenOffset, stringCredit);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
+            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
             this.textCredits.push(credit);
             this.addRenderable(credit);
         };
@@ -116,7 +110,7 @@ define([
             }
 
             for (i = 0; i < this.textCredits.length; i++) {
-                this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin + this.obtainCreditWidth(this.textCredits[i]));
+                this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.textCredits[i].screenOffset.y = j * this.creditSpacing;
                 j++;
             }
