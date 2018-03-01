@@ -71,8 +71,9 @@ define(['../error/ArgumentError',
                     var maxTimestamp = 0;
 
                     for (var i = 0; i < this.coverages.length; i++) {
-                        if (maxTimestamp < this.coverages[i].timestamp) {
-                            maxTimestamp = this.coverages[i].timestamp;
+                        var coverage=this.coverages[i];
+                        if (coverage.enabled && maxTimestamp < coverage.timestamp) {
+                            maxTimestamp = coverage.timestamp;
                         }
                     }
 
@@ -90,8 +91,9 @@ define(['../error/ArgumentError',
                     var minElevation = Number.MAX_VALUE;
 
                     for (var i = 0; i < this.coverages.length; i++) {
-                        if (this.coverages[i].minElevation < minElevation) {
-                            minElevation = this.coverages[i].minElevation;
+                        var coverage=this.coverages[i];
+                        if (coverage.enabled && coverage.minElevation < minElevation) {
+                            minElevation = coverage.minElevation;
                         }
                     }
 
@@ -109,8 +111,9 @@ define(['../error/ArgumentError',
                     var maxElevation = Number.MIN_VALUE;
 
                     for (var i = 0; i < this.coverages.length; i++) {
-                        if (maxElevation < this.coverages[i].maxElevation) {
-                            maxElevation = this.coverages[i].maxElevation;
+                        var coverage=this.coverages[i];
+                        if (coverage.enabled && maxElevation < coverage.maxElevation) {
+                            maxElevation = coverage.maxElevation;
                         }
                     }
 
@@ -170,10 +173,13 @@ define(['../error/ArgumentError',
             var result = [Number.MAX_VALUE, Number.MIN_VALUE];
 
             for (var i = 0; i < this.coverages.length; i++) {
-                var coverageResult = this.coverages[i].minAndMaxElevationsForSector(sector);
-                if (coverageResult) {
-                    result[0] = coverageResult[0] < Number.MAX_VALUE ? coverageResult[0] : result[0];
-                    result[1] = coverageResult[1] > Number.MIN_VALUE ? coverageResult[1] : result[1];
+                var coverage=this.coverages[i];
+                if (coverage.enabled) {
+                    var coverageResult = coverage.minAndMaxElevationsForSector(sector);
+                    if (coverageResult) {
+                        result[0] = coverageResult[0] < Number.MAX_VALUE ? coverageResult[0] : result[0];
+                        result[1] = coverageResult[1] > Number.MIN_VALUE ? coverageResult[1] : result[1];
+                    }
                 }
             }
 
@@ -190,9 +196,12 @@ define(['../error/ArgumentError',
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
             var result = 0;
             for (var i = 0; i < this.coverages.length; i++) {
-                var elevation = this.coverages[i].elevationAtLocation(latitude, longitude);
-                if (elevation !== 0) {
-                    result = elevation;
+                var coverage=this.coverages[i];
+                if (coverage.enabled) {
+                    var elevation = coverage.elevationAtLocation(latitude, longitude);
+                    if (elevation !== 0) {
+                        result = elevation;
+                    }
                 }
             }
 
@@ -232,11 +241,14 @@ define(['../error/ArgumentError',
             var resolution = Number.MAX_VALUE;
             var coverageResult = new Float64Array(result.length);
             for (var i = 0; i < this.coverages.length; i++) {
-                var coverageResolution = this.coverages[i].elevationsForGrid(sector, numLat, numLon, targetResolution, coverageResult);
-                if (coverageResolution < Number.MAX_VALUE) {
-                    resolution = coverageResolution;
-                    for (var j = 0; j < result.length; j++) {
-                        result[j] = coverageResult[j];
+                var coverage=this.coverages[i];
+                if (coverage.enabled) {
+                    var coverageResolution = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, coverageResult);
+                    if (coverageResolution < Number.MAX_VALUE) {
+                        resolution = coverageResolution;
+                        for (var j = 0; j < result.length; j++) {
+                            result[j] = coverageResult[j];
+                        }
                     }
                 }
             }

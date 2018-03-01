@@ -43,6 +43,13 @@ define(['../util/Logger',
              * @default "Elevations"
              */
             this.displayName = "Elevations";
+
+            /**
+             * Indicates whether or not to use this coverage.
+             * @type {Boolean}
+             * @default true
+             */
+            this.enabled = true;
         };
 
         /**
