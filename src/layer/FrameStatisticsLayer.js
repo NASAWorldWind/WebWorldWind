@@ -94,7 +94,7 @@ define([
 
         // Intentionally not documented.
         FrameStatisticsLayer.prototype.handleRedraw = function (worldWindow, stage) {
-            if (stage != WorldWind.BEFORE_REDRAW) {
+            if (stage !== WorldWind.BEFORE_REDRAW) {
                 return; // ignore after redraw events
             }
 
