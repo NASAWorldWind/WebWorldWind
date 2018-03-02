@@ -133,7 +133,7 @@ define([
         ScreenCreditController.prototype.doRender = function (dc) {
             var creditOrdinal = 1;
 
-            for (var i = 0; i < this.imageCredits.length; i++) {
+            for (var i = 0, len = this.imageCredits.length; i < len; i++) {
                 this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.imageCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
                 creditOrdinal++;
