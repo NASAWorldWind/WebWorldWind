@@ -50,7 +50,8 @@ requirejs(['./WorldWindShim',
 
         var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
 
-        GeoTiffReader.fromUrl(resourcesUrl, function(geoTiffReader) {
+        // Define the result of a successful GeoTiff retrieval
+        var success = function (geoTiffReader) {
             var surfaceGeoTiff = new WorldWind.SurfaceImage(
                 geoTiffReader.metadata.bbox,
                 new WorldWind.ImageSource(geoTiffReader.image)
@@ -65,5 +66,13 @@ requirejs(['./WorldWindShim',
             wwd.redraw();
 
             wwd.goTo(new WorldWind.Position(43.69, 28.54, 55000));
-        });
+        };
+
+        // Define a simple log output on failure
+        var failure = function (xhr) {
+            console.log("Failed Retrieval: " + xhr.status);
+        };
+
+        // Load the GeoTiff using the Reader's built in XHR retrieval function
+        WorldWind.GeoTiffReader.fromUrl(resourcesUrl, success, failure);
     });

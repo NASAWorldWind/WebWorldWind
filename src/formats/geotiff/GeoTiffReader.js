@@ -140,7 +140,7 @@ define([
             }
         });
 
-        GeoTiffReader.fromUrl = function (url, success, failure) {
+        GeoTiffReader.fromUrl = function (url, onSuccess, onFailure) {
             var xhr = new XMLHttpRequest();
 
             xhr.open("GET", url, true);
@@ -150,58 +150,34 @@ define([
                     if (xhr.status === 200) {
                         var arrayBuffer = xhr.response;
                         if (arrayBuffer) {
-                            success(new GeoTiffReader(arrayBuffer));
+                            onSuccess(new GeoTiffReader(arrayBuffer));
                         }
                     }
                     else {
-                        failure(xhr);
+                        Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed (" + xhr.statusText + "): " + url);
+                        if (onFailure) {
+                            onFailure(xhr);
+                        }
                     }
                 }
             }).bind(this);
 
             xhr.onerror = function () {
-                failure(xhr);
+                Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed: " + url);
+                if (onFailure) {
+                    onFailure(xhr);
+                }
             };
 
             xhr.ontimeout = function () {
-                failure(xhr);
+                Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval timed out: " + url);
+                if (onFailure) {
+                    onFailure(xhr);
+                }
             };
 
             xhr.send(null);
         };
-
-        // // Get geotiff file as an array buffer using XMLHttpRequest. Internal use only.
-        // GeoTiffReader.prototype.requestUrl = function (url, callback) {
-        //     var xhr = new XMLHttpRequest();
-        //
-        //     xhr.open("GET", url, true);
-        //     xhr.responseType = 'arraybuffer';
-        //     xhr.onreadystatechange = (function () {
-        //         if (xhr.readyState === 4) {
-        //             if (xhr.status === 200) {
-        //                 var arrayBuffer = xhr.response;
-        //                 if (arrayBuffer) {
-        //                     this.parse(arrayBuffer);
-        //                     callback();
-        //                 }
-        //             }
-        //             else {
-        //                 Logger.log(Logger.LEVEL_WARNING,
-        //                     "GeoTiff retrieval failed (" + xhr.statusText + "): " + url);
-        //             }
-        //         }
-        //     }).bind(this);
-        //
-        //     xhr.onerror = function () {
-        //         Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed: " + url);
-        //     };
-        //
-        //     xhr.ontimeout = function () {
-        //         Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval timed out: " + url);
-        //     };
-        //
-        //     xhr.send(null);
-        // };
 
         // Parse geotiff file. Internal use only
         GeoTiffReader.prototype.parse = function () {
