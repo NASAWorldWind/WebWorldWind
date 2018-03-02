@@ -205,7 +205,7 @@ define([
 
         // Get byte order of the geotiff file. Internal use only.
         GeoTiffReader.prototype.getEndianness = function () {
-            var byteOrderValue = GeoTiffUtil.getBytes(this._geoTiffData, 0, 2, this.isLittleEndian);
+            var byteOrderValue = GeoTiffUtil.getBytes(this.geoTiffData, 0, 2, this.isLittleEndian);
             if (byteOrderValue === 0x4949) {
                 this._isLittleEndian = true;
             }
