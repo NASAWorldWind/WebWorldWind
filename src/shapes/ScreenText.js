@@ -70,7 +70,7 @@ define([
         // Documented in superclass.
         ScreenText.prototype.render = function (dc) {
             // Ensure that this text is drawn only once per frame.
-            if (this.lastFrameTime !== dc.timestamp) {
+            if (this.lastFrameTime != dc.timestamp) {
                 Text.prototype.render.call(this, dc);
             }
         };
