@@ -91,17 +91,17 @@ define(['../geom/Vec2'
         Offset.prototype.offsetForSize = function (width, height) {
             var x, y;
 
-            if (this.xUnits == WorldWind.OFFSET_FRACTION) {
+            if (this.xUnits === WorldWind.OFFSET_FRACTION) {
                 x = width * this.x;
-            } else if (this.xUnits == WorldWind.OFFSET_INSET_PIXELS) {
+            } else if (this.xUnits === WorldWind.OFFSET_INSET_PIXELS) {
                 x = width - this.x;
             } else { // default to OFFSET_PIXELS
                 x = this.x;
             }
 
-            if (this.yUnits == WorldWind.OFFSET_FRACTION) {
+            if (this.yUnits === WorldWind.OFFSET_FRACTION) {
                 y = height * this.y;
-            } else if (this.yUnits == WorldWind.OFFSET_INSET_PIXELS) {
+            } else if (this.yUnits === WorldWind.OFFSET_INSET_PIXELS) {
                 y = height - this.y;
             } else { // default to OFFSET_PIXELS
                 y = this.y;
