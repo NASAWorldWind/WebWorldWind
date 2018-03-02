@@ -61,9 +61,6 @@ define([
             this.textCredits = [];
 
             // Internal. Intentionally not documented.
-            this.imageCreditSize = 64;
-
-            // Internal. Intentionally not documented.
             this.margin = 5;
 
             // Internal. Intentionally not documented.
