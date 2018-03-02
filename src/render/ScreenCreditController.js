@@ -131,18 +131,18 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var j = 1;
+            var creditOrdinal = 1;
 
             for (var i = 0; i < this.imageCredits.length; i++) {
                 this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.imageCredits[i].screenOffset.y = j * this.creditSpacing;
-                j++;
+                this.imageCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+                creditOrdinal++;
             }
 
             for (i = 0; i < this.textCredits.length; i++) {
                 this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.textCredits[i].screenOffset.y = j * this.creditSpacing;
-                j++
+                this.textCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+                creditOrdinal++;
             }
 
             RenderableLayer.prototype.doRender.call(this, dc);
