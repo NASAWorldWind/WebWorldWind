@@ -507,23 +507,6 @@ define([
             return typedElevationArray;
         }
 
-        // /**
-        //  * Retrieves the GeoTiff file, parses it and creates a typed array of its content. The array is passed
-        //  * to the callback function as a parameter.
-        //  *
-        //  * @param {Function} callback A function called when GeoTiff parsing is complete.
-        //  */
-        // GeoTiffReader.prototype.readAsData = function (callback) {
-        //     if (this.isDataSourceArrayBuffer()) {
-        //         this.parse(this._dataSource);
-        //         callback(this.createTypedElevationArray());
-        //     } else {
-        //         this.requestUrl(this.url, (function () {
-        //             callback(this.createTypedElevationArray());
-        //         }).bind(this));
-        //     }
-        // };
-
         // Parse geotiff strips. Internal use only
         GeoTiffReader.prototype.parseStrips = function (returnElevation) {
             var samplesPerPixel = this.metadata.samplesPerPixel;
