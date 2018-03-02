@@ -125,22 +125,29 @@ define([
                 get: function () {
                     return this._metadata;
                 }
-            },
-
-            image: {
-                get: function () {
-                    return this.createImage();
-                }
-            },
-
-            data: {
-                get: function () {
-                    return this.createTypedElevationArray();
-                }
             }
         });
 
-        GeoTiffReader.fromUrl = function (url, onSuccess, onFailure) {
+        /**
+         * Attempts to retrieve the GeoTiff data from the provided URL, parse the data and return a GeoTiffReader
+         * using the provided parserCompletionCallback.
+         *
+         * @param url the URL source for the GeoTiff
+         * @param parserCompletionCallback a callback wher
+         */
+        GeoTiffReader.retrieveFromUrl = function (url, parserCompletionCallback) {
+            if (!url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "retrieveFromUrl",
+                        "missingUrl"));
+            }
+
+            if (!parserCompletionCallback) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "retrieveFromUrl",
+                        "The specified callback is null or undefined."));
+            }
+
             var xhr = new XMLHttpRequest();
 
             xhr.open("GET", url, true);
@@ -150,30 +157,24 @@ define([
                     if (xhr.status === 200) {
                         var arrayBuffer = xhr.response;
                         if (arrayBuffer) {
-                            onSuccess(new GeoTiffReader(arrayBuffer));
+                            parserCompletionCallback(new GeoTiffReader(arrayBuffer), xhr.statusText);
                         }
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed (" + xhr.statusText + "): " + url);
-                        if (onFailure) {
-                            onFailure(xhr);
-                        }
+                        parserCompletionCallback(null, xhr.statusText);
                     }
                 }
             }).bind(this);
 
             xhr.onerror = function () {
                 Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed: " + url);
-                if (onFailure) {
-                    onFailure(xhr);
-                }
+                parserCompletionCallback(null, xhr.statusText);
             };
 
             xhr.ontimeout = function () {
                 Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval timed out: " + url);
-                if (onFailure) {
-                    onFailure(xhr);
-                }
+                parserCompletionCallback(null, xhr.statusText);
             };
 
             xhr.send(null);
@@ -218,6 +219,25 @@ define([
         };
 
         /**
+         * Creates an RGB canvas from the GeoTiff image data.
+         *
+         * @return {Canvas}
+         *
+         */
+        GeoTiffReader.prototype.getImage = function () {
+            return this.createImage();
+        };
+
+        /**
+         * Creates a typed array based on the contents of the GeoTiff.
+         *
+         * @return {TypedArray}
+         */
+        GeoTiffReader.prototype.getImageData = function () {
+            return this.createTypedElevationArray();
+        };
+
+        /**
          * Indicates whether this geotiff is a tiff file type.
          *
          * @return {Boolean} True if this geotiff file is a tiff file type.
@@ -245,23 +265,6 @@ define([
                 return false;
             }
         };
-
-        // /**
-        //  * Retrieves the GeoTiff file, parses it and creates a canvas of its content. The canvas is passed
-        //  * to the callback function as a parameter.
-        //  *
-        //  * @param {Function} callback A function called when GeoTiff parsing is complete.
-        //  */
-        // GeoTiffReader.prototype.readAsImage = function (callback) {
-        //     if (this.isDataSourceArrayBuffer()) {
-        //         this.parse(this._dataSource);
-        //         callback(this.createImage());
-        //     } else {
-        //         this.requestUrl(this.url, (function () {
-        //             callback(this.createImage());
-        //         }).bind(this));
-        //     }
-        // };
 
         // Generate a canvas image. Internal use only.
         GeoTiffReader.prototype.createImage = function () {

@@ -680,7 +680,7 @@ define([
                 elevationImage.size = elevationImage.imageData.length * 4;
             } else if (this.retrievalImageFormat === "image/tiff") {
                 geoTiff = new GeoTiffReader(xhr.response);
-                elevationImage.imageData = geoTiff.data;
+                elevationImage.imageData = geoTiff.getImageData();
                 elevationImage.size = elevationImage.imageData.length * geoTiff.metadata.bitsPerSample[0] / 8;
             }
 
