@@ -25,7 +25,27 @@ define(['../../error/ArgumentError',
               Logger) {
         "use strict";
 
+        /**
+         * Provides GeoJSON exporter functions.
+         * The following renderables can be exported:
+         * <ul>
+         *     <li>WorldWind.Placemark</li>
+         *     <li>WorldWind.SurfacePolyline</li>
+         *     <li>WorldWind.SurfacePolygon</li>
+         *     <li>WorldWind.SurfaceEllipse</li>
+         *     <li>WorldWind.SurfaceRectangle</li>
+         *     <li>WorldWind.Path</li>
+         *     <li>WorldWind.Polygon</li>
+         * </ul>
+         * @exports GeoJSONExporter
+         */
         var GeoJSONExporter = {
+            /**
+             * Exports a [Renderable]{@link Renderable} in GeoJSON format.
+             * @param {Renderable} renderable The renderable to export.
+             * @throws {ArgumentError} If the specified renderable is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportRenderable: function (renderable) {
                 if (!renderable) {
                     throw new ArgumentError(
@@ -45,6 +65,9 @@ define(['../../error/ArgumentError',
                 else if (renderable instanceof WorldWind.SurfaceEllipse) {
                     return this.exportSurfaceEllipse(renderable);
                 }
+                else if (renderable instanceof WorldWind.SurfaceCircle) {
+                    return this.exportSurfaceCircle(renderable);
+                }
                 else if (renderable instanceof WorldWind.SurfaceRectangle) {
                     return this.exportSurfaceRectangle(renderable);
                 }
@@ -62,6 +85,13 @@ define(['../../error/ArgumentError',
                     return null;
                 }
             },
+
+            /**
+             * Exports a list of [Renderable]{@link Renderable} in GeoJSON format of type GeometryCollection.
+             * @param {Renderable[]} renderables The renderables to export.
+             * @throws {ArgumentError} If the specified renderable is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportRenderables: function (renderables) {
                 if (!renderables) {
                     throw new ArgumentError(
@@ -95,6 +125,13 @@ define(['../../error/ArgumentError',
                     return this.exportRenderable(renderables[0]);
                 }
             },
+
+            /**
+             * Exports a [Layer]{@link Layer} in GeoJSON format of type GeometryCollection.
+             * @param {Layer} layer The layer to export.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportLayer: function (layer) {
                 if (!layer) {
                     throw new ArgumentError(
@@ -104,7 +141,20 @@ define(['../../error/ArgumentError',
 
                 return this.exportRenderables(layer.renderables);
             },
+
+            /**
+             * Exports a [Placemark]{@link Placemark} in GeoJSON format of type Point.
+             * @param {Placemark} renderable The Placemark object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportPlacemark: function (renderable) {
+                if (!(renderable instanceof WorldWind.Placemark)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportPlacemark",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_POINT + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":';
@@ -112,7 +162,20 @@ define(['../../error/ArgumentError',
                 sb = sb + '}';
                 return sb;
             },
+
+            /**
+             * Exports a [SurfacePolyline]{@link SurfacePolyline} in GeoJSON format of type LineString.
+             * @param {SurfacePolyline} renderable The SurfacePolyline object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportSurfacePolyline: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfacePolyline)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfacePolyline",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_LINE_STRING + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
@@ -127,7 +190,20 @@ define(['../../error/ArgumentError',
                 sb = sb + '}';
                 return sb;
             },
+
+            /**
+             * Exports a [SurfacePolygon]{@link SurfacePolygon} in GeoJSON format of type Polygon.
+             * @param {SurfacePolygon} renderable The SurfacePolygon object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportSurfacePolygon: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfacePolygon)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfacePolygon",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_POLYGON + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
@@ -170,7 +246,20 @@ define(['../../error/ArgumentError',
                 sb = sb + '}';
                 return sb;
             },
+
+            /**
+             * Exports a [SurfaceEllipse]{@link SurfaceEllipse} in GeoJSON format of type Polygon.
+             * @param {SurfaceEllipse} renderable The SurfaceEllipse object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportSurfaceEllipse: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceEllipse)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfaceEllipse",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_POLYGON + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
@@ -190,7 +279,53 @@ define(['../../error/ArgumentError',
                 sb = sb + '}';
                 return sb;
             },
+
+            /**
+             * Exports a [SurfaceCircle]{@link SurfaceCircle} in GeoJSON format of type Polygon.
+             * @param {SurfaceCircle} renderable The SurfaceCircle object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
+            exportSurfaceCircle: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceCircle)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfaceCircle",
+                            "invalidTypeOfRenderable"));
+                }
+
+                var sb = '{';
+                sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_POLYGON + '",';
+                sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
+                sb = sb + '[';
+                for (var i = renderable._boundaries.length - 1; i >= 0 ; i--) {
+                    sb = sb + '[' + renderable._boundaries[i].longitude + ',' +
+                        renderable._boundaries[i].latitude + ']';
+                    sb = sb + ',';
+
+                    if (i === 0) {
+                        sb = sb + '[' + renderable._boundaries[renderable._boundaries.length-1].longitude + ',' +
+                            renderable._boundaries[renderable._boundaries.length-1].latitude + ']';
+                    }
+                }
+                sb = sb + ']';
+                sb = sb + ']';
+                sb = sb + '}';
+                return sb;
+            },
+
+            /**
+             * Exports a [SurfaceRectangle]{@link SurfaceRectangle} in GeoJSON format of type Polygon.
+             * @param {SurfaceRectangle} renderable The SurfaceRectangle object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportSurfaceRectangle: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceRectangle)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfaceRectangle",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_POLYGON + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
@@ -210,7 +345,20 @@ define(['../../error/ArgumentError',
                 sb = sb + '}';
                 return sb;
             },
+
+            /**
+             * Exports a [SurfaceSector]{@link SurfaceSector} in GeoJSON format of type Polygon.
+             * @param {SurfaceSector} renderable The SurfaceSector object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportSurfaceSector: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceSector)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfaceSector",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_POLYGON + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
@@ -234,7 +382,20 @@ define(['../../error/ArgumentError',
                 sb = sb + '}';
                 return sb;
             },
+
+            /**
+             * Exports a [Path]{@link Path} in GeoJSON format of type LineString.
+             * @param {Path} renderable The Path object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportPath: function (renderable) {
+                if (!(renderable instanceof WorldWind.Path)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportPath",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_LINE_STRING + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
@@ -250,7 +411,20 @@ define(['../../error/ArgumentError',
                 sb = sb + '}';
                 return sb;
             },
+
+            /**
+             * Exports a [Polygon]{@link Polygon} in GeoJSON format of type Polygon.
+             * @param {Polygon} renderable The Polygon object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} GeoJSON format.
+             */
             exportPolygon: function (renderable) {
+                if (!(renderable instanceof WorldWind.Polygon)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportPolygon",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = '{';
                 sb = sb + '"' + GeoJSONConstants.FIELD_TYPE + '":"' + GeoJSONConstants.TYPE_POLYGON + '",';
                 sb = sb + '"' + GeoJSONConstants.FIELD_COORDINATES + '":[';
