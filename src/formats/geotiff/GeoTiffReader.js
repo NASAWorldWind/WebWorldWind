@@ -433,7 +433,7 @@ define([
                         var yInTile = y % tileLength;
                         var sampleIndex = yInTile * tileWidth + xInTile;
                         var pixelSamples = tiles[tileIndex][sampleIndex];
-                        elevationArray.push(pixelSamples);//todo de 0??? servet
+                        elevationArray.push(pixelSamples);
                     }
                 }
             }
