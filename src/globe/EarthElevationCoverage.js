@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports BasicElevationCoverage
+ * @exports EarthElevationCoverage
  */
 define([
         '../geom/Location',
@@ -31,11 +31,11 @@ define([
         "use strict";
 
         /**
-         * Constructs a BasicElevationCoverage
-         * @alias BasicElevationCoverage
+         * Constructs a EarthElevationCoverage
+         * @alias EarthElevationCoverage
          * @constructor
          */
-        var BasicElevationCoverage = function () {
+        var EarthElevationCoverage = function () {
             TiledElevationCoverage.call(this,
                 Sector.FULL_SPHERE, new Location(45, 45), 12, "application/bil16", "EarthElevations256", 256, 256);
 
@@ -48,7 +48,7 @@ define([
                 "GEBCO,aster_v2,USGS-NED", "", "1.3.0");
         };
 
-        BasicElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
+        EarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return BasicElevationCoverage;
+        return EarthElevationCoverage;
     });

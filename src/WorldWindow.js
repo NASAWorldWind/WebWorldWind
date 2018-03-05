@@ -18,9 +18,9 @@
  */
 define([
         './error/ArgumentError',
-        './globe/BasicElevationCoverage',
         './BasicWorldWindowController',
         './render/DrawContext',
+        './globe/EarthElevationCoverage',
         './globe/ElevationModel',
         './util/FrameStatistics',
         './geom/Frustum',
@@ -44,9 +44,9 @@ define([
         './util/WWMath'
     ],
     function (ArgumentError,
-              BasicElevationCoverage,
               BasicWorldWindowController,
               DrawContext,
+              EarthElevationCoverage,
               ElevationModel,
               FrameStatistics,
               Frustum,
@@ -145,7 +145,7 @@ define([
             if (!elevationModel)
             {
                 elevationModel=new ElevationModel();
-                elevationModel.addCoverage(new BasicElevationCoverage());
+                elevationModel.addCoverage(new EarthElevationCoverage());
             }
             this.globe = new Globe(elevationModel);
 

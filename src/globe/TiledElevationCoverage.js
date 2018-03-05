@@ -17,9 +17,9 @@
  * @exports TiledElevationCoverage
  */
 define(['../util/AbsentResourceList',
-        '../globe/AbstractElevationCoverage',
         '../geom/Angle',
         '../error/ArgumentError',
+        '../globe/ElevationCoverage',
         '../globe/ElevationImage',
         '../globe/ElevationTile',
         '../util/LevelSet',
@@ -29,9 +29,9 @@ define(['../util/AbsentResourceList',
         '../util/Tile',
         '../util/WWMath'],
     function (AbsentResourceList,
-              AbstractElevationCoverage,
               Angle,
               ArgumentError,
+              ElevationCoverage,
               ElevationImage,
               ElevationTile,
               LevelSet,
@@ -49,7 +49,7 @@ define(['../util/AbsentResourceList',
          * @classdesc Represents the elevations for an area, often but not necessarily the whole globe.
          * <p>
          *     This class is intended to be a base class for more concrete elevation
-         *     coverages, such as {@link BasicElevationCoverage}.
+         *     coverages, such as {@link EarthElevationCoverage}.
          * @param {Sector} coverageSector The sector this coverage spans.
          * @param {Location} levelZeroDelta The size of top-level tiles, in degrees.
          * @param {Number} numLevels The number of levels used to represent this coverage's resolution pyramid.
@@ -65,7 +65,7 @@ define(['../util/AbsentResourceList',
          */
         var TiledElevationCoverage = function (coverageSector, levelZeroDelta, numLevels, retrievalImageFormat, cachePath,
                                                tileWidth, tileHeight) {
-            AbstractElevationCoverage.call(this);
+            ElevationCoverage.call(this);
 
             if (!coverageSector) {
                 throw new ArgumentError(
@@ -199,7 +199,7 @@ define(['../util/AbsentResourceList',
             this.absentResourceList = new AbsentResourceList(3, 5e3);
         };
 
-        TiledElevationCoverage.prototype = Object.create(AbstractElevationCoverage.prototype);
+        TiledElevationCoverage.prototype = Object.create(ElevationCoverage.prototype);
 
         // Documented in super class
         TiledElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {

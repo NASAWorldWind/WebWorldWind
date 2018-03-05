@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports AbstractElevationCoverage
+ * @exports ElevationCoverage
  */
 define(['../util/Logger',
         '../error/UnsupportedOperationError'],
@@ -23,11 +23,11 @@ define(['../util/Logger',
         "use strict";
 
         /**
-         * Constructs an AbstractElevationCoverage
-         * @alias AbstractElevationCoverage
+         * Constructs an ElevationCoverage
+         * @alias ElevationCoverage
          * @constructor
          */
-        var AbstractElevationCoverage = function () {
+        var ElevationCoverage = function () {
 
             /**
              * Indicates the last time this coverage changed, in milliseconds since midnight Jan 1, 1970.
@@ -59,9 +59,9 @@ define(['../util/Logger',
          * or null if the specified sector is outside this elevation model's coverage area.
          * @throws {ArgumentError} If the specified sector is null or undefined.
          */
-        AbstractElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
+        ElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
             throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "AbstractElevationCoverage", "minAndMaxElevationsForSector", "abstractInvocation"));
+                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "minAndMaxElevationsForSector", "abstractInvocation"));
         };
 
         /**
@@ -71,9 +71,9 @@ define(['../util/Logger',
          * @returns {Number} The elevation at the specified location, in meters. Returns zero if the location is
          * outside the coverage area of this coverage.
          */
-        AbstractElevationCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
+        ElevationCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
             throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "AbstractElevationCoverage", "elevationAtLocation", "abstractInvocation"));
+                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "elevationAtLocation", "abstractInvocation"));
         };
 
         /**
@@ -89,10 +89,10 @@ define(['../util/Logger',
          * @throws {ArgumentError} If the specified sector or result array is null or undefined, or if either of the
          * specified numLat or numLon values is less than one.
          */
-        AbstractElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        ElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
             throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "AbstractElevationCoverage", "elevationsForGrid", "abstractInvocation"));
+                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "elevationsForGrid", "abstractInvocation"));
         };
 
-        return AbstractElevationCoverage;
+        return ElevationCoverage;
     });

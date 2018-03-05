@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
-        './globe/AbstractElevationCoverage',
         './error/AbstractError',
         './geom/Angle',
         './shapes/Annotation',
@@ -23,7 +22,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './error/ArgumentError',
         './layer/AtmosphereLayer',
         './shaders/AtmosphereProgram',
-        './globe/BasicElevationCoverage',
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './util/BasicTimeSequence',
@@ -47,7 +45,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/DigitalGlobeTiledImageLayer',
         './gesture/DragRecognizer',
         './render/DrawContext',
+        './globe/EarthElevationCoverage',
         './globe/EarthRestElevationModel',
+        './globe/ElevationCoverage',
         './globe/ElevationModel',
         './util/Font',
         './util/FrameStatistics',
@@ -256,8 +256,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WWUtil',
         './util/XmlDocument',
         './globe/ZeroElevationModel'],
-    function (AbstractElevationCoverage,
-              AbstractError,
+    function (AbstractError,
               Angle,
               Annotation,
               AnnotationAttributes,
@@ -265,7 +264,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ArgumentError,
               AtmosphereLayer,
               AtmosphereProgram,
-              BasicElevationCoverage,
               BasicProgram,
               BasicTextureProgram,
               BasicTimeSequence,
@@ -289,7 +287,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               DigitalGlobeTiledImageLayer,
               DragRecognizer,
               DrawContext,
+              EarthElevationCoverage,
               EarthRestElevationModel,
+              ElevationCoverage,
               ElevationModel,
               Font,
               FrameStatistics,
@@ -719,7 +719,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             WEST: "west"
         };
 
-        WorldWind['AbstractElevationCoverage'] = AbstractElevationCoverage;
         WorldWind['AbstractError'] = AbstractError;
         WorldWind['Angle'] = Angle;
         WorldWind['Annotation'] = Annotation;
@@ -728,7 +727,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ArgumentError'] = ArgumentError;
         WorldWind['AtmosphereLayer'] = AtmosphereLayer;
         WorldWind['AtmosphereProgram'] = AtmosphereProgram;
-        WorldWind['BasicElevationCoverage'] = BasicElevationCoverage;
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BasicTimeSequence'] = BasicTimeSequence;
@@ -752,7 +750,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['DigitalGlobeTiledImageLayer'] = DigitalGlobeTiledImageLayer;
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
+        WorldWind['EarthElevationCoverage'] = EarthElevationCoverage;
         WorldWind['EarthRestElevationModel'] = EarthRestElevationModel;
+        WorldWind['ElevationCoverage'] = ElevationCoverage;
         WorldWind['ElevationModel'] = ElevationModel;
         WorldWind['Font'] = Font;
         WorldWind['FrameStatistics'] = FrameStatistics;
