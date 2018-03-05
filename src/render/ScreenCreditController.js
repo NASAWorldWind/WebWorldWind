@@ -22,6 +22,7 @@ define([
         '../shaders/BasicTextureProgram',
         '../util/Color',
         '../util/Font',
+        '../layer/Layer',
         '../util/Logger',
         '../geom/Matrix',
         '../util/Offset',
@@ -35,6 +36,7 @@ define([
               BasicTextureProgram,
               Color,
               Font,
+              Layer,
               Logger,
               Matrix,
               Offset,
@@ -52,7 +54,7 @@ define([
          * @classdesc Collects and displays screen credits.
          */
         var ScreenCreditController = function () {
-            RenderableLayer.call(this, "ScreenCreditController");
+            Layer.call(this, "ScreenCreditController");
 
             // Internal. Intentionally not documented.
             this.imageCredits = [];
@@ -70,7 +72,7 @@ define([
             this.opacity = 0.5;
         };
 
-        ScreenCreditController.prototype = Object.create(RenderableLayer.prototype);
+        ScreenCreditController.prototype = Object.create(Layer.prototype);
 
         /**
          * Clears all credits from this controller.
@@ -78,7 +80,7 @@ define([
         ScreenCreditController.prototype.clear = function (dc) {
             this.imageCredits = [];
             this.textCredits = [];
-            this.removeAllRenderables();
+            //this.removeAllRenderables();
         };
 
         /**
@@ -98,7 +100,7 @@ define([
             credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
 
             this.imageCredits.push(credit);
-            this.addRenderable(credit);
+            //this.addRenderable(credit);
         };
 
         /**
@@ -126,7 +128,7 @@ define([
             credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
 
             this.textCredits.push(credit);
-            this.addRenderable(credit);
+            //this.addRenderable(credit);
         };
 
         // Internal use only. Intentionally not documented.
@@ -145,7 +147,7 @@ define([
                 creditOrdinal++;
             }
 
-            RenderableLayer.prototype.doRender.call(this, dc);
+            Layer.prototype.doRender.call(this, dc);
         };
 
         return ScreenCreditController;
