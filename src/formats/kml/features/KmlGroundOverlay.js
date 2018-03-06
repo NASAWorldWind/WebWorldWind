@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ define([
                         this.kmlLatLonBox.kmlWest,
                         this.kmlLatLonBox.kmlEast
                     ),
-                    this.kmlIcon.kmlHref
+                    this.kmlIcon.kmlHref(kmlOptions.fileCache)
                 );
                 dc.redrawRequested = true;
             }

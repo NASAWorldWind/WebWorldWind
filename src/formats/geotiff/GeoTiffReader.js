@@ -433,7 +433,7 @@ define([
                         var yInTile = y % tileLength;
                         var sampleIndex = yInTile * tileWidth + xInTile;
                         var pixelSamples = tiles[tileIndex][sampleIndex];
-                        elevationArray.push(pixelSamples);//todo de 0??? servet
+                        elevationArray.push(pixelSamples);
                     }
                 }
             }
@@ -884,22 +884,6 @@ define([
                         break;
                     default:
                         Logger.log(Logger.LEVEL_WARNING, "Ignored GeoTiff tag: " + this.imageFileDirectories[0][i].tag);
-                }
-            }
-        }
-
-        // Get metadata from GeoKeys. Internal use only.
-        GeoTiffReader.prototype.getMetadataFromGeoKeys = function () {
-            for (var i = 0; i < this.geoKeys.length; i++) {
-                var keyAsString = GeoTiffUtil.getTagValueAsString(GeoTiffConstants.Key, this.geoKeys[i].keyId);
-
-                if (keyAsString) {
-                    this._metadata.geotiff.geoKeys[keyAsString] = this.geoKeys[i].getGeoKeyValue(
-                        this.metadata.geoDoubleParams,
-                        this.metadata.geoAsciiParams);
-                }
-                else {
-                    Logger.log(Logger.LEVEL_WARNING, "Unknown GeoTiff key: " + this.geoKeys[i].keyId);
                 }
             }
         }
