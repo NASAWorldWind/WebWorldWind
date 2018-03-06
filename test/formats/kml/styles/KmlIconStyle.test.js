@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define([ 'src/util/XmlDocument',
-    'src/formats/kml/styles/KmlIconStyle'
+define([
+    'src/formats/kml/KmlFileCache',
+    'src/formats/kml/styles/KmlIconStyle',
+    'src/util/XmlDocument'
 ], function (
-    XmlDocument,
-    KmlIconStyle
+    KmlFileCache,
+    KmlIconStyle,
+    XmlDocument
 ) {
     "use strict";
     describe ("KmlIconStyle", function (){
@@ -45,7 +48,7 @@ define([ 'src/util/XmlDocument',
                 expect(iconStyle.kmlColorMode).toEqual('normal');
                 expect(iconStyle.kmlScale).toEqual(1);
                 expect(iconStyle.kmlHeading).toEqual(0);
-                expect(iconStyle.kmlIcon.kmlHref).toEqual('test');
+                expect(iconStyle.kmlIcon.kmlHref(new KmlFileCache())).toEqual('test');
 
         });
     });

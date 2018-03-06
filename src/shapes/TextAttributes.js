@@ -36,7 +36,7 @@ define([
          * in which case the new instance contains default attributes.
          */
         var TextAttributes = function (attributes) {
-            this._color = attributes ? attributes._color : new Color(1, 1, 1, 1);
+            this._color = attributes ? attributes._color.clone() : Color.WHITE.clone();
             this._font = attributes ? attributes._font : new Font(14);
             this._offset = attributes ? attributes._offset
                 : new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
@@ -44,7 +44,7 @@ define([
             this._depthTest = attributes ? attributes._depthTest : false;
             this._enableOutline = attributes ? attributes._enableOutline : true;
             this._outlineWidth = attributes ? attributes._outlineWidth : 4;
-            this._outlineColor = attributes ? attributes._color : new Color(0, 0, 0, 0.5);
+            this._outlineColor = attributes ? attributes._outlineColor : new Color(0, 0, 0, 0.5);
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
@@ -71,7 +71,7 @@ define([
                 " dt " + this._depthTest +
                 " eo " + this._enableOutline +
                 " ow " + this._outlineWidth +
-                " oc " + this._outlineColor;
+                " oc " + this._outlineColor.toHexString(true);
         };
 
         Object.defineProperties(TextAttributes.prototype, {

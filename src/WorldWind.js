@@ -148,7 +148,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/MemoryCacheListener',
         './layer/MercatorTiledImageLayer',
         './navigate/Navigator',
-        './navigate/NavigatorState',
         './util/NominatimGeocoder',
         './error/NotYetImplementedError',
         './util/Offset',
@@ -389,7 +388,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               MemoryCacheListener,
               MercatorTiledImageLayer,
               Navigator,
-              NavigatorState,
               NominatimGeocoder,
               NotYetImplementedError,
               Offset,
@@ -581,6 +579,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
              * @constant
              */
             FAILED: "failed",
+
+            /**
+             * Indicates a linear filter.
+             * @constant
+             */
+            FILTER_LINEAR: "filter_linear",
+
+            /**
+             * Indicates a nearest neighbor filter.
+             * @constant
+             */
+            FILTER_NEAREST: "filter_nearest",
 
             /**
              * Indicates a great circle path.
@@ -791,7 +801,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
         WorldWind['MercatorTiledImageLayer'] = MercatorTiledImageLayer;
         WorldWind['Navigator'] = Navigator;
-        WorldWind['NavigatorState'] = NavigatorState;
         WorldWind['NominatimGeocoder'] = NominatimGeocoder;
         WorldWind['NotYetImplementedError'] = NotYetImplementedError;
         WorldWind['Offset'] = Offset;
