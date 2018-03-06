@@ -1,48 +1,38 @@
--/*
-- * Copyright 2015-2017 WorldWind Contributors
-- *
-- * Licensed under the Apache License, Version 2.0 (the "License");
-- * you may not use this file except in compliance with the License.
-- * You may obtain a copy of the License at
-- *
-- *     http://www.apache.org/licenses/LICENSE-2.0
-- *
-- * Unless required by applicable law or agreed to in writing, software
-- * distributed under the License is distributed on an "AS IS" BASIS,
-- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-- * See the License for the specific language governing permissions and
-- * limitations under the License.
-- */
-/**
-* @exports ScreenCreditController
+/*
+* Copyright 2015-2017 WorldWind Contributors
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
 */
+/**
+ * @exports ScreenCreditController
+ */
 
 define([
         '../error/ArgumentError',
-        '../shaders/BasicTextureProgram',
         '../util/Color',
         '../util/Font',
         '../layer/Layer',
         '../util/Logger',
-        '../geom/Matrix',
         '../util/Offset',
-        '../pick/PickedObject',
-        '../render/Renderable',
-        '../layer/RenderableLayer',
         '../shapes/ScreenImage',
         '../shapes/ScreenText'
     ],
     function (ArgumentError,
-              BasicTextureProgram,
               Color,
               Font,
               Layer,
               Logger,
-              Matrix,
               Offset,
-              PickedObject,
-              Renderable,
-              RenderableLayer,
               ScreenImage,
               ScreenText) {
         "use strict";
@@ -51,6 +41,7 @@ define([
          * Constructs a screen credit controller.
          * @alias ScreenCreditController
          * @constructor
+         * @augments Layer
          * @classdesc Collects and displays screen credits.
          */
         var ScreenCreditController = function () {
@@ -80,7 +71,6 @@ define([
         ScreenCreditController.prototype.clear = function (dc) {
             this.imageCredits = [];
             this.textCredits = [];
-            //this.removeAllRenderables();
         };
 
         /**
@@ -100,7 +90,6 @@ define([
             credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
 
             this.imageCredits.push(credit);
-            //this.addRenderable(credit);
         };
 
         /**
@@ -128,7 +117,6 @@ define([
             credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
 
             this.textCredits.push(credit);
-            //this.addRenderable(credit);
         };
 
         // Internal use only. Intentionally not documented.
@@ -138,16 +126,16 @@ define([
             for (var i = 0, len = this.imageCredits.length; i < len; i++) {
                 this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.imageCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+                this.imageCredits[i].render(dc);
                 creditOrdinal++;
             }
 
             for (i = 0; i < this.textCredits.length; i++) {
                 this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.textCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+                this.textCredits[i].render(dc);
                 creditOrdinal++;
             }
-
-            Layer.prototype.doRender.call(this, dc);
         };
 
         return ScreenCreditController;
