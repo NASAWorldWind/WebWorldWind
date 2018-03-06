@@ -83,6 +83,13 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
             }
 
+            // Verify if image credit is not already in controller, if it is, don't add it.
+            for (var i = 0, len = this.imageCredits.length; i < len; i++){
+                if (this.imageCredits[i].imageSource === imageUrl){
+                    return 0;
+                }
+            }
+
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
 
@@ -106,6 +113,13 @@ define([
             if (!color) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
+            }
+
+            // Verify if text credit is not already in controller, if it is, don't add it.
+            for (var i = 0, len = this.textCredits.length; i < len; i++){
+                if (this.textCredits[i].text === stringCredit){
+                    return 0;
+                }
             }
 
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
