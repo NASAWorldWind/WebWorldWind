@@ -67,7 +67,7 @@ define([
         /**
          * Clears all credits from this controller.
          */
-        ScreenCreditController.prototype.clear = function (dc) {
+        ScreenCreditController.prototype.clear = function () {
             this.imageCredits = [];
             this.textCredits = [];
         };
