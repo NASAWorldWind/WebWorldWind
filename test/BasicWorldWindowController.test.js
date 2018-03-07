@@ -54,6 +54,7 @@ define([
             return {left: 339.5, top: 225};
         }
     };
+    wwd.layers = [];
     wwd.scratchModelview = Matrix.fromIdentity();
     wwd.scratchProjection = Matrix.fromIdentity();
     wwd.resetDrawContext();
