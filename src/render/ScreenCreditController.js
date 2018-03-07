@@ -56,7 +56,7 @@ define([
             this.margin = 5;
 
             // Internal. Intentionally not documented.
-            this.creditSpacing = 22;
+            this.creditSpacing = 21;
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
@@ -84,9 +84,9 @@ define([
             }
 
             // Verify if image credit is not already in controller, if it is, don't add it.
-            for (var i = 0, len = this.imageCredits.length; i < len; i++){
-                if (this.imageCredits[i].imageSource === imageUrl){
-                    return 0;
+            for (var i = 0, len = this.imageCredits.length; i < len; i++) {
+                if (this.imageCredits[i].imageSource === imageUrl) {
+                    return;
                 }
             }
 
@@ -116,9 +116,9 @@ define([
             }
 
             // Verify if text credit is not already in controller, if it is, don't add it.
-            for (var i = 0, len = this.textCredits.length; i < len; i++){
-                if (this.textCredits[i].text === stringCredit){
-                    return 0;
+            for (var i = 0, len = this.textCredits.length; i < len; i++) {
+                if (this.textCredits[i].text === stringCredit) {
+                    return;
                 }
             }
 
