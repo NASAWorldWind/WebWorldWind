@@ -71,7 +71,7 @@ define(['../error/ArgumentError',
                     var maxTimestamp = 0;
 
                     for (var i = 0; i < this.coverages.length; i++) {
-                        var coverage=this.coverages[i];
+                        var coverage = this.coverages[i];
                         if (coverage.enabled && maxTimestamp < coverage.timestamp) {
                             maxTimestamp = coverage.timestamp;
                         }
@@ -91,7 +91,7 @@ define(['../error/ArgumentError',
                     var minElevation = Number.MAX_VALUE;
 
                     for (var i = 0; i < this.coverages.length; i++) {
-                        var coverage=this.coverages[i];
+                        var coverage = this.coverages[i];
                         if (coverage.enabled && coverage.minElevation < minElevation) {
                             minElevation = coverage.minElevation;
                         }
@@ -111,7 +111,7 @@ define(['../error/ArgumentError',
                     var maxElevation = Number.MIN_VALUE;
 
                     for (var i = 0; i < this.coverages.length; i++) {
-                        var coverage=this.coverages[i];
+                        var coverage = this.coverages[i];
                         if (coverage.enabled && maxElevation < coverage.maxElevation) {
                             maxElevation = coverage.maxElevation;
                         }
@@ -141,20 +141,79 @@ define(['../error/ArgumentError',
             this.stateKey = "elevationModel " + this.id.toString() + " ";
         };
 
+        /**
+         * Internal use only
+         * The comparison function used for sorting elevation coverages.
+         * @type {Number}
+         * @ignore
+         */
+        ElevationModel.prototype.coverageComparator = function (coverage1, coverage2) {
+            var res1 = coverage1.getBestResolution(null);
+            var res2 = coverage2.getBestResolution(null);
+            // sort from lowest resolution to highest
+            return res1 > res2 ? -1 : res1 === res2 ? 0 : 1;
+        };
+
+        ElevationModel.prototype.performCoverageListChangedActions = function () {
+            if (this.coverages.length > 1) {
+                this.coverage.sort(this.coverageComparator);
+            }
+            this.computeStateKey();
+        };
+
+        /**
+         * Adds an elevation coverage to this elevation model. The list of elevation coverages for this class is sorted from
+         * lowest resolution to highest. This method inserts the specified elevation elevation at the appropriate position in
+         * the list, and as a side effect resorts the entire list.
+         *
+         * @param coverage The elevation model to add.
+         *
+         * @throws ArgumentError if the specified elevation coverage is null.
+         */
         ElevationModel.prototype.addCoverage = function (coverage) {
             if (!coverage) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "addCoverage", "missingCoverage"));
             }
 
-            var index = this.coverages.indexOf(coverage);
-            if (index < 0) {
+            if (!this.containsCoverage(coverage)) {
                 this.coverages.push(coverage);
-                this.computeStateKey();
+                this.performCoverageListChangedActions();
                 return true;
             }
 
             return false;
+        };
+
+        ElevationModel.prototype.removeCoverage = function (coverage) {
+            if (!coverage) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "removeCoverage", "missingCoverage"));
+            }
+
+            var index = this.coverages.indexOf(coverage);
+            if (index >= 0) {
+                this.coverages.splice(index, 1);
+                this.performCoverageListChangedActions();
+            }
+        };
+
+        /**
+         * Returns true if this ElevationModel contains the specified ElevationCoverage, and false otherwise.
+         *
+         * @param coverage the ElevationCoverage to test.
+         *
+         * @return {Boolean} if the ElevationCoverage is in this ElevationModel; false otherwise.
+         *
+         * @throws ArgumentError if the ElevationCoverage is null.
+         */
+        ElevationModel.prototype.containsCoverage = function (coverage) {
+            if (!coverage) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "containsCoverage", "missingCoverage"));
+            }
+            var index = this.coverages.indexOf(coverage);
+            return index >= 0;
         };
 
         /**
@@ -173,7 +232,7 @@ define(['../error/ArgumentError',
             var result = [Number.MAX_VALUE, Number.MIN_VALUE];
 
             for (var i = 0; i < this.coverages.length; i++) {
-                var coverage=this.coverages[i];
+                var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var coverageResult = coverage.minAndMaxElevationsForSector(sector);
                     if (coverageResult) {
@@ -196,7 +255,7 @@ define(['../error/ArgumentError',
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
             var result = 0;
             for (var i = 0; i < this.coverages.length; i++) {
-                var coverage=this.coverages[i];
+                var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var elevation = coverage.elevationAtLocation(latitude, longitude);
                     if (elevation !== 0) {
@@ -241,7 +300,7 @@ define(['../error/ArgumentError',
             var resolution = Number.MAX_VALUE;
             var coverageResult = new Float64Array(result.length);
             for (var i = 0; i < this.coverages.length; i++) {
-                var coverage=this.coverages[i];
+                var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var coverageResolution = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, coverageResult);
                     if (coverageResolution < Number.MAX_VALUE) {

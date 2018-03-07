@@ -94,5 +94,19 @@ define(['../util/Logger',
                 Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "elevationsForGrid", "abstractInvocation"));
         };
 
+        /**
+         * Indicates the best resolution attainable for a specified sector.
+         *
+         * @param sector the sector in question. If null, the elevation coverage's best overall resolution is returned. This is
+         *               the best attainable at <em>some</em> locations but not necessarily at all locations.
+         *
+         * @return the best resolution attainable for the specified sector, in radians, or {@link Number.MAX_VALUE} if the
+         *         sector does not intersect the elevation model.
+         */
+        ElevationCoverage.prototype.getBestResolution = function (sector) {
+            throw new UnsupportedOperationError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "getBestResolution", "abstractInvocation"));
+        };
+
         return ElevationCoverage;
     });

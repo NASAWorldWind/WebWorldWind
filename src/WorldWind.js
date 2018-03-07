@@ -255,7 +255,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WWMessage',
         './util/WWUtil',
         './util/XmlDocument',
-        './globe/ZeroElevationModel'],
+        './globe/ZeroElevationCoverage'],
     function (AbstractError,
               Angle,
               Annotation,
@@ -497,7 +497,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WWMessage,
               WWUtil,
               XmlDocument,
-              ZeroElevationModel) {
+              ZeroElevationCoverage) {
         "use strict";
         /**
          * This is the top-level WorldWind module. It is global.
@@ -907,7 +907,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['WorldWindowController'] = WorldWindowController;
-        WorldWind['ZeroElevationModel'] = ZeroElevationModel;
+        WorldWind['ZeroElevationCoverage'] = ZeroElevationCoverage;
 
         /**
          * Holds configuration parameters for WorldWind. Applications may modify these parameters prior to creating

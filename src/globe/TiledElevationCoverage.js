@@ -677,5 +677,14 @@ define(['../util/AbsentResourceList',
             }
         };
 
+        // Documented in super class
+        TiledElevationCoverage.prototype.getBestResolution = function (sector) {
+            if (!sector)
+                return this.levels.lastLevel().texelSize;
+
+            var level = this.levels.lastLevel();
+            return level.sector.intersection(sector) ? level.texelSize : Number.MAX_VALUE;
+        };
+
         return TiledElevationCoverage;
     });
