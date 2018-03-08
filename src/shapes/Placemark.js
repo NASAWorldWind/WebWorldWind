@@ -175,7 +175,7 @@ define([
             this.updateImage = true;
 
             /**
-             * Indicates the group ID of the declutter group to include this Text shape. If non-zero, this shape
+             * Indicates the group ID of the declutter group to include this placemark. If non-zero, this placemark
              * is decluttered relative to all other shapes within its group.
              * @type {Number}
              * @default 2
@@ -183,21 +183,22 @@ define([
             this.declutterGroup = 2;
 
             /**
-             * This shape's target visibility, a value between 0 and 1. During ordered rendering this shape modifies its
-             * [current visibility]{@link Text#currentVisibility} towards its target visibility at the rate
-             * specified by the draw context's [fade time]{@link DrawContext#fadeTime} property. The target
-             * visibility and current visibility are used to control the fading in and out of this shape.
+             * This placemark's target label visibility, a value between 0 and 1. During ordered rendering this
+             * placemark modifies its [current visibility]{@link Placemark#currentVisibility} towards its target
+             * visibility at the rate specified by the draw context's [fade time]{@link DrawContext#fadeTime} property.
+             * The target visibility and current visibility are used to control the fading in and out of this
+             * placemark's label.
              * @type {Number}
              * @default 1
              */
             this.targetVisibility = 1;
 
             /**
-             * This shape's current visibility, a value between 0 and 1. This property scales the shape's effective
-             * opacity. It is incremented or decremented each frame according to the draw context's
-             * [fade time]{@link DrawContext#fadeTime} property in order to achieve this shape's current
-             * [target visibility]{@link Text#targetVisibility}. This current visibility and target visibility are
-             * used to control the fading in and out of this shape.
+             * This placemark's current label visibility, a value between 0 and 1. This property scales the placemark's
+             * effective label opacity. It is incremented or decremented each frame according to the draw context's
+             * [fade time]{@link DrawContext#fadeTime} property in order to achieve this placemark's
+             * [target visibility]{@link Placemark#targetVisibility}. This current visibility and target visibility are
+             * used to control the fading in and out of this placemark's label.
              * @type {Number}
              * @default 1
              * @readonly
@@ -634,7 +635,7 @@ define([
                 }
             }
 
-            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity * this.currentVisibility);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
             // Draw the leader line first so that the image and label have visual priority.
             if (this.mustDrawLeaderLine(dc)) {
