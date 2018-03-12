@@ -157,24 +157,24 @@ define([
                     if (xhr.status === 200) {
                         var arrayBuffer = xhr.response;
                         if (arrayBuffer) {
-                            parserCompletionCallback(new GeoTiffReader(arrayBuffer), xhr.statusText);
+                            parserCompletionCallback(new GeoTiffReader(arrayBuffer), xhr);
                         }
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed (" + xhr.statusText + "): " + url);
-                        parserCompletionCallback(null, xhr.statusText);
+                        parserCompletionCallback(null, xhr);
                     }
                 }
             }).bind(this);
 
             xhr.onerror = function () {
                 Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed: " + url);
-                parserCompletionCallback(null, xhr.statusText);
+                parserCompletionCallback(null, xhr);
             };
 
             xhr.ontimeout = function () {
                 Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval timed out: " + url);
-                parserCompletionCallback(null, xhr.statusText);
+                parserCompletionCallback(null, xhr);
             };
 
             xhr.send(null);
