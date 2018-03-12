@@ -70,7 +70,7 @@ define(['../error/ArgumentError',
                 get: function () {
                     var maxTimestamp = 0;
 
-                    for (var i = 0; i < this.coverages.length; i++) {
+                    for (var i = 0, n = this.coverages.length; i < n; i++) {
                         var coverage = this.coverages[i];
                         if (coverage.enabled && maxTimestamp < coverage.timestamp) {
                             maxTimestamp = coverage.timestamp;
@@ -156,7 +156,7 @@ define(['../error/ArgumentError',
 
         ElevationModel.prototype.performCoverageListChangedActions = function () {
             if (this.coverages.length > 1) {
-                this.coverage.sort(this.coverageComparator);
+                this.coverages.sort(this.coverageComparator);
             }
             this.computeStateKey();
         };
@@ -183,6 +183,13 @@ define(['../error/ArgumentError',
             }
 
             return false;
+        };
+
+        ElevationModel.prototype.removeAllCoverages = function () {
+            if (this.coverages.length > 0) {
+                this.coverages.clear();
+                this.performCoverageListChangedActions();
+            }
         };
 
         ElevationModel.prototype.removeCoverage = function (coverage) {
@@ -254,7 +261,7 @@ define(['../error/ArgumentError',
          */
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
             var result = 0;
-            for (var i = 0; i < this.coverages.length; i++) {
+            for (var i = 0, n=this.coverages.length; i < n; i++) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var elevation = coverage.elevationAtLocation(latitude, longitude);

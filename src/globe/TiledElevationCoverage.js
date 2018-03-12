@@ -197,6 +197,15 @@ define(['../util/AbsentResourceList',
              * @ignore
              */
             this.absentResourceList = new AbsentResourceList(3, 5e3);
+
+            /**
+             * Internal use only
+             * The factory to create URLs for data requests. This property is typically set in the constructor of child classes.
+             * See {@link WcsTileUrlBuilder} and {@link WmsUrlBuilder} for concrete examples.
+             * @type {Object}
+             * @ignore
+             */
+            this.urlBuilder = null;
         };
 
         TiledElevationCoverage.prototype = Object.create(ElevationCoverage.prototype);

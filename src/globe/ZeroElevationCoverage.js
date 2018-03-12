@@ -18,13 +18,11 @@
  */
 define([
         '../error/ArgumentError',
-        '../globe/ElevationModel',
         '../geom/Location',
         '../util/Logger',
         '../geom/Sector',
         '../globe/TiledElevationCoverage'],
     function (ArgumentError,
-              ElevationModel,
               Location,
               Logger,
               Sector,
@@ -36,7 +34,7 @@ define([
          * @alias ZeroElevationCoverage
          * @constructor
          * @classdesc Represents an elevation coverage whose elevations are zero at all locations.
-         * @augments ElevationModel
+         * @augments TiledElevationCoverage
          */
         var ZeroElevationCoverage = function () {
             TiledElevationCoverage.call(this, Sector.FULL_SPHERE, new Location(45, 45), 1, " ", " ", 150, 150);
