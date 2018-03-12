@@ -16,11 +16,11 @@
 define([
     'src/geom/Sector',
     'src/geom/Location',
-    'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/geom/BoundingBox',
     'src/geom/Vec3',
     'src/globe/Globe'
-], function (Sector, Location, EarthElevationModel, BoundingBox, Vec3, Globe) {
+], function (Sector, Location, ElevationModel, BoundingBox, Vec3, Globe) {
     "use strict";
 
     describe("Sector Tests", function () {

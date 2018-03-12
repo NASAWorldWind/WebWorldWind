@@ -258,8 +258,19 @@ define(['../error/ArgumentError',
          * @param {Number} longitude The location's longitude in degrees.
          * @returns {Number} The elevation at the specified location, in meters. Returns zero if the location is
          * outside the coverage area of this coverage.
+         * @throws {ArgumentError} If the specified latitude or longitude is null or undefined.
          */
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
+            if (!latitude) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "missingLatitude"));
+            }
+
+            if (!longitude) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "missingLongitude"));
+            }
+
             var result = 0;
             for (var i = 0, n=this.coverages.length; i < n; i++) {
                 var coverage = this.coverages[i];
@@ -284,24 +295,29 @@ define(['../error/ArgumentError',
          * @param {Number[]} result An array in which to return the requested elevations.
          * @returns {Number} The resolution actually achieved, which may be greater than that requested if the
          * elevation data for the requested resolution is not currently available.
-         * @throws {ArgumentError} If the specified sector or result array is null or undefined, or if either of the
+         * @throws {ArgumentError} If the specified sector, targetResolution, or result array is null or undefined, or if either of the
          * specified numLat or numLon values is less than one.
          */
         ElevationModel.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
             if (!sector) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForSector", "missingSector"));
-            }
-
-            if (!result) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForSector", "missingResult"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingSector"));
             }
 
             if (!numLat || !numLon || numLat < 1 || numLon < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "constructor",
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid",
                         "The specified number of latitudinal or longitudinal positions is less than one."));
+            }
+
+            if (!targetResolution) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingTargetResolution"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingResult"));
             }
 
             var resolution = Number.MAX_VALUE;

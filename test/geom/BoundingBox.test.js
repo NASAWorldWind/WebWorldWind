@@ -18,9 +18,9 @@ define([
     'src/geom/Vec3',
     'src/geom/Plane',
     'src/globe/Globe',
-    'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/geom/Sector'
-], function (BoundingBox, Vec3, Plane, Globe, EarthElevationModel, Sector) {
+], function (BoundingBox, Vec3, Plane, Globe, ElevationModel, Sector) {
     "use strict";
 
     describe("BoundingBox Tests", function () {

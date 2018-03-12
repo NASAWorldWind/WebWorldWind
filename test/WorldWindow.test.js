@@ -16,7 +16,7 @@
 define([
     'src/BasicWorldWindowController',
     'src/render/DrawContext',
-    'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/globe/Globe',
     'src/geom/Matrix',
     'src/navigate/LookAtNavigator',
@@ -25,7 +25,7 @@ define([
     'src/geom/Vec3',
     'src/WorldWind',
     'src/WorldWindow'
-], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
+], function (BasicWorldWindowController, DrawContext, ElevationModel, Globe, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
 
     var expectVec3CloseTo = function (v1, v2) {
@@ -51,7 +51,7 @@ define([
     Globe.prototype.minAndMaxElevationsForSector = function (sector) {
         return [125.0, 350.0];
     };
-    var mockGlobe = new Globe(new EarthElevationModel());
+    var mockGlobe = new Globe(new ElevationModel());
     var wwd = new MockWorldWindow();
     wwd.globe = mockGlobe;
     wwd.drawContext = dc;

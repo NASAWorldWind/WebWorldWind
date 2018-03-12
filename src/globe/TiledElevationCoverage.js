@@ -273,18 +273,23 @@ define(['../util/AbsentResourceList',
         TiledElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
             if (!sector) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForSector", "missingSector"));
-            }
-
-            if (!result) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForSector", "missingResult"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingSector"));
             }
 
             if (!numLat || !numLon || numLat < 1 || numLon < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor",
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid",
                         "The specified number of latitudinal or longitudinal positions is less than one."));
+            }
+
+            if (!targetResolution) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingTargetResolution"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingResult"));
             }
 
             var level = this.levels.levelForTexelSize(targetResolution);
@@ -597,7 +602,7 @@ define(['../util/AbsentResourceList',
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
                 var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
                     xhr = new XMLHttpRequest(),
-                    elevationModel = this;
+                    elevationCoverage = this;
 
                 if (!url)
                     return;
@@ -606,35 +611,35 @@ define(['../util/AbsentResourceList',
                 xhr.responseType = 'arraybuffer';
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
-                        elevationModel.removeFromCurrentRetrievals(tile.imagePath);
+                        elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
 
                         var contentType = xhr.getResponseHeader("content-type");
 
                         if (xhr.status === 200) {
-                            if (contentType === elevationModel.retrievalImageFormat
+                            if (contentType === elevationCoverage.retrievalImageFormat
                                 || contentType === "text/plain"
                                 || contentType === "application/octet-stream") {
                                 Logger.log(Logger.LEVEL_INFO, "Elevations retrieval succeeded: " + url);
-                                elevationModel.loadElevationImage(tile, xhr);
-                                elevationModel.absentResourceList.unmarkResourceAbsent(tile.imagePath);
+                                elevationCoverage.loadElevationImage(tile, xhr);
+                                elevationCoverage.absentResourceList.unmarkResourceAbsent(tile.imagePath);
 
                                 // Send an event to request a redraw.
                                 var e = document.createEvent('Event');
                                 e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
                                 window.dispatchEvent(e);
                             } else if (contentType === "text/xml") {
-                                elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
                                 Logger.log(Logger.LEVEL_WARNING,
                                     "Elevations retrieval failed (" + xhr.statusText + "): " + url + ".\n "
                                     + String.fromCharCode.apply(null, new Uint8Array(xhr.response)));
                             } else {
-                                elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
                                 Logger.log(Logger.LEVEL_WARNING,
                                     "Elevations retrieval failed: " + url + ". " + "Unexpected content type "
                                     + contentType);
                             }
                         } else {
-                            elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                            elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
                             Logger.log(Logger.LEVEL_WARNING,
                                 "Elevations retrieval failed (" + xhr.statusText + "): " + url);
                         }
@@ -642,14 +647,14 @@ define(['../util/AbsentResourceList',
                 };
 
                 xhr.onerror = function () {
-                    elevationModel.removeFromCurrentRetrievals(tile.imagePath);
-                    elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                    elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval failed: " + url);
                 };
 
                 xhr.ontimeout = function () {
-                    elevationModel.removeFromCurrentRetrievals(tile.imagePath);
-                    elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                    elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval timed out: " + url);
                 };
 

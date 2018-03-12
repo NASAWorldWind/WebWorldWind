@@ -17,11 +17,11 @@ define([
     'src/geom/Matrix',
     'src/geom/Angle',
     'src/globe/Globe',
-    'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/geom/Plane',
     'src/geom/Rectangle',
     'src/geom/Vec3'
-], function (Matrix, Angle, Globe, EarthElevationModel, Plane, Rectangle, Vec3) {
+], function (Matrix, Angle, Globe, ElevationModel, Plane, Rectangle, Vec3) {
     "use strict";
 
     describe("Matrix Tests", function () {
