@@ -1544,9 +1544,9 @@ define([
                 this.textRenderer.outlineColor = textAttributes.outlineColor;
                 this.textRenderer.outlineWidth = textAttributes.outlineWidth;
                 texture = this.textRenderer.renderText(text);
+                this.gpuResourceCache.putResource(textureKey, texture, texture.size);
             }
 
-            this.gpuResourceCache.putResource(textureKey, texture, texture.size);
             return texture;
         };
 
