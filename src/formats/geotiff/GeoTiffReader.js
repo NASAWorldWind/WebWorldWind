@@ -59,7 +59,7 @@ define([
         var GeoTiffReader = function (arrayBuffer) {
             if (!arrayBuffer) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missing ArrayBuffer"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "constructor", "missingArrayBuffer"));
             }
 
             // Documented in defineProperties below.
