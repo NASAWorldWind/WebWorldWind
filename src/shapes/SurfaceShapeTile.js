@@ -219,7 +219,8 @@ define([
             var gpuResourceCache = dc.gpuResourceCache;
             var texture = new Texture(gl, canvas);
             gpuResourceCache.putResource(this.gpuCacheKey, texture, texture.size);
-
+            gpuResourceCache.setResourceAging(this.gpuCacheKey, 10);   // 10x
+            
             return texture;
         };
 
