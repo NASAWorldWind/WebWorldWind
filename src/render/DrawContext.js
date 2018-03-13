@@ -1545,6 +1545,7 @@ define([
                 this.textRenderer.outlineWidth = textAttributes.outlineWidth;
                 texture = this.textRenderer.renderText(text);
                 this.gpuResourceCache.putResource(textureKey, texture, texture.size);
+                this.gpuResourceCache.setResourceAging(textureKey, 100);  // 100x
             }
 
             return texture;
