@@ -193,7 +193,7 @@ define([
                 entry: entry,
                 size: size,
                 lastUsed: Date.now(),
-                agingMuliplier: 1  // 1x = normal aging
+                agingFactor: 1  // 1x = normal aging
             };
 
             this.entries[key] = cacheEntry;
@@ -234,23 +234,23 @@ define([
         };
 
         /**
-         * Sets an entry's aging multiplier used to sort the entries for eviction.
+         * Sets an entry's aging factor (multiplier) used to sort the entries for eviction.
          * A value of one is normal aging; a value of two invokes 2x aging, causing
          * the entry to become twice as old as a normal sibling with the same
          * 'last used' timestamp. Setting a value of zero would be a "fountain
          * of youth" for an entry as it wouldn't age and thus would sort to the
          * bottom of the eviction queue.
          * @param {String} key The key of the entry to modify. If null or undefined, the cache entry is not modified.
-         * @param {Number} agingMuliplier The multiplier applied to the age of the entry when sorting candidates for eviction.
+         * @param {Number} agingFactor A multiplier applied to the age of the entry when sorting candidates for eviction.
          *
          */
-        MemoryCache.prototype.setEntryAgingMuliplier = function (key, agingMuliplier) {
+        MemoryCache.prototype.setEntryAgingFactor = function (key, agingFactor) {
             if (!key)
                 return;
 
             var cacheEntry = this.entries[key];
             if (cacheEntry) {
-                cacheEntry.agingMuliplier = agingMuliplier;
+                cacheEntry.agingFactor = agingFactor;
             }
         };
 
@@ -333,39 +333,17 @@ define([
                 }
             }
             sortedEntries.sort(function (a, b) {
-                var aAge = (now - a.lastUsed) * a.agingMuliplier,
-                    bAge = (now - b.lastUsed) * b.agingMuliplier;
+                var aAge = (now - a.lastUsed) * a.agingFactor,
+                    bAge = (now - b.lastUsed) * b.agingFactor;
                 return bAge - aAge;
             });
 
-            var DEBUG = false;
-            // BDS: Dump the cache in order of eviction 
-            if (DEBUG) {
-                for (var n = 0, len = sortedEntries.length; n < len; n++) {
-                    console.log(n + ": (" + sortedEntries[n].lastUsed + ") key: " + sortedEntries[n].key);
-                }
-            }
-
-            // BDS: Debugging vars 
-            if (DEBUG) {
-                var minTime = Number.MAX_VALUE, maxTime = 0;
-            }
             for (var i = 0, len = sortedEntries.length; i < len; i++) {
-                if (DEBUG) {
-                    minTime = Math.min(minTime, sortedEntries[i].lastUsed);
-                    maxTime = Math.max(maxTime, sortedEntries[i].lastUsed);
-                }
                 if (this.usedCapacity > this._lowWater || this.freeCapacity < spaceRequired) {
                     this.removeCacheEntry(sortedEntries[i]);
                 } else {
                     break;
                 }
-            }
-            // BDS: Debugging output 
-            if (DEBUG) {
-                console.log("=================");
-                console.log("AGE RANGE: " + (maxTime - minTime) + "ms, ITEMS REMOVED: " + i);
-                console.log("");
             }
         };
 

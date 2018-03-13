@@ -216,7 +216,7 @@ define([
             var gpuResourceCache = dc.gpuResourceCache;
             var texture = new Texture(gl, canvas);
             gpuResourceCache.putResource(this.gpuCacheKey, texture, texture.size);
-            gpuResourceCache.setResourceAging(this.gpuCacheKey, 10);   // 10x
+            gpuResourceCache.setResourceAgingFactor(this.gpuCacheKey, 10);   // age this texture 10x faster than normal resources (e.g., tiles)
             
             return texture;
         };
