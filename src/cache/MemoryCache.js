@@ -17,11 +17,11 @@
  * @exports MemoryCache
  */
 define([
-    '../error/ArgumentError',
-    '../util/Logger'
-],
+        '../error/ArgumentError',
+        '../util/Logger'
+    ],
     function (ArgumentError,
-        Logger) {
+              Logger) {
         "use strict";
 
         /**
@@ -234,15 +234,15 @@ define([
         };
 
         /**
-         * Sets an entry's aging multiplier used to sort the entries for eviction. 
+         * Sets an entry's aging multiplier used to sort the entries for eviction.
          * A value of one is normal aging; a value of two invokes 2x aging, causing
-         * the entry to become twice as old as a normal sibling with the same 
-         * 'last used' timestamp. Setting a value of zero would be a "fountain 
-         * of youth" for an entry as it wouldn't age and thus would sort to the 
+         * the entry to become twice as old as a normal sibling with the same
+         * 'last used' timestamp. Setting a value of zero would be a "fountain
+         * of youth" for an entry as it wouldn't age and thus would sort to the
          * bottom of the eviction queue.
          * @param {String} key The key of the entry to modify. If null or undefined, the cache entry is not modified.
          * @param {Number} agingMuliplier The multiplier applied to the age of the entry when sorting candidates for eviction.
-         * 
+         *
          */
         MemoryCache.prototype.setEntryAgingMuliplier = function (key, agingMuliplier) {
             if (!key)
