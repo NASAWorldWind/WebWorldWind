@@ -183,6 +183,13 @@ define(['../util/AbsentResourceList',
             this.imageCache = new MemoryCache(10000000, 8000000);
 
             /**
+             * Controls how many concurrent tile requests are allowed for this coverage.
+             * @type {Number}
+             * @default WorldWind.configuration.elevationRetrievalQueueSize
+             */
+            this.retrievalQueueSize = WorldWind.configuration.elevationRetrievalQueueSize;
+
+            /**
              * Internal use only
              * The list of elevation retrievals in progress.
              * @type {Array}
@@ -600,6 +607,11 @@ define(['../util/AbsentResourceList',
         // Intentionally not documented.
         TiledElevationCoverage.prototype.retrieveTileImage = function (tile) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+
+                if (this.currentRetrievals.length > this.retrievalQueueSize) {
+                    return;
+                }
+
                 var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
                     xhr = new XMLHttpRequest(),
                     elevationCoverage = this;

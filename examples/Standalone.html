@@ -43,7 +43,8 @@ imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create a WorldWindow for the canvas. Use a REST elevation model rather than the default.
-        var elevationModel = new WorldWind.EarthRestElevationModel(null, "../standalonedata/Earth/DTED0");
+        var elevationModel = new WorldWind.ElevationModel();
+        elevationModel.addCoverage(new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0"));
         var wwd = new WorldWind.WorldWindow("canvasOne", elevationModel);
 
         // Add the REST Blue Marble layer that retrieves imagery from local standalone data.

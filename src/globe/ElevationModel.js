@@ -70,7 +70,8 @@ define(['../error/ArgumentError',
                 get: function () {
                     var maxTimestamp = 0;
 
-                    for (var i = 0, n = this.coverages.length; i < n; i++) {
+                    var i, len;
+                    for (i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
                         if (coverage.enabled && maxTimestamp < coverage.timestamp) {
                             maxTimestamp = coverage.timestamp;
@@ -90,7 +91,8 @@ define(['../error/ArgumentError',
                 get: function () {
                     var minElevation = Number.MAX_VALUE;
 
-                    for (var i = 0; i < this.coverages.length; i++) {
+                    var i, len;
+                    for (i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
                         if (coverage.enabled && coverage.minElevation < minElevation) {
                             minElevation = coverage.minElevation;
@@ -110,7 +112,8 @@ define(['../error/ArgumentError',
                 get: function () {
                     var maxElevation = Number.MIN_VALUE;
 
-                    for (var i = 0; i < this.coverages.length; i++) {
+                    var i, len;
+                    for (i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
                         if (coverage.enabled && maxElevation < coverage.maxElevation) {
                             maxElevation = coverage.maxElevation;
@@ -187,7 +190,7 @@ define(['../error/ArgumentError',
 
         ElevationModel.prototype.removeAllCoverages = function () {
             if (this.coverages.length > 0) {
-                this.coverages.clear();
+                this.coverages = [];
                 this.performCoverageListChangedActions();
             }
         };
@@ -272,7 +275,7 @@ define(['../error/ArgumentError',
             }
 
             var result = 0;
-            for (var i = 0, n=this.coverages.length; i < n; i++) {
+            for (var i = 0, n = this.coverages.length; i < n; i++) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var elevation = coverage.elevationAtLocation(latitude, longitude);

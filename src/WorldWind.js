@@ -46,7 +46,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/DragRecognizer',
         './render/DrawContext',
         './globe/EarthElevationCoverage',
-        './globe/EarthRestElevationModel',
+        './globe/EarthRestElevationCoverage',
         './globe/ElevationCoverage',
         './globe/ElevationModel',
         './util/Font',
@@ -289,7 +289,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               DragRecognizer,
               DrawContext,
               EarthElevationCoverage,
-              EarthRestElevationModel,
+              EarthRestElevationCoverage,
               ElevationCoverage,
               ElevationModel,
               Font,
@@ -753,7 +753,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
         WorldWind['EarthElevationCoverage'] = EarthElevationCoverage;
-        WorldWind['EarthRestElevationModel'] = EarthRestElevationModel;
+        WorldWind['EarthRestElevationCoverage'] = EarthRestElevationCoverage;
         WorldWind['ElevationCoverage'] = ElevationCoverage;
         WorldWind['ElevationModel'] = ElevationModel;
         WorldWind['Font'] = Font;
@@ -924,7 +924,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
          */
         WorldWind.configuration = {
             gpuCacheSize: 250e6,
-            baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../')
+            baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../'),
+            elevationRetrievalQueueSize: 16
         };
 
         /**
