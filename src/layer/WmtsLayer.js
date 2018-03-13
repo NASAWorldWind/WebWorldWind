@@ -204,6 +204,13 @@ define([
              * @default 1.75
              */
             this.detailControl = 1.75;
+            
+            /**
+             * Controls how many concurrent tile requests that are allowed for this layer.
+             * @type {Number}
+             * @default WorldWind.configuration.layerRetrievalQueueSize;
+             */
+            this.retrievalQueueSize = WorldWind.configuration.layerRetrievalQueueSize;            
         };
 
         /**
@@ -678,6 +685,9 @@ define([
 
         WmtsLayer.prototype.retrieveTileImage = function (dc, tile) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+                if (this.currentRetrievals.length > this.retrievalQueueSize) {
+                    return;
+                }                
                 if (this.absentResourceList.isResourceAbsent(tile.imagePath)) {
                     return;
                 }
