@@ -171,10 +171,7 @@ define([
                 this.gpuCacheKey = this.getCacheKey();
             }
 
-            var gpuResourceCache = dc.gpuResourceCache;
-            var texture = gpuResourceCache.resourceForKey(this.gpuCacheKey);
-
-            return !!texture;
+            return dc.gpuResourceCache.containsResource(this.gpuCacheKey);
         };
 
         /**
