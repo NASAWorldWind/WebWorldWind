@@ -162,6 +162,13 @@ define([
              */
             this.levels = new LevelSet(this.coverageSector, levelZeroDelta, numLevels, tileWidth, tileHeight);
 
+            /**
+             * Controls how many concurrent tile requests are allowed for this model.
+             * @type {Number}
+             * @default WorldWind.configuration.elevationRetrievalQueueSize
+             */
+            this.retrievalQueueSize = WorldWind.configuration.elevationRetrievalQueueSize;
+
             // These are internal and intentionally not documented.
             this.currentTiles = []; // holds assembled tiles
             this.currentSector = new Sector(0, 0, 0, 0); // a scratch variable
@@ -593,6 +600,11 @@ define([
         // Intentionally not documented.
         ElevationModel.prototype.retrieveTileImage = function (tile) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+
+                if (this.currentRetrievals.length >= this.retrievalQueueSize) {
+                    return;
+                }
+
                 var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
                     xhr = new XMLHttpRequest(),
                     elevationModel = this;
