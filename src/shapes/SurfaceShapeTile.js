@@ -171,10 +171,7 @@ define([
                 this.gpuCacheKey = this.getCacheKey();
             }
 
-            var gpuResourceCache = dc.gpuResourceCache;
-            var texture = gpuResourceCache.resourceForKey(this.gpuCacheKey);
-
-            return !!texture;
+            return dc.gpuResourceCache.containsResource(this.gpuCacheKey);
         };
 
         /**
@@ -219,7 +216,8 @@ define([
             var gpuResourceCache = dc.gpuResourceCache;
             var texture = new Texture(gl, canvas);
             gpuResourceCache.putResource(this.gpuCacheKey, texture, texture.size);
-
+            gpuResourceCache.setResourceAgingFactor(this.gpuCacheKey, 10);   // age this texture 10x faster than normal resources (e.g., tiles)
+            
             return texture;
         };
 
