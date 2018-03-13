@@ -17,11 +17,11 @@
  * @exports MemoryCache
  */
 define([
-        '../error/ArgumentError',
-        '../util/Logger'
-    ],
+    '../error/ArgumentError',
+    '../util/Logger'
+],
     function (ArgumentError,
-              Logger) {
+        Logger) {
         "use strict";
 
         /**
@@ -83,7 +83,7 @@ define([
              * @memberof MemoryCache.prototype
              */
             capacity: {
-                get: function() {
+                get: function () {
                     return this._capacity;
                 },
                 set: function (value) {
@@ -192,7 +192,8 @@ define([
                 key: key,
                 entry: entry,
                 size: size,
-                lastUsed: Date.now()
+                lastUsed: Date.now(),
+                agingMuliplier: 1  // 1x = normal aging
             };
 
             this.entries[key] = cacheEntry;
@@ -229,6 +230,27 @@ define([
             var cacheEntry = this.entries[key];
             if (cacheEntry) {
                 this.removeCacheEntry(cacheEntry);
+            }
+        };
+
+        /**
+         * Sets an entry's aging multiplier used to sort the entries for eviction. 
+         * A value of one is normal aging; a value of two invokes 2x aging, causing
+         * the entry to become twice as old as a normal sibling with the same 
+         * 'last used' timestamp. Setting a value of zero would be a "fountain 
+         * of youth" for an entry as it wouldn't age and thus would sort to the 
+         * bottom of the eviction queue.
+         * @param {String} key The key of the entry to modify. If null or undefined, the cache entry is not modified.
+         * @param {Number} agingMuliplier The multiplier applied to the age of the entry when sorting candidates for eviction.
+         * 
+         */
+        MemoryCache.prototype.setEntryAgingMuliplier = function (key, agingMuliplier) {
+            if (!key)
+                return;
+
+            var cacheEntry = this.entries[key];
+            if (cacheEntry) {
+                cacheEntry.agingMuliplier = agingMuliplier;
             }
         };
 
@@ -299,29 +321,51 @@ define([
 
         // Private. Clears this cache to that necessary to contain a specified amount of free space.
         MemoryCache.prototype.makeSpace = function (spaceRequired) {
-            var sortedEntries = [];
+            var sortedEntries = [],
+                now = Date.now();
 
             // Sort the entries from least recently used to most recently used, then remove the least recently used entries
             // until the cache capacity reaches the low water and the cache has enough free capacity for the required
             // space.
-
-            var sizeAtStart = this.usedCapacity;
             for (var key in this.entries) {
                 if (this.entries.hasOwnProperty(key)) {
                     sortedEntries.push(this.entries[key]);
                 }
             }
-
             sortedEntries.sort(function (a, b) {
-                return a.lastUsed - b.lastUsed;
+                var aAge = (now - a.lastUsed) * a.agingMuliplier,
+                    bAge = (now - b.lastUsed) * b.agingMuliplier;
+                return bAge - aAge;
             });
 
+            var DEBUG = false;
+            // BDS: Dump the cache in order of eviction 
+            if (DEBUG) {
+                for (var n = 0, len = sortedEntries.length; n < len; n++) {
+                    console.log(n + ": (" + sortedEntries[n].lastUsed + ") key: " + sortedEntries[n].key);
+                }
+            }
+
+            // BDS: Debugging vars 
+            if (DEBUG) {
+                var minTime = Number.MAX_VALUE, maxTime = 0;
+            }
             for (var i = 0, len = sortedEntries.length; i < len; i++) {
+                if (DEBUG) {
+                    minTime = Math.min(minTime, sortedEntries[i].lastUsed);
+                    maxTime = Math.max(maxTime, sortedEntries[i].lastUsed);
+                }
                 if (this.usedCapacity > this._lowWater || this.freeCapacity < spaceRequired) {
                     this.removeCacheEntry(sortedEntries[i]);
                 } else {
                     break;
                 }
+            }
+            // BDS: Debugging output 
+            if (DEBUG) {
+                console.log("=================");
+                console.log("AGE RANGE: " + (maxTime - minTime) + "ms, ITEMS REMOVED: " + i);
+                console.log("");
             }
         };
 
