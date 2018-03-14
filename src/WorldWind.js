@@ -224,6 +224,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec3',
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
+        './globe/WcsEarthElevationModel',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
         './formats/wkt/Wkt',
@@ -464,6 +465,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec3,
               ViewControlsLayer,
               ViewVolume,
+              WcsEarthElevationModel,
               WcsTileUrlBuilder,
               WfsCapabilities,
               Wkt,
@@ -873,6 +875,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
+        WorldWind['WcsEarthElevationModel'] = WcsEarthElevationModel;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
