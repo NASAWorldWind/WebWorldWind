@@ -185,9 +185,9 @@ define(['../util/AbsentResourceList',
             /**
              * Controls how many concurrent tile requests are allowed for this coverage.
              * @type {Number}
-             * @default WorldWind.configuration.elevationRetrievalQueueSize
+             * @default WorldWind.configuration.coverageRetrievalQueueSize
              */
-            this.retrievalQueueSize = WorldWind.configuration.elevationRetrievalQueueSize;
+            this.retrievalQueueSize = WorldWind.configuration.coverageRetrievalQueueSize;
 
             /**
              * Internal use only

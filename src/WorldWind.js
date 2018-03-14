@@ -925,7 +925,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind.configuration = {
             gpuCacheSize: 250e6,
             baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../'),
-            elevationRetrievalQueueSize: 16
+            coverageRetrievalQueueSize: 16
         };
 
         /**
