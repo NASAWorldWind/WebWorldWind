@@ -167,9 +167,9 @@ define([
             /**
              * Controls how many concurrent tile requests are allowed for this model.
              * @type {Number}
-             * @default WorldWind.configuration.elevationRetrievalQueueSize
+             * @default WorldWind.configuration.coverageRetrievalQueueSize
              */
-            this.retrievalQueueSize = WorldWind.configuration.elevationRetrievalQueueSize;
+            this.retrievalQueueSize = WorldWind.configuration.coverageRetrievalQueueSize;
 
             // These are internal and intentionally not documented.
             this.currentTiles = []; // holds assembled tiles
