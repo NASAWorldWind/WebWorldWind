@@ -52,6 +52,8 @@ define([
             // Internal. Intentionally not documented.
             this.textCredits = [];
 
+            this.hyperlinkCredits = [];
+
             // Internal. Intentionally not documented.
             this.margin = 5;
 
@@ -70,6 +72,7 @@ define([
         ScreenCreditController.prototype.clear = function () {
             this.imageCredits = [];
             this.textCredits = [];
+            this.hyperlinkCredits = [];
         };
 
         /**
@@ -101,7 +104,7 @@ define([
         /**
          * Adds a string credit to this controller.
          * @param {String} stringCredit The string to display in the credits area.
-         * @param (Color} color The color with which to draw the string.
+         * @param {Color} color The color with which to draw the string.
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
         ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
@@ -132,6 +135,47 @@ define([
             this.textCredits.push(credit);
         };
 
+        /**
+         * Adds a clickable hyperlink credit to this controller.
+         * @param {String} hyperlinkCredit The string to display in the credits area.
+         * @param {Color} color The color with which to draw the string.
+         * @param {Url} url The url where the hyperlink leads to when clicked.
+         * @throws {ArgumentError} If either the specified string or color is null or undefined.
+         */
+        ScreenCreditController.prototype.addHyperlinkCredit = function (hyperlinkCredit, color, url) {
+            if (!hyperlinkCredit) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addHyperlinkCredit", "missingText"));
+            }
+
+            if (!color) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addHyperlinkCredit", "missingColor"));
+            }
+
+            if (!url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addHyperlinkCredit", "missingUrl"));
+            }
+
+            // Verify if hyperlink credit is not already in controller, if it is, don't add it.
+            for (var i = 0, len = this.hyperlinkCredits.length; i < len; i++) {
+                if (this.hyperlinkCredits[i].text === hyperlinkCredit) {
+                    return;
+                }
+            }
+
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
+            var credit = new ScreenText(screenOffset, stringCredit);
+
+            credit.attributes.color = color;
+            credit.attributes.enableOutline = false;
+            credit.attributes.font.weight = "bold";
+            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+
+            this.hyperlinkCredits.push(credit);
+        };
+
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
             var creditOrdinal = 1,
@@ -142,6 +186,13 @@ define([
                 this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.imageCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
                 this.imageCredits[i].render(dc);
+                creditOrdinal++;
+            }
+
+            for (i = 0, len = this.hyperlinkCreditsCredits.length; i < len; i++) {
+                this.hyperlinkCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
+                this.hyperlinkCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+                this.hyperlinkCredits[i].render(dc);
                 creditOrdinal++;
             }
 
