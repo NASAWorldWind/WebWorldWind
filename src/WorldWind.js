@@ -224,6 +224,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec3',
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
+        './globe/WcsEarthElevationModel',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
         './formats/wkt/Wkt',
@@ -464,6 +465,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec3,
               ViewControlsLayer,
               ViewVolume,
+              WcsEarthElevationModel,
               WcsTileUrlBuilder,
               WfsCapabilities,
               Wkt,
@@ -873,6 +875,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
+        WorldWind['WcsEarthElevationModel'] = WcsEarthElevationModel;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
@@ -911,13 +914,15 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
          *     resources such as textures, GLSL programs and buffer objects. Default is 250e6 (250 MB).</li>
          *     <li><code>baseUrl</code>: The URL of the directory containing the WorldWind Library and its resources.</li>
          *     <li><code>layerRetrievalQueueSize</code>: The number of concurrent tile requests allowed per layer. The default is 16.</li>
+         *     <li><code>coverageRetrievalQueueSize</code>: The number of concurrent tile requests allowed per elevation coverage. The default is 16.</li>
          * </ul>
          * @type {{gpuCacheSize: number}}
          */
         WorldWind.configuration = {
             gpuCacheSize: 250e6,
             baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../'),
-            layerRetrievalQueueSize: 16
+            layerRetrievalQueueSize: 16,
+            coverageRetrievalQueueSize: 16
         };
 
         /**
