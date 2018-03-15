@@ -88,7 +88,7 @@ define([
                 var origin = new Vec3(0, 1, 2);
                 var direction = new Vec3(2, 3, 4);
                 var line = new Line(origin, direction);
-                var result = line.pointAt(5, Vec3.ZERO);
+                var result = line.pointAt(5, new Vec3());
 
                 var expectedResult = new Vec3(10, 16, 22);
                 expect(result).toEqual(expectedResult);
