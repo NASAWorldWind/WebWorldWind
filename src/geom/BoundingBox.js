@@ -318,6 +318,16 @@ define([
                 this.adjustExtremes(this.r, rExtremes, this.s, sExtremes, this.t, tExtremes, this.tmp1);
             }
 
+            // If the sector encompasses more than one hemisphere, the 3x3 grid does not capture enough detail to bound
+            // the sector. The antipodal points along the parallel through the sector's centroid represent its extremes
+            // in longitude. Incorporate those antipodal points into the extremes along each axis.
+            if (sector.deltaLongitude() > 180) {
+                globe.computePointFromPosition(sector.centroidLatitude(), sector.centroidLongitude() + 90, maxElevation, this.tmp1);
+                globe.computePointFromPosition(sector.centroidLatitude(), sector.centroidLongitude() - 90, maxElevation, this.tmp2);
+                this.adjustExtremes(this.r, rExtremes, this.s, sExtremes, this.t, tExtremes, this.tmp1);
+                this.adjustExtremes(this.r, rExtremes, this.s, sExtremes, this.t, tExtremes, this.tmp2);
+            }
+
             // Sort the axes from most prominent to least prominent. The frustum intersection methods in WWBoundingBox assume
             // that the axes are defined in this way.
             if (rExtremes[1] - rExtremes[0] < sExtremes[1] - sExtremes[0]) {
