@@ -33,6 +33,22 @@ define([
 
         MockCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
+        MockCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
+            return [this.minElevation, this.maxElevation];
+        };
+
+        MockCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
+            return this.maxElevation;
+        };
+
+        MockCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+            for (var i = 0, n = result.length; i < n; i++) {
+                result[i] = this.maxElevation;
+            }
+
+            return 1;
+        };
+
         describe("Missing parameter tests", function () {
             it("Correctly rejects calls with missing parameters", function () {
                 var elevationModel = new ElevationModel();
@@ -72,19 +88,103 @@ define([
             });
         });
 
+        describe("Elevation result tests", function () {
+            it("Returns correct min and max elevations for a sector", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    em.addCoverage(c);
+                }
+
+                var minMax = em.minAndMaxElevationsForSector("dummySector");
+                expect(minMax[0]).toEqual(-n);
+                expect(minMax[1]).toEqual(n);
+            });
+
+            it("Returns correct min and max elevations for a sector when some coverages are disabled", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    em.addCoverage(c);
+                }
+
+                em.coverages[n - 1].enabled = false;
+                em.coverages[n - 2].enabled = false;
+                var minMax = em.minAndMaxElevationsForSector("dummySector");
+                expect(minMax[0]).toEqual(-n + 2);
+                expect(minMax[1]).toEqual(n - 2);
+            });
+
+            it("Returns correct elevation for a location", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    em.addCoverage(c);
+                }
+
+                var e = em.elevationAtLocation(0, 0);
+                expect(e).toEqual(n);
+            });
+
+            it("Returns correct elevation for a location when some coverages are disabled", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    em.addCoverage(c);
+                }
+
+                em.coverages[n - 1].enabled = false;
+                em.coverages[n - 2].enabled = false;
+                var e = em.elevationAtLocation(0, 0);
+                expect(e).toEqual(n - 2);
+            });
+
+            it("Returns correct elevations for a grid", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    em.addCoverage(c);
+                }
+
+                var result = [0];
+                em.elevationsForGrid("dummySector", 1, 1, 1, result);
+                expect(result[0]).toEqual(n);
+            });
+
+            it("Returns correct elevations for a grid when some coverages are disabled", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    em.addCoverage(c);
+                }
+
+                em.coverages[n - 1].enabled = false;
+                em.coverages[n - 2].enabled = false;
+                var result = [0];
+                em.elevationsForGrid("dummySector", 1, 1, 1, result);
+                expect(result[0]).toEqual(n - 2);
+            });
+        });
+
         describe("Coverage list manipulation tests", function () {
             it("Maintains coverages in the correct order", function () {
                 var em = new ElevationModel();
                 var coverages = [];
-                var nCoverages = 12;
-                for (var i = nCoverages; i > 0; i--) {
+                var n = 12;
+                for (var i = n; i > 0; i--) {
                     var c = new MockCoverage(i);
                     em.addCoverage(c);
                     coverages.push(c);
                 }
 
-                for (i = 0; i < nCoverages; i++) {
-                    expect(coverages[nCoverages - (i + 1)] === em.coverages[i]).toBe(true);
+                for (i = 0; i < n; i++) {
+                    expect(coverages[n - (i + 1)] === em.coverages[i]).toBe(true);
                 }
             });
 
@@ -96,6 +196,72 @@ define([
                 }
                 em.removeAllCoverages();
                 expect(em.coverages.length).toEqual(0);
+            });
+
+            it("Detects coverage containment", function () {
+                var em = new ElevationModel();
+                var i, n = 12;
+                var coverages = [];
+                for (i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1);
+                    em.addCoverage(c);
+                    coverages.push(c);
+                }
+
+                for (i = 0; i < n; i++) {
+                    expect(em.containsCoverage(coverages[i])).toBe(true);
+                }
+            });
+
+            it("Removes coverages", function () {
+                var em = new ElevationModel();
+                var i, n = 12;
+                var coverages = [];
+                for (i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1);
+                    em.addCoverage(c);
+                    coverages.push(c);
+                }
+
+                var removedCoverage = coverages.splice(3, 1);
+                em.removeCoverage(removedCoverage[0]);
+                n = coverages.length;
+                expect(em.coverages.length).toEqual(n);
+                for (i = 0; i < n; i++) {
+                    expect(coverages[i] === em.coverages[i]).toBe(true);
+                }
+            });
+
+            it("Clears coverage list", function () {
+                var em = new ElevationModel();
+                for (var i = 1; i < 12; i++) {
+                    var c = new MockCoverage(i);
+                    em.addCoverage(c);
+                }
+                em.removeAllCoverages();
+                expect(em.coverages.length).toEqual(0);
+            });
+        });
+
+        describe("StateKey tests", function () {
+            it("StateKey changes due to list manipulation", function () {
+                var em = new ElevationModel();
+                var prevStateKey = em.stateKey;
+                em.addCoverage(new MockCoverage(1));
+                expect(em.stateKey).not.toEqual(prevStateKey);
+
+                prevStateKey = em.stateKey;
+                em.removeAllCoverages();
+                expect(em.stateKey).not.toEqual(prevStateKey);
+
+                prevStateKey = em.stateKey;
+                em.addCoverage(new MockCoverage(1));
+                em.addCoverage(new MockCoverage(1));
+                expect(em.stateKey).not.toEqual(prevStateKey);
+
+                prevStateKey = em.stateKey;
+                em.removeCoverage(em.coverages[0]);
+                expect(em.stateKey).not.toEqual(prevStateKey);
             });
         });
 
@@ -148,62 +314,72 @@ define([
                 expect(sortedCoverages[n - 2].timestamp).toEqual(em.timestamp);
             });
 
-            describe("Min and max elevation calculation tests", function () {
-                it("Calculates elevations correctly", function () {
-                    var em = new ElevationModel();
-                    var n=10;
-                    for (var i = 0; i < n; i++) {
-                        var c = new MockCoverage(i + 1,(Math.random()+1)*-1000,(Math.random()+1)*1000);
-                        em.addCoverage(c);
-                    }
-                    var sortedCoverages = em.coverages.slice();
-                    sortedCoverages.sort(function (c1, c2) {
-                        return c1.minElevation - c2.minElevation;
-                    });
-                    expect(sortedCoverages[0].minElevation).toEqual(em.minElevation);
+        });
 
-                    sortedCoverages.sort(function (c1, c2) {
-                        return c1.maxElevation - c2.maxElevation;
-                    });
-                    expect(sortedCoverages[n-1].maxElevation).toEqual(em.maxElevation);
+        describe("Min and max elevation calculation tests", function () {
+            it("Calculates elevations correctly", function () {
+                var em = new ElevationModel();
+                var n = 10;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, (Math.random() + 1) * -1000, (Math.random() + 1) * 1000);
+                    em.addCoverage(c);
+                }
+                var sortedCoverages = em.coverages.slice();
+                sortedCoverages.sort(function (c1, c2) {
+                    return c1.minElevation - c2.minElevation;
                 });
-                // it("Disregards elevations for disabled coverages", function () {
-                //     var em = new ElevationModel();
-                //     for (var i = 0; i < 10; i++) {
-                //         var c = new MockCoverage(i + 1,(Math.random()+1)*-1000,(Math.random()+1)*1000);
-                //         em.addCoverage(c);
-                //         c.enabled = (i % 2) > 0;
-                //     }
-                //     var sortedCoverages = em.coverages.slice();
-                //     sortedCoverages.sort(function (c1, c2) {
-                //         return c1.minElevation - c2.minElevation;
-                //     });
-                //     expect(newestCoverage.timestamp).toEqual(em.timestamp);
-                // });
-                //
-                // it("Returns correct elevations after coverage removal", function () {
-                //     var em = new ElevationModel();
-                //     var n = 10;
-                //     for (var i = 0; i < n; i++) {
-                //         var c = new MockCoverage(i + 1,(Math.random()+1)*-1000,(Math.random()+1)*1000);
-                //         em.addCoverage(c);
-                //     }
-                //     var sortedCoverages = em.coverages.slice();
-                //     sortedCoverages.sort(function (c1, c2) {
-                //         return c1.minElevation - c2.minElevation;
-                //     });
-                //     expect(sortedCoverages[n - 1].minElevation).toEqual(em.minElevation);
-                //     em.removeCoverage(sortedCoverages[n - 1]);
-                //     expect(sortedCoverages[n - 2].minElevation).toEqual(em.minElevation);
-                //
-                //     sortedCoverages = em.coverages.slice();
-                //     sortedCoverages.sort(function (c1, c2) {
-                //         return c1.maxElevation - c2.maxElevation;
-                //     });
-                //     expect(sortedCoverages[n - 1].maxElevation).toEqual(em.maxElevation);
-                //     em.removeCoverage(sortedCoverages[n - 1]);
-                //     expect(sortedCoverages[n - 2].maxElevation).toEqual(em.maxElevation);
-                // });
+                expect(sortedCoverages[0].minElevation).toEqual(em.minElevation);
+
+                sortedCoverages.sort(function (c1, c2) {
+                    return c1.maxElevation - c2.maxElevation;
+                });
+                expect(sortedCoverages[n - 1].maxElevation).toEqual(em.maxElevation);
+            });
+            it("Disregards elevations for disabled coverages", function () {
+                var em = new ElevationModel();
+                var enabledCoverages = [];
+                for (var i = 0; i < 10; i++) {
+                    var c = new MockCoverage(i + 1, (Math.random() + 1) * -1000, (Math.random() + 1) * 1000);
+                    em.addCoverage(c);
+                    c.enabled = (i % 2) > 0;
+                    if (c.enabled) {
+                        enabledCoverages.push(c);
+                    }
+                }
+                enabledCoverages.sort(function (c1, c2) {
+                    return c1.minElevation - c2.minElevation;
+                });
+                expect(enabledCoverages[0].minElevation).toEqual(em.minElevation);
+
+                enabledCoverages.sort(function (c1, c2) {
+                    return c1.maxElevation - c2.maxElevation;
+                });
+                expect(enabledCoverages[enabledCoverages.length - 1].maxElevation).toEqual(em.maxElevation);
+            });
+
+            it("Returns correct elevations after coverage removal", function () {
+                var em = new ElevationModel();
+                var n = 10;
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1, (Math.random() + 1) * -1000, (Math.random() + 1) * 1000);
+                    em.addCoverage(c);
+                }
+                var sortedCoverages = em.coverages.slice();
+                sortedCoverages.sort(function (c1, c2) {
+                    return c1.minElevation - c2.minElevation;
+                });
+                expect(sortedCoverages[0].minElevation).toEqual(em.minElevation);
+                em.removeCoverage(sortedCoverages[0]);
+                expect(sortedCoverages[1].minElevation).toEqual(em.minElevation);
+
+                sortedCoverages = em.coverages.slice();
+                n = sortedCoverages.length;
+                sortedCoverages.sort(function (c1, c2) {
+                    return c1.maxElevation - c2.maxElevation;
+                });
+                expect(sortedCoverages[n - 1].maxElevation).toEqual(em.maxElevation);
+                em.removeCoverage(sortedCoverages[n - 1]);
+                expect(sortedCoverages[n - 2].maxElevation).toEqual(em.maxElevation);
             });
         });
     });

@@ -241,7 +241,7 @@ define(['../error/ArgumentError',
 
             var result = [Number.MAX_VALUE, Number.MIN_VALUE];
 
-            for (var i = 0; i < this.coverages.length; i++) {
+            for (var i = 0, n = this.coverages.length; i < n; i++) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var coverageResult = coverage.minAndMaxElevationsForSector(sector);
@@ -264,12 +264,12 @@ define(['../error/ArgumentError',
          * @throws {ArgumentError} If the specified latitude or longitude is null or undefined.
          */
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
-            if (!latitude) {
+            if (latitude === undefined || latitude === null) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "missingLatitude"));
             }
 
-            if (!longitude) {
+            if (longitude === undefined || longitude === null) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "missingLongitude"));
             }
@@ -325,13 +325,13 @@ define(['../error/ArgumentError',
 
             var resolution = Number.MAX_VALUE;
             var coverageResult = new Float64Array(result.length);
-            for (var i = 0; i < this.coverages.length; i++) {
+            for (var i = 0, n = this.coverages.length; i < n; i++) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var coverageResolution = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, coverageResult);
                     if (coverageResolution < Number.MAX_VALUE) {
                         resolution = coverageResolution;
-                        for (var j = 0; j < result.length; j++) {
+                        for (var j = 0, len=result.length; j < len; j++) {
                             result[j] = coverageResult[j];
                         }
                     }
