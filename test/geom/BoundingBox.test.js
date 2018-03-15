@@ -129,7 +129,7 @@ define([
                 var globe = new Globe(new EarthElevationModel());
                 var minElevation = -11000; // Approximately the depth of the Marianas Trench, in meters
                 var maxElevation = 8850; // Approximately the height of the Mt. Everest, in meters
-                var boundingBox = new BoundingBox().setToSector(sector, globe, 0, 0);
+                var boundingBox = new BoundingBox().setToSector(sector, globe, minElevation, maxElevation);
 
                 var equatorialExtreme = globe.equatorialRadius + maxElevation;
                 var polarExtreme = globe.polarRadius + maxElevation;
