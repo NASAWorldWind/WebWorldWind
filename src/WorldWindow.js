@@ -1207,8 +1207,7 @@ define([
                     }
                 }
             }
-            // TODO: Following line commented out as workaround until issue #494 is addressed.
-            // dc.currentLayer = null;
+            dc.currentLayer = null;
             var now = Date.now();
             dc.frameStatistics.layerRenderingTime = now - beginTime;
         };

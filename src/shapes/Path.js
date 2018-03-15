@@ -546,9 +546,9 @@ define([
             if (this.mustDrawInterior(dc)) {
                 color = this.activeAttributes.interiorColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, numPoints);
@@ -563,9 +563,9 @@ define([
 
                 color = this.activeAttributes.outlineColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 
@@ -608,7 +608,7 @@ define([
             currentData.fillVbo = false;
 
             if (dc.pickingMode) {
-                var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, null, dc.currentLayer,
+                var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, null, this.layer,
                     false);
                 dc.resolvePick(po);
             }
