@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 define([
     'src/geom/Sector',
     'src/geom/Location',
+    'src/globe/EarthElevationCoverage',
     'src/globe/ElevationModel',
     'src/geom/BoundingBox',
     'src/geom/Vec3',
     'src/globe/Globe'
-], function (Sector, Location, ElevationModel, BoundingBox, Vec3, Globe) {
+], function (Sector, Location, EarthElevationCoverage, ElevationModel, BoundingBox, Vec3, Globe) {
     "use strict";
 
     describe("Sector Tests", function () {
@@ -360,7 +361,9 @@ define([
                 Globe.prototype.minAndMaxElevationsForSector = function (sector) {
                     return [125.0, 350.0];
                 };
-                var mockGlobe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var mockGlobe = new Globe(em);
                 var sector = new Sector(44.0, 45.0, -95.0, -94.0);
                 var boundingPoints = sector.computeBoundingPoints(mockGlobe, 1 /* verticalExaggeration */);
                 var results = [-4578078.7560, 4408178.4447, -400529.9919, -4578239.9915, 4408334.7429, -400544.0982,
@@ -385,7 +388,9 @@ define([
                 Globe.prototype.minAndMaxElevationsForSector = function (sector) {
                     return [125.0, 350.0];
                 };
-                var mockGlobe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var mockGlobe = new Globe(em);
                 var sector = new Sector(44.0, 45.0, -179, 179.0);
                 var boundingPoints = sector.computeBoundingPoints(mockGlobe, 1 /* verticalExaggeration */);
                 var results = [-80203.6904, 4408178.4447, -4594866.3461, -80206.5151, 4408334.7429, -4595028.1729,
@@ -412,7 +417,9 @@ define([
                 Globe.prototype.minAndMaxElevationsForSector = function (sector) {
                     return [125.0, 350.0];
                 };
-                var mockGlobe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var mockGlobe = new Globe(em);
                 var sector = new Sector(44.0, 45.0, -180, 180.0);
                 var boundingPoints = sector.computeBoundingPoints(mockGlobe, 1 /* verticalExaggeration */);
                 var results = [-0.0000, 4408178.4447, -4595566.2731, -0.0000, 4408334.7429, -4595728.1245,
@@ -441,7 +448,9 @@ define([
                 Globe.prototype.minAndMaxElevationsForSector = function (sector) {
                     return [125.0, 350.0];
                 };
-                var mockGlobe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var mockGlobe = new Globe(em);
                 var sector = new Sector(-45.0, -44.0, -95.0, -94.0);
                 var boundingPoints = sector.computeBoundingPoints(mockGlobe, 1 /* verticalExaggeration */);
                 var results = [-4500488.1337, -4487436.7972, -393741.6920, -4500646.6273, -4487595.8962, -393755.5584,
@@ -466,7 +475,9 @@ define([
                 Globe.prototype.minAndMaxElevationsForSector = function (sector) {
                     return [125.0, 350.0];
                 };
-                var mockGlobe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var mockGlobe = new Globe(em);
                 var sector = new Sector(-10.0, 10.0, -95.0, -94.0);
                 var boundingPoints = sector.computeBoundingPoints(mockGlobe, 1 /* verticalExaggeration */);
                 var results = [-6258091.0395, -1100270.2538, -547512.0213, -6258311.7780, -1100309.3246, -547531.3334,

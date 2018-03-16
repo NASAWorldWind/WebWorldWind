@@ -120,8 +120,11 @@ define([
                     this.handleWheelEvent(e);
                 }
                 else {
-                    for (var i = 0; i < GestureRecognizer.allRecognizers.length; i++) {
-                        handled |= GestureRecognizer.allRecognizers[i].onGestureEvent(e); // use or-assignment to indicate if any recognizer handled the event
+                    for (var i = 0, len = GestureRecognizer.allRecognizers.length; i < len; i++) {
+                        var recognizer = GestureRecognizer.allRecognizers[i];
+                        if (recognizer.target === this.wwd) {
+                            handled |= recognizer.onGestureEvent(e); // use or-assignment to indicate if any recognizer handled the event
+                        }
                     }
                 }
             }

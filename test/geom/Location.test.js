@@ -16,9 +16,10 @@
 define([
     'src/geom/Location',
     'src/geom/Angle',
-    'src/globe/Globe',
-    'src/globe/ElevationModel'
-], function (Location, Angle, Globe, ElevationModel) {
+    'src/globe/EarthElevationCoverage',
+    'src/globe/ElevationModel',
+    'src/globe/Globe'
+], function (Location, Angle, EarthElevationCoverage, ElevationModel, Globe) {
     "use strict";
 
     describe("Location Tests", function () {
@@ -659,7 +660,9 @@ define([
             it('Meridian intersected', function () {
                 var locationA = new Location(-120, 15.08);
                 var locationB = new Location(87.00, 25.12);
-                var globe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var globe = new Globe(em);
 
                 var intersection = Location.intersectionWithMeridian(locationA, locationB, 180, globe);
                 expect(intersection).toBeCloseTo(-54.824);
@@ -669,7 +672,9 @@ define([
             it('Meridian not intersected', function () {
                 var locationA = new Location(37.52, 15.08);
                 var locationB = new Location(87.00, 25.12);
-                var globe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var globe = new Globe(em);
 
                 var intersection = Location.intersectionWithMeridian(locationA, locationB, 180, globe);
                 expect(intersection).toEqual(null);

@@ -1544,9 +1544,10 @@ define([
                 this.textRenderer.outlineColor = textAttributes.outlineColor;
                 this.textRenderer.outlineWidth = textAttributes.outlineWidth;
                 texture = this.textRenderer.renderText(text);
+                this.gpuResourceCache.putResource(textureKey, texture, texture.size);
+                this.gpuResourceCache.setResourceAgingFactor(textureKey, 100);  // age this texture 100x faster than normal resources (e.g., tiles)
             }
 
-            this.gpuResourceCache.putResource(textureKey, texture, texture.size);
             return texture;
         };
 

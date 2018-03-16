@@ -48,14 +48,19 @@ requirejs(['./WorldWindShim',
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
-        var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
+        var resourceUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
 
-        var geoTiffObject = new WorldWind.GeoTiffReader(resourcesUrl);
+        // Define a parser completion callback
+        var parserCallback = function (geoTiffReader, xhrStatus) {
+            if (!geoTiffReader) {
+                // Error, provide the status text to the console
+                console.log(xhrStatus);
+                return;
+            }
 
-        var geoTiffImage = geoTiffObject.readAsImage(function (canvas) {
             var surfaceGeoTiff = new WorldWind.SurfaceImage(
-                geoTiffObject.metadata.bbox,
-                new WorldWind.ImageSource(canvas)
+                geoTiffReader.metadata.bbox,
+                new WorldWind.ImageSource(geoTiffReader.getImage())
             );
 
             geoTiffLayer.addRenderable(surfaceGeoTiff);
@@ -67,5 +72,8 @@ requirejs(['./WorldWindShim',
             wwd.redraw();
 
             wwd.goTo(new WorldWind.Position(43.69, 28.54, 55000));
-        });
+        };
+
+        // Load the GeoTiff using the Reader's built in XHR retrieval function
+        WorldWind.GeoTiffReader.retrieveFromUrl(resourceUrl, parserCallback);
     });

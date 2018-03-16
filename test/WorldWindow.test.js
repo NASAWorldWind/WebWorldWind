@@ -61,6 +61,7 @@ define([
     wwd.depthBits = 24;
     wwd.scratchModelview = Matrix.fromIdentity();
     wwd.scratchProjection = Matrix.fromIdentity();
+    wwd.layers = [];
     wwd.resetDrawContext();
 
     describe("WorldWindow Tests", function () {

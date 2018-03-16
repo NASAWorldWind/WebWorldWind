@@ -57,7 +57,7 @@ define([
 
         OpenStreetMapImageLayer.prototype.doRender = function (dc) {
 
-            this.configureLayer();
+            this.configureLayer(dc);
 
             if (this.layer) {
                 this.layer.opacity = this.opacity;
@@ -74,19 +74,25 @@ define([
             }
         };
 
-        OpenStreetMapImageLayer.prototype.configureLayer = function () {
+        OpenStreetMapImageLayer.prototype.configureLayer = function (dc) {
             if (!this.xhr) {
                 var self = this;
+                var canvas = dc.currentGlContext.canvas;
                 this.xhr = new XMLHttpRequest();
                 this.xhr.open("GET", "https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml", true);
                 this.xhr.onreadystatechange = function () {
                     if (self.xhr.readyState === 4) {
                         if (self.xhr.status === 200) {
+                            // Create a layer from the WMTS capabilities.
                             var wmtsCapabilities = new WmtsCapabilities(self.xhr.responseXML);
                             var wmtsLayerCapabilities = wmtsCapabilities.getLayer("osm");
                             var wmtsConfig = WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
                             wmtsConfig.title = self.displayName;
                             self.layer = new WmtsLayer(wmtsConfig);
+                            // Send an event to request a redraw.
+                            var e = document.createEvent('Event');
+                            e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                            canvas.dispatchEvent(e);
                         } else {
                             Logger.log(Logger.LEVEL_WARNING,
                                 "OSM retrieval failed (" + xhr.statusText + "): " + url);
