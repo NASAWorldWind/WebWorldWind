@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 define([
         './geom/Angle',
         './error/ArgumentError',
+        './gesture/ClickRecognizer',
         './gesture/DragRecognizer',
         './gesture/GestureRecognizer',
         './util/Logger',
@@ -27,6 +28,7 @@ define([
         './gesture/PinchRecognizer',
         './geom/Position',
         './gesture/RotationRecognizer',
+        './gesture/TapRecognizer',
         './gesture/TiltRecognizer',
         './geom/Vec2',
         './geom/Vec3',
@@ -35,6 +37,7 @@ define([
     ],
     function (Angle,
               ArgumentError,
+              ClickRecognizer,
               DragRecognizer,
               GestureRecognizer,
               Logger,
@@ -43,6 +46,7 @@ define([
               PinchRecognizer,
               Position,
               RotationRecognizer,
+              TapRecognizer,
               TiltRecognizer,
               Vec2,
               Vec3,
@@ -100,6 +104,14 @@ define([
             this.rotationRecognizer.requireRecognizerToFail(this.tiltRecognizer);
 
             // Intentionally not documented.
+            this.tapRecognizer = new TapRecognizer(this.wwd, null);
+            this.tapRecognizer.addListener(this);
+
+            // Intentionally not documented.
+            this.clickRecognizer = new ClickRecognizer(this.wwd, null);
+            this.clickRecognizer.addListener(this);
+
+            // Intentionally not documented.
             this.beginPoint = new Vec2(0, 0);
             this.lastPoint = new Vec2(0, 0);
             this.beginHeading = 0;
@@ -148,6 +160,28 @@ define([
             }
             else if (recognizer === this.tiltRecognizer) {
                 this.handleTilt(recognizer);
+            }
+            else if (recognizer === this.clickRecognizer || recognizer === this.tapRecognizer) {
+                this.handleClickOrTap(recognizer);
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.handleClickOrTap = function (recognizer) {
+            if (recognizer.state === WorldWind.RECOGNIZED) {
+                var pickPoint = this.wwd.canvasCoordinates(recognizer.clientX, recognizer.clientY);
+
+                var pickList = this.wwd.pick(pickPoint);
+                for (var p = 0, n = pickList.objects.length; p < n; p++) {
+                    var pickedObject = pickList.objects[p];
+                    if (!pickedObject.isTerrain) {
+                        console.log(pickedObject.userObject);
+                        // Identify picked objects that have URLs here.
+                        // if (pickedObject.userObject.url) {
+                        //     window.open(pickedObject.userObject.url, "_blank");
+                        // }
+                    }
+                }
             }
         };
 
