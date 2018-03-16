@@ -96,7 +96,7 @@ define(['../error/ArgumentError',
              */
             minTimestamp: {
                 get: function () {
-                    var minTimestamp = 0;
+                    var minTimestamp = Number.MAX_VALUE;
 
                     var i, len;
                     for (i = 0, len = this.coverages.length; i < len; i++) {
@@ -292,16 +292,17 @@ define(['../error/ArgumentError',
          * @throws ArgumentError if the specified index is null or undefined.
          */
         ElevationModel.prototype.removeCoverageAtIndex = function (index) {
-            if (index === undefined || index === null) {
+            if (index === undefined || index === null || index < 0) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "insertCoverage", "invalidIndex"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "removeCoverageAtIndex", "invalidIndex"));
             }
 
-            if (index < 0 || index >= this.coverages.length) {
-                return;
+            if (index >= this.coverages.length - 1) {
+                this.coverages.pop();
             }
-
-            this.coverages.splice(index, 1);
+            else {
+                this.coverages.splice(index, 1);
+            }
             this.performCoverageListChangedActions();
         };
 

@@ -62,6 +62,9 @@ define([
                     elevationModel.removeCoverage();
                 }).toThrow();
                 expect(function () {
+                    elevationModel.removeCoverageAtIndex();
+                }).toThrow();
+                expect(function () {
                     elevationModel.elevationAtLocation();
                 }).toThrow();
                 expect(function () {
@@ -85,11 +88,17 @@ define([
                 expect(function () {
                     elevationModel.minAndMaxElevationsForSector();
                 }).toThrow();
+                expect(function () {
+                    elevationModel.insertCoverage();
+                }).toThrow();
+                expect(function () {
+                    elevationModel.insertCoverage(0);
+                }).toThrow();
             });
         });
 
         describe("Elevation result tests", function () {
-            it("Returns correct min and max elevations for a sector", function () {
+            it("Returns correct min and max elevations for a sector, respects unsorted coverages", function () {
                 var n = 12;
                 for (var t = 0; t < 2; t++) {
                     var em = new ElevationModel();
@@ -177,18 +186,61 @@ define([
         });
 
         describe("Coverage list manipulation tests", function () {
-            it("Maintains coverages in the correct order", function () {
+            it("Maintains coverages in the correct order, respecting the sortCoverages flag", function () {
+                var n = 12;
+                for (var t = 0; t < 2; t++) {
+                    var em = new ElevationModel();
+                    var coverages = [];
+                    em.sortCoverages = (t === 0);
+                    for (var i = n; i > 0; i--) {
+                        var c = new MockCoverage(i);
+                        em.addCoverage(c);
+                        coverages.push(c);
+                    }
+
+                    for (i = 0; i < n; i++) {
+                        var index = em.sortCoverages ? n - (i + 1) : i;
+                        expect(coverages[index] === em.coverages[i]).toBe(true);
+                    }
+                }
+            });
+
+            it("Rejects duplicate coverages", function () {
                 var em = new ElevationModel();
                 var coverages = [];
-                var n = 12;
-                for (var i = n; i > 0; i--) {
-                    var c = new MockCoverage(i);
-                    em.addCoverage(c);
-                    coverages.push(c);
+                em.sortCoverages = false;
+                var n = 12, c;
+                for (var t = 0; t < 2; t++) {
+                    var expectedResult = (t === 0);
+                    for (var i = 0; i < n; i++) {
+                        if (expectedResult) {
+                            c = new MockCoverage(i + 1);
+                            coverages.push(c);
+                        } else {
+                            c = coverages[i];
+                        }
+                        expect(em.insertCoverage(0, c)).toBe(expectedResult);
+                        expect(em.addCoverage(c)).toBe(false);
+                    }
+                }
+            });
+
+            it("Inserts coverages at the correct index", function () {
+                var em = new ElevationModel();
+                var coverages = [];
+                em.sortCoverages = false;
+                var n = 12, c;
+                for (var t = 0; t < 2; t++) {
+                    for (var i = 0; i < n; i++) {
+                        c = new MockCoverage(i + 1);
+                        em.insertCoverage(i, c);
+                        coverages.push(c);
+                    }
                 }
 
                 for (i = 0; i < n; i++) {
-                    expect(coverages[n - (i + 1)] === em.coverages[i]).toBe(true);
+                    expect(coverages[i] === em.coverages[i + n]).toBe(true);
+                    expect(coverages[i + n] === em.coverages[i]).toBe(true);
                 }
             });
 
@@ -236,6 +288,27 @@ define([
                 }
             });
 
+            it("Removes coverages using indices", function () {
+                var em = new ElevationModel();
+                var i, n = 12;
+                var coverages = [];
+                for (i = 0; i < n; i++) {
+                    var c = new MockCoverage(i + 1);
+                    em.addCoverage(c);
+                    coverages.push(c);
+                }
+
+                for (i = n - 1; i >= 0; i -= 2) {
+                    em.removeCoverageAtIndex(i);
+                }
+
+                expect(em.coverages.length).toEqual(n / 2);
+                for (i = 0; i < n; i += 2) {
+                    expect(coverages[i] === em.coverages[i / 2]).toBe(true);
+                }
+
+            });
+
             it("Clears coverage list", function () {
                 var em = new ElevationModel();
                 for (var i = 1; i < 12; i++) {
@@ -272,7 +345,7 @@ define([
         describe("Timestamp calculation tests", function () {
             it("Calculates timestamp correctly", function () {
                 var em = new ElevationModel();
-                var newestCoverage;
+                var newestCoverage, oldestCoverage;
                 for (var i = 0; i < 10; i++) {
                     var c = new MockCoverage(i + 1);
                     em.addCoverage(c);
@@ -280,14 +353,18 @@ define([
                     if (!newestCoverage || newestCoverage.timestamp < c.timestamp) {
                         newestCoverage = c;
                     }
+                    if (!oldestCoverage || oldestCoverage.timestamp > c.timestamp) {
+                        oldestCoverage = c;
+                    }
                 }
 
-                expect(newestCoverage.timestamp).toEqual(em.timestamp);
+                expect(oldestCoverage.timestamp).toEqual(em.minTimestamp);
+                expect(newestCoverage.timestamp).toEqual(em.maxTimestamp);
             });
 
             it("Disregards timestamp for disabled coverages", function () {
                 var em = new ElevationModel();
-                var newestCoverage;
+                var newestCoverage, oldestCoverage;
                 for (var i = 0; i < 10; i++) {
                     var c = new MockCoverage(i + 1);
                     em.addCoverage(c);
@@ -296,9 +373,13 @@ define([
                     if (c.enabled && (!newestCoverage || newestCoverage.timestamp < c.timestamp)) {
                         newestCoverage = c;
                     }
+                    if (c.enabled && (!oldestCoverage || oldestCoverage.timestamp > c.timestamp)) {
+                        oldestCoverage = c;
+                    }
                 }
 
-                expect(newestCoverage.timestamp).toEqual(em.timestamp);
+                expect(oldestCoverage.timestamp).toEqual(em.minTimestamp);
+                expect(newestCoverage.timestamp).toEqual(em.maxTimestamp);
             });
 
             it("Returns correct timestamp after coverage removal", function () {
@@ -313,9 +394,17 @@ define([
                 sortedCoverages.sort(function (c1, c2) {
                     return c1.timestamp - c2.timestamp;
                 });
-                expect(sortedCoverages[n - 1].timestamp).toEqual(em.timestamp);
-                em.removeCoverage(sortedCoverages[n - 1]);
-                expect(sortedCoverages[n - 2].timestamp).toEqual(em.timestamp);
+                expect(sortedCoverages[0].timestamp).toEqual(em.minTimestamp);
+                em.removeCoverage(sortedCoverages[0]);
+                expect(sortedCoverages[1].timestamp).toEqual(em.minTimestamp);
+
+                sortedCoverages = em.coverages.slice();
+                sortedCoverages.sort(function (c1, c2) {
+                    return c2.timestamp - c1.timestamp;
+                });
+                expect(sortedCoverages[0].timestamp).toEqual(em.maxTimestamp);
+                em.removeCoverage(sortedCoverages[0]);
+                expect(sortedCoverages[1].timestamp).toEqual(em.maxTimestamp);
             });
 
         });
