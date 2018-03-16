@@ -90,16 +90,20 @@ define([
 
         describe("Elevation result tests", function () {
             it("Returns correct min and max elevations for a sector", function () {
-                var em = new ElevationModel();
                 var n = 12;
-                for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
-                    em.addCoverage(c);
-                }
+                for (var t = 0; t < 2; t++) {
+                    var em = new ElevationModel();
+                    em.sortCoverages = (t === 0);
+                    for (var i = 0; i < n; i++) {
+                        var nLevels = em.sortCoverages ? i + 1 : n - i;
+                        var c = new MockCoverage(nLevels, -i - 1, i + 1);
+                        em.addCoverage(c);
+                    }
 
-                var minMax = em.minAndMaxElevationsForSector("dummySector");
-                expect(minMax[0]).toEqual(-n);
-                expect(minMax[1]).toEqual(n);
+                    var minMax = em.minAndMaxElevationsForSector("dummySector");
+                    expect(minMax[0]).toEqual(-n);
+                    expect(minMax[1]).toEqual(n);
+                }
             });
 
             it("Returns correct min and max elevations for a sector when some coverages are disabled", function () {

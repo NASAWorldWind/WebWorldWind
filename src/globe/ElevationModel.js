@@ -49,6 +49,13 @@ define(['../error/ArgumentError',
             this.stateKey = "";
 
             /**
+             * A boolean indicating whether or not to sort coverages by resolution (coarsest to finest).
+             * @memberof ElevationModel.prototype
+             * @type {Boolean}
+             */
+            this.sortCoverages = true;
+
+            /**
              * Internal use only
              * The list of all elevation coverages useable by this model.
              * @type {Array}
@@ -66,7 +73,7 @@ define(['../error/ArgumentError',
              * @type {Number}
              * @readonly
              */
-            timestamp: {
+            maxTimestamp: {
                 get: function () {
                     var maxTimestamp = 0;
 
@@ -79,6 +86,27 @@ define(['../error/ArgumentError',
                     }
 
                     return maxTimestamp;
+                }
+            },
+
+            /**
+             * Returns the time of the oldest coverage, in milliseconds since midnight Jan 1, 1970.
+             * @type {Number}
+             * @readonly
+             */
+            minTimestamp: {
+                get: function () {
+                    var minTimestamp = 0;
+
+                    var i, len;
+                    for (i = 0, len = this.coverages.length; i < len; i++) {
+                        var coverage = this.coverages[i];
+                        if (coverage.enabled && minTimestamp > coverage.timestamp) {
+                            minTimestamp = coverage.timestamp;
+                        }
+                    }
+
+                    return minTimestamp;
                 }
             },
 
@@ -157,20 +185,25 @@ define(['../error/ArgumentError',
             return res1 > res2 ? -1 : res1 === res2 ? 0 : 1;
         };
 
+        /**
+         * Internal use only
+         * Perform common actions required when the list of available coverages changes.
+         * @ignore
+         */
         ElevationModel.prototype.performCoverageListChangedActions = function () {
-            if (this.coverages.length > 1) {
+            if (this.coverages.length > 1 && this.sortCoverages) {
                 this.coverages.sort(this.coverageComparator);
             }
             this.computeStateKey();
         };
 
         /**
-         * Adds an elevation coverage to this elevation model. The list of elevation coverages for this class is sorted from
-         * lowest resolution to highest. This method inserts the specified elevation elevation at the appropriate position in
-         * the list, and as a side effect resorts the entire list.
+         * Adds an elevation coverage to this elevation model and, optionally, sorts the list. Sorting occurs based on the
+         * value of the ElevationModel.sortCoverages property. If sorting is disabled the coverage is added to the end
+         * of the coverage list. Duplicate coverages will be ignored.
          *
          * @param coverage The elevation model to add.
-         *
+         * @return {Boolean} true if the ElevationCoverage as added; false if the coverage was a duplicate.
          * @throws ArgumentError if the specified elevation coverage is null.
          */
         ElevationModel.prototype.addCoverage = function (coverage) {
@@ -188,6 +221,43 @@ define(['../error/ArgumentError',
             return false;
         };
 
+        /**
+         * Inserts an elevation coverage at a specific index in this elevation model. If the sortCoverages property of
+         * this class is true, the effect of insertCoverage will be identical to addCoverage. Duplicate coverages will be ignored.
+         *
+         * @param index The position in the list to insert the coverage.
+         * @param coverage The elevation model to add.
+         * @return {Boolean} true if the ElevationCoverage as added; false if the coverage was a duplicate.
+         * @throws ArgumentError if the specified elevation coverage is null.
+         */
+        ElevationModel.prototype.insertCoverage = function (index, coverage) {
+            if (index === undefined || index === null || index < 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "insertCoverage", "invalidIndex"));
+            }
+
+            if (!coverage) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "insertCoverage", "missingCoverage"));
+            }
+
+            if (!this.containsCoverage(coverage)) {
+                if (index >= this.coverages.length) {
+                    this.coverages.push(coverage);
+                }
+                else {
+                    this.coverages.splice(index, 0, coverage);
+                }
+                this.performCoverageListChangedActions();
+                return true;
+            }
+
+            return false;
+        };
+
+        /**
+         * Removes all elevation coverages from this elevation model.
+         */
         ElevationModel.prototype.removeAllCoverages = function () {
             if (this.coverages.length > 0) {
                 this.coverages = [];
@@ -195,6 +265,13 @@ define(['../error/ArgumentError',
             }
         };
 
+        /**
+         * Removes a specific elevation coverage from this elevation model.
+         *
+         * @param coverage The elevation model to remove.
+         *
+         * @throws ArgumentError if the specified elevation coverage is null.
+         */
         ElevationModel.prototype.removeCoverage = function (coverage) {
             if (!coverage) {
                 throw new ArgumentError(
@@ -209,12 +286,30 @@ define(['../error/ArgumentError',
         };
 
         /**
+         * Removes the elevation coverage at the specified index from this elevation model.
+         *
+         * @param index The index of the elevation coverage to remove.
+         * @throws ArgumentError if the specified index is null or undefined.
+         */
+        ElevationModel.prototype.removeCoverageAtIndex = function (index) {
+            if (index === undefined || index === null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "insertCoverage", "invalidIndex"));
+            }
+
+            if (index < 0 || index >= this.coverages.length) {
+                return;
+            }
+
+            this.coverages.splice(index, 1);
+            this.performCoverageListChangedActions();
+        };
+
+        /**
          * Returns true if this ElevationModel contains the specified ElevationCoverage, and false otherwise.
          *
          * @param coverage the ElevationCoverage to test.
-         *
-         * @return {Boolean} if the ElevationCoverage is in this ElevationModel; false otherwise.
-         *
+         * @return {Boolean} true if the ElevationCoverage is in this ElevationModel; false otherwise.
          * @throws ArgumentError if the ElevationCoverage is null.
          */
         ElevationModel.prototype.containsCoverage = function (coverage) {
@@ -331,7 +426,7 @@ define(['../error/ArgumentError',
                     var coverageResolution = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, coverageResult);
                     if (coverageResolution < Number.MAX_VALUE) {
                         resolution = coverageResolution;
-                        for (var j = 0, len=result.length; j < len; j++) {
+                        for (var j = 0, len = result.length; j < len; j++) {
                             result[j] = coverageResult[j];
                         }
                     }
