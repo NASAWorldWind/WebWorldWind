@@ -43,7 +43,7 @@ define([
          * @augments Layer
          * @classdesc Collects and displays screen credits.
          */
-        var ScreenCreditController = function () {
+        var ScreenCreditController = function (worldwindow) {
             Layer.call(this, "ScreenCreditController");
 
             // Internal. Intentionally not documented.
@@ -52,13 +52,13 @@ define([
             // Internal. Intentionally not documented.
             this.textCredits = [];
 
-            this.hyperlinkCredits = [];
-
             // Internal. Intentionally not documented.
             this.margin = 5;
 
             // Internal. Intentionally not documented.
             this.creditSpacing = 21;
+
+            this.wwd = worldwindow;
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
@@ -72,7 +72,6 @@ define([
         ScreenCreditController.prototype.clear = function () {
             this.imageCredits = [];
             this.textCredits = [];
-            this.hyperlinkCredits = [];
         };
 
         /**
@@ -107,7 +106,7 @@ define([
          * @param {Color} color The color with which to draw the string.
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
-        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
+        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color, url) {
             if (!stringCredit) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
@@ -128,6 +127,12 @@ define([
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenText(screenOffset, stringCredit);
 
+            if(url){
+                // Append new user property to store URL
+                credit.userProperties.url = url;
+                credit.pickDelegate = credit.userProperties;
+            }
+
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
             credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
@@ -135,46 +140,27 @@ define([
             this.textCredits.push(credit);
         };
 
-        /**
-         * Adds a clickable hyperlink credit to this controller.
-         * @param {String} hyperlinkCredit The string to display in the credits area.
-         * @param {Color} color The color with which to draw the string.
-         * @param {Url} url The url where the hyperlink leads to when clicked.
-         * @throws {ArgumentError} If either the specified string or color is null or undefined.
-         */
-        ScreenCreditController.prototype.addHyperlinkCredit = function (hyperlinkCredit, color, url) {
-            if (!hyperlinkCredit) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addHyperlinkCredit", "missingText"));
+        ScreenCreditController.prototype.onGestureEvent = function (e) {
+            if (e.type !== "pointerdown") {
+                return false;
             }
+            var pickPoint = this.wwd.canvasCoordinates(e.clientX, e.clientY);
 
-            if (!color) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addHyperlinkCredit", "missingColor"));
-            }
-
-            if (!url) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addHyperlinkCredit", "missingUrl"));
-            }
-
-            // Verify if hyperlink credit is not already in controller, if it is, don't add it.
-            for (var i = 0, len = this.hyperlinkCredits.length; i < len; i++) {
-                if (this.hyperlinkCredits[i].text === hyperlinkCredit) {
-                    return;
+            var pickList = this.wwd.pick(pickPoint);
+            if (pickList.objects.length > 0) {
+                for (var p = 0; p < pickList.objects.length; p++) {
+                    var pickedObject = pickList.objects[p];
+                    if (!pickedObject.isTerrain) {
+                        if (pickedObject.userObject.url) {
+                            window.open(pickedObject.userObject.url, "_blank");
+                            return true;
+                        }
+                    }
                 }
             }
-
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
-            var credit = new ScreenText(screenOffset, stringCredit);
-
-            credit.attributes.color = color;
-            credit.attributes.enableOutline = false;
-            credit.attributes.font.weight = "bold";
-            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
-
-            this.hyperlinkCredits.push(credit);
+            return false;
         };
+
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
@@ -186,13 +172,6 @@ define([
                 this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
                 this.imageCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
                 this.imageCredits[i].render(dc);
-                creditOrdinal++;
-            }
-
-            for (i = 0, len = this.hyperlinkCreditsCredits.length; i < len; i++) {
-                this.hyperlinkCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.hyperlinkCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
-                this.hyperlinkCredits[i].render(dc);
                 creditOrdinal++;
             }
 

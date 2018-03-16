@@ -18,11 +18,13 @@
  */
 define([
         '../geom/Angle',
+        '../util/Color',
         '../geom/Location',
         '../geom/Sector',
         '../layer/MercatorTiledImageLayer'
     ],
     function (Angle,
+              Color,
               Location,
               Sector,
               MercatorTiledImageLayer) {
@@ -59,6 +61,7 @@ define([
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
+                dc.screenCreditController.addStringCredit("Link to bing maps", Color.DARK_GRAY, "https://www.bing.com/maps");
                 dc.screenCreditController.addImageCredit(this.creditImage);
             }
         };
