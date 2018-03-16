@@ -21,9 +21,7 @@ requirejs(['./WorldWindShim',
 
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // var elevationModel = new WorldWind.ElevationModel();
-        // elevationModel.addCoverage(new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0"));
-        var wwd = new WorldWind.WorldWindow("canvasOne"); //,elevationModel);
+        var wwd = new WorldWind.WorldWindow("canvasOne");
 
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
