@@ -672,7 +672,7 @@ define([
                 refPoint);
 
             var screenRefPoint = new Vec3(0, 0, 0);
-            this.worldWindow.drawContext.navigatorState.project(refPoint, screenRefPoint);
+            this.worldWindow.drawContext.project(refPoint, screenRefPoint);
 
             // Compute screen-coord delta since last event.
             var dx = event.clientX - this.lastX;
@@ -685,8 +685,7 @@ define([
             var x = screenRefPoint[0] + dx;
             var y = this.worldWindow.canvas.height - screenRefPoint[1] + dy;
 
-            var ray = this.worldWindow.drawContext.navigatorState.rayFromScreenPoint(
-                new Vec2(x, y));
+            var ray = this.worldWindow.rayThroughScreenPoint(new Vec2(x, y));
 
             var intersection = new Vec3(0, 0, 0);
             if (this.worldWindow.globe.intersectsLine(ray, intersection)) {
