@@ -14,41 +14,41 @@
  * limitations under the License.
  */
 /**
- * @exports ZeroElevationModel
+ * @exports ZeroElevationCoverage
  */
 define([
         '../error/ArgumentError',
-        '../globe/ElevationModel',
         '../geom/Location',
         '../util/Logger',
-        '../geom/Sector'],
+        '../geom/Sector',
+        '../globe/TiledElevationCoverage'],
     function (ArgumentError,
-              ElevationModel,
               Location,
               Logger,
-              Sector) {
+              Sector,
+              TiledElevationCoverage) {
         "use strict";
 
         /**
-         * Constructs a Zero elevation model whose elevations are zero at every location.
-         * @alias ZeroElevationModel
+         * Constructs a Zero elevation coverage whose elevations are zero at every location.
+         * @alias ZeroElevationCoverage
          * @constructor
-         * @classdesc Represents an elevation model whose elevations are zero at all locations.
-         * @augments ElevationModel
+         * @classdesc Represents an elevation coverage whose elevations are zero at all locations.
+         * @augments TiledElevationCoverage
          */
-        var ZeroElevationModel = function () {
-            ElevationModel.call(this, Sector.FULL_SPHERE, new Location(45, 45), 1, " ", " ", 150, 150);
+        var ZeroElevationCoverage = function () {
+            TiledElevationCoverage.call(this, Sector.FULL_SPHERE, new Location(45, 45), 1, " ", " ", 150, 150);
 
             /**
-             * Indicates this elevation model's display name.
+             * Indicates this elevation coverage's display name.
              * @type {string}
              * @default "Zero Elevations"
              */
             this.displayName = "Zero Elevations";
 
             /**
-             * Indicates the last time this elevation model changed. Since a zero elevation model never changes, this
-             * property always returns the date and time at which the elevation model was constructed, in milliseconds
+             * Indicates the last time this elevation coverage changed. Since a zero elevation coverage never changes, this
+             * property always returns the date and time at which the elevation coverage was constructed, in milliseconds
              * since midnight Jan 1, 1970.
              * @type {number}
              * @default Date.getTime() at construction
@@ -57,7 +57,7 @@ define([
             this.timestamp = Date.now();
 
             /**
-             * This elevation model's minimum elevation, which is always 0.
+             * This elevation coverage's minimum elevation, which is always 0.
              * @type {number}
              * @default 0
              * @readonly
@@ -65,7 +65,7 @@ define([
             this.minElevation = 0;
 
             /**
-             * This elevation model's maximum elevation, which is always 0.
+             * This elevation coverage's maximum elevation, which is always 0.
              * @type {number}
              * @default 0
              * @readonly
@@ -73,15 +73,15 @@ define([
             this.maxElevation = 0;
         };
 
-        // Inherit from the abstract elevation model class.
-        ZeroElevationModel.prototype = Object.create(ElevationModel.prototype);
+        // Inherit from the abstract elevation coverage class.
+        ZeroElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
         /**
          * Returns minimum and maximum elevations of 0.
          * @param {Sector} sector The sector for which to determine extreme elevations.
          * @returns {Number[]} An array containing minimum and maximum elevations of 0.
          */
-        ZeroElevationModel.prototype.minAndMaxElevationsForSector = function (sector) {
+        ZeroElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
             return [0, 0];
         };
 
@@ -91,12 +91,12 @@ define([
          * @param {Number} longitude The location's longitude in degrees.
          * @returns {Number} 0.
          */
-        ZeroElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
+        ZeroElevationCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
             return 0;
         };
 
         /**
-         * Returns the elevations at locations within a specified sector. For this elevation model they are all 0.
+         * Returns the elevations at locations within a specified sector. For this elevation coverage they are all 0.
          * @param {Sector} sector The sector for which to determine the elevations.
          * @param {Number} numLat The number of latitudinal sample locations within the sector.
          * @param {Number} numLon The number of longitudinal sample locations within the sector.
@@ -109,19 +109,19 @@ define([
          * specified numLat or numLon values is less than 1, or the result array is not of sufficient length
          * to hold numLat x numLon values.
          */
-        ZeroElevationModel.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        ZeroElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
             if (!sector) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ZeroElevationModel", "elevationsForSector", "missingSector"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ZeroElevationCoverage", "elevationsForSector", "missingSector"));
             }
 
             if (numLat <= 0 || numLon <= 0) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ZeroElevationModel",
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ZeroElevationCoverage",
                     "elevationsForSector", "numLat or numLon is less than 1"));
             }
 
             if (!result || result.length < numLat * numLon) {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ZeroElevationModel",
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ZeroElevationCoverage",
                     "elevationsForSector", "missingArray"));
             }
 
@@ -132,5 +132,5 @@ define([
             return 0;
         };
 
-        return ZeroElevationModel;
+        return ZeroElevationCoverage;
     });

@@ -20,7 +20,8 @@ define([
         './error/ArgumentError',
         './BasicWorldWindowController',
         './render/DrawContext',
-        './globe/EarthElevationModel',
+        './globe/EarthElevationCoverage',
+        './globe/ElevationModel',
         './util/FrameStatistics',
         './geom/Frustum',
         './globe/Globe',
@@ -45,7 +46,8 @@ define([
     function (ArgumentError,
               BasicWorldWindowController,
               DrawContext,
-              EarthElevationModel,
+              EarthElevationCoverage,
+              ElevationModel,
               FrameStatistics,
               Frustum,
               Globe,
@@ -148,7 +150,11 @@ define([
              * The globe displayed.
              * @type {Globe}
              */
-            this.globe = new Globe(elevationModel || new EarthElevationModel());
+            if (!elevationModel) {
+                elevationModel = new ElevationModel();
+                elevationModel.addCoverage(new EarthElevationCoverage());
+            }
+            this.globe = new Globe(elevationModel);
 
             /**
              * The layers to display in this WorldWindow.

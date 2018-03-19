@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 /**
- * @exports WcsEarthElevationModel
+ * @exports WcsEarthElevationCoverage
  */
 define([
         '../geom/Location',
         '../geom/Sector',
-        '../globe/ElevationModel',
+        '../globe/TiledElevationCoverage',
         '../util/WcsTileUrlBuilder'
     ],
     function (Location,
               Sector,
-              ElevationModel,
+              TiledElevationCoverage,
               WcsTileUrlBuilder) {
         "use strict";
 
         /**
          * Constructs an Earth elevation model.
-         * @alias WcsEarthElevationModel
+         * @alias WcsEarthElevationCoverage
          * @constructor
-         * @augments ElevationModel
+         * @augments TiledElevationCoverage
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
-        var WcsEarthElevationModel = function () {
-            ElevationModel.call(this,
+        var WcsEarthElevationCoverage = function () {
+            TiledElevationCoverage.call(this,
                 Sector.FULL_SPHERE, new Location(45, 45), 12, "image/tiff", "EarthElevations256", 256, 256);
 
-            this.displayName = "WCS Earth Elevation Model";
+            this.displayName = "WCS Earth Elevation Coverage";
             this.minElevation = -11000; // Depth of Marianas Trench, in meters
             this.maxElevation = 8850; // Height of Mt. Everest
             this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images
@@ -48,7 +48,7 @@ define([
                 "NASA_SRTM30_900m_Tiled", "1.0.0");
         };
 
-        WcsEarthElevationModel.prototype = Object.create(ElevationModel.prototype);
+        WcsEarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return WcsEarthElevationModel;
+        return WcsEarthElevationCoverage;
     });

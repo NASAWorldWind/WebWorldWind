@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,36 +14,35 @@
  * limitations under the License.
  */
 /**
- * @exports EarthRestElevationModel
+ * @exports EarthRestElevationCoverage
  */
 define([
         '../geom/Location',
         '../geom/Sector',
-        '../globe/ElevationModel',
-        '../util/LevelRowColumnUrlBuilder'
+        '../util/LevelRowColumnUrlBuilder',
+        '../globe/TiledElevationCoverage'
     ],
     function (Location,
               Sector,
-              ElevationModel,
-              LevelRowColumnUrlBuilder) {
+              LevelRowColumnUrlBuilder,
+              TiledElevationCoverage) {
         "use strict";
 
-        // THIS CLASS IS NOT YET MEANT TO BE EXPOSED.
         ///**
-        // * Constructs an elevation model for Earth using a REST interface to retrieve the elevations from the server.
-        // * @alias EarthRestElevationModel
+        // * Constructs an elevation coverage for Earth using a REST interface to retrieve the elevations from the server.
+        // * @alias EarthRestElevationCoverage
         // * @constructor
-        // * @classdesc Represents an Earth elevation model spanning the globe and using a REST interface to retrieve
+        // * @classdesc Represents an Earth elevation coverage spanning the globe and using a REST interface to retrieve
         // * the elevations from the server.
         // * See [LevelRowColumnUrlBuilder]{@link LevelRowColumnUrlBuilder} for a description of the REST interface.
         // * @param {String} serverAddress The server address of the tile service. May be null, in which case the
         // * current origin is used (see <code>window.location</code>.
         // * @param {String} pathToData The path to the data directory relative to the specified server address.
         // * May be null, in which case the server address is assumed to be the full path to the data directory.
-        // * @param {String} displayName The display name to associate with this elevation model.
+        // * @param {String} displayName The display name to associate with this elevation coverage.
         // */
-        var EarthRestElevationModel = function (serverAddress, pathToData, displayName) {
-            ElevationModel.call(this,
+        var EarthRestElevationCoverage = function (serverAddress, pathToData, displayName) {
+            TiledElevationCoverage.call(this,
                 Sector.FULL_SPHERE, new Location(60, 60), 5, "application/bil16", "EarthElevations", 512, 512);
 
             this.displayName = displayName;
@@ -52,7 +51,7 @@ define([
             this.urlBuilder = new LevelRowColumnUrlBuilder(serverAddress, pathToData);
         };
 
-        EarthRestElevationModel.prototype = Object.create(ElevationModel.prototype);
+        EarthRestElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return EarthRestElevationModel;
+        return EarthRestElevationCoverage;
     });

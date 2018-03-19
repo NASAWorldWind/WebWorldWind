@@ -15,23 +15,24 @@
  */
 define([
     'src/geom/BoundingBox',
-    'src/globe/EarthElevationModel',
+    'src/globe/EarthElevationCoverage',
+    'src/globe/ElevationModel',
     'src/globe/Globe',
     'src/geom/Plane',
     'src/geom/Sector',
     'src/geom/Vec3',
     'test/CustomMatchers.test'
-], function (
-    BoundingBox,
-    EarthElevationModel,
-    Globe,
-    Plane,
-    Sector,
-    Vec3,
-    CustomMatchers) {
+], function (BoundingBox,
+             EarthElevationCoverage,
+             ElevationModel,
+             Globe,
+             Plane,
+             Sector,
+             Vec3,
+             CustomMatchers) {
     "use strict";
 
-    beforeEach(function() {
+    beforeEach(function () {
         jasmine.addMatchers(CustomMatchers);
     });
 
@@ -126,7 +127,9 @@ define([
 
             it("Sets this bounding box to contain an entire globe", function () {
                 var sector = new Sector(-90, 90, -180, 180);
-                var globe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var globe = new Globe(new ElevationModel());
                 var minElevation = -11000; // Approximately the depth of the Marianas Trench, in meters
                 var maxElevation = 8850; // Approximately the height of the Mt. Everest, in meters
                 var boundingBox = new BoundingBox().setToSector(sector, globe, minElevation, maxElevation);

@@ -45,8 +45,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/DigitalGlobeTiledImageLayer',
         './gesture/DragRecognizer',
         './render/DrawContext',
-        './globe/EarthElevationModel',
-        './globe/EarthRestElevationModel',
+        './globe/EarthElevationCoverage',
+        './globe/EarthRestElevationCoverage',
+        './globe/ElevationCoverage',
         './globe/ElevationModel',
         './util/Font',
         './util/FrameStatistics',
@@ -214,6 +215,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/Texture',
         './render/TextureTile',
         './util/Tile',
+        './globe/TiledElevationCoverage',
         './layer/TiledImageLayer',
         './util/TileFactory',
         './gesture/TiltRecognizer',
@@ -224,7 +226,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec3',
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
-        './globe/WcsEarthElevationModel',
+        './globe/WcsEarthElevationCoverage',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
         './formats/wkt/Wkt',
@@ -254,7 +256,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WWMessage',
         './util/WWUtil',
         './util/XmlDocument',
-        './globe/ZeroElevationModel'],
+        './globe/ZeroElevationCoverage'],
     function (AbstractError,
               Angle,
               Annotation,
@@ -286,8 +288,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               DigitalGlobeTiledImageLayer,
               DragRecognizer,
               DrawContext,
-              EarthElevationModel,
-              EarthRestElevationModel,
+              EarthElevationCoverage,
+              EarthRestElevationCoverage,
+              ElevationCoverage,
               ElevationModel,
               Font,
               FrameStatistics,
@@ -455,6 +458,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Texture,
               TextureTile,
               Tile,
+              TiledElevationCoverage,
               TiledImageLayer,
               TileFactory,
               TiltRecognizer,
@@ -465,7 +469,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec3,
               ViewControlsLayer,
               ViewVolume,
-              WcsEarthElevationModel,
+              WcsEarthElevationCoverage,
               WcsTileUrlBuilder,
               WfsCapabilities,
               Wkt,
@@ -495,7 +499,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WWMessage,
               WWUtil,
               XmlDocument,
-              ZeroElevationModel) {
+              ZeroElevationCoverage) {
         "use strict";
         /**
          * This is the top-level WorldWind module. It is global.
@@ -748,8 +752,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['DigitalGlobeTiledImageLayer'] = DigitalGlobeTiledImageLayer;
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
-        WorldWind['EarthElevationModel'] = EarthElevationModel;
-        WorldWind['EarthRestElevationModel'] = EarthRestElevationModel;
+        WorldWind['EarthElevationCoverage'] = EarthElevationCoverage;
+        WorldWind['EarthRestElevationCoverage'] = EarthRestElevationCoverage;
+        WorldWind['ElevationCoverage'] = ElevationCoverage;
         WorldWind['ElevationModel'] = ElevationModel;
         WorldWind['Font'] = Font;
         WorldWind['FrameStatistics'] = FrameStatistics;
@@ -866,6 +871,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Texture'] = Texture;
         WorldWind['TextureTile'] = TextureTile;
         WorldWind['Tile'] = Tile;
+        WorldWind['TiledElevationCoverage'] = TiledElevationCoverage;
         WorldWind['TiledImageLayer'] = TiledImageLayer;
         WorldWind['TileFactory'] = TileFactory;
         WorldWind['TiltRecognizer'] = TiltRecognizer;
@@ -875,7 +881,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
-        WorldWind['WcsEarthElevationModel'] = WcsEarthElevationModel;
+        WorldWind['WcsEarthElevationCoverage'] = WcsEarthElevationCoverage;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
@@ -904,7 +910,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['WorldWindowController'] = WorldWindowController;
-        WorldWind['ZeroElevationModel'] = ZeroElevationModel;
+        WorldWind['ZeroElevationCoverage'] = ZeroElevationCoverage;
 
         /**
          * Holds configuration parameters for WorldWind. Applications may modify these parameters prior to creating

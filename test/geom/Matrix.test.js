@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,12 @@ define([
     'src/geom/Matrix',
     'src/geom/Angle',
     'src/globe/Globe',
-    'src/globe/EarthElevationModel',
+    'src/globe/EarthElevationCoverage',
+    'src/globe/ElevationModel',
     'src/geom/Plane',
     'src/geom/Rectangle',
     'src/geom/Vec3'
-], function (Matrix, Angle, Globe, EarthElevationModel, Plane, Rectangle, Vec3) {
+], function (Matrix, Angle, Globe, EarthElevationCoverage, ElevationModel, Plane, Rectangle, Vec3) {
     "use strict";
 
     describe("Matrix Tests", function () {
@@ -441,7 +442,9 @@ define([
             it("Multiplies the matrix correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                 var origin = new Vec3(37, 15, 10e2);
-                var globe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var globe = new Globe(em);
                 matrix.multiplyByLocalCoordinateTransform(origin, globe);
 
                 expect(matrix[0]).toBeCloseTo(-0.073);
@@ -552,7 +555,9 @@ define([
                 var heading = 20;
                 var tilt = 40;
                 var roll = 60;
-                var globe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var globe = new Globe(em);
                 matrix.multiplyByFirstPersonModelview(position, heading, tilt, roll, globe);
 
                 expect(matrix[0]).toBeCloseTo(-0.615);
@@ -607,7 +612,9 @@ define([
                     var heading = 20;
                     var tilt = 40;
                     var roll = 60;
-                    var globe = new Globe(new EarthElevationModel());
+                    var em = new ElevationModel();
+                    em.addCoverage(new EarthElevationCoverage());
+                    var globe = new Globe(em);
                     matrix.multiplyByLookAtModelview(position, range, heading, tilt, roll, globe);
 
                     expect(matrix[0]).toBeCloseTo(-0.615);
@@ -680,7 +687,9 @@ define([
                 var heading = 20;
                 var tilt = 40;
                 var roll = 60;
-                var globe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var globe = new Globe(em);
                 matrix.multiplyByLookAtModelview(position, range, heading, tilt, roll, globe);
 
                 expect(matrix[0]).toBeCloseTo(-0.615);
@@ -926,7 +935,9 @@ define([
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                 var origin = new Vec3(2, 4, 6);
                 var roll = 60;
-                var globe = new Globe(new EarthElevationModel());
+                var em = new ElevationModel();
+                em.addCoverage(new EarthElevationCoverage());
+                var globe = new Globe(em);
                 var result = {};
 
                 matrix.extractViewingParameters(origin, roll, globe, result);
