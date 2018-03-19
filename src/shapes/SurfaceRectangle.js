@@ -198,13 +198,13 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        SurfaceRectangle.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
+        SurfaceRectangle.prototype.moveTo = function (oldReferenceLocation, position) {
             var heading = Location.greatCircleAzimuth(oldReferenceLocation,
                 new Location(this.center.latitude, this.center.longitude));
             var pathLength = Location.greatCircleDistance(oldReferenceLocation,
                 new Location(this.center.latitude, this.center.longitude));
             var location = new Location(0, 0);
-            Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+            Location.greatCircleLocation(position, heading, pathLength, location);
 
             this.center = location;
         };

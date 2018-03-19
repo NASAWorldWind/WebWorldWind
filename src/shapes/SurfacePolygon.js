@@ -133,7 +133,7 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        SurfacePolygon.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
+        SurfacePolygon.prototype.moveTo = function (oldReferenceLocation, position) {
             if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
                 var boundaries = [];
                 for (var i = 0; i < this._boundaries.length; i++){
@@ -144,7 +144,7 @@ define([
                         var pathLength = Location.greatCircleDistance(oldReferenceLocation,
                             new Location(this._boundaries[i][j].latitude, this._boundaries[i][j].longitude));
                         var location = new Location(0, 0);
-                        Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+                        Location.greatCircleLocation(position, heading, pathLength, location);
                         locations.push(new Location(location.latitude, location.longitude));
                     }
                     boundaries.push(locations);
@@ -159,7 +159,7 @@ define([
                     var pathLength = Location.greatCircleDistance(oldReferenceLocation,
                         new Location(this._boundaries[i].latitude, this._boundaries[i].longitude));
                     var location = new Location(0, 0);
-                    Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+                    Location.greatCircleLocation(position, heading, pathLength, location);
                     locations.push(new Location(location.latitude, location.longitude));
                 }
                 this.boundaries = locations;
