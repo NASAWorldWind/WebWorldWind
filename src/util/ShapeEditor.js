@@ -339,45 +339,24 @@ define([
                 if (pickList.objects.length > 0) {
                     for (var p = 0; p < pickList.objects.length; p++) {
                         if (!pickList.objects[p].isTerrain) {
-                            // if (shapeEditor.shape == null) {
-                            //     // Highlight current shape
-                            //     shapeEditor.shape = pickList.objects[p].userObject;
-                            //     shapeEditor.shape.highlighted = true;
-                            //     shapeEditor.setArmed(true);
-                            // }
-                            // else if (shapeEditor.shape !== pickList.objects[p].userObject && !(pickList.objects[p].userObject instanceof ControlPointMarker)) {
-                            //     // Switch editor to a different shape.
-                            //     shapeEditor.shape.highlighted = false;
-                            //     shapeEditor.setArmed(false);
-                            //     shapeEditor.shape = pickList.objects[p].userObject;
-                            //     shapeEditor.shape.highlighted = true;
-                            //     shapeEditor.setArmed(true);
-                            // } else {
-                                if (shapeEditor.startX === shapeEditor.lastX &&
-                                    shapeEditor.startY === shapeEditor.lastY) {
-                                    if (event.shiftKey) {
-                                        var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX,
-                                            event.clientY);
-                                        var terrainObject;
+                            if (shapeEditor.startX === shapeEditor.lastX &&
+                                shapeEditor.startY === shapeEditor.lastY) {
+                                if (event.shiftKey) {
+                                    var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX,
+                                        event.clientY);
+                                    var terrainObject;
 
-                                        if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                                            terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint)
-                                                .terrainObject();
-                                        }
-
-                                        if (terrainObject) {
-                                            shapeEditor.addNearestLocation(terrainObject.position, 0,
-                                                shapeEditor.shape.boundaries);
-                                        }
+                                    if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
+                                        terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint)
+                                            .terrainObject();
                                     }
-                                    // else {
-                                    //     // Disable editing of the current shape.
-                                    //     shapeEditor.shape.highlighted = false;
-                                    //     shapeEditor.setArmed(false);
-                                    //     shapeEditor.shape = null;
-                                    // }
+
+                                    if (terrainObject) {
+                                        shapeEditor.addNearestLocation(terrainObject.position, 0,
+                                            shapeEditor.shape.boundaries);
+                                    }
                                 }
-                            //}
+                            }
 
                             redrawRequired = true;
                             break;
