@@ -130,7 +130,7 @@ define(['../error/ArgumentError',
                     return minElevation;
                 }
             },
-            
+
             /**
              * This model's maximum elevation in meters across all coverages.
              * @type {Number}

@@ -127,7 +127,7 @@ define([
 
             it("Sets this bounding box to contain an entire globe", function () {
                 var sector = new Sector(-90, 90, -180, 180);
-                var em=new ElevationModel();
+                var em = new ElevationModel();
                 em.addCoverage(new EarthElevationCoverage());
                 var globe = new Globe(new ElevationModel());
                 var minElevation = -11000; // Approximately the depth of the Marianas Trench, in meters

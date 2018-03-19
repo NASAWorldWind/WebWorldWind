@@ -150,9 +150,8 @@ define([
              * The globe displayed.
              * @type {Globe}
              */
-            if (!elevationModel)
-            {
-                elevationModel=new ElevationModel();
+            if (!elevationModel) {
+                elevationModel = new ElevationModel();
                 elevationModel.addCoverage(new EarthElevationCoverage());
             }
             this.globe = new Globe(elevationModel);

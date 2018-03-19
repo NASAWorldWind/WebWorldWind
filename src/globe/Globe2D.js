@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ define(['../globe/ElevationModel',
          * The default rectangular projection scrolls longitudinally.
          */
         var Globe2D = function () {
-            var elevationModel=new ElevationModel();
+            var elevationModel = new ElevationModel();
             elevationModel.addCoverage(new ZeroElevationCoverage());
             Globe.call(this, elevationModel, new ProjectionEquirectangular());
         };
