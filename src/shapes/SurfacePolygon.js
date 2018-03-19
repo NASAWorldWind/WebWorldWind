@@ -116,5 +116,56 @@ define([
         SurfacePolygon.prototype.computeBoundaries = function(dc) {
         };
 
+        // Internal use only. Intentionally not documented.
+        SurfacePolygon.prototype.getReferencePosition = function () {
+            // Assign the first position as the reference position.
+            if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
+                return this.boundaries[0][0];
+            }
+            else if (this.boundaries.length > 2){
+                return this.boundaries[0];
+            }
+            else {
+                return null;
+            }
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfacePolygon.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
+            if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
+                var boundaries = [];
+                for (var i = 0; i < this._boundaries.length; i++){
+                    var locations = [];
+                    for (var j = 0; j < this._boundaries[i].length; j++){
+                        var heading = Location.greatCircleAzimuth(oldReferenceLocation,
+                            new Location(this._boundaries[i][j].latitude, this._boundaries[i][j].longitude));
+                        var pathLength = Location.greatCircleDistance(oldReferenceLocation,
+                            new Location(this._boundaries[i][j].latitude, this._boundaries[i][j].longitude));
+                        var location = new Location(0, 0);
+                        Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+                        locations.push(new Location(location.latitude, location.longitude));
+                    }
+                    boundaries.push(locations);
+                }
+                this.boundaries = boundaries;
+            }
+            else if (this.boundaries.length > 2){
+                var locations = [];
+                for (var i = 0; i < this._boundaries.length; i++){
+                    var heading = Location.greatCircleAzimuth(oldReferenceLocation,
+                        new Location(this._boundaries[i].latitude, this._boundaries[i].longitude));
+                    var pathLength = Location.greatCircleDistance(oldReferenceLocation,
+                        new Location(this._boundaries[i].latitude, this._boundaries[i].longitude));
+                    var location = new Location(0, 0);
+                    Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+                    locations.push(new Location(location.latitude, location.longitude));
+                }
+                this.boundaries = locations;
+            }
+            else {
+                return;
+            }
+        };
+
         return SurfacePolygon;
     });
