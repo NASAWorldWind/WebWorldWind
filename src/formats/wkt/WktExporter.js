@@ -25,7 +25,28 @@ define(['../../error/ArgumentError',
               WktType) {
         "use strict";
 
+        /**
+         * Provides WKT exporter functions.
+         * The following renderables can be exported:
+         * <ul>
+         *     <li>WorldWind.Placemark</li>
+         *     <li>WorldWind.SurfacePolyline</li>
+         *     <li>WorldWind.SurfacePolygon</li>
+         *     <li>WorldWind.SurfaceEllipse</li>
+         *     <li>WorldWind.SurfaceRectangle</li>
+         *     <li>WorldWind.Path</li>
+         *     <li>WorldWind.Polygon</li>
+         * </ul>
+         * @exports WktExporter
+         */
         var WktExporter = {
+
+            /**
+             * Exports a [Renderable]{@link Renderable} in WKT format.
+             * @param {Renderable} renderable The renderable to export.
+             * @throws {ArgumentError} If the specified renderable is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportRenderable: function (renderable) {
                 if (!renderable) {
                     throw new ArgumentError(
@@ -48,11 +69,30 @@ define(['../../error/ArgumentError',
                 else if (renderable instanceof WorldWind.SurfacePolygon) {
                     return this.exportSurfacePolygon(renderable);
                 }
+                // else if (renderable instanceof WorldWind.SurfaceEllipse) {
+                //     return this.exportSurfaceEllipse(renderable);
+                // }
+                // else if (renderable instanceof WorldWind.SurfaceCircle) {
+                //     return this.exportSurfaceCircle(renderable);
+                // }
+                // else if (renderable instanceof WorldWind.SurfaceRectangle) {
+                //     return this.exportSurfaceRectangle(renderable);
+                // }
+                // else if (renderable instanceof WorldWind.SurfaceSector) {
+                //     return this.exportSurfaceSector(renderable);
+                // }
                 else {
                     Logger.log(Logger.LEVEL_WARNING, "Export renderable not implemented: " + renderable);
                     return null;
                 }
             },
+
+            /**
+             * Exports a list of [Renderable]{@link Renderable} in WKT format of type GeometryCollection.
+             * @param {Renderable[]} renderables The renderables to export.
+             * @throws {ArgumentError} If the specified renderable is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportRenderables: function (renderables) {
                 if (!renderables) {
                     throw new ArgumentError(
@@ -84,6 +124,13 @@ define(['../../error/ArgumentError',
                     return this.exportRenderable(renderables[0]);
                 }
             },
+
+            /**
+             * Exports a [Layer]{@link Layer} in WKT format of type GeometryCollection.
+             * @param {Layer} layer The layer to export.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportLayer: function (layer) {
                 if (!layer) {
                     throw new ArgumentError(
@@ -93,13 +140,39 @@ define(['../../error/ArgumentError',
 
                 return this.exportRenderables(layer.renderables);
             },
+
+            /**
+             * Exports a [Placemark]{@link Placemark} in WKT format of type Point.
+             * @param {Placemark} renderable The Placemark object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportPlacemark: function (renderable) {
+                if (!(renderable instanceof WorldWind.Placemark)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportPlacemark",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = WktType.SupportedGeometries.POINT + '(';
                 sb = sb + renderable.position.longitude + ' ' + renderable.position.latitude;
                 sb = sb + ')';
                 return sb;
             },
+
+            /**
+             * Exports a [Path]{@link Path} in WKT format of type LineString.
+             * @param {SurfacePolyline} renderable The Path object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportPath: function (renderable) {
+                if (!(renderable instanceof WorldWind.Path)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportPath",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = WktType.SupportedGeometries.LINE_STRING + '(';
                 for (var i = 0; i < renderable.positions.length; i++) {
                     sb = sb + renderable.positions[i].longitude + ' ' +
@@ -109,7 +182,20 @@ define(['../../error/ArgumentError',
                 sb = sb + ')';
                 return sb;
             },
+
+            /**
+             * Exports a [Polygon]{@link Polygon} in WKT format of type Polygon.
+             * @param {Polygon} renderable The Polygon object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportPolygon: function (renderable) {
+                if (!(renderable instanceof WorldWind.Polygon)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportPolygon",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = WktType.SupportedGeometries.POLYGON + '(';
                 if (renderable.boundaries.length > 0 && renderable.boundaries[0].length > 2) {
                     //with holes
@@ -141,7 +227,20 @@ define(['../../error/ArgumentError',
                 sb = sb + ')';
                 return sb;
             },
+
+            /**
+             * Exports a [SurfacePolyline]{@link SurfacePolyline} in WKT format of type LineString.
+             * @param {SurfacePolyline} renderable The SurfacePolyline object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportSurfacePolyline: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfacePolyline)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportSurfacePolyline",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = WktType.SupportedGeometries.LINE_STRING + '(';
                 for (var i = 0; i < renderable.boundaries.length; i++) {
                     sb = sb + renderable.boundaries[i].longitude + ' ' +
@@ -152,7 +251,20 @@ define(['../../error/ArgumentError',
                 sb = sb + ')';
                 return sb;
             },
+
+            /**
+             * Exports a [SurfacePolygon]{@link SurfacePolygon} in WKT format of type Polygon.
+             * @param {SurfacePolygon} renderable The SurfacePolygon object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
             exportSurfacePolygon: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfacePolygon)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportSurfacePolygon",
+                            "invalidTypeOfRenderable"));
+                }
+
                 var sb = WktType.SupportedGeometries.POLYGON + '(';
                 if (renderable.boundaries.length > 0 && renderable.boundaries[0].length > 2) {
                     //with holes
@@ -180,6 +292,34 @@ define(['../../error/ArgumentError',
                     sb = sb.substring(0, sb.length - 2);
                     sb = sb + ')';
                 }
+                sb = sb + ')';
+                return sb;
+            },
+
+            /**
+             * Exports a [SurfaceEllipse]{@link SurfaceEllipse} in WKT format of type Polygon.
+             * @param {SurfaceEllipse} renderable The SurfaceEllipse object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
+            exportSurfaceEllipse: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceEllipse)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfaceEllipse",
+                            "invalidTypeOfRenderable"));
+                }
+
+                var sb = WktType.SupportedGeometries.POLYGON + '(';
+                sb = sb + '(';
+                for (var i = 0; i < renderable._boundaries.length; i++) {
+                    sb = sb + renderable._boundaries[i].longitude + ' ' +
+                        renderable._boundaries[i].latitude;
+                    sb = sb + ', ';
+                }
+
+                sb = sb.substring(0, sb.length - 2);
+
+                sb = sb + ')';
                 sb = sb + ')';
                 return sb;
             }
