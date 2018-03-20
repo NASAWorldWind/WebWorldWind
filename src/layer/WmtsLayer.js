@@ -190,7 +190,7 @@ define([
 
             this.currentTiles = [];
             this.currentTilesInvalid = true;
-            this.tileCache = new MemoryCache(500, 400);
+            this.tileCache = new MemoryCache(1000, 850);    // Allocate a cache that accommodates 1,000 tiles.
             this.currentRetrievals = [];
             this.absentResourceList = new AbsentResourceList(3, 50e3);
 

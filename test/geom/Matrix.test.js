@@ -527,7 +527,7 @@ define([
 
             it("Multiplies the matrix correctly", function () {
                 var targetMatrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
 
                 targetMatrix.extractRotationAngles(result);
 
@@ -886,7 +886,7 @@ define([
 
             it("Returns the eye point correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractEyePoint(result);
 
                 expect(result).toEqual(new Vec3(-116, -137, -158));
@@ -905,7 +905,7 @@ define([
 
             it("Returns the vector correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractForwardVector(result);
 
                 expect(result).toEqual(new Vec3(-8, -9, -10));

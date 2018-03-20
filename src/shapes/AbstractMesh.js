@@ -354,9 +354,9 @@ define([
 
                 color = this.activeAttributes.interiorColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 if (hasTexture && (!dc.pickingMode || !this.pickTransparentImagePixels)) {
                     this.activeTexture = dc.gpuResourceCache.resourceForKey(this.activeAttributes.imageSource);
@@ -453,9 +453,9 @@ define([
                 color = this.activeAttributes.outlineColor;
                 // Disable writing the shape's fragments to the depth buffer when the interior is
                 // semi-transparent.
-                gl.depthMask(color.alpha * dc.currentLayer.opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : dc.currentLayer.opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 
@@ -486,7 +486,7 @@ define([
             if (dc.pickingMode) {
                 var pickPosition = this.computePickPosition(dc);
                 var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, pickPosition,
-                    dc.currentLayer, false);
+                    this.layer, false);
                 dc.resolvePick(po);
             }
         };
