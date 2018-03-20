@@ -43,7 +43,7 @@ define([
          * @augments Layer
          * @classdesc Collects and displays screen credits.
          */
-        var ScreenCreditController = function (worldwindow) {
+        var ScreenCreditController = function () {
             Layer.call(this, "ScreenCreditController");
 
             // Internal. Intentionally not documented.
@@ -57,8 +57,6 @@ define([
 
             // Internal. Intentionally not documented.
             this.creditSpacing = 21;
-
-            this.wwd = worldwindow;
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
@@ -128,7 +126,9 @@ define([
             var credit = new ScreenText(screenOffset, stringCredit);
 
             if(url){
-                // Append new user property to store URL
+
+                console.log("here");
+                // Append new user property to store URL for hyperlinking
                 credit.userProperties.url = url;
                 credit.pickDelegate = credit.userProperties;
             }
@@ -139,28 +139,6 @@ define([
 
             this.textCredits.push(credit);
         };
-
-        ScreenCreditController.prototype.onGestureEvent = function (e) {
-            if (e.type !== "pointerdown") {
-                return false;
-            }
-            var pickPoint = this.wwd.canvasCoordinates(e.clientX, e.clientY);
-
-            var pickList = this.wwd.pick(pickPoint);
-            if (pickList.objects.length > 0) {
-                for (var p = 0; p < pickList.objects.length; p++) {
-                    var pickedObject = pickList.objects[p];
-                    if (!pickedObject.isTerrain) {
-                        if (pickedObject.userObject.url) {
-                            window.open(pickedObject.userObject.url, "_blank");
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        };
-
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
