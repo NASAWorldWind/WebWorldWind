@@ -63,7 +63,7 @@ define([
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
-                dc.screenCreditController.addStringCredit("Link to bing maps", Color.DARK_GRAY, "https://www.bing.com/maps");
+                dc.screenCreditController.addStringCredit("Imagery courtesy of Bing maps", Color.DARK_GRAY, "https://www.bing.com/maps");
                 dc.screenCreditController.addImageCredit(this.creditImage, "https://www.bing.com/");
             }
         };

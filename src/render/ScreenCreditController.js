@@ -76,9 +76,10 @@ define([
         /**
          * Adds an image credit to this controller.
          * @param {String} imageUrl The URL of the image to display in the credits area.
+         * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
-        ScreenCreditController.prototype.addImageCredit = function (imageUrl, url) {
+        ScreenCreditController.prototype.addImageCredit = function (imageUrl, hyperlinkUrl) {
             if (!imageUrl) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
@@ -94,9 +95,10 @@ define([
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
 
-            if(url){
-                // Append new user property to store URL for hyperlinking
-                credit.userProperties.url = url;
+            if(hyperlinkUrl){
+                // Append new user property to store URL for hyperlinking.
+                // (See BasicWorldWindowController.handleClickOrTap).
+                credit.userProperties.url = hyperlinkUrl;
             }
 
             credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
@@ -108,9 +110,10 @@ define([
          * Adds a string credit to this controller.
          * @param {String} stringCredit The string to display in the credits area.
          * @param {Color} color The color with which to draw the string.
+         * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
-        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color, url) {
+        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color, hyperlinkUrl) {
             if (!stringCredit) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
@@ -131,10 +134,10 @@ define([
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenText(screenOffset, stringCredit);
 
-            if(url){
-                // Append new user property to store URL for hyperlinking
-                credit.userProperties.url = url;
-                //credit.pickDelegate = credit.userProperties;
+            if(hyperlinkUrl){
+                // Append new user property to store URL for hyperlinking.
+                // (See BasicWorldWindowController.handleClickOrTap).
+                credit.userProperties.url = hyperlinkUrl;
             }
 
             credit.attributes.color = color;
