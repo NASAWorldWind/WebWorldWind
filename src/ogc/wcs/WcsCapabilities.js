@@ -72,9 +72,12 @@ define([
             // WCS 1.0.0 does not utilize OWS Common GetCapabilities service and capability descriptions.
             if (this.version === "1.0.0") {
                 this.assembleVersion100Document(root);
-                return;
+            } else {
+                this.assembleVersion200Document(root);
             }
+        };
 
+        WcsCapabilities.prototype.assembleVersion200Document = function (root) {
             var children = root.children || root.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -86,24 +89,23 @@ define([
                 } else if (child.localName === "OperationsMetadata") {
                     this.operationsMetadata = new OwsOperationsMetadata(child);
                 } else if (child.localName === "ServiceMetadata") {
-                    this.serviceMetadata = this.assembleServiceMetadata(child);
+                    this.serviceMetadata = WcsCapabilities.assembleServiceMetadata(child);
                 } else if (child.localName === "Contents") {
                     this.assembleContents(child);
                 }
             }
-
         };
 
         WcsCapabilities.prototype.assembleVersion100Document = function (root) {
-            // TODO Align service providers, operators, and metadata with OWS 2.0.1 style from 1.0.0
+
             var children = root.children || root.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "Service") {
-                    this.service = this.assemble100Service(child);
+                    this.service = WcsCapabilities.assemble100Service(child);
                 } else if (child.localName === "Capability") {
-                    this.capability = this.assemble100Capability(child);
+                    this.capability = WcsCapabilities.assemble100Capability(child);
                 } else if (child.localName === "ContentMetadata") {
                     this.assembleContents(child);
                 }
@@ -111,7 +113,7 @@ define([
         };
 
         WcsCapabilities.prototype.assembleContents = function (element) {
-            var children = element.children || element.childNodes, coverage = {};
+            var children = element.children || element.childNodes, coverage;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -119,21 +121,21 @@ define([
                     // WCS 1.1+
                     coverage = new OwsDatasetSummary(child);
                     if (this.version === "2.0.0" || this.version === "2.0.1") {
-                        coverage = this.assembleDataset200Augment(child, coverage);
+                        coverage = WcsCapabilities.assembleDataset200Augment(child);
                     }
                     this.coverages = this.coverages || [];
                     this.coverages.push(coverage);
                 } else if (child.localName === "CoverageOfferingBrief") {
                     // WCS 1.0.0
-                    coverage = this.assemble100Coverages(child);
+                    coverage = WcsCapabilities.assemble100Coverages(child);
                     this.coverages = this.coverages || [];
                     this.coverages.push(coverage);
                 }
             }
         };
 
-        WcsCapabilities.prototype.assembleDataset200Augment = function (element, coverage) {
-            var children = element.children || element.childNodes;
+        WcsCapabilities.assembleDataset200Augment = function (element) {
+            var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -148,7 +150,7 @@ define([
             return coverage;
         };
 
-        WcsCapabilities.prototype.assemble100Coverages = function (element) {
+        WcsCapabilities.assemble100Coverages = function (element) {
             var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -167,14 +169,14 @@ define([
                     coverage.keywords = coverage.keywords || [];
                     coverage.keywords.push(new OwsKeywords(child));
                 } else if (child.localName === "lonLatEnvelope") {
-                    coverage.wgs84BoundingBox = this.assembleLatLonBoundingBox(child);
+                    coverage.wgs84BoundingBox = WcsCapabilities.assembleLatLonBoundingBox(child);
                 }
             }
 
             return coverage;
         };
 
-        WcsCapabilities.prototype.assembleLatLonBoundingBox = function (element) {
+        WcsCapabilities.assembleLatLonBoundingBox = function (element) {
             var children = element.children || element.childNodes, boundingBox = {}, previousValue, lonOne, lonTwo;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -199,7 +201,7 @@ define([
             return boundingBox;
         };
 
-        WcsCapabilities.prototype.assemble100Service = function (element) {
+        WcsCapabilities.assemble100Service = function (element) {
             var children = element.children || element.childNodes, service = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -225,13 +227,13 @@ define([
             return service;
         };
 
-        WcsCapabilities.prototype.assemble100Capability = function (element) {
+        WcsCapabilities.assemble100Capability = function (element) {
             var children = element.children || element.childNodes, capability = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "Request") {
-                    capability.request = this.assemble100RequestCapabilities(child);
+                    capability.request = WcsCapabilities.assemble100RequestCapabilities(child);
                 } else if (child.localName === "Exception") {
                     child = child.children || child.childNodes;
                     child = child[0];
@@ -244,17 +246,17 @@ define([
             return capability;
         };
 
-        WcsCapabilities.prototype.assemble100RequestCapabilities = function (element) {
+        WcsCapabilities.assemble100RequestCapabilities = function (element) {
             var children = element.children || element.childNodes, request = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "GetCapabilities") {
-                    request.getCapabilities = this.assemble100DCPType(child);
+                    request.getCapabilities = WcsCapabilities.assemble100DCPType(child);
                 } else if (child.localName === "DescribeCoverage") {
                     request.describeCoverage = this.assemble100DCPType(child);
                 } else if (child.localName === "GetCoverage") {
-                    request.getCoverage = this.assemble100DCPType(child);
+                    request.getCoverage = WcsCapabilities.assemble100DCPType(child);
                 }
             }
 
@@ -262,7 +264,7 @@ define([
         };
 
         // Internal use only. This flattens the DCPType structure to provide a simplified object model.
-        WcsCapabilities.prototype.assemble100DCPType = function (element) {
+        WcsCapabilities.assemble100DCPType = function (element) {
             var children = element.children || element.childNodes, dcptype = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -287,7 +289,7 @@ define([
             return dcptype;
         };
 
-        WcsCapabilities.prototype.assembleServiceMetadata = function (element) {
+        WcsCapabilities.assembleServiceMetadata = function (element) {
             var children = element.children || element.childNodes, serviceMetadata = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -296,14 +298,14 @@ define([
                     serviceMetadata.formatsSupported = serviceMetadata.formatsSupported || [];
                     serviceMetadata.formatsSupported.push(child.textContent);
                 } else if (child.localName === "Extension") {
-                    serviceMetadata.extension = this.assembleServiceMetadataExtension(child);
+                    serviceMetadata.extension = WcsCapabilities.assembleServiceMetadataExtension(child);
                 }
             }
 
             return serviceMetadata;
         };
 
-        WcsCapabilities.prototype.assembleServiceMetadataExtension = function (element) {
+        WcsCapabilities.assembleServiceMetadataExtension = function (element) {
             var children = element.children || element.childNodes, len = children.length, extension = {};
             for (var c = 0; c < len; c++) {
                 var child = children[c];
