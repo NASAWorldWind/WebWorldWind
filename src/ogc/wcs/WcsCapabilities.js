@@ -20,6 +20,7 @@ define([
         '../../error/ArgumentError',
         '../../util/Logger',
         '../../ogc/ows/OwsDatasetSummary',
+        '../../ogc/ows/OwsKeywords',
         '../../ogc/ows/OwsOperationsMetadata',
         '../../ogc/ows/OwsServiceIdentification',
         '../../ogc/ows/OwsServiceProvider'
@@ -27,6 +28,7 @@ define([
     function (ArgumentError,
               Logger,
               OwsDatasetSummary,
+              OwsKeywords,
               OwsOperationsMetadata,
               OwsServiceIdentification,
               OwsServiceProvider) {
@@ -98,7 +100,11 @@ define([
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
-                if (child.localName === "ContentMetadata") {
+                if (child.localName === "Service") {
+                    this.service = this.assemble100Service(child);
+                } else if (child.localName === "Capability") {
+                    // TODO
+                } else if (child.localName === "ContentMetadata") {
                     this.assembleContents(child);
                 }
             }
@@ -194,10 +200,29 @@ define([
         };
 
         WcsCapabilities.prototype.assemble100Service = function (element) {
-            var children = element.children || element.childNodes;
+            var children = element.children || element.childNodes, service = {};
             for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "description") {
+                    service.description = child.textContent;
+                } else if (child.localName === "name") {
+                    service.name = child.textContent;
+                } else if (child.localName === "label") {
+                    service.label = child.textContent;
+                } else if (child.localName == "fees") {
+                    service.fees = child.textContent;
+                } else if (child.localName === "accessConstraints") {
+                    service.accessConstraints = service.accessConstraints || [];
+                    service.accessConstraints.push(child.textContent);
+                } else if (child.localName === "Keywords") {
+                    // WCS 1.0.0 doesn't use the ogc namespace keywords, but the implementation is identical
+                    service.keywords = new OwsKeywords(child);
+                }
 
             }
+
+            return service;
         };
 
         WcsCapabilities.prototype.assembleServiceMetadata = function (element) {

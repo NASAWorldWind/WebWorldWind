@@ -159,5 +159,30 @@ define([
             expect(lowerValue).toBeLessThan(upperValue);
 
         });
+
+        // Service Element
+        it("should have the wcs name", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var name = wcs.service.name;
+
+            expect(name).toBe("WCS");
+        });
+
+        it("should have NONE fees", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var fees = wcs.service.fees;
+
+            expect(fees).toBe("NONE");
+        });
+
+        it("should have NONE accessConstraints", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var accessContraints = wcs.service.accessConstraints[0];
+
+            expect(accessContraints).toBe("NONE");
+        });
     });
 });
