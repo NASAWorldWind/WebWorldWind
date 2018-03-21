@@ -50,11 +50,12 @@ define([
 
             this.displayName = displayName;
 
-            // this.pickEnabled = false; // Line temporarily commented out to enable picking for screen credit hyperlinks
+            // TODO: Picking is enabled as a temporary measure for screen credit hyperlinks to work (see Layer.render)
+            this.pickEnabled = true;
 
             this.detectBlankImages = true;
 
-            this.creditImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png"
+            this.creditImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
         };
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);

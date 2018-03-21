@@ -176,7 +176,7 @@ define([
                     var pickedObject = pickList.objects[p];
                     if (!pickedObject.isTerrain) {
                         // Identify picked objects that have URLs here.
-                        if (pickedObject.userObject.url) {
+                        if (pickedObject.userObject.userProperties.url) {
                             window.open(pickedObject.userObject.userProperties.url, "_blank");
                         }
                     }
