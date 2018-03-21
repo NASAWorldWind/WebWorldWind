@@ -56,8 +56,8 @@ define([
                     this.serviceTypeVersions = this.serviceTypeVersions || [];
                     this.serviceTypeVersions.push(child.textContent);
                 } else if (child.localName === "Profile") {
-                    this.profile = this.profiles || [];
-                    this.profile.push(child.textContent);
+                    this.profiles = this.profiles || [];
+                    this.profiles.push(child.textContent);
                 } else if (child.localName === "Fees") {
                     this.fees = child.textContent;
                 } else if (child.localName === "AccessConstraints") {

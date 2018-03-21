@@ -105,7 +105,7 @@ define([
         };
 
         WcsCapabilities.prototype.assembleContents = function (element) {
-            var children = element.children || element.childNodes, coverage;
+            var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -143,7 +143,7 @@ define([
         };
 
         WcsCapabilities.prototype.assemble100Coverages = function (element) {
-            var children = element.children || element.childNodes, coverage;
+            var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -169,16 +169,16 @@ define([
         };
 
         WcsCapabilities.prototype.assembleLatLonBoundingBox = function (element) {
-            var children = element.children || element.childNodes, boundingBox, previousValue, lonOne, lonTwo;
+            var children = element.children || element.childNodes, boundingBox = {}, previousValue, lonOne, lonTwo;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "pos") {
                     if (!previousValue) {
                         previousValue = child.textContent;
-                        lonOne = previousValue.split(/\s+/)[0];
+                        lonOne = new Number(previousValue.split(/\s+/)[0]);
                     } else {
-                        lonTwo = child.textContent.split(/\s+/)[0];
+                        lonTwo = new Number(child.textContent.split(/\s+/)[0]);
                         if (lonOne < lonTwo) {
                             boundingBox.lowerCorner = previousValue;
                             boundingBox.upperCorner = child.textContent;
