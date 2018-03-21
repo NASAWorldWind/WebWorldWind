@@ -103,7 +103,7 @@ define([
                 if (child.localName === "Service") {
                     this.service = this.assemble100Service(child);
                 } else if (child.localName === "Capability") {
-                    // TODO
+                    this.capability = this.assemble100Capability(child);
                 } else if (child.localName === "ContentMetadata") {
                     this.assembleContents(child);
                 }
@@ -223,6 +223,68 @@ define([
             }
 
             return service;
+        };
+
+        WcsCapabilities.prototype.assemble100Capability = function (element) {
+            var children = element.children || element.childNodes, capability = {};
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Request") {
+                    capability.request = this.assemble100RequestCapabilities(child);
+                } else if (child.localName === "Exception") {
+                    child = child.children || child.childNodes;
+                    child = child[0];
+                    // child should now be the Format element
+                    capability.exception = capability.exception || [];
+                    capability.exception.push(child.textContent);
+                }
+            }
+
+            return capability;
+        };
+
+        WcsCapabilities.prototype.assemble100RequestCapabilities = function (element) {
+            var children = element.children || element.childNodes, request = {};
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "GetCapabilities") {
+                    request.getCapabilities = this.assemble100DCPType(child);
+                } else if (child.localName === "DescribeCoverage") {
+                    request.describeCoverage = this.assemble100DCPType(child);
+                } else if (child.localName === "GetCoverage") {
+                    request.getCoverage = this.assemble100DCPType(child);
+                }
+            }
+
+            return request;
+        };
+
+        // Internal use only. This flattens the DCPType structure to provide a simplified object model.
+        WcsCapabilities.prototype.assemble100DCPType = function (element) {
+            var children = element.children || element.childNodes, dcptype = {};
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "DCPType") {
+                    // retrieve the HTTP element which should be the only child
+                    var httpChild = child.children || child.childNodes;
+                    httpChild = httpChild[0];
+                    var method = httpChild.children || httpChild.childNodes;
+                    method = method[0];
+                    var onlineResource = method.children || method.childNodes;
+                    onlineResource = onlineResource[0];
+                    var url = onlineResource.getAttribute("xlink:href");
+                    if (method.localName === "Get") {
+                        dcptype.get = url;
+                    } else if (method.localName === "Post") {
+                        dcptype.post = url;
+                    }
+                }
+            }
+
+            return dcptype;
         };
 
         WcsCapabilities.prototype.assembleServiceMetadata = function (element) {

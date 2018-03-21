@@ -184,5 +184,54 @@ define([
 
             expect(accessContraints).toBe("NONE");
         });
+
+        // Capability Element
+        it("should have a get capabilities GET url of http://localhost:8080/geoserver/wcs?", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var getCapabilitiesUrl = wcs.capability.request.getCapabilities.get;
+
+            expect(getCapabilitiesUrl).toBe("http://localhost:8080/geoserver/wcs?");
+        });
+
+        it("should have a get capabilities POST url of http://localhost:8080/geoserver/wcs?", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var getCapabilitiesUrl = wcs.capability.request.getCapabilities.post;
+
+            expect(getCapabilitiesUrl).toBe("http://localhost:8080/geoserver/wcs?");
+        });
+
+        it("should have a describe coverage GET url of http://localhost:8080/geoserver/wcs?", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var describeCoverageUrl = wcs.capability.request.describeCoverage.get;
+
+            expect(describeCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+        });
+
+        it("should have a describe coverage POST url of http://localhost:8080/geoserver/wcs?", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var describeCoverageUrl = wcs.capability.request.describeCoverage.post;
+
+            expect(describeCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+        });
+
+        it("should have a get coverage GET url of http://localhost:8080/geoserver/wcs?", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var getCoverageUrl = wcs.capability.request.getCoverage.get;
+
+            expect(getCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+        });
+
+        it("should have a get coverage POST url of http://localhost:8080/geoserver/wcs?", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+
+            var getCoverageUrl = wcs.capability.request.getCoverage.post;
+
+            expect(getCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+        });
     });
 });
