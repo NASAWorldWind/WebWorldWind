@@ -84,7 +84,7 @@ define([
                 } else if (child.localName === "OperationsMetadata") {
                     this.operationsMetadata = new OwsOperationsMetadata(child);
                 } else if (child.localName === "ServiceMetadata") {
-                    // TODO
+                    this.serviceMetadata = this.assembleServiceMetadata(child);
                 } else if (child.localName === "Contents") {
                     this.assembleContents(child);
                 }
@@ -191,6 +191,46 @@ define([
             }
 
             return boundingBox;
+        };
+
+        WcsCapabilities.prototype.assemble100Service = function (element) {
+            var children = element.children || element.childNodes;
+            for (var c = 0; c < children.length; c++) {
+
+            }
+        };
+
+        WcsCapabilities.prototype.assembleServiceMetadata = function (element) {
+            var children = element.children || element.childNodes, serviceMetadata = {};
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "formatSupported") {
+                    serviceMetadata.formatsSupported = serviceMetadata.formatsSupported || [];
+                    serviceMetadata.formatsSupported.push(child.textContent);
+                } else if (child.localName === "Extension") {
+                    serviceMetadata.extension = this.assembleServiceMetadataExtension(child);
+                }
+            }
+
+            return serviceMetadata;
+        };
+
+        WcsCapabilities.prototype.assembleServiceMetadataExtension = function (element) {
+            var children = element.children || element.childNodes, len = children.length, extension = {};
+            for (var c = 0; c < len; c++) {
+                var child = children[c];
+
+                if (child.localName === "crsSupported") {
+                    extension.crsSupported = extension.crsSupported || [];
+                    extension.crsSupported.push(child.textContent);
+                } else if (child.localName === "interpolationSupported") {
+                    extension.interpolationSupported = extension.interpolationSupported || [];
+                    extension.interpolationSupported.push(child.textContent);
+                }
+            }
+
+            return extension;
         };
 
         return WcsCapabilities;

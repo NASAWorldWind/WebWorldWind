@@ -76,6 +76,35 @@ define([
 
             expect(url).toBe("http://localhost:8080/geoserver/wcs?");
         });
+
+        // Service Metadata
+        it("should have seven supported formats", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+            var formatsSupported = wcs.serviceMetadata.formatsSupported.length;
+
+            expect(formatsSupported).toBe(7);
+        });
+
+        it("should suport image/tiff as the sixth format", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+            var imageTiffFormat = wcs.serviceMetadata.formatsSupported[5];
+
+            expect(imageTiffFormat).toBe("image/tiff");
+        });
+
+        it("should include 5841 supported crs", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+            var supportedCrsCount = wcs.serviceMetadata.extension.crsSupported.length;
+
+            expect(supportedCrsCount).toBe(5841);
+        });
+
+        it("should include three supported interpolation methods", function () {
+            var wcs = new WcsCapabilities(xmlDom);
+            var supportedInterpolationMethods = wcs.serviceMetadata.extension.interpolationSupported.length;
+
+            expect(supportedInterpolationMethods).toBe(3);
+        });
     });
 
     describe("WCS 1.0.0 Capabilities Parsing", function () {
