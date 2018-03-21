@@ -48,7 +48,7 @@ define([
         var WcsCapabilities = function (xmlDom) {
             if (!xmlDom) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmsCapabilities", "constructor", "No XML DOM specified."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "constructor", "No XML DOM specified."));
             }
 
             /**
@@ -62,7 +62,6 @@ define([
         };
 
         WcsCapabilities.prototype.assembleDocument = function () {
-
             // Determine version and update sequence
             var root = this.xmlDom.documentElement;
 
@@ -97,7 +96,6 @@ define([
         };
 
         WcsCapabilities.prototype.assembleVersion100Document = function (root) {
-
             var children = root.children || root.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -212,7 +210,7 @@ define([
                     service.name = child.textContent;
                 } else if (child.localName === "label") {
                     service.label = child.textContent;
-                } else if (child.localName == "fees") {
+                } else if (child.localName === "fees") {
                     service.fees = child.textContent;
                 } else if (child.localName === "accessConstraints") {
                     service.accessConstraints = service.accessConstraints || [];
@@ -265,19 +263,19 @@ define([
 
         // Internal use only. This flattens the DCPType structure to provide a simplified object model.
         WcsCapabilities.assemble100DCPType = function (element) {
-            var children = element.children || element.childNodes, dcptype = {};
+            var children = element.children || element.childNodes, dcptype = {}, httpChild, method, onlineResource, url;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "DCPType") {
-                    // retrieve the HTTP element which should be the only child
-                    var httpChild = child.children || child.childNodes;
+                    // Traverse the DCPType element to determine the GET/POST urls
+                    httpChild = child.children || child.childNodes;
                     httpChild = httpChild[0];
-                    var method = httpChild.children || httpChild.childNodes;
+                    method = httpChild.children || httpChild.childNodes;
                     method = method[0];
-                    var onlineResource = method.children || method.childNodes;
+                    onlineResource = method.children || method.childNodes;
                     onlineResource = onlineResource[0];
-                    var url = onlineResource.getAttribute("xlink:href");
+                    url = onlineResource.getAttribute("xlink:href");
                     if (method.localName === "Get") {
                         dcptype.get = url;
                     } else if (method.localName === "Post") {
