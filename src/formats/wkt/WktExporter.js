@@ -69,18 +69,18 @@ define(['../../error/ArgumentError',
                 else if (renderable instanceof WorldWind.SurfacePolygon) {
                     return this.exportSurfacePolygon(renderable);
                 }
-                // else if (renderable instanceof WorldWind.SurfaceEllipse) {
-                //     return this.exportSurfaceEllipse(renderable);
-                // }
-                // else if (renderable instanceof WorldWind.SurfaceCircle) {
-                //     return this.exportSurfaceCircle(renderable);
-                // }
-                // else if (renderable instanceof WorldWind.SurfaceRectangle) {
-                //     return this.exportSurfaceRectangle(renderable);
-                // }
-                // else if (renderable instanceof WorldWind.SurfaceSector) {
-                //     return this.exportSurfaceSector(renderable);
-                // }
+                else if (renderable instanceof WorldWind.SurfaceEllipse) {
+                    return this.exportSurfaceEllipse(renderable);
+                }
+                else if (renderable instanceof WorldWind.SurfaceCircle) {
+                    return this.exportSurfaceCircle(renderable);
+                }
+                else if (renderable instanceof WorldWind.SurfaceRectangle) {
+                    return this.exportSurfaceRectangle(renderable);
+                }
+                else if (renderable instanceof WorldWind.SurfaceSector) {
+                    return this.exportSurfaceSector(renderable);
+                }
                 else {
                     Logger.log(Logger.LEVEL_WARNING, "Export renderable not implemented: " + renderable);
                     return null;
@@ -305,7 +305,91 @@ define(['../../error/ArgumentError',
             exportSurfaceEllipse: function (renderable) {
                 if (!(renderable instanceof WorldWind.SurfaceEllipse)) {
                     throw new ArgumentError(
-                        Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONExporter", "exportSurfaceEllipse",
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportSurfaceEllipse",
+                            "invalidTypeOfRenderable"));
+                }
+
+                var sb = WktType.SupportedGeometries.POLYGON + '(';
+                sb = sb + '(';
+                for (var i = 0; i < renderable._boundaries.length; i++) {
+                    sb = sb + renderable._boundaries[i].longitude + ' ' +
+                        renderable._boundaries[i].latitude;
+                    sb = sb + ', ';
+                }
+
+                sb = sb.substring(0, sb.length - 2);
+
+                sb = sb + ')';
+                sb = sb + ')';
+                return sb;
+            },
+
+            /**
+             * Exports a [SurfaceCircle]{@link SurfaceCircle} in WKT format of type Polygon.
+             * @param {SurfaceCircle} renderable The SurfaceCircle object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
+            exportSurfaceCircle: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceCircle)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportSurfaceCircle",
+                                "invalidTypeOfRenderable"));
+                }
+
+                var sb = WktType.SupportedGeometries.POLYGON + '(';
+                sb = sb + '(';
+                for (var i = 0; i < renderable._boundaries.length; i++) {
+                    sb = sb + renderable._boundaries[i].longitude + ' ' +
+                        renderable._boundaries[i].latitude;
+                    sb = sb + ', ';
+                }
+
+                sb = sb.substring(0, sb.length - 2);
+
+                sb = sb + ')';
+                sb = sb + ')';
+                return sb;
+            },
+
+            /**
+             * Exports a [SurfaceRectangle]{@link SurfaceRectangle} in WKT format of type Polygon.
+             * @param {SurfaceRectangle} renderable The SurfaceRectangle object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
+            exportSurfaceRectangle: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceRectangle)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportSurfaceRectangle",
+                            "invalidTypeOfRenderable"));
+                }
+
+                var sb = WktType.SupportedGeometries.POLYGON + '(';
+                sb = sb + '(';
+                for (var i = 0; i < renderable._boundaries.length; i++) {
+                    sb = sb + renderable._boundaries[i].longitude + ' ' +
+                        renderable._boundaries[i].latitude;
+                    sb = sb + ', ';
+                }
+
+                sb = sb.substring(0, sb.length - 2);
+
+                sb = sb + ')';
+                sb = sb + ')';
+                return sb;
+            },
+
+            /**
+             * Exports a [SurfaceSector]{@link SurfaceSector} in WKT format of type Polygon.
+             * @param {SurfaceSector} renderable The SurfaceSector object.
+             * @throws {ArgumentError} If the specified argument is null or undefined.
+             * @returns {String} WKT format.
+             */
+            exportSurfaceSector: function (renderable) {
+                if (!(renderable instanceof WorldWind.SurfaceSector)) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WktExporter", "exportSurfaceSector",
                             "invalidTypeOfRenderable"));
                 }
 
