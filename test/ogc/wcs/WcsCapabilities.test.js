@@ -26,7 +26,7 @@ define([
         beforeEach(function (done) {
 
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "../base/test/ogc/wcs/wcs201.xml", true);
+            xhr.open("GET", "../base/test/ogc/wcs/wcs201GetCapabilities.xml", true);
             xhr.addEventListener('load', function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
@@ -113,7 +113,7 @@ define([
         beforeEach(function (done) {
 
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "../base/test/ogc/wcs/wcs100.xml", true);
+            xhr.open("GET", "../base/test/ogc/wcs/wcs100GetCapabilities.xml", true);
             xhr.addEventListener('load', function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {

@@ -48,7 +48,7 @@ define([
         var WcsCapabilities = function (xmlDom) {
             if (!xmlDom) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "constructor", "No XML DOM specified."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "constructor", "missingXmlDom"));
             }
 
             /**
