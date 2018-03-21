@@ -175,9 +175,6 @@ define([
                 for (var p = 0, n = pickList.objects.length; p < n; p++) {
                     var pickedObject = pickList.objects[p];
                     if (!pickedObject.isTerrain) {
-
-                        console.log(pickedObject.userObject);
-
                         // Identify picked objects that have URLs here.
                         if (pickedObject.userObject.url) {
                             window.open(pickedObject.userObject.userProperties.url, "_blank");

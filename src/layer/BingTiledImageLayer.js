@@ -49,6 +49,7 @@ define([
                 this.imageSize, this.imageSize);
 
             this.displayName = displayName;
+
             this.pickEnabled = false;
 
             this.detectBlankImages = true;
@@ -62,7 +63,7 @@ define([
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
                 dc.screenCreditController.addStringCredit("Link to bing maps", Color.DARK_GRAY, "https://www.bing.com/maps");
-                dc.screenCreditController.addImageCredit(this.creditImage);
+                dc.screenCreditController.addImageCredit(this.creditImage, "https://www.bing.com/");
             }
         };
 

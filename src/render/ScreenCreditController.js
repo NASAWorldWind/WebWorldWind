@@ -60,6 +60,7 @@ define([
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
+
         };
 
         ScreenCreditController.prototype = Object.create(Layer.prototype);
@@ -77,7 +78,7 @@ define([
          * @param {String} imageUrl The URL of the image to display in the credits area.
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
-        ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
+        ScreenCreditController.prototype.addImageCredit = function (imageUrl, url) {
             if (!imageUrl) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
@@ -92,6 +93,11 @@ define([
 
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
+
+            if(url){
+                // Append new user property to store URL for hyperlinking
+                credit.userProperties.url = url;
+            }
 
             credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
 
@@ -126,11 +132,9 @@ define([
             var credit = new ScreenText(screenOffset, stringCredit);
 
             if(url){
-
-                console.log("here");
                 // Append new user property to store URL for hyperlinking
                 credit.userProperties.url = url;
-                credit.pickDelegate = credit.userProperties;
+                //credit.pickDelegate = credit.userProperties;
             }
 
             credit.attributes.color = color;
