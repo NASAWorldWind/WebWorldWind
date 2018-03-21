@@ -83,7 +83,7 @@ define([
             //"pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6IjljZjQwNmEyMTNhOWUyMWM5NWUzYWIwOGNhYTY2ZDViIn0.Ju3tOUUUc0C_gcCSAVpFIA";
 
             this.displayName = displayName;
-            this.pickEnabled = false;
+            // this.pickEnabled = false; // Line temporarily commented out to enable picking for screen credit hyperlinks
 
             // Create a canvas we can use when unprojecting retrieved images.
             this.destCanvas = document.createElement("canvas");

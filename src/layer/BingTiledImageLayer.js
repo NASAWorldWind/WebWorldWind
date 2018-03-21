@@ -50,7 +50,7 @@ define([
 
             this.displayName = displayName;
 
-            this.pickEnabled = false;
+            // this.pickEnabled = false; // Line temporarily commented out to enable picking for screen credit hyperlinks
 
             this.detectBlankImages = true;
 
