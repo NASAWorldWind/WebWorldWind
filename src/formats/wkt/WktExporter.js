@@ -30,10 +30,12 @@ define(['../../error/ArgumentError',
          * The following renderables can be exported:
          * <ul>
          *     <li>WorldWind.Placemark</li>
+         *     <li>WorldWind.SurfaceCircle</li>
          *     <li>WorldWind.SurfacePolyline</li>
          *     <li>WorldWind.SurfacePolygon</li>
          *     <li>WorldWind.SurfaceEllipse</li>
          *     <li>WorldWind.SurfaceRectangle</li>
+         *     <li>WorldWind.SurfaceSector</li>
          *     <li>WorldWind.Path</li>
          *     <li>WorldWind.Polygon</li>
          * </ul>
