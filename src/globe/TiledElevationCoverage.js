@@ -234,11 +234,10 @@ define(['../util/AbsentResourceList',
             // output extreme elevations would always contain zero, even when the range of the image's extreme elevations in the
             // sector does not contain zero.
             var min = Number.MAX_VALUE,
-                max = -min,
+                max = Number.MIN_VALUE,
                 image,
                 imageMin,
-                imageMax,
-                result = [];
+                imageMax;
 
             for (var i = 0, len = this.currentTiles.length; i < len; i++) {
                 image = this.currentTiles[i].image();
@@ -253,16 +252,11 @@ define(['../util/AbsentResourceList',
                         max = imageMax;
                     }
                 } else {
-                    result[0] = this.minElevation;
-                    result[1] = this.maxElevation;
-                    return result; // At least one tile image is not in memory; return the model's extreme elevations.
+                    return null; // At least one tile image is not in memory; return the model's extreme elevations.
                 }
             }
 
-            result[0] = min;
-            result[1] = max;
-
-            return result;
+            return [min, max];
         };
 
         // Documented in super class

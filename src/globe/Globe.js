@@ -576,28 +576,11 @@ define([
         };
 
         /**
-         * Returns the time of the oldest elevation coverage associated with this globe.
-         * @returns {Number} The time in milliseconds relative to the Epoch of the oldest elevation coverage.
-         */
-        Globe.prototype.minElevationTimestamp = function () {
-            return this.elevationModel.minTimestamp;
-        };
-
-        /**
          * Returns the time at which any elevations associated with this globe last changed.
-         * @returns {Number} The time in milliseconds relative to the Epoch of the most recent elevation change.
-         */
-        Globe.prototype.maxElevationTimestamp = function () {
-            return this.elevationModel.maxTimestamp;
-        };
-
-        /**
-         * Returns the time at which any elevations associated with this globe last changed.
-         * @deprecated See maxElevationTimestap and minElevationTimestamp.
          * @returns {Number} The time in milliseconds relative to the Epoch of the most recent elevation change.
          */
         Globe.prototype.elevationTimestamp = function () {
-            return this.maxElevationTimestamp();
+            return this.elevationModel.timestamp;
         };
 
         /**

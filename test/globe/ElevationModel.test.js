@@ -24,7 +24,7 @@ define([
 
         var MockCoverage = function (numLevels, minElevation, maxElevation) {
             TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), numLevels, "application/bil16", "MockElevations256", 256, 256);
+                Sector.FULL_SPHERE, new Location(45, 45), numLevels, "application/bil16", "MockElevations256", 256, 256, 100);
 
             this.displayName = "Mock Elevation Coverage";
             this.minElevation = minElevation ? minElevation : -11000;

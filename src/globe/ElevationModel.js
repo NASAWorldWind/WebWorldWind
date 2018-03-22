@@ -49,13 +49,6 @@ define(['../error/ArgumentError',
             this.stateKey = "";
 
             /**
-             * A boolean indicating whether or not to sort coverages by resolution (coarsest to finest).
-             * @memberof ElevationModel.prototype
-             * @type {Boolean}
-             */
-            this.sortCoverages = true;
-
-            /**
              * Internal use only
              * The list of all elevation coverages useable by this model.
              * @type {Array}
@@ -73,7 +66,7 @@ define(['../error/ArgumentError',
              * @type {Number}
              * @readonly
              */
-            maxTimestamp: {
+            timestamp: {
                 get: function () {
                     var maxTimestamp = 0;
 
@@ -86,27 +79,6 @@ define(['../error/ArgumentError',
                     }
 
                     return maxTimestamp;
-                }
-            },
-
-            /**
-             * Returns the time of the oldest coverage, in milliseconds since midnight Jan 1, 1970.
-             * @type {Number}
-             * @readonly
-             */
-            minTimestamp: {
-                get: function () {
-                    var minTimestamp = Number.MAX_VALUE;
-
-                    var i, len;
-                    for (i = 0, len = this.coverages.length; i < len; i++) {
-                        var coverage = this.coverages[i];
-                        if (coverage.enabled && minTimestamp > coverage.timestamp) {
-                            minTimestamp = coverage.timestamp;
-                        }
-                    }
-
-                    return minTimestamp;
                 }
             },
 
@@ -191,16 +163,14 @@ define(['../error/ArgumentError',
          * @ignore
          */
         ElevationModel.prototype.performCoverageListChangedActions = function () {
-            if (this.coverages.length > 1 && this.sortCoverages) {
+            if (this.coverages.length > 1) {
                 this.coverages.sort(this.coverageComparator);
             }
             this.computeStateKey();
         };
 
         /**
-         * Adds an elevation coverage to this elevation model and, optionally, sorts the list. Sorting occurs based on the
-         * value of the ElevationModel.sortCoverages property. If sorting is disabled the coverage is added to the end
-         * of the coverage list. Duplicate coverages will be ignored.
+         * Adds an elevation coverage to this elevation model and sorts the list. Duplicate coverages will be ignored.
          *
          * @param coverage The elevation model to add.
          * @return {Boolean} true if the ElevationCoverage as added; false if the coverage was a duplicate.
@@ -214,40 +184,6 @@ define(['../error/ArgumentError',
 
             if (!this.containsCoverage(coverage)) {
                 this.coverages.push(coverage);
-                this.performCoverageListChangedActions();
-                return true;
-            }
-
-            return false;
-        };
-
-        /**
-         * Inserts an elevation coverage at a specific index in this elevation model. If the sortCoverages property of
-         * this class is true, the effect of insertCoverage will be identical to addCoverage. Duplicate coverages will be ignored.
-         *
-         * @param index The position in the list to insert the coverage.
-         * @param coverage The elevation model to add.
-         * @return {Boolean} true if the ElevationCoverage as added; false if the coverage was a duplicate.
-         * @throws ArgumentError if the specified elevation coverage is null.
-         */
-        ElevationModel.prototype.insertCoverage = function (index, coverage) {
-            if (index === undefined || index === null || index < 0) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "insertCoverage", "invalidIndex"));
-            }
-
-            if (!coverage) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "insertCoverage", "missingCoverage"));
-            }
-
-            if (!this.containsCoverage(coverage)) {
-                if (index >= this.coverages.length) {
-                    this.coverages.push(coverage);
-                }
-                else {
-                    this.coverages.splice(index, 0, coverage);
-                }
                 this.performCoverageListChangedActions();
                 return true;
             }
@@ -335,20 +271,21 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "minAndMaxElevationsForSector", "missingSector"));
             }
 
-            var result = [Number.MAX_VALUE, Number.MIN_VALUE];
+            var i,
+                n = this.coverages.length,
+                coverageResult;
 
-            for (var i = 0, n = this.coverages.length; i < n; i++) {
+            for (i = n - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled) {
-                    var coverageResult = coverage.minAndMaxElevationsForSector(sector);
+                    coverageResult = coverage.minAndMaxElevationsForSector(sector);
                     if (coverageResult) {
-                        result[0] = coverageResult[0] < Number.MAX_VALUE ? coverageResult[0] : result[0];
-                        result[1] = coverageResult[1] > Number.MIN_VALUE ? coverageResult[1] : result[1];
+                        return coverageResult;
                     }
                 }
             }
 
-            return result;
+            return (n === 0) ? [0, 0] : [this.coverages[n - 1].minElevation, this.coverages[n - 1].maxElevation];
         };
 
         /**
