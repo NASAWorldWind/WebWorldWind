@@ -171,15 +171,12 @@ define([
             if (recognizer.state === WorldWind.RECOGNIZED) {
                 var pickPoint = this.wwd.canvasCoordinates(recognizer.clientX, recognizer.clientY);
 
+                // Identify if the top picked object contains a URL for hyperlinking
                 var pickList = this.wwd.pick(pickPoint);
-                for (var p = 0, n = pickList.objects.length; p < n; p++) {
-                    var pickedObject = pickList.objects[p];
-                    if (!pickedObject.isTerrain) {
-                        // Identify picked objects that have URLs here.
-                        if (pickedObject.userObject.userProperties.url) {
-                            window.open(pickedObject.userObject.userProperties.url, "_blank");
-                        }
-                    }
+                var topPickedObject = pickList.topPickedObject();
+                // If the url object was appended, open the hyperlink
+                if(!!topPickedObject.userObject.userProperties.url){
+                    window.open(topPickedObject.userObject.userProperties.url, "_blank");
                 }
             }
         };

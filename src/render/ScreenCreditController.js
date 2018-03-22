@@ -94,14 +94,13 @@ define([
 
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
+            credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
 
-            if(hyperlinkUrl){
-                // Append new user property to store URL for hyperlinking.
-                // (See BasicWorldWindowController.handleClickOrTap).
+            // Append new user property to store URL for hyperlinking.
+            // (See BasicWorldWindowController.handleClickOrTap).
+            if (hyperlinkUrl) {
                 credit.userProperties.url = hyperlinkUrl;
             }
-
-            credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
 
             this.imageCredits.push(credit);
         };
@@ -132,17 +131,17 @@ define([
             }
 
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
+
             var credit = new ScreenText(screenOffset, stringCredit);
-
-            if(hyperlinkUrl){
-                // Append new user property to store URL for hyperlinking.
-                // (See BasicWorldWindowController.handleClickOrTap).
-                credit.userProperties.url = hyperlinkUrl;
-            }
-
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
             credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+
+            // Append new user property to store URL for hyperlinking.
+            // (See BasicWorldWindowController.handleClickOrTap).
+            if (hyperlinkUrl) {
+                credit.userProperties.url = hyperlinkUrl;
+            }
 
             this.textCredits.push(credit);
         };
