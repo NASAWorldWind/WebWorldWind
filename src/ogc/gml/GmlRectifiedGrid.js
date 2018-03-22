@@ -50,7 +50,7 @@ define([
         };
 
         GmlRectifiedGrid.prototype.assembleElement = function (element) {
-            var children = element.children || element.childNodes, geometries = {};
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -64,7 +64,8 @@ define([
                     this.names = this.names || [];
                     this.names.push(child.textContent);
                 } else if (child.localName === "limits") {
-                    this.limits = GmlRectifiedGrid.assembleGridEnvelope(child);
+                    this.limits = GmlRectifiedGrid.assembleLimits(child);
+                    console.log(JSON.stringify(this.limits));
                 } else if (child.localName === "axisLabels") {
                     this.axisLabels = child.textContent.split(/\s+/);
                 } else if (child.localName === "axisName") {
@@ -78,16 +79,23 @@ define([
             }
         };
 
-        GmlRectifiedGrid.assembleGridEnvelope = function (element) {
-            var children = element.children || element.childNodes, envelop = {};
-
-            if (children[0].localName === "GridEnvelope") {
-                return GmlRectifiedGrid.assembleGridEnvelope(children[0]);
-            }
+        GmlRectifiedGrid.assembleLimits = function (element) {
+            var children = element.children || element.childNodes;
 
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
+                if (child.localName === "GridEnvelope") {
+                    return GmlRectifiedGrid.assembleGridEnvelope(child);
+                }
+            }
+        };
+
+        GmlRectifiedGrid.assembleGridEnvelope = function (element) {
+            var children = element.children || element.childNodes, envelop = {};
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
                 envelop[child.localName] = child.textContent.split(/\s+/);
             }
 
