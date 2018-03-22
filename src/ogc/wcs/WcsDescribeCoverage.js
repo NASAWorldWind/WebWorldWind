@@ -51,7 +51,8 @@ define([
         WcsDescribeCoverage.prototype.assemble100Document = function (element) {
             this.version = element.getAttribute("version");
 
-            var children = element.children || element.childNode;
+            var children = element.children || element.childNodes;
+
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -63,7 +64,8 @@ define([
         };
 
         WcsDescribeCoverage.prototype.assemble201Document = function (element) {
-            var children = element.children || element.childNode;
+            var children = element.children || element.childNodes;
+
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -75,7 +77,7 @@ define([
         };
 
         WcsDescribeCoverage.assemble100Coverages = function (element) {
-            var children = element.children || element.childNode, coverage = {};
+            var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -88,7 +90,7 @@ define([
         };
 
         WcsDescribeCoverage.assemble201Coverages = function (element) {
-            var children = element.children || element.childNode, coverage = {};
+            var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
