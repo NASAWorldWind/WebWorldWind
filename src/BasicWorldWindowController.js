@@ -175,8 +175,12 @@ define([
                 var pickList = this.wwd.pick(pickPoint);
                 var topPickedObject = pickList.topPickedObject();
                 // If the url object was appended, open the hyperlink
-                if(!!topPickedObject.userObject.userProperties.url){
-                    window.open(topPickedObject.userObject.userProperties.url, "_blank");
+                if ("userObject" in topPickedObject) {
+                    if ("userProperties" in topPickedObject.userObject) {
+                        if ("url" in topPickedObject.userObject.userProperties) {
+                            window.open(topPickedObject.userObject.userProperties.url, "_blank");
+                        }
+                    }
                 }
             }
         };
