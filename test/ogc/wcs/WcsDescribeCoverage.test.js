@@ -26,4 +26,62 @@ define([
             expect((function () {new WcsDescribeCoverage(null)})).toThrow();
         });
     });
+
+    describe("WSC 1.0.0 Describe Coverage", function () {
+        var xmlDom;
+
+        beforeEach(function (done) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "../base/test/ogc/wcs/wcs100DescribeCoverage.xml", true);
+            xhr.addEventListener('load', function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        xmlDom = xhr.responseXML;
+                        done();
+                    } else {
+                        done("Test WCS Capabilities Retrieval Error: " + xhr.statusText);
+                    }
+                }
+            });
+            xhr.send(null);
+        });
+
+        it("should match the coverage id testing:gebco", function () {
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+            var name = wcsDescribeCoverage.coverages[0].name;
+
+            expect(name).toBe("testing:gebco");
+        });
+    });
+
+    describe("WSC 2.0.1 Describe Coverage", function () {
+        var xmlDom;
+
+        beforeEach(function (done) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "../base/test/ogc/wcs/wcs201DescribeCoverage.xml", true);
+            xhr.addEventListener('load', function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        xmlDom = xhr.responseXML;
+                        done();
+                    } else {
+                        done("Test WCS Capabilities Retrieval Error: " + xhr.statusText);
+                    }
+                }
+            });
+            xhr.send(null);
+        });
+
+        it("should match the coverage id testing__gebco", function () {
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+            var name = wcsDescribeCoverage.coverages[0].coverageId;
+
+            expect(name).toBe("testing__gebco");
+        });
+    });
 });

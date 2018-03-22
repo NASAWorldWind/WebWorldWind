@@ -30,6 +30,74 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsDescribeCoverage", "constructor", "missingXmlDom"));
             }
 
+            this.xmlDom = xmlDom;
+
+            this.assembleDocument();
+        };
+
+        WcsDescribeCoverage.prototype.assembleDocument = function () {
+            // Determine version and update sequence
+            var root = this.xmlDom.documentElement;
+
+            if (root.localName === "CoverageDescription") {
+                this.assemble100Document(root);
+            } else if (root.localName === "CoverageDescriptions") {
+                this.assemble201Document(root);
+            } else {
+                // TODO determine proper logging message for incompatible xml document
+            }
+        };
+
+        WcsDescribeCoverage.prototype.assemble100Document = function (element) {
+            this.version = element.getAttribute("version");
+
+            var children = element.children || element.childNode;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "CoverageOffering") {
+                    this.coverages = this.coverages || [];
+                    this.coverages.push(WcsDescribeCoverage.assemble100Coverages(child));
+                }
+            }
+        };
+
+        WcsDescribeCoverage.prototype.assemble201Document = function (element) {
+            var children = element.children || element.childNode;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "CoverageDescription") {
+                    this.coverages = this.coverages || [];
+                    this.coverages.push(WcsDescribeCoverage.assemble201Coverages(child));
+                }
+            }
+        };
+
+        WcsDescribeCoverage.assemble100Coverages = function (element) {
+            var children = element.children || element.childNode, coverage = {};
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "name") {
+                    coverage.name = child.textContent;
+                }
+            }
+
+            return coverage;
+        };
+
+        WcsDescribeCoverage.assemble201Coverages = function (element) {
+            var children = element.children || element.childNode, coverage = {};
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "CoverageId") {
+                    coverage.coverageId = child.textContent;
+                }
+            }
+
+            return coverage;
         };
 
         return WcsDescribeCoverage;
