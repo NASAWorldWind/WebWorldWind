@@ -201,7 +201,7 @@ define([
                             lon = maxLon; // explicitly set the last lon to the max longitude to ensure alignment
                         }
 
-                        if (lon >= minLonSelf && lon <= maxLonSelf) {
+                        if (lon >= minLonSelf && lon <= maxLonSelf && isNaN(result[index])) {
                             // Image x-coordinate of the specified location, given an image origin in the top-left corner.
                             var x = (this.imageWidth - 1) * (lon - minLonSelf) / deltaLonSelf,
                                 x0 = Math.floor(WWMath.clamp(x, 0, this.imageWidth - 1)),
@@ -214,9 +214,9 @@ define([
                                 x1y1 = pixels[x1 + y1 * this.imageWidth];
 
                             result[index] = (1 - xf) * (1 - yf) * x0y0 +
-                            xf * (1 - yf) * x1y0 +
-                            (1 - xf) * yf * x0y1 +
-                            xf * yf * x1y1;
+                                xf * (1 - yf) * x1y0 +
+                                (1 - xf) * yf * x0y1 +
+                                xf * yf * x1y1;
                         }
 
                         index++;

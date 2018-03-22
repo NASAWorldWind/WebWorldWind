@@ -20,6 +20,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/AnnotationAttributes',
         './util/measure/AreaMeasurer',
         './error/ArgumentError',
+        './globe/AsterV2EarthElevationCoverage',
         './layer/AtmosphereLayer',
         './shaders/AtmosphereProgram',
         './shaders/BasicProgram',
@@ -45,7 +46,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/DigitalGlobeTiledImageLayer',
         './gesture/DragRecognizer',
         './render/DrawContext',
-        './globe/EarthElevationCoverage',
+        './globe/EarthElevationModel',
         './globe/EarthRestElevationCoverage',
         './globe/ElevationCoverage',
         './globe/ElevationModel',
@@ -56,6 +57,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/FramebufferTile',
         './render/FramebufferTileController',
         './geom/Frustum',
+        './globe/GebcoEarthElevationCoverage',
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
@@ -222,6 +224,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/Touch',
         './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
+        './globe/UsgsNedEarthElevationCoverage',
         './geom/Vec2',
         './geom/Vec3',
         './layer/ViewControlsLayer',
@@ -255,14 +258,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
-        './util/XmlDocument',
-        './globe/ZeroElevationCoverage'],
+        './util/XmlDocument'],
     function (AbstractError,
               Angle,
               Annotation,
               AnnotationAttributes,
               AreaMeasurer,
               ArgumentError,
+              AsterV2EarthElevationCoverage,
               AtmosphereLayer,
               AtmosphereProgram,
               BasicProgram,
@@ -288,7 +291,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               DigitalGlobeTiledImageLayer,
               DragRecognizer,
               DrawContext,
-              EarthElevationCoverage,
+              EarthElevationModel,
               EarthRestElevationCoverage,
               ElevationCoverage,
               ElevationModel,
@@ -299,6 +302,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               FramebufferTile,
               FramebufferTileController,
               Frustum,
+              GebcoEarthElevationCoverage,
               GeographicMesh,
               GeographicProjection,
               GeographicText,
@@ -464,6 +468,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               TiltRecognizer,
               Touch,
               TriangleMesh,
+              UsgsNedEarthElevationCoverage,
               UnsupportedOperationError,
               Vec2,
               Vec3,
@@ -498,8 +503,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WWMath,
               WWMessage,
               WWUtil,
-              XmlDocument,
-              ZeroElevationCoverage) {
+              XmlDocument) {
         "use strict";
         /**
          * This is the top-level WorldWind module. It is global.
@@ -727,6 +731,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
         WorldWind['AreaMeasurer'] = AreaMeasurer;
         WorldWind['ArgumentError'] = ArgumentError;
+        WorldWind['AsterV2EarthElevationCoverage'] = AsterV2EarthElevationCoverage;
         WorldWind['AtmosphereLayer'] = AtmosphereLayer;
         WorldWind['AtmosphereProgram'] = AtmosphereProgram;
         WorldWind['BasicProgram'] = BasicProgram;
@@ -752,7 +757,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['DigitalGlobeTiledImageLayer'] = DigitalGlobeTiledImageLayer;
         WorldWind['DragRecognizer'] = DragRecognizer;
         WorldWind['DrawContext'] = DrawContext;
-        WorldWind['EarthElevationCoverage'] = EarthElevationCoverage;
+        WorldWind['EarthElevationModel'] = EarthElevationModel;
         WorldWind['EarthRestElevationCoverage'] = EarthRestElevationCoverage;
         WorldWind['ElevationCoverage'] = ElevationCoverage;
         WorldWind['ElevationModel'] = ElevationModel;
@@ -763,6 +768,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['FramebufferTile'] = FramebufferTile;
         WorldWind['FramebufferTileController'] = FramebufferTileController;
         WorldWind['Frustum'] = Frustum;
+        WorldWind['GebcoEarthElevationCoverage'] = GebcoEarthElevationCoverage;
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
@@ -877,6 +883,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['TiltRecognizer'] = TiltRecognizer;
         WorldWind['Touch'] = Touch;
         WorldWind['TriangleMesh'] = TriangleMesh;
+        WorldWind['UsgsNedEarthElevationCoverage'] = UsgsNedEarthElevationCoverage;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
@@ -910,7 +917,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['WorldWindowController'] = WorldWindowController;
-        WorldWind['ZeroElevationCoverage'] = ZeroElevationCoverage;
 
         /**
          * Holds configuration parameters for WorldWind. Applications may modify these parameters prior to creating

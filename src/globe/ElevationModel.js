@@ -179,8 +179,8 @@ define(['../error/ArgumentError',
          * @ignore
          */
         ElevationModel.prototype.coverageComparator = function (coverage1, coverage2) {
-            var res1 = coverage1.getBestResolution(null);
-            var res2 = coverage2.getBestResolution(null);
+            var res1 = coverage1.resolution;
+            var res2 = coverage2.resolution;
             // sort from lowest resolution to highest
             return res1 > res2 ? -1 : res1 === res2 ? 0 : 1;
         };
@@ -370,18 +370,18 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "missingLongitude"));
             }
 
-            var result = 0;
-            for (var i = 0, n = this.coverages.length; i < n; i++) {
+            var i, n = this.coverages.length;
+            for (i = n - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled) {
                     var elevation = coverage.elevationAtLocation(latitude, longitude);
-                    if (elevation !== 0) {
-                        result = elevation;
+                    if (elevation !== null) {
+                        return elevation;
                     }
                 }
             }
 
-            return result;
+            return 0;
         };
 
         /**
@@ -419,21 +419,26 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingResult"));
             }
 
-            var resolution = Number.MAX_VALUE;
-            var coverageResult = new Float64Array(result.length);
-            for (var i = 0, n = this.coverages.length; i < n; i++) {
+            result.fill(NaN);
+            var resolution = Number.MAX_VALUE, i, n = this.coverages.length, resultFilled = false;
+            for (i = n - 1; !resultFilled && i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled) {
-                    var coverageResolution = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, coverageResult);
-                    if (coverageResolution < Number.MAX_VALUE) {
-                        resolution = coverageResolution;
-                        for (var j = 0, len = result.length; j < len; j++) {
-                            result[j] = coverageResult[j];
-                        }
+                    resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
+                    if (resultFilled) {
+                        resolution = coverage.resolution;
                     }
                 }
             }
 
+            if (!resultFilled) {
+                n = result.length;
+                for (i = 0; i < n; i++) {
+                    if (isNaN(result[i])) {
+                        result[i] = 0;
+                    }
+                }
+            }
             return resolution;
         };
 

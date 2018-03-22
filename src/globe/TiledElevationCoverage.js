@@ -47,9 +47,6 @@ define(['../util/AbsentResourceList',
          * @alias TiledElevationCoverage
          * @constructor
          * @classdesc Represents the elevations for an area, often but not necessarily the whole globe.
-         * <p>
-         *     This class is intended to be a base class for more concrete elevation
-         *     coverages, such as {@link EarthElevationCoverage}.
          * @param {Sector} coverageSector The sector this coverage spans.
          * @param {Location} levelZeroDelta The size of top-level tiles, in degrees.
          * @param {Number} numLevels The number of levels used to represent this coverage's resolution pyramid.
@@ -60,12 +57,13 @@ define(['../util/AbsentResourceList',
          * model's elevation tiles.
          * @param {Number} tileHeight The number of intervals (cells) in the latitudinal direction of this elevation
          * model's elevation tiles.
+         * @param {Number} resolution The resolution of the coverage in meters.
          * @throws {ArgumentError} If any argument is null or undefined, if the number of levels specified is less
          * than one, or if either the tile width or tile height are less than one.
          */
         var TiledElevationCoverage = function (coverageSector, levelZeroDelta, numLevels, retrievalImageFormat, cachePath,
-                                               tileWidth, tileHeight) {
-            ElevationCoverage.call(this);
+                                               tileWidth, tileHeight, resolution) {
+            ElevationCoverage.call(this, resolution);
 
             if (!coverageSector) {
                 throw new ArgumentError(
@@ -270,7 +268,7 @@ define(['../util/AbsentResourceList',
         // Documented in super class
         TiledElevationCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
             if (!this.coverageSector.containsLocation(latitude, longitude)) {
-                return 0; // location is outside the coverage's coverage
+                return null; // location is outside the coverage's coverage
             }
 
             return this.pointElevationForLocation(latitude, longitude);
@@ -330,17 +328,14 @@ define(['../util/AbsentResourceList',
                 c = Math.floor(c / 2);
             }
 
-            return 0; // did not find a tile with an image
+            return null; // did not find a tile with an image
         };
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.pointElevationsForGrid = function (sector, numLat, numLon, level, result) {
-            var maxResolution = 0,
-                resolution;
-
             this.assembleTiles(level, sector, true);
             if (this.currentTiles.length === 0) {
-                return 0; // Sector is outside the coverage's coverage area. Do not modify the results array.
+                return false; // Sector is outside the coverage's coverage area. Do not modify the results array.
             }
 
             // Sort from lowest resolution to highest so that higher resolutions override lower resolutions in the
@@ -355,17 +350,10 @@ define(['../util/AbsentResourceList',
 
                 if (image) {
                     image.elevationsForGrid(sector, numLat, numLon, result);
-                    resolution = tile.level.texelSize;
-
-                    if (maxResolution < resolution) {
-                        maxResolution = resolution;
-                    }
-                } else {
-                    maxResolution = Number.MAX_VALUE;
                 }
             }
 
-            return maxResolution;
+            return !result.includes(NaN); // true if the result array is fully populated.
         };
 
         // Internal. Returns elevations for a grid assuming pixel-is-area.
@@ -379,6 +367,7 @@ define(['../util/AbsentResourceList',
                 lat, lon, s, t,
                 latIndex, lonIndex, resultIndex = 0;
 
+            var resultFilled = true;
             for (latIndex = 0, lat = minLat; latIndex < numLat; latIndex += 1, lat += deltaLat) {
                 if (latIndex === numLat - 1) {
                     lat = maxLat; // explicitly set the last lat to the max latitude ensure alignment
@@ -389,17 +378,22 @@ define(['../util/AbsentResourceList',
                         lon = maxLon; // explicitly set the last lon to the max longitude ensure alignment
                     }
 
-                    if (this.coverageSector.containsLocation(lat, lon)) { // ignore locations outside of the model
-                        s = (lon + 180) / 360;
-                        t = (lat + 90) / 180;
-                        this.areaElevationForCoord(s, t, level.levelNumber, result, resultIndex);
+                    if (isNaN(result[resultIndex])) {
+                        if (this.coverageSector.containsLocation(lat, lon)) { // ignore locations outside of the model
+                            s = (lon + 180) / 360;
+                            t = (lat + 90) / 180;
+                            resultFilled = resultFilled && this.areaElevationForCoord(s, t, level.levelNumber, result, resultIndex);
+                        }
+                        else {
+                            resultFilled = false;
+                        }
                     }
 
                     resultIndex++;
                 }
             }
 
-            return level.texelSize; // TODO: return the actual achieved
+            return resultFilled;
         };
 
         // Internal. Returns an elevation for a location assuming pixel-is-area.
@@ -436,9 +430,11 @@ define(['../util/AbsentResourceList',
                         xf * (1 - yf) * pixels[1] +
                         (1 - xf) * yf * pixels[2] +
                         xf * yf * pixels[3];
-                    return;
+                    return true;
                 }
             }
+
+            return false;
         };
 
         // Internal. Bilinearly interpolates tile-image elevations.
@@ -676,7 +672,7 @@ define(['../util/AbsentResourceList',
             }
         };
 
-        // Intentionally not documented.
+        // Intentionally not documented
         TiledElevationCoverage.prototype.removeFromCurrentRetrievals = function (imagePath) {
             var index = this.currentRetrievals.indexOf(imagePath);
             if (index > -1) {
@@ -706,15 +702,6 @@ define(['../util/AbsentResourceList',
                 this.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
                 this.timestamp = Date.now();
             }
-        };
-
-        // Documented in super class
-        TiledElevationCoverage.prototype.getBestResolution = function (sector) {
-            if (!sector)
-                return this.levels.lastLevel().texelSize;
-
-            var level = this.levels.lastLevel();
-            return level.sector.intersection(sector) ? level.texelSize : Number.MAX_VALUE;
         };
 
         return TiledElevationCoverage;

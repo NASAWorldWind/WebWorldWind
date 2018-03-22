@@ -14,41 +14,39 @@
  * limitations under the License.
  */
 /**
- * @exports EarthElevationCoverage
+ * @exports AsterV2EarthElevationCoverage
  */
 define([
         '../geom/Location',
         '../geom/Sector',
-        '../globe/ElevationModel',
         '../globe/TiledElevationCoverage',
         '../util/WmsUrlBuilder'
     ],
     function (Location,
               Sector,
-              ElevationModel,
               TiledElevationCoverage,
               WmsUrlBuilder) {
         "use strict";
 
         /**
-         * Constructs a EarthElevationCoverage
-         * @alias EarthElevationCoverage
+         * Constructs an Earth elevation coverage using ASTER V2 data.
+         * @alias AsterV2EarthElevationCoverage
          * @constructor
+         * @augments TiledElevationCoverage
+         * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
-        var EarthElevationCoverage = function () {
+        var AsterV2EarthElevationCoverage = function () {
             TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "application/bil16", "EarthElevations256", 256, 256);
+                new Sector(-83.0001, 83.0001, -180, 180), new Location(45, 45), 12, "application/bil16", "AsterV2EarthElevations256", 256, 256, 30);
 
-            this.displayName = "Earth Elevation Coverage";
-            this.minElevation = -11000; // Depth of Marianas Trench, in meters
-            this.maxElevation = 8850; // Height of Mt. Everest
-            this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images
-
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev",
-                "GEBCO,aster_v2,USGS-NED", "", "1.3.0");
+            this.displayName = "ASTER V2 Earth Elevation Coverage";
+            this.minElevation = -11000;
+            this.maxElevation = 8850;
+            this.pixelIsPoint = false;
+            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "aster_v2", "", "1.3.0");
         };
 
-        EarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
+        AsterV2EarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return EarthElevationCoverage;
+        return AsterV2EarthElevationCoverage;
     });

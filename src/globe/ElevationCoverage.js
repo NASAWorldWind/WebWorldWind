@@ -16,18 +16,27 @@
 /**
  * @exports ElevationCoverage
  */
-define(['../util/Logger',
-        '../error/UnsupportedOperationError'],
-    function (Logger,
-              UnsupportedOperationError) {
+define(['../error/ArgumentError',
+        '../util/Logger'],
+    function (ArgumentError,
+              Logger) {
         "use strict";
 
         /**
          * Constructs an ElevationCoverage
          * @alias ElevationCoverage
          * @constructor
+         * @classdesc When used directly and not through a subclass, this class represents an elevation coverage
+         * whose elevations are zero at all locations.
+         * @param {Number} resolution The resolution of the coverage in meters.
+         * @throws {ArgumentError} If the resolution argument is null, undefined, or zero.
          */
-        var ElevationCoverage = function () {
+        var ElevationCoverage = function (resolution) {
+            if (!resolution) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "constructor",
+                        "missingResolution"));
+            }
 
             /**
              * Indicates the last time this coverage changed, in milliseconds since midnight Jan 1, 1970.
@@ -42,7 +51,7 @@ define(['../util/Logger',
              * @type {String}
              * @default "Elevations"
              */
-            this.displayName = "Elevations";
+            this.displayName = "Zero Elevations";
 
             /**
              * Indicates whether or not to use this coverage.
@@ -50,6 +59,12 @@ define(['../util/Logger',
              * @default true
              */
             this.enabled = true;
+
+            /**
+             * The resolution of this coverage in meters.
+             * @type {Number}
+             */
+            this.resolution = resolution;
         };
 
         /**
@@ -60,8 +75,7 @@ define(['../util/Logger',
          * @throws {ArgumentError} If the specified sector is null or undefined.
          */
         ElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "minAndMaxElevationsForSector", "abstractInvocation"));
+            return [0, 0];
         };
 
         /**
@@ -72,8 +86,7 @@ define(['../util/Logger',
          * outside the coverage area of this coverage.
          */
         ElevationCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "elevationAtLocation", "abstractInvocation"));
+            return 0;
         };
 
         /**
@@ -90,22 +103,26 @@ define(['../util/Logger',
          * specified numLat or numLon values is less than one.
          */
         ElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "elevationsForGrid", "abstractInvocation"));
-        };
+            if (!sector) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "elevationsForGrid", "missingSector"));
+            }
 
-        /**
-         * Indicates the best resolution attainable for a specified sector.
-         *
-         * @param sector the sector in question. If null, the elevation coverage's best overall resolution is returned. This is
-         *               the best attainable at <em>some</em> locations but not necessarily at all locations.
-         *
-         * @return the best resolution attainable for the specified sector, in radians, or {@link Number.MAX_VALUE} if the
-         *         sector does not intersect the elevation model.
-         */
-        ElevationCoverage.prototype.getBestResolution = function (sector) {
-            throw new UnsupportedOperationError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "getBestResolution", "abstractInvocation"));
+            if (numLat <= 0 || numLon <= 0) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage",
+                    "elevationsForGrid", "numLat or numLon is less than 1"));
+            }
+
+            if (!result || result.length < numLat * numLon) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage",
+                    "elevationsForGrid", "missingArray"));
+            }
+
+            for (var i = 0, len = result.length; i < len; i++) {
+                result[i] = 0;
+            }
+
+            return 0;
         };
 
         return ElevationCoverage;
