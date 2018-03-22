@@ -1,0 +1,176 @@
+/*
+ * Copyright 2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @exports GmlRectifiedGrid
+ */
+define([
+        '../../error/ArgumentError',
+        '../../util/Logger'
+    ],
+    function (ArgumentError,
+              Logger) {
+        "use strict";
+
+        var GmlRectifiedGrid = function (element) {
+            if (!element) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GmlRectifiedGrid", "constructor", "missingXmlDom"));
+            }
+
+            this.captureAttributes(element);
+            this.assembleElement(element);
+        };
+
+        GmlRectifiedGrid.prototype.captureAttributes = function (element) {
+            this.id = element.getAttribute("gml:id");
+            this.srsName = element.getAttribute("srsName");
+            this.srsDimension = element.getAttribute("srsDimension");
+            this.axisLabels = element.getAttribute("axisLabels");
+            if (this.axisLabels) {
+                this.axisLabels = this.axisLabels.split(/\s+/);
+            }
+            this.uomLabels = element.getAttribute("uomLabels");
+            if (this.uomLabels) {
+                this.uomLabels = this.uomLabels.split(/\s+/);
+            }
+            this.dimension = parseInt(element.getAttribute("dimension"));
+        };
+
+        GmlRectifiedGrid.prototype.assembleElement = function (element) {
+            var children = element.children || element.childNodes, geometries = {};
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "description") {
+                    this.description = child.textContent;
+                } else if (child.localName === "descriptionReference") {
+                    this.descriptionReference = child.getAttribute("xlink:href");
+                } else if (child.localName === "identifier") {
+                    this.identifier = child.textContent;
+                } else if (child.localName === "name") {
+                    this.names = this.names || [];
+                    this.names.push(child.textContent);
+                } else if (child.localName === "limits") {
+                    this.limits = GmlRectifiedGrid.assembleGridEnvelope(child);
+                } else if (child.localName === "axisLabels") {
+                    this.axisLabels = child.textContent.split(/\s+/);
+                } else if (child.localName === "axisName") {
+                    this.axisNames = this.axisNames || [];
+                    this.axisNames.push(child.textContent);
+                } else if (child.localName === "origin") {
+                    this.origin = GmlRectifiedGrid.assembleOrigin(child);
+                } else if (child.localName === "offsetVector") {
+                    // TODO
+                }
+            }
+        };
+
+        GmlRectifiedGrid.assembleGridEnvelope = function (element) {
+            var children = element.children || element.childNodes, envelop = {};
+
+            if (children[0].localName === "GridEnvelope") {
+                return GmlRectifiedGrid.assembleGridEnvelope(children[0]);
+            }
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                envelop[child.localName] = child.textContent.split(/\s+/);
+            }
+
+            return envelop;
+        };
+
+        GmlRectifiedGrid.assembleOrigin = function (element) {
+            var origin = {};
+            origin.type = element.getAttribute("xlink:type");
+            origin.href = element.getAttribute("xlink:href");
+            origin.role = element.getAttribute("xlink:role");
+            origin.arcrole = element.getAttribute("xlink:arcrole");
+            origin.title = element.getAttribute("xlink:title");
+            origin.show = element.getAttribute("xlink:show");
+            origin.actuate = element.getAttribute("xlink:actuate");
+            origin.nilReason = element.getAttribute("nilReason");
+            origin.remoteSchema = element.getAttribute("gml:remoteSchema");
+            origin.owns = element.getAttribute("owns");
+
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Point") {
+                    origin.point = GmlRectifiedGrid.assemblePoint(child);
+                }
+            }
+
+            return origin;
+        };
+
+        GmlRectifiedGrid.assemblePoint = function (element) {
+            var point = {}, pos = {};
+            point.id = element.getAttribute("gml:id");
+            point.srsName = element.getAttribute("srsName");
+            point.srsDimension = element.getAttribute("srsDimension");
+            point.axisLabels = element.getAttribute("axisLabels");
+            if (point.axisLabels) {
+                point.axisLabels = point.axisLabels.split(/\s+/);
+            }
+            point.uomLabels = element.getAttribute("uomLabels");
+            if (point.uomLabels) {
+                point.uomLabels = point.uomLabels.split(/\s+/);
+            }
+
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "description") {
+                    point.description = child.textContent;
+                } else if (child.localName === "descriptionReference") {
+                    point.descriptionReference = GmlRectifiedGrid.assembleOrigin(child);
+                } else if (child.localName === "identifier") {
+                    point.identifier = child.textContent;
+                } else if (child.localName === "name") {
+                    point.name = child.textContent;
+                } else if (child.localName === "pos") {
+                    pos.srsName = child.getAttribute("srsName");
+                    pos.srsDimension = parseInt(child.getAttribute("srsDimension"));
+                    pos.axisLabels = child.getAttribute("axisLabels");
+                    if (pos.axisLabels) {
+                        pos.axisLabels = pos.axisLabels.split(/\s+/);
+                    }
+                    pos.uomLabels = child.getAttribute("uomLabels");
+                    if (pos.uomLabels) {
+                        pos.uomLabels = pos.uomLabels.split(/\s+/);
+                    }
+                    pos.pos = child.textContent;
+                    if (pos.pos) {
+                        pos.pos = pos.pos.split(/\s+/);
+                        for (var p = 0; p < pos.pos.length; p++) {
+                            pos.pos[p] = parseFloat(pos.pos[p]);
+                        }
+                    }
+                    point.pos = pos;
+                }
+            }
+
+            return point;
+        };
+
+        return GmlRectifiedGrid;
+    });

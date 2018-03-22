@@ -18,9 +18,11 @@
  */
 define([
         '../../error/ArgumentError',
+        '../../ogc/gml/GmlDomainSet',
         '../../util/Logger'
     ],
     function (ArgumentError,
+              GmlDomainSet,
               Logger) {
         "use strict";
 
@@ -96,6 +98,8 @@ define([
 
                 if (child.localName === "CoverageId") {
                     coverage.coverageId = child.textContent;
+                } else if (child.localName === "domainSet") {
+                    coverage.domainSet = new GmlDomainSet(child);
                 }
             }
 

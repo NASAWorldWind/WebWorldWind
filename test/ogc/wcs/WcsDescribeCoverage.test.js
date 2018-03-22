@@ -83,5 +83,52 @@ define([
 
             expect(name).toBe("testing__gebco");
         });
+
+        describe("Domain Set", function () {
+
+            it("should have the correct gml:id of grid00__testing__gebco", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var gmlDomainSetId = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.id;
+
+                expect(gmlDomainSetId).toBe("grid00__testing__gebco");
+            });
+
+            it("should have the correct axis labels of i and j", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var axisLabels = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.axisLabels;
+
+                expect(axisLabels[0]).toBe("i");
+                expect(axisLabels[1]).toBe("j");
+            });
+
+            it("should have an origin of 89.99583333333334 -179.99583333333334", function() {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var pos = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.origin.point.pos.pos;
+
+                expect(pos[0]).toBeCloseTo(89.99583333333334, 0.000001);
+                expect(pos[1]).toBeCloseTo(-179.99583333333334, 0.000001);
+            });
+
+            it("should have a low grid envelope of 0, 0", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var lowEnvelope = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.limits.low;
+
+                expect(lowEnvelope[0]).toBe("0");
+                expect(lowEnvelope[1]).toBe("0");
+            });
+
+            it("should have a high grid envelope of 43199, 21599", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var highEnvelope = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.limits.high;
+
+                expect(highEnvelope[0]).toBe("43199");
+                expect(highEnvelope[1]).toBe("21599");
+            });
+        });
     });
 });
