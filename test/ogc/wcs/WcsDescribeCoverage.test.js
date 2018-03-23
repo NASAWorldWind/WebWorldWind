@@ -100,6 +100,16 @@ define([
             expect(lonLatEnvelop.pos[1][0]).toBeCloseTo(180.0, error);
             expect(lonLatEnvelop.pos[1][1]).toBeCloseTo(90.0, error);
         });
+
+        it("should show support for the EPSG:4326 CRS", function () {
+            var wcs = new WcsDescribeCoverage(xmlDom);
+
+            var supportedRequestCrs = wcs.coverages[0].supportedCrs.requests[0];
+            var supportedResponseCrs = wcs.coverages[0].supportedCrs.responses[0];
+
+            expect(supportedRequestCrs).toBe("EPSG:4326");
+            expect(supportedResponseCrs).toBe("EPSG:4326");
+        });
     });
 
     describe("WSC 2.0.1 Describe Coverage", function () {
