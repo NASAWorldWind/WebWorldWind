@@ -129,6 +129,34 @@ define([
                 expect(highEnvelope[0]).toBe("43199");
                 expect(highEnvelope[1]).toBe("21599");
             });
+
+            it("should have an offset vector srsName of 4326 for the first and second offsets", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var offsetSrsOne = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.offsetVector[0].srsName;
+                var offsetSrsTwo = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.offsetVector[1].srsName;
+
+                expect(offsetSrsOne).toBe("http://www.opengis.net/def/crs/EPSG/0/4326");
+                expect(offsetSrsTwo).toBe("http://www.opengis.net/def/crs/EPSG/0/4326");
+            });
+
+            it("should have offset vector values of 0.0 0.008333333333333333 for the first offset", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var values = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.offsetVector[0].values;
+
+                expect(values[0]).toBeCloseTo(0, 0.000001);
+                expect(values[1]).toBeCloseTo(0.008333333333333333, 0.0000001);
+            });
+
+            it("should have offset vector values of -0.008333333333333333 0.0 for the second offset", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var values = wcsDescribeCoverage.coverages[0].domainSet.rectifiedGrid.offsetVector[1].values;
+
+                expect(values[0]).toBeCloseTo(-0.008333333333333333, 0.0000001);
+                expect(values[1]).toBeCloseTo(0, 0.000001);
+            });
         });
     });
 });

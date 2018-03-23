@@ -65,7 +65,6 @@ define([
                     this.names.push(child.textContent);
                 } else if (child.localName === "limits") {
                     this.limits = GmlRectifiedGrid.assembleLimits(child);
-                    console.log(JSON.stringify(this.limits));
                 } else if (child.localName === "axisLabels") {
                     this.axisLabels = child.textContent.split(/\s+/);
                 } else if (child.localName === "axisName") {
@@ -74,7 +73,8 @@ define([
                 } else if (child.localName === "origin") {
                     this.origin = GmlRectifiedGrid.assembleOrigin(child);
                 } else if (child.localName === "offsetVector") {
-                    // TODO
+                    this.offsetVector = this.offsetVector || [];
+                    this.offsetVector.push(GmlRectifiedGrid.assembleOffsetVector(child));
                 }
             }
         };
@@ -178,6 +178,30 @@ define([
             }
 
             return point;
+        };
+
+        GmlRectifiedGrid.assembleOffsetVector = function (element) {
+            var children = element.children || element.childNodes, offsetVector = {}, rawValues;
+
+            // Collect and store associated attributes
+            offsetVector.srsName = element.getAttribute("srsName");
+            offsetVector.srsDimension = parseInt(element.getAttribute("srsDimension"));
+            offsetVector.axisLabels = element.getAttribute("axisLabels");
+            if (offsetVector.axisLabels) {
+                offsetVector.axisLabels = offsetVector.axisLabels.split(/\s+/);
+            }
+            offsetVector.uomLabels = element.getAttribute("uomLabels");
+            if (offsetVector.uomLabels) {
+                offsetVector.uomLabels = offsetVector.uomLabels.split(/\s+/);
+            }
+
+            rawValues = element.textContent.split(/\s+/);
+            offsetVector.values = [];
+            for (var i = 0; i < rawValues.length; i++) {
+                offsetVector.values.push(parseFloat(rawValues[i]));
+            }
+
+            return offsetVector;
         };
 
         return GmlRectifiedGrid;
