@@ -87,7 +87,7 @@ define([
              * Use the addHeader method.
              * @type {Object}
              */
-            this.headers = options.headers || defaultOptions.headers;
+            this.headers = options.headers || {};
 
             /**
              * Payload data for POST, PUT requests.
@@ -152,7 +152,7 @@ define([
             relation: OpenSearchConstants.RESULTS,
             withCredentials: false,
             timeout: 0,
-            headers: {},
+            headers: null,
             body: null,
             responseType: 'text',
             user: null,
