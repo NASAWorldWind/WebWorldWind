@@ -102,6 +102,8 @@ define([
                     coverage.supportedCrs = WcsDescribeCoverage.assemble100SupportedCrs(child);
                 } else if (child.localName === "supportedFormats") {
                     coverage.supportedFormats = WcsDescribeCoverage.assemble100SupportedFormats(child);
+                } else if (child.localName === "supportedInterpolations") {
+                    coverage.supportedInterpolations = WcsDescribeCoverage.assemble100SupportedInterpolations(child);
                 }
             }
 
@@ -206,6 +208,23 @@ define([
             }
 
             return supportedFormats;
+        };
+
+        WcsDescribeCoverage.assemble100SupportedInterpolations = function (element) {
+            var children = element.children || element.childNodes, supportedInterpolations = {};
+
+            supportedInterpolations.default = element.getAttribute("default");
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "interpolationMethod") {
+                    supportedInterpolations.methods = supportedInterpolations.methods || [];
+                    supportedInterpolations.methods.push(child.textContent);
+                }
+            }
+
+            return supportedInterpolations;
         };
 
         WcsDescribeCoverage.parseSpacedFloatArray = function (line) {

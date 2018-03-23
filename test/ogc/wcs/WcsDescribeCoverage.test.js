@@ -137,6 +137,33 @@ define([
                 expect(formatSupported).toBe("GeoPackage (tiles)");
             });
         });
+        
+        describe("Supported Interpolations", function () {
+            
+            it("should have three supported interpolation methods", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var numberOfSupportedInterpolationMethods = wcs.coverages[0].supportedInterpolations.methods.length;
+
+                expect(numberOfSupportedInterpolationMethods).toBe(3);
+            });
+
+            it("should show a default nearest neighbor interpolation method", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var defaultInterpolation = wcs.coverages[0].supportedInterpolations.default;
+
+                expect(defaultInterpolation).toBe("nearest neighbor");
+            });
+
+            it("should support bilinear interpolation", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var bilinearInterpolationMethod = wcs.coverages[0].supportedInterpolations.methods[1];
+
+                expect(bilinearInterpolationMethod).toBe("bilinear");
+            });
+        });
     });
 
     describe("WSC 2.0.1 Describe Coverage", function () {
