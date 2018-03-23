@@ -20,12 +20,14 @@ define([
         '../../error/ArgumentError',
         '../../ogc/gml/GmlBoundedBy',
         '../../ogc/gml/GmlDomainSet',
+        '../../ogc/gml/GmlRectifiedGrid',
         '../../util/Logger',
         '../../ogc/ows/OwsKeywords'
     ],
     function (ArgumentError,
               GmlBoundedBy,
               GmlDomainSet,
+              GmlRectifiedGrid,
               Logger,
               OwsKeywords) {
         "use strict";
@@ -104,6 +106,8 @@ define([
                     coverage.supportedFormats = WcsDescribeCoverage.assemble100SupportedFormats(child);
                 } else if (child.localName === "supportedInterpolations") {
                     coverage.supportedInterpolations = WcsDescribeCoverage.assemble100SupportedInterpolations(child);
+                } else if (child.localName === "domainSet") {
+                    coverage.domainSet = WcsDescribeCoverage.assemble100DomainSet(child);
                 }
             }
 
@@ -225,6 +229,36 @@ define([
             }
 
             return supportedInterpolations;
+        };
+
+        WcsDescribeCoverage.assemble100DomainSet = function (element) {
+            var children = element.children || element.childNodes, domainSet = {};
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "spatialDomain") {
+                    domainSet.spatialDomain = WcsDescribeCoverage.assemble100SpatialDomain(child);
+                }
+            }
+
+            return domainSet;
+        };
+
+        WcsDescribeCoverage.assemble100SpatialDomain = function (element) {
+            var children = element.children || element.childNodes, spatialDomain = {};
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Envelope") {
+                    spatialDomain.envelope = WcsDescribeCoverage.assemble100LonLatEnvelope(child);
+                } else if (child.localName === "RectifiedGrid") {
+                    spatialDomain.rectifiedGrid = new GmlRectifiedGrid(child);
+                }
+            }
+
+            return spatialDomain;
         };
 
         WcsDescribeCoverage.parseSpacedFloatArray = function (line) {

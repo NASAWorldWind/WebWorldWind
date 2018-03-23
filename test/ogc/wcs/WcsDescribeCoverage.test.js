@@ -164,6 +164,83 @@ define([
                 expect(bilinearInterpolationMethod).toBe("bilinear");
             });
         });
+
+        describe("Spatial Domain Set", function () {
+
+            it("Should have an envelope with an EPSG:4326 srs name", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var envelopSrsName = wcs.coverages[0].domainSet.spatialDomain.envelope.srsName;
+
+                expect(envelopSrsName).toBe("EPSG:4326");
+            });
+
+            it("Should have an envelope which spans the entire globe", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+                var error = 1e-9;
+
+                var domainEnvelope = wcs.coverages[0].domainSet.spatialDomain.envelope.pos;
+
+                expect(domainEnvelope[0][0]).toBeCloseTo(-180.0, error);
+                expect(domainEnvelope[0][1]).toBeCloseTo(-90.0, error);
+                expect(domainEnvelope[1][0]).toBeCloseTo(180.0, error);
+                expect(domainEnvelope[1][1]).toBeCloseTo(90.0, error);
+            });
+
+            it("should have the correct axis names of x and y", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var axisNames = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.rectifiedGrid.axisNames;
+
+                expect(axisNames[0]).toBe("x");
+                expect(axisNames[1]).toBe("y");
+            });
+
+            it("should have an origin of -179.99583333333334 89.99583333333334", function() {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var pos = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.rectifiedGrid.origin.pos.pos;
+
+                expect(pos[0]).toBeCloseTo(-179.99583333333334, 0.000001);
+                expect(pos[1]).toBeCloseTo(89.99583333333334, 0.000001);
+            });
+
+            it("should have a low grid envelope of 0, 0", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var lowEnvelope = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.rectifiedGrid.limits.low;
+
+                expect(lowEnvelope[0]).toBe("0");
+                expect(lowEnvelope[1]).toBe("0");
+            });
+
+            it("should have a high grid envelope of 43199, 21599", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var highEnvelope = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.rectifiedGrid.limits.high;
+
+                expect(highEnvelope[0]).toBe("43199");
+                expect(highEnvelope[1]).toBe("21599");
+            });
+
+            it("should have offset vector values of 0.0 0.008333333333333333 for the first offset", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var values = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.rectifiedGrid.offsetVector[0].values;
+
+                expect(values[0]).toBeCloseTo(0, 0.000001);
+                expect(values[1]).toBeCloseTo(0.008333333333333333, 0.0000001);
+            });
+
+            it("should have offset vector values of -0.008333333333333333 0.0 for the second offset", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var values = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.rectifiedGrid.offsetVector[1].values;
+
+                expect(values[0]).toBeCloseTo(-0.008333333333333333, 0.0000001);
+                expect(values[1]).toBeCloseTo(0, 0.000001);
+            });
+        });
     });
 
     describe("WSC 2.0.1 Describe Coverage", function () {

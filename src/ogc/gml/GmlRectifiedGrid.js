@@ -122,6 +122,8 @@ define([
 
                 if (child.localName === "Point") {
                     origin.point = GmlRectifiedGrid.assemblePoint(child);
+                } else if (child.localName === "pos") {
+                    origin.pos = GmlRectifiedGrid.assemblePos(child);
                 }
             }
 
@@ -156,28 +158,34 @@ define([
                 } else if (child.localName === "name") {
                     point.name = child.textContent;
                 } else if (child.localName === "pos") {
-                    pos.srsName = child.getAttribute("srsName");
-                    pos.srsDimension = parseInt(child.getAttribute("srsDimension"));
-                    pos.axisLabels = child.getAttribute("axisLabels");
-                    if (pos.axisLabels) {
-                        pos.axisLabels = pos.axisLabels.split(/\s+/);
-                    }
-                    pos.uomLabels = child.getAttribute("uomLabels");
-                    if (pos.uomLabels) {
-                        pos.uomLabels = pos.uomLabels.split(/\s+/);
-                    }
-                    pos.pos = child.textContent;
-                    if (pos.pos) {
-                        pos.pos = pos.pos.split(/\s+/);
-                        for (var p = 0; p < pos.pos.length; p++) {
-                            pos.pos[p] = parseFloat(pos.pos[p]);
-                        }
-                    }
-                    point.pos = pos;
+                    point.pos = GmlRectifiedGrid.assemblePos(child);
                 }
             }
 
             return point;
+        };
+
+        GmlRectifiedGrid.assemblePos = function (child) {
+            var pos = {};
+            pos.srsName = child.getAttribute("srsName");
+            pos.srsDimension = parseInt(child.getAttribute("srsDimension"));
+            pos.axisLabels = child.getAttribute("axisLabels");
+            if (pos.axisLabels) {
+                pos.axisLabels = pos.axisLabels.split(/\s+/);
+            }
+            pos.uomLabels = child.getAttribute("uomLabels");
+            if (pos.uomLabels) {
+                pos.uomLabels = pos.uomLabels.split(/\s+/);
+            }
+            pos.pos = child.textContent;
+            if (pos.pos) {
+                pos.pos = pos.pos.split(/\s+/);
+                for (var p = 0; p < pos.pos.length; p++) {
+                    pos.pos[p] = parseFloat(pos.pos[p]);
+                }
+            }
+
+            return pos;
         };
 
         GmlRectifiedGrid.assembleOffsetVector = function (element) {
