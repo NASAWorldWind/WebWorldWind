@@ -31,23 +31,19 @@ requirejs([
         wwd.addLayer(openSearchLayer);
 
         openSearchLayer.shapeConfigurationCallback = shapeConfigurationCallback;
-        openSearchLayer.currentTimeInterval = [
-            new Date('2013-03-06T00:00:00.000Z'),
-            new Date('2013-03-12T00:00:00.000Z')
-        ];
 
         // ************************************************************************************************************
         // This performs a 2-step search for Earth Observation products using the OpenSearch service and layer.
 
         var url = 'http://geo.spacebel.be/opensearch/description.xml';
 
-        var openSearchService = new WorldWind.OpenSearchService(url);
+        var openSearchService = new WorldWind.OpenSearchService();
 
         // Use the service for getting and parsing the OpenSearch description document
-        openSearchService.discover()
+        openSearchService.discover({url : url})
             .then(function (service) {
                 var searchParams = [
-                    {name: 'platform', value: 'smos'}
+                    {name: 'organisationName', value: 'VITO'}
                 ];
 
                 // Search for collections using the given parameters
@@ -66,7 +62,8 @@ requirejs([
             })
             .then(function (layer) {
                 var searchParams = [
-                    {name: 'productType', value: '{MIR_SCLF1C,MIR_SCSF1C,MIR_SCLD1C,MIR_SCSD1C}'}
+                    {name: 'startDate', value: new Date('2000-01-01T00:00:00Z')},
+                    {name: 'endDate', value: new Date('2018-03-01T00:00:00Z')}
                 ];
 
                 // Search for products using the given parameters

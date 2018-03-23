@@ -198,7 +198,7 @@ define([
          */
         OpenSearchLayer.prototype.loadFromGeoJSON = function (geoJSONCollection, shapeConfigurationCallback) {
             var shapeCb = shapeConfigurationCallback || this._shapeConfigurationCallback || null;
-            var polygonGeoJSON = new GeoJSONParser(JSON.stringify(geoJSONCollection));
+            var polygonGeoJSON = new GeoJSONParser(geoJSONCollection);
             polygonGeoJSON.load(null, shapeCb, this);
         };
 
