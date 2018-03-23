@@ -361,7 +361,6 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "incorrectResultType"));
             }
 
-            console.log(result);
             result.fill(NaN);
             var resolution = Number.MAX_VALUE, i, n = this.coverages.length, resultFilled = false;
             for (i = n - 1; !resultFilled && i >= 0; i--) {

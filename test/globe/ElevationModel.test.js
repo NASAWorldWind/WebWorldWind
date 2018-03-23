@@ -49,6 +49,14 @@ define([
             return 1;
         };
 
+        // TODO: It would appear that Float64Array.fill is not supported by the unit test engine. (PhantomJS 2.1.1 at the time of this writing)
+        // TODO: Revisit the need for this hack with future versions of PhantomJS.
+        Float64Array.prototype.fill = function (n) {
+            for (var i = 0; i < this.length; i++) {
+                this[i] = n;
+            }
+        };
+
         describe("Missing parameter tests", function () {
             it("Correctly rejects calls with missing parameters", function () {
                 var elevationModel = new ElevationModel();
@@ -133,13 +141,13 @@ define([
             });
 
             it("Returns correct elevation for a location when some coverages are disabled", function () {
+
                 var em = new ElevationModel();
                 var n = 12;
                 for (var i = 0; i < n; i++) {
                     var c = new MockCoverage(n - i, -i - 1, i + 1);
                     em.addCoverage(c);
                 }
-
                 em.coverages[n - 1].enabled = false;
                 em.coverages[n - 2].enabled = false;
                 var e = em.elevationAtLocation(0, 0);
