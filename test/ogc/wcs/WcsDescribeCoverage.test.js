@@ -80,6 +80,26 @@ define([
             expect(keywords[1].value).toBe("WCS");
             expect(keywords[2].value).toBe("GeoTIFF");
         });
+
+        it("should have a lonLatEnvelope srs of CRS84", function () {
+            var wcs = new WcsDescribeCoverage(xmlDom);
+
+            var lonLatEnvelopSrs = wcs.coverages[0].lonLatEnvelope.srsName;
+
+            expect(lonLatEnvelopSrs).toBe("urn:ogc:def:crs:OGC:1.3:CRS84");
+        });
+
+        it("should have lonLatEnvelop positions spanning the globe", function () {
+            var wcs = new WcsDescribeCoverage(xmlDom);
+            var error = 1e-9;
+
+            var lonLatEnvelop = wcs.coverages[0].lonLatEnvelope;
+
+            expect(lonLatEnvelop.pos[0][0]).toBeCloseTo(-180.0, error);
+            expect(lonLatEnvelop.pos[0][1]).toBeCloseTo(-90.0, error);
+            expect(lonLatEnvelop.pos[1][0]).toBeCloseTo(180.0, error);
+            expect(lonLatEnvelop.pos[1][1]).toBeCloseTo(90.0, error);
+        });
     });
 
     describe("WSC 2.0.1 Describe Coverage", function () {

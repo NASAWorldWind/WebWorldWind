@@ -96,6 +96,8 @@ define([
                 } else if (child.localName === "keywords") {
                     // the OWS keywords namespace isn't used but the format is similar
                     coverage.keywords = new OwsKeywords(child).keywords;
+                } else if (child.localName === "lonLatEnvelope") {
+                    coverage.lonLatEnvelope = WcsDescribeCoverage.assemble100LonLatEnvelope(child);
                 }
             }
 
@@ -140,6 +142,33 @@ define([
             }
 
             return serviceParameters;
+        };
+
+        WcsDescribeCoverage.assemble100LonLatEnvelope = function (element) {
+            var children = element.children || element.childNodes, latLonEnvelope = {};
+
+            latLonEnvelope.srsName = element.getAttribute("srsName");
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "pos") {
+                    latLonEnvelope.pos = latLonEnvelope.pos || [];
+                    latLonEnvelope.pos.push(WcsDescribeCoverage.parseSpacedFloatArray(child.textContent));
+                }
+            }
+
+            return latLonEnvelope;
+        };
+
+        WcsDescribeCoverage.parseSpacedFloatArray = function (line) {
+            var result = [], elements = line.split(/\s+/);
+
+            for (var i = 0; i < elements.length; i++) {
+                result.push(parseFloat(elements[i]));
+            }
+
+            return result;
         };
 
         return WcsDescribeCoverage;
