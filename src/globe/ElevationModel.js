@@ -328,7 +328,7 @@ define(['../error/ArgumentError',
          * @param {Number} numLon The number of longitudinal sample locations within the sector.
          * @param {Number} targetResolution The desired elevation resolution, in radians. (To compute radians from
          * meters, divide the number of meters by the globe's radius.)
-         * @param {Number[]} result An array in which to return the requested elevations.
+         * @param {Float64Array} result An array in which to return the requested elevations.
          * @returns {Number} The resolution actually achieved, which may be greater than that requested if the
          * elevation data for the requested resolution is not currently available.
          * @throws {ArgumentError} If the specified sector, targetResolution, or result array is null or undefined, or if either of the
@@ -356,11 +356,17 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingResult"));
             }
 
+            if (!(result instanceof Float64Array)) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "incorrectResultType"));
+            }
+
+            console.log(result);
             result.fill(NaN);
             var resolution = Number.MAX_VALUE, i, n = this.coverages.length, resultFilled = false;
             for (i = n - 1; !resultFilled && i >= 0; i--) {
                 var coverage = this.coverages[i];
-                if (coverage.enabled) {
+                if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
                     resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
                     if (resultFilled) {
                         resolution = coverage.resolution;

@@ -22,9 +22,9 @@ define([
     "use strict";
     describe("ElevationModel tests", function () {
 
-        var MockCoverage = function (numLevels, minElevation, maxElevation) {
+        var MockCoverage = function (resolution, minElevation, maxElevation) {
             TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), numLevels, "application/bil16", "MockElevations256", 256, 256, 100);
+                Sector.FULL_SPHERE, new Location(45, 45), 1, "application/bil16", "MockElevations256", 256, 256, resolution);
 
             this.displayName = "Mock Elevation Coverage";
             this.minElevation = minElevation ? minElevation : -11000;
@@ -88,31 +88,21 @@ define([
                 expect(function () {
                     elevationModel.minAndMaxElevationsForSector();
                 }).toThrow();
-                expect(function () {
-                    elevationModel.insertCoverage();
-                }).toThrow();
-                expect(function () {
-                    elevationModel.insertCoverage(0);
-                }).toThrow();
             });
         });
 
         describe("Elevation result tests", function () {
-            it("Returns correct min and max elevations for a sector, respects unsorted coverages", function () {
+            it("Returns correct min and max elevations for a sector", function () {
                 var n = 12;
-                for (var t = 0; t < 2; t++) {
-                    var em = new ElevationModel();
-                    em.sortCoverages = (t === 0);
-                    for (var i = 0; i < n; i++) {
-                        var nLevels = em.sortCoverages ? i + 1 : n - i;
-                        var c = new MockCoverage(nLevels, -i - 1, i + 1);
-                        em.addCoverage(c);
-                    }
-
-                    var minMax = em.minAndMaxElevationsForSector("dummySector");
-                    expect(minMax[0]).toEqual(-n);
-                    expect(minMax[1]).toEqual(n);
+                var em = new ElevationModel();
+                for (var i = 0; i < n; i++) {
+                    var c = new MockCoverage(n - i + 1, -i - 1, i + 1);
+                    em.addCoverage(c);
                 }
+
+                var minMax = em.minAndMaxElevationsForSector("dummySector");
+                expect(minMax[0]).toEqual(-n);
+                expect(minMax[1]).toEqual(n);
             });
 
             it("Returns correct min and max elevations for a sector when some coverages are disabled", function () {
@@ -126,15 +116,15 @@ define([
                 em.coverages[n - 1].enabled = false;
                 em.coverages[n - 2].enabled = false;
                 var minMax = em.minAndMaxElevationsForSector("dummySector");
-                expect(minMax[0]).toEqual(-n + 2);
-                expect(minMax[1]).toEqual(n - 2);
+                expect(minMax[0]).toEqual(-3);
+                expect(minMax[1]).toEqual(3);
             });
 
             it("Returns correct elevation for a location", function () {
                 var em = new ElevationModel();
                 var n = 12;
                 for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    var c = new MockCoverage(n - i + 1, -i - 1, i + 1);
                     em.addCoverage(c);
                 }
 
@@ -146,7 +136,7 @@ define([
                 var em = new ElevationModel();
                 var n = 12;
                 for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    var c = new MockCoverage(n - i, -i - 1, i + 1);
                     em.addCoverage(c);
                 }
 
@@ -160,12 +150,12 @@ define([
                 var em = new ElevationModel();
                 var n = 12;
                 for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    var c = new MockCoverage(n - i, -i - 1, i + 1);
                     em.addCoverage(c);
                 }
 
-                var result = [0];
-                em.elevationsForGrid("dummySector", 1, 1, 1, result);
+                var result = new Float64Array(1);
+                em.elevationsForGrid(new Sector(-1, 1, -1, 1), 1, 1, 1, result);
                 expect(result[0]).toEqual(n);
             });
 
@@ -173,14 +163,14 @@ define([
                 var em = new ElevationModel();
                 var n = 12;
                 for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
+                    var c = new MockCoverage(n - i, -i - 1, i + 1);
                     em.addCoverage(c);
                 }
 
                 em.coverages[n - 1].enabled = false;
                 em.coverages[n - 2].enabled = false;
-                var result = [0];
-                em.elevationsForGrid("dummySector", 1, 1, 1, result);
+                var result = new Float64Array(1);
+                em.elevationsForGrid(new Sector(-1, 1, -1, 1), 1, 1, 1, result);
                 expect(result[0]).toEqual(n - 2);
             });
         });
@@ -188,27 +178,22 @@ define([
         describe("Coverage list manipulation tests", function () {
             it("Maintains coverages in the correct order, respecting the sortCoverages flag", function () {
                 var n = 12;
-                for (var t = 0; t < 2; t++) {
-                    var em = new ElevationModel();
-                    var coverages = [];
-                    em.sortCoverages = (t === 0);
-                    for (var i = n; i > 0; i--) {
-                        var c = new MockCoverage(i);
-                        em.addCoverage(c);
-                        coverages.push(c);
-                    }
+                var em = new ElevationModel();
+                var coverages = [];
+                for (var i = n; i > 0; i--) {
+                    var c = new MockCoverage(n - i + 1);
+                    em.addCoverage(c);
+                    coverages.push(c);
+                }
 
-                    for (i = 0; i < n; i++) {
-                        var index = em.sortCoverages ? n - (i + 1) : i;
-                        expect(coverages[index] === em.coverages[i]).toBe(true);
-                    }
+                for (i = 0; i < n; i++) {
+                    expect(coverages[n - (i + 1)] === em.coverages[i]).toBe(true);
                 }
             });
 
             it("Rejects duplicate coverages", function () {
                 var em = new ElevationModel();
                 var coverages = [];
-                em.sortCoverages = false;
                 var n = 12, c;
                 for (var t = 0; t < 2; t++) {
                     var expectedResult = (t === 0);
@@ -219,28 +204,8 @@ define([
                         } else {
                             c = coverages[i];
                         }
-                        expect(em.insertCoverage(0, c)).toBe(expectedResult);
-                        expect(em.addCoverage(c)).toBe(false);
+                        expect(em.addCoverage(c)).toBe(expectedResult);
                     }
-                }
-            });
-
-            it("Inserts coverages at the correct index", function () {
-                var em = new ElevationModel();
-                var coverages = [];
-                em.sortCoverages = false;
-                var n = 12, c;
-                for (var t = 0; t < 2; t++) {
-                    for (var i = 0; i < n; i++) {
-                        c = new MockCoverage(i + 1);
-                        em.insertCoverage(i, c);
-                        coverages.push(c);
-                    }
-                }
-
-                for (i = 0; i < n; i++) {
-                    expect(coverages[i] === em.coverages[i + n]).toBe(true);
-                    expect(coverages[i + n] === em.coverages[i]).toBe(true);
                 }
             });
 
@@ -274,7 +239,7 @@ define([
                 var i, n = 12;
                 var coverages = [];
                 for (i = 0; i < n; i++) {
-                    var c = new MockCoverage(i + 1);
+                    var c = new MockCoverage(n - i);
                     em.addCoverage(c);
                     coverages.push(c);
                 }
@@ -293,7 +258,7 @@ define([
                 var i, n = 12;
                 var coverages = [];
                 for (i = 0; i < n; i++) {
-                    var c = new MockCoverage(i + 1);
+                    var c = new MockCoverage(n - i + 1);
                     em.addCoverage(c);
                     coverages.push(c);
                 }
@@ -345,7 +310,7 @@ define([
         describe("Timestamp calculation tests", function () {
             it("Calculates timestamp correctly", function () {
                 var em = new ElevationModel();
-                var newestCoverage, oldestCoverage;
+                var newestCoverage;
                 for (var i = 0; i < 10; i++) {
                     var c = new MockCoverage(i + 1);
                     em.addCoverage(c);
@@ -353,13 +318,9 @@ define([
                     if (!newestCoverage || newestCoverage.timestamp < c.timestamp) {
                         newestCoverage = c;
                     }
-                    if (!oldestCoverage || oldestCoverage.timestamp > c.timestamp) {
-                        oldestCoverage = c;
-                    }
                 }
 
-                expect(oldestCoverage.timestamp).toEqual(em.minTimestamp);
-                expect(newestCoverage.timestamp).toEqual(em.maxTimestamp);
+                expect(newestCoverage.timestamp).toEqual(em.timestamp);
             });
 
             it("Disregards timestamp for disabled coverages", function () {
@@ -373,13 +334,9 @@ define([
                     if (c.enabled && (!newestCoverage || newestCoverage.timestamp < c.timestamp)) {
                         newestCoverage = c;
                     }
-                    if (c.enabled && (!oldestCoverage || oldestCoverage.timestamp > c.timestamp)) {
-                        oldestCoverage = c;
-                    }
                 }
 
-                expect(oldestCoverage.timestamp).toEqual(em.minTimestamp);
-                expect(newestCoverage.timestamp).toEqual(em.maxTimestamp);
+                expect(newestCoverage.timestamp).toEqual(em.timestamp);
             });
 
             it("Returns correct timestamp after coverage removal", function () {
@@ -392,19 +349,11 @@ define([
                 }
                 var sortedCoverages = em.coverages.slice();
                 sortedCoverages.sort(function (c1, c2) {
-                    return c1.timestamp - c2.timestamp;
-                });
-                expect(sortedCoverages[0].timestamp).toEqual(em.minTimestamp);
-                em.removeCoverage(sortedCoverages[0]);
-                expect(sortedCoverages[1].timestamp).toEqual(em.minTimestamp);
-
-                sortedCoverages = em.coverages.slice();
-                sortedCoverages.sort(function (c1, c2) {
                     return c2.timestamp - c1.timestamp;
                 });
-                expect(sortedCoverages[0].timestamp).toEqual(em.maxTimestamp);
+                expect(sortedCoverages[0].timestamp).toEqual(em.timestamp);
                 em.removeCoverage(sortedCoverages[0]);
-                expect(sortedCoverages[1].timestamp).toEqual(em.maxTimestamp);
+                expect(sortedCoverages[1].timestamp).toEqual(em.timestamp);
             });
 
         });
