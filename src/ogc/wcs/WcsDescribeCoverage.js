@@ -18,10 +18,12 @@
  */
 define([
         '../../error/ArgumentError',
+        '../../ogc/gml/GmlBoundedBy',
         '../../ogc/gml/GmlDomainSet',
         '../../util/Logger'
     ],
     function (ArgumentError,
+              GmlBoundedBy,
               GmlDomainSet,
               Logger) {
         "use strict";
@@ -100,6 +102,8 @@ define([
                     coverage.coverageId = child.textContent;
                 } else if (child.localName === "domainSet") {
                     coverage.domainSet = new GmlDomainSet(child);
+                } else if (child.localName === "boundedBy") {
+                    coverage.boundedBy = new GmlBoundedBy(child);
                 }
             }
 

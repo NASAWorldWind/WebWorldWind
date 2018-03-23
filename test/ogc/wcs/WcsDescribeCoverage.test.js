@@ -157,6 +157,58 @@ define([
                 expect(values[0]).toBeCloseTo(-0.008333333333333333, 0.0000001);
                 expect(values[1]).toBeCloseTo(0, 0.000001);
             });
+
+            it("should have a bounded by envelope srs name of http://www.opengis.net/def/crs/EPSG/0/4326", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var boundedBySrsName = wcs.coverages[0].boundedBy.envelope.srsName;
+
+                expect(boundedBySrsName).toBe("http://www.opengis.net/def/crs/EPSG/0/4326");
+            });
+
+            it("should have a bounded by envelope axis labels of Lat and Lon", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var boundedByAxisLabels = wcs.coverages[0].boundedBy.envelope.axisLabels;
+
+                expect(boundedByAxisLabels[0]).toBe("Lat");
+                expect(boundedByAxisLabels[1]).toBe("Long");
+            });
+
+            it("should have a bounded by envelope uom labels of Deg and Deg", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var boundedByUomLabels = wcs.coverages[0].boundedBy.envelope.uomLabels;
+
+                expect(boundedByUomLabels[0]).toBe("Deg");
+                expect(boundedByUomLabels[1]).toBe("Deg");
+            });
+
+            it("should have a bounded by envelope srs dimension of 2", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var boundedBySrsDimension = wcs.coverages[0].boundedBy.envelope.srsDimension;
+
+                expect(boundedBySrsDimension).toBe(2);
+            });
+
+            it("should have a bounded by envelope lower corner of -90.0 and -180.0", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var boundedByLowerCorner = wcs.coverages[0].boundedBy.envelope.lower;
+
+                expect(boundedByLowerCorner[0]).toBeCloseTo(-90.0, 0.000001);
+                expect(boundedByLowerCorner[1]).toBeCloseTo(-180.0, 0.000001);
+            });
+
+            it("should have a bounded by envelope upper corner of 90.0 and 180.0", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var boundedByUpperCorner = wcs.coverages[0].boundedBy.envelope.upper;
+
+                expect(boundedByUpperCorner[0]).toBeCloseTo(90.0, 0.000001);
+                expect(boundedByUpperCorner[1]).toBeCloseTo(180.0, 0.000001);
+            });
         });
     });
 });
