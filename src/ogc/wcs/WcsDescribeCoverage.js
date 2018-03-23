@@ -106,6 +106,10 @@ define([
                     coverage.boundedBy = new GmlBoundedBy(child);
                 } else if (child.localName === "ServiceParameters") {
                     coverage.serviceParameters = WcsDescribeCoverage.assemble201ServiceParameters(child);
+                } else if (child.localName === "rangeType") {
+                    // The information from rangeType is not required for forming a request. Instead of implementing a
+                    // complex parser for the SWE DataRecord, a reference to the particular dom element will be provided
+                    coverage.rangeType = child;
                 }
             }
 
