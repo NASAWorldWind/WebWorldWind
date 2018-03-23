@@ -47,12 +47,38 @@ define([
             xhr.send(null);
         });
 
-        it("should match the coverage id testing:gebco", function () {
+        it("should match the coverage name testing:gebco", function () {
             var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
             var name = wcsDescribeCoverage.coverages[0].name;
 
             expect(name).toBe("testing:gebco");
+        });
+
+        it("should match the coverage label gebco", function () {
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+            var label = wcsDescribeCoverage.coverages[0].label;
+
+            expect(label).toBe("gebco");
+        });
+
+        it("should match the coverage description Generated from GeoTIFF", function () {
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+            var description = wcsDescribeCoverage.coverages[0].description;
+
+            expect(description).toBe("Generated from GeoTIFF");
+        });
+
+        it("should have the keywords gebco, WCS, GeoTIFF", function() {
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+            var keywords = wcsDescribeCoverage.coverages[0].keywords;
+
+            expect(keywords[0].value).toBe("gebco");
+            expect(keywords[1].value).toBe("WCS");
+            expect(keywords[2].value).toBe("GeoTIFF");
         });
     });
 

@@ -20,12 +20,14 @@ define([
         '../../error/ArgumentError',
         '../../ogc/gml/GmlBoundedBy',
         '../../ogc/gml/GmlDomainSet',
-        '../../util/Logger'
+        '../../util/Logger',
+        '../../ogc/ows/OwsKeywords'
     ],
     function (ArgumentError,
               GmlBoundedBy,
               GmlDomainSet,
-              Logger) {
+              Logger,
+              OwsKeywords) {
         "use strict";
 
         var WcsDescribeCoverage = function (xmlDom) {
@@ -87,6 +89,13 @@ define([
 
                 if (child.localName === "name") {
                     coverage.name = child.textContent;
+                } else if (child.localName === "description") {
+                    coverage.description = child.textContent;
+                } else if (child.localName === "label") {
+                    coverage.label = child.textContent;
+                } else if (child.localName === "keywords") {
+                    // the OWS keywords namespace isn't used but the format is similar
+                    coverage.keywords = new OwsKeywords(child).keywords;
                 }
             }
 
