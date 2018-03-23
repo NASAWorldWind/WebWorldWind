@@ -341,7 +341,7 @@ define(['../../error/ArgumentError',
                     this._geoJSONObject = JSON.parse(geoJSONSource);
                 }
                 else if (typeof geoJSONSource === 'object') {
-                    this._geoJSONObject = geoJSONSource
+                    this._geoJSONObject = geoJSONSource;
                 }
                 else {
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
