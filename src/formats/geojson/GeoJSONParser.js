@@ -83,7 +83,8 @@ define(['../../error/ArgumentError',
          * This function enables the application to assign independent attributes to each
          * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
          * feature.
-         * @param {String} dataSource The data source of the GeoJSON. Can be a string or an URL to a GeoJSON.
+         * @param {String|Object} dataSource The data source of the GeoJSON. Can be a URL to an external resource,
+         * a JSON string or a plain js object.
          * @throws {ArgumentError} If the specified data source is null or undefined.
          */
         var GeoJSONParser = function (dataSource) {
@@ -125,7 +126,7 @@ define(['../../error/ArgumentError',
             /**
              * The GeoJSON data source as specified to this GeoJSON's constructor.
              * @memberof GeoJSONParser.prototype
-             * @type {String}
+             * @type {String|Object}
              * @readonly
              */
             dataSource: {
@@ -260,7 +261,7 @@ define(['../../error/ArgumentError',
 
             this._layer = layer || new RenderableLayer();
 
-            if (this.isDataSourceJson()){
+            if (typeof this.dataSource === 'object' || this.isDataSourceJson()) {
                 this.parse(this.dataSource);
             }
             else {
@@ -334,9 +335,18 @@ define(['../../error/ArgumentError',
         };
 
         // Parse GeoJSON string using built in method JSON.parse(). Internal use only.
-        GeoJSONParser.prototype.parse = function (geoJSONString) {
+        GeoJSONParser.prototype.parse = function (geoJSONSource) {
             try {
-                this._geoJSONObject = JSON.parse(geoJSONString);
+                if (typeof geoJSONSource === 'string') {
+                    this._geoJSONObject = JSON.parse(geoJSONSource);
+                }
+                else if (typeof geoJSONSource === 'object') {
+                    this._geoJSONObject = geoJSONSource
+                }
+                else {
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
+                        "invalidGeoJSONSource");
+                }
             }
             catch (e) {
                 Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
