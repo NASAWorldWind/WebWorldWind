@@ -110,6 +110,33 @@ define([
             expect(supportedRequestCrs).toBe("EPSG:4326");
             expect(supportedResponseCrs).toBe("EPSG:4326");
         });
+
+        describe("Supported Formats", function () {
+
+            it("should have 12 supported formats", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var supportedFormatsCount = wcs.coverages[0].supportedFormats.formats.length;
+
+                expect(supportedFormatsCount).toBe(12);
+            });
+
+            it("should show a native format of GeoTIFF", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var nativeFormat = wcs.coverages[0].supportedFormats.nativeFormat;
+
+                expect(nativeFormat).toBe("GeoTIFF");
+            });
+
+            it("should have support for GeoPackage (tiles)", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var formatSupported = wcs.coverages[0].supportedFormats.formats[3];
+
+                expect(formatSupported).toBe("GeoPackage (tiles)");
+            });
+        });
     });
 
     describe("WSC 2.0.1 Describe Coverage", function () {

@@ -100,6 +100,8 @@ define([
                     coverage.lonLatEnvelope = WcsDescribeCoverage.assemble100LonLatEnvelope(child);
                 } else if (child.localName === "supportedCRSs") {
                     coverage.supportedCrs = WcsDescribeCoverage.assemble100SupportedCrs(child);
+                } else if (child.localName === "supportedFormats") {
+                    coverage.supportedFormats = WcsDescribeCoverage.assemble100SupportedFormats(child);
                 }
             }
 
@@ -187,6 +189,23 @@ define([
             }
 
             return supportedCrs;
+        };
+
+        WcsDescribeCoverage.assemble100SupportedFormats = function (element) {
+            var children = element.children || element.childNodes, supportedFormats = {};
+
+            supportedFormats.nativeFormat = element.getAttribute("nativeFormat");
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "formats") {
+                    supportedFormats.formats = supportedFormats.formats || [];
+                    supportedFormats.formats.push(child.textContent);
+                }
+            }
+
+            return supportedFormats;
         };
 
         WcsDescribeCoverage.parseSpacedFloatArray = function (line) {
