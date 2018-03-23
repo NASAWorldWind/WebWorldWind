@@ -104,10 +104,29 @@ define([
                     coverage.domainSet = new GmlDomainSet(child);
                 } else if (child.localName === "boundedBy") {
                     coverage.boundedBy = new GmlBoundedBy(child);
+                } else if (child.localName === "ServiceParameters") {
+                    coverage.serviceParameters = WcsDescribeCoverage.assemble201ServiceParameters(child);
                 }
             }
 
             return coverage;
+        };
+
+        WcsDescribeCoverage.assemble201ServiceParameters = function (element) {
+            var children = element.children || element.childNodes, serviceParameters = {};
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "nativeFormat") {
+                    serviceParameters.nativeFormat = child.textContent;
+                } else if (child.localName === "CoverageSubtype") {
+                    serviceParameters.coverageSubtype = child.textContent;
+                }
+                // TODO CoverageSubtypeParent, Extension
+            }
+
+            return serviceParameters;
         };
 
         return WcsDescribeCoverage;

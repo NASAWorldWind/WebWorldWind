@@ -158,6 +158,10 @@ define([
                 expect(values[1]).toBeCloseTo(0, 0.000001);
             });
 
+        });
+
+        describe("BoundedBy", function () {
+
             it("should have a bounded by envelope srs name of http://www.opengis.net/def/crs/EPSG/0/4326", function () {
                 var wcs = new WcsDescribeCoverage(xmlDom);
 
@@ -208,6 +212,25 @@ define([
 
                 expect(boundedByUpperCorner[0]).toBeCloseTo(90.0, 0.000001);
                 expect(boundedByUpperCorner[1]).toBeCloseTo(180.0, 0.000001);
+            });
+        });
+
+        describe("Service Parameters", function () {
+
+            it("should have a subtype of RectifiedGridCoverage", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var serviceParameterSubtype = wcs.coverages[0].serviceParameters.coverageSubtype;
+
+                expect(serviceParameterSubtype).toBe("RectifiedGridCoverage");
+            });
+
+            it("should have a native format of image/tiff", function () {
+                var wcs = new WcsDescribeCoverage(xmlDom);
+
+                var serviceParameterNativeFormat = wcs.coverages[0].serviceParameters.nativeFormat;
+
+                expect(serviceParameterNativeFormat).toBe("image/tiff");
             });
         });
     });
