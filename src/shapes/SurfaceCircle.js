@@ -1,18 +1,18 @@
 /*
-* Copyright 2015-2017 WorldWind Contributors
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /**
  * @exports SurfaceCircle
  */
@@ -161,21 +161,18 @@ define(['../error/ArgumentError',
                 );
             }
         };
+
         // Internal use only. Intentionally not documented.
         SurfaceCircle.prototype.getReferencePosition = function () {
             return this.center;
         };
 
         // Internal use only. Intentionally not documented.
-        SurfaceCircle.prototype.moveTo = function (oldReferenceLocation, newReferenceLocation) {
-            var heading = Location.greatCircleAzimuth(oldReferenceLocation,
-                new Location(this.center.latitude, this.center.longitude));
-            var pathLength = Location.greatCircleDistance(oldReferenceLocation,
-                new Location(this.center.latitude, this.center.longitude));
-            var location = new Location(0, 0);
-            Location.greatCircleLocation(newReferenceLocation, heading, pathLength, location);
+        SurfaceCircle.prototype.moveTo = function (globe, position) {
+            var locations = [];
+            locations.push(new Location(this.center.latitude, this.center.longitude));
 
-            this.center = location;
+            this.center = Location.computeShiftedLocations(globe, this.getReferencePosition(), position, locations)[0];
         };
 
         /**
