@@ -19,10 +19,10 @@
 define([
         '../error/ArgumentError',
         '../util/Logger',
-        '../ogc/wmts/OwsLanguageString',
-        '../ogc/wmts/OwsOperationsMetadata',
-        '../ogc/wmts/OwsServiceIdentification',
-        '../ogc/wmts/OwsServiceProvider'
+        '../ogc/ows/OwsLanguageString',
+        '../ogc/ows/OwsOperationsMetadata',
+        '../ogc/ows/OwsServiceIdentification',
+        '../ogc/ows/OwsServiceProvider'
     ],
     function (ArgumentError,
               Logger,
