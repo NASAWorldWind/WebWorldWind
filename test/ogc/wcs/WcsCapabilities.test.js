@@ -38,70 +38,81 @@ define([
             xhr.send(null);
         });
 
-        it("Should provide a coverageId of test:pacificnw_usgs_ned_10m", function () {
-
-            var wcs = new WcsCapabilities(xmlDom);
-
-            expect(wcs.coverages[0].coverageId).toBe("test__pacificnw_usgs_ned_10m");
-        });
-
-        it("Should have a 2.0.1 version", function () {
+        it("should have a 2.0.1 version", function () {
 
             var wcs = new WcsCapabilities(xmlDom);
 
             expect(wcs.version).toBe("2.0.1");
         });
 
-        it("Should have a update sequence of 5", function () {
+        it("should have a update sequence of 5", function () {
 
             var wcs = new WcsCapabilities(xmlDom);
 
             expect(wcs.updateSequence).toBe("5");
         });
 
-        it("Should have scaling extension detailed in the profile", function () {
+        describe("Service Identification", function () {
 
-            var wcs = new WcsCapabilities(xmlDom);
+            it("should have scaling extension detailed in the profile", function () {
 
-            expect(wcs.serviceIdentification.profile[8])
-                .toBe("http://www.opengis.net/spec/WCS_service-extension_scaling/1.0/conf/scaling");
+                var wcs = new WcsCapabilities(xmlDom);
+
+                expect(wcs.serviceIdentification.profile[8])
+                    .toBe("http://www.opengis.net/spec/WCS_service-extension_scaling/1.0/conf/scaling");
+            });
         });
 
-        it("Should have a GET GetCoverage link defined", function () {
+        describe("Operations Metadata", function () {
 
-            var wcs = new WcsCapabilities(xmlDom);
-            var url = wcs.operationsMetadata.getOperationMetadataByName("GetCoverage").dcp[0].getMethods[0].url;
+            it("should have a GET GetCoverage link defined", function () {
 
-            expect(url).toBe("http://localhost:8080/geoserver/wcs?");
+                var wcs = new WcsCapabilities(xmlDom);
+                var url = wcs.operationsMetadata.getOperationMetadataByName("GetCoverage").dcp[0].getMethods[0].url;
+
+                expect(url).toBe("http://localhost:8080/geoserver/wcs?");
+            });
         });
 
-        // Service Metadata
-        it("should have seven supported formats", function () {
-            var wcs = new WcsCapabilities(xmlDom);
-            var formatsSupported = wcs.serviceMetadata.formatsSupported.length;
+        describe("Service Metadata", function () {
 
-            expect(formatsSupported).toBe(7);
+            it("should have seven supported formats", function () {
+                var wcs = new WcsCapabilities(xmlDom);
+                var formatsSupported = wcs.serviceMetadata.formatsSupported.length;
+
+                expect(formatsSupported).toBe(7);
+            });
+
+            it("should suport image/tiff as the sixth format", function () {
+                var wcs = new WcsCapabilities(xmlDom);
+                var imageTiffFormat = wcs.serviceMetadata.formatsSupported[5];
+
+                expect(imageTiffFormat).toBe("image/tiff");
+            });
+
+            it("should include 5841 supported crs", function () {
+                var wcs = new WcsCapabilities(xmlDom);
+                var supportedCrsCount = wcs.serviceMetadata.extension.crsSupported.length;
+
+                expect(supportedCrsCount).toBe(5841);
+            });
+
+            it("should include three supported interpolation methods", function () {
+                var wcs = new WcsCapabilities(xmlDom);
+                var supportedInterpolationMethods = wcs.serviceMetadata.extension.interpolationSupported.length;
+
+                expect(supportedInterpolationMethods).toBe(3);
+            });
         });
 
-        it("should suport image/tiff as the sixth format", function () {
-            var wcs = new WcsCapabilities(xmlDom);
-            var imageTiffFormat = wcs.serviceMetadata.formatsSupported[5];
+        describe("Contents", function () {
 
-            expect(imageTiffFormat).toBe("image/tiff");
-        });
+            it("should provide a coverageId of test:pacificnw_usgs_ned_10m", function () {
 
-        it("should include 5841 supported crs", function () {
-            var wcs = new WcsCapabilities(xmlDom);
-            var supportedCrsCount = wcs.serviceMetadata.extension.crsSupported.length;
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(supportedCrsCount).toBe(5841);
-        });
-
-        it("should include three supported interpolation methods", function () {
-            var wcs = new WcsCapabilities(xmlDom);
-            var supportedInterpolationMethods = wcs.serviceMetadata.extension.interpolationSupported.length;
-
-            expect(supportedInterpolationMethods).toBe(3);
+                expect(wcs.coverages[0].coverageId).toBe("test__pacificnw_usgs_ned_10m");
+            });
         });
     });
 
@@ -153,11 +164,10 @@ define([
                 var wcs = new WcsCapabilities(xmlDom);
 
                 // determine the lowest longitude value and ensure that coordinate is specified first in the bounding box
-                var lowerValue = new Number(wcs.coverages[0].wgs84BoundingBox.lowerCorner.split(/\s+/)[0]);
-                var upperValue = new Number(wcs.coverages[0].wgs84BoundingBox.upperCorner.split(/\s+/)[0]);
+                var lowerValue = parseFloat(wcs.coverages[0].wgs84BoundingBox.lowerCorner.split(/\s+/)[0]);
+                var upperValue = parseFloat(wcs.coverages[0].wgs84BoundingBox.upperCorner.split(/\s+/)[0]);
 
                 expect(lowerValue).toBeLessThan(upperValue);
-
             });
         });
 
