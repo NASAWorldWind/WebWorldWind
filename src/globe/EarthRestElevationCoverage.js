@@ -41,9 +41,9 @@ define([
         // * May be null, in which case the server address is assumed to be the full path to the data directory.
         // * @param {String} displayName The display name to associate with this elevation coverage.
         // */
-        var EarthRestElevationCoverage = function (serverAddress, pathToData, displayName) {
+        var EarthRestElevationCoverage = function (serverAddress, pathToData, displayName, resolution) {
             TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(60, 60), 5, "application/bil16", "EarthElevations", 512, 512);
+                Sector.FULL_SPHERE, new Location(60, 60), 5, "application/bil16", "EarthElevations", 512, 512, resolution);
 
             this.displayName = displayName;
             this.minElevation = -11000; // Depth of Marianas Trench, in meters

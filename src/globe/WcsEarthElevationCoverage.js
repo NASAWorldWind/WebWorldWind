@@ -34,10 +34,11 @@ define([
          * @constructor
          * @augments TiledElevationCoverage
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
+         * @deprecated
          */
         var WcsEarthElevationCoverage = function () {
             TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "image/tiff", "EarthElevations256", 256, 256);
+                Sector.FULL_SPHERE, new Location(45, 45), 12, "image/tiff", "EarthElevations256", 256, 256, 900);
 
             this.displayName = "WCS Earth Elevation Coverage";
             this.minElevation = -11000; // Depth of Marianas Trench, in meters
