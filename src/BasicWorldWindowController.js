@@ -173,14 +173,13 @@ define([
 
                 // Identify if the top picked object contains a URL for hyperlinking
                 var pickList = this.wwd.pick(pickPoint);
-                var topPickedObject = pickList.topPickedObject();
+                var topObject = pickList.topPickedObject();
                 // If the url object was appended, open the hyperlink
-                if ("userObject" in topPickedObject) {
-                    if ("userProperties" in topPickedObject.userObject) {
-                        if ("url" in topPickedObject.userObject.userProperties) {
-                            window.open(topPickedObject.userObject.userProperties.url, "_blank");
-                        }
-                    }
+                if (topObject &&
+                    topObject.userObject &&
+                    topObject.userObject.userProperties &&
+                    topObject.userObject.userProperties.url) {
+                    window.open(topObject.userObject.userProperties.url, "_blank");
                 }
             }
         };
