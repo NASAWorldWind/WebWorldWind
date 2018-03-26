@@ -65,7 +65,7 @@ define([
 
             var wcs = new WcsCapabilities(xmlDom);
 
-            expect(wcs.serviceIdentification.profiles[8])
+            expect(wcs.serviceIdentification.profile[8])
                 .toBe("http://www.opengis.net/spec/WCS_service-extension_scaling/1.0/conf/scaling");
         });
 
