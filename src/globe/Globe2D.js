@@ -16,19 +16,17 @@
 /**
  * @exports Globe2D
  */
-define(['../globe/ElevationCoverage',
-        '../globe/ElevationModel',
+define(['../globe/ElevationModel',
         '../globe/Globe',
         '../projections/ProjectionEquirectangular'
     ],
-    function (ElevationCoverage,
-              ElevationModel,
+    function (ElevationModel,
               Globe,
               ProjectionEquirectangular) {
         "use strict";
 
         /**
-         * Constructs a 2D globe with a default {@link ElevationCoverage} and
+         * Constructs a 2D globe with a default {@link ElevationModel} and
          * [equirectangular projection]{@link ProjectionEquirectangular}.
          * @alias Globe2D
          * @constructor
@@ -37,9 +35,7 @@ define(['../globe/ElevationCoverage',
          * The default rectangular projection scrolls longitudinally.
          */
         var Globe2D = function () {
-            var elevationModel = new ElevationModel();
-            elevationModel.addCoverage(new ElevationCoverage(1));
-            Globe.call(this, elevationModel, new ProjectionEquirectangular());
+            Globe.call(this, new ElevationModel(), new ProjectionEquirectangular());
         };
 
         Globe2D.prototype = Object.create(Globe.prototype);
