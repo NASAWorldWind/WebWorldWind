@@ -17,9 +17,11 @@
  * @exports ElevationCoverage
  */
 define(['../error/ArgumentError',
-        '../util/Logger'],
+        '../util/Logger',
+        '../geom/Sector'],
     function (ArgumentError,
-              Logger) {
+              Logger,
+              Sector) {
         "use strict";
 
         /**
@@ -65,6 +67,13 @@ define(['../error/ArgumentError',
              * @type {Number}
              */
             this.resolution = resolution;
+
+            /**
+             * The sector this coverage spans.
+             * @type {Sector}
+             * @readonly
+             */
+            this.coverageSector = Sector.FULL_SPHERE;
         };
 
         /**
