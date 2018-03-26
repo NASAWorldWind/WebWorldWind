@@ -22,6 +22,7 @@ define(['../../geom/Location'], function(Location){
      * @augments Location
      * @inheritDoc
      * @intensity {Number} Number representing the intensity of the source for this position;
+     * @alias IntensityLocation
      */
     var IntensityLocation = function(latitude, longitude, intensity) {
         Location.call(this, latitude, longitude);

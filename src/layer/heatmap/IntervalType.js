@@ -3,7 +3,7 @@ define([], function(){
 
     /**
      * Enumeration of different approaches towards the interval and color scales in case of heatmap.
-     * @export IntervalType
+     * @exports IntervalType
      * @type {{CONTINUOUS: number, QUANTILES: number}}
      */
     var IntervalType = {

@@ -1,5 +1,6 @@
 define([
     './ColoredTile',
+    './HeatMapQuadTree',
     '../../util/ImageSource',
     './IntervalType',
     '../../geom/Location',
@@ -8,6 +9,7 @@ define([
     '../../geom/Sector',
     '../../util/WWUtil'
 ], function (ColoredTile,
+             HeatMapQuadTree,
              ImageSource,
              IntervalType,
              Location,
@@ -18,11 +20,15 @@ define([
     "use strict";
 
     /**
+     * It represents a HeatMap Layer. The default implementation uses gradient circles as the way to display the
+     * point. The intensity of the point is taken in the account. The default implementation should look just fine,
+     * though it is possible to change the way the HeatMap looks via options to quite some extent.
      * @constructor
      * @augments TiledImageLayer
+     * @alias HeatMapLayer
      * @param displayName {String} The display name to associate with this layer.
      * @param data {IntensityLocation[]} Array of the point containing on top of the information also intensity vector
-     * @param options {Object}
+     * @param options {Object} The empty object is used if none is provided.
      * @param options.scale {String[]} Optional. Array of colors representing the scale which should be used when generating the
      *  layer. Default is ['blue', 'cyan', 'lime', 'yellow', 'red']
      * @param options.intervalType {IntervalType} Optional. Different types of approaches to handling the interval between min
@@ -30,10 +36,14 @@ define([
      * @param options.radius {Number|Function} Optional. It is also possible to provide a function. Radius of the point to
      *  be representing the intensity location. Default value is 25. The size of the radius.
      * @param options.blur {Number} Optional. Amount of pixels used for blur.
-     * @param options.tile {Tile} Tile used to display the information.
-     * @param options.incrementPerIntensity {Number} Increment per intensity.
+     * @param options.tile {HeatMapTile} Tile used to display the information. As long as it is descendant of the Tile, it is
+     *  possible to provide your own implementation for drawing the shapes representing the points.
+     * @param options.incrementPerIntensity {Number} Increment per intensity. How strong is going to be the change in
+     *  the intensity based on the intensity vector of the point
      */
     var HeatMapLayer = function (displayName, data, options) {
+        options = options || {};
+
         this.tileWidth = 512;
         this.tileHeight = 512;
 
@@ -41,7 +51,19 @@ define([
 
         this.displayName = displayName;
 
-        this._data = data;
+        this._data = new HeatMapQuadTree({
+            bounds: {
+                x: 0,
+                y: 0,
+                width: 360,
+                height: 180
+            },
+            maxObjects: Math.ceil(data.length / Math.pow(4, 4)),
+            maxLevels: 4
+        });
+        data.forEach(function(pieceOfData){
+            this._data.insert(pieceOfData);
+        }.bind(this));
 
         this._gradient = this.getGradient(data,
             options.intervalType || IntervalType.CONTINUOUS,
@@ -60,14 +82,19 @@ define([
     HeatMapLayer.prototype = Object.create(TiledImageLayer.prototype);
 
     /**
+     * It gets the relevant points for the visualisation for current sector. At the moment it uses QuadTree to retrieve
+     * the information.
      * @private
      * @param data
      * @param sector
      * @returns {IntensityLocation[]}
      */
     HeatMapLayer.prototype.filterGeographically = function(data, sector) {
-        return data.filter(function(point){
-            return point.isInSector(sector)
+        return data.retrieve({
+            x: sector.minLongitude,
+            y: sector.minLatitude,
+            width: Math.ceil(sector.maxLongitude - sector.minLongitude),
+            height: Math.ceil(sector.maxLatitude - sector.minLatitude)
         });
     };
 

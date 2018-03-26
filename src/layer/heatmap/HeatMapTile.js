@@ -15,9 +15,9 @@
  */
 define([], function(){
     /**
-     * It represents one tile in the heatmap information. It is basically an interface specifying the public methods
+     * It represents one tile in the HeatMap information. It is basically an interface specifying the public methods
      * properties and default configuration. The logic itself is handled in the subclasses.
-     * @alias Tile
+     * @alias HeatMapTile
      * @constructor
      * @param data {IntensityLocation[]} Array of information constituting points in the map.
      * @param options {Object}
@@ -25,10 +25,10 @@ define([], function(){
      * @param options.width {Number} Width of the Canvas to be created in pixels.
      * @param options.height {Number} Height of the Canvas to be created in pixels.
      * @param options.radius {Number} Radius of the data point in pixels.
-     * @param options.blur {Number} Blur of the heatmap element in the pixels.
+     * @param options.blur {Number} Blur of the HeatMap element in the pixels.
      * @param options.incrementPerIntensity {Number}
      */
-    var Tile = function(data, options) {
+    var HeatMapTile = function(data, options) {
         this._data = data;
 
         this._sector = options.sector;
@@ -43,11 +43,21 @@ define([], function(){
         this._incrementPerIntensity = options.incrementPerIntensity;
     };
 
-    Tile.prototype.url = function() {
+    /**
+     * It returns the drawn HeatMapTile in the form of URL.
+     * @return {String} Data URL of the tile.
+     */
+    HeatMapTile.prototype.url = function() {
         return this.draw().toDataURL();
     };
 
-    Tile.prototype.canvas = function() {
+    /**
+     * It returns the whole Canvas. It is then possible to use for further uses. This one is actually used in the
+     * HeatMapLayer mechanism so if you want to provide some custom implementation of Canvas creation in your tile,
+     * change this method.
+     * @return {HTMLCanvasElement} Canvas Element representing the drawn tile.
+     */
+    HeatMapTile.prototype.canvas = function() {
         return this.draw();
     };
 
@@ -56,7 +66,7 @@ define([], function(){
      * @protected
      * @returns {HTMLCanvasElement}
      */
-    Tile.prototype.draw = function() {
+    HeatMapTile.prototype.draw = function() {
         var shape = this.shape();
 
         var ctx = this._canvas.getContext('2d');
@@ -79,7 +89,7 @@ define([], function(){
      * @param height {Number} Height of the canvas in pixels
      * @returns {HTMLCanvasElement} Created the canvas
      */
-    Tile.prototype.createCanvas = function(width, height) {
+    HeatMapTile.prototype.createCanvas = function(width, height) {
         var canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
@@ -97,7 +107,7 @@ define([], function(){
      * @param height {Number} Height of the clip area.
      * @returns {HTMLCanvasElement} Clipped canvas.
      */
-    Tile.prototype.clip = function(canvas, x, y, width, height) {
+    HeatMapTile.prototype.clip = function(canvas, x, y, width, height) {
         var result = this.createCanvas(width, height);
         result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(x, y, width, height), 0, 0);
         return result;
@@ -109,23 +119,27 @@ define([], function(){
      * @protected
      * @returns {HTMLCanvasElement} Canvas representing the circle.
      */
-    Tile.prototype.shape = function() {
-        var circle = this.createCanvas(this._width, this._height),
-            ctx = circle.getContext('2d'),
+    HeatMapTile.prototype.shape = function() {
+        var shape = this.createCanvas(this._width, this._height),
+            ctx = shape.getContext('2d'),
             r2 = this._radius + this._radius;
 
-        circle.width = circle.height = r2;
+        shape.width = shape.height = r2;
 
-        ctx.shadowBlur = this._blur;
-        ctx.shadowColor = 'black';
+        var gradient = ctx.createRadialGradient(this._radius, this._radius, 0, this._radius, this._radius, this._radius);
+        gradient.addColorStop(0, "rgba(0,0,0,1)");
+        gradient.addColorStop(1, "rgba(0,0,0,0)");
 
         ctx.beginPath();
         ctx.arc(this._radius, this._radius, this._radius, 0, Math.PI * 2, true);
-        ctx.closePath();
+
+        ctx.fillStyle = gradient;
         ctx.fill();
 
-        return circle;
+        ctx.closePath();
+
+        return shape;
     };
 
-    return Tile;
+    return HeatMapTile;
 });

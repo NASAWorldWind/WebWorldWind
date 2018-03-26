@@ -15,18 +15,26 @@
  */
 define([], function () {
     /**
-     * Quadtree Constructor.
-     * @param options {Object}
-     * @param options.bounds {Object}
-     * @param options.bounds.x (Number)
-     * @param options.bounds.y (Number)
-     * @param options.bounds.width {Number}
-     * @param options.bounds.height {Number}
-     * @param options.maxObjects {Number}
-     * @param options.maxLevels {Number}
-     * @param options.level {Number}
+     * QuadTree Constructor. It is basically a binary tree branching into the 4 areas at every level instead of into
+     * the two level. It is common structure used in the game programming and computer graphics area. You can read
+     * more for example here: https://en.wikipedia.org/wiki/Quadtree
+     * @param options {Object} If no object is provided then empty is used.
+     * @param options.bounds {Object} Bounds representing the area of the tree
+     * @param options.bounds.x (Number) X coordinate for the beginning of the area
+     * @param options.bounds.y (Number) Y coordinate for the beginning of the area
+     * @param options.bounds.width {Number} Width of the area used by the tree
+     * @param options.bounds.height {Number} Height of the area used by the tree
+     * @param options.maxObjects {Number} Maximum objects that will be kept in the QuadTree node before it will branch.
+     * @param options.maxLevels {Number} Maximum amount of levels in the QuadTree. This in combination with maxObjects
+     *  defines how many elements will be the tree able to handle.
+     * @param options.level {Number} Used when the tree branches as it allows you to understand what level of the tree
+     *  the current subtree is on.
+     * @alias QuadTree
+     * @constructor
      */
     var QuadTree = function (options) {
+        options = options || {};
+
         this.maxObjects = options.maxObjects || 10;
         this.maxLevels = options.maxLevels || 4;
 
@@ -39,6 +47,7 @@ define([], function () {
 
     /**
      * It splits the node into the 4 subnodes.
+     * @private
      */
     QuadTree.prototype.split = function () {
         var nextLevel = this.level + 1,
@@ -49,40 +58,61 @@ define([], function () {
 
         //top right node
         this.nodes[0] = new QuadTree({
-            x: x + subWidth,
-            y: y,
-            width: subWidth,
-            height: subHeight
-        }, this.maxObjects, this.maxLevels, nextLevel);
+            bounds: {
+                x: x + subWidth,
+                y: y,
+                width: subWidth,
+                height: subHeight
+            },
+            maxObjects: this.maxObjects,
+            maxLevels: this.maxLevels,
+            level: nextLevel
+        });
 
         //top left node
         this.nodes[1] = new QuadTree({
-            x: x,
-            y: y,
-            width: subWidth,
-            height: subHeight
-        }, this.maxObjects, this.maxLevels, nextLevel);
+            bounds: {
+                x: x,
+                y: y,
+                width: subWidth,
+                height: subHeight
+            },
+            maxObjects: this.maxObjects,
+            maxLevels: this.maxLevels,
+            level: nextLevel
+        });
 
         //bottom left node
         this.nodes[2] = new QuadTree({
-            x: x,
-            y: y + subHeight,
-            width: subWidth,
-            height: subHeight
-        }, this.maxObjects, this.maxLevels, nextLevel);
+            bounds: {
+                x: x,
+                y: y + subHeight,
+                width: subWidth,
+                height: subHeight
+            },
+            maxObjects: this.maxObjects,
+            maxLevels: this.maxLevels,
+            level: nextLevel
+        });
 
         //bottom right node
         this.nodes[3] = new QuadTree({
-            x: x + subWidth,
-            y: y + subHeight,
-            width: subWidth,
-            height: subHeight
-        }, this.maxObjects, this.maxLevels, nextLevel);
+            bounds: {
+                x: x + subWidth,
+                y: y + subHeight,
+                width: subWidth,
+                height: subHeight
+            },
+            maxObjects: this.maxObjects,
+            maxLevels: this.maxLevels,
+            level: nextLevel
+        });
     };
 
 
     /**
      * It determines to which of the 4 nodes the given object belongs.
+     * @private
      * @param bounds {Object}
      * @param bounds.x {Number} Left position of the bounds
      * @param bounds.y {Number} Top position of the bounds
@@ -181,7 +211,12 @@ define([], function () {
             }
         }
 
-        return returnObjects;
+        return returnObjects.filter(function(candidate){
+            return candidate.x >= bounds.x &&
+                candidate.x <= (bounds.x + bounds.width) &&
+                candidate.y >= bounds.y &&
+                candidate.y <= (bounds.y + bounds.height);
+        });
     };
 
 

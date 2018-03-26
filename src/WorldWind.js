@@ -38,7 +38,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
-        './layer/heatmap/ColoredSquareTile',
         './layer/heatmap/ColoredTile',
         './shapes/Compass',
         './layer/CompassLayer',
@@ -80,7 +79,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GroundProgram',
         './util/HashMap',
         './layer/heatmap/HeatMapLayer',
-        './layer/heatmap/Tile',
+        './layer/heatmap/HeatMapQuadTree',
+        './layer/heatmap/HeatMapTile',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
         './util/ImageSource',
@@ -178,6 +178,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './projections/ProjectionPolarEquidistant',
         './projections/ProjectionUPS',
         './projections/ProjectionWgs84',
+        './util/QuadTree',
         './geom/Rectangle',
         './render/Renderable',
         './layer/RenderableLayer',
@@ -286,7 +287,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ClickRecognizer,
               ColladaLoader,
               Color,
-              ColoredSquareTile,
               ColoredTile,
               Compass,
               CompassLayer,
@@ -328,6 +328,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GroundProgram,
               HashMap,
               HeatMapLayer,
+              HeatMapQuadTree,
               HeatMapTile,
               HighlightController,
               ImagePyramid,
@@ -426,6 +427,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ProjectionPolarEquidistant,
               ProjectionUPS,
               ProjectionWgs84,
+              QuadTree,
               Rectangle,
               Renderable,
               RenderableLayer,
@@ -743,7 +745,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
-        WorldWind['ColoredSquareTile'] = ColoredSquareTile;
         WorldWind['ColoredTile'] = ColoredTile;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
@@ -785,6 +786,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HashMap'] = HashMap;
         WorldWind['HeatMapLayer'] = HeatMapLayer;
+        WorldWind['HeatMapQuadTree'] = HeatMapQuadTree;
         WorldWind['HeatMapTile'] = HeatMapTile;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
@@ -834,6 +836,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ProjectionPolarEquidistant'] = ProjectionPolarEquidistant;
         WorldWind['ProjectionUPS'] = ProjectionUPS;
         WorldWind['ProjectionWgs84'] = ProjectionWgs84;
+        WorldWind['QuadTree'] = QuadTree;
         WorldWind['Rectangle'] = Rectangle;
         WorldWind['Renderable'] = Renderable;
         WorldWind['RenderableLayer'] = RenderableLayer;

@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 define([
-    './Tile'
-], function (Tile) {
+    './HeatMapTile'
+], function (HeatMapTile) {
     /**
-     * It provides us with a Tile available to ColoredTile.
+     * It provides us with a HeatMapTile available to ColoredTile.
      * @constructor
-     * @augments Tile
+     * @augments HeatMapTile
      * @alias ColoredTile
      * @inheritDoc
      * @param options.intensityGradient {Object} Keys represent the opacity between 0 and 1 and the values represent
      *  color strings.
      */
     var ColoredTile = function(data, options) {
-        Tile.call(this, data, options);
+        HeatMapTile.call(this, data, options);
 
         this._gradient = this.gradient(options.intensityGradient);
     };
 
-    ColoredTile.prototype = Object.create(Tile.prototype);
+    ColoredTile.prototype = Object.create(HeatMapTile.prototype);
 
     /**
      * @inheritDoc
      */
     ColoredTile.prototype.draw = function() {
-        var canvas = Tile.prototype.draw.call(this);
+        var canvas = HeatMapTile.prototype.draw.call(this);
 
         var ctx = canvas.getContext('2d');
         var colored = ctx.getImageData(0, 0, this._width, this._height);
@@ -48,7 +48,7 @@ define([
     };
 
     /**
-     *
+     * It creates one pixel height gradient based on the provided color scale. It is then used to color the HeatMap.
      * @private
      * @param grad {Object}
      * @return {Uint8ClampedArray} Array of the gradient data
