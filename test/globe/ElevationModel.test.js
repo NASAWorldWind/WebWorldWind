@@ -123,7 +123,7 @@ define([
 
                 em.coverages[n - 1].enabled = false;
                 em.coverages[n - 2].enabled = false;
-                var minMax = em.minAndMaxElevationsForSector("dummySector");
+                var minMax = em.minAndMaxElevationsForSector(new Sector(-1,1,-1,1));
                 expect(minMax[0]).toEqual(-3);
                 expect(minMax[1]).toEqual(3);
             });
