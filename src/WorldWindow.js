@@ -148,7 +148,7 @@ define([
              * The globe displayed.
              * @type {Globe}
              */
-            this.globe = new Globe(elevationModel ? elevationModel : new EarthElevationModel());
+            this.globe = new Globe(elevationModel || new EarthElevationModel());
 
             /**
              * The layers to display in this WorldWindow.
