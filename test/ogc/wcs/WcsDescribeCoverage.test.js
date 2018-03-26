@@ -241,6 +241,41 @@ define([
                 expect(values[1]).toBeCloseTo(0, 0.000001);
             });
         });
+
+        describe("Range Set", function () {
+
+            it("should have a range set name gebco", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var rangeSetName = wcsDescribeCoverage.coverages[0].rangeSet.name;
+
+                expect(rangeSetName).toBe("gebco");
+            });
+
+            it ("should have a range set label gebco", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var rangeSetLabel = wcsDescribeCoverage.coverages[0].rangeSet.label;
+
+                expect(rangeSetLabel).toBe("gebco");
+            });
+
+            it("should have a range set axis description name: Band", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var rangeSetAxisName = wcsDescribeCoverage.coverages[0].rangeSet.axisDescriptions[0].name;
+
+                expect(rangeSetAxisName).toBe("Band");
+            });
+
+            it("should have a range set axis description label: Band", function () {
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
+
+                var rangeSetAxisLabel = wcsDescribeCoverage.coverages[0].rangeSet.axisDescriptions[0].label;
+
+                expect(rangeSetAxisLabel).toBe("Band");
+            });
+        });
     });
 
     describe("WSC 2.0.1 Describe Coverage", function () {

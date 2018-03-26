@@ -108,6 +108,8 @@ define([
                     coverage.supportedInterpolations = WcsDescribeCoverage.assemble100SupportedInterpolations(child);
                 } else if (child.localName === "domainSet") {
                     coverage.domainSet = WcsDescribeCoverage.assemble100DomainSet(child);
+                } else if (child.localName === "rangeSet") {
+                    coverage.rangeSet = WcsDescribeCoverage.assemble100RangeSet(child);
                 }
             }
 
@@ -259,6 +261,88 @@ define([
             }
 
             return spatialDomain;
+        };
+
+        WcsDescribeCoverage.assemble100RangeSet = function (element) {
+            var children = element.children || element.childNodes, rangeSet = {};
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "RangeSet") {
+                    // Jump into the first similarly named element
+                    return WcsDescribeCoverage.assemble100RangeSetElement(child);
+                }
+            }
+        };
+
+        WcsDescribeCoverage.assemble100RangeSetElement = function (element) {
+            var children = element.children || element.childNodes, rangeSet = {};
+
+            rangeSet.semantic = element.getAttribute("semantic");
+            rangeSet.refSys = element.getAttribute("refSys");
+            rangeSet.refSysLable = element.getAttribute("refSysLabel");
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "name") {
+                    rangeSet.name = child.textContent;
+                } else if (child.localName === "label") {
+                    rangeSet.label = child.textContent;
+                } else if (child.localName === "axisDescription") {
+                    rangeSet.axisDescriptions = WcsDescribeCoverage.assemble100RangeSetAxisDescription(child);
+                }
+            }
+
+            return rangeSet;
+        };
+
+        WcsDescribeCoverage.assemble100RangeSetAxisDescription = function (element) {
+            var children = element.children || element.childNodes, axisDescriptions = [];
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "AxisDescription") {
+                    axisDescriptions.push(WcsDescribeCoverage.assemble100RangeSetAxisDescriptionElement(child));
+                }
+            }
+
+            return axisDescriptions;
+        };
+
+        WcsDescribeCoverage.assemble100RangeSetAxisDescriptionElement = function (element) {
+            var children = element.children || element.childNodes, axisDescription = {};
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "name") {
+                    axisDescription.name = child.textContent;
+                } else if (child.localName === "label") {
+                    axisDescription.label = child.textContent;
+                } else if (child.localName === "values") {
+                    axisDescription.values = WcsDescribeCoverage.assemble100RangeSetValues(child);
+                }
+            }
+
+            return axisDescription;
+        };
+
+        WcsDescribeCoverage.assemble100RangeSetValues = function (element) {
+            var children = element.children || element.childNodes, values = {};
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "singleValue") {
+                    values.singleValue = child.textContent;
+                }
+                // TODO intervals value type
+            }
+
+            return values;
         };
 
         WcsDescribeCoverage.parseSpacedFloatArray = function (line) {
