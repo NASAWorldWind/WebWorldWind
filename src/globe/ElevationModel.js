@@ -172,7 +172,7 @@ define(['../error/ArgumentError',
         /**
          * Adds an elevation coverage to this elevation model and sorts the list. Duplicate coverages will be ignored.
          *
-         * @param coverage The elevation model to add.
+         * @param coverage The elevation coverage to add.
          * @return {Boolean} true if the ElevationCoverage as added; false if the coverage was a duplicate.
          * @throws ArgumentError if the specified elevation coverage is null.
          */
