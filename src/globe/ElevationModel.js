@@ -225,10 +225,10 @@ define(['../error/ArgumentError',
          * Removes the elevation coverage at the specified index from this elevation model.
          *
          * @param index The index of the elevation coverage to remove.
-         * @throws ArgumentError if the specified index is null or undefined.
+         * @throws ArgumentError if the specified index is less than zero.
          */
         ElevationModel.prototype.removeCoverageAtIndex = function (index) {
-            if (index === undefined || index === null || index < 0) {
+            if (index < 0) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "removeCoverageAtIndex", "invalidIndex"));
             }
@@ -294,19 +294,8 @@ define(['../error/ArgumentError',
          * @param {Number} longitude The location's longitude in degrees.
          * @returns {Number} The elevation at the specified location, in meters. Returns zero if the location is
          * outside the coverage area of this model.
-         * @throws {ArgumentError} If the specified latitude or longitude is null or undefined.
          */
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
-            if (latitude === undefined || latitude === null) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "missingLatitude"));
-            }
-
-            if (longitude === undefined || longitude === null) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "missingLongitude"));
-            }
-
             var i, n = this.coverages.length;
             for (i = n - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
