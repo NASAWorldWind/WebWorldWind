@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports ElevationModel
- * @version $Id: ElevationModel.js 3415 2015-08-20 19:15:57Z tgaskins $
  */
 define([
         '../util/AbsentResourceList',
@@ -12,6 +22,7 @@ define([
         '../error/ArgumentError',
         '../globe/ElevationImage',
         '../globe/ElevationTile',
+        '../formats/geotiff/GeoTiffReader',
         '../util/LevelSet',
         '../util/Logger',
         '../cache/MemoryCache',
@@ -23,6 +34,7 @@ define([
               ArgumentError,
               ElevationImage,
               ElevationTile,
+              GeoTiffReader,
               LevelSet,
               Logger,
               MemoryCache,
@@ -151,6 +163,13 @@ define([
              * @readonly
              */
             this.levels = new LevelSet(this.coverageSector, levelZeroDelta, numLevels, tileWidth, tileHeight);
+
+            /**
+             * Controls how many concurrent tile requests are allowed for this model.
+             * @type {Number}
+             * @default WorldWind.configuration.coverageRetrievalQueueSize
+             */
+            this.retrievalQueueSize = WorldWind.configuration.coverageRetrievalQueueSize;
 
             // These are internal and intentionally not documented.
             this.currentTiles = []; // holds assembled tiles
@@ -583,6 +602,11 @@ define([
         // Intentionally not documented.
         ElevationModel.prototype.retrieveTileImage = function (tile) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+
+                if (this.currentRetrievals.length >= this.retrievalQueueSize) {
+                    return;
+                }
+
                 var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
                     xhr = new XMLHttpRequest(),
                     elevationModel = this;
@@ -657,14 +681,19 @@ define([
 
         // Intentionally not documented.
         ElevationModel.prototype.loadElevationImage = function (tile, xhr) {
-            var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight);
+            var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight),
+                geoTiff;
 
-            if (this.retrievalImageFormat == "application/bil16") {
+            if (this.retrievalImageFormat === "application/bil16") {
                 elevationImage.imageData = new Int16Array(xhr.response);
                 elevationImage.size = elevationImage.imageData.length * 2;
-            } else if (this.retrievalImageFormat == "application/bil32") {
+            } else if (this.retrievalImageFormat === "application/bil32") {
                 elevationImage.imageData = new Float32Array(xhr.response);
                 elevationImage.size = elevationImage.imageData.length * 4;
+            } else if (this.retrievalImageFormat === "image/tiff") {
+                geoTiff = new GeoTiffReader(xhr.response);
+                elevationImage.imageData = geoTiff.getImageData();
+                elevationImage.size = elevationImage.imageData.length * geoTiff.metadata.bitsPerSample[0] / 8;
             }
 
             if (elevationImage.imageData) {
@@ -675,5 +704,4 @@ define([
         };
 
         return ElevationModel;
-
     });

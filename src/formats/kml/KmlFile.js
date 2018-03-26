@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * It is basically a collection of KmlRecords.
@@ -8,7 +19,6 @@
  */
 define([
     '../../error/ArgumentError',
-    '../../util/jszip',
     './KmlElements',
     './KmlFileCache',
     './KmlObject',
@@ -16,6 +26,7 @@ define([
     './styles/KmlStyleMap',
     './KmlTimeSpan',
     './KmlTimeStamp',
+    './KmzFile',
     '../../util/Logger',
     '../../util/Promise',
     './util/RefreshListener',
@@ -24,7 +35,6 @@ define([
     '../../util/XmlDocument',
     '../../util/WWUtil'
 ], function (ArgumentError,
-             JsZip,
              KmlElements,
              KmlFileCache,
              KmlObject,
@@ -32,6 +42,7 @@ define([
              KmlStyleMap,
              KmlTimeSpan,
              KmlTimeStamp,
+             KmzFile,
              Logger,
              Promise,
              RefreshListener,
@@ -67,38 +78,25 @@ define([
         this._styleResolver = new StyleResolver(this._fileCache);
         this._listener = new RefreshListener();
         this._headers = null;
-        
-        var filePromise;
-        // Load the document
-        filePromise = new Promise(function (resolve) {
-            var promise = self.requestRemote(url);
-            promise.then(function (options) {
-                var rootDocument = null;
-                var loadedDocument = options.text;
-                self._headers = options.headers;
-                if (!self.hasExtension("kmz", url)) {
-                    rootDocument = loadedDocument;
-                } else {
-                    var kmzFile = new JsZip();
-                    kmzFile.load(loadedDocument);
-                    for(var key in kmzFile.files) {
-                        var file = kmzFile.files[key];
-                        if (rootDocument == null && self.hasExtension("kml", file.name)) {
-                            rootDocument = file.asText();
-                        }
-                    }
-                }
 
-                self._document = new XmlDocument(rootDocument).dom();
-                KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
+        return this.requestRemote(url).then(function (options) {
+            var loadedDocument = options.text;
+            self._headers = options.headers;
 
-                window.setTimeout(function () {
-                    resolve(self);
-                }, 0);
-            });
+            if (!self.hasExtension("kmz", url)) {
+                return loadedDocument;
+            } else {
+                var kmzFile = new KmzFile(loadedDocument, self._fileCache);
+                return kmzFile.load();
+            }
+        }).then(function (rootDocument) {
+            self._document = new XmlDocument(rootDocument).dom();
+            KmlObject.call(self, {objectNode: self._document.documentElement, controls: controls});
+
+            self._fileCache.add(url, self, true);
+
+            return self;
         });
-        this._fileCache.add(url, filePromise);
-        return filePromise;
     };
 
     KmlFile.prototype = Object.create(KmlObject.prototype);
@@ -142,7 +140,9 @@ define([
      * FOR INTERNAL USE ONLY.
      * Returns a value indicating whether the URL ends with the given extension.
      * @param url {String} Url to a file
+     * @param extension {String} Extension of the file.
      * @returns {boolean} true if the extension matches otherwise false
+     * @private
      */
     KmlFile.prototype.hasExtension = function (extension, url) {
         return WWUtil.endsWith(url, "." + extension);
@@ -166,7 +166,7 @@ define([
         return new RemoteFile(options).get();
     };
 
-	/**
+    /**
      * It finds the style in the document.
      * @param pId {String} Id of the style.
      */
@@ -196,11 +196,11 @@ define([
         });
     };
 
-	/**
+    /**
      * This function returns expire time of this file in miliseconds.
      * @returns {Number} miliseconds for this file to expire.
      */
-    KmlFile.prototype.getExpired = function() {
+    KmlFile.prototype.getExpired = function () {
         var expireDate = new Date(this._headers.getRequestHeader("Expires"));
         var currentDate = new Date();
         return currentDate.getTime - expireDate.getTime();

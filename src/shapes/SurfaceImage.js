@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports SurfaceImage
- * @version $Id: SurfaceImage.js 3023 2015-04-15 20:24:17Z tgaskins $
  */
 define([
         '../error/ArgumentError',
@@ -57,6 +67,17 @@ define([
             this._imageSource = imageSource;
 
             /**
+             * This surface image's resampling mode. Indicates the sampling algorithm used to display this image when it
+             * is larger on screen than its native resolution. May be one of:
+             * <ul>
+             *  <li>WorldWind.FILTER_LINEAR</li>
+             *  <li>WorldWind.FILTER_NEAREST</li>
+             * </ul>
+             * @default WorldWind.FILTER_LINEAR
+             */
+            this.resamplingMode = WorldWind.FILTER_LINEAR;
+
+            /**
              * This surface image's opacity. When this surface image is drawn, the actual opacity is the product of
              * this opacity and the opacity of the layer containing this surface image.
              * @type {number}
@@ -103,14 +124,25 @@ define([
         SurfaceImage.prototype.bind = function (dc) {
             var texture = dc.gpuResourceCache.resourceForKey(this._imageSource);
             if (texture && !this.imageSourceWasUpdated) {
-                return texture.bind(dc);
+                return this.bindTexture(dc, texture);
             } else {
                 texture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this._imageSource);
                 this.imageSourceWasUpdated = false;
                 if (texture) {
-                    return texture.bind(dc);
+                    return this.bindTexture(dc, texture);
                 }
             }
+        };
+
+        SurfaceImage.prototype.bindTexture = function (dc, texture) {
+            var gl = dc.currentGlContext;
+
+            texture.setTexParameter(
+                gl.TEXTURE_MAG_FILTER,
+                this.resamplingMode === WorldWind.FILTER_NEAREST ? gl.NEAREST : gl.LINEAR
+            );
+
+            return texture.bind(dc);
         };
 
         SurfaceImage.prototype.applyInternalTransform = function (dc, matrix) {
@@ -122,7 +154,15 @@ define([
          * @param {DrawContext} dc The current draw context.
          */
         SurfaceImage.prototype.render = function (dc) {
-            if (!this.enabled || !this.sector.overlaps(dc.terrain.sector)) {
+            if (!this.enabled) {
+                return;
+            }
+
+            if (!dc.terrain) {
+                return;
+            }
+
+            if (!this.sector.overlaps(dc.terrain.sector)) {
                 return;
             }
 

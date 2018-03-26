@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 define([
     './../KmlElements',
@@ -8,15 +19,13 @@ define([
     './KmlOverlay',
     '../util/NodeTransformers',
     '../../../util/Offset',
-    '../../../shapes/ScreenImage',
-    '../../../util/WWUtil'
+    '../../../shapes/ScreenImage'
 ], function (KmlElements,
              KmlFeature,
              KmlOverlay,
              NodeTransformers,
              Offset,
-             ScreenImage,
-             WWUtil) {
+             ScreenImage) {
     "use strict";
 
     /**
@@ -33,8 +42,6 @@ define([
      */
     var KmlScreenOverlay = function (options) {
         KmlOverlay.call(this, options);
-
-        console.log("Create Screen Overlay", this);
     };
 
     KmlScreenOverlay.prototype = Object.create(KmlOverlay.prototype);
@@ -290,7 +297,7 @@ define([
                         this.kmlScreenXYyunits,
                         this.kmlScreenXYy
                     ),
-                    this.kmlIcon.kmlHref
+                    this.kmlIcon.kmlHref(kmlOptions.fileCache)
                 );
                 this._renderable.imageOffset = new Offset(
                     this.kmlOverlayXYxunits,

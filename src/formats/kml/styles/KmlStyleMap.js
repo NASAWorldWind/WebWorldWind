@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 define([
     '../KmlElements',
@@ -57,25 +68,21 @@ define([
 
     /**
      * Resolve the information from style map and create the options with normal and highlight.
-     * @param resolve Callback to be called when all promises are resolved with correct style.
+     * @param styleResolver {StyleResolver} Resolver used to handle the potential remoteness of the style. The style
+     *   itself can be located in any file.
+     * @return {Promise} Promise of the resolved style.
      */
-    KmlStyleMap.prototype.resolve = function(resolve, styleResolver) {
+    KmlStyleMap.prototype.resolve = function(styleResolver) {
         // Create promise which resolves, when all styles are resolved.
-        var self = this;
         var results = {};
-        var promises = [];
-        var pairs = self.kmlPairs;
-        pairs.forEach(function(pair) {
+        var promises = this.kmlPairs.map(function(pair) {
             var key = pair.kmlKey;
-            var style = pair.getStyle(styleResolver);
-            promises.push(style);
-            style.then(function(pStyle){
+            return pair.getStyle(styleResolver).then(function(pStyle){
                 results[key] = pStyle.normal;
             });
         });
 
-        var compoundPromise = Promise.all(promises);
-        compoundPromise.then(function(){
+        return Promise.all(promises).then(function(){
             if(!results['normal']){
                 results['normal'] = null;
             }
@@ -84,7 +91,7 @@ define([
                 results['highlight'] =  null;
             }
 
-            resolve(results);
+            return results;
         });
     };
 

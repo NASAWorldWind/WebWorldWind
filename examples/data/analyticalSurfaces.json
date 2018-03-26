@@ -1,6 +1,6 @@
 [
 	{ 
-		"url":"http://worldwindserver.net/webworldwind/data/proba_v_out_italy/",
+		"url":"https://worldwind.arc.nasa.gov/web/examples/data/proba_v_out_italy/",
         "regionName":"Rome",
 		"filenameList":["probav_s5_toc_x19y03_20140606_100m_ndvi_v001.txt",
 						"probav_s5_toc_x19y03_20140706_100m_ndvi_v001.txt",
@@ -18,7 +18,7 @@
 						]
     },
 	{ 
-		"url":"http://worldwindserver.net/webworldwind/data/proba_v_italy_sicily/",
+		"url":"https://worldwind.arc.nasa.gov/web/examples/data/proba_v_italy_sicily/",
         "regionName":"Sicily",
 		"filenameList":["probav_s10_toc_x19y03_20140601_333m_ndvi_v001.txt",
 						"probav_s10_toc_x19y03_20140611_333m_ndvi_v001.txt",

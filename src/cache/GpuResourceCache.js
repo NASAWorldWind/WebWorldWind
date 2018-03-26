@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports GpuResourceCache
- * @version $Id: GpuResourceCache.js 3023 2015-04-15 20:24:17Z tgaskins $
  */
 define([
         '../util/AbsentResourceList',
@@ -161,7 +171,23 @@ define([
             var entry = (key instanceof ImageSource)
                 ? this.entries.entryForKey(key.key) : this.entries.entryForKey(key);
 
-            return entry ? entry.resource : null;
+            var resource = entry ? entry.resource : null;
+
+            // This is faster than checking if the resource is a texture using instanceof.
+            if (resource !== null && typeof resource.clearTexParameters === "function") {
+                resource.clearTexParameters();
+            }
+
+            return resource;
+        };
+        
+        /**
+         * Sets a resource's aging factor (multiplier).
+         * @param {String} key The key of the resource to modify. If null or undefined, the resource's cache entry is not modified.
+         * @param {Number} agingFactor A multiplier applied to the age of the resource.
+         */
+        GpuResourceCache.prototype.setResourceAgingFactor = function (key, agingFactor) {
+            this.entries.setEntryAgingFactor(key, agingFactor);
         };
 
         /**
@@ -199,7 +225,7 @@ define([
          * @param {WebGLRenderingContext} gl The current WebGL context.
          * @param {String|ImageSource} imageSource The image source, either a {@link ImageSource} or a String
          * giving the URL of the image.
-         * @param {GL.enum} wrapMode Optional. Specifies the wrap mode of the texture. Defaults to gl.CLAMP_TO_EDGE
+         * @param {GLenum} wrapMode Optional. Specifies the wrap mode of the texture. Defaults to gl.CLAMP_TO_EDGE
          * @returns {Texture} The {@link Texture} created for the image if the specified image source is an
          * {@link ImageSource}, otherwise null.
          */

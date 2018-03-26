@@ -1,11 +1,24 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 define([
+    'src/formats/kml/KmlFileCache',
     'src/formats/kml/KmlLink',
     'src/util/XmlDocument'
 ], function (
+    KmlFileCache,
     KmlLink,
     XmlDocument
 ) {
@@ -29,8 +42,7 @@ define([
                 kmlRepresentation.getElementsByTagName("Link")[0]});
         it('should have the Href, RefreshMode,RefreshInterval,ViewRefreshMode,ViewRefreshTime, ViewBoundScale, ViewFormat,' +
             'HttpQuery properties', function(){
-
-            expect(link.kmlHref).toEqual('link');
+            expect(link.kmlHref(new KmlFileCache())).toEqual('link');
             expect(link.kmlRefreshMode).toEqual('onChange');
             expect(link.kmlRefreshInterval).toEqual(4);
             expect(link.kmlViewRefreshMode).toEqual('never');

@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports BingImageryUrlBuilder
- * @version $Id: BingImageryUrlBuilder.js 3094 2015-05-14 23:02:03Z tgaskins $
  */
 define([
         '../error/ArgumentError',
@@ -62,7 +72,7 @@ define([
 
                 Logger.log(Logger.LEVEL_WARNING, "WARNING: You are using a limited use, non-production Bing Maps key.\n" +
                 "If you are developing an app or a web page this violates the Bing Terms of Use.\n" +
-                "Please visit https://www.microsoft.com/maps/choose-your-bing-maps-API.aspx to obtain your own key for your application.\n" +
+                "Please visit https://www.microsoft.com/en-us/maps/create-a-bing-maps-key to obtain your own key for your application.\n" +
                 "Specify that key to WorldWind by setting the WorldWind.BingMapsKey property to your key " +
                 "prior to creating any Bing Maps layers.\n");
             }

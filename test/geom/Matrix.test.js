@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 define([
     'src/geom/Matrix',
@@ -8,8 +19,9 @@ define([
     'src/globe/Globe',
     'src/globe/EarthElevationModel',
     'src/geom/Plane',
+    'src/geom/Rectangle',
     'src/geom/Vec3'
-], function (Matrix, Angle, Globe, EarthElevationModel, Plane, Vec3) {
+], function (Matrix, Angle, Globe, EarthElevationModel, Plane, Rectangle, Vec3) {
     "use strict";
 
     describe("Matrix Tests", function () {
@@ -515,7 +527,7 @@ define([
 
             it("Multiplies the matrix correctly", function () {
                 var targetMatrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
 
                 targetMatrix.extractRotationAngles(result);
 
@@ -874,7 +886,7 @@ define([
 
             it("Returns the eye point correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractEyePoint(result);
 
                 expect(result).toEqual(new Vec3(-116, -137, -158));
@@ -893,7 +905,7 @@ define([
 
             it("Returns the vector correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractForwardVector(result);
 
                 expect(result).toEqual(new Vec3(-8, -9, -10));
@@ -1210,5 +1222,74 @@ define([
             expect(matrix[14]).toEqual(9);
             expect(matrix[15]).toEqual(10);
         });
+
+        describe("unProject rejects null parameters", function () {
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(null, dummyParam, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(dummyParam, null, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing output variable", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(dummyParam, dummyParam, null);
+                }).toThrow();
+            });
+        });
+
+        describe("Correctly converts screen coordinates to model coordinates", function () {
+
+            it("unProjects correctly", function () {
+                var modelView = new Matrix(
+                    -0.342, 0, 0.939, 2.328e-10,
+                    0.469, 0.866, 0.171, 18504.137,
+                    -0.813, 0.500, -0.296, -16372797.555,
+                    0, 0, 0, 1
+                );
+
+                var projection = new Matrix(
+                    2, 0, 0, 0,
+                    0, 2, 0, 0,
+                    0, 0, -1.196, -3254427.538,
+                    0, 0, -1, 0
+                );
+
+                var modelviewProjection = Matrix.fromIdentity();
+                modelviewProjection.setToMultiply(projection, modelView);
+                var modelviewProjectionInv = Matrix.fromIdentity();
+                modelviewProjectionInv.invertMatrix(modelviewProjection);
+                var viewport = new Rectangle(0, 0, 848, 848);
+                var screenPoint = new Vec3(637.5, 839, 0);
+                var result = new Vec3(0, 0, 0);
+                var expectedResult = new Vec3(-11925849.053, 8054028.030, -3946244.954);
+                modelviewProjectionInv.unProject(screenPoint, viewport, result);
+                for (var i = 0; i < 3; i++) {
+                    expect(result[i]).toBeCloseTo(expectedResult[i], 3);
+                }
+
+            });
+        });
+
+        describe("Matrix cloning", function () {
+
+            it("Correctly clones matrices", function () {
+                var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+                var matrixB = matrixA.clone();
+                expect(matrixA.equals(matrixB)).toBe(true);
+            });
+        });
+
     });
 });

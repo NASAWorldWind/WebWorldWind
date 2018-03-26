@@ -1,10 +1,20 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports Offset
- * @version $Id: Offset.js 2958 2015-04-01 23:25:29Z tgaskins $
  */
 define(['../geom/Vec2'
     ],
@@ -81,17 +91,17 @@ define(['../geom/Vec2'
         Offset.prototype.offsetForSize = function (width, height) {
             var x, y;
 
-            if (this.xUnits == WorldWind.OFFSET_FRACTION) {
+            if (this.xUnits === WorldWind.OFFSET_FRACTION) {
                 x = width * this.x;
-            } else if (this.xUnits == WorldWind.OFFSET_INSET_PIXELS) {
+            } else if (this.xUnits === WorldWind.OFFSET_INSET_PIXELS) {
                 x = width - this.x;
             } else { // default to OFFSET_PIXELS
                 x = this.x;
             }
 
-            if (this.yUnits == WorldWind.OFFSET_FRACTION) {
+            if (this.yUnits === WorldWind.OFFSET_FRACTION) {
                 y = height * this.y;
-            } else if (this.yUnits == WorldWind.OFFSET_INSET_PIXELS) {
+            } else if (this.yUnits === WorldWind.OFFSET_INSET_PIXELS) {
                 y = height - this.y;
             } else { // default to OFFSET_PIXELS
                 y = this.y;

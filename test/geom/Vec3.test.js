@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 define([
     'src/geom/Vec3'
@@ -28,14 +39,14 @@ define([
         it("Should return the average of a vector", function () {
             var vec3_a = new Vec3(1, 2, 3);
             var vec3_b = new Vec3(3, 2, 1);
-            var vec3_average = Vec3.average([vec3_a, vec3_b], Vec3.ZERO);
+            var vec3_average = Vec3.average([vec3_a, vec3_b], new Vec3());
             expect(vec3_average).toEqual(new Vec3(2, 2, 2));
         });
 
 
         it("Should return the average a specified array of points packed into a single array", function () {
             var pointArray = [1, 2, 3, 3, 2, 1];
-            expect(Vec3.averageOfBuffer(pointArray, Vec3.ZERO)).toEqual(new Vec3(2, 2, 2));
+            expect(Vec3.averageOfBuffer(pointArray, new Vec3())).toEqual(new Vec3(2, 2, 2));
         });
 
         describe("Test the colinearity of three arrays", function () {
@@ -115,13 +126,13 @@ define([
         describe('#Set components', function () {
 
             it('sets vector equal to different vector', function () {
-                var vec3 = Vec3.ZERO;
+                var vec3 = new Vec3();
                 vec3.set(2, 3, 4);
                 expect(vec3).toEqual(new Vec3(2, 3, 4));
             });
 
             it('sets vector and verify by components', function () {
-                var vec3 = Vec3.ZERO;
+                var vec3 = new Vec3();
                 vec3.set(5, 6, 7);
                 expect(vec3[0]).toEqual(5);
                 expect(vec3[1]).toEqual(6);
@@ -130,7 +141,7 @@ define([
         });
 
         it("Copies the component of a Vec3", function () {
-            var destination = Vec3.ZERO;
+            var destination = new Vec3();
             var source = new Vec3(2, 3, 4);
             destination.copy(source);
             expect(destination).toEqual(source);

@@ -1,12 +1,25 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 define([
+    './util/HrefResolver',
     './KmlElements',
     './KmlObject',
     './util/NodeTransformers'
-], function (KmlElements,
+], function (HrefResolver,
+             KmlElements,
              KmlObject,
              NodeTransformers) {
     "use strict";
@@ -32,23 +45,6 @@ define([
     KmlLink.prototype = Object.create(KmlObject.prototype);
 
     Object.defineProperties(KmlLink.prototype, {
-        /**
-         * A URL (either an HTTP address or a local file specification). When the parent of &lt;Link&gt; is a
-         * NetworkLink,
-         * &lt;href&gt; is a KML file. When the parent of &lt;Link&gt; is a Model, &lt;href&gt; is a COLLADA file. When the parent of
-         * &lt;Icon&gt; (same fields as &lt;Link&gt;) is an Overlay, &lt;href&gt; is an image. Relative URLs can be used in this tag
-         * and are evaluated relative to the enclosing KML file. See KMZ Files for details on constructing relative
-         * references in KML and KMZ files.
-         * @memberof KmlLink.prototype
-         * @readonly
-         * @type {String}
-         */
-        kmlHref: {
-            get: function () {
-                return this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string});
-            }
-        },
-
         /**
          * Specifies a time-based refresh mode, which can be one of the following:
          * onChange - refresh when the file is loaded and whenever the Link parameters change (the default).
@@ -175,6 +171,17 @@ define([
             }
         }
     });
+
+    /**
+     * It returns valid URL usable for remote resources.
+     * @param fileCache {KmlFileCache} Cache needed to retrieve data urls from remote locations.
+     * @returns {String} URL to use
+     */
+    KmlLink.prototype.kmlHref = function(fileCache){
+        return new HrefResolver(
+            this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string}), fileCache
+        ).url();
+    };
 
     /**
      * @inheritDoc

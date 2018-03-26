@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015-2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 define([
     '../../../util/Color',
     '../KmlElements',
@@ -125,14 +140,14 @@ define([
      * @param styles.normal {KmlStyle} Style applied when item not highlighted
      * @param styles.highlight {KmlStyle} Style applied when item is highlighted
      */
-    KmlLineString.prototype.createPath = function (styles) {
+    KmlLineString.prototype.createPath = function (styles, fileCache) {
         if(this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
-            this._renderable = new SurfacePolyline(this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this._renderable = new SurfacePolyline(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         } else {
-            this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         }
         if(styles.highlight) {
-            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight);
+            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight, fileCache);
         }
         this.moveValidProperties();
     };
@@ -141,7 +156,7 @@ define([
         KmlGeometry.prototype.render.call(this, dc, kmlOptions);
 
         if(kmlOptions.lastStyle && !this._renderable) {
-            this.createPath(kmlOptions.lastStyle);
+            this.createPath(kmlOptions.lastStyle, kmlOptions.fileCache);
             dc.redrawRequested = true;
         }
 
@@ -154,8 +169,8 @@ define([
     /**
      * @inheritDoc
      */
-    KmlLineString.prototype.prepareAttributes = function (style) {
-        var shapeOptions = style && style.generate() || {};
+    KmlLineString.prototype.prepareAttributes = function (style, fileCache) {
+        var shapeOptions = style && style.generate(fileCache) || {};
 
         shapeOptions._applyLighting = true;
         shapeOptions._drawOutline = true;
@@ -211,7 +226,3 @@ define([
 
     return KmlLineString;
 });
-/*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
- */

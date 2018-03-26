@@ -1,6 +1,17 @@
 /*
- * Copyright (C) 2014 United States Government as represented by the Administrator of the
- * National Aeronautics and Space Administration. All Rights Reserved.
+ * Copyright 2015-2017 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 /**
  * @exports ColladaScene
@@ -470,7 +481,7 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
-            this.eyeDistance = dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = dc.eyePoint.distanceTo(this.placePoint);
 
             return this;
 
@@ -586,7 +597,7 @@ define([
                 this.applyLighting(dc, buffers);
             }
 
-            this.applyMatrix(dc, hasLighting, hasTexture , nodeWorldMatrix, nodeNormalMatrix);
+            this.applyMatrix(dc, hasLighting, hasTexture, nodeWorldMatrix, nodeNormalMatrix);
 
             if (buffers.indexedRendering) {
                 this.applyIndices(dc, buffers);
@@ -657,7 +668,7 @@ define([
             }
 
             var color = new Color(r, g, b, a);
-            opacity = a * dc.currentLayer.opacity;
+            opacity = a * this.layer.opacity;
             gl.depthMask(opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? this.pickColor : color);
             program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
@@ -749,7 +760,7 @@ define([
 
             var mvpMatrix = Matrix.fromIdentity();
 
-            mvpMatrix.copy(dc.navigatorState.modelviewProjection);
+            mvpMatrix.copy(dc.modelviewProjection);
 
             mvpMatrix.multiplyMatrix(this.transformationMatrix);
 
@@ -761,7 +772,7 @@ define([
 
                 var normalMatrix = Matrix.fromIdentity();
 
-                normalMatrix.copy(dc.navigatorState.modelviewNormalTransform);
+                normalMatrix.copy(dc.modelviewNormalTransform);
 
                 normalMatrix.multiplyMatrix(this.normalMatrix);
 
@@ -772,7 +783,7 @@ define([
                 dc.currentProgram.loadModelviewInverse(dc.currentGlContext, normalMatrix);
             }
 
-            if (hasTexture && this._activeTexture){
+            if (hasTexture && this._activeTexture) {
                 dc.currentProgram.loadTextureMatrix(dc.currentGlContext, this._texCoordMatrix);
                 this._activeTexture = null;
             }
