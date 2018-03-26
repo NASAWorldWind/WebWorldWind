@@ -45,7 +45,7 @@ define([
             expect(wcs.coverages[0].coverageId).toBe("test__pacificnw_usgs_ned_10m");
         });
 
-        it("Should have a 2.0.1 version", function() {
+        it("Should have a 2.0.1 version", function () {
 
             var wcs = new WcsCapabilities(xmlDom);
 
@@ -125,14 +125,14 @@ define([
             xhr.send(null);
         });
 
-        it("Should have a 1.0.0 version", function() {
+        it("should have a 1.0.0 version", function () {
 
             var wcs = new WcsCapabilities(xmlDom);
 
             expect(wcs.version).toBe("1.0.0");
         });
 
-        it("Should have a update sequence of 5", function () {
+        it("should have a update sequence of 5", function () {
 
             var wcs = new WcsCapabilities(xmlDom);
 
@@ -141,14 +141,14 @@ define([
 
         describe("Coverages", function () {
 
-            it("Should provide a coverageId of test:pacificnw_usgs_ned_10m", function () {
+            it("should provide a coverageId of test:pacificnw_usgs_ned_10m", function () {
 
                 var wcs = new WcsCapabilities(xmlDom);
 
                 expect(wcs.coverages[0].coverageId).toBe("test:pacificnw_usgs_ned_10m");
             });
 
-            it("Should have a bounding box with the correct order", function () {
+            it("should have a bounding box with the correct order", function () {
 
                 var wcs = new WcsCapabilities(xmlDom);
 
