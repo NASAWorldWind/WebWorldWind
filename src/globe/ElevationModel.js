@@ -277,7 +277,7 @@ define(['../error/ArgumentError',
 
             for (i = n - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
-                if (coverage.enabled) {
+                if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
                     coverageResult = coverage.minAndMaxElevationsForSector(sector);
                     if (coverageResult) {
                         return coverageResult;
@@ -310,7 +310,7 @@ define(['../error/ArgumentError',
             var i, n = this.coverages.length;
             for (i = n - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
-                if (coverage.enabled) {
+                if (coverage.enabled && coverage.coverageSector.containsLocation(latitude, longitude)) {
                     var elevation = coverage.elevationAtLocation(latitude, longitude);
                     if (elevation !== null) {
                         return elevation;
