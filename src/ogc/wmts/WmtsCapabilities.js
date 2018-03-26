@@ -19,11 +19,11 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        '../../ogc/wmts/OwsDescription',
-        '../../ogc/wmts/OwsLanguageString',
-        '../../ogc/wmts/OwsOperationsMetadata',
-        '../../ogc/wmts/OwsServiceIdentification',
-        '../../ogc/wmts/OwsServiceProvider',
+        '../../ogc/ows/OwsDescription',
+        '../../ogc/ows/OwsLanguageString',
+        '../../ogc/ows/OwsOperationsMetadata',
+        '../../ogc/ows/OwsServiceIdentification',
+        '../../ogc/ows/OwsServiceProvider',
         '../../ogc/wms/WmsCapabilities',
         '../../ogc/wmts/WmtsLayerCapabilities'
     ],
