@@ -18,8 +18,6 @@ define([
 ], function (WcsCapabilities) {
     "use strict";
 
-    // TODO logically order tests according to parent element
-
     describe("WCS 2.0.1 Capabilities Parsing", function () {
         var xmlDom;
 
@@ -127,13 +125,6 @@ define([
             xhr.send(null);
         });
 
-        it("Should provide a coverageId of test:pacificnw_usgs_ned_10m", function () {
-
-            var wcs = new WcsCapabilities(xmlDom);
-
-            expect(wcs.coverages[0].coverageId).toBe("test:pacificnw_usgs_ned_10m");
-        });
-
         it("Should have a 1.0.0 version", function() {
 
             var wcs = new WcsCapabilities(xmlDom);
@@ -148,90 +139,104 @@ define([
             expect(wcs.updateSequence).toBe("5");
         });
 
-        it("Should have a bounding box with the correct order", function () {
+        describe("Coverages", function () {
 
-            var wcs = new WcsCapabilities(xmlDom);
+            it("Should provide a coverageId of test:pacificnw_usgs_ned_10m", function () {
 
-            // determine the lowest longitude value and ensure that coordinate is specified first in the bounding box
-            var lowerValue = new Number(wcs.coverages[0].wgs84BoundingBox.lowerCorner.split(/\s+/)[0]);
-            var upperValue = new Number(wcs.coverages[0].wgs84BoundingBox.upperCorner.split(/\s+/)[0]);
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(lowerValue).toBeLessThan(upperValue);
+                expect(wcs.coverages[0].coverageId).toBe("test:pacificnw_usgs_ned_10m");
+            });
 
+            it("Should have a bounding box with the correct order", function () {
+
+                var wcs = new WcsCapabilities(xmlDom);
+
+                // determine the lowest longitude value and ensure that coordinate is specified first in the bounding box
+                var lowerValue = new Number(wcs.coverages[0].wgs84BoundingBox.lowerCorner.split(/\s+/)[0]);
+                var upperValue = new Number(wcs.coverages[0].wgs84BoundingBox.upperCorner.split(/\s+/)[0]);
+
+                expect(lowerValue).toBeLessThan(upperValue);
+
+            });
         });
 
-        // Service Element
-        it("should have the wcs name", function () {
-            var wcs = new WcsCapabilities(xmlDom);
+        describe("Service", function () {
 
-            var name = wcs.service.name;
+            it("should have the wcs name", function () {
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(name).toBe("WCS");
+                var name = wcs.service.name;
+
+                expect(name).toBe("WCS");
+            });
+
+            it("should have NONE fees", function () {
+                var wcs = new WcsCapabilities(xmlDom);
+
+                var fees = wcs.service.fees;
+
+                expect(fees).toBe("NONE");
+            });
+
+            it("should have NONE accessConstraints", function () {
+                var wcs = new WcsCapabilities(xmlDom);
+
+                var accessContraints = wcs.service.accessConstraints[0];
+
+                expect(accessContraints).toBe("NONE");
+            });
         });
 
-        it("should have NONE fees", function () {
-            var wcs = new WcsCapabilities(xmlDom);
+        describe("Capability", function () {
 
-            var fees = wcs.service.fees;
+            it("should have a get capabilities GET url of http://localhost:8080/geoserver/wcs?", function () {
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(fees).toBe("NONE");
-        });
+                var getCapabilitiesUrl = wcs.capability.request.getCapabilities.get;
 
-        it("should have NONE accessConstraints", function () {
-            var wcs = new WcsCapabilities(xmlDom);
+                expect(getCapabilitiesUrl).toBe("http://localhost:8080/geoserver/wcs?");
+            });
 
-            var accessContraints = wcs.service.accessConstraints[0];
+            it("should have a get capabilities POST url of http://localhost:8080/geoserver/wcs?", function () {
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(accessContraints).toBe("NONE");
-        });
+                var getCapabilitiesUrl = wcs.capability.request.getCapabilities.post;
 
-        // Capability Element
-        it("should have a get capabilities GET url of http://localhost:8080/geoserver/wcs?", function () {
-            var wcs = new WcsCapabilities(xmlDom);
+                expect(getCapabilitiesUrl).toBe("http://localhost:8080/geoserver/wcs?");
+            });
 
-            var getCapabilitiesUrl = wcs.capability.request.getCapabilities.get;
+            it("should have a describe coverage GET url of http://localhost:8080/geoserver/wcs?", function () {
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(getCapabilitiesUrl).toBe("http://localhost:8080/geoserver/wcs?");
-        });
+                var describeCoverageUrl = wcs.capability.request.describeCoverage.get;
 
-        it("should have a get capabilities POST url of http://localhost:8080/geoserver/wcs?", function () {
-            var wcs = new WcsCapabilities(xmlDom);
+                expect(describeCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+            });
 
-            var getCapabilitiesUrl = wcs.capability.request.getCapabilities.post;
+            it("should have a describe coverage POST url of http://localhost:8080/geoserver/wcs?", function () {
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(getCapabilitiesUrl).toBe("http://localhost:8080/geoserver/wcs?");
-        });
+                var describeCoverageUrl = wcs.capability.request.describeCoverage.post;
 
-        it("should have a describe coverage GET url of http://localhost:8080/geoserver/wcs?", function () {
-            var wcs = new WcsCapabilities(xmlDom);
+                expect(describeCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+            });
 
-            var describeCoverageUrl = wcs.capability.request.describeCoverage.get;
+            it("should have a get coverage GET url of http://localhost:8080/geoserver/wcs?", function () {
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(describeCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
-        });
+                var getCoverageUrl = wcs.capability.request.getCoverage.get;
 
-        it("should have a describe coverage POST url of http://localhost:8080/geoserver/wcs?", function () {
-            var wcs = new WcsCapabilities(xmlDom);
+                expect(getCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+            });
 
-            var describeCoverageUrl = wcs.capability.request.describeCoverage.post;
+            it("should have a get coverage POST url of http://localhost:8080/geoserver/wcs?", function () {
+                var wcs = new WcsCapabilities(xmlDom);
 
-            expect(describeCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
-        });
+                var getCoverageUrl = wcs.capability.request.getCoverage.post;
 
-        it("should have a get coverage GET url of http://localhost:8080/geoserver/wcs?", function () {
-            var wcs = new WcsCapabilities(xmlDom);
-
-            var getCoverageUrl = wcs.capability.request.getCoverage.get;
-
-            expect(getCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
-        });
-
-        it("should have a get coverage POST url of http://localhost:8080/geoserver/wcs?", function () {
-            var wcs = new WcsCapabilities(xmlDom);
-
-            var getCoverageUrl = wcs.capability.request.getCoverage.post;
-
-            expect(getCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+                expect(getCoverageUrl).toBe("http://localhost:8080/geoserver/wcs?");
+            });
         });
     });
 });
