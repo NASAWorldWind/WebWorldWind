@@ -28,7 +28,8 @@ define([
         '../projections/ProjectionWgs84',
         '../geom/Sector',
         '../globe/Tessellator',
-        '../geom/Vec3'],
+        '../geom/Vec3',
+        '../util/WWMath'],
     function (Angle,
               ArgumentError,
               BoundingBox,
@@ -40,7 +41,8 @@ define([
               ProjectionWgs84,
               Sector,
               Tessellator,
-              Vec3) {
+              Vec3,
+              WWMath) {
         "use strict";
 
         /**
@@ -68,7 +70,6 @@ define([
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "Globe",
                     "constructor", "Elevation model is null or undefined."));
             }
-
             /**
              * This globe's elevation model.
              * @type {ElevationModel}
