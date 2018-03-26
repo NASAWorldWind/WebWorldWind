@@ -954,6 +954,40 @@ define([
         };
 
         /**
+         * Computes a new set of locations translated from a specified location to a new location.
+         *
+         * @param {Globe} globe Globe used to compute translation.
+         * @param {Location} oldLocation The original reference location.
+         * @param {Location} newLocation The new reference location.
+         * @param {Location[]} locations The locations to translate.
+         *
+         * @return {Location[]} The translated locations.
+         */
+        Location.computeShiftedLocations = function(globe, oldLocation, newLocation, locations)
+        {
+            var newLocations = [];
+
+            var oldPoint = globe.computePointFromLocation(oldLocation.latitude, oldLocation.longitude,
+                new Vec3(0, 0, 0));
+            var newPoint = globe.computePointFromLocation(newLocation.latitude, newLocation.longitude,
+                new Vec3(0, 0, 0));
+            var delta = newPoint.subtract(oldPoint);
+
+            for(var i =0; i < locations.length; i++)
+            {
+                var point = globe.computePointFromLocation(locations[i].latitude, locations[i].longitude,
+                    new Vec3(0, 0, 0));
+                point = point.add(delta);
+                var newPos = new WorldWind.Position(0, 0, 0);
+                globe.computePositionFromPoint(point[0], point[1], point[2], newPos);
+
+                newLocations.push(newPos);
+            }
+
+            return newLocations;
+        }
+
+        /**
          * A bit mask indicating which if any pole is being referenced.
          * This corresponds to Java WW's AVKey.NORTH and AVKey.SOUTH,
          * although this encoding can capture both poles simultaneously, which was

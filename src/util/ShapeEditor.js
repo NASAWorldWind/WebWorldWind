@@ -88,11 +88,6 @@ define([
                     "missingWorldWindow"));
             }
 
-            // if (!shape) {
-            //     throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ShapeEditor", "constructor",
-            //         "missingShape"));
-            // }
-
             /**
              * The World Window associated with the shape editor controller.
              * @type {WorldWindow}
@@ -671,7 +666,7 @@ define([
                 var p = new Position(0, 0, 0);
                 this.worldWindow.globe.computePositionFromPoint(intersection[0], intersection[1],
                     intersection[2], p);
-                this.shape.moveTo(refPos, new WorldWind.Location(p.latitude, p.longitude));
+                this.shape.moveTo(this.worldWindow.globe, new WorldWind.Location(p.latitude, p.longitude));
             }
         };
 

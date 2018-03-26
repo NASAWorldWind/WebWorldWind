@@ -123,18 +123,9 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        SurfacePolyline.prototype.moveTo = function (oldReferenceLocation, position) {
-            var locations = [];
-            for (var i = 0; i < this.boundaries.length; i++){
-                var heading = Location.greatCircleAzimuth(oldReferenceLocation,
-                    new Location(this.boundaries[i].latitude, this.boundaries[i].longitude));
-                var pathLength = Location.greatCircleDistance(oldReferenceLocation,
-                    new Location(this._boundaries[i].latitude, this._boundaries[i].longitude));
-                var location = new Location(0, 0);
-                Location.greatCircleLocation(position, heading, pathLength, location);
-                locations.push(new Location(location.latitude, location.longitude));
-            }
-            this.boundaries = locations;
+        SurfacePolyline.prototype.moveTo = function (globe, position) {
+            this.boundaries = Location.computeShiftedLocations(globe, this.getReferencePosition(),
+                position, this._boundaries);
         };
 
         return SurfacePolyline;
