@@ -380,8 +380,9 @@
             <name>Ground Overlays</name>
             <description>Examples of ground overlays</description>
             <NetworkLink>
+                <name>Etna</name>
                 <Link>
-                    <href>data/etnaOverlay.kml</href>
+                    <href>data/etna.kmz</href>
                     <refreshMode>onInterval</refreshMode>
                     <refreshInterval>10</refreshInterval>
                 </Link>
@@ -399,8 +400,9 @@
             </NetworkLink>
         </Folder>
         <Folder>
-
+            <name>Sentinel-2 Imagery</name>
             <GroundOverlay>
+                <name>Sentinel-2 Image 1</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T32UQB.tif.png</href>
                 </Icon>
@@ -425,8 +427,8 @@
                     </LatLonAltBox>
                 </Region>
             </GroundOverlay>
-
             <GroundOverlay>
+                <name>Sentinel-2 Image 2</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UUS.tif.png</href>
                 </Icon>
@@ -451,8 +453,8 @@
                     </LatLonAltBox>
                 </Region>
             </GroundOverlay>
-
             <GroundOverlay>
+                <name>Sentinel-2 Image 3</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150803T101010_A000591_T33UVS.tif.png</href>
                 </Icon>
@@ -463,21 +465,22 @@
                     <west>13.560547850100555</west>
                 </LatLonBox>
                 <TimeStamp>
-                    <when>2015-08-03T10:10:10</when>
+                    <when>2015-08-10T10:10:10</when>
                 </TimeStamp>
                 <Region>
                     <LatLonAltBox>
-                        <north>51.451117795210315</north>
-                        <south>50.45526533911891</south>
-                        <east>15.140457957690417</east>
-                        <west>13.560547850100555</west>
+                        <north>30</north>
+                        <south>29</south>
+                        <east>1</east>
+                        <west>0</west>
                         <minAltitude>0</minAltitude>
-                        <maxAltitude>1000000</maxAltitude>
+                        <maxAltitude>10000000</maxAltitude>
                         <altitudeMode>clampToGround</altitudeMode>
                     </LatLonAltBox>
                 </Region>
             </GroundOverlay>
             <GroundOverlay>
+                <name>Sentinel-2 Image 4</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150810T100716_A000691_T33UVP.tif.png</href>
                 </Icon>
@@ -502,8 +505,8 @@
                     </LatLonAltBox>
                 </Region>
             </GroundOverlay>
-
             <GroundOverlay>
+                <name>Sentinel-2 Image 5</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQA.tif.png</href>
                 </Icon>
@@ -528,8 +531,8 @@
                     </LatLonAltBox>
                 </Region>
             </GroundOverlay>
-
             <GroundOverlay>
+                <name>Sentinel-2 Image 6</name>
                 <Icon>
                     <href>data/S2A_OPER_MTD_L1C_TL_EPA__20150813T101657_A000734_T32UQV.tif.png</href>
                 </Icon>
@@ -934,6 +937,52 @@
                             </LinearRing>
                         </outerBoundaryIs>
                     </Polygon>
+                </Placemark>
+
+                <Placemark>
+                    <name>Example of MultiGeometry</name>
+                    <visibility>1</visibility>
+                    <LookAt>
+                        <longitude>17</longitude>
+                        <latitude>50</latitude>
+                        <altitude>0</altitude>
+                        <heading>-55.42811560891606</heading>
+                        <tilt>56.10280503739589</tilt>
+                        <range>10000</range>
+                    </LookAt>
+                    <styleUrl>#transYellowPoly</styleUrl>
+                    <MultiGeometry>
+                        <Polygon>
+                            <extrude>1</extrude>
+                            <altitudeMode>relativeToGround</altitudeMode>
+                            <outerBoundaryIs>
+                                <LinearRing>
+                                    <coordinates>
+                                    17,52,1000
+                                    18,52,1000
+                                    18,51,1000
+                                    17,51,1000
+                                    17,52,1000
+                                    </coordinates>
+                                </LinearRing>
+                            </outerBoundaryIs>
+                        </Polygon>
+                        <Polygon>
+                            <extrude>1</extrude>
+                            <altitudeMode>relativeToGround</altitudeMode>
+                            <outerBoundaryIs>
+                                <LinearRing>
+                                    <coordinates>
+                                    17,50,1000
+                                    18,50,1000
+                                    18,49,1000
+                                    17,49,1000
+                                    17,50,1000
+                                    </coordinates>
+                                </LinearRing>
+                            </outerBoundaryIs>
+                        </Polygon>
+                    </MultiGeometry>
                 </Placemark>
             </Folder>
         </Folder>

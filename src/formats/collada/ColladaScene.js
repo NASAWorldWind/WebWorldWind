@@ -668,7 +668,7 @@ define([
             }
 
             var color = new Color(r, g, b, a);
-            opacity = a * dc.currentLayer.opacity;
+            opacity = a * this.layer.opacity;
             gl.depthMask(opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? this.pickColor : color);
             program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);

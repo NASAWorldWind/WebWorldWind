@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,12 @@ define([
     './../KmlElements',
     '../KmlObject',
     '../styles/KmlStyleSelector',
-    './NodeTransformers',
-    '../../../util/Promise',
-    '../util/StyleResolver'
+    './NodeTransformers'
 ], function (
     KmlElements,
     KmlObject,
     KmlStyleSelector,
-    NodeTransformers,
-    Promise,
-    StyleResolver
+    NodeTransformers
 ) {
     "use strict";
 
@@ -99,12 +95,7 @@ define([
      * @inheritDoc
      */
     Pair.prototype.getStyle = function(styleResolver) {
-        var self = this;
-        return new Promise(function (resolve, reject) {
-            window.setTimeout(function(){
-                styleResolver.handleRemoteStyle(self.kmlStyleUrl, self.kmlStyleSelector, resolve, reject);
-            },0);
-        });
+        return styleResolver.handleRemoteStyle(this.kmlStyleUrl, this.kmlStyleSelector);
     };
 
     KmlElements.addKey(Pair.prototype.getTagNames()[0], Pair);

@@ -268,8 +268,7 @@ define([
             // annotation
             this.label = dc.textRenderer.wrap(
                 this.label,
-                this.attributes.width, this.attributes.height,
-                this.attributes.textAttributes.font);
+                this.attributes.width, this.attributes.height);
 
             // Compute the annotation's model point.
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
@@ -284,17 +283,7 @@ define([
                 return null;
             }
 
-            var labelFont = this.attributes.textAttributes.font;
-            var labelKey = this.label + labelFont.toString();
-
-            this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-
-            if (!this.labelTexture) {
-                dc.textRenderer.enableOutline = false; // Temporary, while TextRenderer is refactored
-                this.labelTexture = dc.textRenderer.renderText(this.label);
-                dc.textRenderer.enableOutline = true; // Temporary, while TextRenderer is refactored
-                dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-            }
+            this.labelTexture = dc.createTextTexture(this.label, this.attributes.textAttributes);
 
             w = this.labelTexture.imageWidth;
             h = this.labelTexture.imageHeight;
@@ -333,7 +322,7 @@ define([
                 leaderOffsetY = 0;
             }
 
-            if (this.attributes.stateKey != this.lastStateKey) {
+            if (this.attributes.stateKey !== this.lastStateKey) {
                 this.calloutPoints = this.createCallout(
                     width, height,
                     leaderOffsetX, leaderOffsetY,
@@ -462,11 +451,11 @@ define([
                 this.pickColor = dc.uniquePickColor();
             }
 
-            program.loadOpacity(gl, this.attributes.opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.attributes.opacity * this.layer.opacity);
 
             // Attributes have changed. We need to track this because the callout vbo data may
             // have changed if scaled or text wrapping changes callout dimensions
-            var calloutAttributesChanged = (this.attributes.stateKey != this.lastStateKey);
+            var calloutAttributesChanged = (this.attributes.stateKey !== this.lastStateKey);
 
             // Create new cache key if callout drawing points have changed
             if (!this.calloutCacheKey || calloutAttributesChanged) {
@@ -523,7 +512,7 @@ define([
             Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
             program.loadTextureMatrix(gl, Annotation.matrix);
 
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : Color.WHITE);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 
