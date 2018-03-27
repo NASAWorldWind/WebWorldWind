@@ -30,27 +30,14 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GmlRectifiedGrid", "constructor", "missingXmlDom"));
             }
 
-            this.captureAttributes(element);
             this.assembleElement(element);
-        };
-
-        GmlRectifiedGrid.prototype.captureAttributes = function (element) {
-            this.id = element.getAttribute("gml:id");
-            this.srsName = element.getAttribute("srsName");
-            this.srsDimension = element.getAttribute("srsDimension");
-            this.axisLabels = element.getAttribute("axisLabels");
-            if (this.axisLabels) {
-                this.axisLabels = this.axisLabels.split(/\s+/);
-            }
-            this.uomLabels = element.getAttribute("uomLabels");
-            if (this.uomLabels) {
-                this.uomLabels = this.uomLabels.split(/\s+/);
-            }
-            this.dimension = parseInt(element.getAttribute("dimension"));
         };
 
         GmlRectifiedGrid.prototype.assembleElement = function (element) {
             var children = element.children || element.childNodes;
+
+            this.captureAttributes(element);
+
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -77,6 +64,21 @@ define([
                     this.offsetVector.push(this.assembleOffsetVector(child));
                 }
             }
+        };
+
+        GmlRectifiedGrid.prototype.captureAttributes = function (element) {
+            this.id = element.getAttribute("gml:id");
+            this.srsName = element.getAttribute("srsName");
+            this.srsDimension = element.getAttribute("srsDimension");
+            this.axisLabels = element.getAttribute("axisLabels");
+            if (this.axisLabels) {
+                this.axisLabels = this.axisLabels.split(/\s+/);
+            }
+            this.uomLabels = element.getAttribute("uomLabels");
+            if (this.uomLabels) {
+                this.uomLabels = this.uomLabels.split(/\s+/);
+            }
+            this.dimension = parseInt(element.getAttribute("dimension"));
         };
 
         GmlRectifiedGrid.prototype.assembleLimits = function (element) {

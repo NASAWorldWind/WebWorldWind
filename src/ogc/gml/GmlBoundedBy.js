@@ -30,13 +30,12 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GmlAbstractGeometry", "constructor", "missingXmlDom"));
             }
 
-            this.nilReason = element.getAttribute("nilReason");
-
             this.assembleElement(element);
         };
 
         GmlBoundedBy.prototype.assembleElement = function (element) {
             var children = element.children || element.childNodes;
+            this.nilReason = element.getAttribute("nilReason");
 
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];

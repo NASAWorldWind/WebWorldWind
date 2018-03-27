@@ -32,6 +32,10 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "OwsBoundingBox", "constructor", "missingDomElement"));
             }
 
+            this.assembleElement(element);
+        };
+
+        OwsBoundingBox.prototype.assembleElement = function (element) {
             this.crs = element.localName === "WGS84BoundingBox" ? "WGS84" : element.getAttribute("crs");
 
             this.dimensions = element.getAttribute("dimensions");

@@ -36,7 +36,12 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "OwsDatasetSummary", "constructor", "missingDomElement"));
             }
 
+            this.assembleElement(element);
+        };
+
+        OwsDatasetSummary.prototype.assembleElement = function (element) {
             var children = element.children || element.childNodes;
+
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
