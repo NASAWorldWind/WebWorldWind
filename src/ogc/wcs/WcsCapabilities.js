@@ -156,14 +156,11 @@ define([
                 var child = children[c];
 
                 if (child.localName === "name") {
-                    coverage.coverageId = child.textContent;
+                    coverage.name = child.textContent;
                 } else if (child.localName === "description") {
-                    coverage.abstract = coverage.abstract || [];
-                    coverage.abstract.push({value: child.textContent});
+                    coverage.description = child.textContent;
                 } else if (child.localName === "label") {
-                    // The label is being added to the abstract as there is not a comparable 2.0.0 element
-                    coverage.abstract = coverage.abstract || [];
-                    coverage.abstract.push({value: child.textContent});
+                    coverage.label = child.textContent;
                 } else if (child.localName === "Keywords") {
                     // WCS 1.0.0 does not use OWS Keywords by namespace, but the implementation is identical
                     coverage.keywords = coverage.keywords || [];
