@@ -19,7 +19,7 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        '../../ogc/wmts/OwsLanguageString'
+        '../../ogc/ows/OwsLanguageString'
     ],
 
     function (ArgumentError,
