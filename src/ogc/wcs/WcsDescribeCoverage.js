@@ -38,6 +38,10 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsDescribeCoverage", "constructor", "missingXmlDom"));
             }
 
+            /**
+             * The original unmodified XML document. Referenced for use in advanced cases.
+             * @type {{}}
+             */
             this.xmlDom = xmlDom;
 
             this.assembleDocument();
@@ -52,7 +56,8 @@ define([
             } else if (root.localName === "CoverageDescriptions") {
                 this.assemble201Document(root);
             } else {
-                // TODO determine proper logging message for incompatible xml document
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "assembleDocument", "unsupportedWcsVersion"));
             }
         };
 
