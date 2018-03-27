@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 define([
-    'src/error/ArgumentError',
     'src/ogc/wcs/WcsDescribeCoverage'
-], function (ArgumentError,
-             WcsDescribeCoverage) {
+], function (WcsDescribeCoverage) {
     "use strict";
 
     describe("Constructor testing", function () {
@@ -30,7 +28,7 @@ define([
     describe("WSC 1.0.0 Describe Coverage", function () {
         var xmlDom;
 
-        beforeEach(function (done) {
+        beforeAll(function (done) {
 
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "../base/test/ogc/wcs/wcs100DescribeCoverage.xml", true);
@@ -82,18 +80,18 @@ define([
         });
 
         it("should have a lonLatEnvelope srs of CRS84", function () {
-            var wcs = new WcsDescribeCoverage(xmlDom);
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-            var lonLatEnvelopSrs = wcs.coverages[0].lonLatEnvelope.srsName;
+            var lonLatEnvelopSrs = wcsDescribeCoverage.coverages[0].lonLatEnvelope.srsName;
 
             expect(lonLatEnvelopSrs).toBe("urn:ogc:def:crs:OGC:1.3:CRS84");
         });
 
         it("should have lonLatEnvelop positions spanning the globe", function () {
-            var wcs = new WcsDescribeCoverage(xmlDom);
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
             var error = 1e-9;
 
-            var lonLatEnvelop = wcs.coverages[0].lonLatEnvelope;
+            var lonLatEnvelop = wcsDescribeCoverage.coverages[0].lonLatEnvelope;
 
             expect(lonLatEnvelop.pos[0][0]).toBeCloseTo(-180.0, error);
             expect(lonLatEnvelop.pos[0][1]).toBeCloseTo(-90.0, error);
@@ -102,10 +100,10 @@ define([
         });
 
         it("should show support for the EPSG:4326 CRS", function () {
-            var wcs = new WcsDescribeCoverage(xmlDom);
+            var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-            var supportedRequestCrs = wcs.coverages[0].supportedCrs.requests[0];
-            var supportedResponseCrs = wcs.coverages[0].supportedCrs.responses[0];
+            var supportedRequestCrs = wcsDescribeCoverage.coverages[0].supportedCrs.requests[0];
+            var supportedResponseCrs = wcsDescribeCoverage.coverages[0].supportedCrs.responses[0];
 
             expect(supportedRequestCrs).toBe("EPSG:4326");
             expect(supportedResponseCrs).toBe("EPSG:4326");
@@ -114,25 +112,25 @@ define([
         describe("Supported Formats", function () {
 
             it("should have 12 supported formats", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var supportedFormatsCount = wcs.coverages[0].supportedFormats.formats.length;
+                var supportedFormatsCount = wcsDescribeCoverage.coverages[0].supportedFormats.formats.length;
 
                 expect(supportedFormatsCount).toBe(12);
             });
 
             it("should show a native format of GeoTIFF", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var nativeFormat = wcs.coverages[0].supportedFormats.nativeFormat;
+                var nativeFormat = wcsDescribeCoverage.coverages[0].supportedFormats.nativeFormat;
 
                 expect(nativeFormat).toBe("GeoTIFF");
             });
 
             it("should have support for GeoPackage (tiles)", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var formatSupported = wcs.coverages[0].supportedFormats.formats[3];
+                var formatSupported = wcsDescribeCoverage.coverages[0].supportedFormats.formats[3];
 
                 expect(formatSupported).toBe("GeoPackage (tiles)");
             });
@@ -141,25 +139,25 @@ define([
         describe("Supported Interpolations", function () {
             
             it("should have three supported interpolation methods", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var numberOfSupportedInterpolationMethods = wcs.coverages[0].supportedInterpolations.methods.length;
+                var numberOfSupportedInterpolationMethods = wcsDescribeCoverage.coverages[0].supportedInterpolations.methods.length;
 
                 expect(numberOfSupportedInterpolationMethods).toBe(3);
             });
 
             it("should show a default nearest neighbor interpolation method", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var defaultInterpolation = wcs.coverages[0].supportedInterpolations.default;
+                var defaultInterpolation = wcsDescribeCoverage.coverages[0].supportedInterpolations.default;
 
                 expect(defaultInterpolation).toBe("nearest neighbor");
             });
 
             it("should support bilinear interpolation", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var bilinearInterpolationMethod = wcs.coverages[0].supportedInterpolations.methods[1];
+                var bilinearInterpolationMethod = wcsDescribeCoverage.coverages[0].supportedInterpolations.methods[1];
 
                 expect(bilinearInterpolationMethod).toBe("bilinear");
             });
@@ -168,18 +166,18 @@ define([
         describe("Spatial Domain Set", function () {
 
             it("Should have an envelope with an EPSG:4326 srs name", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var envelopSrsName = wcs.coverages[0].domainSet.spatialDomain.envelope.srsName;
+                var envelopSrsName = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.envelope.srsName;
 
                 expect(envelopSrsName).toBe("EPSG:4326");
             });
 
             it("Should have an envelope which spans the entire globe", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
                 var error = 1e-9;
 
-                var domainEnvelope = wcs.coverages[0].domainSet.spatialDomain.envelope.pos;
+                var domainEnvelope = wcsDescribeCoverage.coverages[0].domainSet.spatialDomain.envelope.pos;
 
                 expect(domainEnvelope[0][0]).toBeCloseTo(-180.0, error);
                 expect(domainEnvelope[0][1]).toBeCloseTo(-90.0, error);
@@ -281,7 +279,7 @@ define([
     describe("WSC 2.0.1 Describe Coverage", function () {
         var xmlDom;
 
-        beforeEach(function (done) {
+        beforeAll(function (done) {
 
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "../base/test/ogc/wcs/wcs201DescribeCoverage.xml", true);
@@ -385,52 +383,52 @@ define([
         describe("BoundedBy", function () {
 
             it("should have a bounded by envelope srs name of http://www.opengis.net/def/crs/EPSG/0/4326", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var boundedBySrsName = wcs.coverages[0].boundedBy.envelope.srsName;
+                var boundedBySrsName = wcsDescribeCoverage.coverages[0].boundedBy.envelope.srsName;
 
                 expect(boundedBySrsName).toBe("http://www.opengis.net/def/crs/EPSG/0/4326");
             });
 
             it("should have a bounded by envelope axis labels of Lat and Lon", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var boundedByAxisLabels = wcs.coverages[0].boundedBy.envelope.axisLabels;
+                var boundedByAxisLabels = wcsDescribeCoverage.coverages[0].boundedBy.envelope.axisLabels;
 
                 expect(boundedByAxisLabels[0]).toBe("Lat");
                 expect(boundedByAxisLabels[1]).toBe("Long");
             });
 
             it("should have a bounded by envelope uom labels of Deg and Deg", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var boundedByUomLabels = wcs.coverages[0].boundedBy.envelope.uomLabels;
+                var boundedByUomLabels = wcsDescribeCoverage.coverages[0].boundedBy.envelope.uomLabels;
 
                 expect(boundedByUomLabels[0]).toBe("Deg");
                 expect(boundedByUomLabels[1]).toBe("Deg");
             });
 
             it("should have a bounded by envelope srs dimension of 2", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var boundedBySrsDimension = wcs.coverages[0].boundedBy.envelope.srsDimension;
+                var boundedBySrsDimension = wcsDescribeCoverage.coverages[0].boundedBy.envelope.srsDimension;
 
                 expect(boundedBySrsDimension).toBe(2);
             });
 
             it("should have a bounded by envelope lower corner of -90.0 and -180.0", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var boundedByLowerCorner = wcs.coverages[0].boundedBy.envelope.lower;
+                var boundedByLowerCorner = wcsDescribeCoverage.coverages[0].boundedBy.envelope.lower;
 
                 expect(boundedByLowerCorner[0]).toBeCloseTo(-90.0, 0.000001);
                 expect(boundedByLowerCorner[1]).toBeCloseTo(-180.0, 0.000001);
             });
 
             it("should have a bounded by envelope upper corner of 90.0 and 180.0", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var boundedByUpperCorner = wcs.coverages[0].boundedBy.envelope.upper;
+                var boundedByUpperCorner = wcsDescribeCoverage.coverages[0].boundedBy.envelope.upper;
 
                 expect(boundedByUpperCorner[0]).toBeCloseTo(90.0, 0.000001);
                 expect(boundedByUpperCorner[1]).toBeCloseTo(180.0, 0.000001);
@@ -440,17 +438,17 @@ define([
         describe("Service Parameters", function () {
 
             it("should have a subtype of RectifiedGridCoverage", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var serviceParameterSubtype = wcs.coverages[0].serviceParameters.coverageSubtype;
+                var serviceParameterSubtype = wcsDescribeCoverage.coverages[0].serviceParameters.coverageSubtype;
 
                 expect(serviceParameterSubtype).toBe("RectifiedGridCoverage");
             });
 
             it("should have a native format of image/tiff", function () {
-                var wcs = new WcsDescribeCoverage(xmlDom);
+                var wcsDescribeCoverage = new WcsDescribeCoverage(xmlDom);
 
-                var serviceParameterNativeFormat = wcs.coverages[0].serviceParameters.nativeFormat;
+                var serviceParameterNativeFormat = wcsDescribeCoverage.coverages[0].serviceParameters.nativeFormat;
 
                 expect(serviceParameterNativeFormat).toBe("image/tiff");
             });

@@ -41,6 +41,7 @@ define([
          * @classdesc Represents the common properties of a WCS Capabilities document. Common properties are parsed and
          * mapped to a plain javascript object model. Most fields can be accessed as properties named according to their
          * document names converted to camel case. This model supports version 1.0.0 and 2.0.1 of the WCS specification.
+         * Not all properties are mapped to this representative javascript object model.
          */
         var WcsCapabilities = function (xmlDom) {
             if (!xmlDom) {
