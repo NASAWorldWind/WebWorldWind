@@ -64,34 +64,34 @@ define([
                     this.names = this.names || [];
                     this.names.push(child.textContent);
                 } else if (child.localName === "limits") {
-                    this.limits = GmlRectifiedGrid.assembleLimits(child);
+                    this.limits = this.assembleLimits(child);
                 } else if (child.localName === "axisLabels") {
                     this.axisLabels = child.textContent.split(/\s+/);
                 } else if (child.localName === "axisName") {
                     this.axisNames = this.axisNames || [];
                     this.axisNames.push(child.textContent);
                 } else if (child.localName === "origin") {
-                    this.origin = GmlRectifiedGrid.assembleOrigin(child);
+                    this.origin = this.assembleOrigin(child);
                 } else if (child.localName === "offsetVector") {
                     this.offsetVector = this.offsetVector || [];
-                    this.offsetVector.push(GmlRectifiedGrid.assembleOffsetVector(child));
+                    this.offsetVector.push(this.assembleOffsetVector(child));
                 }
             }
         };
 
-        GmlRectifiedGrid.assembleLimits = function (element) {
+        GmlRectifiedGrid.prototype.assembleLimits = function (element) {
             var children = element.children || element.childNodes;
 
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "GridEnvelope") {
-                    return GmlRectifiedGrid.assembleGridEnvelope(child);
+                    return this.assembleGridEnvelope(child);
                 }
             }
         };
 
-        GmlRectifiedGrid.assembleGridEnvelope = function (element) {
+        GmlRectifiedGrid.prototype.assembleGridEnvelope = function (element) {
             var children = element.children || element.childNodes, envelop = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -102,7 +102,7 @@ define([
             return envelop;
         };
 
-        GmlRectifiedGrid.assembleOrigin = function (element) {
+        GmlRectifiedGrid.prototype.assembleOrigin = function (element) {
             var origin = {};
             origin.type = element.getAttribute("xlink:type");
             origin.href = element.getAttribute("xlink:href");
@@ -121,16 +121,16 @@ define([
                 var child = children[c];
 
                 if (child.localName === "Point") {
-                    origin.point = GmlRectifiedGrid.assemblePoint(child);
+                    origin.point = this.assemblePoint(child);
                 } else if (child.localName === "pos") {
-                    origin.pos = GmlRectifiedGrid.assemblePos(child);
+                    origin.pos = this.assemblePos(child);
                 }
             }
 
             return origin;
         };
 
-        GmlRectifiedGrid.assemblePoint = function (element) {
+        GmlRectifiedGrid.prototype.assemblePoint = function (element) {
             var point = {}, pos = {};
             point.id = element.getAttribute("gml:id");
             point.srsName = element.getAttribute("srsName");
@@ -152,20 +152,20 @@ define([
                 if (child.localName === "description") {
                     point.description = child.textContent;
                 } else if (child.localName === "descriptionReference") {
-                    point.descriptionReference = GmlRectifiedGrid.assembleOrigin(child);
+                    point.descriptionReference = this.assembleOrigin(child);
                 } else if (child.localName === "identifier") {
                     point.identifier = child.textContent;
                 } else if (child.localName === "name") {
                     point.name = child.textContent;
                 } else if (child.localName === "pos") {
-                    point.pos = GmlRectifiedGrid.assemblePos(child);
+                    point.pos = this.assemblePos(child);
                 }
             }
 
             return point;
         };
 
-        GmlRectifiedGrid.assemblePos = function (child) {
+        GmlRectifiedGrid.prototype.assemblePos = function (child) {
             var pos = {};
             pos.srsName = child.getAttribute("srsName");
             pos.srsDimension = parseInt(child.getAttribute("srsDimension"));
@@ -188,7 +188,7 @@ define([
             return pos;
         };
 
-        GmlRectifiedGrid.assembleOffsetVector = function (element) {
+        GmlRectifiedGrid.prototype.assembleOffsetVector = function (element) {
             var children = element.children || element.childNodes, offsetVector = {}, rawValues;
 
             // Collect and store associated attributes

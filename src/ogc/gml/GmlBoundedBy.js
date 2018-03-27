@@ -42,12 +42,12 @@ define([
                 var child = children[c];
 
                 if (child.localName === "Envelope") {
-                    this.envelope = GmlBoundedBy.assembleEnvelope(child);
+                    this.envelope = this.assembleEnvelope(child);
                 }
             }
         };
 
-        GmlBoundedBy.assembleEnvelope = function (element) {
+        GmlBoundedBy.prototype.assembleEnvelope = function (element) {
             var children = element.children || element.childNodes, envelop = {};
 
             envelop.srsName = element.getAttribute("srsName");
