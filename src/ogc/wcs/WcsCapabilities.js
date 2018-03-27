@@ -182,9 +182,9 @@ define([
                 if (child.localName === "pos") {
                     if (!previousValue) {
                         previousValue = child.textContent;
-                        lonOne = new Number(previousValue.split(/\s+/)[0]);
+                        lonOne = parseFloat(previousValue.split(/\s+/)[0]);
                     } else {
-                        lonTwo = new Number(child.textContent.split(/\s+/)[0]);
+                        lonTwo = parseFloat(child.textContent.split(/\s+/)[0]);
                         if (lonOne < lonTwo) {
                             boundingBox.lowerCorner = previousValue;
                             boundingBox.upperCorner = child.textContent;
