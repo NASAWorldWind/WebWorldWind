@@ -229,6 +229,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/WfsCapabilities',
         './formats/wkt/Wkt',
         './formats/wkt/WktElements',
+        './formats/wkt/WktExporter',
         './formats/wkt/geom/WktGeometryCollection',
         './formats/wkt/geom/WktLineString',
         './formats/wkt/geom/WktMultiLineString',
@@ -470,6 +471,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WfsCapabilities,
               Wkt,
               WktElements,
+              WktExporter,
               WktGeometryCollection,
               WktLineString,
               WktMultiLineString,
@@ -880,6 +882,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
         WorldWind['WktElements'] = WktElements;
+        WorldWind['WktExporter'] = WktExporter;
         WorldWind['WktGeometryCollection'] = WktGeometryCollection;
         WorldWind['WktLineString'] = WktLineString;
         WorldWind['WktMultiLineString'] = WktMultiLineString;
