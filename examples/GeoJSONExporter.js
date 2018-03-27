@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 /**
- * Basic example for GeoJSON Exporter
+ * Illustrates how to export surface shapes in GeoJSON.
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
-    function (ww,
+    function (WorldWind,
               LayerManager) {
         "use strict";
 
@@ -43,19 +42,15 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer to hold the surface shapes.
+        // Create a layer and some surface shapes
         var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
         wwd.addLayer(shapesLayer);
 
-        // Create a simple surface polygon, a triangle.
         var boundary = [];
         boundary.push(new WorldWind.Location(40, -100));
         boundary.push(new WorldWind.Location(45, -110));
         boundary.push(new WorldWind.Location(40, -120));
 
-        // Create and set attributes for it. The shapes below except the surface polyline use this same attributes
-        // object. Real apps typically create new attributes objects for each shape unless they know the attributes
-        // can be shared among shapes.
         var attributes = new WorldWind.ShapeAttributes(null);
         attributes.outlineColor = WorldWind.Color.BLUE;
         attributes.interiorColor = new WorldWind.Color(1, 1, 1, 1.0);
@@ -108,12 +103,15 @@ requirejs(['./WorldWindShim',
         shape = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -88, -83), attributes);
         shapesLayer.addRenderable(shape);
 
-        function onExportGeojson() {
-            var exportedGeojson = WorldWind.GeoJSONExporter.exportRenderables(shapesLayer.renderables);
+        // Export the surface shapes on click
+        function onExportGeoJSON() {
 
-            document.getElementById("geojsonTxtArea").value = exportedGeojson;
+            // This is the actual export action.
+            var exportedGeoJSON = WorldWind.GeoJSONExporter.exportRenderables(shapesLayer.renderables);
+
+            document.getElementById("geoJSONTxtArea").value = exportedGeoJSON;
         }
-        document.getElementById("exportGeojsonBtn").onclick = onExportGeojson;
+        document.getElementById("exportGeoJSONBtn").onclick = onExportGeoJSON;
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);

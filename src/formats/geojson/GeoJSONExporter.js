@@ -40,6 +40,7 @@ define(['../../error/ArgumentError',
          * @exports GeoJSONExporter
          */
         var GeoJSONExporter = {
+
             /**
              * Exports a [Renderable]{@link Renderable} in GeoJSON format.
              * @param {Renderable} renderable The renderable to export.
