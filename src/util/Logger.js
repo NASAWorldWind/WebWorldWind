@@ -153,7 +153,8 @@ define(function () {
             missingViewport: "The specified viewport is null or undefined.",
             missingWorldWindow: "The specified WorldWindow is null or undefined.",
             missingXmlDom: "No XML DOM specified.",
-            notYetImplemented: "This function is not yet implemented"
+            notYetImplemented: "This function is not yet implemented",
+            unsupportedWcsVersion: "The specified WCS version is not supported."
         }
     };
 

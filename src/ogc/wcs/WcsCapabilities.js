@@ -36,14 +36,11 @@ define([
 
         /**
          * Constructs a WCS Capabilities instance from an XML DOM.
-         * @alias WMSCapabilities
+         * @alias WcsCapabilities
          * @constructor
-         * @classdesc Represents the common properties of a WCS Capabilities document. This object represents a version
-         * agnostic common model of a WCS Capabilities document. The common model is designed to facilitate use of the
-         * service without requiring knowledge of the version. The original unmodified document object model is
-         * referenced and available for query for advanced uses beyond the provided common model.
-         * @param {{}} xmlDom An XML DOM representing the WMS Capabilities document.
-         * @throws {ArgumentError} If the specified XML DOM is null or undefined.
+         * @classdesc Represents the common properties of a WCS Capabilities document. Common properties are parsed and
+         * mapped to a plain javascript object model. Most fields can be accessed as properties named according to their
+         * document names converted to camel case. This model supports version 1.0.0 and 2.0.1 of the WCS specification.
          */
         var WcsCapabilities = function (xmlDom) {
             if (!xmlDom) {
@@ -54,7 +51,6 @@ define([
             /**
              * The original unmodified XML document. Referenced for use in advanced cases.
              * @type {{}}
-             * @private
              */
             this.xmlDom = xmlDom;
 
@@ -71,8 +67,26 @@ define([
             // WCS 1.0.0 does not utilize OWS Common GetCapabilities service and capability descriptions.
             if (this.version === "1.0.0") {
                 this.assembleVersion100Document(root);
-            } else {
+            } else if (this.version === "2.0.1") {
                 this.assembleVersion200Document(root);
+            } else {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "assembleDocument", "unsupportedWcsVersion"));
+            }
+        };
+
+        WcsCapabilities.prototype.assembleVersion100Document = function (root) {
+            var children = root.children || root.childNodes;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Service") {
+                    this.service = this.assemble100Service(child);
+                } else if (child.localName === "Capability") {
+                    this.capability = this.assemble100Capability(child);
+                } else if (child.localName === "ContentMetadata") {
+                    this.assemble100Contents(child);
+                }
             }
         };
 
@@ -90,50 +104,39 @@ define([
                 } else if (child.localName === "ServiceMetadata") {
                     this.serviceMetadata = this.assembleServiceMetadata(child);
                 } else if (child.localName === "Contents") {
-                    this.assembleContents(child);
+                    this.assemble201Contents(child);
                 }
             }
         };
 
-        WcsCapabilities.prototype.assembleVersion100Document = function (root) {
-            var children = root.children || root.childNodes;
+        WcsCapabilities.prototype.assemble100Contents = function (element) {
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
-                if (child.localName === "Service") {
-                    this.service = this.assemble100Service(child);
-                } else if (child.localName === "Capability") {
-                    this.capability = this.assemble100Capability(child);
-                } else if (child.localName === "ContentMetadata") {
-                    this.assembleContents(child);
+                if (child.localName === "CoverageOfferingBrief") {
+                    this.coverages = this.coverages || [];
+                    this.coverages.push(this.assemble100Coverages(child));
                 }
             }
         };
 
-        WcsCapabilities.prototype.assembleContents = function (element) {
+        WcsCapabilities.prototype.assemble201Contents = function (element) {
             var children = element.children || element.childNodes, coverage;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "CoverageSummary") {
-                    // WCS 1.1+
                     coverage = new OwsDatasetSummary(child);
-                    if (this.version === "2.0.0" || this.version === "2.0.1") {
-                        coverage = this.assembleDataset200Augment(child);
-                    }
-                    this.coverages = this.coverages || [];
-                    this.coverages.push(coverage);
-                } else if (child.localName === "CoverageOfferingBrief") {
-                    // WCS 1.0.0
-                    coverage = this.assemble100Coverages(child);
+                    this.assembleDataset201Augment(child, coverage);
                     this.coverages = this.coverages || [];
                     this.coverages.push(coverage);
                 }
             }
         };
 
-        WcsCapabilities.prototype.assembleDataset200Augment = function (element) {
-            var children = element.children || element.childNodes, coverage = {};
+        WcsCapabilities.prototype.assembleDataset201Augment = function (element, coverage) {
+            var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
@@ -144,8 +147,6 @@ define([
                     coverage.subType.push(child.textContent);
                 }
             }
-
-            return coverage;
         };
 
         WcsCapabilities.prototype.assemble100Coverages = function (element) {
@@ -172,31 +173,6 @@ define([
             }
 
             return coverage;
-        };
-
-        WcsCapabilities.prototype.assembleLatLonBoundingBox = function (element) {
-            var children = element.children || element.childNodes, boundingBox = {}, previousValue, lonOne, lonTwo;
-            for (var c = 0; c < children.length; c++) {
-                var child = children[c];
-
-                if (child.localName === "pos") {
-                    if (!previousValue) {
-                        previousValue = child.textContent;
-                        lonOne = parseFloat(previousValue.split(/\s+/)[0]);
-                    } else {
-                        lonTwo = parseFloat(child.textContent.split(/\s+/)[0]);
-                        if (lonOne < lonTwo) {
-                            boundingBox.lowerCorner = previousValue;
-                            boundingBox.upperCorner = child.textContent;
-                        } else {
-                            boundingBox.lowerCorner = child.textContent;
-                            boundingBox.upperCorner = previousValue;
-                        }
-                    }
-                }
-            }
-
-            return boundingBox;
         };
 
         WcsCapabilities.prototype.assemble100Service = function (element) {
@@ -285,6 +261,31 @@ define([
             }
 
             return dcptype;
+        };
+
+        WcsCapabilities.prototype.assembleLatLonBoundingBox = function (element) {
+            var children = element.children || element.childNodes, boundingBox = {}, previousValue, lonOne, lonTwo;
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "pos") {
+                    if (!previousValue) {
+                        previousValue = child.textContent;
+                        lonOne = parseFloat(previousValue.split(/\s+/)[0]);
+                    } else {
+                        lonTwo = parseFloat(child.textContent.split(/\s+/)[0]);
+                        if (lonOne < lonTwo) {
+                            boundingBox.lowerCorner = previousValue;
+                            boundingBox.upperCorner = child.textContent;
+                        } else {
+                            boundingBox.lowerCorner = child.textContent;
+                            boundingBox.upperCorner = previousValue;
+                        }
+                    }
+                }
+            }
+
+            return boundingBox;
         };
 
         WcsCapabilities.prototype.assembleServiceMetadata = function (element) {
