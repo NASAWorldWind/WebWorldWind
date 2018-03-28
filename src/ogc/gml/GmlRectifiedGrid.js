@@ -33,6 +33,7 @@ define([
             this.assembleElement(element);
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.assembleElement = function (element) {
             var children = element.children || element.childNodes;
 
@@ -66,6 +67,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.captureAttributes = function (element) {
             this.id = element.getAttribute("gml:id");
             this.srsName = element.getAttribute("srsName");
@@ -81,6 +83,7 @@ define([
             this.dimension = parseInt(element.getAttribute("dimension"));
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.assembleLimits = function (element) {
             var children = element.children || element.childNodes;
 
@@ -93,6 +96,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.assembleGridEnvelope = function (element) {
             var children = element.children || element.childNodes, envelop = {};
 
@@ -104,6 +108,7 @@ define([
             return envelop;
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.assembleOrigin = function (element) {
             var origin = {};
             origin.type = element.getAttribute("xlink:type");
@@ -132,6 +137,7 @@ define([
             return origin;
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.assemblePoint = function (element) {
             var point = {}, pos = {};
             point.id = element.getAttribute("gml:id");
@@ -167,6 +173,7 @@ define([
             return point;
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.assemblePos = function (child) {
             var pos = {};
             pos.srsName = child.getAttribute("srsName");
@@ -190,6 +197,7 @@ define([
             return pos;
         };
 
+        // Internal. Intentionally not documented.
         GmlRectifiedGrid.prototype.assembleOffsetVector = function (element) {
             var children = element.children || element.childNodes, offsetVector = {}, rawValues;
 

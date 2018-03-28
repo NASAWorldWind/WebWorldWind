@@ -39,6 +39,7 @@ define([
             this.assembleElement(element);
         };
 
+        // Internal. Intentionally not documented.
         OwsDatasetSummary.prototype.assembleElement = function (element) {
             var children = element.children || element.childNodes;
 

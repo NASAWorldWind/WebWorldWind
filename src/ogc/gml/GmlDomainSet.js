@@ -35,6 +35,7 @@ define([
             this.assembleElement(element);
         };
 
+        // Internal. Intentionally not documented.
         GmlDomainSet.prototype.assembleElement = function (element) {
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {

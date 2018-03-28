@@ -35,6 +35,7 @@ define([
             this.assembleElement(element);
         };
 
+        // Internal. Intentionally not documented.
         OwsBoundingBox.prototype.assembleElement = function (element) {
             this.crs = element.localName === "WGS84BoundingBox" ? "WGS84" : element.getAttribute("crs");
 
@@ -52,6 +53,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         OwsBoundingBox.prototype.getSector = function () {
             var minLat, minLon, maxLat, maxLon, vals;
 

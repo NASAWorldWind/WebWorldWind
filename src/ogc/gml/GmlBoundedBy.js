@@ -33,6 +33,7 @@ define([
             this.assembleElement(element);
         };
 
+        // Internal. Intentionally not documented.
         GmlBoundedBy.prototype.assembleElement = function (element) {
             var children = element.children || element.childNodes;
             this.nilReason = element.getAttribute("nilReason");
@@ -46,6 +47,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         GmlBoundedBy.prototype.assembleEnvelope = function (element) {
             var children = element.children || element.childNodes, envelop = {};
 

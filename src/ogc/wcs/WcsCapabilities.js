@@ -35,13 +35,16 @@ define([
         "use strict";
 
         /**
-         * Constructs a WCS Capabilities instance from an XML DOM.
+         * Constructs an OGC WCS Capabilities instance from an XML DOM.
          * @alias WcsCapabilities
          * @constructor
          * @classdesc Represents the common properties of a WCS Capabilities document. Common properties are parsed and
          * mapped to a plain javascript object model. Most fields can be accessed as properties named according to their
-         * document names converted to camel case. This model supports version 1.0.0 and 2.0.1 of the WCS specification.
-         * Not all properties are mapped to this representative javascript object model.
+         * document names converted to camel case. This model supports version 1.0.0 and 2.0.x of the WCS specification.
+         * Not all properties are mapped to this representative javascript object model, but the provided XML dom is
+         * maintained in xmlDom property for reference.
+         * @param {{}} xmlDom an XML DOM representing the WCS Capabilities document.
+         * @throws {ArgumentError} If the specified XML DOM is null or undefined.
          */
         var WcsCapabilities = function (xmlDom) {
             if (!xmlDom) {
@@ -58,6 +61,7 @@ define([
             this.assembleDocument();
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDocument = function () {
             // Determine version and update sequence
             var root = this.xmlDom.documentElement;
@@ -76,6 +80,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDocument100 = function (root) {
             var children = root.children || root.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -91,6 +96,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDocument20x = function (root) {
             var children = root.children || root.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -110,6 +116,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleContents100 = function (element) {
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -136,6 +143,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDatasetAugment20x = function (element, coverage) {
             var children = element.children || element.childNodes;
             for (var c = 0; c < children.length; c++) {
@@ -150,6 +158,7 @@ define([
             }
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleCoverages100 = function (element) {
             var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
@@ -173,6 +182,7 @@ define([
             return coverage;
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleService100 = function (element) {
             var children = element.children || element.childNodes, service = {};
             for (var c = 0; c < children.length; c++) {
@@ -199,6 +209,7 @@ define([
             return service;
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleCapability100 = function (element) {
             var children = element.children || element.childNodes, capability = {};
             for (var c = 0; c < children.length; c++) {
@@ -218,6 +229,7 @@ define([
             return capability;
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleRequestCapabilities100 = function (element) {
             var children = element.children || element.childNodes, request = {};
             for (var c = 0; c < children.length; c++) {
@@ -261,6 +273,7 @@ define([
             return dcptype;
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleLatLonBoundingBox = function (element) {
             var children = element.children || element.childNodes, boundingBox = {}, previousValue, lonOne, lonTwo;
             for (var c = 0; c < children.length; c++) {
@@ -286,6 +299,7 @@ define([
             return boundingBox;
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleServiceMetadata = function (element) {
             var children = element.children || element.childNodes, serviceMetadata = {};
             for (var c = 0; c < children.length; c++) {
@@ -302,6 +316,7 @@ define([
             return serviceMetadata;
         };
 
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleServiceMetadataExtension = function (element) {
             var children = element.children || element.childNodes, len = children.length, extension = {};
             for (var c = 0; c < len; c++) {
