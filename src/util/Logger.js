@@ -152,9 +152,8 @@ define(function () {
             missingVertex: "The specified vertex is null or undefined.",
             missingViewport: "The specified viewport is null or undefined.",
             missingWorldWindow: "The specified WorldWindow is null or undefined.",
-            missingXmlDom: "No XML DOM specified.",
             notYetImplemented: "This function is not yet implemented",
-            unsupportedWcsVersion: "The specified WCS version is not supported."
+            unsupportedVersion: "The specified version is not supported."
         }
     };
 

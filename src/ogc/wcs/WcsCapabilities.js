@@ -46,7 +46,7 @@ define([
         var WcsCapabilities = function (xmlDom) {
             if (!xmlDom) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "constructor", "missingXmlDom"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "constructor", "missingDom"));
             }
 
             /**
@@ -72,7 +72,7 @@ define([
                 this.assembleDocument20x(root);
             } else {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "assembleDocument", "unsupportedWcsVersion"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "assembleDocument", "unsupportedVersion"));
             }
         };
 

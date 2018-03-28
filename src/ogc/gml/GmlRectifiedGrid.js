@@ -27,7 +27,7 @@ define([
         var GmlRectifiedGrid = function (element) {
             if (!element) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GmlRectifiedGrid", "constructor", "missingXmlDom"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GmlRectifiedGrid", "constructor", "missingDom"));
             }
 
             this.assembleElement(element);

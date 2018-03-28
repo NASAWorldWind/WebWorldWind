@@ -29,7 +29,7 @@ define([
         var GmlDomainSet = function (element) {
             if (!element) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GmlAbstractGeometry", "constructor", "missingXmlDom"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GmlAbstractGeometry", "constructor", "missingDom"));
             }
 
             this.assembleElement(element);
