@@ -52,16 +52,16 @@ define([
             var root = this.xmlDom.documentElement;
 
             if (root.localName === "CoverageDescription") {
-                this.assemble100Document(root);
+                this.assembleDocument100(root);
             } else if (root.localName === "CoverageDescriptions") {
-                this.assemble201Document(root);
+                this.assembleDocument20x(root);
             } else {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "assembleDocument", "unsupportedWcsVersion"));
             }
         };
 
-        WcsDescribeCoverage.prototype.assemble100Document = function (element) {
+        WcsDescribeCoverage.prototype.assembleDocument100 = function (element) {
             this.version = element.getAttribute("version");
 
             var children = element.children || element.childNodes;
@@ -71,12 +71,12 @@ define([
 
                 if (child.localName === "CoverageOffering") {
                     this.coverages = this.coverages || [];
-                    this.coverages.push(this.assemble100Coverages(child));
+                    this.coverages.push(this.assembleCoverages100(child));
                 }
             }
         };
 
-        WcsDescribeCoverage.prototype.assemble201Document = function (element) {
+        WcsDescribeCoverage.prototype.assembleDocument20x = function (element) {
             var children = element.children || element.childNodes;
 
             for (var c = 0; c < children.length; c++) {
@@ -84,12 +84,12 @@ define([
 
                 if (child.localName === "CoverageDescription") {
                     this.coverages = this.coverages || [];
-                    this.coverages.push(this.assemble201Coverages(child));
+                    this.coverages.push(this.assembleCoverages20x(child));
                 }
             }
         };
 
-        WcsDescribeCoverage.prototype.assemble100Coverages = function (element) {
+        WcsDescribeCoverage.prototype.assembleCoverages100 = function (element) {
             var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -104,24 +104,24 @@ define([
                     // the OWS keywords namespace isn't used but the format is similar
                     coverage.keywords = new OwsKeywords(child).keywords;
                 } else if (child.localName === "lonLatEnvelope") {
-                    coverage.lonLatEnvelope = this.assemble100LonLatEnvelope(child);
+                    coverage.lonLatEnvelope = this.assembleLonLatEnvelope100(child);
                 } else if (child.localName === "supportedCRSs") {
-                    coverage.supportedCrs = this.assemble100SupportedCrs(child);
+                    coverage.supportedCrs = this.assembleSupportedCrs100(child);
                 } else if (child.localName === "supportedFormats") {
-                    coverage.supportedFormats = this.assemble100SupportedFormats(child);
+                    coverage.supportedFormats = this.assembleSupportedFormats100(child);
                 } else if (child.localName === "supportedInterpolations") {
-                    coverage.supportedInterpolations = this.assemble100SupportedInterpolations(child);
+                    coverage.supportedInterpolations = this.assembleSupportedInterpolations100(child);
                 } else if (child.localName === "domainSet") {
-                    coverage.domainSet = this.assemble100DomainSet(child);
+                    coverage.domainSet = this.assembleDomainSet100(child);
                 } else if (child.localName === "rangeSet") {
-                    coverage.rangeSet = this.assemble100RangeSet(child);
+                    coverage.rangeSet = this.assembleRangeSet100(child);
                 }
             }
 
             return coverage;
         };
 
-        WcsDescribeCoverage.prototype.assemble201Coverages = function (element) {
+        WcsDescribeCoverage.prototype.assembleCoverages20x = function (element) {
             var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -133,7 +133,7 @@ define([
                 } else if (child.localName === "boundedBy") {
                     coverage.boundedBy = new GmlBoundedBy(child);
                 } else if (child.localName === "ServiceParameters") {
-                    coverage.serviceParameters = this.assemble201ServiceParameters(child);
+                    coverage.serviceParameters = this.assembleServiceParameters20x(child);
                 } else if (child.localName === "rangeType") {
                     // The information from rangeType is not required for forming a request. Instead of implementing a
                     // complex parser for the SWE DataRecord, a reference to the particular dom element will be provided
@@ -144,7 +144,7 @@ define([
             return coverage;
         };
 
-        WcsDescribeCoverage.prototype.assemble201ServiceParameters = function (element) {
+        WcsDescribeCoverage.prototype.assembleServiceParameters20x = function (element) {
             var children = element.children || element.childNodes, serviceParameters = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -161,7 +161,7 @@ define([
             return serviceParameters;
         };
 
-        WcsDescribeCoverage.prototype.assemble100LonLatEnvelope = function (element) {
+        WcsDescribeCoverage.prototype.assembleLonLatEnvelope100 = function (element) {
             var children = element.children || element.childNodes, latLonEnvelope = {};
 
             latLonEnvelope.srsName = element.getAttribute("srsName");
@@ -178,7 +178,7 @@ define([
             return latLonEnvelope;
         };
 
-        WcsDescribeCoverage.prototype.assemble100SupportedCrs = function (element) {
+        WcsDescribeCoverage.prototype.assembleSupportedCrs100 = function (element) {
             var children = element.children || element.childNodes, supportedCrs = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -204,7 +204,7 @@ define([
             return supportedCrs;
         };
 
-        WcsDescribeCoverage.prototype.assemble100SupportedFormats = function (element) {
+        WcsDescribeCoverage.prototype.assembleSupportedFormats100 = function (element) {
             var children = element.children || element.childNodes, supportedFormats = {};
 
             supportedFormats.nativeFormat = element.getAttribute("nativeFormat");
@@ -221,7 +221,7 @@ define([
             return supportedFormats;
         };
 
-        WcsDescribeCoverage.prototype.assemble100SupportedInterpolations = function (element) {
+        WcsDescribeCoverage.prototype.assembleSupportedInterpolations100 = function (element) {
             var children = element.children || element.childNodes, supportedInterpolations = {};
 
             supportedInterpolations.default = element.getAttribute("default");
@@ -238,28 +238,28 @@ define([
             return supportedInterpolations;
         };
 
-        WcsDescribeCoverage.prototype.assemble100DomainSet = function (element) {
+        WcsDescribeCoverage.prototype.assembleDomainSet100 = function (element) {
             var children = element.children || element.childNodes, domainSet = {};
 
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "spatialDomain") {
-                    domainSet.spatialDomain = this.assemble100SpatialDomain(child);
+                    domainSet.spatialDomain = this.assembleSpatialDomain100(child);
                 }
             }
 
             return domainSet;
         };
 
-        WcsDescribeCoverage.prototype.assemble100SpatialDomain = function (element) {
+        WcsDescribeCoverage.prototype.assembleSpatialDomain100 = function (element) {
             var children = element.children || element.childNodes, spatialDomain = {};
 
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "Envelope") {
-                    spatialDomain.envelope = this.assemble100LonLatEnvelope(child);
+                    spatialDomain.envelope = this.assembleLonLatEnvelope100(child);
                 } else if (child.localName === "RectifiedGrid") {
                     spatialDomain.rectifiedGrid = new GmlRectifiedGrid(child);
                 }
@@ -268,7 +268,7 @@ define([
             return spatialDomain;
         };
 
-        WcsDescribeCoverage.prototype.assemble100RangeSet = function (element) {
+        WcsDescribeCoverage.prototype.assembleRangeSet100 = function (element) {
             var children = element.children || element.childNodes, rangeSet = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -276,12 +276,12 @@ define([
 
                 if (child.localName === "RangeSet") {
                     // Jump into the first similarly named element
-                    return this.assemble100RangeSetElement(child);
+                    return this.assembleRangeSetElement100(child);
                 }
             }
         };
 
-        WcsDescribeCoverage.prototype.assemble100RangeSetElement = function (element) {
+        WcsDescribeCoverage.prototype.assembleRangeSetElement100 = function (element) {
             var children = element.children || element.childNodes, rangeSet = {};
 
             rangeSet.semantic = element.getAttribute("semantic");
@@ -296,28 +296,28 @@ define([
                 } else if (child.localName === "label") {
                     rangeSet.label = child.textContent;
                 } else if (child.localName === "axisDescription") {
-                    rangeSet.axisDescriptions = this.assemble100RangeSetAxisDescription(child);
+                    rangeSet.axisDescriptions = this.assembleRangeSetAxisDescription100(child);
                 }
             }
 
             return rangeSet;
         };
 
-        WcsDescribeCoverage.prototype.assemble100RangeSetAxisDescription = function (element) {
+        WcsDescribeCoverage.prototype.assembleRangeSetAxisDescription100 = function (element) {
             var children = element.children || element.childNodes, axisDescriptions = [];
 
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "AxisDescription") {
-                    axisDescriptions.push(this.assemble100RangeSetAxisDescriptionElement(child));
+                    axisDescriptions.push(this.assembleRangeSetAxisDescriptionElement100(child));
                 }
             }
 
             return axisDescriptions;
         };
 
-        WcsDescribeCoverage.prototype.assemble100RangeSetAxisDescriptionElement = function (element) {
+        WcsDescribeCoverage.prototype.assembleRangeSetAxisDescriptionElement100 = function (element) {
             var children = element.children || element.childNodes, axisDescription = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -328,14 +328,14 @@ define([
                 } else if (child.localName === "label") {
                     axisDescription.label = child.textContent;
                 } else if (child.localName === "values") {
-                    axisDescription.values = this.assemble100RangeSetValues(child);
+                    axisDescription.values = this.assembleRangeSetValues100(child);
                 }
             }
 
             return axisDescription;
         };
 
-        WcsDescribeCoverage.prototype.assemble100RangeSetValues = function (element) {
+        WcsDescribeCoverage.prototype.assembleRangeSetValues100 = function (element) {
             var children = element.children || element.childNodes, values = {};
 
             for (var c = 0; c < children.length; c++) {
