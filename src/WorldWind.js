@@ -58,6 +58,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
+        './formats/geojson/GeoJSONExporter',
         './formats/geojson/GeoJSONGeometry',
         './formats/geojson/GeoJSONGeometryCollection',
         './formats/geojson/GeoJSONGeometryLineString',
@@ -224,11 +225,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec3',
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
+        './ogc/wcs/WcsCapabilities',
+        './ogc/wcs/WcsDescribeCoverage',
         './globe/WcsEarthElevationModel',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
         './formats/wkt/Wkt',
         './formats/wkt/WktElements',
+        './formats/wkt/WktExporter',
         './formats/wkt/geom/WktGeometryCollection',
         './formats/wkt/geom/WktLineString',
         './formats/wkt/geom/WktMultiLineString',
@@ -299,6 +303,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
+              GeoJSONExporter,
               GeoJSONGeometry,
               GeoJSONGeometryCollection,
               GeoJSONGeometryLineString,
@@ -465,11 +470,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec3,
               ViewControlsLayer,
               ViewVolume,
+              WcsCapabilities,
+              WcsDescribeCoverage,
               WcsEarthElevationModel,
               WcsTileUrlBuilder,
               WfsCapabilities,
               Wkt,
               WktElements,
+              WktExporter,
               WktGeometryCollection,
               WktLineString,
               WktMultiLineString,
@@ -761,6 +769,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
+        WorldWind['GeoJSONExporter'] = GeoJSONExporter;
         WorldWind['GeoJSONGeometry'] = GeoJSONGeometry;
         WorldWind['GeoJSONGeometryCollection'] = GeoJSONGeometryCollection;
         WorldWind['GeoJSONGeometryLineString'] = GeoJSONGeometryLineString;
@@ -875,11 +884,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
+        WorldWind['WcsCapabilities'] = WcsCapabilities;
+        WorldWind['WcsDescribeCoverage'] = WcsDescribeCoverage;
         WorldWind['WcsEarthElevationModel'] = WcsEarthElevationModel;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
         WorldWind['WktElements'] = WktElements;
+        WorldWind['WktExporter'] = WktExporter;
         WorldWind['WktGeometryCollection'] = WktGeometryCollection;
         WorldWind['WktLineString'] = WktLineString;
         WorldWind['WktMultiLineString'] = WktMultiLineString;
