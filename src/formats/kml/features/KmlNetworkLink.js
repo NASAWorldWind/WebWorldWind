@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,8 +78,8 @@ define([
          * NetworkLinkControl (if it exists). If the NetworkLinkControl does not contain an AbstractView element,
          * Google Earth flies to the LookAt or Camera element in the Feature child within the &lt;kml&gt; element in the
          * refreshed file. If the &lt;kml&gt; element does not have a LookAt or Camera specified, the view is unchanged.
-         * For example, Google Earth would fly to the &lt;LookAt&gt; view of the parent Document, not the &lt;LookAt&gt; of the
-         * Placemarks contained within the Document.
+         * For example, Google Earth would fly to the &lt;LookAt&gt; view of the parent Document, not the &lt;LookAt&gt;
+         * of the Placemarks contained within the Document.
          * @memberof KmlNetworkLink.prototype
          * @readonly
          * @type {Boolean}
@@ -127,7 +127,7 @@ define([
             this.isDownloading = true;
             var self = this;
 
-            new KmlFile(self.buildUrl()).then(function (kmlFile) {
+            new KmlFile(self.buildUrl(kmlOptions.fileCache)).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
                 self.isDownloading = false;
 
@@ -143,8 +143,8 @@ define([
         }
     };
 
-    KmlNetworkLink.prototype.buildUrl = function() {
-        return this.kmlLink.kmlHref;
+    KmlNetworkLink.prototype.buildUrl = function(fileCache) {
+        return this.kmlLink.kmlHref(fileCache);
     };
 
 	/**
@@ -159,7 +159,7 @@ define([
         });
         if(activeEvents.length > 0) {
             var self = this;
-            new KmlFile(self.buildUrl()).then(function (kmlFile) {
+            new KmlFile(self.buildUrl(kmlOptions.fileCache)).then(function (kmlFile) {
                 self.resolvedFile = kmlFile;
 
                 self.fireEvent(kmlOptions);
@@ -170,7 +170,8 @@ define([
 	/**
      * It fires event when the kmlLink refreshMode contains refreshMode.
      * @param kmlOptions {Object}
-     * @param kmlOptions.listener {RefreshListener} Object which allows you to schedule events, which will be triggered at some point in future. It doesn't have to be exactly that time.
+     * @param kmlOptions.listener {RefreshListener} Object which allows you to schedule events, which will be triggered
+     *   at some point in future. It doesn't have to be exactly that time.
      */
     KmlNetworkLink.prototype.fireEvent = function(kmlOptions) {
         var time = 0;

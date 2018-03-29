@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 define([
+    'src/formats/kml/KmlFileCache',
     'src/formats/kml/KmlLink',
     'src/util/XmlDocument'
 ], function (
+    KmlFileCache,
     KmlLink,
     XmlDocument
 ) {
@@ -40,8 +42,7 @@ define([
                 kmlRepresentation.getElementsByTagName("Link")[0]});
         it('should have the Href, RefreshMode,RefreshInterval,ViewRefreshMode,ViewRefreshTime, ViewBoundScale, ViewFormat,' +
             'HttpQuery properties', function(){
-
-            expect(link.kmlHref).toEqual('link');
+            expect(link.kmlHref(new KmlFileCache())).toEqual('link');
             expect(link.kmlRefreshMode).toEqual('onChange');
             expect(link.kmlRefreshInterval).toEqual(4);
             expect(link.kmlViewRefreshMode).toEqual('never');

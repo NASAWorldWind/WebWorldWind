@@ -158,10 +158,10 @@ define([
 
             ctx2D.scale(pixelScale, pixelScale);
             ctx2D.font = this.typeFace.fontString;
-            ctx2D.textBaseline = "top";
+            ctx2D.textBaseline = "bottom";
             ctx2D.textAlign = this.typeFace.horizontalAlignment;
-            ctx2D.fillStyle = this.textColor.toHexString(false);
-            ctx2D.strokeStyle = this.outlineColor.toRGBAString();
+            ctx2D.fillStyle = this.textColor.toCssColorString();
+            ctx2D.strokeStyle = this.outlineColor.toCssColorString();
             ctx2D.lineWidth = this.outlineWidth;
             ctx2D.lineCap = "round";
             ctx2D.lineJoin = "round";
@@ -175,11 +175,11 @@ define([
             }
 
             for (var i = 0; i < lines.length; i++) {
+                ctx2D.translate(0, this.typeFace.size * (1 + this.lineSpacing) + strokeOffset);
                 if (this.enableOutline) {
                     ctx2D.strokeText(lines[i], 0, 0);
                 }
                 ctx2D.fillText(lines[i], 0, 0);
-                ctx2D.translate(0, this.typeFace.size * (1 + this.lineSpacing) + strokeOffset);
             }
 
             return canvas2D;

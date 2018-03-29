@@ -116,6 +116,13 @@ define([
             this.retrievalImageFormat = imageFormat;
             this.cachePath = cachePath;
 
+            /**
+             * Controls how many concurrent tile requests are allowed for this layer.
+             * @type {Number}
+             * @default WorldWind.configuration.layerRetrievalQueueSize
+             */
+            this.retrievalQueueSize = WorldWind.configuration.layerRetrievalQueueSize;
+            
             this.levels = new LevelSet(sector, levelZeroDelta, numLevels, tileWidth, tileHeight);
 
             /**
@@ -462,6 +469,10 @@ define([
          */
         TiledImageLayer.prototype.retrieveTileImage = function (dc, tile, suppressRedraw) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+                if (this.currentRetrievals.length > this.retrievalQueueSize) {
+                    return;
+                }
+                
                 if (this.absentResourceList.isResourceAbsent(tile.imagePath)) {
                     return;
                 }

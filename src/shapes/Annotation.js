@@ -283,15 +283,7 @@ define([
                 return null;
             }
 
-            var labelFont = this.attributes.textAttributes.font;
-            var labelKey = this.label + labelFont.toString();
-
-            this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-
-            if (!this.labelTexture) {
-                this.labelTexture = dc.renderText(this.label, this.attributes.textAttributes);
-                dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-            }
+            this.labelTexture = dc.createTextTexture(this.label, this.attributes.textAttributes);
 
             w = this.labelTexture.imageWidth;
             h = this.labelTexture.imageHeight;
@@ -330,7 +322,7 @@ define([
                 leaderOffsetY = 0;
             }
 
-            if (this.attributes.stateKey != this.lastStateKey) {
+            if (this.attributes.stateKey !== this.lastStateKey) {
                 this.calloutPoints = this.createCallout(
                     width, height,
                     leaderOffsetX, leaderOffsetY,
@@ -459,11 +451,11 @@ define([
                 this.pickColor = dc.uniquePickColor();
             }
 
-            program.loadOpacity(gl, this.attributes.opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.attributes.opacity * this.layer.opacity);
 
             // Attributes have changed. We need to track this because the callout vbo data may
             // have changed if scaled or text wrapping changes callout dimensions
-            var calloutAttributesChanged = (this.attributes.stateKey != this.lastStateKey);
+            var calloutAttributesChanged = (this.attributes.stateKey !== this.lastStateKey);
 
             // Create new cache key if callout drawing points have changed
             if (!this.calloutCacheKey || calloutAttributesChanged) {

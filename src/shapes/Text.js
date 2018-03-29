@@ -312,14 +312,7 @@ define([
                 return null;
             }
 
-            var labelFont = this.activeAttributes.font,
-                textureKey = this.text + labelFont.toString();
-
-            this.activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
-            if (!this.activeTexture) {
-                this.activeTexture = dc.renderText(this.text, this.activeAttributes);
-                dc.gpuResourceCache.putResource(textureKey, this.activeTexture, this.activeTexture.size);
-            }
+            this.activeTexture = dc.createTextTexture(this.text, this.activeAttributes);
 
             w = this.activeTexture.imageWidth;
             h = this.activeTexture.imageHeight;

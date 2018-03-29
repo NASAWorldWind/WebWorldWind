@@ -73,25 +73,33 @@ define([
          * @alias WorldWindow
          * @constructor
          * @classdesc Represents a WorldWind window for an HTML canvas.
-         * @param {String} canvasName The name assigned to the HTML canvas in the document.
+         * @param {String|HTMLCanvasElement} canvasElem The ID assigned to the HTML canvas in the document or the canvas
+         * element itself.
          * @param {ElevationModel} elevationModel An optional argument indicating the elevation model to use for the World
          * Window. If missing or null, a default elevation model is used.
-         * @throws {ArgumentError} If there is no HTML element with the specified name in the document, or if the
+         * @throws {ArgumentError} If there is no HTML element with the specified ID in the document, or if the
          * HTML canvas does not support WebGL.
          */
-        var WorldWindow = function (canvasName, elevationModel) {
+        var WorldWindow = function (canvasElem, elevationModel) {
             if (!(window.WebGLRenderingContext)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor",
                         "The specified canvas does not support WebGL."));
             }
 
-            // Attempt to get the HTML canvas with the specified name.
-            var canvas = document.getElementById(canvasName);
-            if (!canvas) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor",
-                        "The specified canvas name is not in the document."));
+            // Get the actual canvas element either directly or by ID.
+            var canvas;
+            if (canvasElem instanceof HTMLCanvasElement) {
+                canvas = canvasElem;
+            } else {
+                // Attempt to get the HTML canvas with the specified ID.
+                canvas = document.getElementById(canvasElem);
+
+                if (!canvas) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor",
+                            "The specified canvas ID is not in the document."));
+                }
             }
 
             // Create the WebGL context associated with the HTML canvas.
@@ -815,7 +823,8 @@ define([
             dc.reset();
             dc.globe = this.globe;
             dc.navigator = this.navigator;
-            dc.layers = this.layers;
+            dc.layers = this.layers.slice();
+            dc.layers.push(dc.screenCreditController);
             this.computeDrawContext();
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;
@@ -974,8 +983,6 @@ define([
                     this.drawContext.currentGlContext.stencilOp(
                         this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE, this.drawContext.currentGlContext.REPLACE);
                     this.drawOrderedRenderables();
-
-                    this.drawContext.screenCreditController.drawCredits(this.drawContext);
                 }
             } else {
                 this.drawContext.surfaceShapeTileBuilder.clear();
@@ -987,8 +994,6 @@ define([
                     this.drawOrderedRenderables();
                     this.drawScreenRenderables();
                 }
-
-                this.drawContext.screenCreditController.drawCredits(this.drawContext);
             }
         };
 
@@ -1202,53 +1207,55 @@ define([
                     }
                 }
             }
-
+            dc.currentLayer = null;
             var now = Date.now();
             dc.frameStatistics.layerRenderingTime = now - beginTime;
         };
 
         /**
          * Adds a specified layer to the end of this WorldWindow.
-         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not modified.
+         * @param {Layer} layer The layer to add. May be null or undefined, in which case this WorldWindow is not
+         * modified.
          */
         WorldWindow.prototype.addLayer = function (layer) {
-            this.layers.push(layer);
+            if (layer) {
+                this.layers.push(layer);
+            }
         };
 
         /**
          * Removes the first instance of a specified layer from this WorldWindow.
          * @param {Layer} layer The layer to remove. May be null or undefined, in which case this WorldWindow is not
-         * modified. This WorldWindow is also not modified if the specified layer does not exist in this world
-         * window's layer list.
+         * modified. This WorldWindow is also not modified if the specified layer does not exist in this WorldWindow's
+         * layer list.
          */
         WorldWindow.prototype.removeLayer = function (layer) {
-            if (!layer)
-                return;
-
-            var index = -1;
-            for (var i = 0, len = this.layers.length; i < len; i++) {
-                if (this.layers[i] == layer) {
-                    index = i;
-                    break;
-                }
-            }
-
+            var index = this.indexOfLayer(layer);
             if (index >= 0) {
                 this.layers.splice(index, 1);
             }
         };
 
         /**
-         * Inserts a specified layer at a specified position in this WorldWindow's layer list.
-         * @param {number} index The index at which to insert the layer. May be negative to specify the position
+         * Inserts a specified layer at a specified position in this WorldWindow.
+         * @param {Number} index The index at which to insert the layer. May be negative to specify the position
          * from the end of the array.
-         * @param {Layer} layer The layer to insert. This WorldWindow's layer list is not changed if the specified
-         * layer is null or undefined.
+         * @param {Layer} layer The layer to insert. May be null or undefined, in which case this WorldWindow is not
+         * modified.
          */
         WorldWindow.prototype.insertLayer = function (index, layer) {
             if (layer) {
                 this.layers.splice(index, 0, layer);
             }
+        };
+
+        /**
+         * Returns the index of a specified layer in this WorldWindow.
+         * @param {Layer} layer The layer to search for.
+         * @returns {Number} The index of the specified layer or -1 if it doesn't exist in this WorldWindow.
+         */
+        WorldWindow.prototype.indexOfLayer = function (layer) {
+            return this.layers.indexOf(layer);
         };
 
         // Internal function. Intentionally not documented.

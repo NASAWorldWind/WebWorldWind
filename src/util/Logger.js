@@ -102,6 +102,7 @@ define(function () {
             invalidWidth: "The specified width is zero or negative.",
             invalidSize: "The specified size is zero or negative.",
             missingAltitudeMode: "The specified altitude mode is null or undefined.",
+            missingArrayBuffer: "The specified array buffer is null or undefined",
             missingAttributeName: "The specified DBase attribute file name is null or undefined.",
             missingArray: "The specified array is null, undefined or of insufficient length.",
             missingBoundaries: "The specified boundaries array is null or undefined.",
@@ -151,7 +152,8 @@ define(function () {
             missingVertex: "The specified vertex is null or undefined.",
             missingViewport: "The specified viewport is null or undefined.",
             missingWorldWindow: "The specified WorldWindow is null or undefined.",
-            notYetImplemented: "This function is not yet implemented"
+            notYetImplemented: "This function is not yet implemented",
+            unsupportedVersion: "The specified version is not supported."
         }
     };
 
