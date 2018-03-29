@@ -50,7 +50,8 @@ define([
 
             this.xhr = null;
 
-            this.pickEnabled = false;
+            // TODO: Picking is enabled as a temporary measure for screen credit hyperlinks to work (see Layer.render)
+            this.pickEnabled = true;
         };
 
         OpenStreetMapImageLayer.prototype = Object.create(Layer.prototype);

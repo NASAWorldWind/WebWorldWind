@@ -19,7 +19,8 @@ module.exports = function(config) {
       {pattern: 'test/**/*.test.js', included: false},
       {pattern: 'src/**/*.js', included: false},
       {pattern: 'examples/data/KML_Samples.kml', included: false},
-      {pattern: 'test/formats/geotiff/*.tif', included: false}
+      {pattern: 'test/formats/geotiff/*.tif', included: false},
+      {pattern: 'test/ogc/wcs/*.xml', included: false}
     ],
 
 
