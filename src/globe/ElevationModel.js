@@ -73,7 +73,7 @@ define(['../error/ArgumentError',
                     var i, len;
                     for (i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
-                        if (coverage.enabled && maxTimestamp < coverage.timestamp) {
+                        if (maxTimestamp < coverage.timestamp) {
                             maxTimestamp = coverage.timestamp;
                         }
                     }
@@ -110,7 +110,7 @@ define(['../error/ArgumentError',
              */
             maxElevation: {
                 get: function () {
-                    var maxElevation = Number.MIN_VALUE;
+                    var maxElevation = -Number.MAX_VALUE;
 
                     var i, len;
                     for (i = 0, len = this.coverages.length; i < len; i++) {
@@ -222,27 +222,6 @@ define(['../error/ArgumentError',
         };
 
         /**
-         * Removes the elevation coverage at the specified index from this elevation model.
-         *
-         * @param index The index of the elevation coverage to remove.
-         * @throws ArgumentError if the specified index is less than zero.
-         */
-        ElevationModel.prototype.removeCoverageAtIndex = function (index) {
-            if (index < 0) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "removeCoverageAtIndex", "invalidIndex"));
-            }
-
-            if (index >= this.coverages.length - 1) {
-                this.coverages.pop();
-            }
-            else {
-                this.coverages.splice(index, 1);
-            }
-            this.performCoverageListChangedActions();
-        };
-
-        /**
          * Returns true if this ElevationModel contains the specified ElevationCoverage, and false otherwise.
          *
          * @param coverage the ElevationCoverage to test.
@@ -285,7 +264,7 @@ define(['../error/ArgumentError',
                 }
             }
 
-            return (n === 0) ? [0, 0] : [this.coverages[n - 1].minElevation, this.coverages[n - 1].maxElevation];
+            return [0, 0];
         };
 
         /**
@@ -315,9 +294,9 @@ define(['../error/ArgumentError',
          * @param {Sector} sector The sector for which to determine the elevations.
          * @param {Number} numLat The number of latitudinal sample locations within the sector.
          * @param {Number} numLon The number of longitudinal sample locations within the sector.
-         * @param {Number} targetResolution The desired elevation resolution, in radians. (To compute radians from
-         * meters, divide the number of meters by the globe's radius.)
-         * @param {Float64Array} result An array in which to return the requested elevations.
+         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
+         * @param {Number[]} result An array in which to return the requested elevations.
          * @returns {Number} The resolution actually achieved, which may be greater than that requested if the
          * elevation data for the requested resolution is not currently available.
          * @throws {ArgumentError} If the specified sector, targetResolution, or result array is null or undefined, or if either of the
@@ -343,11 +322,6 @@ define(['../error/ArgumentError',
             if (!result) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingResult"));
-            }
-
-            if (!(result instanceof Float64Array)) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "incorrectResultType"));
             }
 
             result.fill(NaN);

@@ -20,7 +20,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/AnnotationAttributes',
         './util/measure/AreaMeasurer',
         './error/ArgumentError',
-        './globe/AsterV2EarthElevationCoverage',
+        './globe/AsterV2ElevationCoverage',
         './layer/AtmosphereLayer',
         './shaders/AtmosphereProgram',
         './shaders/BasicProgram',
@@ -57,7 +57,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/FramebufferTile',
         './render/FramebufferTileController',
         './geom/Frustum',
-        './globe/GebcoEarthElevationCoverage',
+        './globe/GebcoElevationCoverage',
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
@@ -224,7 +224,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/Touch',
         './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
-        './globe/UsgsNedEarthElevationCoverage',
+        './globe/UsgsNedElevationCoverage',
         './geom/Vec2',
         './geom/Vec3',
         './layer/ViewControlsLayer',
@@ -265,7 +265,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               AnnotationAttributes,
               AreaMeasurer,
               ArgumentError,
-              AsterV2EarthElevationCoverage,
+              AsterV2ElevationCoverage,
               AtmosphereLayer,
               AtmosphereProgram,
               BasicProgram,
@@ -302,7 +302,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               FramebufferTile,
               FramebufferTileController,
               Frustum,
-              GebcoEarthElevationCoverage,
+              GebcoElevationCoverage,
               GeographicMesh,
               GeographicProjection,
               GeographicText,
@@ -468,7 +468,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               TiltRecognizer,
               Touch,
               TriangleMesh,
-              UsgsNedEarthElevationCoverage,
+              UsgsNedElevationCoverage,
               UnsupportedOperationError,
               Vec2,
               Vec3,
@@ -731,7 +731,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
         WorldWind['AreaMeasurer'] = AreaMeasurer;
         WorldWind['ArgumentError'] = ArgumentError;
-        WorldWind['AsterV2EarthElevationCoverage'] = AsterV2EarthElevationCoverage;
+        WorldWind['AsterV2ElevationCoverage'] = AsterV2ElevationCoverage;
         WorldWind['AtmosphereLayer'] = AtmosphereLayer;
         WorldWind['AtmosphereProgram'] = AtmosphereProgram;
         WorldWind['BasicProgram'] = BasicProgram;
@@ -768,7 +768,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['FramebufferTile'] = FramebufferTile;
         WorldWind['FramebufferTileController'] = FramebufferTileController;
         WorldWind['Frustum'] = Frustum;
-        WorldWind['GebcoEarthElevationCoverage'] = GebcoEarthElevationCoverage;
+        WorldWind['GebcoElevationCoverage'] = GebcoElevationCoverage;
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
@@ -883,7 +883,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['TiltRecognizer'] = TiltRecognizer;
         WorldWind['Touch'] = Touch;
         WorldWind['TriangleMesh'] = TriangleMesh;
-        WorldWind['UsgsNedEarthElevationCoverage'] = UsgsNedEarthElevationCoverage;
+        WorldWind['UsgsNedElevationCoverage'] = UsgsNedElevationCoverage;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;

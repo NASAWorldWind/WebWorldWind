@@ -30,7 +30,8 @@ define(['../error/ArgumentError',
          * @constructor
          * @classdesc When used directly and not through a subclass, this class represents an elevation coverage
          * whose elevations are zero at all locations.
-         * @param {Number} resolution The resolution of the coverage in meters.
+         * @param {Number} resolution The resolution of the coverage, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
          * @throws {ArgumentError} If the resolution argument is null, undefined, or zero.
          */
         var ElevationCoverage = function (resolution) {
@@ -53,17 +54,17 @@ define(['../error/ArgumentError',
              * @type {String}
              * @default "Elevations"
              */
-            this.displayName = "Zero Elevations";
+            this.displayName = "Coverage";
 
             /**
              * Indicates whether or not to use this coverage.
              * @type {Boolean}
              * @default true
              */
-            this.enabled = true;
+            this._enabled = true;
 
             /**
-             * The resolution of this coverage in meters.
+             * The resolution of this coverage in degrees.
              * @type {Number}
              */
             this.resolution = resolution;
@@ -75,6 +76,23 @@ define(['../error/ArgumentError',
              */
             this.coverageSector = Sector.FULL_SPHERE;
         };
+
+        Object.defineProperties(ElevationCoverage.prototype, {
+            /**
+             * Indicates whether or not to use this coverage.
+             * @type {Boolean}
+             * @default true
+             */
+            enabled: {
+                get: function () {
+                    return this._enabled;
+                },
+                set: function (value) {
+                    this._enabled = value;
+                    this.timestamp = Date.now();
+                }
+            }
+        });
 
         /**
          * Returns the minimum and maximum elevations within a specified sector.
@@ -91,7 +109,7 @@ define(['../error/ArgumentError',
          * Returns the elevation at a specified location.
          * @param {Number} latitude The location's latitude in degrees.
          * @param {Number} longitude The location's longitude in degrees.
-         * @returns {Number} The elevation at the specified location, in meters. Returns zero if the location is
+         * @returns {Number} The elevation at the specified location, in meters. Returns null if the location is
          * outside the coverage area of this coverage.
          */
         ElevationCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
@@ -103,11 +121,10 @@ define(['../error/ArgumentError',
          * @param {Sector} sector The sector for which to determine the elevations.
          * @param {Number} numLat The number of latitudinal sample locations within the sector.
          * @param {Number} numLon The number of longitudinal sample locations within the sector.
-         * @param {Number} targetResolution The desired elevation resolution, in radians. (To compute radians from
-         * meters, divide the number of meters by the globe's radius.)
+         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
          * @param {Number[]} result An array in which to return the requested elevations.
-         * @returns {Number} The resolution actually achieved, which may be greater than that requested if the
-         * elevation data for the requested resolution is not currently available.
+         * @returns {Boolean} true if the result array was completely filled with elevation data, false otherwise.
          * @throws {ArgumentError} If the specified sector or result array is null or undefined, or if either of the
          * specified numLat or numLon values is less than one.
          */
@@ -131,7 +148,7 @@ define(['../error/ArgumentError',
                 result[i] = 0;
             }
 
-            return 0;
+            return true;
         };
 
         return ElevationCoverage;

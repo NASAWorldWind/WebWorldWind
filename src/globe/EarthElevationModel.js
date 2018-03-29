@@ -17,15 +17,15 @@
  * @exports EarthElevationModel
  */
 define([
-        '../globe/AsterV2EarthElevationCoverage',
+        '../globe/AsterV2ElevationCoverage',
         '../globe/ElevationModel',
-        '../globe/GebcoEarthElevationCoverage',
-        '../globe/UsgsNedEarthElevationCoverage'
+        '../globe/GebcoElevationCoverage',
+        '../globe/UsgsNedElevationCoverage'
     ],
-    function (AsterV2EarthElevationCoverage,
+    function (AsterV2ElevationCoverage,
               ElevationModel,
-              GebcoEarthElevationCoverage,
-              UsgsNedEarthElevationCoverage) {
+              GebcoElevationCoverage,
+              UsgsNedElevationCoverage) {
         "use strict";
 
         /**
@@ -36,9 +36,9 @@ define([
         var EarthElevationModel = function () {
             ElevationModel.call(this);
 
-            this.addCoverage(new GebcoEarthElevationCoverage());
-            this.addCoverage(new AsterV2EarthElevationCoverage());
-            this.addCoverage(new UsgsNedEarthElevationCoverage());
+            this.addCoverage(new GebcoElevationCoverage());
+            this.addCoverage(new AsterV2ElevationCoverage());
+            this.addCoverage(new UsgsNedElevationCoverage());
         };
 
         EarthElevationModel.prototype = Object.create(ElevationModel.prototype);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports GebcoEarthElevationCoverage
+ * @exports UsgsNedElevationCoverage
  */
 define([
         '../geom/Location',
@@ -29,24 +29,25 @@ define([
         "use strict";
 
         /**
-         * Constructs an Earth elevation coverage using GEBCO data.
-         * @alias GebcoEarthElevationCoverage
+         * Constructs an Earth elevation coverage using USGS NED data.
+         * @alias UsgsNedElevationCoverage
          * @constructor
          * @augments TiledElevationCoverage
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
-        var GebcoEarthElevationCoverage = function () {
+        var UsgsNedElevationCoverage = function () {
             TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "application/bil16", "GebcoEarthElevations256", 256, 256, 900);
+                new Sector(-15.0006, 50.0006, -171.001, 164.001), new Location(45, 45), 12, "application/bil16",
+                "UsgsNedElevations256", 256, 256, 0.000092592592593);
 
-            this.displayName = "GEBCO Earth Elevation Coverage";
+            this.displayName = "USGS NED Earth Elevation Coverage";
             this.minElevation = -11000;
             this.maxElevation = 8850;
             this.pixelIsPoint = false;
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "GEBCO", "", "1.3.0");
+            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "USGS-NED", "", "1.3.0");
         };
 
-        GebcoEarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
+        UsgsNedElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return GebcoEarthElevationCoverage;
+        return UsgsNedElevationCoverage;
     });

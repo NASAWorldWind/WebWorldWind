@@ -49,9 +49,9 @@ define([
             return 1;
         };
 
-        // TODO: It would appear that Float64Array.fill is not supported by the unit test engine. (PhantomJS 2.1.1 at the time of this writing)
+        // TODO: It would appear that Array.fill is not supported by the unit test engine. (PhantomJS 2.1.1 at the time of this writing)
         // TODO: Revisit the need for this hack with future versions of PhantomJS.
-        Float64Array.prototype.fill = function (n) {
+        Array.prototype.fill = function (n) {
             for (var i = 0; i < this.length; i++) {
                 this[i] = n;
             }
@@ -99,7 +99,7 @@ define([
                     em.addCoverage(c);
                 }
 
-                var minMax = em.minAndMaxElevationsForSector("dummySector");
+                var minMax = em.minAndMaxElevationsForSector(new Sector(-1, 1, -1, 1));
                 expect(minMax[0]).toEqual(-n);
                 expect(minMax[1]).toEqual(n);
             });
@@ -153,7 +153,7 @@ define([
                     em.addCoverage(c);
                 }
 
-                var result = new Float64Array(1);
+                var result = [0];
                 em.elevationsForGrid(new Sector(-1, 1, -1, 1), 1, 1, 1, result);
                 expect(result[0]).toEqual(n);
             });
@@ -168,7 +168,7 @@ define([
 
                 em.coverages[n - 1].enabled = false;
                 em.coverages[n - 2].enabled = false;
-                var result = new Float64Array(1);
+                var result = [0];
                 em.elevationsForGrid(new Sector(-1, 1, -1, 1), 1, 1, 1, result);
                 expect(result[0]).toEqual(n - 2);
             });
@@ -252,27 +252,6 @@ define([
                 }
             });
 
-            it("Removes coverages using indices", function () {
-                var em = new ElevationModel();
-                var i, n = 12;
-                var coverages = [];
-                for (i = 0; i < n; i++) {
-                    var c = new MockCoverage(n - i + 1);
-                    em.addCoverage(c);
-                    coverages.push(c);
-                }
-
-                for (i = n - 1; i >= 0; i -= 2) {
-                    em.removeCoverageAtIndex(i);
-                }
-
-                expect(em.coverages.length).toEqual(n / 2);
-                for (i = 0; i < n; i += 2) {
-                    expect(coverages[i] === em.coverages[i / 2]).toBe(true);
-                }
-
-            });
-
             it("Clears coverage list", function () {
                 var em = new ElevationModel();
                 for (var i = 1; i < 12; i++) {
@@ -315,22 +294,6 @@ define([
                     em.addCoverage(c);
                     c.timestamp += Math.round(Math.random() * 1000);
                     if (!newestCoverage || newestCoverage.timestamp < c.timestamp) {
-                        newestCoverage = c;
-                    }
-                }
-
-                expect(newestCoverage.timestamp).toEqual(em.timestamp);
-            });
-
-            it("Disregards timestamp for disabled coverages", function () {
-                var em = new ElevationModel();
-                var newestCoverage, oldestCoverage;
-                for (var i = 0; i < 10; i++) {
-                    var c = new MockCoverage(i + 1);
-                    em.addCoverage(c);
-                    c.timestamp += Math.round(Math.random() * 1000);
-                    c.enabled = (i % 2) > 0;
-                    if (c.enabled && (!newestCoverage || newestCoverage.timestamp < c.timestamp)) {
                         newestCoverage = c;
                     }
                 }

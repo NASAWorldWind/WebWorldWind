@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports UsgsNedEarthElevationCoverage
+ * @exports AsterV2ElevationCoverage
  */
 define([
         '../geom/Location',
@@ -29,24 +29,25 @@ define([
         "use strict";
 
         /**
-         * Constructs an Earth elevation coverage using USGS NED data.
-         * @alias UsgsNedEarthElevationCoverage
+         * Constructs an Earth elevation coverage using ASTER V2 data.
+         * @alias AsterV2ElevationCoverage
          * @constructor
          * @augments TiledElevationCoverage
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
-        var UsgsNedEarthElevationCoverage = function () {
+        var AsterV2ElevationCoverage = function () {
             TiledElevationCoverage.call(this,
-                new Sector(-15.0006, 50.0006, -171.001, 164.001), new Location(45, 45), 12, "application/bil16", "UsgsNedEarthElevations256", 256, 256, 10);
+                new Sector(-83.0001, 83.0001, -180, 180), new Location(45, 45), 11, "application/bil16",
+                "AsterV2Elevations256", 256, 256, 0.000277777777778);
 
-            this.displayName = "USGS NED Earth Elevation Coverage";
+            this.displayName = "ASTER V2 Earth Elevation Coverage";
             this.minElevation = -11000;
             this.maxElevation = 8850;
             this.pixelIsPoint = false;
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "USGS-NED", "", "1.3.0");
+            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "aster_v2", "", "1.3.0");
         };
 
-        UsgsNedEarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
+        AsterV2ElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return UsgsNedEarthElevationCoverage;
+        return AsterV2ElevationCoverage;
     });

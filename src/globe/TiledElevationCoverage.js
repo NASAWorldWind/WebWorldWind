@@ -59,7 +59,8 @@ define(['../util/AbsentResourceList',
          * model's elevation tiles.
          * @param {Number} tileHeight The number of intervals (cells) in the latitudinal direction of this elevation
          * model's elevation tiles.
-         * @param {Number} resolution The resolution of the coverage in meters.
+         * @param {Number} resolution The resolution of the coverage, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
          * @throws {ArgumentError} If any argument is null or undefined, if the number of levels specified is less
          * than one, or if either the tile width or tile height are less than one.
          */
@@ -236,7 +237,7 @@ define(['../util/AbsentResourceList',
             // output extreme elevations would always contain zero, even when the range of the image's extreme elevations in the
             // sector does not contain zero.
             var min = Number.MAX_VALUE,
-                max = Number.MIN_VALUE,
+                max = -min,
                 image,
                 imageMin,
                 imageMax;
@@ -293,7 +294,7 @@ define(['../util/AbsentResourceList',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingResult"));
             }
 
-            var level = this.levels.levelForTexelSize(targetResolution);
+            var level = this.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
             if (this.pixelIsPoint) {
                 return this.pointElevationsForGrid(sector, numLat, numLon, level, result);
             } else {
@@ -363,7 +364,6 @@ define(['../util/AbsentResourceList',
                 lat, lon, s, t,
                 latIndex, lonIndex, resultIndex = 0;
 
-            var resultFilled = true;
             for (latIndex = 0, lat = minLat; latIndex < numLat; latIndex += 1, lat += deltaLat) {
                 if (latIndex === numLat - 1) {
                     lat = maxLat; // explicitly set the last lat to the max latitude ensure alignment
@@ -378,10 +378,7 @@ define(['../util/AbsentResourceList',
                         if (this.coverageSector.containsLocation(lat, lon)) { // ignore locations outside of the model
                             s = (lon + 180) / 360;
                             t = (lat + 90) / 180;
-                            resultFilled = resultFilled && this.areaElevationForCoord(s, t, level.levelNumber, result, resultIndex);
-                        }
-                        else {
-                            resultFilled = false;
+                            this.areaElevationForCoord(s, t, level.levelNumber, result, resultIndex);
                         }
                     }
 
@@ -389,7 +386,7 @@ define(['../util/AbsentResourceList',
                 }
             }
 
-            return resultFilled;
+            return !result.includes(NaN); // true if the result array is fully populated.
         };
 
         // Internal. Returns an elevation for a location assuming pixel-is-area.
