@@ -20,12 +20,14 @@ define([
         '../globe/AsterV2ElevationCoverage',
         '../globe/ElevationModel',
         '../globe/GebcoElevationCoverage',
-        '../globe/UsgsNedElevationCoverage'
+        '../globe/UsgsNedElevationCoverage',
+        '../globe/UsgsNedHiElevationCoverage'
     ],
     function (AsterV2ElevationCoverage,
               ElevationModel,
               GebcoElevationCoverage,
-              UsgsNedElevationCoverage) {
+              UsgsNedElevationCoverage,
+              UsgsNedHiElevationCoverage) {
         "use strict";
 
         /**
@@ -39,6 +41,7 @@ define([
             this.addCoverage(new GebcoElevationCoverage());
             this.addCoverage(new AsterV2ElevationCoverage());
             this.addCoverage(new UsgsNedElevationCoverage());
+            this.addCoverage(new UsgsNedHiElevationCoverage());
         };
 
         EarthElevationModel.prototype = Object.create(ElevationModel.prototype);

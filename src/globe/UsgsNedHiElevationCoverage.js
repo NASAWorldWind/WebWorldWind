@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports UsgsNedElevationCoverage
+ * @exports UsgsNedHiElevationCoverage
  */
 define([
         '../geom/Location',
@@ -30,26 +30,26 @@ define([
 
         /**
          * Constructs an Earth elevation coverage using USGS NED data.
-         * @alias UsgsNedElevationCoverage
+         * @alias UsgsNedHiElevationCoverage
          * @constructor
          * @augments TiledElevationCoverage
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
-        var UsgsNedElevationCoverage = function () {
-            // CONUS Extent: (-124.848974, 24.396308) - (-66.885444, 49.384358)
-            // TODO: Expand this extent to cover HI when the server NO_DATA value issue is resolved.
+        var UsgsNedHiElevationCoverage = function () {
+            // Hawaii Extent: (-178.443593, 18.865460) - (-154.755792, 28.517269)
+            // TODO: Remove this class when the server NO_DATA value issue is resolved.
             TiledElevationCoverage.call(this,
-                new Sector(24.396308, 49.384358, -124.848974, -66.885444), new Location(45, 45), 12, "application/bil16",
-                "UsgsNedElevations256", 256, 256, 0.000092592592593);
+                new Sector(18.865460, 28.517269, -178.443593, -154.755792), new Location(45, 45), 12, "application/bil16",
+                "UsgsNedHiElevations256", 256, 256, 0.000092592592593);
 
-            this.displayName = "USGS NED Earth Elevation Coverage";
+            this.displayName = "USGS NED Hawaii Elevation Coverage";
             this.minElevation = -11000;
             this.maxElevation = 8850;
             this.pixelIsPoint = false;
             this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "USGS-NED", "", "1.3.0");
         };
 
-        UsgsNedElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
+        UsgsNedHiElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return UsgsNedElevationCoverage;
+        return UsgsNedHiElevationCoverage;
     });

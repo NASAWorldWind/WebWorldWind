@@ -136,7 +136,6 @@ define(['../error/ArgumentError',
         /**
          * Internal use only
          * Sets the state key to a new unique value.
-         * @type {Array}
          * @ignore
          */
         ElevationModel.prototype.computeStateKey = function () {
@@ -147,7 +146,6 @@ define(['../error/ArgumentError',
         /**
          * Internal use only
          * The comparison function used for sorting elevation coverages.
-         * @type {Number}
          * @ignore
          */
         ElevationModel.prototype.coverageComparator = function (coverage1, coverage2) {

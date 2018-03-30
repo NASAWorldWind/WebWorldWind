@@ -317,7 +317,8 @@ define(['../util/AbsentResourceList',
                 if (tile) {
                     image = tile.image();
                     if (image) {
-                        return image.elevationAtLocation(latitude, longitude);
+                        var elevation = image.elevationAtLocation(latitude, longitude);
+                        return isNaN(elevation) ? null : elevation;
                     }
                 }
 
@@ -419,11 +420,16 @@ define(['../util/AbsentResourceList',
                 retrieveTiles = (i == levelNumber) || (i == 0);
 
                 if (this.lookupPixels(x0, x1, y0, y1, level, retrieveTiles, pixels)) {
-                    result[resultIndex] = (1 - xf) * (1 - yf) * pixels[0] +
-                        xf * (1 - yf) * pixels[1] +
-                        (1 - xf) * yf * pixels[2] +
-                        xf * yf * pixels[3];
-                    return true;
+                    if (ElevationImage.isNoData(pixels[0], pixels[1], pixels[2], pixels[3])) {
+                        return false;
+                    }
+                    else {
+                        result[resultIndex] = (1 - xf) * (1 - yf) * pixels[0] +
+                            xf * (1 - yf) * pixels[1] +
+                            (1 - xf) * yf * pixels[2] +
+                            xf * yf * pixels[3];
+                        return true;
+                    }
                 }
             }
 

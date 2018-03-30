@@ -226,6 +226,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/TriangleMesh',
         './error/UnsupportedOperationError',
         './globe/UsgsNedElevationCoverage',
+        './globe/UsgsNedHiElevationCoverage',
         './geom/Vec2',
         './geom/Vec3',
         './layer/ViewControlsLayer',
@@ -474,6 +475,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Touch,
               TriangleMesh,
               UsgsNedElevationCoverage,
+              UsgsNedHiElevationCoverage,
               UnsupportedOperationError,
               Vec2,
               Vec3,
@@ -894,6 +896,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Touch'] = Touch;
         WorldWind['TriangleMesh'] = TriangleMesh;
         WorldWind['UsgsNedElevationCoverage'] = UsgsNedElevationCoverage;
+        WorldWind['UsgsNedHiElevationCoverage'] = UsgsNedHiElevationCoverage;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;

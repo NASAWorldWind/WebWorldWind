@@ -89,6 +89,18 @@ define([
         };
 
         /**
+         * Internal use only
+         * Returns true if a set of elevation pixels represents the NO_DATA value.
+         * @ignore
+         */
+        ElevationImage.isNoData = function (x0y0, x1y0, x0y1, x1y1) {
+            return x0y0 === 0 &&
+                x1y0 === 0 &&
+                x0y1 === 0 &&
+                x1y1 === 0;
+        };
+
+        /**
          * Returns the pixel value at a specified coordinate in this elevation image. The coordinate origin is the
          * image's lower left corner, so (0, 0) indicates the lower left pixel and (imageWidth-1, imageHeight-1)
          * indicates the upper right pixel. This returns 0 if the coordinate indicates a pixel outside of this elevation
@@ -135,6 +147,10 @@ define([
                 x1y1 = pixels[x1 + y1 * this.imageWidth],
                 xf = x - x0,
                 yf = y - y0;
+
+            if (ElevationImage.isNoData(x0y0, x1y0, x0y1, x1y1)) {
+                return NaN;
+            }
 
             return (1 - xf) * (1 - yf) * x0y0 +
                 xf * (1 - yf) * x1y0 +
@@ -213,10 +229,15 @@ define([
                                 x0y1 = pixels[x0 + y1 * this.imageWidth],
                                 x1y1 = pixels[x1 + y1 * this.imageWidth];
 
-                            result[index] = (1 - xf) * (1 - yf) * x0y0 +
-                                xf * (1 - yf) * x1y0 +
-                                (1 - xf) * yf * x0y1 +
-                                xf * yf * x1y1;
+                            if (ElevationImage.isNoData(x0y0, x1y0, x0y1, x1y1)) {
+                                result[index] = NaN;
+                            }
+                            else {
+                                result[index] = (1 - xf) * (1 - yf) * x0y0 +
+                                    xf * (1 - yf) * x1y0 +
+                                    (1 - xf) * yf * x0y1 +
+                                    xf * yf * x1y1;
+                            }
                         }
 
                         index++;
