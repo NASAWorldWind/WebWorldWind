@@ -22,12 +22,12 @@ define([
         '../shapes/AnnotationAttributes',
         '../error/ArgumentError',
         '../util/Color',
-        '../shapes/ControlPointMarker',
         '../util/Font',
         '../util/Insets',
         '../geom/Location',
         '../util/Logger',
         '../shapes/Path',
+        '../shapes/Placemark',
         '../shapes/PlacemarkAttributes',
         '../geom/Position',
         '../layer/RenderableLayer',
@@ -46,12 +46,12 @@ define([
               AnnotationAttributes,
               ArgumentError,
               Color,
-              ControlPointMarker,
               Font,
               Insets,
               Location,
               Logger,
               Path,
+              Placemark,
               PlacemarkAttributes,
               Position,
               RenderableLayer,
@@ -152,8 +152,8 @@ define([
             this.previousPosition = null;
 
             /**
-             * The control point associated with the current sizing operation.
-             * @type {ControlPointMarker}
+             * The placemark associated with the current sizing operation.
+             * @type {Placemark}
              */
             this.currentSizingMarker = null;
 
@@ -238,7 +238,8 @@ define([
                     return;
                 }
 
-                if (shapeEditor.currentSizingMarker instanceof ControlPointMarker) {
+                if (shapeEditor.currentSizingMarker instanceof Placemark &&
+                    shapeEditor.currentSizingMarker.userProperties.isControlPoint) {
                     shapeEditor.reshapeShape(terrainObject);
                     shapeEditor.updateControlPoints();
                 }
@@ -280,7 +281,8 @@ define([
                                 //set previous position
                                 shapeEditor.setPreviousPosition(event);
                             }
-                            else if (pickList.objects[p].userObject instanceof ControlPointMarker) {
+                            else if (pickList.objects[p].userObject instanceof Placemark &&
+                                pickList.objects[p].userObject.userProperties.isControlPoint) {
                                 event.preventDefault();
                                 shapeEditor.currentSizingMarker = pickList.objects[p].userObject;
                                 shapeEditor.isDragging = true;
@@ -308,7 +310,8 @@ define([
                     shapeEditor.updateAnnotation(null);
                 }
 
-                if (shapeEditor.currentSizingMarker instanceof ControlPointMarker) {
+                if (shapeEditor.currentSizingMarker instanceof Placemark &&
+                        shapeEditor.currentSizingMarker.userProperties.isControlPoint) {
                     if (event.altKey) {
                         var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX, event.clientY);
                         var terrainObject;
@@ -485,9 +488,12 @@ define([
             var center = this.getShapeCenter();
 
             if (center != null) {
-                var dummyMarker = new ControlPointMarker(
+                var dummyMarker = new Placemark(
                     new Position(center.latitude, center.longitude, 0),
-                    null, 0, ControlPointMarker.ANNOTATION);
+                    null);
+                dummyMarker.userProperties.isControlPoint = true;
+                dummyMarker.userProperties.id = 0;
+                dummyMarker.userProperties.purpose = ShapeEditor.ANNOTATION;
                 this.updateAnnotation(dummyMarker);
             }
             else {
@@ -691,7 +697,7 @@ define([
          * Subclasses should override this method if they provide editing for shapes other than those supported by
          * the basic editor.
          *
-         * @param {ControlPointMarker} controlPoint The control point selected.
+         * @param {Placemark} controlPoint The control point selected.
          * @param {Position} terrainPosition The terrain position under the cursor.
          */
         ShapeEditor.prototype.doReshapeShape = function (controlPoint, terrainPosition) {
@@ -802,7 +808,7 @@ define([
 
         /**
          * Updates the annotation associated with a specified control point.
-         * @param {ControlPointMarker} controlPoint The control point.
+         * @param {Placemark} controlPoint The control point.
          */
         ShapeEditor.prototype.updateAnnotation = function (controlPoint) {
             if (!controlPoint) {
@@ -818,11 +824,11 @@ define([
             );
 
             var annotationText;
-            if (controlPoint.size !== null) {
-                annotationText = this.formatLength(controlPoint.size);
+            if (controlPoint.userProperties.size !== undefined) {
+                annotationText = this.formatLength(controlPoint.userProperties.size);
             }
-            else if (controlPoint.rotation !== null) {
-                annotationText = this.formatRotation(controlPoint.rotation);
+            else if (controlPoint.userProperties.rotation !== undefined) {
+                annotationText = this.formatRotation(controlPoint.userProperties.rotation);
             }
             else {
                 annotationText = this.formatLatitude(controlPoint.position.latitude) + " " +
@@ -994,7 +1000,7 @@ define([
 
         /**
          * Moves a control point location.
-         * @param {ControlPointMarker} controlPoint The control point being moved.
+         * @param {Placemark} controlPoint The control point being moved.
          * @param {Position} terrainPosition The position selected by the user.
          * @returns {Position} The position after move.
          */
@@ -1078,8 +1084,8 @@ define([
                 outer:
                     for (var i = 0; i < boundaries.length; i++) {
                         for (var j = 0; j < boundaries[i].length; j++) {
-                            if (controlPoint.purpose == ControlPointMarker.LOCATION) {
-                                if (controlPoint.id == k) {
+                            if (controlPoint.userProperties.purpose == ShapeEditor.LOCATION) {
+                                if (controlPoint.userProperties.id == k) {
                                     newPos = this.moveLocation(controlPoint, terrainPosition);
                                     boundaries[i][j] = newPos;
                                     this.shape.boundaries = boundaries;
@@ -1087,7 +1093,7 @@ define([
                                     break outer;
                                 }
                             }
-                            else if (controlPoint.purpose == ControlPointMarker.ROTATION) {
+                            else if (controlPoint.userProperties.purpose == ShapeEditor.ROTATION) {
                                 this.rotateLocations(terrainPosition, boundaries);
                                 this.shape.boundaries = boundaries;
                                 break outer;
@@ -1099,29 +1105,27 @@ define([
             else if (boundaries.length >= 2) {
                 //poly without whole
                 for (var i = 0; i < boundaries.length; i++) {
-                    if (controlPoint.id == k) {
-                        if (controlPoint.purpose == ControlPointMarker.LOCATION) {
-                            if (controlPoint.id == k) {
-                                if (this.currentEvent.altKey) {
-                                    //remove location
-                                    var minSize = this.shape instanceof SurfacePolygon ? 3 : 2;
-                                    if (boundaries.length > minSize) {
-                                        // Delete the control point.
-                                        boundaries.splice(i, 1);
-                                        this.shape.boundaries = boundaries;
-                                        this.removeControlPoints();
-                                    }
-                                }
-                                else {
-                                    newPos = this.moveLocation(controlPoint, terrainPosition);
-                                    boundaries[i] = newPos;
+                    if (controlPoint.userProperties.purpose == ShapeEditor.LOCATION) {
+                        if (controlPoint.userProperties.id == k) {
+                            if (this.currentEvent.altKey) {
+                                //remove location
+                                var minSize = this.shape instanceof SurfacePolygon ? 3 : 2;
+                                if (boundaries.length > minSize) {
+                                    // Delete the control point.
+                                    boundaries.splice(i, 1);
                                     this.shape.boundaries = boundaries;
-                                    controlPoint.position = newPos;
+                                    this.removeControlPoints();
                                 }
-                                break;
                             }
+                            else {
+                                newPos = this.moveLocation(controlPoint, terrainPosition);
+                                boundaries[i] = newPos;
+                                this.shape.boundaries = boundaries;
+                                controlPoint.position = newPos;
+                            }
+                            break;
                         }
-                    } else if (controlPoint.purpose == ControlPointMarker.ROTATION) {
+                    } else if (controlPoint.userProperties.purpose == ShapeEditor.ROTATION) {
                         this.rotateLocations(terrainPosition, boundaries);
                         this.shape.boundaries = boundaries;
                         break;
@@ -1176,28 +1180,36 @@ define([
                     markers[i].position = locations[i];
                 }
                 markers[locations.length].position = rotationPosition;
-                markers[locations.length].rotation = heading;
+                markers[locations.length].userProperties.rotation = heading;
             }
             else {
                 var controlPointMarker;
                 for (var i = 0; i < locations.length; i++) {
-                    controlPointMarker = new ControlPointMarker(
+                    controlPointMarker = new Placemark(
                         locations[i],
-                        this.locationControlPointAttributes,
-                        i,
-                        ControlPointMarker.LOCATION);
+                        false,
+                        this.locationControlPointAttributes);
+                    controlPointMarker.userProperties.isControlPoint = true;
+                    controlPointMarker.userProperties.id = i;
+                    controlPointMarker.userProperties.purpose = ShapeEditor.LOCATION;
+
                     controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                     this.controlPointLayer.addRenderable(controlPointMarker);
                 }
 
-                controlPointMarker = new ControlPointMarker(
+                controlPointMarker = new Placemark(
                     rotationPosition,
-                    this.angleControlPointAttributes,
-                    locations.length,
-                    ControlPointMarker.ROTATION
+                    false,
+                    this.angleControlPointAttributes
                 );
+
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = locations.length;
+                controlPointMarker.userProperties.purpose = ShapeEditor.ROTATION;
+                controlPointMarker.userProperties.rotation = heading;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPointMarker.rotation = heading;
+
                 this.controlPointLayer.addRenderable(controlPointMarker);
             }
 
@@ -1252,16 +1264,20 @@ define([
                 markers[0].position = radiusLocation;
             }
             else {
-                var controlPointMarker = new ControlPointMarker(
+                var controlPointMarker = new Placemark(
                     radiusLocation,
-                    this.sizeControlPointAttributes,
-                    0,
-                    ControlPointMarker.OUTER_RADIUS);
+                    false,
+                    this.sizeControlPointAttributes
+                );
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = 0;
+                controlPointMarker.userProperties.purpose = ShapeEditor.OUTER_RADIUS;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                 this.controlPointLayer.addRenderable(controlPointMarker);
             }
 
-            markers[0].size = circle.radius;
+            markers[0].userProperties.size = circle.radius;
         };
 
         //Internal use only. Intentionally not documented.
@@ -1300,9 +1316,9 @@ define([
             );
             var vMarker = markerPoint.subtract(centerPoint).normalize();
 
-            if (controlPoint.purpose == ControlPointMarker.WIDTH || controlPoint.purpose == ControlPointMarker.HEIGHT) {
-                var width = rectangle.width + (controlPoint.id == 0 ? delta.dot(vMarker) * 2 : 0);
-                var height = rectangle.height + (controlPoint.id == 1 ? delta.dot(vMarker) * 2 : 0);
+            if (controlPoint.userProperties.purpose == ShapeEditor.WIDTH || controlPoint.userProperties.purpose == ShapeEditor.HEIGHT) {
+                var width = rectangle.width + (controlPoint.userProperties.id == 0 ? delta.dot(vMarker) * 2 : 0);
+                var height = rectangle.height + (controlPoint.userProperties.id == 1 ? delta.dot(vMarker) * 2 : 0);
 
                 if (width > 0 && height > 0) {
                     rectangle.width = width;
@@ -1350,37 +1366,48 @@ define([
                 markers[2].position = rotationLocation;
             }
             else {
-                var controlPointMarker = new ControlPointMarker(
+                var controlPointMarker = new Placemark(
                     widthLocation,
-                    this.sizeControlPointAttributes,
-                    0,
-                    ControlPointMarker.WIDTH
+                    false,
+                    this.sizeControlPointAttributes
                 );
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = 0;
+                controlPointMarker.userProperties.purpose = ShapeEditor.WIDTH;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                 this.controlPointLayer.addRenderable(controlPointMarker);
 
-                controlPointMarker = new ControlPointMarker(
+                controlPointMarker = new Placemark(
                     heightLocation,
-                    this.sizeControlPointAttributes,
-                    1,
-                    ControlPointMarker.HEIGHT);
+                    false,
+                    this.sizeControlPointAttributes
+                );
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = 1;
+                controlPointMarker.userProperties.purpose = ShapeEditor.HEIGHT;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                 this.controlPointLayer.addRenderable(controlPointMarker);
 
-                controlPointMarker = new ControlPointMarker(
+                controlPointMarker = new Placemark(
                     rotationLocation,
-                    this.angleControlPointAttributes,
-                    1,
-                    ControlPointMarker.ROTATION);
+                    false,
+                    this.angleControlPointAttributes
+                );
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = 1;
+                controlPointMarker.userProperties.purpose = ShapeEditor.ROTATION;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                 this.controlPointLayer.addRenderable(controlPointMarker);
             }
 
-            markers[0].size = rectangle.width;
-            markers[1].size = rectangle.height;
-            markers[2].rotation = rectangle.heading;
+            markers[0].userProperties.size = rectangle.width;
+            markers[1].userProperties.size = rectangle.height;
+            markers[2].userProperties.rotation = rectangle.heading;
 
-            this.updateOrientationLine(rectangle.center, rotationLocation)
+            this.updateOrientationLine(rectangle.center, rotationLocation);
         };
 
         //Internal use only. Intentionally not documented.
@@ -1419,16 +1446,16 @@ define([
             );
             var vMarker = markerPoint.subtract(centerPoint).normalize();
 
-            if (controlPoint.purpose == ControlPointMarker.WIDTH || controlPoint.purpose == ControlPointMarker.HEIGHT) {
-                var majorRadius = ellipse.majorRadius + (controlPoint.id == 0 ? delta.dot(vMarker) : 0);
-                var minorRadius = ellipse.minorRadius + (controlPoint.id == 1 ? delta.dot(vMarker) : 0);
+            if (controlPoint.userProperties.purpose == ShapeEditor.WIDTH ||
+                controlPoint.userProperties.purpose == ShapeEditor.HEIGHT) {
+                var majorRadius = ellipse.majorRadius + (controlPoint.userProperties.id == 0 ? delta.dot(vMarker) : 0);
+                var minorRadius = ellipse.minorRadius + (controlPoint.userProperties.id == 1 ? delta.dot(vMarker) : 0);
 
                 if (majorRadius > 0 && minorRadius > 0) {
                     ellipse.majorRadius = majorRadius;
                     ellipse.minorRadius = minorRadius;
                 }
-            }
-            else {
+            } else {
                 var oldHeading = Location.greatCircleAzimuth(ellipse.center, this.previousPosition);
                 var deltaHeading = Location.greatCircleAzimuth(ellipse.center, terrainPosition) - oldHeading;
                 ellipse.heading = this.normalizedHeading(ellipse.heading, deltaHeading);
@@ -1468,37 +1495,70 @@ define([
                 markers[2].position = rotationLocation;
             }
             else {
-                var controlPointMarker = new ControlPointMarker(
+                var controlPointMarker = new Placemark(
                     majorLocation,
-                    this.sizeControlPointAttributes,
-                    0,
-                    ControlPointMarker.WIDTH);
+                    false,
+                    this.sizeControlPointAttributes
+                );
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = 0;
+                controlPointMarker.userProperties.purpose = ShapeEditor.WIDTH;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                 this.controlPointLayer.addRenderable(controlPointMarker);
 
-                controlPointMarker = new ControlPointMarker(
+                controlPointMarker = new Placemark(
                     minorLocation,
-                    this.sizeControlPointAttributes,
-                    1,
-                    ControlPointMarker.HEIGHT);
+                    false,
+                    this.sizeControlPointAttributes
+                );
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = 1;
+                controlPointMarker.userProperties.purpose = ShapeEditor.HEIGHT;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                 this.controlPointLayer.addRenderable(controlPointMarker);
 
-                controlPointMarker = new ControlPointMarker(
+                controlPointMarker = new Placemark(
                     rotationLocation,
-                    this.angleControlPointAttributes,
-                    2,
-                    ControlPointMarker.ROTATION);
+                    false,
+                    this.angleControlPointAttributes
+                );
+                controlPointMarker.userProperties.isControlPoint = true;
+                controlPointMarker.userProperties.id = 2;
+                controlPointMarker.userProperties.purpose = ShapeEditor.ROTATION;
+
                 controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
                 this.controlPointLayer.addRenderable(controlPointMarker);
             }
 
-            markers[0].size = ellipse.majorRadius;
-            markers[1].size = ellipse.minorRadius;
-            markers[2].rotation = ellipse.heading;
+            markers[0].userProperties.size = ellipse.majorRadius;
+            markers[1].userProperties.size = ellipse.minorRadius;
+            markers[2].userProperties.rotation = ellipse.heading;
 
-            this.updateOrientationLine(ellipse.center, rotationLocation)
+            this.updateOrientationLine(ellipse.center, rotationLocation);
         };
+
+        // Indicates that a control point is associated with annotation.
+        ShapeEditor.ANNOTATION = "annotation";
+
+        // Indicates a control point is associated with a location.
+        ShapeEditor.LOCATION = "location";
+
+        // Indicates that a control point is associated with whole-shape rotation.
+        ShapeEditor.ROTATION = "rotation";
+
+        // Indicates that a control point is associated with width change.
+        ShapeEditor.WIDTH = "width";
+
+        // Indicates that a control point is associated with height change.
+        ShapeEditor.HEIGHT = "height";
+
+        // Indicates that a control point is associated with the right width of a shape.
+        ShapeEditor.RIGHT_WIDTH = "rightWidth";
+
+        // Indicates that a control point is associated with the outer radius of a shape.
+        ShapeEditor.OUTER_RADIUS = "outerRadius";
 
         return ShapeEditor;
     }
