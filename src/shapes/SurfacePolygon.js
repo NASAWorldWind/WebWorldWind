@@ -137,14 +137,14 @@ define([
             if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
                 var boundaries = [];
                 for (var i = 0; i < this._boundaries.length; i++){
-                    var locations = Location.computeShiftedLocations(globe, this.getReferencePosition(),
+                    var locations = globe.computeShiftedLocations(this.getReferencePosition(),
                         position, this._boundaries[i]);
                     boundaries.push(locations);
                 }
                 this.boundaries = boundaries;
             }
             else if (this.boundaries.length > 2){
-                this.boundaries = Location.computeShiftedLocations(globe, this.getReferencePosition(),
+                this.boundaries = globe.computeShiftedLocations(this.getReferencePosition(),
                     position, this._boundaries);
             }
             else {

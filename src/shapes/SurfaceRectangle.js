@@ -202,7 +202,7 @@ define([
             var locations = [];
             locations.push(new Location(this.center.latitude, this.center.longitude));
 
-            this.center = Location.computeShiftedLocations(globe, this.getReferencePosition(), position, locations)[0];
+            this.center = globe.computeShiftedLocations(this.getReferencePosition(), position, locations)[0];
         };
 
         return SurfaceRectangle;

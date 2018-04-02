@@ -124,7 +124,7 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfacePolyline.prototype.moveTo = function (globe, position) {
-            this.boundaries = Location.computeShiftedLocations(globe, this.getReferencePosition(),
+            this.boundaries = globe.computeShiftedLocations(this.getReferencePosition(),
                 position, this._boundaries);
         };
 
