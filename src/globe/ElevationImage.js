@@ -86,7 +86,23 @@ define([
              * @readonly
              */
             this.size = this.imageWidth * this.imageHeight;
+
+            /**
+             * Internal use only
+             * false if the entire image consists of NO_DATA values, true otherwise.
+             * @ignore
+             */
+            this.hasData = true;
+
         };
+
+        /**
+         * Internal use only
+         * The value that indicates a pixel contains no data.
+         * TODO: This will eventually need to become an instance property
+         * @ignore
+         */
+        ElevationImage.NO_DATA = 0;
 
         /**
          * Internal use only
@@ -94,10 +110,12 @@ define([
          * @ignore
          */
         ElevationImage.isNoData = function (x0y0, x1y0, x0y1, x1y1) {
-            return x0y0 === 0 &&
-                x1y0 === 0 &&
-                x0y1 === 0 &&
-                x1y1 === 0;
+            // TODO: Change this logic once proper NO_DATA value handling is in place.
+            var v = ElevationImage.NO_DATA;
+            return x0y0 === v &&
+                x1y0 === v &&
+                x0y1 === v &&
+                x1y1 === v;
         };
 
         /**
@@ -253,11 +271,15 @@ define([
          * @param {Sector} sector The sector of interest. If null or undefined, the minimum and maximum elevations
          * for the sector associated with this tile are returned.
          * @returns {Number[]} An array containing the minimum and maximum elevations within the specified sector,
-         * or null if the specified sector does not include this elevation image's coverage sector.
+         * or null if the specified sector does not include this elevation image's coverage sector or the image is filled with
+         * NO_DATA values.
          */
         ElevationImage.prototype.minAndMaxElevationsForSector = function (sector) {
-            var result = [];
+            if (!this.hasData) {
+                return null;
+            }
 
+            var result = [];
             if (!sector) { // the sector is this sector
                 result[0] = this.minElevation;
                 result[1] = this.maxElevation;
@@ -326,6 +348,7 @@ define([
          * this object. See [minAndMaxElevationsForSector]{@link ElevationImage#minAndMaxElevationsForSector}
          */
         ElevationImage.prototype.findMinAndMaxElevation = function () {
+            this.hasData = false;
             if (this.imageData && (this.imageData.length > 0)) {
                 this.minElevation = Number.MAX_VALUE;
                 this.maxElevation = -this.minElevation;
@@ -335,16 +358,20 @@ define([
 
                 for (var i = 0; i < pixelCount; i++) {
                     var p = pixels[i];
+                    if (p !== ElevationImage.NO_DATA) {
+                        this.hasData = true;
+                        if (this.minElevation > p) {
+                            this.minElevation = p;
+                        }
 
-                    if (this.minElevation > p) {
-                        this.minElevation = p;
-                    }
-
-                    if (this.maxElevation < p) {
-                        this.maxElevation = p;
+                        if (this.maxElevation < p) {
+                            this.maxElevation = p;
+                        }
                     }
                 }
-            } else {
+            }
+
+            if (!this.hasData) {
                 this.minElevation = 0;
                 this.maxElevation = 0;
             }
