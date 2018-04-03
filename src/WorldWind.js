@@ -59,6 +59,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/GeographicMesh',
         './projections/GeographicProjection',
         './shapes/GeographicText',
+        './formats/geojson/GeoJSONExporter',
         './formats/geojson/GeoJSONGeometry',
         './formats/geojson/GeoJSONGeometryCollection',
         './formats/geojson/GeoJSONGeometryLineString',
@@ -154,7 +155,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './cache/MemoryCacheListener',
         './layer/MercatorTiledImageLayer',
         './navigate/Navigator',
-        './navigate/NavigatorState',
         './util/NominatimGeocoder',
         './error/NotYetImplementedError',
         './util/Offset',
@@ -218,7 +218,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './globe/Tessellator',
         './shapes/Text',
         './shapes/TextAttributes',
-        './render/TextSupport',
+        './render/TextRenderer',
         './render/Texture',
         './render/TextureTile',
         './util/Tile',
@@ -233,10 +233,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec3',
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
+        './ogc/wcs/WcsCapabilities',
+        './ogc/wcs/WcsDescribeCoverage',
+        './globe/WcsEarthElevationModel',
         './util/WcsTileUrlBuilder',
         './ogc/WfsCapabilities',
         './formats/wkt/Wkt',
         './formats/wkt/WktElements',
+        './formats/wkt/WktExporter',
         './formats/wkt/geom/WktGeometryCollection',
         './formats/wkt/geom/WktLineString',
         './formats/wkt/geom/WktMultiLineString',
@@ -308,6 +312,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GeographicMesh,
               GeographicProjection,
               GeographicText,
+              GeoJSONExporter,
               GeoJSONGeometry,
               GeoJSONGeometryCollection,
               GeoJSONGeometryLineString,
@@ -403,7 +408,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               MemoryCacheListener,
               MercatorTiledImageLayer,
               Navigator,
-              NavigatorState,
               NominatimGeocoder,
               NotYetImplementedError,
               Offset,
@@ -467,7 +471,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Tessellator,
               Text,
               TextAttributes,
-              TextSupport,
+              TextRenderer,
               Texture,
               TextureTile,
               Tile,
@@ -482,10 +486,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec3,
               ViewControlsLayer,
               ViewVolume,
+              WcsCapabilities,
+              WcsDescribeCoverage,
+              WcsEarthElevationModel,
               WcsTileUrlBuilder,
               WfsCapabilities,
               Wkt,
               WktElements,
+              WktExporter,
               WktGeometryCollection,
               WktLineString,
               WktMultiLineString,
@@ -597,6 +605,18 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
              * @constant
              */
             FAILED: "failed",
+
+            /**
+             * Indicates a linear filter.
+             * @constant
+             */
+            FILTER_LINEAR: "filter_linear",
+
+            /**
+             * Indicates a nearest neighbor filter.
+             * @constant
+             */
+            FILTER_NEAREST: "filter_nearest",
 
             /**
              * Indicates a great circle path.
@@ -766,6 +786,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GeographicMesh'] = GeographicMesh;
         WorldWind['GeographicProjection'] = GeographicProjection;
         WorldWind['GeographicText'] = GeographicText;
+        WorldWind['GeoJSONExporter'] = GeoJSONExporter;
         WorldWind['GeoJSONGeometry'] = GeoJSONGeometry;
         WorldWind['GeoJSONGeometryCollection'] = GeoJSONGeometryCollection;
         WorldWind['GeoJSONGeometryLineString'] = GeoJSONGeometryLineString;
@@ -813,7 +834,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
         WorldWind['MercatorTiledImageLayer'] = MercatorTiledImageLayer;
         WorldWind['Navigator'] = Navigator;
-        WorldWind['NavigatorState'] = NavigatorState;
         WorldWind['NominatimGeocoder'] = NominatimGeocoder;
         WorldWind['NotYetImplementedError'] = NotYetImplementedError;
         WorldWind['Offset'] = Offset;
@@ -874,7 +894,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Tessellator'] = Tessellator;
         WorldWind['Text'] = Text;
         WorldWind['TextAttributes'] = TextAttributes;
-        WorldWind['TextSupport'] = TextSupport;
+        WorldWind['TextRenderer'] = TextRenderer;
         WorldWind['Texture'] = Texture;
         WorldWind['TextureTile'] = TextureTile;
         WorldWind['Tile'] = Tile;
@@ -888,10 +908,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
+        WorldWind['WcsCapabilities'] = WcsCapabilities;
+        WorldWind['WcsDescribeCoverage'] = WcsDescribeCoverage;
+        WorldWind['WcsEarthElevationModel'] = WcsEarthElevationModel;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
         WorldWind['WktElements'] = WktElements;
+        WorldWind['WktExporter'] = WktExporter;
         WorldWind['WktGeometryCollection'] = WktGeometryCollection;
         WorldWind['WktLineString'] = WktLineString;
         WorldWind['WktMultiLineString'] = WktMultiLineString;
@@ -925,12 +949,16 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
          *     <li><code>gpuCacheSize</code>: A Number indicating the size in bytes to allocate from GPU memory for
          *     resources such as textures, GLSL programs and buffer objects. Default is 250e6 (250 MB).</li>
          *     <li><code>baseUrl</code>: The URL of the directory containing the WorldWind Library and its resources.</li>
+         *     <li><code>layerRetrievalQueueSize</code>: The number of concurrent tile requests allowed per layer. The default is 16.</li>
+         *     <li><code>coverageRetrievalQueueSize</code>: The number of concurrent tile requests allowed per elevation coverage. The default is 16.</li>
          * </ul>
          * @type {{gpuCacheSize: number}}
          */
         WorldWind.configuration = {
             gpuCacheSize: 250e6,
-            baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../')
+            baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../'),
+            layerRetrievalQueueSize: 16,
+            coverageRetrievalQueueSize: 16
         };
 
         /**

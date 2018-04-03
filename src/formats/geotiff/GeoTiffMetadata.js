@@ -154,6 +154,9 @@ define([
 
             // Documented in defineProperties below.
             this._projectedCSType = null;
+
+            // Documented in defineProperties below.
+            this._projLinearUnits = null;
         };
 
         Object.defineProperties(GeoTiffMetadata.prototype, {
@@ -756,6 +759,21 @@ define([
 
                 set: function(value){
                     this._projectedCSType = value;
+                }
+            },
+
+            /**
+             * Contains the linear units of the geotiff.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            projLinearUnits: {
+                get: function () {
+                    return this._projLinearUnits;
+                },
+
+                set: function(value){
+                    this._projLinearUnits = value;
                 }
             },
 

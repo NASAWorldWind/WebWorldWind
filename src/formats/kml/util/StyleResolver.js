@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 define([
     '../KmlFile',
     '../styles/KmlStyle',
-    '../../../util/Logger'
+    '../../../util/Logger',
+    '../../../util/Promise'
 ], function (KmlFile,
              KmlStyle,
-             Logger) {
+             Logger,
+             Promise) {
     "use strict";
 
     /**
@@ -34,58 +36,74 @@ define([
      * This function externalizes handling of the remote style based on the type of the style
      * @param styleUrl {String} Url of the style. Optional.
      * @param styleSelector {KmlStyleSelector} Style to be applied. Optional.
-     * @param resolve {function} Function for resolving dependant promise
-     * @param reject {function} Function for rejecting dependant promise
-     * @param filePromise {Promise} Promise of the file. It is applied in the case of style url.
+     * @return {Promise} Promise of the style.
      */
-    StyleResolver.prototype.handleRemoteStyle = function (styleUrl, styleSelector, resolve, reject, filePromise) {
+    StyleResolver.prototype.handleRemoteStyle = function (styleUrl, styleSelector) {
         if (styleUrl) {
-            this.handleStyleUrl(styleUrl, resolve, reject, filePromise);
+            return this.handleStyleUrl(styleUrl);
         } else if (styleSelector) {
-            this.handleStyleSelector(styleSelector, resolve, reject);
+            return this.handleStyleSelector(styleSelector);
         } else {
-            Logger.logMessage(Logger.LEVEL_WARNING, "StyleResolver", "handleRemoteStyle", "Style was null.");
-            resolve(KmlStyle.default());
+            Logger.logMessage(Logger.LEVEL_INFO, "StyleResolver", "handleRemoteStyle", "Style was null.");
+            return Promise.resolve(KmlStyle.default());
         }
     };
 
-    // Intentionally undocumented. For internal use only
-    StyleResolver.prototype.handleStyleUrl = function (styleUrl, resolve, reject, filePromise) {
+    /**
+     * It receives the url of the style and load it.
+     * @param styleUrl {String} Url of the style. Url contain a file and a id of the style contained there.
+     * @return {Promise} Promise of the style.
+     * @private
+     */
+    StyleResolver.prototype.handleStyleUrl = function (styleUrl) {
         var self = this;
-        filePromise = this.handlePromiseOfFile(styleUrl, filePromise);
-        filePromise.then(function (kmlFile) {
-            kmlFile.resolveStyle(styleUrl).then(function (style) {
-                if (style.isMap) {
-                    style.resolve(resolve, self);
-                } else {
-                    resolve({normal: style, highlight: null});
-                }
-            });
+        return this.handlePromiseOfFile(styleUrl).then(function (kmlFile) {
+            return kmlFile.resolveStyle(styleUrl);
+        }).then(function (style) {
+            if (style.isMap) {
+                return style.resolve(self);
+            } else {
+                return Promise.resolve({normal: style, highlight: null});
+            }
         });
     };
 
-    // Intentionally undocumented. For internal use only
-    StyleResolver.prototype.handlePromiseOfFile = function (styleUrl, filePromise) {
-        if (!filePromise) {
-            filePromise = this._fileCache.retrieve(styleUrl);
-            if (!filePromise) {
-                // This is an issue of circular dependency again.
-                filePromise = new WorldWind.KmlFile({url: styleUrl});
-                this._fileCache.add(filePromise);
-            }
+    /**
+     * It either retrieves the file from the cache or build a new file from the URL.
+     * @param styleUrl {String} Url used to store the information in the cache.
+     * @returns {Promise} Promise of the resolved KmlFile
+     * @private
+     */
+    StyleResolver.prototype.handlePromiseOfFile = function (styleUrl) {
+        var file = this._fileCache.retrieve(styleUrl);
+        if (!file) {
+            // This is an issue of circular dependency again.
+            return new WorldWind.KmlFile({url: styleUrl}).then(function(kmlFile){
+                this._fileCache.add(styleUrl, kmlFile);
+
+                return kmlFile;
+            }.bind(this));
+        } else {
+            return Promise.resolve(file);
         }
-        return filePromise;
     };
 
-    // Intentionally undocumented. For internal use only
-    StyleResolver.prototype.handleStyleSelector = function (styleSelector, resolve, reject) {
+    /**
+     * It handles style selector. Either by resolving a map or by simply returning the resolved promise with style data.
+     * @param styleSelector
+     * @returns {Promise|*}
+     * @private
+     */
+    StyleResolver.prototype.handleStyleSelector = function (styleSelector) {
         if (styleSelector.isMap) {
-            styleSelector.resolve(resolve, this);
+            return styleSelector.resolve(this);
         } else {
             // Move this resolve to the end of the stack to prevent recursion.
-            window.setTimeout(function () {
-                resolve({normal: styleSelector, highlight: null});
-            }, 0);
+            return new Promise(function(resolve){
+                window.setTimeout(function () {
+                    resolve({normal: styleSelector, highlight: null});
+                }, 0);
+            });
         }
     };
 

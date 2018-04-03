@@ -19,7 +19,7 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        '../../ogc/wmts/OwsDescription'
+        '../../ogc/ows/OwsDescription'
     ],
     function (ArgumentError,
               Logger,
@@ -56,7 +56,7 @@ define([
                     this.serviceTypeVersions = this.serviceTypeVersions || [];
                     this.serviceTypeVersions.push(child.textContent);
                 } else if (child.localName === "Profile") {
-                    this.profile = this.profiles || [];
+                    this.profile = this.profile || [];
                     this.profile.push(child.textContent);
                 } else if (child.localName === "Fees") {
                     this.fees = child.textContent;

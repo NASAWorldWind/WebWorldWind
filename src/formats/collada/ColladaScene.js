@@ -481,7 +481,7 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
-            this.eyeDistance = dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = dc.eyePoint.distanceTo(this.placePoint);
 
             return this;
 
@@ -597,7 +597,7 @@ define([
                 this.applyLighting(dc, buffers);
             }
 
-            this.applyMatrix(dc, hasLighting, hasTexture , nodeWorldMatrix, nodeNormalMatrix);
+            this.applyMatrix(dc, hasLighting, hasTexture, nodeWorldMatrix, nodeNormalMatrix);
 
             if (buffers.indexedRendering) {
                 this.applyIndices(dc, buffers);
@@ -668,7 +668,7 @@ define([
             }
 
             var color = new Color(r, g, b, a);
-            opacity = a * dc.currentLayer.opacity;
+            opacity = a * this.layer.opacity;
             gl.depthMask(opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? this.pickColor : color);
             program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
@@ -760,7 +760,7 @@ define([
 
             var mvpMatrix = Matrix.fromIdentity();
 
-            mvpMatrix.copy(dc.navigatorState.modelviewProjection);
+            mvpMatrix.copy(dc.modelviewProjection);
 
             mvpMatrix.multiplyMatrix(this.transformationMatrix);
 
@@ -772,7 +772,7 @@ define([
 
                 var normalMatrix = Matrix.fromIdentity();
 
-                normalMatrix.copy(dc.navigatorState.modelviewNormalTransform);
+                normalMatrix.copy(dc.modelviewNormalTransform);
 
                 normalMatrix.multiplyMatrix(this.normalMatrix);
 
@@ -783,7 +783,7 @@ define([
                 dc.currentProgram.loadModelviewInverse(dc.currentGlContext, normalMatrix);
             }
 
-            if (hasTexture && this._activeTexture){
+            if (hasTexture && this._activeTexture) {
                 dc.currentProgram.loadTextureMatrix(dc.currentGlContext, this._texCoordMatrix);
                 this._activeTexture = null;
             }

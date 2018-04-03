@@ -112,6 +112,14 @@ define([
             }
         };
 
+        /**
+         * Called by WorldWindow to allow the controller to enforce navigation limits. Implementation is not required by
+         * sub-classes.
+         */
+        WorldWindowController.prototype.applyLimits = function () {
+
+        };
+
         return WorldWindowController;
     }
 );
