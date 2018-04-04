@@ -238,8 +238,8 @@ define(['../error/ArgumentError',
         /**
          * Returns the minimum and maximum elevations within a specified sector.
          * @param {Sector} sector The sector for which to determine extreme elevations.
-         * @returns {Number[]} An array containing the minimum and maximum elevations within the specified sector,
-         * or null if the specified sector is outside this elevation model's coverage area.
+         * @returns {Number[]} An array containing the minimum and maximum elevations within the specified sector. If no coverage
+         * can satisfy the request, a min and max of zero is returned.
          * @throws {ArgumentError} If the specified sector is null or undefined.
          */
         ElevationModel.prototype.minAndMaxElevationsForSector = function (sector) {
@@ -252,17 +252,19 @@ define(['../error/ArgumentError',
                 n = this.coverages.length,
                 coverageResult;
 
+            var result = [Number.MAX_VALUE, -Number.MAX_VALUE];
             for (i = n - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
                     coverageResult = coverage.minAndMaxElevationsForSector(sector);
                     if (coverageResult) {
-                        return coverageResult;
+                        result[0] = Math.min(result[0], coverageResult[0]);
+                        result[1] = Math.max(result[1], coverageResult[1]);
                     }
                 }
             }
 
-            return [0, 0];
+            return result[0] === Number.MAX_VALUE ? [0, 0] : result;
         };
 
         /**

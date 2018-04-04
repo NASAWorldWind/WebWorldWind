@@ -98,7 +98,8 @@ define(['../error/ArgumentError',
          * Returns the minimum and maximum elevations within a specified sector.
          * @param {Sector} sector The sector for which to determine extreme elevations.
          * @returns {Number[]} An array containing the minimum and maximum elevations within the specified sector,
-         * or null if the specified sector is outside this elevation model's coverage area.
+         * or null if the specified sector is outside this elevation model's coverage area or if the server data is not yet
+         * available.
          * @throws {ArgumentError} If the specified sector is null or undefined.
          */
         ElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {

@@ -229,7 +229,7 @@ define(['../util/AbsentResourceList',
             this.assembleTiles(level, sector, false);
 
             if (this.currentTiles.length === 0) {
-                return null; // Sector is outside the coverage's coverage area. Do not modify the result array.
+                return null; // Sector is outside the coverage's coverage area.
             }
 
             // Assign the output extreme elevations to the largest and smallest double values, respectively. This has the effect
@@ -255,7 +255,7 @@ define(['../util/AbsentResourceList',
                         max = imageMax;
                     }
                 } else {
-                    return null; // At least one tile image is not in memory; return the model's extreme elevations.
+                    return null; // At least one tile image is not in memory.
                 }
             }
 
