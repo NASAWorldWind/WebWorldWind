@@ -677,7 +677,7 @@ define([
                 new Vec3(0, 0, 0));
             var delta = newPoint.subtract(oldPoint);
 
-            for(var i =0; i < locations.length; i++)
+            for(var i = 0, len = locations.length; i < len; i++)
             {
                 var point = this.computePointFromLocation(locations[i].latitude, locations[i].longitude,
                     new Vec3(0, 0, 0));
