@@ -18,13 +18,11 @@
  */
 define([
         '../error/ArgumentError',
-        '../geom/Location',
         '../util/Logger',
         '../shapes/ShapeAttributes',
         '../shapes/SurfaceShape'
     ],
     function (ArgumentError,
-              Location,
               Logger,
               ShapeAttributes,
               SurfaceShape) {
