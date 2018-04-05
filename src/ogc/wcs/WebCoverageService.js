@@ -40,6 +40,12 @@ define([
          */
         var WebCoverageService = function (serviceAddress) {
 
+            /**
+             * A collection of the coverages available from this service. Not populated until service is initialized by
+             * the connect method.
+             * @type {Array}
+             */
+            this.coverages = [];
         };
 
         /**
@@ -58,14 +64,6 @@ define([
          * @returns {WcsCoverage}
          */
         WebCoverageService.prototype.getCoverage = function (coverageId) {
-
-        };
-
-        /**
-         * Returns an array of coverage objects
-         * @returns {Array} an array of WcsCoverage objects
-         */
-        WebCoverageService.prototype.getCoverages = function () {
 
         };
 
