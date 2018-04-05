@@ -36,32 +36,36 @@ define([
          * Represents a Web Coverage Service and provides functionality for interacting with the service. Includes
          * functionality for retrieving DescribeCoverage documents and providing WCS version agnostic coverage objects.
          * @param serviceAddress the url of the Web Coverage Service
-         * @param getCapabilities {WcsCapabilities}
          * @constructor
          */
-        var WebCoverageService = function (serviceAddress, getCapabilities) {
+        var WebCoverageService = function (serviceAddress) {
 
         };
 
         /**
-         * Creates a WebCoverageService based on the provided service address. This function handles version negotiation
-         * and capabilities document retrieval. The return is a Promise which returns the completed WebCoverageService.
-         * @param serviceAddress the url of the Web Coverage Service
-         * @param version optional WCS version
+         * Connects to the Web Coverage Service specified in the constructor. This function handles version negotiation
+         * and capabilities document retrieval. The return is a Promise which returns the initialized
+         * WebCoverageService.
          * @returns {Promise} a Promise of a WebCoverageService
          */
-        WebCoverageService.connect = function (serviceAddress, version) {
+        WebCoverageService.prototype.connect = function () {
 
         };
 
         /**
-         * Returns a Promise to an array of version agnostic WcsCoverage objects for the provided array of coverage
-         * names or ids.
-         * @param coverageIds an optional array of the requested coverage arrays. If no coverage ids are specified, all
-         * coverages expressed in the GetCapabilities document are returned
-         * @returns {Promise} a Promise of an array of WcsCoverage objects
+         * Returns the coverage associated with the provided id or name
+         * @param coverageId the requested coverage id or name
+         * @returns {WcsCoverage}
          */
-        WebCoverageService.prototype.coverages = function (coverageIds) {
+        WebCoverageService.prototype.getCoverage = function (coverageId) {
+
+        };
+
+        /**
+         * Returns an array of coverage objects
+         * @returns {Array} an array of WcsCoverage objects
+         */
+        WebCoverageService.prototype.getCoverages = function () {
 
         };
 
