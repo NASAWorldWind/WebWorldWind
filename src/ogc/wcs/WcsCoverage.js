@@ -40,13 +40,19 @@ define([
 
         };
 
-        /**
-         * Creates and returns a simple configuration object with required parameters of an ElevationCoverage.
-         * @returns a simple configuration object for use by ElevationCoverage constructor
-         */
-        WcsCoverage.prototype.elevationConfig = function () {
+        Object.defineProperties(WcsCoverage.prototype, {
+            elevationConfig : {
 
-        };
+                /**
+                 * A simple configuration object with the required parameters for ElevationCoverage.
+                 * @memberOf WcsCoverage.prototype
+                 * @type {Object}
+                 */
+                get: function () {
+
+                }
+            }
+        });
 
         return WcsCoverage;
     });
