@@ -244,22 +244,24 @@ define(['../util/AbsentResourceList',
 
             for (var i = 0, len = this.currentTiles.length; i < len; i++) {
                 image = this.currentTiles[i].image();
-                if (image && image.hasData) {
-                    imageMin = image.minElevation;
-                    if (min > imageMin) {
-                        min = imageMin;
-                    }
+                if (image) {
+                    if (image.hasData) {
+                        imageMin = image.minElevation;
+                        if (min > imageMin) {
+                            min = imageMin;
+                        }
 
-                    imageMax = image.maxElevation;
-                    if (max < imageMax) {
-                        max = imageMax;
+                        imageMax = image.maxElevation;
+                        if (max < imageMax) {
+                            max = imageMax;
+                        }
                     }
                 } else {
                     return null; // At least one tile image is not in memory.
                 }
             }
 
-            return [min, max];
+            return min === Number.MAX_VALUE ? null : [min, max];
         };
 
         // Documented in super class

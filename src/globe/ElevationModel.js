@@ -253,9 +253,13 @@ define(['../error/ArgumentError',
                 coverageResult;
 
             var result = [Number.MAX_VALUE, -Number.MAX_VALUE];
+            var failoverResult = null;
             for (i = n - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
+                    if (failoverResult === null) {
+                        failoverResult = [coverage.minElevation, coverage.maxElevation];
+                    }
                     coverageResult = coverage.minAndMaxElevationsForSector(sector);
                     if (coverageResult) {
                         result[0] = Math.min(result[0], coverageResult[0]);
@@ -264,7 +268,14 @@ define(['../error/ArgumentError',
                 }
             }
 
-            return result[0] === Number.MAX_VALUE ? [0, 0] : result;
+            if (result[0] === Number.MAX_VALUE) {
+                if (failoverResult === null) {
+                    return [0, 0];
+                }
+
+                return failoverResult;
+            }
+            return result;
         };
 
         /**
