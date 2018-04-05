@@ -38,21 +38,12 @@ define([
          */
         var WcsCoverage = function (coverageId, getCapabilities, describeCoverage) {
 
+            /**
+             * A simple configuration object with the required parameters for ElevationCoverage.
+             * @type {Object}
+             */
+            this.elevationConfig = {};
         };
-
-        Object.defineProperties(WcsCoverage.prototype, {
-            elevationConfig : {
-
-                /**
-                 * A simple configuration object with the required parameters for ElevationCoverage.
-                 * @memberOf WcsCoverage.prototype
-                 * @type {Object}
-                 */
-                get: function () {
-
-                }
-            }
-        });
 
         return WcsCoverage;
     });
