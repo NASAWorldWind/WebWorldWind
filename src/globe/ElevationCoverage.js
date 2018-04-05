@@ -52,7 +52,7 @@ define(['../error/ArgumentError',
             /**
              * Indicates this coverage's display name.
              * @type {String}
-             * @default "Elevations"
+             * @default "Coverage"
              */
             this.displayName = "Coverage";
 

@@ -49,7 +49,7 @@ define(['../error/ArgumentError',
             this.stateKey = "";
 
             /**
-             * The list of all elevation coverages useable by this model.
+             * The list of all elevation coverages usable by this model.
              * @type {Array}
              */
             this.coverages = [];
