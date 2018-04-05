@@ -49,10 +49,8 @@ define(['../error/ArgumentError',
             this.stateKey = "";
 
             /**
-             * Internal use only
              * The list of all elevation coverages useable by this model.
              * @type {Array}
-             * @ignore
              */
             this.coverages = [];
 
