@@ -219,10 +219,8 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfaceEllipse.prototype.moveTo = function (globe, position) {
-            var locations = [];
-            locations.push(new Location(this.center.latitude, this.center.longitude));
-
-            this.center = globe.computeShiftedLocations(this.getReferencePosition(), position, locations)[0];
+            this.center = globe.computeShiftedLocations(this.getReferencePosition(), position,
+                [new Location(this.center.latitude, this.center.longitude)])[0];
         };
 
         /**

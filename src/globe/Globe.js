@@ -670,6 +670,7 @@ define([
          */
         Globe.prototype.computeShiftedLocations = function(oldLocation, newLocation, locations) {
             var newLocations = [];
+            var result = new Vec3(0, 0, 0);
 
             var oldPoint = this.computePointFromLocation(oldLocation.latitude, oldLocation.longitude,
                 new Vec3(0, 0, 0));
@@ -680,7 +681,7 @@ define([
             for(var i = 0, len = locations.length; i < len; i++)
             {
                 var point = this.computePointFromLocation(locations[i].latitude, locations[i].longitude,
-                    new Vec3(0, 0, 0));
+                    result);
                 point = point.add(delta);
                 var newPos = new WorldWind.Position(0, 0, 0);
                 this.computePositionFromPoint(point[0], point[1], point[2], newPos);
