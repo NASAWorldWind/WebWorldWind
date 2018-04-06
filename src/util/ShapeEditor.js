@@ -405,6 +405,11 @@ define([
                     this.shape.minorRadius,
                     this.shape.heading,
                     this.shape.attributes);
+            } else if (this.shape && this.shape instanceof SurfaceCircle) {
+                return new SurfaceCircle(
+                    this.shape.center,
+                    this.shape.radius,
+                    this.shape.attributes);
             } else if (this.shape && this.shape instanceof SurfaceRectangle) {
                 return new SurfaceRectangle(
                     this.shape.center,
