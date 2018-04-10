@@ -659,40 +659,6 @@ define([
             return this.elevationModel.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
         };
 
-        /**
-         * Computes a new set of locations translated from a specified location to a new location for this globe.
-         *
-         * @param {Location} oldLocation The original reference location.
-         * @param {Location} newLocation The new reference location.
-         * @param {Location[]} locations The locations to translate.
-         *
-         * @return {Location[]} The translated locations.
-         */
-        Globe.prototype.computeShiftedLocations = function(oldLocation, newLocation, locations) {
-            var newLocations = [];
-            var result = new Vec3(0, 0, 0);
-
-            var oldPoint = this.computePointFromLocation(oldLocation.latitude, oldLocation.longitude,
-                new Vec3(0, 0, 0));
-            var newPoint = this.computePointFromLocation(newLocation.latitude, newLocation.longitude,
-                new Vec3(0, 0, 0));
-            var delta = newPoint.subtract(oldPoint);
-
-            for(var i = 0, len = locations.length; i < len; i++)
-            {
-                var point = this.computePointFromLocation(locations[i].latitude, locations[i].longitude,
-                    result);
-                point = point.add(delta);
-                var newPos = new WorldWind.Position(0, 0, 0);
-                this.computePositionFromPoint(point[0], point[1], point[2], newPos);
-
-                newLocations.push(newPos);
-            }
-
-            return newLocations;
-        };
-
         return Globe;
     }
-)
-;
+);
