@@ -62,31 +62,29 @@ define([
          * @returns {Promise} a Promise of a WebCoverageService
          */
         WebCoverageService.prototype.connect = function () {
-            var self = this;
-
-            if (!self._connectPromise) {
-                self._connectPromise = new Promise(function (resolve, reject) {
-
-                    self.negotiateService()
-                        .then(self.retrieveDescribeCoverage)
-                        .then(function (describeCoverages) {
-                            var len = describeCoverages.length, coverageDescription, coverageCount;
-                            for (var i = 0; i < len; i++) {
-                                coverageDescription = new WcsDescribeCoverage(describeCoverages[i]);
-                                coverageCount = coverageDescription.coverages.length;
-                                for (var j = 0; j < coverageCount; j++) {
-                                    self.coverages.push(coverageDescription.coverages[i]);
-                                }
-                            }
-                            resolve(self);
-                        })
-                        .catch(function (e) {
-                            reject(e);
-                        });
-                });
+            if (!this._connectPromise) {
+                this._connectPromise = this.doConnect();
             }
 
-            return self._connectPromise;
+            return this._connectPromise;
+        };
+
+        WebCoverageService.prototype.doConnect = function () {
+            var self = this;
+
+            return new Promise(function (resolve, reject) {
+
+                WebCoverageService.negotiateService(self.serviceAddress)
+                    .then(WebCoverageService.retrieveDescribeCoverage)
+                    .then(WebCoverageService.parseCoverages)
+                    .then(function (coverages) {
+                        self.coverages = coverages.slice();
+                        resolve(self);
+                    })
+                    .catch(function (e) {
+                        reject(e);
+                    });
+            });
         };
 
         /**
@@ -98,8 +96,21 @@ define([
 
         };
 
+        WebCoverageService.parseCoverages = function (describeCoverages) {
+            var len = describeCoverages.length, coverageDescription, coverageCount, coverages = [];
+            for (var i = 0; i < len; i++) {
+                coverageDescription = new WcsDescribeCoverage(describeCoverages[i]);
+                coverageCount = coverageDescription.coverages.length;
+                for (var j = 0; j < coverageCount; j++) {
+                    coverages.push(coverageDescription.coverages[i]);
+                }
+            }
+
+            return coverages;
+        };
+
         // Internal use only
-        WebCoverageService.prototype.retrieveDescribeCoverage = function (wcsCaps) {
+        WebCoverageService.retrieveDescribeCoverage = function (wcsCaps) {
             if (!wcsCaps) {
                 throw new Error("no capabilities document");
             }
@@ -134,19 +145,19 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.negotiateService = function (version) {
-            var wcsCaps, self = this;
+        WebCoverageService.negotiateService = function (serviceAddress, version) {
+            var wcsCaps;
 
             return new Promise(function (resolve, reject) {
 
-                WebCoverageService.retrieveXml(self.buildGetCapabilitiesUrl(version))
+                WebCoverageService.retrieveXml(WebCoverageService.buildGetCapabilitiesUrl(serviceAddress, version))
                     .then(function (xml) {
                         try {
                             wcsCaps = new WcsCapabilities(xml);
                             resolve(wcsCaps);
                         } catch (e) {
                             if (!version) {
-                                resolve(self.negotiateService("1.0.0"));
+                                resolve(WebCoverageService.negotiateService(serviceAddress, "1.0.0"));
                             } else {
                                 reject(Error("unable to parse"));
                             }
@@ -175,8 +186,8 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.buildGetCapabilitiesUrl = function (version) {
-            var requestUrl = WebCoverageService.prepareBaseUrl(this.serviceAddress);
+        WebCoverageService.buildGetCapabilitiesUrl = function (serviceAddress, version) {
+            var requestUrl = WebCoverageService.prepareBaseUrl(serviceAddress);
 
             requestUrl += "SERVICE=WCS";
             requestUrl += "&REQUEST=GetCapabilities";
