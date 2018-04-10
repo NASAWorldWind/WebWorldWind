@@ -136,6 +136,7 @@ requirejs(['./WorldWindShim',
         var geometryCollectionLayer = new WorldWind.RenderableLayer("GeometryCollection");
         var geometryCollectionGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "GeometryCollectionFeatureTest.geojson");
         geometryCollectionGeoJSON.load(parserCompletionCallback, shapeConfigurationCallback, geometryCollectionLayer);
+        wwd.addLayer(geometryCollectionLayer);
 
         // Feature test
         var featureLayer = new WorldWind.RenderableLayer("Feature - USA");
