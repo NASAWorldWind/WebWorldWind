@@ -134,7 +134,7 @@ define([
         SurfacePolygon.prototype.moveTo = function (globe, position) {
             if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
                 var boundaries = [];
-                for (var i = 0; i < this._boundaries.length; i++){
+                for (var i = 0, len = this._boundaries.length; i < len; i++){
                     var locations = globe.computeShiftedLocations(this.getReferencePosition(),
                         position, this._boundaries[i]);
                     boundaries.push(locations);
