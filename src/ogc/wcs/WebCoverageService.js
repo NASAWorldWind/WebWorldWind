@@ -114,13 +114,14 @@ define([
             var len = wcsCaps.coverages.length, version = wcsCaps.version, coverageIds = [], coverage, baseUrl,
                 remainingCharCount, characterCount = 0, coverageId, requests = [];
 
-            if (version === "1.0.0") {
-                baseUrl = wcsCaps.capability.request.describeCoverage.get
-                    + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=1.0.0&COVERAGES=";
-            } else if (version === "2.0.0" || version === "2.0.1") {
-                baseUrl = wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url
-                    + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=" + version + "&COVERAGEID=";
-            }
+            baseUrl = WebCoverageService.buildDescribeCoverageUrl(wcsCaps);
+            // if (version === "1.0.0") {
+            //     baseUrl = wcsCaps.capability.request.describeCoverage.get
+            //         + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=1.0.0&COVERAGES=";
+            // } else if (version === "2.0.0" || version === "2.0.1") {
+            //     baseUrl = wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url
+            //         + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=" + version + "&COVERAGEID=";
+            // }
             remainingCharCount = 2083 - baseUrl.length;
 
             for (var i = 0; i < len; i++) {
@@ -189,13 +190,7 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.buildGetCapabilitiesUrl = function (version) {
-            var requestUrl;
-
-            if (this.serviceAddress.indexOf("?") > 0) {
-                requestUrl = this.serviceAddress + "&";
-            } else {
-                requestUrl = this.serviceAddress + "?";
-            }
+            var requestUrl = WebCoverageService.prepareBaseUrl(this.serviceAddress);
 
             requestUrl += "SERVICE=WCS";
             requestUrl += "&REQUEST=GetCapabilities";
@@ -207,18 +202,42 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.buildDescribeCoverageUrl = function (wcsCaps) {
+        WebCoverageService.buildDescribeCoverageUrl = function (wcsCaps) {
             if (!wcsCaps) {
                 throw new ArgumentError("blaa"); // TODO
             }
-            var version = wcsCaps.version;
+            var version = wcsCaps.version, requestUrl, coverageParameter;
 
             if (version === "1.0.0") {
-                return wcsCaps.capability.request.describeCoverage.get + "?SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=1.0.0&COVERAGES=";
+                requestUrl = wcsCaps.capability.request.describeCoverage.get;
+                coverageParameter = "&COVERAGES=";
             } else if (version === "2.0.0" || version === "2.0.1") {
-                return wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url
-                    + "?SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=" + version + "COVERAGEID=";
+                requestUrl = wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url;
+                coverageParameter = "&COVERAGEID=";
             }
+
+            requestUrl = WebCoverageService.prepareBaseUrl(requestUrl);
+            requestUrl += "SERVICE=WCS";
+            requestUrl += "&REQUEST=DescribeCoverage";
+            requestUrl += "&VERSION=" + version;
+            requestUrl += coverageParameter;
+
+            return encodeURI(requestUrl);
+        };
+
+        WebCoverageService.prepareBaseUrl = function (url) {
+            var index = url.indexOf("?");
+
+            if (index < 0) { // if string contains no question mark
+                url = url + "?"; // add one
+            } else if (index !== url.length - 1) { // else if question mark not at end of string
+                index = url.search(/&$/);
+                if (index < 0) {
+                    url = url + "&"; // add a parameter separator
+                }
+            }
+
+            return url;
         };
 
         return WebCoverageService;
