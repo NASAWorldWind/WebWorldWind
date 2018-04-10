@@ -788,6 +788,7 @@ define([
         SurfaceShape.prototype.computeShiftedLocations = function(globe, oldLocation, newLocation, locations) {
             var newLocations = [];
             var result = new Vec3(0, 0, 0);
+            var newPos = new WorldWind.Position(0, 0, 0);
 
             var oldPoint = globe.computePointFromLocation(oldLocation.latitude, oldLocation.longitude,
                 new Vec3(0, 0, 0));
@@ -800,7 +801,6 @@ define([
                 var point = globe.computePointFromLocation(locations[i].latitude, locations[i].longitude,
                     result);
                 point = point.add(delta);
-                var newPos = new WorldWind.Position(0, 0, 0);
                 globe.computePositionFromPoint(point[0], point[1], point[2], newPos);
 
                 newLocations.push(new Location(newPos.latitude, newPos.longitude));
