@@ -119,7 +119,7 @@ define([
                     + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=1.0.0&COVERAGES=";
             } else if (version === "2.0.0" || version === "2.0.1") {
                 baseUrl = wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url
-                    + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=" + version + "COVERAGEID=";
+                    + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=" + version + "&COVERAGEID=";
             }
             remainingCharCount = 2083 - baseUrl.length;
 

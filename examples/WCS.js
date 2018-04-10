@@ -44,8 +44,8 @@ requirejs(['./WorldWindShim',
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
-        // var serviceAddress = "https://worldwind26.arc.nasa.gov/wcs";
-        var serviceAddress = "http://localhost:8080/geoserver/wcs";
+        //var serviceAddress = "https://worldwind26.arc.nasa.gov/wcs";
+        var serviceAddress = "http://138.68.23.204/geoserver/wcs";
 
         var wcs = new WorldWind.WebCoverageService(serviceAddress);
         wcs.connect()
