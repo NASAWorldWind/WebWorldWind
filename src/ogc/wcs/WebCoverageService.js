@@ -52,6 +52,12 @@ define([
              */
             this.coverages = null;
 
+            /**
+             * The Promise which includes capabilities document retrieval, version negotiation, describe coverage
+             * document retrieval, and initialization of the WebCoverageService.
+             * @type {Promise}
+             * @private
+             */
             this._connectPromise = null;
         };
 
@@ -109,12 +115,13 @@ define([
                             resolve(wcsCaps);
                         } catch (e) {
                             // WcsCapabilities throws an ArgumentError in the event of an incompatible version
-                            // If the version is not defined and an argument error is thrown, the server replied with a
-                            // preferred version not supported by WebWorldWind. Retry with version 1.0.0.
+                            // If the version is not defined and an argument error is thrown, the server likely replied
+                            // to the initial request with a preferred version not supported by WebWorldWind. Retry with
+                            // version 1.0.0.
                             if (!version && e instanceof ArgumentError) {
                                 resolve(self.retrieveGetCapabilities("1.0.0"));
                             } else {
-                                reject(Error("unable to parse")); // TODO more appropriate error
+                                reject(new Error("unable to parse")); // TODO more appropriate error
                             }
                         }
                     });
@@ -124,7 +131,9 @@ define([
         // Internal use only
         WebCoverageService.prototype.retrieveDescribeCoverage = function (wcsCaps) {
             if (!wcsCaps) {
-                throw new Error("no capabilities document");
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "buildDescribeCoverageUrl",
+                        "The WCS Caps object is missing."));
             }
 
             var len = wcsCaps.coverages.length, version = wcsCaps.version, coverageIds = [], coverage, baseUrl,
@@ -157,8 +166,7 @@ define([
             return Promise.all(requests);
         };
 
-
-
+        // Internal use only
         WebCoverageService.prototype.parseCoverages = function (describeCoverages) {
             var len = describeCoverages.length, coverageDescription, coverageCount, coverages = [];
             for (var i = 0; i < len; i++) {
