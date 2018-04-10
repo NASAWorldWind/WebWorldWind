@@ -67,13 +67,6 @@ define([
             if (!self._connectPromise) {
                 self._connectPromise = new Promise(function (resolve, reject) {
 
-                    // Configuration Steps
-                    // 1. Retrieve Capabilities Document
-                    // 2. Parse, ensure version is compatible
-                    // 3. Retry if necessary with error fallback
-                    // 4. Create DescribeCoverage request(s)
-                    // 5. Parse Describe Coverage
-                    // 6. Setup 'coverages' array
                     self.negotiateService()
                         .then(self.retrieveDescribeCoverage)
                         .then(function (describeCoverages) {
@@ -115,13 +108,6 @@ define([
                 remainingCharCount, characterCount = 0, coverageId, requests = [];
 
             baseUrl = WebCoverageService.buildDescribeCoverageUrl(wcsCaps);
-            // if (version === "1.0.0") {
-            //     baseUrl = wcsCaps.capability.request.describeCoverage.get
-            //         + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=1.0.0&COVERAGES=";
-            // } else if (version === "2.0.0" || version === "2.0.1") {
-            //     baseUrl = wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url
-            //         + "SERVICE=WCS&REQUEST=DescribeCoverage&VERSION=" + version + "&COVERAGEID=";
-            // }
             remainingCharCount = 2083 - baseUrl.length;
 
             for (var i = 0; i < len; i++) {
