@@ -50,7 +50,7 @@ define([
              * the connect method.
              * @type {Array}
              */
-            this.coverages = [];
+            this.coverages = null;
 
             this._connectPromise = null;
         };
@@ -63,26 +63,25 @@ define([
          */
         WebCoverageService.prototype.connect = function () {
             if (!this._connectPromise) {
-                this._connectPromise = this.doConnect();
+                this._connectPromise = this.createConnection();
             }
 
             return this._connectPromise;
         };
 
-        WebCoverageService.prototype.doConnect = function () {
+        // Internal use only
+        WebCoverageService.prototype.createConnection = function () {
             var self = this;
 
             return new Promise(function (resolve, reject) {
 
-                WebCoverageService.negotiateService(self.serviceAddress)
-                    .then(WebCoverageService.retrieveDescribeCoverage)
-                    .then(WebCoverageService.parseCoverages)
+                self.retrieveGetCapabilities()
+                    .then(self.retrieveDescribeCoverage.bind(self))
+                    .then(self.parseCoverages)
                     .then(function (coverages) {
+                        // TODO more formal definition of the setup process
                         self.coverages = coverages.slice();
                         resolve(self);
-                    })
-                    .catch(function (e) {
-                        reject(e);
                     });
             });
         };
@@ -93,10 +92,74 @@ define([
          * @returns {WcsCoverage}
          */
         WebCoverageService.prototype.getCoverage = function (coverageId) {
-
+            // TODO
         };
 
-        WebCoverageService.parseCoverages = function (describeCoverages) {
+        // Internal use only
+        WebCoverageService.prototype.retrieveGetCapabilities = function (version) {
+            var self = this, wcsCaps;
+
+            return new Promise(function (resolve, reject) {
+
+                self.retrieveXml(self.buildGetCapabilitiesUrl(version))
+                    .then(function (xml) {
+                        try {
+                            // Attempt to parse the returned XML
+                            wcsCaps = new WcsCapabilities(xml);
+                            resolve(wcsCaps);
+                        } catch (e) {
+                            // WcsCapabilities throws an ArgumentError in the event of an incompatible version
+                            // If the version is not defined and an argument error is thrown, the server replied with a
+                            // preferred version not supported by WebWorldWind. Retry with version 1.0.0.
+                            if (!version && e instanceof ArgumentError) {
+                                resolve(self.retrieveGetCapabilities("1.0.0"));
+                            } else {
+                                reject(Error("unable to parse")); // TODO more appropriate error
+                            }
+                        }
+                    });
+            });
+        };
+
+        // Internal use only
+        WebCoverageService.prototype.retrieveDescribeCoverage = function (wcsCaps) {
+            if (!wcsCaps) {
+                throw new Error("no capabilities document");
+            }
+
+            var len = wcsCaps.coverages.length, version = wcsCaps.version, coverageIds = [], coverage, baseUrl,
+                remainingCharCount, characterCount = 0, coverageId, requests = [];
+
+            // Watch for the 2083 character limit and split describe coverage requests as needed
+            baseUrl = this.buildDescribeCoverageUrl(wcsCaps);
+            remainingCharCount = 2083 - baseUrl.length;
+
+            for (var i = 0; i < len; i++) {
+                coverage = wcsCaps.coverages[i];
+                if (version === "1.0.0") {
+                    coverageId = coverage.name;
+                } else if (version === "2.0.0" || version === "2.0.1") {
+                    coverageId = coverage.coverageId;
+                }
+
+                if (coverageId.length + characterCount > remainingCharCount) {
+                    requests.push(this.retrieveXml(baseUrl + coverageIds.join(",")));
+                    characterCount = 0;
+                    coverageIds = [];
+                }
+
+                coverageIds.push(coverageId);
+                characterCount += coverageId.length + 1;
+            }
+
+            requests.push(this.retrieveXml(baseUrl + coverageIds.join(",")));
+
+            return Promise.all(requests);
+        };
+
+
+
+        WebCoverageService.prototype.parseCoverages = function (describeCoverages) {
             var len = describeCoverages.length, coverageDescription, coverageCount, coverages = [];
             for (var i = 0; i < len; i++) {
                 coverageDescription = new WcsDescribeCoverage(describeCoverages[i]);
@@ -110,64 +173,7 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.retrieveDescribeCoverage = function (wcsCaps) {
-            if (!wcsCaps) {
-                throw new Error("no capabilities document");
-            }
-
-            var len = wcsCaps.coverages.length, version = wcsCaps.version, coverageIds = [], coverage, baseUrl,
-                remainingCharCount, characterCount = 0, coverageId, requests = [];
-
-            baseUrl = WebCoverageService.buildDescribeCoverageUrl(wcsCaps);
-            remainingCharCount = 2083 - baseUrl.length;
-
-            for (var i = 0; i < len; i++) {
-                coverage = wcsCaps.coverages[i];
-                if (version === "1.0.0") {
-                    coverageId = coverage.name;
-                } else if (version === "2.0.0" || version === "2.0.1") {
-                    coverageId = coverage.coverageId;
-                }
-
-                if (coverageId.length + characterCount > remainingCharCount) {
-                    requests.push(WebCoverageService.retrieveXml(baseUrl + coverageIds.join(",")));
-                    characterCount = 0;
-                    coverageIds = [];
-                }
-
-                coverageIds.push(coverageId);
-                characterCount += coverageId.length;
-            }
-
-            requests.push(WebCoverageService.retrieveXml(baseUrl + coverageIds.join(",")));
-
-            return Promise.all(requests);
-        };
-
-        // Internal use only
-        WebCoverageService.negotiateService = function (serviceAddress, version) {
-            var wcsCaps;
-
-            return new Promise(function (resolve, reject) {
-
-                WebCoverageService.retrieveXml(WebCoverageService.buildGetCapabilitiesUrl(serviceAddress, version))
-                    .then(function (xml) {
-                        try {
-                            wcsCaps = new WcsCapabilities(xml);
-                            resolve(wcsCaps);
-                        } catch (e) {
-                            if (!version) {
-                                resolve(WebCoverageService.negotiateService(serviceAddress, "1.0.0"));
-                            } else {
-                                reject(Error("unable to parse"));
-                            }
-                        }
-                    });
-            });
-        };
-
-        // Internal use only
-        WebCoverageService.retrieveXml = function (url) {
+        WebCoverageService.prototype.retrieveXml = function (url) {
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
@@ -175,6 +181,9 @@ define([
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             resolve(xhr.responseXML);
+                        } else {
+                            // TODO proper error
+                            reject(new Error(xhr.statusText + " " + xhr.status));
                         }
                     }
                 };
@@ -186,8 +195,8 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.buildGetCapabilitiesUrl = function (serviceAddress, version) {
-            var requestUrl = WebCoverageService.prepareBaseUrl(serviceAddress);
+        WebCoverageService.prototype.buildGetCapabilitiesUrl = function (version) {
+            var requestUrl = WebCoverageService.prepareBaseUrl(this.serviceAddress);
 
             requestUrl += "SERVICE=WCS";
             requestUrl += "&REQUEST=GetCapabilities";
@@ -199,10 +208,13 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.buildDescribeCoverageUrl = function (wcsCaps) {
+        WebCoverageService.prototype.buildDescribeCoverageUrl = function (wcsCaps) {
             if (!wcsCaps) {
-                throw new ArgumentError("blaa"); // TODO
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "buildDescribeCoverageUrl",
+                        "The WCS Caps object is missing."));
             }
+
             var version = wcsCaps.version, requestUrl, coverageParameter;
 
             if (version === "1.0.0") {
@@ -222,6 +234,7 @@ define([
             return encodeURI(requestUrl);
         };
 
+        // Internal use only - copied from WmsUrlBuilder, is there a better place to centralize???
         WebCoverageService.prepareBaseUrl = function (url) {
             var index = url.indexOf("?");
 

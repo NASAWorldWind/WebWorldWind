@@ -44,16 +44,23 @@ requirejs(['./WorldWindShim',
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
-        //var serviceAddress = "https://worldwind26.arc.nasa.gov/wcs";
-        var serviceAddress = "http://138.68.23.204/geoserver/wcs";
+        var createAndTestService = function (serviceAddress) {
+            var wcs = new WorldWind.WebCoverageService(serviceAddress);
+            wcs.connect()
+                .then(function (wcsCaps) {
+                    console.log(serviceAddress + " has " + wcsCaps.coverages.length + " coverages.");
+                })
+                .catch(function (e) {
+                    console.log("This was caught application side catch statement in the " + serviceAddress + "...");
+                    console.log(e);
+                })
+        };
 
-        var wcs = new WorldWind.WebCoverageService(serviceAddress);
-        wcs.connect()
-            .then(function (wcsCaps) {
-                console.log(wcsCaps.coverages.length);
-            })
-            .catch(function (e) {
-                console.log(e);
-            })
+        var simple = "http://maps.f17d911.rocks/geoserver/wcs";
+        var versionNegotiation = "https://worldwind26.arc.nasa.gov/wcs";
+        var multipleDescribeCoverageRequests = "http://sedac.ciesin.columbia.edu/geoserver/wcs";
 
+        createAndTestService(simple);
+        createAndTestService(versionNegotiation);
+        createAndTestService(multipleDescribeCoverageRequests);
     });
