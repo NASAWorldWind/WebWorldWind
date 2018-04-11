@@ -1,4 +1,5 @@
 define([
+    '../../error/ArgumentError',
     './ColoredTile',
     './HeatMapQuadTree',
     '../../util/ImageSource',
@@ -8,7 +9,8 @@ define([
     '../TiledImageLayer',
     '../../geom/Sector',
     '../../util/WWUtil'
-], function (ColoredTile,
+], function (ArgumentError,
+             ColoredTile,
              HeatMapQuadTree,
              ImageSource,
              IntervalType,
@@ -27,13 +29,20 @@ define([
      * @augments TiledImageLayer
      * @alias HeatMapLayer
      * @param displayName {String} The display name to associate with this layer.
-     * @param data {IntensityLocation[]} Array of the point containing on top of the information also intensity vector
+     * @param locations {Location[]} Array of the points to be shown in the HeatMap
+     * @param intensities {Number[]} Array of the intensities. The amount must be the same as for the locations.
      */
-    var HeatMapLayer = function (displayName, data) {
+    var HeatMapLayer = function (displayName, locations, intensities) {
         this.tileWidth = 512;
         this.tileHeight = 512;
 
         TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 14, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
+
+        if(locations.length !== intensities.length) {
+            throw new ArgumentError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "HeatMapLayer", "constructor", "The length of locations and intensities differs")
+            );
+        }
 
         this.displayName = displayName;
 
@@ -44,22 +53,24 @@ define([
                 width: 360,
                 height: 180
             },
-            maxObjects: Math.ceil(data.length / Math.pow(4, 4)),
+            maxObjects: Math.ceil(locations.length / Math.pow(4, 4)),
             maxLevels: 4
         });
-        data.forEach(function(pieceOfData){
-            this._data.insert(pieceOfData);
+        locations.forEach(function(location, index){
+            this._data.insert({
+                latitude: location.latitude,
+                longitude: location.longitude,
+                intensity: intensities[index]
+            });
         }.bind(this));
 
         this._intervalType = IntervalType.CONTINUOUS;
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
-        this.setGradient();
-
         this._radius = 25;
-
         this._blur = 10;
-
         this._incrementPerIntensity = 0.025;
+
+        this.setGradient();
     };
 
     HeatMapLayer.prototype = Object.create(TiledImageLayer.prototype);
@@ -162,7 +173,7 @@ define([
      * @private
      * @param data
      * @param sector
-     * @returns {IntensityLocation[]}
+     * @returns {Object[]}
      */
     HeatMapLayer.prototype.filterGeographically = function(data, sector) {
         return data.retrieve({
@@ -177,7 +188,12 @@ define([
      * It sets gradient based on the Scale and IntervalType.
      */
     HeatMapLayer.prototype.setGradient = function() {
-        var data = this._data;
+        var data = this._data.retrieve({
+            x: -180,
+            y: -90,
+            width: 360,
+            height: 180
+        });
         var intervalType = this.intervalType;
         var scale = this.scale;
 
@@ -284,7 +300,7 @@ define([
     /**
      * Overwrite this method if you want to use a custom implementation of tile used for displaying the data.
      * @protected
-     * @param data {IntensityLocation[]} Array of information constituting points in the map.
+     * @param data {Object[]} Array of information constituting points in the map.
      * @param options {Object}
      * @param options.sector {Sector} Sector with the geographical information for tile representation.
      * @param options.width {Number} Width of the Canvas to be created in pixels.
