@@ -28,22 +28,8 @@ define([
      * @alias HeatMapLayer
      * @param displayName {String} The display name to associate with this layer.
      * @param data {IntensityLocation[]} Array of the point containing on top of the information also intensity vector
-     * @param options {Object} The empty object is used if none is provided.
-     * @param options.scale {String[]} Optional. Array of colors representing the scale which should be used when generating the
-     *  layer. Default is ['blue', 'cyan', 'lime', 'yellow', 'red']
-     * @param options.intervalType {IntervalType} Optional. Different types of approaches to handling the interval between min
-     *  and max values. Default value is Continuous.
-     * @param options.radius {Number|Function} Optional. It is also possible to provide a function. Radius of the point to
-     *  be representing the intensity location. Default value is 25. The size of the radius.
-     * @param options.blur {Number} Optional. Amount of pixels used for blur.
-     * @param options.tile {HeatMapTile} Tile used to display the information. As long as it is descendant of the Tile, it is
-     *  possible to provide your own implementation for drawing the shapes representing the points.
-     * @param options.incrementPerIntensity {Number} Increment per intensity. How strong is going to be the change in
-     *  the intensity based on the intensity vector of the point
      */
-    var HeatMapLayer = function (displayName, data, options) {
-        options = options || {};
-
+    var HeatMapLayer = function (displayName, data) {
         this.tileWidth = 512;
         this.tileHeight = 512;
 
@@ -65,21 +51,110 @@ define([
             this._data.insert(pieceOfData);
         }.bind(this));
 
-        this._gradient = this.getGradient(data,
-            options.intervalType || IntervalType.CONTINUOUS,
-            options.scale || ['blue', 'cyan', 'lime', 'yellow', 'red']);
+        this._intervalType = IntervalType.CONTINUOUS;
+        this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
+        this.setGradient();
 
-        // It is necessary
-        this._radius = options.radius || 25;
+        this._radius = 25;
 
-        this._blur = options.blur || 10;
+        this._blur = 10;
 
-        this._tile = options.tile || ColoredTile;
-
-        this._incrementPerIntensity = options.incrementPerIntensity || 0.025;
+        this._incrementPerIntensity = 0.025;
     };
 
     HeatMapLayer.prototype = Object.create(TiledImageLayer.prototype);
+
+    Object.defineProperties(HeatMapLayer.prototype, {
+        /**
+         * Different types of approaches to handling the interval between min
+         * and max values. Default value is Continuous.
+         * @memberof HeatMapLayer.prototype
+         * @type {IntervalType}
+         */
+        intervalType: {
+            get: function() {
+                return this._intervalType;
+            },
+            set: function(intervalType) {
+                this._intervalType = intervalType;
+                this.setGradient();
+            }
+        },
+
+        /**
+         * Array of colors representing the scale which should be used when generating the
+         * layer. Default is ['blue', 'cyan', 'lime', 'yellow', 'red']
+         * @memberof HeatMapLayer.prototype
+         * @type {String[]}
+         */
+        scale: {
+            get: function() {
+                return this._scale;
+            },
+            set: function(scale) {
+                this._scale = scale;
+                this.setGradient();
+            }
+        },
+
+        /**
+         * Gradient to use for coloring of the HeatMap.
+         * @memberOf HeatMapLayer.prototype
+         * @type {String[]}
+         */
+        gradient: {
+            get: function() {
+                return this._gradient;
+            },
+            set: function(gradient) {
+                this._gradient = gradient;
+            }
+        },
+
+        /**
+         * It is also possible to provide a function. Radius of the point to
+         * be representing the intensity location. Default value is 25. The size of the radius.
+         * @memberof HeatMapLayer.prototype
+         * @type {Function|Number}
+         */
+        radius: {
+            get: function() {
+                return this._radius;
+            },
+            set: function(radius) {
+                this._radius = radius;
+            }
+        },
+
+        /**
+         * Amount of pixels used for blur.
+         * @memberof HeatMapLayer.prototype
+         * @type {Number}
+         */
+        blur: {
+            get: function() {
+                return this._blur;
+            },
+            set: function(blur) {
+                this._blur = blur;
+            }
+        },
+
+        /**
+         * Increment per intensity. How strong is going to be the change in
+         * the intensity based on the intensity vector of the point
+         * @memberof HeatMapLayer.prototype
+         * @type {Number}
+         */
+        incrementPerIntensity: {
+            get: function() {
+                return this._incrementPerIntensity;
+            },
+            set: function(incrementPerIntensity) {
+                this._incrementPerIntensity = incrementPerIntensity;
+            }
+        }
+    });
 
     /**
      * It gets the relevant points for the visualisation for current sector. At the moment it uses QuadTree to retrieve
@@ -99,14 +174,13 @@ define([
     };
 
     /**
-     * Object represented by
-     * 0.2: #ff0000
-     * @param data
-     * @param intervalType
-     * @param scale
-     * @returns {{}}
+     * It sets gradient based on the Scale and IntervalType.
      */
-    HeatMapLayer.prototype.getGradient = function(data, intervalType, scale) {
+    HeatMapLayer.prototype.setGradient = function() {
+        var data = this._data;
+        var intervalType = this.intervalType;
+        var scale = this.scale;
+
         var gradient = {};
         if(intervalType === IntervalType.CONTINUOUS) {
             scale.forEach(function(color, index){
@@ -137,7 +211,7 @@ define([
                 });
             }
         }
-        return gradient;
+        this.gradient = gradient;
     };
 
     /**
@@ -152,10 +226,10 @@ define([
             var imagePath = tile.imagePath,
                 cache = dc.gpuResourceCache,
                 layer = this,
-                radius = this._radius;
+                radius = this.radius;
 
-            if(typeof this._radius === 'function') {
-                radius = this._radius(tile.sector, this.tileWidth, this.tileHeight);
+            if(typeof this.radius === 'function') {
+                radius = this.radius(tile.sector, this.tileWidth, this.tileHeight);
             }
 
             var extensionFactor = 1;
@@ -171,16 +245,16 @@ define([
 
             // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
             // of the tile width / tile height. The size you need to actually take into account differs.
-            var canvas = new this._tile(data, {
+            var canvas = this.createTile(data, {
                 sector: extendedSector,
 
                 width: this.tileWidth + 2 * Math.ceil(extensionFactor * this.tileWidth),
                 height: this.tileHeight + 2 * Math.ceil(extensionFactor * this.tileHeight),
                 radius: radius,
-                blur: this._blur,
+                blur: this.blur,
 
-                intensityGradient: this._gradient,
-                incrementPerIntensity: this._incrementPerIntensity
+                intensityGradient: this.gradient,
+                incrementPerIntensity: this.incrementPerIntensity
             }).canvas();
 
             var result = document.createElement('canvas');
@@ -205,6 +279,23 @@ define([
                 }
             }
         }
+    };
+
+    /**
+     * Overwrite this method if you want to use a custom implementation of tile used for displaying the data.
+     * @protected
+     * @param data {IntensityLocation[]} Array of information constituting points in the map.
+     * @param options {Object}
+     * @param options.sector {Sector} Sector with the geographical information for tile representation.
+     * @param options.width {Number} Width of the Canvas to be created in pixels.
+     * @param options.height {Number} Height of the Canvas to be created in pixels.
+     * @param options.radius {Number} Radius of the data point in pixels.
+     * @param options.blur {Number} Blur of the HeatMap element in the pixels.
+     * @param options.incrementPerIntensity {Number}
+     * @return {HeatMapTile} Implementation of the HeatMapTile used for this instance of the layer.
+     */
+    HeatMapLayer.prototype.createTile = function(data, options) {
+        return new ColoredTile(data, options);
     };
 
     return HeatMapLayer;
