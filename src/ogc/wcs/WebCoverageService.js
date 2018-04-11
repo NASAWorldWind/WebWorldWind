@@ -50,7 +50,7 @@ define([
              * the connect method.
              * @type {Array}
              */
-            this.coverages = null;
+            this.coverages = [];
 
             /**
              * The Promise which includes capabilities document retrieval, version negotiation, describe coverage
@@ -83,10 +83,8 @@ define([
 
                 self.retrieveGetCapabilities()
                     .then(self.retrieveDescribeCoverage.bind(self))
-                    .then(self.parseCoverages)
-                    .then(function (coverages) {
-                        // TODO more formal definition of the setup process
-                        self.coverages = coverages.slice();
+                    .then(self.parseCoverages.bind(self))
+                    .then(function () {
                         resolve(self);
                     });
             });
@@ -114,14 +112,14 @@ define([
                             wcsCaps = new WcsCapabilities(xml);
                             resolve(wcsCaps);
                         } catch (e) {
-                            // WcsCapabilities throws an ArgumentError in the event of an incompatible version
+                            // WcsCapabilities throws an ArgumentError in the event of an incompatible version.
                             // If the version is not defined and an argument error is thrown, the server likely replied
                             // to the initial request with a preferred version not supported by WebWorldWind. Retry with
                             // version 1.0.0.
                             if (!version && e instanceof ArgumentError) {
                                 resolve(self.retrieveGetCapabilities("1.0.0"));
                             } else {
-                                reject(new Error("unable to parse")); // TODO more appropriate error
+                                reject(e);
                             }
                         }
                     });
@@ -132,7 +130,7 @@ define([
         WebCoverageService.prototype.retrieveDescribeCoverage = function (wcsCaps) {
             if (!wcsCaps) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "buildDescribeCoverageUrl",
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveDescribeCoverage",
                         "The WCS Caps object is missing."));
             }
 
@@ -168,35 +166,40 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.parseCoverages = function (describeCoverages) {
-            var len = describeCoverages.length, coverageDescription, coverageCount, coverages = [];
+            var len = describeCoverages.length, coverageDescription, coverageCount;
             for (var i = 0; i < len; i++) {
                 coverageDescription = new WcsDescribeCoverage(describeCoverages[i]);
                 coverageCount = coverageDescription.coverages.length;
                 for (var j = 0; j < coverageCount; j++) {
-                    coverages.push(coverageDescription.coverages[i]);
+                    this.coverages.push(coverageDescription.coverages[i]);
                 }
             }
-
-            return coverages;
         };
 
         // Internal use only
         WebCoverageService.prototype.retrieveXml = function (url) {
+            if (!url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveXml", "missingUrl"));
+            }
+
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
                 xhr.open("GET", url);
-                xhr.onloadend = function () {
+                xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             resolve(xhr.responseXML);
                         } else {
-                            // TODO proper error
-                            reject(new Error(xhr.statusText + " " + xhr.status));
+                            reject(new Error(Logger.log(Logger.LEVEL_WARNING,"XML retrieval failed (" + xhr.statusText + "): " + url)));
                         }
                     }
                 };
                 xhr.onerror = function () {
-                    reject(Error(xhr.statusText));
+                    reject(new Error(Logger.log(Logger.LEVEL_WARNING, "XML retrieval failed: " + url)));
+                };
+                xhr.ontimeout = function () {
+                    reject(new Error(Logger.log(Logger.LEVEL_WARNING, "XML retrieval timed out: " + url)));
                 };
                 xhr.send();
             });
@@ -204,7 +207,7 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.buildGetCapabilitiesUrl = function (version) {
-            var requestUrl = WebCoverageService.prepareBaseUrl(this.serviceAddress);
+            var requestUrl = this.prepareBaseUrl(this.serviceAddress);
 
             requestUrl += "SERVICE=WCS";
             requestUrl += "&REQUEST=GetCapabilities";
@@ -233,7 +236,7 @@ define([
                 coverageParameter = "&COVERAGEID=";
             }
 
-            requestUrl = WebCoverageService.prepareBaseUrl(requestUrl);
+            requestUrl = this.prepareBaseUrl(requestUrl);
             requestUrl += "SERVICE=WCS";
             requestUrl += "&REQUEST=DescribeCoverage";
             requestUrl += "&VERSION=" + version;
@@ -243,7 +246,12 @@ define([
         };
 
         // Internal use only - copied from WmsUrlBuilder, is there a better place to centralize???
-        WebCoverageService.prepareBaseUrl = function (url) {
+        WebCoverageService.prototype.prepareBaseUrl = function (url) {
+            if (!url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "prepareBaseUrl", "missingUrl"));
+            }
+
             var index = url.indexOf("?");
 
             if (index < 0) { // if string contains no question mark
