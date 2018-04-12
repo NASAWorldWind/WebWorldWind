@@ -102,20 +102,14 @@ define([
 
             return self.retrieveXml(self.buildGetCapabilitiesUrl(version))
                 .then(function (xml) {
-                    try {
-                        // Attempt to parse the returned XML
-                        wcsCaps = new WcsCapabilities(xml);
-                        return wcsCaps;
-                    } catch (e) {
-                        // WcsCapabilities throws an ArgumentError in the event of an incompatible version.
-                        // If the version is not defined and an argument error is thrown, the server likely replied
-                        // to the initial request with a preferred version not supported by WebWorldWind. Retry with
-                        // version 1.0.0.
-                        if (!version && e instanceof ArgumentError) {
-                            return self.retrieveGetCapabilities("1.0.0");
-                        } else {
-                            throw e;
-                        }
+                    if (self.isCompatibleWcsVersion(xml)) {
+                        return new WcsCapabilities(xml);
+                    } else if (!version) {
+                        // retry the service with a 1.0.0 request
+                        return self.retrieveGetCapabilities("1.0.0")
+                    } else {
+                        throw new ArgumentError(
+                            Logger.logMessage(Logger.LEVEL_SEVER, "WebCoverageService", "retrieveGetCapabilities", "unsupportedVersion"));
                     }
                 });
         };
@@ -239,6 +233,25 @@ define([
             requestUrl += coverageParameter;
 
             return encodeURI(requestUrl);
+        };
+
+        // Internal use only
+        WebCoverageService.prototype.isCompatibleWcsVersion = function (xml) {
+            if (!xml) {
+                return false;
+            }
+
+            var version = xml.documentElement.getAttribute("version");
+
+            if (version === "1.0.0") {
+                return true;
+            } else if (version === "2.0.0") {
+                return true;
+            } else if (version === "2.0.1") {
+                return true;
+            } else {
+                return false;
+            }
         };
 
         // Internal use only - copied from WmsUrlBuilder, is there a better place to centralize???
