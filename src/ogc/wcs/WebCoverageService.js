@@ -59,6 +59,10 @@ define([
              * @private
              */
             this._connectPromise = null;
+
+            this.getCapabilitiesDocument = null;
+
+            this.describeCoverageDocuments = [];
         };
 
         /**
@@ -80,7 +84,10 @@ define([
             var self = this;
 
             return self.retrieveGetCapabilities()
-                    .then(self.retrieveDescribeCoverage.bind(self))
+                    .then(function (wcsCapabilities) {
+                        self.getCapabilitiesDocument = wcsCapabilities;
+                        return self.retrieveDescribeCoverage(wcsCapabilities);
+                    })
                     .then(function (coverages) {
                         self.parseCoverages(coverages);
                         return self;
@@ -157,8 +164,10 @@ define([
             var len = describeCoverages.length, coverageDescription, coverageCount;
             for (var i = 0; i < len; i++) {
                 coverageDescription = new WcsDescribeCoverage(describeCoverages[i]);
+                this.describeCoverageDocuments.push(coverageDescription);
                 coverageCount = coverageDescription.coverages.length;
                 for (var j = 0; j < coverageCount; j++) {
+                    // temporary, will be replaced by a formal WcsCoverage object
                     this.coverages.push(coverageDescription.coverages[i]);
                 }
             }
