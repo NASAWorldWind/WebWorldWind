@@ -261,7 +261,7 @@ define([
 
             // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
             // of the tile width / tile height. The size you need to actually take into account differs.
-            var canvas = this.createTile(data, {
+            var canvas = this.createHeatMapTile(data, {
                 sector: extendedSector,
 
                 width: this.tileWidth + 2 * Math.ceil(extensionFactor * this.tileWidth),
@@ -310,7 +310,7 @@ define([
      * @param options.incrementPerIntensity {Number}
      * @return {HeatMapTile} Implementation of the HeatMapTile used for this instance of the layer.
      */
-    HeatMapLayer.prototype.createTile = function(data, options) {
+    HeatMapLayer.prototype.createHeatMapTile = function(data, options) {
         return new ColoredTile(data, options);
     };
 

@@ -19,7 +19,7 @@ define([], function(){
      * properties and default configuration. The logic itself is handled in the subclasses.
      * @alias HeatMapTile
      * @constructor
-     * @param data {IntensityLocation[]} Array of information constituting points in the map.
+     * @param data {Object[]} Array of information constituting points in the map.
      * @param options {Object}
      * @param options.sector {Sector} Sector with the geographical information for tile representation.
      * @param options.width {Number} Width of the Canvas to be created in pixels.
@@ -76,7 +76,7 @@ define([], function(){
             var location = this._data[i];
             // Get the location in pixels and draw the image.
             ctx.globalAlpha = location.intensity * this._incrementPerIntensity;
-            ctx.drawImage(shape, location.longitudeInSector(this._sector, this._width), this._height - location.latitudeInSector(this._sector, this._height));
+            ctx.drawImage(shape, this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
         }
 
         return this.clip(this._canvas, this._radius, this._radius, this._width, this._height);
@@ -139,6 +139,31 @@ define([], function(){
         ctx.closePath();
 
         return shape;
+    };
+
+    /**
+     * @param location {Location} Location to transform
+     * @param sector {Sector} Sector to which transform
+     * @param height {Number} Height of the tile to draw to.
+     * @returns {number} Position on the height in pixels. THe result needs to start with 0
+     */
+    HeatMapTile.prototype.latitudeInSector = function(location, sector, height) {
+        // Percentage of the available space.
+        var sizeOfArea = sector.maxLatitude - sector.minLatitude;
+        var locationInArea = location.latitude - sector.minLatitude;
+        return Math.ceil((locationInArea / sizeOfArea) * (height - 1));
+    };
+
+    /**
+     * @param location {Location} Location to transform
+     * @param sector {Sector} Sector to which transform
+     * @param width {Number} Height of the tile to draw to.
+     * @returns {number}
+     */
+    HeatMapTile.prototype.longitudeInSector = function(location, sector, width) {
+        var sizeOfArea = sector.maxLongitude - sector.minLongitude ;
+        var locationInArea = location.longitude - sector.minLongitude;
+        return Math.ceil((locationInArea / sizeOfArea) * (width - 1));
     };
 
     return HeatMapTile;

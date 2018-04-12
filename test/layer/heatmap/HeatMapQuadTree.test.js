@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 require([
-    'src/layer/heatmap/HeatMapQuadTree',
-    'src/layer/heatmap/IntensityLocation'
-], function (HeatMapQuadTree,
-             IntensityLocation) {
+    'src/layer/heatmap/HeatMapQuadTree'
+], function (HeatMapQuadTree) {
     "use strict";
 
     describe("HeatMapQuadTree", function () {
@@ -51,7 +49,7 @@ require([
             });
 
             for (var i = 0; i < 11; i++) {
-                quadTree.insert(new IntensityLocation(-90 + 5 * i, -180 + 10 * i, 0));
+                quadTree.insert({latitude: -90 + 5 * i, longitude: -180 + 10 * i, intensity: 0});
             }
 
             it("has second level", function () {
@@ -73,7 +71,7 @@ require([
             });
 
             for (var i = 0; i < 20; i++) {
-                quadTree.insert(new IntensityLocation(-90 + 5 * i, -180 + 10 * i, 0));
+                quadTree.insert({latitude: -90 + 5 * i, longitude: -180 + 10 * i, intensity: 0});
             }
 
             it('returns points in the area', function () {
