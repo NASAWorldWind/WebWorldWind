@@ -79,15 +79,12 @@ define([
         WebCoverageService.prototype.createConnection = function () {
             var self = this;
 
-            return new Promise(function (resolve, reject) {
-
-                self.retrieveGetCapabilities()
+            return self.retrieveGetCapabilities()
                     .then(self.retrieveDescribeCoverage.bind(self))
                     .then(self.parseCoverages.bind(self))
-                    .then(function () {
-                        resolve(self);
+                    .then(function (wcs) {
+                        return wcs;
                     });
-            });
         };
 
         /**
@@ -103,27 +100,24 @@ define([
         WebCoverageService.prototype.retrieveGetCapabilities = function (version) {
             var self = this, wcsCaps;
 
-            return new Promise(function (resolve, reject) {
-
-                self.retrieveXml(self.buildGetCapabilitiesUrl(version))
-                    .then(function (xml) {
-                        try {
-                            // Attempt to parse the returned XML
-                            wcsCaps = new WcsCapabilities(xml);
-                            resolve(wcsCaps);
-                        } catch (e) {
-                            // WcsCapabilities throws an ArgumentError in the event of an incompatible version.
-                            // If the version is not defined and an argument error is thrown, the server likely replied
-                            // to the initial request with a preferred version not supported by WebWorldWind. Retry with
-                            // version 1.0.0.
-                            if (!version && e instanceof ArgumentError) {
-                                resolve(self.retrieveGetCapabilities("1.0.0"));
-                            } else {
-                                reject(e);
-                            }
+            return self.retrieveXml(self.buildGetCapabilitiesUrl(version))
+                .then(function (xml) {
+                    try {
+                        // Attempt to parse the returned XML
+                        wcsCaps = new WcsCapabilities(xml);
+                        return wcsCaps;
+                    } catch (e) {
+                        // WcsCapabilities throws an ArgumentError in the event of an incompatible version.
+                        // If the version is not defined and an argument error is thrown, the server likely replied
+                        // to the initial request with a preferred version not supported by WebWorldWind. Retry with
+                        // version 1.0.0.
+                        if (!version && e instanceof ArgumentError) {
+                            return self.retrieveGetCapabilities("1.0.0");
+                        } else {
+                            throw e;
                         }
-                    });
-            });
+                    }
+                });
         };
 
         // Internal use only
@@ -174,6 +168,8 @@ define([
                     this.coverages.push(coverageDescription.coverages[i]);
                 }
             }
+
+            return this;
         };
 
         // Internal use only
