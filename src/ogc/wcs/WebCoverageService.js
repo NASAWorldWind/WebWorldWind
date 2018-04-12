@@ -77,11 +77,13 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.createConnection = function () {
-            return this.retrieveGetCapabilities()
-                    .then(this.retrieveDescribeCoverage.bind(this))
-                    .then(this.parseCoverages.bind(this))
-                    .then(function (wcs) {
-                        return wcs;
+            var self = this;
+
+            return self.retrieveGetCapabilities()
+                    .then(self.retrieveDescribeCoverage.bind(self))
+                    .then(function (coverages) {
+                        self.parseCoverages(coverages);
+                        return self;
                     });
         };
 
