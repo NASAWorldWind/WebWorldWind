@@ -60,9 +60,17 @@ define([
              */
             this._connectPromise = null;
 
+            /**
+             * The WCS GetCapabilities document for this service.
+             * @type {WcsCapabilities}
+             */
             this.getCapabilitiesDocument = null;
 
-            this.describeCoverageDocuments = [];
+            /**
+             * A map of the coverages to their corresponding DescribeCoverage documents.
+             * @type {{}}
+             */
+            this.describeCoverageDocuments = {};
         };
 
         /**
@@ -116,7 +124,7 @@ define([
                         return self.retrieveGetCapabilities("1.0.0")
                     } else {
                         throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVER, "WebCoverageService", "retrieveGetCapabilities", "unsupportedVersion"));
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveGetCapabilities", "unsupportedVersion"));
                     }
                 });
         };
@@ -161,14 +169,15 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.parseCoverages = function (describeCoverages) {
-            var len = describeCoverages.length, coverageDescription, coverageCount;
+            var len = describeCoverages.length, coverageDescription, coverageCount, coverageId;
             for (var i = 0; i < len; i++) {
                 coverageDescription = new WcsDescribeCoverage(describeCoverages[i]);
-                this.describeCoverageDocuments.push(coverageDescription);
                 coverageCount = coverageDescription.coverages.length;
                 for (var j = 0; j < coverageCount; j++) {
+                    coverageId = coverageDescription.coverages[j].name || coverageDescription.coverages[j].coverageId;
+                    this.describeCoverageDocuments[coverageId] = coverageDescription;
                     // temporary, will be replaced by a formal WcsCoverage object
-                    this.coverages.push(coverageDescription.coverages[i]);
+                    this.coverages.push(coverageDescription.coverages[j]);
                 }
             }
 
