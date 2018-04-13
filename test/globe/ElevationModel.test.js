@@ -58,7 +58,7 @@ define([
         };
 
         describe("Missing parameter tests", function () {
-            it("Correctly rejects calls with missing parameters", function () {
+            it("Correctly rejects calls with missing or invalid parameters", function () {
                 var elevationModel = new ElevationModel();
                 expect(function () {
                     elevationModel.addCoverage();
@@ -86,6 +86,15 @@ define([
                 }).toThrow();
                 expect(function () {
                     elevationModel.minAndMaxElevationsForSector();
+                }).toThrow();
+                expect(function () {
+                    elevationModel.elevationAtLocation(0, 0, 0);
+                }).toThrow();
+                expect(function () {
+                    elevationModel.bestCoverageAtLocation(0, 0);
+                }).toThrow();
+                expect(function () {
+                    elevationModel.bestCoverageAtLocation(0, 0, -1);
                 }).toThrow();
             });
         });
@@ -122,13 +131,71 @@ define([
             it("Returns correct elevation for a location", function () {
                 var em = new ElevationModel();
                 var n = 12;
-                for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(n - i + 1, -i - 1, i + 1);
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
                     em.addCoverage(c);
                 }
 
                 var e = em.elevationAtLocation(0, 0);
-                expect(e).toEqual(n);
+                expect(e).toEqual(1);
+            });
+
+            it("Returns correct elevation for a location with a resolution target", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
+                    em.addCoverage(c);
+                }
+
+                var e = em.elevationAtLocation(0, 0, 6.7);
+                expect(e).toEqual(7);
+                e = em.elevationAtLocation(0, 0, 6.2);
+                expect(e).toEqual(6);
+            });
+
+            it("Returns correct best coverage for a location", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
+                    em.addCoverage(c);
+                }
+
+                c = em.bestCoverageAtLocation(0, 0, 6.7);
+                expect(c.resolution).toEqual(7);
+                c = em.bestCoverageAtLocation(0, 0, 6.2);
+                expect(c.resolution).toEqual(6);
+            });
+
+            it("Returns correct best coverage for a location with some coverages disabled", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
+                    em.addCoverage(c);
+                    if (i === 6 || i === 7) {
+                        c.enabled = false;
+                    }
+                }
+
+                c = em.bestCoverageAtLocation(0, 0, 6.7);
+                expect(c.resolution).toEqual(8);
+                c = em.bestCoverageAtLocation(0, 0, 6.2);
+                expect(c.resolution).toEqual(5);
+            });
+
+            it("Returns null best coverage for a location with no available coverages", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
+                    em.addCoverage(c);
+                    c.enabled = false;
+                }
+
+                c = em.bestCoverageAtLocation(0, 0, 6.7);
+                expect(c).toEqual(null);
             });
 
             it("Returns correct elevation for a location when some coverages are disabled", function () {
@@ -387,6 +454,7 @@ define([
             });
         });
     });
-});
+})
+;
 
 

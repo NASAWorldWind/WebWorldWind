@@ -155,6 +155,22 @@ define(['../error/ArgumentError',
 
         /**
          * Internal use only
+         * The sort function used for sorting coverages according to their distance from a desired resolution.
+         * @ignore
+         */
+        ElevationModel.prototype.sortForTargetResolution = function (resolution) {
+            var coverageList = this.coverages.slice();
+            coverageList.sort(function (coverage1, coverage2) {
+                var d1 = Math.abs(coverage1.resolution - resolution);
+                var d2 = Math.abs(coverage2.resolution - resolution);
+                return d1 > d2 ? -1 : d1 === d2 ? 0 : 1;
+            });
+
+            return coverageList;
+        };
+
+        /**
+         * Internal use only
          * Perform common actions required when the list of available coverages changes.
          * @ignore
          */
@@ -280,13 +296,27 @@ define(['../error/ArgumentError',
          * Returns the elevation at a specified location.
          * @param {Number} latitude The location's latitude in degrees.
          * @param {Number} longitude The location's longitude in degrees.
+         * @param {Number} resolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
          * @returns {Number} The elevation at the specified location, in meters. Returns zero if the location is
          * outside the coverage area of this model.
+         * @throws {ArgumentError} If the specified resolution is not positive.
          */
-        ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
-            var i, n = this.coverages.length;
+        ElevationModel.prototype.elevationAtLocation = function (latitude, longitude, resolution) {
+
+            if (resolution !== null && resolution !== undefined && resolution <= 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "invalidResolution"));
+            }
+
+            var coverageList = this.coverages;
+            if (resolution) {
+                coverageList = this.sortForTargetResolution(resolution);
+            }
+
+            var i, n = coverageList.length;
             for (i = n - 1; i >= 0; i--) {
-                var coverage = this.coverages[i];
+                var coverage = coverageList[i];
                 if (coverage.enabled && coverage.coverageSector.containsLocation(latitude, longitude)) {
                     var elevation = coverage.elevationAtLocation(latitude, longitude);
                     if (elevation !== null) {
@@ -296,6 +326,36 @@ define(['../error/ArgumentError',
             }
 
             return 0;
+        };
+
+        /**
+         * Returns the best coverage available for a particular resolution,
+         * @param {Number} latitude The location's latitude in degrees.
+         * @param {Number} longitude The location's longitude in degrees.
+         * @param {Number} resolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
+         * @returns {ElevationCoverage} The coverage most closely matching the requested resolution. Returns null if no coverage is available at this
+         * location.
+         * @throws {ArgumentError} If the specified resolution is not positive.
+         */
+        ElevationModel.prototype.bestCoverageAtLocation = function (latitude, longitude, resolution) {
+
+            if (!resolution || resolution < 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "bestCoverageAtLocation", "invalidResolution"));
+            }
+
+            var coverageList = this.sortForTargetResolution(resolution);
+
+            var i, n = coverageList.length;
+            for (i = n - 1; i >= 0; i--) {
+                var coverage = coverageList[i];
+                if (coverage.enabled && coverage.coverageSector.containsLocation(latitude, longitude)) {
+                    return coverage;
+                }
+            }
+
+            return null;
         };
 
         /**
