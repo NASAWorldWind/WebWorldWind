@@ -24,6 +24,9 @@ requirejs(['./WorldWindShim',
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
+
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
@@ -91,6 +94,7 @@ requirejs(['./WorldWindShim',
 
         var parserCompletionCallback = function (layer) {
             wwd.addLayer(layer);
+            layerManager.synchronizeLayerList();
         };
 
         var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/geojson-data/";
@@ -136,7 +140,6 @@ requirejs(['./WorldWindShim',
         var geometryCollectionLayer = new WorldWind.RenderableLayer("GeometryCollection");
         var geometryCollectionGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "GeometryCollectionFeatureTest.geojson");
         geometryCollectionGeoJSON.load(parserCompletionCallback, shapeConfigurationCallback, geometryCollectionLayer);
-        wwd.addLayer(geometryCollectionLayer);
 
         // Feature test
         var featureLayer = new WorldWind.RenderableLayer("Feature - USA");
@@ -184,7 +187,5 @@ requirejs(['./WorldWindShim',
         usa4326GeoJSON.load(null, shapeConfigurationCallback, usa4326Layer);
         wwd.addLayer(usa4326Layer);
 
-
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
+        layerManager.synchronizeLayerList();
     });
