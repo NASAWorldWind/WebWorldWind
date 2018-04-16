@@ -35,15 +35,14 @@ define([
         /**
          * Represents a Web Coverage Service and provides functionality for interacting with the service. Includes
          * functionality for retrieving DescribeCoverage documents and providing WCS version agnostic coverage objects.
-         * @param serviceAddress the url of the Web Coverage Service
          * @constructor
          */
-        var WebCoverageService = function (serviceAddress) {
+        var WebCoverageService = function () {
 
             /**
              * The URL for the Web Coverage Service
              */
-            this.serviceAddress = serviceAddress;
+            this.serviceAddress = null;
 
             /**
              * A collection of the coverages available from this service. Not populated until service is initialized by
@@ -51,14 +50,6 @@ define([
              * @type {Array}
              */
             this.coverages = [];
-
-            /**
-             * The Promise which includes capabilities document retrieval, version negotiation, describe coverage
-             * document retrieval, and initialization of the WebCoverageService.
-             * @type {Promise}
-             * @private
-             */
-            this._connectPromise = null;
 
             /**
              * The WCS GetCapabilities document for this service.
@@ -74,32 +65,25 @@ define([
         };
 
         /**
-         * Connects to the Web Coverage Service specified in the constructor. This function handles version negotiation
-         * and capabilities document retrieval. The return is a Promise which returns the initialized
-         * WebCoverageService.
+         * Contacts the Web Coverage Service specified in the constructor. This function handles version negotiation
+         * and capabilities and describe coverage document retrieval. The return is a Promise which returns the
+         * initialized WebCoverageService.
+         * @param serviceAddress the url of the Web Coverage Service
          * @returns {Promise} a Promise of a WebCoverageService
          */
-        WebCoverageService.prototype.connect = function () {
-            if (!this._connectPromise) {
-                this._connectPromise = this.createConnection();
-            }
+        WebCoverageService.create = function (serviceAddress) {
+            var service = new WebCoverageService();
+            service.serviceAddress = serviceAddress;
 
-            return this._connectPromise;
-        };
-
-        // Internal use only
-        WebCoverageService.prototype.createConnection = function () {
-            var self = this;
-
-            return self.retrieveCapabilities()
-                    .then(function (wcsCapabilities) {
-                        self.capabilities = wcsCapabilities;
-                        return self.describeCoverages(wcsCapabilities);
-                    })
-                    .then(function (coverages) {
-                        self.parseCoverages(coverages);
-                        return self;
-                    });
+            return service.retrieveCapabilities()
+                .then(function (wcsCapabilities) {
+                    service.capabilities = wcsCapabilities;
+                    return service.describeCoverages(wcsCapabilities);
+                })
+                .then(function (coverages) {
+                    service.parseCoverages(coverages);
+                    return service;
+                });
         };
 
         /**
