@@ -393,10 +393,13 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingResult"));
             }
 
+            var coverageList=this.sortForTargetResolution(targetResolution);
+            console.log(targetResolution,coverageList[coverageList.length-1]);
+
             result.fill(NaN);
-            var resolution = Number.MAX_VALUE, i, n = this.coverages.length, resultFilled = false;
+            var resolution = Number.MAX_VALUE, i, n = coverageList.length, resultFilled = false;
             for (i = n - 1; !resultFilled && i >= 0; i--) {
-                var coverage = this.coverages[i];
+                var coverage = coverageList[i];
                 if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
                     resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
                     if (resultFilled) {
