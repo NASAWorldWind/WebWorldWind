@@ -64,13 +64,13 @@ define([
              * The WCS GetCapabilities document for this service.
              * @type {WcsCapabilities}
              */
-            this.getCapabilitiesDocument = null;
+            this.capabilities = null;
 
             /**
              * A map of the coverages to their corresponding DescribeCoverage documents.
              * @type {{}}
              */
-            this.describeCoverageDocuments = {};
+            this.coverageDescriptions = {};
         };
 
         /**
@@ -91,10 +91,10 @@ define([
         WebCoverageService.prototype.createConnection = function () {
             var self = this;
 
-            return self.retrieveGetCapabilities()
+            return self.retrieveCapabilities()
                     .then(function (wcsCapabilities) {
-                        self.getCapabilitiesDocument = wcsCapabilities;
-                        return self.retrieveDescribeCoverage(wcsCapabilities);
+                        self.capabilities = wcsCapabilities;
+                        return self.describeCoverages(wcsCapabilities);
                     })
                     .then(function (coverages) {
                         self.parseCoverages(coverages);
@@ -112,28 +112,28 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.retrieveGetCapabilities = function (version) {
+        WebCoverageService.prototype.retrieveCapabilities = function (version) {
             var self = this, wcsCaps;
 
             return self.retrieveXml(self.buildGetCapabilitiesUrl(version))
-                .then(function (xml) {
-                    if (self.isCompatibleWcsVersion(xml)) {
-                        return new WcsCapabilities(xml);
+                .then(function (xmlDom) {
+                    if (self.isCompatibleWcsVersion(xmlDom)) {
+                        return new WcsCapabilities(xmlDom);
                     } else if (!version) {
                         // retry the service with a 1.0.0 request
-                        return self.retrieveGetCapabilities("1.0.0")
+                        return self.retrieveCapabilities("1.0.0")
                     } else {
                         throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveGetCapabilities", "unsupportedVersion"));
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveCapabilities", "unsupportedVersion"));
                     }
                 });
         };
 
         // Internal use only
-        WebCoverageService.prototype.retrieveDescribeCoverage = function (wcsCaps) {
+        WebCoverageService.prototype.describeCoverages = function (wcsCaps) {
             if (!wcsCaps) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveDescribeCoverage",
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "describeCoverages",
                         "The WCS Caps object is missing."));
             }
 
@@ -175,7 +175,7 @@ define([
                 coverageCount = coverageDescription.coverages.length;
                 for (var j = 0; j < coverageCount; j++) {
                     coverageId = coverageDescription.coverages[j].name || coverageDescription.coverages[j].coverageId;
-                    this.describeCoverageDocuments[coverageId] = coverageDescription;
+                    this.coverageDescriptions[coverageId] = coverageDescription;
                     // temporary, will be replaced by a formal WcsCoverage object
                     this.coverages.push(coverageDescription.coverages[j]);
                 }
@@ -254,12 +254,12 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.isCompatibleWcsVersion = function (xml) {
-            if (!xml) {
+        WebCoverageService.prototype.isCompatibleWcsVersion = function (xmlDom) {
+            if (!xmlDom) {
                 return false;
             }
 
-            var version = xml.documentElement.getAttribute("version");
+            var version = xmlDom.documentElement.getAttribute("version");
 
             if (version === "1.0.0") {
                 return true;
