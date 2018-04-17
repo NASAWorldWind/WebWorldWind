@@ -17,8 +17,10 @@
  * @exports ElevationModel
  */
 define(['../error/ArgumentError',
+        '../geom/Angle',
         '../util/Logger'],
     function (ArgumentError,
+              Angle,
               Logger) {
         "use strict";
 
@@ -394,7 +396,9 @@ define(['../error/ArgumentError',
             }
 
             var coverageList=this.sortForTargetResolution(targetResolution);
-            console.log(targetResolution,coverageList[coverageList.length-1]);
+            var preferredCoverage=coverageList[coverageList.length-1];
+            var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
+            console.log(level.levelNumber, preferredCoverage);
 
             result.fill(NaN);
             var resolution = Number.MAX_VALUE, i, n = coverageList.length, resultFilled = false;

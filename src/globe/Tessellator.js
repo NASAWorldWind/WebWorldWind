@@ -166,6 +166,7 @@ define(['../geom/Angle',
 
             this.corners = {};
             this.tiles = [];
+            this.maxTileLevel = 0;
         };
 
         /**
@@ -180,6 +181,7 @@ define(['../geom/Angle',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "tessellate", "missingDC"));
             }
 
+            this.maxTileLevel = 0;
             var lastElevationsChange = dc.globe.elevationTimestamp();
             if (this.lastGlobeStateKey === dc.globeStateKey
                 && this.lastVerticalExaggeration === dc.verticalExaggeration
@@ -694,6 +696,7 @@ define(['../geom/Angle',
             var idx = this.tiles.length;
             this.tiles.push(tile);
 
+            this.maxTileLevel = Math.max(this.maxTileLevel, tile.level.levelNumber);
             // Insert tile into corner data collection for later LOD neighbor analysis.
             var sector = tile.sector;
 
@@ -881,6 +884,9 @@ define(['../geom/Angle',
                 this.regenerateTileGeometryIfNeeded(dc, tile);
                 this.currentTiles.addTile(tile);
             }
+
+            // console.log("tiles:", this.tiles.length);
+            // console.log("maxLevels:",this.maxTileLevel);
         };
 
         Tessellator.prototype.setNeighbors = function (tile) {
@@ -980,6 +986,7 @@ define(['../geom/Angle',
 
             // Retrieve the elevations for all points in the tile.
             WWUtil.fillArray(elevations, 0);
+            console.log("bang", tile.texelSize * Angle.RADIANS_TO_DEGREES);
             dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize * Angle.RADIANS_TO_DEGREES, elevations);
 
             // Modify the elevations around the tile's border to match neighbors of lower resolution, if any.
