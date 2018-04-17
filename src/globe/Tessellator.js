@@ -986,7 +986,6 @@ define(['../geom/Angle',
 
             // Retrieve the elevations for all points in the tile.
             WWUtil.fillArray(elevations, 0);
-            console.log("bang", tile.texelSize * Angle.RADIANS_TO_DEGREES);
             dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize * Angle.RADIANS_TO_DEGREES, elevations);
 
             // Modify the elevations around the tile's border to match neighbors of lower resolution, if any.
