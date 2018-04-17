@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ define([
     'src/geom/Angle',
     'src/globe/Globe',
     'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/geom/Plane',
     'src/geom/Rectangle',
     'src/geom/Vec3'
-], function (Matrix, Angle, Globe, EarthElevationModel, Plane, Rectangle, Vec3) {
+], function (Matrix, Angle, Globe, EarthElevationModel, ElevationModel, Plane, Rectangle, Vec3) {
     "use strict";
 
     describe("Matrix Tests", function () {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,35 +17,31 @@
  * @exports EarthElevationModel
  */
 define([
-        '../geom/Location',
-        '../geom/Sector',
+        '../globe/AsterV2ElevationCoverage',
         '../globe/ElevationModel',
-        '../util/WmsUrlBuilder'
+        '../globe/GebcoElevationCoverage',
+        '../globe/UsgsNedElevationCoverage',
+        '../globe/UsgsNedHiElevationCoverage'
     ],
-    function (Location,
-              Sector,
+    function (AsterV2ElevationCoverage,
               ElevationModel,
-              WmsUrlBuilder) {
+              GebcoElevationCoverage,
+              UsgsNedElevationCoverage,
+              UsgsNedHiElevationCoverage) {
         "use strict";
 
         /**
-         * Constructs an Earth elevation model.
+         * Constructs an EarthElevationModel consisting of three elevation coverages GEBCO, Aster V2, and USGS NED.
          * @alias EarthElevationModel
          * @constructor
-         * @augments ElevationModel
-         * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
         var EarthElevationModel = function () {
-            ElevationModel.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "application/bil16", "EarthElevations256", 256, 256);
+            ElevationModel.call(this);
 
-            this.displayName = "Earth Elevation Model";
-            this.minElevation = -11000; // Depth of Marianas Trench, in meters
-            this.maxElevation = 8850; // Height of Mt. Everest
-            this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images
-
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev",
-                "GEBCO,aster_v2,USGS-NED", "", "1.3.0");
+            this.addCoverage(new GebcoElevationCoverage());
+            this.addCoverage(new AsterV2ElevationCoverage());
+            this.addCoverage(new UsgsNedElevationCoverage());
+            this.addCoverage(new UsgsNedHiElevationCoverage());
         };
 
         EarthElevationModel.prototype = Object.create(ElevationModel.prototype);
