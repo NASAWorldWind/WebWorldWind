@@ -199,8 +199,7 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfaceRectangle.prototype.moveTo = function (globe, position) {
-            this.center = this.computeShiftedLocations(globe, this.getReferencePosition(), position,
-                [this.center])[0];
+            this.center = this.computeShiftedLocations(globe, this.getReferencePosition(), position, [this.center])[0];
         };
 
         return SurfaceRectangle;

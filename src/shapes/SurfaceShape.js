@@ -796,13 +796,10 @@ define([
                 new Vec3(0, 0, 0));
             var delta = newPoint.subtract(oldPoint);
 
-            for(var i = 0, len = locations.length; i < len; i++)
-            {
-                var point = globe.computePointFromLocation(locations[i].latitude, locations[i].longitude,
-                    result);
-                point = point.add(delta);
-                globe.computePositionFromPoint(point[0], point[1], point[2], newPos);
-
+            for (var i = 0, len = locations.length; i < len; i++) {
+                globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
+                result.add(delta);
+                globe.computePositionFromPoint(result[0], result[1], result[2], newPos);
                 newLocations.push(new Location(newPos.latitude, newPos.longitude));
             }
 
