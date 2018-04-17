@@ -71,13 +71,13 @@ define([
         WebCoverageService.compatibleWcsVersions = ["1.0.0", "2.0.0", "2.0.1"];
 
         /**
-         * Contacts the Web Coverage Service specified in the constructor. This function handles version negotiation
-         * and capabilities and describe coverage document retrieval. The return is a Promise which returns the
-         * initialized WebCoverageService.
-         * @param serviceAddress the url of the Web Coverage Service
-         * @returns {Promise} a Promise of a WebCoverageService
+         * Contacts the Web Coverage Service specified by the service address. This function handles version negotiation
+         * and capabilities and describe coverage document retrieval. The return is a Promise to a fully initialized
+         * WebCoverageService which includes an array of WcsCoverage objects available from this service.
+         * @param serviceAddress the url of the WebCoverageService
+         * @returns {PromiseLike<WebCoverageService>}
          */
-        WebCoverageService.create = function (serviceAddress) {
+        WebCoverageService.load = function (serviceAddress) {
             var service = new WebCoverageService();
             service.serviceAddress = serviceAddress;
 
