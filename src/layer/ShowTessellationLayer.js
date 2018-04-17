@@ -18,9 +18,17 @@
  */
 define([
         '../shaders/BasicProgram',
+        '../globe/GebcoElevationCoverage',
+        '../globe/AsterV2ElevationCoverage',
+        '../globe/UsgsNedElevationCoverage',
+        '../globe/UsgsNedHiElevationCoverage',
         '../layer/Layer'
     ],
     function (BasicProgram,
+              GebcoElevationCoverage,
+              AsterV2ElevationCoverage,
+              UsgsNedElevationCoverage,
+              UsgsNedHiElevationCoverage,
               Layer) {
         "use strict";
 
@@ -95,7 +103,15 @@ define([
                 for (var i = 0, len = surfaceGeometry.length; i < len; i++) {
                     terrainTile = surfaceGeometry[i];
                     tessellator.beginRenderingTile(dc, terrainTile);
-                    program.loadColorComponents(gl, 1, 1, 1, 0.3);
+                    if (terrainTile.elevationCoverage instanceof GebcoElevationCoverage) {
+                        program.loadColorComponents(gl, 1, 1, 0, 0.3); // Yellow
+                    }
+                    else if (terrainTile.elevationCoverage instanceof AsterV2ElevationCoverage) {
+                        program.loadColorComponents(gl, 1, 0, 1, 0.3); // magenta
+                    }
+                    else {
+                        program.loadColorComponents(gl, 0, 1, 1, 0.3); // cyan
+                    }
                     tessellator.renderWireframeTile(dc, terrainTile);
                     program.loadColorComponents(gl, 1, 0, 0, 0.6);
                     tessellator.renderTileOutline(dc, terrainTile);

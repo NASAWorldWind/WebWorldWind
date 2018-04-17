@@ -986,7 +986,7 @@ define(['../geom/Angle',
 
             // Retrieve the elevations for all points in the tile.
             WWUtil.fillArray(elevations, 0);
-            dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize * Angle.RADIANS_TO_DEGREES, elevations);
+            tile.elevationCoverage = dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize * Angle.RADIANS_TO_DEGREES, elevations);
 
             // Modify the elevations around the tile's border to match neighbors of lower resolution, if any.
             if (this.mustAlignNeighborElevations(dc, tile)) {
@@ -1033,7 +1033,7 @@ define(['../geom/Angle',
 
             // Retrieve the previous level elevations, using 1/2 the number of tile cells.
             WWUtil.fillArray(prevElevations, 0);
-            dc.globe.elevationsForGrid(tile.sector, prevNumLat, prevNumLon, prevLevel.texelSize * Angle.RADIANS_TO_DEGREES, prevElevations);
+            tile.elevationCoverage = dc.globe.elevationsForGrid(tile.sector, prevNumLat, prevNumLon, prevLevel.texelSize * Angle.RADIANS_TO_DEGREES, prevElevations);
 
             // Use previous level elevations along the north edge when the northern neighbor is lower resolution.
             neighborLevel = tile.neighborLevel(WorldWind.NORTH);

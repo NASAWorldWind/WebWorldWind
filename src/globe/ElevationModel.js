@@ -420,7 +420,7 @@ define(['../error/ArgumentError',
                     }
                 }
             }
-            return resolution;
+            return preferredCoverage;
         };
 
         return ElevationModel;
