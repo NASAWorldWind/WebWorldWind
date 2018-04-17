@@ -65,6 +65,12 @@ define([
         };
 
         /**
+         * An array of compatible WCS versions supported by this client service.
+         * @type {string[]}
+         */
+        WebCoverageService.compatibleWcsVersions = ["1.0.0", "2.0.0", "2.0.1"];
+
+        /**
          * Contacts the Web Coverage Service specified in the constructor. This function handles version negotiation
          * and capabilities and describe coverage document retrieval. The return is a Promise which returns the
          * initialized WebCoverageService.
@@ -75,7 +81,7 @@ define([
             var service = new WebCoverageService();
             service.serviceAddress = serviceAddress;
 
-            return service.retrieveCapabilities()
+            return service.retrieveCapabilities("2.0.1", true)
                 .then(function (wcsCapabilities) {
                     service.capabilities = wcsCapabilities;
                     return service.describeCoverages(wcsCapabilities);
@@ -96,16 +102,16 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.retrieveCapabilities = function (version) {
+        WebCoverageService.prototype.retrieveCapabilities = function (version, retry) {
             var self = this, wcsCaps;
 
             return self.retrieveXml(self.buildGetCapabilitiesUrl(version))
                 .then(function (xmlDom) {
                     if (self.isCompatibleWcsVersion(xmlDom)) {
                         return new WcsCapabilities(xmlDom);
-                    } else if (!version) {
+                    } else if (retry) {
                         // retry the service with a 1.0.0 request
-                        return self.retrieveCapabilities("1.0.0")
+                        return self.retrieveCapabilities("1.0.0", false);
                     } else {
                         throw new ArgumentError(
                             Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveCapabilities", "unsupportedVersion"));
@@ -200,11 +206,13 @@ define([
         // Internal use only
         WebCoverageService.prototype.buildGetCapabilitiesUrl = function (version) {
             var requestUrl = this.prepareBaseUrl(this.serviceAddress);
-
             requestUrl += "SERVICE=WCS";
             requestUrl += "&REQUEST=GetCapabilities";
-            if (version) {
-                requestUrl += "&VERSION=" + version;
+
+            if (version === "1.0.0") {
+                requestUrl += "&VERSION=1.0.0";
+            } else if (version === "2.0.0" || version === "2.0.1") {
+                requestUrl += "&ACCEPTEDVERSIONS=2.0.0,2.0.1";
             }
 
             return encodeURI(requestUrl);
@@ -245,15 +253,7 @@ define([
 
             var version = xmlDom.documentElement.getAttribute("version");
 
-            if (version === "1.0.0") {
-                return true;
-            } else if (version === "2.0.0") {
-                return true;
-            } else if (version === "2.0.1") {
-                return true;
-            } else {
-                return false;
-            }
+            return WebCoverageService.compatibleWcsVersions.indexOf(version) >= 0;
         };
 
         // Internal use only - copied from WmsUrlBuilder, is there a better place to centralize???
