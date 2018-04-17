@@ -68,7 +68,13 @@ define([
          * An array of compatible WCS versions supported by this client service.
          * @type {string[]}
          */
-        WebCoverageService.compatibleWcsVersions = ["1.0.0", "2.0.0", "2.0.1"];
+        WebCoverageService.COMPATIBLE_WCS_VERSIONS = ["1.0.0", "2.0.0", "2.0.1"];
+
+        /**
+         * The maximum length of a constructed DescribeCoverage url request.
+         * @type {number}
+         */
+        WebCoverageService.MAX_URL_LENGTH = 2083;
 
         /**
          * Contacts the Web Coverage Service specified by the service address. This function handles version negotiation
@@ -77,7 +83,7 @@ define([
          * @param serviceAddress the url of the WebCoverageService
          * @returns {PromiseLike<WebCoverageService>}
          */
-        WebCoverageService.load = function (serviceAddress) {
+        WebCoverageService.create = function (serviceAddress) {
             var service = new WebCoverageService();
             service.serviceAddress = serviceAddress;
 
@@ -130,9 +136,9 @@ define([
             var len = wcsCaps.coverages.length, version = wcsCaps.version, coverageIds = [], coverage, baseUrl,
                 remainingCharCount, characterCount = 0, coverageId, requests = [];
 
-            // Watch for the 2083 character limit and split describe coverage requests as needed
+            // Watch for the maximum character limit and split describe coverage requests as needed
             baseUrl = this.buildDescribeCoverageUrl(wcsCaps);
-            remainingCharCount = 2083 - baseUrl.length;
+            remainingCharCount = WebCoverageService.MAX_URL_LENGTH - baseUrl.length;
 
             for (var i = 0; i < len; i++) {
                 coverage = wcsCaps.coverages[i];
@@ -253,7 +259,7 @@ define([
 
             var version = xmlDom.documentElement.getAttribute("version");
 
-            return WebCoverageService.compatibleWcsVersions.indexOf(version) >= 0;
+            return WebCoverageService.COMPATIBLE_WCS_VERSIONS.indexOf(version) >= 0;
         };
 
         // Internal use only - copied from WmsUrlBuilder, is there a better place to centralize???
