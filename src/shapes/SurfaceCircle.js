@@ -162,6 +162,16 @@ define(['../error/ArgumentError',
             }
         };
 
+        // Internal use only. Intentionally not documented.
+        SurfaceCircle.prototype.getReferencePosition = function () {
+            return this.center;
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceCircle.prototype.moveTo = function (globe, position) {
+            this.center = this.computeShiftedLocations(globe, this.getReferencePosition(), position, [this.center])[0];
+        };
+
         /**
          * The minimum number of intervals the circle generates.
          * @type {Number}

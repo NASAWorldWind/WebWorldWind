@@ -32,6 +32,7 @@ define([
         '../geom/Sector',
         '../shapes/ShapeAttributes',
         '../error/UnsupportedOperationError',
+        '../geom/Vec3',
         '../util/WWMath'
     ],
     function (AbstractError,
@@ -49,6 +50,7 @@ define([
               Sector,
               ShapeAttributes,
               UnsupportedOperationError,
+              Vec3,
               WWMath) {
         "use strict";
 
@@ -771,6 +773,37 @@ define([
 
             return this.currentData.extent;
 
+        };
+
+        /**
+         * Computes a new set of locations translated from a specified location to a new location for a shape.
+         *
+         * @param {Globe} globe The globe on which to compute a new set of locations.
+         * @param {Location} oldLocation The original reference location.
+         * @param {Location} newLocation The new reference location.
+         * @param {Location[]} locations The locations to translate.
+         *
+         * @return {Location[]} The translated locations.
+         */
+        SurfaceShape.prototype.computeShiftedLocations = function(globe, oldLocation, newLocation, locations) {
+            var newLocations = [];
+            var result = new Vec3(0, 0, 0);
+            var newPos = new WorldWind.Position(0, 0, 0);
+
+            var oldPoint = globe.computePointFromLocation(oldLocation.latitude, oldLocation.longitude,
+                new Vec3(0, 0, 0));
+            var newPoint = globe.computePointFromLocation(newLocation.latitude, newLocation.longitude,
+                new Vec3(0, 0, 0));
+            var delta = newPoint.subtract(oldPoint);
+
+            for (var i = 0, len = locations.length; i < len; i++) {
+                globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
+                result.add(delta);
+                globe.computePositionFromPoint(result[0], result[1], result[2], newPos);
+                newLocations.push(new Location(newPos.latitude, newPos.longitude));
+            }
+
+            return newLocations;
         };
 
         // Internal use only. Intentionally not documented.
