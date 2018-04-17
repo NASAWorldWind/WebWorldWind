@@ -395,10 +395,10 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingResult"));
             }
 
-            var coverageList=this.coverages.slice(); //this.sortForTargetResolution(targetResolution);
-            // var preferredCoverage=coverageList[coverageList.length-1];
-            // var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
-            // console.log(level.levelNumber, preferredCoverage);
+            var coverageList=this.sortForTargetResolution(targetResolution);
+            var preferredCoverage=coverageList[coverageList.length-1];
+            var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
+            console.log(level.levelNumber, preferredCoverage);
 
             result.fill(NaN);
             var resolution = Number.MAX_VALUE, i, n = coverageList.length, resultFilled = false;
