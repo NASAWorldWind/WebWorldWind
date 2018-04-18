@@ -59,9 +59,9 @@ define([
 
             /**
              * A map of the coverages to their corresponding DescribeCoverage documents.
-             * @type {{}}
+             * @type {WcsDescribeCoverage}
              */
-            this.coverageDescriptions = {};
+            this.coverageDescriptions = null;
         };
 
         /**
@@ -70,11 +70,9 @@ define([
          */
         WebCoverageService.COMPATIBLE_WCS_VERSIONS = ["1.0.0", "2.0.0", "2.0.1"];
 
-        /**
-         * The maximum length of a constructed DescribeCoverage url request.
-         * @type {number}
-         */
-        WebCoverageService.MAX_URL_LENGTH = 2083;
+        WebCoverageService.WCS_XLMNS = "http://www.opengis.net/wcs";
+
+        WebCoverageService.WCS_2_XLMNS = "http://www.opengis.net/wcs/2.0";
 
         /**
          * Contacts the Web Coverage Service specified by the service address. This function handles version negotiation
@@ -112,14 +110,14 @@ define([
         WebCoverageService.prototype.retrieveCapabilities = function () {
             var self = this;
 
-            return self.retrieveXml(self.buildGetCapabilitiesUrl("2.0.1"))
+            return self.retrieveXml(self.buildCapabilitiesXmlRequest("2.0.1"))
                 // Check if the server supports our preferred version of 2.0.1 or 2.0.0
                 .then(function (xmlDom) {
                     if (self.isCompatibleWcsVersion(xmlDom)) {
                         return xmlDom;
                     } else {
                         // If needed, try the server again with a 1.0.0 request
-                        return self.retrieveXml(self.buildGetCapabilitiesUrl("1.0.0"));
+                        return self.retrieveXml(self.buildCapabilitiesXmlRequest("1.0.0"));
                     }
                 })
                 // Parse the result, if there is an error it will bubble to the client catch
@@ -129,70 +127,27 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.describeCoverages = function (wcsCaps) {
-            if (!wcsCaps) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "describeCoverages",
-                        "The WCS Caps object is missing."));
-            }
-
-            var len = wcsCaps.coverages.length, version = wcsCaps.version, coverageIds = [], coverage, baseUrl,
-                remainingCharCount, characterCount = 0, coverageId, requests = [];
-
-            // Watch for the maximum character limit and split describe coverage requests as needed
-            baseUrl = this.buildDescribeCoverageUrl(wcsCaps);
-            remainingCharCount = WebCoverageService.MAX_URL_LENGTH - baseUrl.length;
-
-            for (var i = 0; i < len; i++) {
-                coverage = wcsCaps.coverages[i];
-                if (version === "1.0.0") {
-                    coverageId = coverage.name;
-                } else if (version === "2.0.0" || version === "2.0.1") {
-                    coverageId = coverage.coverageId;
-                }
-
-                if (coverageId.length + characterCount > remainingCharCount) {
-                    requests.push(this.retrieveXml(baseUrl + coverageIds.join(",")));
-                    characterCount = 0;
-                    coverageIds = [];
-                }
-
-                coverageIds.push(coverageId);
-                characterCount += coverageId.length + 1;
-            }
-
-            requests.push(this.retrieveXml(baseUrl + coverageIds.join(",")));
-
-            return Promise.all(requests);
+        WebCoverageService.prototype.describeCoverages = function () {
+            return this.retrieveXml(this.buildDescribeCoverageXmlRequest());
         };
 
         // Internal use only
-        WebCoverageService.prototype.parseCoverages = function (describeCoverages) {
-            var len = describeCoverages.length, coverageDescription, coverageCount, coverageId;
-            for (var i = 0; i < len; i++) {
-                coverageDescription = new WcsDescribeCoverage(describeCoverages[i]);
-                coverageCount = coverageDescription.coverages.length;
-                for (var j = 0; j < coverageCount; j++) {
-                    coverageId = coverageDescription.coverages[j].name || coverageDescription.coverages[j].coverageId;
-                    this.coverageDescriptions[coverageId] = coverageDescription;
-                    // temporary, will be replaced by a formal WcsCoverage object
-                    this.coverages.push(coverageDescription.coverages[j]);
-                }
-            }
+        WebCoverageService.prototype.parseCoverages = function (xmlDom) {
+            this.coverageDescriptions = new WcsDescribeCoverage(xmlDom);
+            var coverageCount = this.coverageDescriptions.coverages.length;
 
-            return this;
+            for (var i = 0; i < coverageCount; i++) {
+                this.coverages.push(this.coverageDescriptions.coverages[i]);
+            }
         };
 
         // Internal use only
-        WebCoverageService.prototype.retrieveXml = function (url) {
-            if (!url) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveXml", "missingUrl"));
-            }
+        WebCoverageService.prototype.retrieveXml = function (request) {
+            var url = request.url;
 
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
-                xhr.open("GET", url);
+                xhr.open("POST", url);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
@@ -208,50 +163,64 @@ define([
                 xhr.ontimeout = function () {
                     reject(new Error(Logger.log(Logger.LEVEL_WARNING, "XML retrieval timed out: " + url)));
                 };
-                xhr.send();
+                xhr.send(request.body);
             });
         };
 
         // Internal use only
-        WebCoverageService.prototype.buildGetCapabilitiesUrl = function (version) {
-            var requestUrl = this.prepareBaseUrl(this.serviceAddress);
-            requestUrl += "SERVICE=WCS";
-            requestUrl += "&REQUEST=GetCapabilities";
+        WebCoverageService.prototype.buildCapabilitiesXmlRequest = function (version) {
+            var capabilitiesElement;
 
             if (version === "1.0.0") {
-                requestUrl += "&VERSION=1.0.0";
+                capabilitiesElement = document.createElementNS(WebCoverageService.WCS_XLMNS, "GetCapabilities");
+                capabilitiesElement.setAttribute("service", "WCS");
+                capabilitiesElement.setAttribute("version", "1.0.0");
             } else if (version === "2.0.1" || version === "2.0.0") {
-                requestUrl += "&ACCEPTEDVERSIONS=2.0.1,2.0.0";
+                capabilitiesElement = document.createElementNS(WebCoverageService.WCS_2_XLMNS, "GetCapabilities");
+                capabilitiesElement.setAttribute("service", "WCS");
+                capabilitiesElement.setAttribute("version", version);
             }
 
-            return encodeURI(requestUrl);
+            return {
+                url: this.serviceAddress,
+                body: new XMLSerializer().serializeToString(capabilitiesElement)
+            };
         };
 
         // Internal use only
-        WebCoverageService.prototype.buildDescribeCoverageUrl = function (wcsCaps) {
-            if (!wcsCaps) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "buildDescribeCoverageUrl",
-                        "The WCS Caps object is missing."));
-            }
-
-            var version = wcsCaps.version, requestUrl, coverageParameter;
+        WebCoverageService.prototype.buildDescribeCoverageXmlRequest = function () {
+            var version = this.capabilities.version, describeElement, coverageCount = this.capabilities.coverages.length,
+                coverageElement, requestUrl;
 
             if (version === "1.0.0") {
-                requestUrl = wcsCaps.capability.request.describeCoverage.get;
-                coverageParameter = "&COVERAGES=";
+                describeElement = document.createElementNS(WebCoverageService.WCS_XLMNS, "DescribeCoverage");
+                describeElement.setAttribute("service", "WCS");
+                describeElement.setAttribute("version", "1.0.0");
+                requestUrl = this.capabilities.capability.request.describeCoverage.get;
             } else if (version === "2.0.1" || version === "2.0.0") {
-                requestUrl = wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url;
-                coverageParameter = "&COVERAGEID=";
+                describeElement = document.createElementNS(WebCoverageService.WCS_2_XLMNS, "DescribeCoverage");
+                describeElement.setAttribute("service", "WCS");
+                describeElement.setAttribute("version", version);
+                requestUrl = this.capabilities.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url;
             }
 
-            requestUrl = this.prepareBaseUrl(requestUrl);
-            requestUrl += "SERVICE=WCS";
-            requestUrl += "&REQUEST=DescribeCoverage";
-            requestUrl += "&VERSION=" + version;
-            requestUrl += coverageParameter;
+            for (var i = 0; i < coverageCount; i++) {
+                if (version === "1.0.0") {
+                    coverageElement = document.createElementNS(WebCoverageService.WCS_XLMNS, "Coverage");
+                    //coverageElement.innerText = this.capabilities.coverages[i].name;
+                    coverageElement.appendChild(document.createTextNode(this.capabilities.coverages[i].name));
+                } else if (version === "2.0.1" || version === "2.0.0") {
+                    coverageElement = document.createElementNS(WebCoverageService.WCS_2_XLMNS, "CoverageId");
+                    //coverageElement.innerText = this.capabilities.coverages[i].coverageId;
+                    coverageElement.appendChild(document.createTextNode(this.capabilities.coverages[i].coverageId));
+                }
+                describeElement.appendChild(coverageElement);
+            }
 
-            return encodeURI(requestUrl);
+            return {
+                url: requestUrl,
+                body: new XMLSerializer().serializeToString(describeElement)
+            };
         };
 
         // Internal use only
@@ -263,27 +232,6 @@ define([
             var version = xmlDom.documentElement.getAttribute("version");
 
             return WebCoverageService.COMPATIBLE_WCS_VERSIONS.indexOf(version) >= 0;
-        };
-
-        // Internal use only - copied from WmsUrlBuilder, is there a better place to centralize???
-        WebCoverageService.prototype.prepareBaseUrl = function (url) {
-            if (!url) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "prepareBaseUrl", "missingUrl"));
-            }
-
-            var index = url.indexOf("?");
-
-            if (index < 0) { // if string contains no question mark
-                url = url + "?"; // add one
-            } else if (index !== url.length - 1) { // else if question mark not at end of string
-                index = url.search(/&$/);
-                if (index < 0) {
-                    url = url + "&"; // add a parameter separator
-                }
-            }
-
-            return url;
         };
 
         return WebCoverageService;
