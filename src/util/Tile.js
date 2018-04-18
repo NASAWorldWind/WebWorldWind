@@ -372,9 +372,10 @@ define([
             var globe = dc.globe,
                 verticalExaggeration = dc.verticalExaggeration,
                 extremes = globe.minAndMaxElevationsForSector(this.sector),
-                minHeight = extremes ? (extremes[0] * verticalExaggeration) : 0,
-                maxHeight = extremes ? (extremes[1] * verticalExaggeration) : 0;
-            if (minHeight == maxHeight) {
+                minHeight = extremes[0] * verticalExaggeration,
+                maxHeight = extremes[1] * verticalExaggeration;
+
+            if (minHeight === maxHeight) {
                 minHeight = maxHeight + 10; // TODO: Determine if this is necessary.
             }
 

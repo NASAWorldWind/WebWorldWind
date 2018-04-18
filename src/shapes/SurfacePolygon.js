@@ -119,34 +119,28 @@ define([
         // Internal use only. Intentionally not documented.
         SurfacePolygon.prototype.getReferencePosition = function () {
             // Assign the first position as the reference position.
-            if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
+            if (this.boundaries.length > 0 && this.boundaries[0].length > 2) {
                 return this.boundaries[0][0];
-            }
-            else if (this.boundaries.length > 2){
+            } else if (this.boundaries.length > 2) {
                 return this.boundaries[0];
-            }
-            else {
+            } else {
                 return null;
             }
         };
 
         // Internal use only. Intentionally not documented.
         SurfacePolygon.prototype.moveTo = function (globe, position) {
-            if(this.boundaries.length > 0 && this.boundaries[0].length > 2){
+            if (this.boundaries.length > 0 && this.boundaries[0].length > 2) {
                 var boundaries = [];
-                for (var i = 0, len = this._boundaries.length; i < len; i++){
-                    var locations = this.computeShiftedLocations(globe, this.getReferencePosition(),
-                        position, this._boundaries[i]);
+                for (var i = 0, len = this._boundaries.length; i < len; i++) {
+                    var locations = this.computeShiftedLocations(globe, this.getReferencePosition(), position,
+                        this._boundaries[i]);
                     boundaries.push(locations);
                 }
                 this.boundaries = boundaries;
-            }
-            else if (this.boundaries.length > 2){
-                this.boundaries = this.computeShiftedLocations(globe, this.getReferencePosition(),
-                    position, this._boundaries);
-            }
-            else {
-                return;
+            } else if (this.boundaries.length > 2) {
+                this.boundaries = this.computeShiftedLocations(globe, this.getReferencePosition(), position,
+                    this._boundaries);
             }
         };
 

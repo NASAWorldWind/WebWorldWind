@@ -60,6 +60,7 @@ define([
 
             // Internal. Intentionally not documented.
             this.opacity = 0.5;
+
         };
 
         ScreenCreditController.prototype = Object.create(Layer.prototype);
@@ -75,9 +76,10 @@ define([
         /**
          * Adds an image credit to this controller.
          * @param {String} imageUrl The URL of the image to display in the credits area.
+         * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
          * @throws {ArgumentError} If the specified URL is null or undefined.
          */
-        ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
+        ScreenCreditController.prototype.addImageCredit = function (imageUrl, hyperlinkUrl) {
             if (!imageUrl) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
@@ -92,8 +94,13 @@ define([
 
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
             var credit = new ScreenImage(screenOffset, imageUrl);
-
             credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+
+            // Append new user property to store URL for hyperlinking.
+            // (See BasicWorldWindowController.handleClickOrTap).
+            if (hyperlinkUrl) {
+                credit.userProperties.url = hyperlinkUrl;
+            }
 
             this.imageCredits.push(credit);
         };
@@ -101,10 +108,11 @@ define([
         /**
          * Adds a string credit to this controller.
          * @param {String} stringCredit The string to display in the credits area.
-         * @param (Color} color The color with which to draw the string.
+         * @param {Color} color The color with which to draw the string.
+         * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
-        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
+        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color, hyperlinkUrl) {
             if (!stringCredit) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
@@ -123,11 +131,17 @@ define([
             }
 
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
-            var credit = new ScreenText(screenOffset, stringCredit);
 
+            var credit = new ScreenText(screenOffset, stringCredit);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
             credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+
+            // Append new user property to store URL for hyperlinking.
+            // (See BasicWorldWindowController.handleClickOrTap).
+            if (hyperlinkUrl) {
+                credit.userProperties.url = hyperlinkUrl;
+            }
 
             this.textCredits.push(credit);
         };
