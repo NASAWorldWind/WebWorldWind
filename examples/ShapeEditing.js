@@ -18,7 +18,7 @@
  *
  */
 
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         './LayerManager'],
     function (ww,
               LayerManager) {
