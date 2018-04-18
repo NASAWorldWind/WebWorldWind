@@ -88,7 +88,7 @@ define([
             service.serviceAddress = serviceAddress;
 
             // Make the initial request for version 2.0.1, the retrieveCapabilities method will renegotiate if needed
-            return service.retrieveCapabilities("2.0.1")
+            return service.retrieveCapabilities()
                 .then(function (wcsCapabilities) {
                     service.capabilities = wcsCapabilities;
                     return service.describeCoverages(wcsCapabilities);
@@ -109,10 +109,10 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.retrieveCapabilities = function (version) {
+        WebCoverageService.prototype.retrieveCapabilities = function () {
             var self = this;
 
-            return self.retrieveXml(self.buildGetCapabilitiesUrl(version))
+            return self.retrieveXml(self.buildGetCapabilitiesUrl("2.0.1"))
                 // Check if the server supports our preferred version of 2.0.1 or 2.0.0
                 .then(function (xmlDom) {
                     if (self.isCompatibleWcsVersion(xmlDom)) {
@@ -220,8 +220,8 @@ define([
 
             if (version === "1.0.0") {
                 requestUrl += "&VERSION=1.0.0";
-            } else if (version === "2.0.0" || version === "2.0.1") {
-                requestUrl += "&ACCEPTEDVERSIONS=2.0.0,2.0.1";
+            } else if (version === "2.0.1" || version === "2.0.0") {
+                requestUrl += "&ACCEPTEDVERSIONS=2.0.1,2.0.0";
             }
 
             return encodeURI(requestUrl);
@@ -240,7 +240,7 @@ define([
             if (version === "1.0.0") {
                 requestUrl = wcsCaps.capability.request.describeCoverage.get;
                 coverageParameter = "&COVERAGES=";
-            } else if (version === "2.0.0" || version === "2.0.1") {
+            } else if (version === "2.0.1" || version === "2.0.0") {
                 requestUrl = wcsCaps.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url;
                 coverageParameter = "&COVERAGEID=";
             }
