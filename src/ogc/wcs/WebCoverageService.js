@@ -87,7 +87,8 @@ define([
             var service = new WebCoverageService();
             service.serviceAddress = serviceAddress;
 
-            return service.retrieveCapabilities("2.0.1", true)
+            // Make the initial request for version 2.0.1, the retrieveCapabilities method will renegotiate if needed
+            return service.retrieveCapabilities("2.0.1")
                 .then(function (wcsCapabilities) {
                     service.capabilities = wcsCapabilities;
                     return service.describeCoverages(wcsCapabilities);
@@ -108,20 +109,22 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.retrieveCapabilities = function (version, retry) {
-            var self = this, wcsCaps;
+        WebCoverageService.prototype.retrieveCapabilities = function (version) {
+            var self = this;
 
             return self.retrieveXml(self.buildGetCapabilitiesUrl(version))
+                // Check if the server supports our preferred version of 2.0.1 or 2.0.0
                 .then(function (xmlDom) {
                     if (self.isCompatibleWcsVersion(xmlDom)) {
-                        return new WcsCapabilities(xmlDom);
-                    } else if (retry) {
-                        // retry the service with a 1.0.0 request
-                        return self.retrieveCapabilities("1.0.0", false);
+                        return xmlDom;
                     } else {
-                        throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "retrieveCapabilities", "unsupportedVersion"));
+                        // If needed, try the server again with a 1.0.0 request
+                        return self.retrieveXml(self.buildGetCapabilitiesUrl("1.0.0"));
                     }
+                })
+                // Parse the result, if there is an error it will bubble to the client catch
+                .then(function (xmlDom) {
+                    return new WcsCapabilities(xmlDom);
                 });
         };
 
