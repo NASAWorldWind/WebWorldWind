@@ -70,8 +70,16 @@ define([
          */
         WebCoverageService.COMPATIBLE_WCS_VERSIONS = ["1.0.0", "2.0.0", "2.0.1"];
 
+        /**
+         * The XML namespace for WCS version 1.0.0.
+         * @type {string}
+         */
         WebCoverageService.WCS_XLMNS = "http://www.opengis.net/wcs";
 
+        /**
+         * The XML namespace for WCS version 2.0.0 and 2.0.1.
+         * @type {string}
+         */
         WebCoverageService.WCS_2_XLMNS = "http://www.opengis.net/wcs/2.0";
 
         /**
@@ -85,7 +93,6 @@ define([
             var service = new WebCoverageService();
             service.serviceAddress = serviceAddress;
 
-            // Make the initial request for version 2.0.1, the retrieveCapabilities method will renegotiate if needed
             return service.retrieveCapabilities()
                 .then(function (wcsCapabilities) {
                     service.capabilities = wcsCapabilities;
@@ -120,7 +127,7 @@ define([
                         return self.retrieveXml(self.buildCapabilitiesXmlRequest("1.0.0"));
                     }
                 })
-                // Parse the result, if there is an error it will bubble to the client catch
+                // Parse the result
                 .then(function (xmlDom) {
                     return new WcsCapabilities(xmlDom);
                 });
@@ -143,25 +150,28 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.retrieveXml = function (request) {
-            var url = request.url;
 
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", url);
+                xhr.open("POST", request.url);
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             resolve(xhr.responseXML);
                         } else {
-                            reject(new Error(Logger.log(Logger.LEVEL_WARNING,"XML retrieval failed (" + xhr.statusText + "): " + url)));
+                            reject(new Error(
+                                Logger.logMessage(Logger.LEVEL_WARNING,
+                                    "XML retrieval failed (" + xhr.statusText + "): " + request.url)));
                         }
                     }
                 };
                 xhr.onerror = function () {
-                    reject(new Error(Logger.log(Logger.LEVEL_WARNING, "XML retrieval failed: " + url)));
+                    reject(new Error(
+                        Logger.logMessage(Logger.LEVEL_WARNING, "XML retrieval failed: " + request.url)));
                 };
                 xhr.ontimeout = function () {
-                    reject(new Error(Logger.log(Logger.LEVEL_WARNING, "XML retrieval timed out: " + url)));
+                    reject(new Error(
+                        Logger.logMessage(Logger.LEVEL_WARNING, "XML retrieval timed out: " + request.url)));
                 };
                 xhr.send(request.body);
             });
@@ -189,8 +199,8 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.buildDescribeCoverageXmlRequest = function () {
-            var version = this.capabilities.version, describeElement, coverageCount = this.capabilities.coverages.length,
-                coverageElement, requestUrl;
+            var version = this.capabilities.version, describeElement, coverageElement, requestUrl,
+                coverageCount = this.capabilities.coverages.length;
 
             if (version === "1.0.0") {
                 describeElement = document.createElementNS(WebCoverageService.WCS_XLMNS, "DescribeCoverage");
@@ -207,11 +217,9 @@ define([
             for (var i = 0; i < coverageCount; i++) {
                 if (version === "1.0.0") {
                     coverageElement = document.createElementNS(WebCoverageService.WCS_XLMNS, "Coverage");
-                    //coverageElement.innerText = this.capabilities.coverages[i].name;
                     coverageElement.appendChild(document.createTextNode(this.capabilities.coverages[i].name));
                 } else if (version === "2.0.1" || version === "2.0.0") {
                     coverageElement = document.createElementNS(WebCoverageService.WCS_2_XLMNS, "CoverageId");
-                    //coverageElement.innerText = this.capabilities.coverages[i].coverageId;
                     coverageElement.appendChild(document.createTextNode(this.capabilities.coverages[i].coverageId));
                 }
                 describeElement.appendChild(coverageElement);
