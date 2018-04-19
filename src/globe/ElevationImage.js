@@ -94,6 +94,12 @@ define([
              */
             this.hasData = true;
 
+            /**
+             * Internal use only
+             * true if any pixel in the image has a NO_DATA value, false otherwise.
+             * @ignore
+             */
+            this.hasMissingData = false;
         };
 
         /**
@@ -349,9 +355,11 @@ define([
          */
         ElevationImage.prototype.findMinAndMaxElevation = function () {
             this.hasData = false;
+            this.hasMissingData = false;
+
             if (this.imageData && (this.imageData.length > 0)) {
                 this.minElevation = Number.MAX_VALUE;
-                this.maxElevation = -this.minElevation;
+                this.maxElevation = -Number.MAX_VALUE;
 
                 var pixels = this.imageData,
                     pixelCount = this.imageWidth * this.imageHeight;
@@ -367,6 +375,8 @@ define([
                         if (this.maxElevation < p) {
                             this.maxElevation = p;
                         }
+                    } else {
+                        this.hasMissingData = true;
                     }
                 }
             }

@@ -219,49 +219,46 @@ define(['../util/AbsentResourceList',
         TiledElevationCoverage.prototype = Object.create(ElevationCoverage.prototype);
 
         // Documented in super class
-        TiledElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
+        TiledElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector, result) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "minAndMaxElevationsForSector", "missingSector"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "minAndMaxElevationsForSector", "missingResult"));
             }
 
             var level = this.levels.levelForTexelSize(sector.deltaLatitude() * Angle.DEGREES_TO_RADIANS / 64);
             this.assembleTiles(level, sector, false);
 
             if (this.currentTiles.length === 0) {
-                return null; // Sector is outside the coverage's coverage area.
+                return false; // Sector is outside the coverage's coverage area. Don't modify the result.
             }
 
-            // Assign the output extreme elevations to the largest and smallest double values, respectively. This has the effect
-            // of expanding the extremes with each subsequent tile as needed. If we initialized this array with zeros then the
-            // output extreme elevations would always contain zero, even when the range of the image's extreme elevations in the
-            // sector does not contain zero.
-            var min = Number.MAX_VALUE,
-                max = -min,
-                image,
-                imageMin,
-                imageMax;
+            var hasCompleteCoverage = true;
 
             for (var i = 0, len = this.currentTiles.length; i < len; i++) {
-                image = this.currentTiles[i].image();
-                if (image) {
-                    if (image.hasData) {
-                        imageMin = image.minElevation;
-                        if (min > imageMin) {
-                            min = imageMin;
-                        }
-
-                        imageMax = image.maxElevation;
-                        if (max < imageMax) {
-                            max = imageMax;
-                        }
+                var image = this.currentTiles[i].image();
+                if (image && image.hasData) {
+                    var imageMin = image.minElevation;
+                    if (result[0] > imageMin) {
+                        result[0] = imageMin;
                     }
-                } else {
-                    return null; // At least one tile image is not in memory.
+
+                    var imageMax = image.maxElevation;
+                    if (result[1] < imageMax) {
+                        result[1] = imageMax;
+                    }
+                }
+
+                if (!image || !image.hasData || image.hasMissingData) {
+                    hasCompleteCoverage = false;
                 }
             }
 
-            return min === Number.MAX_VALUE ? null : [min, max];
+            return hasCompleteCoverage;
         };
 
         // Documented in super class
