@@ -33,8 +33,9 @@ define([
         "use strict";
 
         /**
-         * Represents a Web Coverage Service and provides functionality for interacting with the service. Includes
-         * functionality for retrieving DescribeCoverage documents and providing WCS version agnostic coverage objects.
+         * Provides a list of coverages from a Web Coverage Service including the capabilities and coverage description
+         * documents. For automated configuration, utilize the create function which provides a Promise with a fully
+         * configured WebCoverageService.
          * @constructor
          */
         var WebCoverageService = function () {
@@ -65,12 +66,6 @@ define([
         };
 
         /**
-         * An array of compatible WCS versions supported by this client service.
-         * @type {string[]}
-         */
-        WebCoverageService.COMPATIBLE_WCS_VERSIONS = ["1.0.0", "2.0.0", "2.0.1"];
-
-        /**
          * The XML namespace for WCS version 1.0.0.
          * @type {string}
          */
@@ -90,6 +85,11 @@ define([
          * @returns {PromiseLike<WebCoverageService>}
          */
         WebCoverageService.create = function (serviceAddress) {
+            if (!serviceAddress) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WebCoverageService", "constructor", "missingUrl"));
+            }
+
             var service = new WebCoverageService();
             service.serviceAddress = serviceAddress;
 
@@ -115,12 +115,13 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.retrieveCapabilities = function () {
-            var self = this;
+            var self = this, version;
 
             return self.retrieveXml(self.buildCapabilitiesXmlRequest("2.0.1"))
-                // Check if the server supports our preferred version of 2.0.1 or 2.0.0
                 .then(function (xmlDom) {
-                    if (self.isCompatibleWcsVersion(xmlDom)) {
+                    // Check if the server supports our preferred version of 2.0.1
+                    version = xmlDom.documentElement.getAttribute("version");
+                    if (version === "2.0.1" || version === "2.0.0") {
                         return xmlDom;
                     } else {
                         // If needed, try the server again with a 1.0.0 request
@@ -150,7 +151,6 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.retrieveXml = function (request) {
-
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", request.url);
@@ -179,17 +179,7 @@ define([
 
         // Internal use only
         WebCoverageService.prototype.buildCapabilitiesXmlRequest = function (version) {
-            var capabilitiesElement;
-
-            if (version === "1.0.0") {
-                capabilitiesElement = document.createElementNS(WebCoverageService.WCS_XLMNS, "GetCapabilities");
-                capabilitiesElement.setAttribute("service", "WCS");
-                capabilitiesElement.setAttribute("version", "1.0.0");
-            } else if (version === "2.0.1" || version === "2.0.0") {
-                capabilitiesElement = document.createElementNS(WebCoverageService.WCS_2_XLMNS, "GetCapabilities");
-                capabilitiesElement.setAttribute("service", "WCS");
-                capabilitiesElement.setAttribute("version", version);
-            }
+            var capabilitiesElement = this.createBaseWcsElement("GetCapabilities", version);
 
             return {
                 url: this.serviceAddress,
@@ -202,15 +192,10 @@ define([
             var version = this.capabilities.version, describeElement, coverageElement, requestUrl,
                 coverageCount = this.capabilities.coverages.length;
 
+            describeElement = this.createBaseWcsElement("DescribeCoverage", version);
             if (version === "1.0.0") {
-                describeElement = document.createElementNS(WebCoverageService.WCS_XLMNS, "DescribeCoverage");
-                describeElement.setAttribute("service", "WCS");
-                describeElement.setAttribute("version", "1.0.0");
                 requestUrl = this.capabilities.capability.request.describeCoverage.get;
             } else if (version === "2.0.1" || version === "2.0.0") {
-                describeElement = document.createElementNS(WebCoverageService.WCS_2_XLMNS, "DescribeCoverage");
-                describeElement.setAttribute("service", "WCS");
-                describeElement.setAttribute("version", version);
                 requestUrl = this.capabilities.operationsMetadata.getOperationMetadataByName("DescribeCoverage").dcp[0].getMethods[0].url;
             }
 
@@ -232,14 +217,20 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.isCompatibleWcsVersion = function (xmlDom) {
-            if (!xmlDom) {
-                return false;
+        WebCoverageService.prototype.createBaseWcsElement = function (elementName, version) {
+            var el;
+
+            if (version === "1.0.0") {
+                el = document.createElementNS(WebCoverageService.WCS_XLMNS, elementName);
+                el.setAttribute("version", "1.0.0");
+            } else if (version === "2.0.1" || version === "2.0.0") {
+                el = document.createElementNS(WebCoverageService.WCS_2_XLMNS, elementName);
+                el.setAttribute("version", version);
             }
 
-            var version = xmlDom.documentElement.getAttribute("version");
+            el.setAttribute("service", "WCS");
 
-            return WebCoverageService.COMPATIBLE_WCS_VERSIONS.indexOf(version) >= 0;
+            return el;
         };
 
         return WebCoverageService;
