@@ -34,7 +34,25 @@ define([], function () {
     CustomMatchers.toEqualVec3 = function (util, customEqualityTesters) {
         return {
             compare: function (actual, expected, delta) {
-                var difference = actual.distanceTo(expected);
+                var dx = Math.abs(actual[0] - expected[0]),
+                    dy = Math.abs(actual[1] - expected[1]),
+                    dz = Math.abs(actual[2] - expected[2]),
+                    difference = Math.max(dx, dy, dz);
+                return {
+                    pass: difference <= delta,
+                    message: "Expected " + actual + " to equal " + expected + ", but the difference is " + difference
+                };
+            }
+        };
+    };
+
+    CustomMatchers.toEqualPosition = function (util, customEqualityTesters) {
+        return {
+            compare: function (actual, expected, delta) {
+                var dlat = Math.abs(actual.latitude - expected.latitude),
+                    dlon = Math.abs(actual.longitude - expected.longitude),
+                    dalt = Math.abs(actual.altitude - expected.altitude),
+                    difference = Math.max(dlat, dlon, dalt);
                 return {
                     pass: difference <= delta,
                     message: "Expected " + actual + " to equal " + expected + ", but the difference is " + difference
