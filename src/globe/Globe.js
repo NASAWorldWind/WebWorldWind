@@ -660,6 +660,4 @@ define([
         };
 
         return Globe;
-    }
-)
-;
+    });
