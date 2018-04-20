@@ -81,7 +81,7 @@ define(['../error/ArgumentError',
             },
 
             /**
-             * This model's minimum elevation in meters across all coverages.
+             * This model's minimum elevation in meters across all enabled coverages.
              * @type {Number}
              * @readonly
              */
@@ -89,20 +89,19 @@ define(['../error/ArgumentError',
                 get: function () {
                     var minElevation = Number.MAX_VALUE;
 
-                    var i, len;
-                    for (i = 0, len = this.coverages.length; i < len; i++) {
+                    for (var i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
                         if (coverage.enabled && coverage.minElevation < minElevation) {
                             minElevation = coverage.minElevation;
                         }
                     }
 
-                    return minElevation;
+                    return (minElevation !== Number.MAX_VALUE) ? minElevation : 0; // no coverages or all coverages disabled
                 }
             },
 
             /**
-             * This model's maximum elevation in meters across all coverages.
+             * This model's maximum elevation in meters across all enabled coverages.
              * @type {Number}
              * @readonly
              */
@@ -110,15 +109,14 @@ define(['../error/ArgumentError',
                 get: function () {
                     var maxElevation = -Number.MAX_VALUE;
 
-                    var i, len;
-                    for (i = 0, len = this.coverages.length; i < len; i++) {
+                    for (var i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
-                        if (coverage.enabled && maxElevation < coverage.maxElevation) {
+                        if (coverage.enabled && coverage.maxElevation > maxElevation) {
                             maxElevation = coverage.maxElevation;
                         }
                     }
 
-                    return maxElevation;
+                    return (maxElevation !== -Number.MAX_VALUE) ? maxElevation : 0; // no coverages or all coverages disabled
                 }
             }
         });
@@ -246,34 +244,23 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "minAndMaxElevationsForSector", "missingSector"));
             }
 
-            var i,
-                n = this.coverages.length,
-                coverageResult;
+            // Initialize the min and max elevations to the largest and smallest numbers, respectively. This has the
+            // effect of moving the extremes with each subsequent coverage as needed, without unintentionally capturing
+            // zero elevation. If we initialized this array with zeros the result would always contain zero, even when
+            // elevations in the sector are all above or below zero. This is critical for tile bounding boxes.
 
             var result = [Number.MAX_VALUE, -Number.MAX_VALUE];
-            var failoverResult = null;
-            for (i = n - 1; i >= 0; i--) {
+
+            for (var i = this.coverages.length - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
-                    if (failoverResult === null) {
-                        failoverResult = [coverage.minElevation, coverage.maxElevation];
-                    }
-                    coverageResult = coverage.minAndMaxElevationsForSector(sector);
-                    if (coverageResult) {
-                        result[0] = Math.min(result[0], coverageResult[0]);
-                        result[1] = Math.max(result[1], coverageResult[1]);
+                    if (coverage.minAndMaxElevationsForSector(sector, result)) {
+                        break; // coverage completely fills the sector, ignore the remaining coverages
                     }
                 }
             }
 
-            if (result[0] === Number.MAX_VALUE) {
-                if (failoverResult === null) {
-                    return [0, 0];
-                }
-
-                return failoverResult;
-            }
-            return result;
+            return (result[0] !== Number.MAX_VALUE) ? result : [0, 0]; // no coverages, all coverages disabled, or no coverages intersect the sector
         };
 
         /**
