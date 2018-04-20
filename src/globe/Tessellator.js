@@ -191,6 +191,18 @@ define(['../geom/Angle',
                 return this.lastTerrain;
             }
 
+            // if (this.lastGlobeStateKey !== dc.globeStateKey) {
+            //     console.log("sk");
+            // }
+            // if (this.lastVerticalExaggeration !== dc.verticalExaggeration) {
+            //     console.log("ve");
+            // }
+            // if (this.elevationTimestamp !== lastElevationsChange) {
+            //     console.log("ts");
+            // }
+            // if (dc.modelviewProjection.equals(this.lastModelViewProjection)) {
+            //     console.log("mvp");
+            // }
             this.lastModelViewProjection.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
             this.elevationTimestamp = lastElevationsChange;
@@ -967,6 +979,25 @@ define(['../geom/Angle',
             }
         };
 
+        /**
+         * Internal use only.
+         * Artificially calculates an adjusted target resolution for the given level number and texel size to more
+         * optimally select elevation coverages until later refactoring.
+         * @returns {Number} An adjusted target resolution in degrees.
+         * TODO: Remove this function when Tessellator and ElevationModel are refactored
+         * @ignore
+         */
+        Tessellator.prototype.temporaryTargetResolution = function (levelNumber, texelSize) {
+            var x = (levelNumber / (this.maximumSubdivisionDepth - 1)) * 4;
+            var levelDivisor = x * x + 1;
+            return (texelSize / levelDivisor) * Angle.RADIANS_TO_DEGREES;
+        };
+
+        // Tessellator.prototype.temporaryTargetResolution = function (levelNumber, texelSize) {
+        //     return texelSize * Angle.RADIANS_TO_DEGREES;
+        // };
+
+
         Tessellator.prototype.regenerateTileGeometry = function (dc, tile) {
             var numLat = tile.tileHeight + 1, // num points in each dimension is 1 more than the number of tile cells
                 numLon = tile.tileWidth + 1,
@@ -986,7 +1017,7 @@ define(['../geom/Angle',
 
             // Retrieve the elevations for all points in the tile.
             WWUtil.fillArray(elevations, 0);
-            tile.elevationCoverage = dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize * Angle.RADIANS_TO_DEGREES, elevations);
+            tile.elevationCoverage = dc.globe.elevationsForGrid(tile.sector, numLat, numLon, this.temporaryTargetResolution(tile.level.levelNumber, tile.texelSize), elevations);
 
             // Modify the elevations around the tile's border to match neighbors of lower resolution, if any.
             if (this.mustAlignNeighborElevations(dc, tile)) {
@@ -1033,7 +1064,7 @@ define(['../geom/Angle',
 
             // Retrieve the previous level elevations, using 1/2 the number of tile cells.
             WWUtil.fillArray(prevElevations, 0);
-            tile.elevationCoverage = dc.globe.elevationsForGrid(tile.sector, prevNumLat, prevNumLon, prevLevel.texelSize * Angle.RADIANS_TO_DEGREES, prevElevations);
+            dc.globe.elevationsForGrid(tile.sector, prevNumLat, prevNumLon, this.temporaryTargetResolution(prevLevel.levelNumber, prevLevel.texelSize), prevElevations);
 
             // Use previous level elevations along the north edge when the northern neighbor is lower resolution.
             neighborLevel = tile.neighborLevel(WorldWind.NORTH);

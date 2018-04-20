@@ -384,8 +384,8 @@ define(['../error/ArgumentError',
 
             var coverageList=this.sortForTargetResolution(targetResolution);
             var preferredCoverage=coverageList[coverageList.length-1];
-            var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
-            console.log(level.levelNumber, preferredCoverage);
+            // var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
+            // console.log(level.levelNumber, preferredCoverage);
 
             result.fill(NaN);
             var resolution = Number.MAX_VALUE, i, n = coverageList.length, resultFilled = false;
@@ -395,6 +395,7 @@ define(['../error/ArgumentError',
                     resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
                     if (resultFilled) {
                         resolution = coverage.resolution;
+                        preferredCoverage = coverage;
                     }
                 }
             }
