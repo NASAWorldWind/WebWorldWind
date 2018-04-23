@@ -218,8 +218,8 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        SurfaceEllipse.prototype.moveTo = function (globe, position) {
-            this.center = this.computeShiftedLocations(globe, this.getReferencePosition(), position, [this.center])[0];
+        SurfaceEllipse.prototype.moveTo = function (position) {
+            this.center = position;
         };
 
         /**
