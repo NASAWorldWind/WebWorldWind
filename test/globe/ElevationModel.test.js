@@ -33,8 +33,15 @@ define([
 
         MockCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        MockCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
-            return [this.minElevation, this.maxElevation];
+        MockCoverage.prototype.minAndMaxElevationsForSector = function (sector, result) {
+            if (result[0] > this.minElevation) {
+                result[0] = this.minElevation;
+            }
+            if (result[1] < this.maxElevation) {
+                result[1] = this.maxElevation;
+            }
+
+            return true;
         };
 
         MockCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
@@ -95,13 +102,13 @@ define([
                 var n = 12;
                 var em = new ElevationModel();
                 for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(n - i + 1, -i - 1, i + 1);
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
                     em.addCoverage(c);
                 }
 
                 var minMax = em.minAndMaxElevationsForSector(new Sector(-1, 1, -1, 1));
-                expect(minMax[0]).toEqual(-n);
-                expect(minMax[1]).toEqual(n);
+                expect(minMax[0]).toEqual(-1);
+                expect(minMax[1]).toEqual(1);
             });
 
             it("Returns correct min and max elevations for a sector when some coverages are disabled", function () {
@@ -110,13 +117,14 @@ define([
                 for (var i = 0; i < n; i++) {
                     var c = new MockCoverage(i + 1, -i - 1, i + 1);
                     em.addCoverage(c);
+                    if (i < 2) {
+                        c.enabled = false;
+                    }
                 }
 
-                em.coverages[0].enabled = false;
-                em.coverages[1].enabled = false;
                 var minMax = em.minAndMaxElevationsForSector(new Sector(-1, 1, -1, 1));
-                expect(minMax[0]).toEqual(-10);
-                expect(minMax[1]).toEqual(10);
+                expect(minMax[0]).toEqual(-3);
+                expect(minMax[1]).toEqual(3);
             });
 
             it("Returns correct elevation for a location", function () {
