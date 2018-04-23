@@ -168,7 +168,7 @@ define(['../error/ArgumentError',
         };
 
         // Internal use only. Intentionally not documented.
-        SurfaceCircle.prototype.moveTo = function (position) {
+        SurfaceCircle.prototype.moveTo = function (globe, position) {
             this.center = position;
         };
 

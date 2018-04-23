@@ -218,7 +218,7 @@ define([
         };
 
         // Internal use only. Intentionally not documented.
-        SurfaceEllipse.prototype.moveTo = function (position) {
+        SurfaceEllipse.prototype.moveTo = function (globe, position) {
             this.center = position;
         };
 
