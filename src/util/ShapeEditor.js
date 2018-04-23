@@ -677,11 +677,7 @@ define([
                 var p = new Position(0, 0, 0);
                 this.worldWindow.globe.computePositionFromPoint(intersection[0], intersection[1],
                     intersection[2], p);
-                if (this.shape instanceof SurfaceCircle || this.shape instanceof SurfaceEllipse) {
-                    this.shape.moveTo(new WorldWind.Location(p.latitude, p.longitude));
-                } else {
-                    this.shape.moveTo(this.worldWindow.globe, new WorldWind.Location(p.latitude, p.longitude));
-                }
+                this.shape.moveTo(this.worldWindow.globe, new WorldWind.Location(p.latitude, p.longitude));
             }
         };
 
