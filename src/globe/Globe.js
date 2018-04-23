@@ -77,25 +77,27 @@ define([
             this.elevationModel = elevationModel;
 
             /**
-             * This globe's equatorial radius.
+             * This globe's equatorial radius in meters.
+             *
              * @type {Number}
-             * @default 6378137.0 meters
+             * @default WGS 84 semi-major axis (6378137.0 meters)
              */
-            this.equatorialRadius = 6378137.0;
+            this.equatorialRadius = WorldWind.WGS84_SEMI_MAJOR_AXIS;
+            var f = 1 / WorldWind.WGS84_INVERSE_FLATTENING;
 
             /**
-             * This globe's polar radius.
+             * This globe's polar radius in meters. Taken from NGA.STND.0036_1.0.0_WGS84, section 3.2.
              * @type {Number}
-             * @default 6356752.3 meters
+             * @default WGS 84 semi-minor axis (6356752.3142 meters)
              */
-            this.polarRadius = 6356752.3;
+            this.polarRadius = this.equatorialRadius * (1 - f);
 
             /**
-             * This globe's eccentricity squared.
+             * This globe's eccentricity squared. Taken from NGA.STND.0036_1.0.0_WGS84, section 3.3.
              * @type {Number}
-             * @default 0.00669437999013
+             * @default WGS 84 first eccentricity squared (6.694379990141e-3)
              */
-            this.eccentricitySquared = 0.00669437999013;
+            this.eccentricitySquared = (2 * f) - (f * f);
 
             /**
              * The tessellator used to create this globe's terrain.
