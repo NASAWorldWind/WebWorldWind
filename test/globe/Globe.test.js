@@ -46,19 +46,26 @@ define([
             it("has an equatorial radius matching the WGS84 reference value", function () {
                 var globe = new Globe(new ElevationModel(), new ProjectionWgs84());
 
+                // Expect an exact match to the reference value.
                 expect(globe.equatorialRadius).toBe(WGS84_REFERENCE_SEMI_MAJOR_RADIUS);
             });
 
             it("has a polar radius matching the WGS84 reference value", function () {
                 var globe = new Globe(new ElevationModel(), new ProjectionWgs84());
 
-                expect(globe.polarRadius).toBeCloseTo(WGS84_REFERENCE_SEMI_MINOR_RADIUS, 4 /*match all decimal values specified; additional decimal values are ok*/);
+                // WGS84 reference value: 6356752.3142
+                // Actual computed value: 6356752.314245179
+                // Match the four decimals specified by the reference value. Additional precision is acceptable.
+                expect(globe.polarRadius).toBeCloseTo(WGS84_REFERENCE_SEMI_MINOR_RADIUS, 4);
             });
 
             it("has an eccentricity squared matching the WGS84 reference value", function () {
                 var globe = new Globe(new ElevationModel(), new ProjectionWgs84());
 
-                expect(globe.eccentricitySquared).toBeCloseTo(WGS84_REFERENCE_EC2, 15 /*match all decimal values specified; additional decimal values are ok*/);
+                // WGS84 reference value: 6.694379990141e-3
+                // Actual computed value: 6.6943799901413165e-3
+                // Match the fifteen decimals specified by the reference value. Additional precision is acceptable.
+                expect(globe.eccentricitySquared).toBeCloseTo(WGS84_REFERENCE_EC2, 15);
             });
 
             it("computes the WGS84 ellipsoid's radius at integer latitudes", function () {
@@ -67,7 +74,9 @@ define([
                 for (var lat = -90; lat <= 90; lat += 1.0) {
                     var radiusExpected = wgs84ReferenceRadiusAt(lat);
                     var radiusActual = globe.radiusAt(lat, 0);
-                    expect(radiusActual).toBeCloseTo(radiusExpected, 8 /*match eight decimal places*/);
+
+                    // Match the first eight decimals.
+                    expect(radiusActual).toBeCloseTo(radiusExpected, 8);
                 }
             });
         });
