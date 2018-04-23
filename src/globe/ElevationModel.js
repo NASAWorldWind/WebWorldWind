@@ -353,11 +353,9 @@ define(['../error/ArgumentError',
          * @throws {ArgumentError} If the specified resolution is not positive.
          */
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
-
-            var coverageList = this.coverages;
-            var i, n = coverageList.length;
+            var i, n = this.coverages.length;
             for (i = n - 1; i >= 0; i--) {
-                var coverage = coverageList[i];
+                var coverage = this.coverages;
                 if (coverage.enabled && coverage.coverageSector.containsLocation(latitude, longitude)) {
                     var elevation = coverage.elevationAtLocation(latitude, longitude);
                     if (elevation !== null) {
@@ -436,7 +434,7 @@ define(['../error/ArgumentError',
 
             var searchRes = this.targetResolutionOverride;
             var coverageList = this.sortForTargetResolution((searchRes > 0) ? searchRes : targetResolution);
-             var preferredCoverage = coverageList[coverageList.length - 1];
+            var preferredCoverage = coverageList[coverageList.length - 1];
             // var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
             // console.log(level.levelNumber, preferredCoverage);
 
