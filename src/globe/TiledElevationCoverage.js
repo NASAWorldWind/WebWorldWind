@@ -698,7 +698,6 @@ define(['../util/AbsentResourceList',
             if (elevationImage.imageData) {
                 elevationImage.findMinAndMaxElevation();
                 this.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
-                console.log(tile.imagePath);
                 this.timestamp = Date.now();
             }
         };

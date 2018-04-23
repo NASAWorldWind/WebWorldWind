@@ -56,6 +56,44 @@ define(['../error/ArgumentError',
              */
             this.coverages = [];
 
+            /**
+             * Internal use only
+             * TODO: Factor out this property during the Tessellator/ElevationModel refactoring.
+             * This property allows external classes to selectively override the targetResolution parameter of
+             * ElevationsForGrid for the purposes of prioritizing coverages. When set to some number greater than zero,
+             * the value in this property will be used to prioritize coverages in lieu of targetResolution. TargetResolution
+             * will still be used to select the appropriate tile level in all cases.
+             *
+             * This property will be reset to zero during each call to ElevationsForGrid.
+             * @type {Number}
+             * @ignore
+             */
+            this.targetResolutionOverride = 0;
+
+            /**
+             * Internal use only
+             * The previous sorted coverage list sorted by desired target resolution.
+             * @type {Array}
+             * @ignore
+             */
+            this.prevSortedCoverages = null;
+
+            /**
+             * Internal use only
+             * The previous target resolution that prevSortedCoverages was sorted by.
+             * @type {Array}
+             * @ignore
+             */
+            this.prevTargetResolution = 0;
+
+            /**
+             * Internal use only
+             * The target resolution below which sorting by target becomes necessary.
+             * @type {Array}
+             * @ignore
+             */
+            this.sortTargetResolution = 0;
+
             this.computeStateKey();
 
         };
@@ -159,14 +197,20 @@ define(['../error/ArgumentError',
          * @ignore
          */
         ElevationModel.prototype.sortForTargetResolution = function (resolution) {
-            var coverageList = this.coverages.slice();
-            coverageList.sort(function (coverage1, coverage2) {
-                var d1 = Math.abs(coverage1.resolution - resolution);
-                var d2 = Math.abs(coverage2.resolution - resolution);
-                return d1 > d2 ? -1 : d1 === d2 ? 0 : 1;
-            });
+            if (resolution !== this.prevTargetResolution) {
+                if (this.prevTargetResolution === 0 || resolution < this.sortTargetResolution) {
+                    var coverageList = this.coverages.slice();
+                    coverageList.sort(function (coverage1, coverage2) {
+                        var d1 = Math.abs(coverage1.resolution - resolution);
+                        var d2 = Math.abs(coverage2.resolution - resolution);
+                        return d1 > d2 ? -1 : d1 === d2 ? 0 : 1;
+                    });
+                    this.prevSortedCoverages = coverageList;
+                }
+                this.prevTargetResolution = resolution;
+            }
 
-            return coverageList;
+            return this.prevSortedCoverages;
         };
 
         /**
@@ -175,9 +219,28 @@ define(['../error/ArgumentError',
          * @ignore
          */
         ElevationModel.prototype.performCoverageListChangedActions = function () {
+            this.sortTargetResolution = 0;
+            this.prevTargetResolution = 0;
+            this.prevSortedCoverages = null;
+
             if (this.coverages.length > 1) {
                 this.coverages.sort(this.coverageComparator);
+
+                var r0 = this.coverages[0].resolution, // coarsest coverage
+                    r1 = r0, // 2nd coarsest
+                    i = 1,
+                    n = this.coverages.length;
+
+                while (r0 === r1 && i < n) {
+                    r1 = this.coverages[i].resolution;
+                    i++;
+                }
+
+                if (r0 !== r1) {
+                    this.sortTargetResolution = r0 - (r0 - r1) / 2;
+                }
             }
+
             this.computeStateKey();
         };
 
@@ -285,24 +348,13 @@ define(['../error/ArgumentError',
          * Returns the elevation at a specified location.
          * @param {Number} latitude The location's latitude in degrees.
          * @param {Number} longitude The location's longitude in degrees.
-         * @param {Number} resolution The desired elevation resolution, in degrees. (To compute degrees from
-         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
          * @returns {Number} The elevation at the specified location, in meters. Returns zero if the location is
          * outside the coverage area of this model.
          * @throws {ArgumentError} If the specified resolution is not positive.
          */
-        ElevationModel.prototype.elevationAtLocation = function (latitude, longitude, resolution) {
-
-            if (resolution !== null && resolution !== undefined && resolution <= 0) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationAtLocation", "invalidResolution"));
-            }
+        ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
 
             var coverageList = this.coverages;
-            if (resolution) {
-                coverageList = this.sortForTargetResolution(resolution);
-            }
-
             var i, n = coverageList.length;
             for (i = n - 1; i >= 0; i--) {
                 var coverage = coverageList[i];
@@ -382,8 +434,9 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "elevationsForGrid", "missingResult"));
             }
 
-            var coverageList=this.sortForTargetResolution(targetResolution);
-            var preferredCoverage=coverageList[coverageList.length-1];
+            var searchRes = this.targetResolutionOverride;
+            var coverageList = this.sortForTargetResolution((searchRes > 0) ? searchRes : targetResolution);
+             var preferredCoverage = coverageList[coverageList.length - 1];
             // var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
             // console.log(level.levelNumber, preferredCoverage);
 
@@ -408,6 +461,9 @@ define(['../error/ArgumentError',
                     }
                 }
             }
+
+            this.targetResolutionOverride = 0;
+
             return preferredCoverage;
         };
 
