@@ -455,6 +455,7 @@ define([
         ColladaScene.prototype.render = function (dc) {
 
             var orderedScene;
+            var frustum = dc.frustumInModelCoordinates;
 
             if (!this.enabled) {
                 return;
@@ -465,6 +466,10 @@ define([
             }
 
             if (!orderedScene) {
+                return;
+            }
+
+            if (!frustum.containsPoint(this._placePoint)) {
                 return;
             }
 
