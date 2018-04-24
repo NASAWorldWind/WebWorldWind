@@ -18,15 +18,10 @@ define([
     'src/geom/Angle',
     'src/geom/Location',
     'src/geom/Sector',
-    'src/globe/AsterV2ElevationCoverage',
-    'src/globe/GebcoElevationCoverage',
-    'src/globe/UsgsNedElevationCoverage',
-    'src/globe/UsgsNedHiElevationCoverage',
     'src/globe/EarthElevationModel',
     'src/globe/Tessellator',
     'src/globe/TiledElevationCoverage'
-], function (ElevationModel, Angle, Location, Sector, AsterV2ElevationCoverage, GebcoElevationCoverage, UsgsNedElevationCoverage,
-             UsgsNedHiElevationCoverage, EarthElevationModel, Tessellator, TiledElevationCoverage) {
+], function (ElevationModel, Angle, Location, Sector, EarthElevationModel, Tessellator, TiledElevationCoverage) {
     "use strict";
     describe("ElevationModel tests", function () {
 

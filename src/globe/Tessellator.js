@@ -694,7 +694,6 @@ define(['../geom/Angle',
             var idx = this.tiles.length;
             this.tiles.push(tile);
 
-            this.maxTileLevel = Math.max(this.maxTileLevel, tile.level.levelNumber);
             // Insert tile into corner data collection for later LOD neighbor analysis.
             var sector = tile.sector;
 
@@ -883,8 +882,6 @@ define(['../geom/Angle',
                 this.currentTiles.addTile(tile);
             }
 
-            // console.log("tiles:", this.tiles.length);
-            // console.log("maxLevels:",this.maxTileLevel);
         };
 
         Tessellator.prototype.setNeighbors = function (tile) {
