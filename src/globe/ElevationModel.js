@@ -350,7 +350,6 @@ define(['../error/ArgumentError',
          * @param {Number} longitude The location's longitude in degrees.
          * @returns {Number} The elevation at the specified location, in meters. Returns zero if the location is
          * outside the coverage area of this model.
-         * @throws {ArgumentError} If the specified resolution is not positive.
          */
         ElevationModel.prototype.elevationAtLocation = function (latitude, longitude) {
             var i, n = this.coverages.length;
