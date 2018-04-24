@@ -166,7 +166,6 @@ define(['../geom/Angle',
 
             this.corners = {};
             this.tiles = [];
-            this.maxTileLevel = 0;
         };
 
         /**
@@ -181,7 +180,6 @@ define(['../geom/Angle',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Tessellator", "tessellate", "missingDC"));
             }
 
-            this.maxTileLevel = 0;
             var lastElevationsChange = dc.globe.elevationTimestamp();
             if (this.lastGlobeStateKey === dc.globeStateKey
                 && this.lastVerticalExaggeration === dc.verticalExaggeration
@@ -191,18 +189,6 @@ define(['../geom/Angle',
                 return this.lastTerrain;
             }
 
-            // if (this.lastGlobeStateKey !== dc.globeStateKey) {
-            //     console.log("sk");
-            // }
-            // if (this.lastVerticalExaggeration !== dc.verticalExaggeration) {
-            //     console.log("ve");
-            // }
-            // if (this.elevationTimestamp !== lastElevationsChange) {
-            //     console.log("ts");
-            // }
-            // if (dc.modelviewProjection.equals(this.lastModelViewProjection)) {
-            //     console.log("mvp");
-            // }
             this.lastModelViewProjection.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
             this.elevationTimestamp = lastElevationsChange;
