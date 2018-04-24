@@ -254,6 +254,32 @@ define([
                     }
                 }
             });
+
+            it("Sorts coverages by target resolution when required, uses cached version when possible", function () {
+                var em = new EarthElevationModel();
+                var res = 0.00431;
+                expect(em.sortTargetResolution).toBeCloseTo(res, 5);
+
+                var coverageList1 = em.sortForTargetResolution(res);
+                var preferredCoverage = coverageList1[coverageList1.length - 1];
+                expect(preferredCoverage.cachePath).toEqual("GebcoElevations256");
+
+                res = res - 0.0005;
+                var coverageList2 = em.sortForTargetResolution(res);
+                preferredCoverage = coverageList2[coverageList2.length - 1];
+                expect(preferredCoverage.cachePath).toEqual("AsterV2Elevations256");
+
+                expect(coverageList1 !== coverageList2).toBe(true);
+
+                coverageList1 = em.sortForTargetResolution(res);
+                expect(coverageList1 === coverageList2).toBe(true);
+
+                res = em.coverages[2].resolution;
+                coverageList2 = em.sortForTargetResolution(res);
+                preferredCoverage = coverageList2[coverageList2.length - 1];
+                expect(preferredCoverage.cachePath.indexOf("UsgsNed")).toEqual(0);
+                expect(coverageList1 !== coverageList2).toBe(true);
+            });
         });
 
         describe("Coverage list manipulation tests", function () {

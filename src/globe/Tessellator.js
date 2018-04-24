@@ -881,7 +881,6 @@ define(['../geom/Angle',
                 this.regenerateTileGeometryIfNeeded(dc, tile);
                 this.currentTiles.addTile(tile);
             }
-
         };
 
         Tessellator.prototype.setNeighbors = function (tile) {
