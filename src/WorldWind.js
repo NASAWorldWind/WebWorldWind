@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
+        './formats/aaigrid/AAIGridConstants',
+        './formats/aaigrid/AAIGridMetadata',
+        './formats/aaigrid/AAIGridReader',
         './error/AbstractError',
         './geom/Angle',
         './shapes/Annotation',
@@ -266,7 +269,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WWMessage',
         './util/WWUtil',
         './util/XmlDocument'],
-    function (AbstractError,
+    function (AAIGridConstants,
+              AAIGridMetadata,
+              AAIGridReader,
+              AbstractError,
               Angle,
               Annotation,
               AnnotationAttributes,
@@ -740,6 +746,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             WEST: "west"
         };
 
+        WorldWind['AAIGridConstants'] = AAIGridConstants;
+        WorldWind['AAIGridMetadata'] = AAIGridMetadata;
+        WorldWind['AAIGridReader'] = AAIGridReader;
         WorldWind['AbstractError'] = AbstractError;
         WorldWind['Angle'] = Angle;
         WorldWind['Annotation'] = Annotation;
