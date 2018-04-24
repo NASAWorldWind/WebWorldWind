@@ -434,19 +434,19 @@ define(['../error/ArgumentError',
 
             var searchRes = this.targetResolutionOverride;
             var coverageList = this.sortForTargetResolution((searchRes > 0) ? searchRes : targetResolution);
-            var preferredCoverage = coverageList[coverageList.length - 1];
-            // var level = preferredCoverage.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
-            // console.log(level.levelNumber, preferredCoverage);
 
             result.fill(NaN);
-            var resolution = Number.MAX_VALUE, i, n = coverageList.length, resultFilled = false;
+            var resolution = Number.MAX_VALUE,
+                i,
+                n = coverageList.length,
+                resultFilled = false;
+
             for (i = n - 1; !resultFilled && i >= 0; i--) {
                 var coverage = coverageList[i];
                 if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
                     resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
                     if (resultFilled) {
                         resolution = coverage.resolution;
-                        preferredCoverage = coverage;
                     }
                 }
             }
@@ -462,7 +462,7 @@ define(['../error/ArgumentError',
 
             this.targetResolutionOverride = 0;
 
-            return preferredCoverage;
+            return resolution;
         };
 
         return ElevationModel;

@@ -1002,7 +1002,7 @@ define(['../geom/Angle',
             // TODO: Factor out the dependency on ElevationModel.targetResolutionOverride when Tessellator/ElevationModel are refactored.
             dc.globe.elevationModel.targetResolutionOverride = this.coverageTargetResolution(tile.level.levelNumber, tile.texelSize);
 
-            tile.elevationCoverage = dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize * Angle.RADIANS_TO_DEGREES, elevations);
+            dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize * Angle.RADIANS_TO_DEGREES, elevations);
 
             // Modify the elevations around the tile's border to match neighbors of lower resolution, if any.
             if (this.mustAlignNeighborElevations(dc, tile)) {

@@ -151,8 +151,6 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.updateGlobeStateKey = null;
-
-            this.elevationCoverage = null;
         };
 
         /**

@@ -242,12 +242,21 @@ define([
             it("Prioritizes coverages correctly according to resolution", function () {
                 var em = new EarthElevationModel();
                 var ts = new Tessellator();
+
                 for (var i = 0; i < ts.maximumSubdivisionDepth; i++) {
                     var l = ts.levels.levels[i];
                     var targetResolutionOverride = ts.coverageTargetResolution(l.levelNumber, l.texelSize);
                     var coverageList = em.sortForTargetResolution(targetResolutionOverride);
                     var preferredCoverage = coverageList[coverageList.length - 1];
-                    console.log(l.levelNumber, l.texelSize * Angle.RADIANS_TO_DEGREES, targetResolutionOverride, preferredCoverage.cachePath);
+                    if (l.levelNumber < 7) {
+                        expect(preferredCoverage.cachePath).toEqual("GebcoElevations256");
+                    }
+                    else if (l.levelNumber < 10) {
+                        expect(preferredCoverage.cachePath).toEqual("AsterV2Elevations256");
+                    }
+                    else {
+                        expect(preferredCoverage.cachePath.indexOf("UsgsNed")).toEqual(0);
+                    }
                 }
             });
         });
