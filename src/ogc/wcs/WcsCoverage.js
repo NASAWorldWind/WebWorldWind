@@ -19,24 +19,21 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        '../../ogc/wcs/WcsCapabilities',
-        '../../ogc/wcs/WcsDescribeCoverage'
+        '../../ogc/wcs/WebCoverageService'
     ],
     function (ArgumentError,
               Logger,
-              WcsCapabilities,
-              WcsDescribeCoverage) {
+              WcsCapabilities) {
         "use strict";
 
         /**
          * A Web Coverage Service version agnostic simple object representation of a coverage. Provides utility methods
          * for common WCS Coverage operations.
          * @param coverageId the name or id of the coverage
-         * @param getCapabilities the WcsCapabilities object representing the capabilities of this coverage
-         * @param describeCoverage the WcsDescribeCoverage object representing the additional parameters of the coverage
+         * @param webCoverageService the WebCoverageService which provided the coverage identified in coverageId
          * @constructor
          */
-        var WcsCoverage = function (coverageId, getCapabilities, describeCoverage) {
+        var WcsCoverage = function (coverageId, webCoverageService) {
 
             /**
              * A simple configuration object with the required parameters for ElevationCoverage.

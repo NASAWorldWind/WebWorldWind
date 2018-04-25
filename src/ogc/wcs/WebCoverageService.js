@@ -22,14 +22,14 @@ define([
     '../../util/Promise',
     '../../ogc/wcs/WcsCapabilities',
     '../../ogc/wcs/WcsCoverage',
-    '../../ogc/wcs/WcsDescribeCoverage'
+    '../../ogc/wcs/WcsCoverageDescriptions'
     ],
     function (ArgumentError,
               Logger,
               Promise,
               WcsCapabilities,
               WcsCoverage,
-              WcsDescribeCoverage) {
+              WcsCoverageDescriptions) {
         "use strict";
 
         /**
@@ -60,7 +60,7 @@ define([
 
             /**
              * A map of the coverages to their corresponding DescribeCoverage documents.
-             * @type {WcsDescribeCoverage}
+             * @type {WcsCoverageDescriptions}
              */
             this.coverageDescriptions = null;
         };
@@ -96,7 +96,7 @@ define([
             return service.retrieveCapabilities()
                 .then(function (wcsCapabilities) {
                     service.capabilities = wcsCapabilities;
-                    return service.describeCoverages(wcsCapabilities);
+                    return service.retrieveCoverageDescriptions(wcsCapabilities);
                 })
                 .then(function (coverages) {
                     service.parseCoverages(coverages);
@@ -135,13 +135,13 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.describeCoverages = function () {
+        WebCoverageService.prototype.retrieveCoverageDescriptions = function () {
             return this.retrieveXml(this.buildDescribeCoverageXmlRequest());
         };
 
         // Internal use only
         WebCoverageService.prototype.parseCoverages = function (xmlDom) {
-            this.coverageDescriptions = new WcsDescribeCoverage(xmlDom);
+            this.coverageDescriptions = new WcsCoverageDescriptions(xmlDom);
             var coverageCount = this.coverageDescriptions.coverages.length;
 
             for (var i = 0; i < coverageCount; i++) {
