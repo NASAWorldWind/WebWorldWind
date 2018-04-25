@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 define([
-    'src/ogc/wcs/WcsCoverageDescriptions'
-], function (WcsCoverageDescriptions) {
+    'src/ogc/wcs/WcsCoverageDescriptions',
+    'src/geom/Sector',
+    'test/CustomMatchers.test'
+], function (WcsCoverageDescriptions,
+             Sector,
+             CustomMatchers) {
     "use strict";
+
+    beforeEach(function () {
+        jasmine.addMatchers(CustomMatchers);
+    });
 
     describe("Constructor testing", function () {
 
@@ -43,6 +51,37 @@ define([
                 }
             });
             xhr.send(null);
+        });
+
+        describe("Utility Methods", function () {
+
+            it("should match the expected bounding sector", function () {
+                var wcsCoverageDescriptions = new WcsCoverageDescriptions(xmlDom);
+                var expectedSector = new Sector(-90, 90, -180, 180);
+
+                var actualSector = wcsCoverageDescriptions.getSector("testing:gebco");
+
+                expect(actualSector).toEqualSector(expectedSector, 1.0e-9);
+            });
+
+            it("should report a resolution of 0.008334 degrees", function () {
+                var wcsCoverageDescriptions = new WcsCoverageDescriptions(xmlDom);
+                var expectedResolution = 0.0083337;
+
+                var actualResolution = wcsCoverageDescriptions.getResolution("testing:gebco");
+
+                expect(actualResolution).toBeCloseTo(expectedResolution, 6);
+            });
+
+            it("should provide the request/response crs", function () {
+                var wcsCoverageDescriptions = new WcsCoverageDescriptions(xmlDom);
+                var expectedCrs = ["EPSG:4326"];
+
+                var supportedCrs = wcsCoverageDescriptions.getSupportedCrs("testing:gebco");
+
+                expect(supportedCrs.length).toBe(expectedCrs.length);
+                expect(supportedCrs[0]).toBe(expectedCrs[0]);
+            });
         });
 
         it("should match the coverage name testing:gebco", function () {
@@ -294,6 +333,37 @@ define([
                 }
             });
             xhr.send(null);
+        });
+
+        describe("Utility Methods", function () {
+
+            it("should match the expected bounding sector", function () {
+                var wcsCoverageDescriptions = new WcsCoverageDescriptions(xmlDom);
+                var expectedSector = new Sector(-90, 90, -180, 180);
+
+                var actualSector = wcsCoverageDescriptions.getSector("testing__gebco");
+
+                expect(actualSector).toEqualSector(expectedSector, 1.0e-9);
+            });
+
+            it("should report a resolution of 0.008334 degrees", function () {
+                var wcsCoverageDescriptions = new WcsCoverageDescriptions(xmlDom);
+                var expectedResolution = 0.0083337;
+
+                var actualResolution = wcsCoverageDescriptions.getResolution("testing__gebco");
+
+                expect(actualResolution).toBeCloseTo(expectedResolution, 6);
+            });
+
+            it("should provide the request/response crs", function () {
+                var wcsCoverageDescriptions = new WcsCoverageDescriptions(xmlDom);
+                var expectedCrs = ["http://www.opengis.net/def/crs/EPSG/0/4326"];
+
+                var supportedCrs = wcsCoverageDescriptions.getSupportedCrs("testing__gebco");
+
+                expect(supportedCrs.length).toBe(expectedCrs.length);
+                expect(supportedCrs[0]).toBe(expectedCrs[0]);
+            });
         });
 
         it("should match the coverage id testing__gebco", function () {

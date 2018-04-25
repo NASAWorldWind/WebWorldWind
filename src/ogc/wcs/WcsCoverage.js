@@ -19,27 +19,65 @@
 define([
         '../../error/ArgumentError',
         '../../util/Logger',
-        '../../ogc/wcs/WebCoverageService'
+        '../../geom/Sector'
     ],
     function (ArgumentError,
               Logger,
-              WcsCapabilities) {
+              Sector) {
         "use strict";
 
         /**
-         * A Web Coverage Service version agnostic simple object representation of a coverage. Provides utility methods
-         * for common WCS Coverage operations.
-         * @param coverageId the name or id of the coverage
-         * @param webCoverageService the WebCoverageService which provided the coverage identified in coverageId
+         * A simple object representation of a Web Coverage Service coverage. Provides utility methods and properties
+         * for use in common WCS Coverage operations.
+         * @param {String} coverageId the name or id of the coverage
+         * @param {WebCoverageService} webCoverageService the WebCoverageService providing the coverage
          * @constructor
          */
         var WcsCoverage = function (coverageId, webCoverageService) {
+            if (!coverageId) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor",
+                        "The specified coverage id is null or undefined."));
+            }
+
+            if (!webCoverageService) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor",
+                        "The specified WebCoverageService is null or undefined."));
+            }
 
             /**
-             * A simple configuration object with the required parameters for ElevationCoverage.
-             * @type {Object}
+             * The Web Coverage Service Coverages id or name as assigned by the providing service.
+             * @type {String}
              */
-            this.elevationConfig = {};
+            this.coverageId = coverageId;
+
+            /**
+             * The WebCoverageService responsible for managing this Coveragea and Web Coverage Service.
+             * @type {WebCoverageService}
+             */
+            this.webCoverageService = webCoverageService;
+
+            /**
+             * The Sector representing the bounds of the coverage.
+             */
+            this.sector = this.webCoverageService.coverageDescriptions.getSector(this.coverageId);
+
+            /**
+             * The resolution of the coverage, in degrees.
+             */
+            this.resolution = this.webCoverageService.coverageDescriptions.getResolution(this.coverageId);
+
+            /**
+             * A configuration object for use by TiledElevationCoverage.
+             */
+            this.elevationConfiguration = this.createElevationConfiguration();
+        };
+
+        // Internal use only
+        WcsCoverage.prototype.createElevationConfiguration = function () {
+            // TODO
+            return {};
         };
 
         return WcsCoverage;

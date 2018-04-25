@@ -43,5 +43,23 @@ define([], function () {
         };
     };
 
+    CustomMatchers.toEqualSector = function (util, customEqualityTesters) {
+        return {
+            compare: function (actual, expected, delta) {
+                var difference = Math.abs(actual.minLatitude - expected.minLatitude);
+                difference += Math.abs(actual.maxLatitude - expected.maxLatitude);
+                difference += Math.abs(actual.minLongitude - expected.minLongitude);
+                difference += Math.abs(actual.maxLongitude - expected.maxLongitude);
+                return {
+                    pass: difference <= Math.abs(delta),
+                    message: "Expected minLat: " + actual.minLatitude + ", maxLat: " + actual.maxLatitude
+                        + ", minLon: " + actual.minLongitude + ", maxLon: " + actual.maxLongitude
+                        + " to equal " + "minLat: " + expected.minLatitude + ", maxLat: " + expected.maxLatitude
+                        + ", minLon: " + expected.minLongitude + ", maxLon: " + expected.maxLongitude
+                }
+            }
+        }
+    };
+
     return CustomMatchers;
 });
