@@ -62,7 +62,7 @@ define([
              * Maps the coverageId or name to the index within the coverages array.
              * @type {{}}
              */
-            this.coverageMap = {};
+            this.coverageIdToIndex = {};
 
             this.assembleDocument();
         };
@@ -73,13 +73,13 @@ define([
          * @returns {Sector} the bounding Sector
          */
         WcsCoverageDescriptions.prototype.getSector = function (coverageId) {
-            if (!this.coverageMap.hasOwnProperty(coverageId)) {
+            if (!this.coverageIdToIndex.hasOwnProperty(coverageId)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSector",
                         "The specified coverage id was null or not defined."));
             }
 
-            var idx = this.coverageMap[coverageId], envelope;
+            var idx = this.coverageIdToIndex[coverageId], envelope;
 
             if (this.version === "1.0.0") {
                 envelope = this.coverages[idx].lonLatEnvelope.pos;
@@ -106,13 +106,13 @@ define([
          * @returns {number} resolution in degrees
          */
         WcsCoverageDescriptions.prototype.getResolution = function (coverageId) {
-            if (!this.coverageMap.hasOwnProperty(coverageId)) {
+            if (!this.coverageIdToIndex.hasOwnProperty(coverageId)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getResolution",
                         "The specified coverage id was null or not defined."));
             }
 
-            var idx = this.coverageMap[coverageId], sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh, xRes,
+            var idx = this.coverageIdToIndex[coverageId], sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh, xRes,
                 yRes;
 
             if (this.version === "1.0.0") {
@@ -139,13 +139,13 @@ define([
          * @param coverageId the coverage id or name
          */
         WcsCoverageDescriptions.prototype.getSupportedCrs = function (coverageId) {
-            if (!this.coverageMap.hasOwnProperty(coverageId)) {
+            if (!this.coverageIdToIndex.hasOwnProperty(coverageId)) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSupportedCrs",
                         "The specified coverage id was null or not defined."));
             }
 
-            var idx = this.coverageMap[coverageId], crses = [];
+            var idx = this.coverageIdToIndex[coverageId], crses = [];
 
             if (this.version === "1.0.0") {
                 return this.coverages[0].supportedCrs.requests;
@@ -211,7 +211,7 @@ define([
             var idx = this.coverages.length - 1,
                 coverageId = this.coverages[idx].coverageId || this.coverages[idx].name;
 
-            this.coverageMap[coverageId] = idx;
+            this.coverageIdToIndex[coverageId] = idx;
         };
 
         // Internal. Intentionally not documented.
