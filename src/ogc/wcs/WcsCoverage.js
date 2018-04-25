@@ -20,12 +20,12 @@ define([
         '../../error/ArgumentError',
         '../../util/Logger',
         '../../ogc/wcs/WcsCapabilities',
-        '../../ogc/wcs/WcsDescribeCoverage'
+        '../../ogc/wcs/WcsCoverageDescriptions'
     ],
     function (ArgumentError,
               Logger,
               WcsCapabilities,
-              WcsDescribeCoverage) {
+              WcsCoverageDescriptions) {
         "use strict";
 
         /**
