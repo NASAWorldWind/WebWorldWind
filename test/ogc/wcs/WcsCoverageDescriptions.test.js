@@ -61,7 +61,7 @@ define([
 
                 var actualSector = wcsCoverageDescriptions.getSector("testing:gebco");
 
-                expect(actualSector).toEqualSector(expectedSector, 1.0e-9);
+                expect(actualSector).toBeSector(expectedSector, 1.0e-9);
             });
 
             it("should report a resolution of 0.008334 degrees", function () {
@@ -343,7 +343,7 @@ define([
 
                 var actualSector = wcsCoverageDescriptions.getSector("testing__gebco");
 
-                expect(actualSector).toEqualSector(expectedSector, 1.0e-9);
+                expect(actualSector).toBeSector(expectedSector, 1.0e-9);
             });
 
             it("should report a resolution of 0.008334 degrees", function () {

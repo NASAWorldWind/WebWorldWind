@@ -43,7 +43,7 @@ define([], function () {
         };
     };
 
-    CustomMatchers.toEqualSector = function (util, customEqualityTesters) {
+    CustomMatchers.toBeSector = function (util, customEqualityTesters) {
         return {
             compare: function (actual, expected, delta) {
                 var difference = Math.abs(actual.minLatitude - expected.minLatitude);
