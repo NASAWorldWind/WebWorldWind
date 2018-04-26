@@ -116,7 +116,6 @@ define([
                 xRes, yRes;
 
             if (this.version === "1.0.0") {
-                // TODO is it possible to unify 1.0.0 and 2.0.1 object models by removing the 'spatialDomain' level?
                 xLow = this.coverages[idx].domainSet.spatialDomain.rectifiedGrid.limits.low[0];
                 yLow = this.coverages[idx].domainSet.spatialDomain.rectifiedGrid.limits.low[1];
                 xHigh = this.coverages[idx].domainSet.spatialDomain.rectifiedGrid.limits.high[0];
