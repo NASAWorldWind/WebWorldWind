@@ -18,12 +18,10 @@
  */
 define([
         '../../error/ArgumentError',
-        '../../util/Logger',
-        '../../geom/Sector'
+        '../../util/Logger'
     ],
     function (ArgumentError,
-              Logger,
-              Sector) {
+              Logger) {
         "use strict";
 
         /**
@@ -60,16 +58,19 @@ define([
 
             /**
              * The Sector representing the bounds of the coverage.
+             * @type {Sector}
              */
             this.sector = this.webCoverageService.coverageDescriptions.getSector(this.coverageId);
 
             /**
              * The resolution of the coverage, in degrees.
+             * @type {Number}
              */
             this.resolution = this.webCoverageService.coverageDescriptions.getResolution(this.coverageId);
 
             /**
              * A configuration object for use by TiledElevationCoverage.
+             * @type {{}}
              */
             this.elevationConfiguration = this.createElevationConfiguration();
         };
