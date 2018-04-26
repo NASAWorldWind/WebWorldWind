@@ -58,12 +58,6 @@ define([
              */
             this.xmlDom = xmlDom;
 
-            /**
-             * Maps the coverageId or name to the index within the coverages array.
-             * @type {{}}
-             */
-            this.coverageIdToIndex = {};
-
             this.assembleDocument();
         };
 
@@ -73,23 +67,22 @@ define([
          * @returns {Sector} the bounding Sector
          */
         WcsCoverageDescriptions.prototype.getSector = function (coverageId) {
-            if (!this.coverageIdToIndex.hasOwnProperty(coverageId)) {
+            var coverage = this.getCoverage(coverageId), envelope;
+            if (!coverage) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSector",
                         "The specified coverage id was null or not defined."));
             }
 
-            var idx = this.coverageIdToIndex[coverageId], envelope;
-
             if (this.version === "1.0.0") {
-                envelope = this.coverages[idx].lonLatEnvelope.pos;
+                envelope = coverage.lonLatEnvelope.pos;
                 return new Sector(
                     envelope[0][1],
                     envelope[1][1],
                     envelope[0][0],
                     envelope[1][0]);
             } else if (this.version === "2.0.1" || this.version === "2.0.0") {
-                envelope = this.coverages[idx].boundedBy.envelope;
+                envelope = coverage.boundedBy.envelope;
                 return new Sector(
                     envelope.lower[0],
                     envelope.upper[0],
@@ -106,25 +99,24 @@ define([
          * @returns {number} resolution in degrees
          */
         WcsCoverageDescriptions.prototype.getResolution = function (coverageId) {
-            if (!this.coverageIdToIndex.hasOwnProperty(coverageId)) {
+            var coverage = this.getCoverage(coverageId), sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
+                xRes, yRes;
+            if (!coverage) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getResolution",
                         "The specified coverage id was null or not defined."));
             }
 
-            var idx = this.coverageIdToIndex[coverageId], sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
-                xRes, yRes;
-
             if (this.version === "1.0.0") {
-                xLow = this.coverages[idx].domainSet.spatialDomain.rectifiedGrid.limits.low[0];
-                yLow = this.coverages[idx].domainSet.spatialDomain.rectifiedGrid.limits.low[1];
-                xHigh = this.coverages[idx].domainSet.spatialDomain.rectifiedGrid.limits.high[0];
-                yHigh = this.coverages[idx].domainSet.spatialDomain.rectifiedGrid.limits.high[1];
+                xLow = coverage.domainSet.spatialDomain.rectifiedGrid.limits.low[0];
+                yLow = coverage.domainSet.spatialDomain.rectifiedGrid.limits.low[1];
+                xHigh = coverage.domainSet.spatialDomain.rectifiedGrid.limits.high[0];
+                yHigh = coverage.domainSet.spatialDomain.rectifiedGrid.limits.high[1];
             } else if (this.version === "2.0.1" || this.version === "2.0.0") {
-                xLow = this.coverages[idx].domainSet.rectifiedGrid.limits.low[0];
-                yLow = this.coverages[idx].domainSet.rectifiedGrid.limits.low[1];
-                xHigh = this.coverages[idx].domainSet.rectifiedGrid.limits.high[0];
-                yHigh = this.coverages[idx].domainSet.rectifiedGrid.limits.high[1];
+                xLow = coverage.domainSet.rectifiedGrid.limits.low[0];
+                yLow = coverage.domainSet.rectifiedGrid.limits.low[1];
+                xHigh = coverage.domainSet.rectifiedGrid.limits.high[0];
+                yHigh = coverage.domainSet.rectifiedGrid.limits.high[1];
             }
 
             xRes = sector.deltaLongitude() / (xHigh - xLow);
@@ -138,19 +130,29 @@ define([
          * @param coverageId the coverage id or name
          */
         WcsCoverageDescriptions.prototype.getSupportedCrs = function (coverageId) {
-            if (!this.coverageIdToIndex.hasOwnProperty(coverageId)) {
+            var coverage = this.getCoverage(coverageId), crses = [];
+            if (!coverage) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSupportedCrs",
                         "The specified coverage id was null or not defined."));
             }
 
-            var idx = this.coverageIdToIndex[coverageId], crses = [];
-
             if (this.version === "1.0.0") {
-                return this.coverages[0].supportedCrs.requests;
+                return coverage.supportedCrs.requests;
             } else if (this.version === "2.0.1" || this.version === "2.0.0") {
-                crses.push(this.coverages[0].boundedBy.envelope.srsName);
+                crses.push(coverage.boundedBy.envelope.srsName);
                 return crses;
+            }
+
+            return null;
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCoverageDescriptions.prototype.getCoverage = function (coverageId) {
+            for (var i = 0, len = this.coverages.length; i < len; i++) {
+                if (coverageId === (this.coverages[i].coverageId || this.coverages[i].name)) {
+                    return this.coverages[i];
+                }
             }
 
             return null;
@@ -185,7 +187,6 @@ define([
                 if (child.localName === "CoverageOffering") {
                     this.coverages = this.coverages || [];
                     this.coverages.push(this.assembleCoverages100(child));
-                    this.addCoverageToMap();
                 }
             }
         };
@@ -200,17 +201,8 @@ define([
                 if (child.localName === "CoverageDescription") {
                     this.coverages = this.coverages || [];
                     this.coverages.push(this.assembleCoverages20x(child));
-                    this.addCoverageToMap();
                 }
             }
-        };
-
-        // Internal. Intentionally not documented.
-        WcsCoverageDescriptions.prototype.addCoverageToMap = function () {
-            var idx = this.coverages.length - 1,
-                coverageId = this.coverages[idx].coverageId || this.coverages[idx].name;
-
-            this.coverageIdToIndex[coverageId] = idx;
         };
 
         // Internal. Intentionally not documented.
