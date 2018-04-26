@@ -112,8 +112,8 @@ define([
                         "The specified coverage id was null or not defined."));
             }
 
-            var idx = this.coverageIdToIndex[coverageId], sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh, xRes,
-                yRes;
+            var idx = this.coverageIdToIndex[coverageId], sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
+                xRes, yRes;
 
             if (this.version === "1.0.0") {
                 // TODO is it possible to unify 1.0.0 and 2.0.1 object models by removing the 'spatialDomain' level?
