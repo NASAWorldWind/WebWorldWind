@@ -146,7 +146,8 @@ define([
             var coverageId, coverage;
 
             for (var i = 0; i < coverageCount; i++) {
-                coverageId = coverage.coverageId || coverage.name;
+                coverageId = this.coverageDescriptions.coverages[i].coverageId
+                    || this.coverageDescriptions.coverages[i].name;
                 coverage = new WcsCoverage(coverageId, this);
                 this.coverages.push(coverage);
             }
