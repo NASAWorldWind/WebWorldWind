@@ -54,19 +54,19 @@ define([
              * The WebCoverageService responsible for managing this Coveragea and Web Coverage Service.
              * @type {WebCoverageService}
              */
-            this.webCoverageService = webCoverageService;
+            this.service = webCoverageService;
 
             /**
              * The Sector representing the bounds of the coverage.
              * @type {Sector}
              */
-            this.sector = this.webCoverageService.coverageDescriptions.getSector(this.coverageId);
+            this.sector = this.service.coverageDescriptions.getSector(this.coverageId);
 
             /**
              * The resolution of the coverage, in degrees.
              * @type {Number}
              */
-            this.resolution = this.webCoverageService.coverageDescriptions.getResolution(this.coverageId);
+            this.resolution = this.service.coverageDescriptions.getResolution(this.coverageId);
 
             /**
              * A configuration object for use by TiledElevationCoverage.
