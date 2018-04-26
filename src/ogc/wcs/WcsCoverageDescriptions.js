@@ -67,11 +67,15 @@ define([
          * @returns {Sector} the bounding Sector
          */
         WcsCoverageDescriptions.prototype.getSector = function (coverageId) {
-            var coverage = this.getCoverage(coverageId), envelope;
-            if (!coverage) {
+            if (!coverageId) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSector",
                         "The specified coverage id was null or not defined."));
+            }
+            var coverage = this.getCoverage(coverageId), envelope;
+
+            if (!coverage) {
+                return null;
             }
 
             if (this.version === "1.0.0") {
@@ -99,12 +103,16 @@ define([
          * @returns {number} resolution in degrees
          */
         WcsCoverageDescriptions.prototype.getResolution = function (coverageId) {
-            var coverage = this.getCoverage(coverageId), sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
-                xRes, yRes;
-            if (!coverage) {
+            if (!coverageId) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getResolution",
                         "The specified coverage id was null or not defined."));
+            }
+            var coverage = this.getCoverage(coverageId), sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
+                xRes, yRes;
+
+            if (!coverage) {
+                return null;
             }
 
             if (this.version === "1.0.0") {
@@ -130,11 +138,15 @@ define([
          * @param coverageId the coverage id or name
          */
         WcsCoverageDescriptions.prototype.getSupportedCrs = function (coverageId) {
-            var coverage = this.getCoverage(coverageId), crses = [];
-            if (!coverage) {
+            if (!coverageId) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSupportedCrs",
                         "The specified coverage id was null or not defined."));
+            }
+            var coverage = this.getCoverage(coverageId), crses = [];
+
+            if (!coverage) {
+                return null;
             }
 
             if (this.version === "1.0.0") {
