@@ -96,7 +96,7 @@ define([
             return {
                 coverageSector: this.sector,
                 resolution: this.resolution,
-                retrievalImageFormat: this.findPreferredFormat(),
+                retrievalImageFormat: this.determineFormatFromService(),
                 levelZeroDelta: new Location(45, 45),
                 numLevels: WcsCoverage.calculateNumberOfLevels(this.resolution),
                 tileWidth: WcsUrlBuilder.TILE_WIDTH,
@@ -109,7 +109,7 @@ define([
         };
 
         // Internal use only
-        WcsCoverage.prototype.findPreferredFormat = function () {
+        WcsCoverage.prototype.determineFormatFromService = function () {
             var version = this.service.capabilities.version, availableFormats, format, coverageDescription;
 
             if (version === "1.0.0") {
@@ -140,9 +140,9 @@ define([
             return WcsCoverage.DEFAULT_FORMAT;
         };
 
-        // Internal use only
+        // Internal use only - See WWA LevelSetConfig
         WcsCoverage.calculateNumberOfLevels = function (degreesPerPixel) {
-            var firstLevelDegreesPerPixel = 90 / WcsUrlBuilder.TILE_HEIGHT;
+            var firstLevelDegreesPerPixel = 90 / 256; // This assumes tile requests will use a width/height of 256
             var level = Math.log(firstLevelDegreesPerPixel / degreesPerPixel) / Math.log(2); // fractional level address
             var levelNumber = Math.floor(level); // floor prevents exceeding the min scale
 

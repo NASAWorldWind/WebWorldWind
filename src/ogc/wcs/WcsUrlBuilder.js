@@ -44,18 +44,6 @@ define([
             this.service = wcsCoverage.service;
         };
 
-        /**
-         * The default dataset y samples.
-         * @type {number}
-         */
-        WcsUrlBuilder.TILE_HEIGHT = 256;
-
-        /**
-         * The default dataset x samples.
-         * @type {number}
-         */
-        WcsUrlBuilder.TILE_WIDTH = 256;
-
         WcsUrlBuilder.prototype.urlForTile = function (tile, format) {
             if (!tile) {
                 throw new ArgumentError(
@@ -88,8 +76,8 @@ define([
             requestUrl += "&VERSION=1.0.0";
             requestUrl += "&COVERAGE=" + this.coverageId;
             requestUrl += "&CRS=EPSG:4326";
-            requestUrl += "&WIDTH=" + WcsUrlBuilder.TILE_WIDTH;
-            requestUrl += "&HEIGHT=" + WcsUrlBuilder.TILE_HEIGHT;
+            requestUrl += "&WIDTH=" + tile.tileWidth;
+            requestUrl += "&HEIGHT=" + tile.tileHeight;
             requestUrl += "&FORMAT=" + format;
             requestUrl += "&BBOX=" + sector.minLongitude + "," + sector.minLatitude + "," + sector.maxLongitude +
                 "," + sector.maxLatitude;
@@ -121,8 +109,8 @@ define([
             requestUrl += "&VERSION=" + this.service.capabilities.version;
             requestUrl += "&COVERAGEID=" + this.coverageId;
             requestUrl += "&FORMAT=" + format;
-            requestUrl += "&SCALESIZE=" + scaleLabels[0] + "(" + WcsUrlBuilder.TILE_WIDTH + ")," + scaleLabels[1] + "(" + WcsUrlBuilder.TILE_HEIGHT + ")";
-            requestUrl += "&OVERVIEWPOLICY=NEAREST";
+            requestUrl += "&SCALESIZE=" + scaleLabels[0] + "(" + tile.tileWidth + ")," + scaleLabels[1] + "(" + tile.tileHeight + ")";
+            requestUrl += "&OVERVIEWPOLICY=NEAREST"; // specific to geoserver to increase performance
             requestUrl += "&SUBSET=" + latLabel + "(" + sector.minLatitude + "," + sector.maxLatitude + ")";
             requestUrl += "&SUBSET=" + lonLabel + "(" + sector.minLongitude + "," + sector.maxLongitude + ")";
 

@@ -40,7 +40,7 @@ define([
         });
 
         describe("Elevation Config", function () {
-            WcsCoverage.prototype.findPreferredFormat = function () {
+            WcsCoverage.prototype.determineFormatFromService = function () {
                 return "image/tiff";
             };
 
