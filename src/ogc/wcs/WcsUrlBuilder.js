@@ -24,6 +24,11 @@ define([
               Logger) {
         "use strict";
 
+        /**
+         * Constructs key value pair (KVP) WCS GetCoverage urls.
+         * @param wcsCoverage the WcsCoverage for which the urls should be generated
+         * @constructor
+         */
         var WcsUrlBuilder = function (wcsCoverage) {
             if (!wcsCoverage) {
                 throw new ArgumentError(
@@ -44,6 +49,12 @@ define([
             this.service = wcsCoverage.service;
         };
 
+        /**
+         * Creates a key value pair WCS GetCoverage URL for the given Tile and format.
+         * @param tile
+         * @param format
+         * @returns {string} the url for the coverage
+         */
         WcsUrlBuilder.prototype.urlForTile = function (tile, format) {
             if (!tile) {
                 throw new ArgumentError(
@@ -66,7 +77,6 @@ define([
             } else if (version === "2.0.1" || version === "2.0.0") {
                 return this.buildUrl20x(tile, format, requestUrl);
             }
-
         };
 
         // Internal use only
@@ -87,7 +97,7 @@ define([
 
         // Internal use only
         WcsUrlBuilder.prototype.buildUrl20x = function (tile, format, requestUrl) {
-            var sector = tile.sector, latLabel, lonLabel, coverageDescription;
+            var sector = tile.sector, latLabel, lonLabel, coverageDescription, scaleLabels, axisLabels;
 
             for (var i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
                 if (this.coverageId === this.service.coverageDescriptions.coverages[i].coverageId) {
@@ -96,8 +106,8 @@ define([
                 }
             }
 
-            var scaleLabels = coverageDescription.domainSet.rectifiedGrid.axisLabels;
-            var axisLabels = coverageDescription.boundedBy.envelope.axisLabels;
+            scaleLabels = coverageDescription.domainSet.rectifiedGrid.axisLabels;
+            axisLabels = coverageDescription.boundedBy.envelope.axisLabels;
             if (axisLabels[0].toLowerCase().indexOf("lat") >= 0) {
                 latLabel = axisLabels[0];
                 lonLabel = axisLabels[1];
