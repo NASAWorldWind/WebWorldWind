@@ -65,13 +65,7 @@ define([
          * Returns the GetCoverage base url as detailed in the capabilities document
          * @param coverageId the coverage id or name
          */
-        WcsCapabilities.prototype.getCoverageBaseUrl = function (coverageId) {
-            if (!coverageId) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "getCoverageBaseUrl",
-                        "The specified coverage id was null or not defined."));
-            }
-
+        WcsCapabilities.prototype.getCoverageBaseUrl = function () {
             if (this.version === "1.0.0") {
                 return this.capability.request.getCoverage.get
             } else if (this.version === "2.0.1" || this.version === "2.0.0") {

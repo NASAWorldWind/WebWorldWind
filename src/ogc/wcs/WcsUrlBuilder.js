@@ -57,7 +57,7 @@ define([
             }
 
             var version = this.service.capabilities.version;
-            var requestUrl = this.fixGetCoverageString(this.service.capabilities.getCoverageBaseUrl(this.coverageId));
+            var requestUrl = this.fixGetCoverageString(this.service.capabilities.getCoverageBaseUrl());
             requestUrl += "SERVICE=WCS";
             requestUrl += "&REQUEST=GetCoverage";
 

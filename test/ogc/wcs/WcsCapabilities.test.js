@@ -69,7 +69,7 @@ define([
                 var wcsCaps = new WcsCapabilities(xmlDom);
                 var expectedUrl = "http://localhost:8080/geoserver/wcs?";
 
-                var actualUrl = wcsCaps.getCoverageBaseUrl("testing__pacificnw_usgs_ned_10m");
+                var actualUrl = wcsCaps.getCoverageBaseUrl();
 
                 expect(actualUrl).toBe(expectedUrl);
             });
@@ -187,7 +187,7 @@ define([
                 var wcsCaps = new WcsCapabilities(xmlDom);
                 var expectedUrl = "http://localhost:8080/geoserver/wcs?";
 
-                var actualUrl = wcsCaps.getCoverageBaseUrl("testing:pacificnw_usgs_ned_10m");
+                var actualUrl = wcsCaps.getCoverageBaseUrl();
 
                 expect(actualUrl).toBe(expectedUrl);
             });
