@@ -22,25 +22,27 @@ define([
         '../../ogc/gml/GmlDomainSet',
         '../../ogc/gml/GmlRectifiedGrid',
         '../../util/Logger',
-        '../../ogc/ows/OwsKeywords'
+        '../../ogc/ows/OwsKeywords',
+        '../../geom/Sector'
     ],
     function (ArgumentError,
               GmlBoundedBy,
               GmlDomainSet,
               GmlRectifiedGrid,
               Logger,
-              OwsKeywords) {
+              OwsKeywords,
+              Sector) {
         "use strict";
 
         /**
          * Constructs a simple javascript object representation of an OGC WCS Describe Coverage XML response.
          * @alias WcsCoverageDescriptions
          * @constructor
-         * @classdesc Represents the common properties of a WCS DescribeCoverage document. Common properties are parsed
-         * and mapped to a plain javascript object model. Most fields can be accessed as properties named according to
-         * their document names converted to camel case. This model supports version 1.0.0 and 2.0.x of the WCS
-         * specification. Not all properties are mapped to this representative javascript object model, but the provided
-         * XML DOM is maintained in xmlDom property for reference.
+         * @classdesc Represents the common properties of a WCS CoverageDescription document. Common properties are
+         * parsed and mapped to a plain javascript object model. Most fields can be accessed as properties named
+         * according to their document names converted to camel case. This model supports version 1.0.0 and 2.0.x of the
+         * WCS specification. Not all properties are mapped to this representative javascript object model, but the
+         * provided XML DOM is maintained in xmlDom property for reference.
          * @param {{}} xmlDom an XML DOM representing the WCS DescribeCoverage document.
          * @throws {ArgumentError} If the specified XML DOM is null or undefined.
          */
@@ -59,6 +61,115 @@ define([
             this.assembleDocument();
         };
 
+        /**
+         * Get the bounding Sector for the provided coverage id or name.
+         * @param coverageId the coverageId or name
+         * @returns {Sector} the bounding Sector
+         */
+        WcsCoverageDescriptions.prototype.getSector = function (coverageId) {
+            if (!coverageId) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSector",
+                        "The specified coverage id was null or not defined."));
+            }
+            var coverage = this.getCoverage(coverageId), envelope;
+
+            if (!coverage) {
+                return null;
+            }
+
+            if (this.version === "1.0.0") {
+                envelope = coverage.lonLatEnvelope.pos;
+                return new Sector(
+                    envelope[0][1],
+                    envelope[1][1],
+                    envelope[0][0],
+                    envelope[1][0]);
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                envelope = coverage.boundedBy.envelope;
+                return new Sector(
+                    envelope.lower[0],
+                    envelope.upper[0],
+                    envelope.lower[1],
+                    envelope.upper[1]);
+            }
+
+            return null;
+        };
+
+        /**
+         * Calculates the resolution of the provided coverage id in degrees.
+         * @param coverageId the coverage id or name
+         * @returns {number} resolution in degrees
+         */
+        WcsCoverageDescriptions.prototype.getResolution = function (coverageId) {
+            if (!coverageId) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getResolution",
+                        "The specified coverage id was null or not defined."));
+            }
+            var coverage = this.getCoverage(coverageId), sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
+                xRes, yRes;
+
+            if (!coverage) {
+                return null;
+            }
+
+            if (this.version === "1.0.0") {
+                xLow = coverage.domainSet.spatialDomain.rectifiedGrid.limits.low[0];
+                yLow = coverage.domainSet.spatialDomain.rectifiedGrid.limits.low[1];
+                xHigh = coverage.domainSet.spatialDomain.rectifiedGrid.limits.high[0];
+                yHigh = coverage.domainSet.spatialDomain.rectifiedGrid.limits.high[1];
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                xLow = coverage.domainSet.rectifiedGrid.limits.low[0];
+                yLow = coverage.domainSet.rectifiedGrid.limits.low[1];
+                xHigh = coverage.domainSet.rectifiedGrid.limits.high[0];
+                yHigh = coverage.domainSet.rectifiedGrid.limits.high[1];
+            }
+
+            xRes = sector.deltaLongitude() / (xHigh - xLow);
+            yRes = sector.deltaLatitude() / (yHigh - yLow);
+
+            return Math.max(xRes, yRes);
+        };
+
+        /**
+         * Returns an array of the supported coordinates reference systems for the provided coverage.
+         * @param coverageId the coverage id or name
+         */
+        WcsCoverageDescriptions.prototype.getSupportedCrs = function (coverageId) {
+            if (!coverageId) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSupportedCrs",
+                        "The specified coverage id was null or not defined."));
+            }
+            var coverage = this.getCoverage(coverageId), crses = [];
+
+            if (!coverage) {
+                return null;
+            }
+
+            if (this.version === "1.0.0") {
+                return coverage.supportedCrs.requests;
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                crses.push(coverage.boundedBy.envelope.srsName);
+                return crses;
+            }
+
+            return null;
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCoverageDescriptions.prototype.getCoverage = function (coverageId) {
+            for (var i = 0, len = this.coverages.length; i < len; i++) {
+                if (coverageId === (this.coverages[i].coverageId || this.coverages[i].name)) {
+                    return this.coverages[i];
+                }
+            }
+
+            return null;
+        };
+
         // Internal. Intentionally not documented.
         WcsCoverageDescriptions.prototype.assembleDocument = function () {
             // Determine version and update sequence
@@ -66,8 +177,10 @@ define([
 
             if (root.localName === "CoverageDescription") {
                 this.assembleDocument100(root);
+                this.version = "1.0.0";
             } else if (root.localName === "CoverageDescriptions") {
                 this.assembleDocument20x(root);
+                this.version = root.getAttribute("version") || "2.0.1"; // work around for geoserver bug
             } else {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "assembleDocument", "unsupportedVersion"));

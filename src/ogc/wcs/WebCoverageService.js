@@ -46,7 +46,7 @@ define([
             this.serviceAddress = null;
 
             /**
-             * A collection of the coverages available from this service. Not populated until service is initialized by
+             * A collection of WcsCoverages available from this service. Not populated until service is initialized by
              * the connect method.
              * @type {Array}
              */
@@ -143,9 +143,13 @@ define([
         WebCoverageService.prototype.parseCoverages = function (xmlDom) {
             this.coverageDescriptions = new WcsCoverageDescriptions(xmlDom);
             var coverageCount = this.coverageDescriptions.coverages.length;
+            var coverageId, coverage;
 
             for (var i = 0; i < coverageCount; i++) {
-                this.coverages.push(this.coverageDescriptions.coverages[i]);
+                coverageId = this.coverageDescriptions.coverages[i].coverageId
+                    || this.coverageDescriptions.coverages[i].name;
+                coverage = new WcsCoverage(coverageId, this);
+                this.coverages.push(coverage);
             }
         };
 
