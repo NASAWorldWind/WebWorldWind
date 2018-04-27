@@ -63,6 +63,18 @@ define([
             expect(updateSequence).toBe("11");
         });
 
+        describe("Utility Methods", function () {
+
+            it("should provide the get coverage base url", function () {
+                var wcsCaps = new WcsCapabilities(xmlDom);
+                var expectedUrl = "http://localhost:8080/geoserver/wcs?";
+
+                var actualUrl = wcsCaps.getCoverageBaseUrl("testing__pacificnw_usgs_ned_10m");
+
+                expect(actualUrl).toBe(expectedUrl);
+            });
+        });
+
         describe("Service Identification", function () {
 
             it("should have scaling extension detailed in the profile", function () {
@@ -167,6 +179,18 @@ define([
             var updateSequence = wcsCaps.updateSequence;
 
             expect(updateSequence).toBe("11");
+        });
+
+        describe("Utility Methods", function () {
+
+            it("should provide the get coverage base url", function () {
+                var wcsCaps = new WcsCapabilities(xmlDom);
+                var expectedUrl = "http://localhost:8080/geoserver/wcs?";
+
+                var actualUrl = wcsCaps.getCoverageBaseUrl("testing:pacificnw_usgs_ned_10m");
+
+                expect(actualUrl).toBe(expectedUrl);
+            });
         });
 
         describe("Coverages", function () {

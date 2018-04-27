@@ -18,10 +18,14 @@
  */
 define([
         '../../error/ArgumentError',
-        '../../util/Logger'
+        '../../geom/Location',
+        '../../util/Logger',
+        '../../ogc/wcs/WcsUrlBuilder'
     ],
     function (ArgumentError,
-              Logger) {
+              Location,
+              Logger,
+              WcsUrlBuilder) {
         "use strict";
 
         /**
@@ -75,10 +79,78 @@ define([
             this.elevationConfiguration = this.createElevationConfiguration();
         };
 
+        /**
+         * Preferred formats used for fuzzy comparison to available formats.
+         * @type {string[]}
+         */
+        WcsCoverage.PREFERRED_FORMATS = ["geotiff", "tiff"];
+
+        /**
+         * The default format.
+         * @type {string}
+         */
+        WcsCoverage.DEFAULT_FORMAT = "image/tiff";
+
         // Internal use only
         WcsCoverage.prototype.createElevationConfiguration = function () {
-            // TODO
-            return {};
+            return {
+                coverageSector: this.sector,
+                resolution: this.resolution,
+                retrievalImageFormat: this.findPreferredFormat(),
+                levelZeroDelta: new Location(45, 45),
+                numLevels: this.calculateNumberOfLevels(this.resolution),
+                tileWidth: WcsUrlBuilder.TILE_WIDTH,
+                tileHeight: WcsUrlBuilder.TILE_HEIGHT,
+                cachePath: this.coverageId,
+                minElevation: -11000,
+                maxElevation: 8850,
+                urlBuilder: new WcsUrlBuilder(this)
+            };
+        };
+
+        // Internal use only
+        WcsCoverage.prototype.findPreferredFormat = function () {
+            var version = this.service.capabilities.version, availableFormats, format, coverageDescription;
+
+            if (version === "1.0.0") {
+                // find the associated coverage description
+                for (var i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
+                    if(this.coverageId === this.service.coverageDescriptions.coverages[i].name) {
+                        availableFormats = this.service.coverageDescriptions.coverages[i].supportedFormats.formats;
+                        break;
+                    }
+                }
+            } else if (version === "2.0.1" || version === "2.0.0") {
+                availableFormats = this.service.capabilities.serviceMetadata.formatsSupported
+            }
+
+            if (!availableFormats) {
+                return WcsCoverage.DEFAULT_FORMAT;
+            }
+
+            for (i = 0; i < WcsCoverage.PREFERRED_FORMATS.length; i++) {
+                format = WcsCoverage.PREFERRED_FORMATS[i].toLowerCase();
+                for (var j =0; j < availableFormats.length; j++) {
+                    if (availableFormats[j].toLowerCase().indexOf(format) >= 0) {
+                        return availableFormats[j];
+                    }
+                }
+            }
+
+            return WcsCoverage.DEFAULT_FORMAT;
+        };
+
+        // Internal use only
+        WcsCoverage.prototype.calculateNumberOfLevels = function (degreesPerPixel) {
+            var firstLevelDegreesPerPixel = 90 / WcsUrlBuilder.TILE_HEIGHT;
+            var level = Math.log(firstLevelDegreesPerPixel / degreesPerPixel) / Math.log(2); // fractional level address
+            var levelNumber = Math.floor(level); // floor prevents exceeding the min scale
+
+            if (levelNumber < 0) {
+                levelNumber = 0; // need at least one level, even if it exceeds the desired resolution
+            }
+
+            return levelNumber + 1; // convert level number to level count
         };
 
         return WcsCoverage;

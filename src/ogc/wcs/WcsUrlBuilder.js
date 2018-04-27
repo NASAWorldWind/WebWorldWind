@@ -1,0 +1,155 @@
+/*
+ * Copyright 2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @exports WcsUrlBuilder
+ */
+define([
+        '../../error/ArgumentError',
+        '../../util/Logger'
+    ],
+    function (ArgumentError,
+              Logger) {
+        "use strict";
+
+        var WcsUrlBuilder = function (wcsCoverage) {
+            if (!wcsCoverage) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsUrlBuilder", "constructor",
+                        "The specified WcsCoverage is null or undefined"));
+            }
+
+            /**
+             * The Coverage id or name.
+             * @type {*|String}
+             */
+            this.coverageId = wcsCoverage.coverageId;
+
+            /**
+             * The WebCoverageService object which provided this coverage.
+             * @type {*|WebCoverageService|String}
+             */
+            this.service = wcsCoverage.service;
+        };
+
+        /**
+         * The default dataset y samples.
+         * @type {number}
+         */
+        WcsUrlBuilder.TILE_HEIGHT = 256;
+
+        /**
+         * The default dataset x samples.
+         * @type {number}
+         */
+        WcsUrlBuilder.TILE_WIDTH = 256;
+
+        WcsUrlBuilder.prototype.urlForTile = function (tile, format) {
+            if (!tile) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsUrlBuilder", "urlForTile", "missingTile"));
+            }
+
+            if (!format) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsUrlBuilder", "urlForTile",
+                        "The specified format is null or undefined."));
+            }
+
+            var version = this.service.capabilities.version;
+            var requestUrl = this.fixGetCoverageString(this.service.capabilities.getCoverageBaseUrl(this.coverageId));
+            requestUrl += "SERVICE=WCS";
+            requestUrl += "&REQUEST=GetCoverage";
+
+            if (version === "1.0.0") {
+                return this.buildUrl100(tile, format, requestUrl);
+            } else if (version === "2.0.1" || version === "2.0.0") {
+                return this.buildUrl20x(tile, format, requestUrl);
+            }
+
+        };
+
+        // Internal use only
+        WcsUrlBuilder.prototype.buildUrl100 = function (tile, format, requestUrl) {
+            var sector = tile.sector;
+
+            requestUrl += "&VERSION=1.0.0";
+            requestUrl += "&COVERAGE=" + this.coverageId;
+            requestUrl += "&CRS=EPSG:4326";
+            requestUrl += "&WIDTH=" + WcsUrlBuilder.TILE_WIDTH;
+            requestUrl += "&HEIGHT=" + WcsUrlBuilder.TILE_HEIGHT;
+            requestUrl += "&FORMAT=" + format;
+            requestUrl += "&BBOX=" + sector.minLongitude + "," + sector.minLatitude + "," + sector.maxLongitude +
+                "," + sector.maxLatitude;
+
+            return encodeURI(requestUrl);
+        };
+
+        // Internal use only
+        WcsUrlBuilder.prototype.buildUrl20x = function (tile, format, requestUrl) {
+            var sector = tile.sector, latLabel, lonLabel, coverageDescription;
+
+            for (var i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
+                if (this.coverageId === this.service.coverageDescriptions.coverages[i].coverageId) {
+                    coverageDescription = this.service.coverageDescriptions.coverages[i];
+                    break;
+                }
+            }
+
+            var scaleLabels = coverageDescription.domainSet.rectifiedGrid.axisLabels;
+            var axisLabels = coverageDescription.boundedBy.envelope.axisLabels;
+            if (axisLabels[0].toLowerCase().indexOf("lat") >= 0) {
+                latLabel = axisLabels[0];
+                lonLabel = axisLabels[1];
+            } else {
+                latLabel = axisLabels[1];
+                lonLabel = axisLabels[0];
+            }
+
+            requestUrl += "&VERSION=" + this.service.capabilities.version;
+            requestUrl += "&COVERAGEID=" + this.coverageId;
+            requestUrl += "&FORMAT=" + format;
+            requestUrl += "&SCALESIZE=" + scaleLabels[0] + "(" + WcsUrlBuilder.TILE_WIDTH + ")," + scaleLabels[1] + "(" + WcsUrlBuilder.TILE_HEIGHT + ")";
+            requestUrl += "&OVERVIEWPOLICY=NEAREST";
+            requestUrl += "&SUBSET=" + latLabel + "(" + sector.minLatitude + "," + sector.maxLatitude + ")";
+            requestUrl += "&SUBSET=" + lonLabel + "(" + sector.minLongitude + "," + sector.maxLongitude + ")";
+
+            return encodeURI(requestUrl);
+        };
+
+        // Intentionally not documented - copied from WmsUrlBuilder see issue #154
+        WcsUrlBuilder.prototype.fixGetCoverageString = function (serviceAddress) {
+            if (!serviceAddress) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmsUrlBuilder", "fixGetMapString",
+                        "The specified service address is null or undefined."));
+            }
+
+            var index = serviceAddress.indexOf("?");
+
+            if (index < 0) { // if string contains no question mark
+                serviceAddress = serviceAddress + "?"; // add one
+            } else if (index !== serviceAddress.length - 1) { // else if question mark not at end of string
+                index = serviceAddress.search(/&$/);
+                if (index < 0) {
+                    serviceAddress = serviceAddress + "&"; // add a parameter separator
+                }
+            }
+
+            return serviceAddress;
+        };
+
+        return WcsUrlBuilder;
+    });
