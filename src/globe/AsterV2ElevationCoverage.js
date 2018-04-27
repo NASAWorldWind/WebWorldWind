@@ -36,15 +36,21 @@ define([
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
         var AsterV2ElevationCoverage = function () {
-            TiledElevationCoverage.call(this,
-                new Sector(-83.0001, 83.0001, -180, 180), new Location(45, 45), 11, "application/bil16",
-                "AsterV2Elevations256", 256, 256, 0.000277777777778);
+            TiledElevationCoverage.call(this, {
+                coverageSector: new Sector(-83.0001, 83.0001, -180, 180),
+                resolution: 0.000277777777778,
+                retrievalImageFormat: "application/bil16",
+                levelZeroDelta: new Location(45, 45),
+                numLevels: 11,
+                tileWidth: 256,
+                tileHeight: 256,
+                cachePath: "AsterV2Elevations256",
+                minElevation: -11000,
+                maxElevation: 8850,
+                urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "aster_v2", "", "1.3.0")
+            });
 
             this.displayName = "ASTER V2 Earth Elevation Coverage";
-            this.minElevation = -11000;
-            this.maxElevation = 8850;
-            this.pixelIsPoint = false;
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "aster_v2", "", "1.3.0");
         };
 
         AsterV2ElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
