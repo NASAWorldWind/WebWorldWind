@@ -23,12 +23,20 @@ define([
     describe("ElevationModel tests", function () {
 
         var MockCoverage = function (resolution, minElevation, maxElevation) {
-            TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 1, "application/bil16", "MockElevations256", 256, 256, resolution);
+            TiledElevationCoverage.call(this, {
+                coverageSector: Sector.FULL_SPHERE,
+                resolution: resolution,
+                retrievalImageFormat: "application/bil16",
+                levelZeroDelta: new Location(45, 45),
+                numLevels: 1,
+                tileWidth: 256,
+                tileHeight: 256,
+                cachePath: "MockElevations256",
+                minElevation: minElevation ? minElevation : -11000,
+                maxElevation: maxElevation ? maxElevation : 8850
+            });
 
             this.displayName = "Mock Elevation Coverage";
-            this.minElevation = minElevation ? minElevation : -11000;
-            this.maxElevation = maxElevation ? maxElevation : 8850;
         };
 
         MockCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
