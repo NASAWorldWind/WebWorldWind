@@ -45,13 +45,13 @@ define([], function () {
 
     CustomMatchers.toBeSector = function (util, customEqualityTesters) {
         return {
-            compare: function (actual, expected, delta) {
-                var difference = Math.abs(actual.minLatitude - expected.minLatitude);
-                difference += Math.abs(actual.maxLatitude - expected.maxLatitude);
-                difference += Math.abs(actual.minLongitude - expected.minLongitude);
-                difference += Math.abs(actual.maxLongitude - expected.maxLongitude);
+            compare: function (actual, expected) {
+                var doMatch = (actual.minLatitude === expected.minLatitude) &&
+                        (actual.maxLatitude === expected.maxLatitude) &&
+                        (actual.minLongitude === expected.minLongitude) &&
+                        (actual.maxLongitude === expected.maxLongitude);
                 return {
-                    pass: difference <= Math.abs(delta),
+                    pass: doMatch,
                     message: "Expected minLat: " + actual.minLatitude + ", maxLat: " + actual.maxLatitude
                         + ", minLon: " + actual.minLongitude + ", maxLon: " + actual.maxLongitude
                         + " to equal " + "minLat: " + expected.minLatitude + ", maxLat: " + expected.maxLatitude
