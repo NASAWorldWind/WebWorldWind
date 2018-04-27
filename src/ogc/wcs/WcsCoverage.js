@@ -98,7 +98,7 @@ define([
                 resolution: this.resolution,
                 retrievalImageFormat: this.findPreferredFormat(),
                 levelZeroDelta: new Location(45, 45),
-                numLevels: this.calculateNumberOfLevels(this.resolution),
+                numLevels: WcsCoverage.calculateNumberOfLevels(this.resolution),
                 tileWidth: WcsUrlBuilder.TILE_WIDTH,
                 tileHeight: WcsUrlBuilder.TILE_HEIGHT,
                 cachePath: this.coverageId,
@@ -141,7 +141,7 @@ define([
         };
 
         // Internal use only
-        WcsCoverage.prototype.calculateNumberOfLevels = function (degreesPerPixel) {
+        WcsCoverage.calculateNumberOfLevels = function (degreesPerPixel) {
             var firstLevelDegreesPerPixel = 90 / WcsUrlBuilder.TILE_HEIGHT;
             var level = Math.log(firstLevelDegreesPerPixel / degreesPerPixel) / Math.log(2); // fractional level address
             var levelNumber = Math.floor(level); // floor prevents exceeding the min scale
