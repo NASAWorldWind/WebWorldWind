@@ -108,6 +108,7 @@ define(function () {
             missingBoundaries: "The specified boundaries array is null or undefined.",
             missingBuffer: "The specified buffer descriptor is null or undefined.",
             missingColor: "The specified color is null or undefined.",
+            missingConfig: "The specified config is null or undefined.",
             missingDc: "The specified draw context is null or undefined.",
             missingDomElement: "The specified DOM element is null or undefined.",
             missingEntry: "The specified entry is null or undefined.",
