@@ -43,64 +43,33 @@ define(['../util/AbsentResourceList',
               Tile,
               WWMath) {
         "use strict";
-
         /**
          * Constructs a TiledElevationCoverage
          * @alias TiledElevationCoverage
          * @constructor
          * @classdesc Represents the elevations for an area, often but not necessarily the whole globe.
-         * @param {Sector} coverageSector The sector this coverage spans.
-         * @param {Location} levelZeroDelta The size of top-level tiles, in degrees.
-         * @param {Number} numLevels The number of levels used to represent this coverage's resolution pyramid.
-         * @param {String} retrievalImageFormat The mime type of the elevation data retrieved by this coverage.
-         * @param {String} cachePath A string unique to this coverage relative to other coverages used by
-         * the application.
-         * @param {Number} tileWidth The number of intervals (cells) in the longitudinal direction of this elevation
-         * model's elevation tiles.
-         * @param {Number} tileHeight The number of intervals (cells) in the latitudinal direction of this elevation
-         * model's elevation tiles.
-         * @param {Number} resolution The resolution of the coverage, in degrees. (To compute degrees from
-         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
-         * @throws {ArgumentError} If any argument is null or undefined, if the number of levels specified is less
-         * than one, or if either the tile width or tile height are less than one.
+         * @param {{}} config Configuration information for the layer with the following properties:
+         * <ul>
+         *     <li>coverageSector: {Sector} The sector this coverage spans. (Required)</li>
+         *     <li>resolution: {Number}The resolution of the coverage, in degrees. (To compute degrees from meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.) (Required)</li>
+         *     <li>retrievalImageFormat: {String} The mime type of the elevation data retrieved by this coverage. (Required)</li>
+         *     <li>levelZeroDelta: {Location} The size of top-level tiles, in degrees. (Required)</li>
+         *     <li>numLevels: {Number} The number of levels used to represent this coverage's resolution pyramid. (Required)</li>
+         *     <li>tileWidth: {Number} The number of intervals (cells) in the longitudinal direction of this elevation model's elevation tiles. (Required)</li>
+         *     <li>tileHeight: {Number}The number of intervals (cells) in the latitudinal direction of this elevation model's elevation tiles. (Required)</li>
+         *     <li>cachePath: {String} A string unique to this coverage relative to other coverages used by the application. (Required)</li>
+         *     <li>minElevation: {Number} This coverage's minimum elevation in meters. (Optional)</li>
+         *     <li>maxElevation: {Number} This coverage's maximum elevation in meters. (Optional)</li>
+         *     <li>urlBuilder: {UrlBuilder} The factory to create URLs for data requests. (Optional)</li>
+         * <ul>
+         * @throws {ArgumentError} If the specified configuration is null or undefined.
          */
-        var TiledElevationCoverage = function (coverageSector, levelZeroDelta, numLevels, retrievalImageFormat, cachePath,
-                                               tileWidth, tileHeight, resolution) {
-            ElevationCoverage.call(this, resolution);
+        var TiledElevationCoverage = function (config) {
+            ElevationCoverage.call(this, config.resolution);
 
-            if (!coverageSector) {
+            if (!config) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingSector"));
-            }
-
-            if (!levelZeroDelta) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor",
-                        "The specified level-zero delta is null or undefined."));
-            }
-
-            if (!retrievalImageFormat) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor",
-                        "The specified image format is null or undefined."));
-            }
-
-            if (!cachePath) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor",
-                        "The specified cache path is null or undefined."));
-            }
-
-            if (!numLevels || numLevels < 1) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor",
-                        "The specified number of levels is not greater than zero."));
-            }
-
-            if (!tileWidth || !tileHeight || tileWidth < 1 || tileHeight < 1) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor",
-                        "The specified tile width or height is not greater than zero."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingConfig"));
             }
 
             /**
@@ -108,33 +77,33 @@ define(['../util/AbsentResourceList',
              * @type {Sector}
              * @readonly
              */
-            this.coverageSector = coverageSector;
+            this.coverageSector = config.coverageSector;
 
             /**
              * The mime type to use when retrieving elevations.
              * @type {String}
              * @readonly
              */
-            this.retrievalImageFormat = retrievalImageFormat;
+            this.retrievalImageFormat = config.retrievalImageFormat;
 
             /** A unique string identifying this coverage relative to other coverages in use.
              * @type {String}
              * @readonly
              */
-            this.cachePath = cachePath;
+            this.cachePath = config.cachePath;
 
             /**
              * This coverage's minimum elevation in meters.
              * @type {Number}
              * @default 0
              */
-            this.minElevation = 0;
+            this.minElevation = config.minElevation || 0;
 
             /**
              * This coverage's maximum elevation in meters.
              * @type {Number}
              */
-            this.maxElevation = 0;
+            this.maxElevation = config.maxElevation || 0;
 
             /**
              * Indicates whether the data associated with this coverage is point data. A value of false
@@ -142,14 +111,14 @@ define(['../util/AbsentResourceList',
              * @type {Boolean}
              * @default true
              */
-            this.pixelIsPoint = true;
+            this.pixelIsPoint = false;
 
             /**
              * The {@link LevelSet} created during construction of this coverage.
              * @type {LevelSet}
              * @readonly
              */
-            this.levels = new LevelSet(this.coverageSector, levelZeroDelta, numLevels, tileWidth, tileHeight);
+            this.levels = new LevelSet(this.coverageSector, config.levelZeroDelta, config.numLevels, config.tileWidth, config.tileHeight);
 
             /**
              * Internal use only
@@ -208,12 +177,12 @@ define(['../util/AbsentResourceList',
 
             /**
              * Internal use only
-             * The factory to create URLs for data requests. This property is typically set in the constructor of child classes.
-             * See {@link WcsTileUrlBuilder} and {@link WmsUrlBuilder} for concrete examples.
-             * @type {Object}
+             * The factory to create URLs for data requests. This property is typically set in the constructor of child
+             * classes. See {@link WcsUrlBuilder} for a concrete example.
+             * @type {UrlBuilder}
              * @ignore
              */
-            this.urlBuilder = null;
+            this.urlBuilder = config.urlBuilder || null;
         };
 
         TiledElevationCoverage.prototype = Object.create(ElevationCoverage.prototype);
