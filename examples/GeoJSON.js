@@ -97,8 +97,7 @@ requirejs(['./WorldWindShim',
             layerManager.synchronizeLayerList();
         };
 
-        // var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/geojson-data/";
-        var resourcesUrl = "../examples/data/geojson-data/";
+        var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/geojson-data/";
 
         // Polygon test
         var polygonLayer = new WorldWind.RenderableLayer("Polygon - Romania");
