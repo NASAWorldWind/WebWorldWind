@@ -80,7 +80,7 @@ requirejs(['./WorldWindShim',
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
-                    0.1);
+                    0.5);
                 // Paint the outline in a darker variant of the interior color.
                 configuration.attributes.outlineColor = new WorldWind.Color(
                     0.5 * configuration.attributes.interiorColor.red,
@@ -134,7 +134,6 @@ requirejs(['./WorldWindShim',
         //MultiLineString test
         var multiLineStringLayer = new WorldWind.RenderableLayer("MultiLineString - Danube");
         var multiLineStringGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "MultiLineStringTest.geojson");
-        console.dir(multiLineStringGeoJSON);
         multiLineStringGeoJSON.load(null, shapeConfigurationCallback, multiLineStringLayer);
         wwd.addLayer(multiLineStringLayer);
 
