@@ -133,7 +133,7 @@ define([
             // find the associated coverage description
             if (version === "1.0.0") {
                 for (var i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
-                    if(this.coverageId === this.service.coverageDescriptions.coverages[i].name) {
+                    if (this.coverageId === this.service.coverageDescriptions.coverages[i].name) {
                         availableFormats = this.service.coverageDescriptions.coverages[i].supportedFormats.formats;
                         break;
                     }
@@ -148,7 +148,7 @@ define([
 
             for (i = 0; i < WcsCoverage.PREFERRED_FORMATS.length; i++) {
                 format = WcsCoverage.PREFERRED_FORMATS[i].toLowerCase();
-                for (var j =0; j < availableFormats.length; j++) {
+                for (var j = 0; j < availableFormats.length; j++) {
                     if (availableFormats[j].toLowerCase().indexOf(format) >= 0) {
                         return availableFormats[j];
                     }
