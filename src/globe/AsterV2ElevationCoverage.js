@@ -44,7 +44,6 @@ define([
                 numLevels: 11,
                 tileWidth: 256,
                 tileHeight: 256,
-                cachePath: "AsterV2Elevations256",
                 minElevation: -11000,
                 maxElevation: 8850,
                 urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "aster_v2", "", "1.3.0")

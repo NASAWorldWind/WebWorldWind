@@ -55,7 +55,6 @@ define(['../util/AbsentResourceList',
          *     <li>numLevels: {Number} The number of levels used to represent this coverage's resolution pyramid. (Required)</li>
          *     <li>tileWidth: {Number} The number of intervals (cells) in the longitudinal direction of this elevation model's elevation tiles. (Required)</li>
          *     <li>tileHeight: {Number}The number of intervals (cells) in the latitudinal direction of this elevation model's elevation tiles. (Required)</li>
-         *     <li>cachePath: {String} A string unique to this coverage relative to other coverages used by the application. (Required)</li>
          *     <li>minElevation: {Number} This coverage's minimum elevation in meters. (Optional)</li>
          *     <li>maxElevation: {Number} This coverage's maximum elevation in meters. (Optional)</li>
          *     <li>urlBuilder: {UrlBuilder} The factory to create URLs for data requests. (Optional)</li>
@@ -83,12 +82,6 @@ define(['../util/AbsentResourceList',
              * @readonly
              */
             this.retrievalImageFormat = config.retrievalImageFormat;
-
-            /** A unique string identifying this coverage relative to other coverages in use.
-             * @type {String}
-             * @readonly
-             */
-            this.cachePath = config.cachePath;
 
             /**
              * This coverage's minimum elevation in meters.
