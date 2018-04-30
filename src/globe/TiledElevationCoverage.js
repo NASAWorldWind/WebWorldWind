@@ -23,6 +23,7 @@ define(['../util/AbsentResourceList',
         '../globe/ElevationImage',
         '../formats/geotiff/GeoTiffReader',
         '../util/LevelSet',
+        '../geom/Location',
         '../util/Logger',
         '../cache/MemoryCache',
         '../geom/Sector',
@@ -35,6 +36,7 @@ define(['../util/AbsentResourceList',
               ElevationImage,
               GeoTiffReader,
               LevelSet,
+              Location,
               Logger,
               MemoryCache,
               Sector,
@@ -46,28 +48,44 @@ define(['../util/AbsentResourceList',
          * @alias TiledElevationCoverage
          * @constructor
          * @classdesc Represents the elevations for an area, often but not necessarily the whole globe.
-         * @param {{}} config Configuration information for the layer with the following properties:
+         * @param {{}} config Configuration properties for the coverage:
          * <ul>
-         *     <li>coverageSector: {Sector} The sector this coverage spans. (Required)</li>
-         *     <li>resolution: {Number}The resolution of the coverage, in degrees. (To compute degrees from meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.) (Required)</li>
-         *     <li>retrievalImageFormat: {String} The mime type of the elevation data retrieved by this coverage. (Required)</li>
-         *     <li>levelZeroDelta: {Location} The size of top-level tiles, in degrees. (Required)</li>
-         *     <li>numLevels: {Number} The number of levels used to represent this coverage's resolution pyramid. (Required)</li>
-         *     <li>tileWidth: {Number} The number of intervals (cells) in the longitudinal direction of this elevation model's elevation tiles. (Required)</li>
-         *     <li>tileHeight: {Number}The number of intervals (cells) in the latitudinal direction of this elevation model's elevation tiles. (Required)</li>
-         *     <li>minElevation: {Number} This coverage's minimum elevation in meters. (Optional)</li>
-         *     <li>maxElevation: {Number} This coverage's maximum elevation in meters. (Optional)</li>
-         *     <li>urlBuilder: {UrlBuilder} The factory to create URLs for data requests. (Optional)</li>
+         *     <li>coverageSector: {Sector} The sector this coverage spans.</li>
+         *     <li>resolution: {Number} The resolution of the coverage, in degrees. (To compute degrees from meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)</li>
+         *     <li>retrievalImageFormat: {String} The mime type of the elevation data retrieved by this coverage.</li>
+         *     <li>minElevation (optional): {Number} The coverage's minimum elevation in meters.</li>
+         *     <li>maxElevation (optional): {Number} Te coverage's maximum elevation in meters.</li>
+         *     <li>urlBuilder (optional): {UrlBuilder} The factory to create URLs for elevation data requests.</li>
          * <ul>
-         * @throws {ArgumentError} If the specified configuration is null or undefined.
+         * @throws {ArgumentError} If any required configuration parameter is null or undefined.
          */
         var TiledElevationCoverage = function (config) {
-            ElevationCoverage.call(this, config.resolution);
-
             if (!config) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingConfig"));
             }
+
+            if (!config.coverageSector) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingSector"));
+            }
+
+            if (!config.resolution) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingResolution"));
+            }
+
+            if (!config.retrievalImageFormat) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingImageFormat"));
+            }
+
+            ElevationCoverage.call(this, config.resolution);
+
+            var firstLevelDelta = 45,
+                tileWidth = 256,
+                lastLevel = LevelSet.numLevelsForResolution(firstLevelDelta / tileWidth, config.resolution),
+                numLevels = Math.ceil(lastLevel); // match or exceed the specified resolution
 
             /**
              * The sector this coverage spans.
@@ -105,11 +123,13 @@ define(['../util/AbsentResourceList',
             this.pixelIsPoint = false;
 
             /**
-             * The {@link LevelSet} created during construction of this coverage.
+             * The {@link LevelSet} dividing this coverage's geographic domain into a multi-resolution, hierarchical
+             * collection of tiles.
              * @type {LevelSet}
              * @readonly
              */
-            this.levels = new LevelSet(this.coverageSector, config.levelZeroDelta, config.numLevels, config.tileWidth, config.tileHeight);
+            this.levels = new LevelSet(this.coverageSector, new Location(firstLevelDelta, firstLevelDelta),
+                numLevels, tileWidth, tileWidth);
 
             /**
              * Internal use only
