@@ -40,10 +40,6 @@ define([
                 coverageSector: new Sector(-83.0001, 83.0001, -180, 180),
                 resolution: 0.000277777777778,
                 retrievalImageFormat: "application/bil16",
-                levelZeroDelta: new Location(45, 45),
-                numLevels: 11,
-                tileWidth: 256,
-                tileHeight: 256,
                 minElevation: -11000,
                 maxElevation: 8850,
                 urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "aster_v2", "", "1.3.0")

@@ -42,10 +42,6 @@ define([
                 coverageSector: new Sector(18.865460, 28.517269, -178.443593, -154.755792),
                 resolution: 0.000092592592593,
                 retrievalImageFormat: "application/bil16",
-                levelZeroDelta: new Location(45, 45),
-                numLevels: 12,
-                tileWidth: 256,
-                tileHeight: 256,
                 minElevation: -11000,
                 maxElevation: 8850,
                 urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "USGS-NED", "", "1.3.0")
