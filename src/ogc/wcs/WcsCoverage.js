@@ -130,8 +130,9 @@ define([
         WcsCoverage.prototype.determineFormatFromService = function () {
             var version = this.service.capabilities.version, availableFormats, format, coverageDescription;
 
-            // find the associated coverage description
+            // find the service supported format identifiers
             if (version === "1.0.0") {
+                // find the associated coverage description
                 for (var i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
                     if (this.coverageId === this.service.coverageDescriptions.coverages[i].name) {
                         availableFormats = this.service.coverageDescriptions.coverages[i].supportedFormats.formats;
