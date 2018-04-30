@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015-2018 WorldWind Contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 define(['../../util/QuadTree'], function(QuadTree){
     /**
      * It works with IntensityLocations instead of with the plain bound object. This type of tree uses default QuadTree
@@ -17,7 +32,7 @@ define(['../../util/QuadTree'], function(QuadTree){
     /**
      * This method could possibly be named differently, but the purpose is the same, only it accepts the geographical
      * points and transform them to the x, y space used by the QuadTree
-     * @param intensityLocation {IntensityLocation} Location to insert into the tree.
+     * @param intensityLocation {MeasuredLocation} Location to insert into the tree.
      */
     HeatMapQuadTree.prototype.insert = function(intensityLocation) {
         // Build the structure to call standard insert

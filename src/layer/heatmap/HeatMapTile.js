@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ define([], function(){
         for(var i = 0; i < this._data.length; i++) {
             var location = this._data[i];
             // Get the location in pixels and draw the image.
-            ctx.globalAlpha = location.intensity * this._incrementPerIntensity;
+            ctx.globalAlpha = location.measure * this._incrementPerIntensity;
             ctx.drawImage(shape, this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
         }
 

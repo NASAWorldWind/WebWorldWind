@@ -29,20 +29,13 @@ define([
      * @augments TiledImageLayer
      * @alias HeatMapLayer
      * @param displayName {String} The display name to associate with this layer.
-     * @param locations {Location[]} Array of the points to be shown in the HeatMap
-     * @param intensities {Number[]} Array of the intensities. The amount must be the same as for the locations.
+     * @param measuredLocations {MeasuredLocation[]} Array of the points with the measured locations provided. .
      */
-    var HeatMapLayer = function (displayName, locations, intensities) {
+    var HeatMapLayer = function (displayName, measuredLocations) {
         this.tileWidth = 512;
         this.tileHeight = 512;
 
         TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 14, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
-
-        if(locations.length !== intensities.length) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "HeatMapLayer", "constructor", "The length of locations and intensities differs")
-            );
-        }
 
         this.displayName = displayName;
 
@@ -53,15 +46,11 @@ define([
                 width: 360,
                 height: 180
             },
-            maxObjects: Math.ceil(locations.length / Math.pow(4, 4)),
+            maxObjects: Math.ceil(measuredLocations.length / Math.pow(4, 4)),
             maxLevels: 4
         });
-        locations.forEach(function(location, index){
-            this._data.insert({
-                latitude: location.latitude,
-                longitude: location.longitude,
-                intensity: intensities[index]
-            });
+        measuredLocations.forEach(function(location){
+            this._data.insert(location);
         }.bind(this));
 
         this._intervalType = IntervalType.CONTINUOUS;
@@ -205,15 +194,15 @@ define([
         } else if(intervalType === IntervalType.QUANTILES) {
             // Equal amount of pieces in each group.
             data.sort(function(item1, item2){
-                if(item1.intensity < item2.intensity){
+                if(item1.measure < item2.measure){
                     return -1;
-                } else if(item1.intensity > item2.intensity) {
+                } else if(item1.measure > item2.measure) {
                     return 1;
                 } else {
                     return 0;
                 }
             });
-            var max = data[data.length - 1].intensity;
+            var max = data[data.length - 1].measure;
             if(data.length >= scale.length) {
                 scale.forEach(function(color, index){
                     // What is the fraction of the colors

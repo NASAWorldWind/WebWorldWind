@@ -27,8 +27,8 @@ requirejs(['./WorldWindShim',
         var locations = [];
         var intensities = [];
         for (var i = 0; i < 500; i++) {
-            locations.push(new WorldWind.Location(30 + (20 * Math.random()), -130 + (50 * Math.random())));
-            intensities.push(Math.ceil(100 * Math.random()));
+            locations.push(new WorldWind.MeasuredLocation(30 + (20 * Math.random()), -130 + (50 * Math.random())),
+                Math.ceil(100 * Math.random()));
         }
 
         //
