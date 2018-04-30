@@ -18,12 +18,10 @@
  */
 define([
         '../../error/ArgumentError',
-        '../../geom/Location',
         '../../util/Logger',
         '../../ogc/wcs/WcsUrlBuilder'
     ],
     function (ArgumentError,
-              Location,
               Logger,
               WcsUrlBuilder) {
         "use strict";
@@ -91,36 +89,12 @@ define([
          */
         WcsCoverage.DEFAULT_FORMAT = "image/tiff";
 
-        /**
-         * The default data width.
-         * @type {number}
-         */
-        WcsCoverage.DEFAULT_TILE_WIDTH = 256;
-
-        /**
-         * The default data height.
-         * @type {number}
-         */
-        WcsCoverage.DEFAULT_TILE_HEIGHT = 256;
-
-        /**
-         * A default level zero tile delta for global coverages.
-         * @type {Location}
-         */
-        WcsCoverage.DEFAULT_LEVEL_ZERO_DELTA = new Location(45, 45);
-
         // Internal use only
         WcsCoverage.prototype.createElevationConfig = function () {
             return {
                 resolution: this.resolution,
                 coverageSector: this.sector,
                 retrievalImageFormat: this.determineFormatFromService(),
-                minElevation: -11000,
-                maxElevation: 8850,
-                levelZeroDelta: WcsCoverage.DEFAULT_LEVEL_ZERO_DELTA,
-                numLevels: WcsCoverage.calculateNumberOfLevels(this.resolution),
-                tileWidth: WcsCoverage.DEFAULT_TILE_WIDTH,
-                tileHeight: WcsCoverage.DEFAULT_TILE_HEIGHT,
                 urlBuilder: new WcsUrlBuilder(this)
             };
         };
@@ -156,19 +130,6 @@ define([
             }
 
             return WcsCoverage.DEFAULT_FORMAT;
-        };
-
-        // Internal use only - See WWA LevelSetConfig
-        WcsCoverage.calculateNumberOfLevels = function (degreesPerPixel) {
-            var firstLevelDegreesPerPixel = 90 / WcsCoverage.DEFAULT_TILE_HEIGHT;
-            var level = Math.log(firstLevelDegreesPerPixel / degreesPerPixel) / Math.log(2); // fractional level address
-            var levelNumber = Math.floor(level); // floor prevents exceeding the min scale
-
-            if (levelNumber < 0) {
-                levelNumber = 0; // need at least one level, even if it exceeds the desired resolution
-            }
-
-            return levelNumber; // convert level number to level count
         };
 
         return WcsCoverage;

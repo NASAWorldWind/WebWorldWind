@@ -29,16 +29,6 @@ define([
 
     describe("WcsCoverage", function () {
 
-        describe("Number of levels calculation", function () {
-
-            it("should calculate the appropriate number of levels", function () {
-
-                var levels = WcsCoverage.calculateNumberOfLevels(0.0003433227539);
-
-                expect(levels).toBe(10);
-            });
-        });
-
         describe("Elevation Config", function () {
             WcsCoverage.prototype.determineFormatFromService = function () {
                 return "image/tiff";
@@ -63,7 +53,6 @@ define([
                 expect(elevationConfig.coverageSector).toBeSector(mockSector);
                 expect(elevationConfig.resolution).toBe(resolution);
                 expect(elevationConfig.retrievalImageFormat).toBe("image/tiff");
-                expect(elevationConfig.numLevels).toBe(10);
             });
         });
     });
