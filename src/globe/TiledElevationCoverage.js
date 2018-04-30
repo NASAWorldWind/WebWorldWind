@@ -449,11 +449,6 @@ define(['../util/AbsentResourceList',
         };
 
         // Intentionally not documented.
-        TiledElevationCoverage.prototype.createTile = function (sector, level, row, column) {
-            return new Tile(sector, level, row, column);
-        };
-
-        // Intentionally not documented.
         TiledElevationCoverage.prototype.assembleTiles = function (level, sector, retrieveTiles) {
             this.currentTiles = [];
 
@@ -542,7 +537,7 @@ define(['../util/AbsentResourceList',
             var level = this.levels.level(levelNumber),
                 sector = Tile.computeSector(level, row, column);
 
-            tile = this.createTile(sector, level, row, column);
+            tile = new Tile(sector, level, row, column);
             this.tileCache.putEntry(tileKey, tile, tile.size());
 
             return tile;
