@@ -26,27 +26,32 @@ define([
 
         /**
          * Constructs key value pair (KVP) WCS GetCoverage urls.
-         * @param wcsCoverage the WcsCoverage for which the urls should be generated
+         * @param coverageId the coverage id or name
+         * @param webCoverageService the WebCoverageService providing the coverage
          * @constructor
          */
-        var WcsUrlBuilder = function (wcsCoverage) {
-            if (!wcsCoverage) {
+        var WcsUrlBuilder = function (coverageId, webCoverageService) {
+            if (!coverageId) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsUrlBuilder", "constructor",
-                        "The specified WcsCoverage is null or undefined"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsUrlBuilder", "constructor", "missingId"));
+            }
+
+            if (!webCoverageService) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsUrlBuilder", "constructor", "missingWebCoverageService"));
             }
 
             /**
              * The Coverage id or name.
              * @type {*|String}
              */
-            this.coverageId = wcsCoverage.coverageId;
+            this.coverageId = coverageId;
 
             /**
              * The WebCoverageService object which provided this coverage.
              * @type {*|WebCoverageService|String}
              */
-            this.service = wcsCoverage.service;
+            this.service = webCoverageService;
         };
 
         /**

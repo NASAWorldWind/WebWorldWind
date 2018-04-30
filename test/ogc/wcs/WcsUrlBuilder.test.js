@@ -90,7 +90,7 @@ define([
                 "1.0.0&COVERAGE=testing:pacificnw_usgs_ned_10m&CRS=EPSG:4326&WIDTH=256&HEIGHT=256&FORMAT=GeoTIFF&" +
                 "BBOX=" + mockSector.minLongitude + "," + mockSector.minLatitude + "," + mockSector.maxLongitude +
                  "," + mockSector.maxLatitude);
-            var wcsUrlBuilder = new WcsUrlBuilder(coverage);
+            var wcsUrlBuilder = new WcsUrlBuilder(coverage.coverageId, webCoverageService);
 
             var coverageUrl = wcsUrlBuilder.urlForTile(mockTile, "GeoTIFF");
 
@@ -159,7 +159,7 @@ define([
                 "&OVERVIEWPOLICY=NEAREST&SUBSET=Lat(" + mockSector.minLatitude + "," + mockSector.maxLatitude + ")" +
                 "&SUBSET=Long(" + mockSector.minLongitude + "," + mockSector.maxLongitude + ")");
 
-            var wcsUrlBuilder = new WcsUrlBuilder(coverage);
+            var wcsUrlBuilder = new WcsUrlBuilder(coverage.coverageId, webCoverageService);
 
             var coverageUrl = wcsUrlBuilder.urlForTile(mockTile, "image/tiff");
 

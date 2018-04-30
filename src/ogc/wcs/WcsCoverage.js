@@ -36,14 +36,12 @@ define([
         var WcsCoverage = function (coverageId, webCoverageService) {
             if (!coverageId) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor",
-                        "The specified coverage id is null or undefined."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor", "missingId"));
             }
 
             if (!webCoverageService) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor",
-                        "The specified WebCoverageService is null or undefined."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor", "missingWebCoverageService"));
             }
 
             /**
@@ -81,7 +79,11 @@ define([
          * Preferred formats used for fuzzy comparison to available formats.
          * @type {string[]}
          */
-        WcsCoverage.PREFERRED_FORMATS = ["geotiff", "tiff"];
+        WcsCoverage.PREFERRED_FORMATS = {
+            "GeoTIFF" : true,
+            "image/tiff": true,
+            "TIFF": true
+        };
 
         /**
          * The default data format.
@@ -95,37 +97,34 @@ define([
                 resolution: this.resolution,
                 coverageSector: this.sector,
                 retrievalImageFormat: this.determineFormatFromService(),
-                urlBuilder: new WcsUrlBuilder(this)
+                urlBuilder: new WcsUrlBuilder(this.coverageId, this.service)
             };
         };
 
         // Internal use only
         WcsCoverage.prototype.determineFormatFromService = function () {
-            var version = this.service.capabilities.version, availableFormats, format, coverageDescription;
+            var version = this.service.capabilities.version, availableFormats, format, coverageDescription, i, len;
 
             // find the service supported format identifiers
             if (version === "1.0.0") {
                 // find the associated coverage description
-                for (var i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
+                for (i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
                     if (this.coverageId === this.service.coverageDescriptions.coverages[i].name) {
                         availableFormats = this.service.coverageDescriptions.coverages[i].supportedFormats.formats;
                         break;
                     }
                 }
             } else if (version === "2.0.1" || version === "2.0.0") {
-                availableFormats = this.service.capabilities.serviceMetadata.formatsSupported
+                availableFormats = this.service.capabilities.serviceMetadata.formatsSupported;
             }
 
             if (!availableFormats) {
                 return WcsCoverage.DEFAULT_FORMAT;
             }
 
-            for (i = 0; i < WcsCoverage.PREFERRED_FORMATS.length; i++) {
-                format = WcsCoverage.PREFERRED_FORMATS[i].toLowerCase();
-                for (var j = 0; j < availableFormats.length; j++) {
-                    if (availableFormats[j].toLowerCase().indexOf(format) >= 0) {
-                        return availableFormats[j];
-                    }
+            for (i = 0, len = availableFormats.length; i < len; i++) {
+                if (WcsCoverage.PREFERRED_FORMATS.hasOwnProperty(availableFormats[i])) {
+                    return availableFormats[i];
                 }
             }
 

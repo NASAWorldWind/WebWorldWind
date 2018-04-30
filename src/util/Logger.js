@@ -117,6 +117,7 @@ define(function () {
             missingFunction: "The specified function is null or undefined.",
             missingGlContext: "The specified WebGL rendering context is null or undefined.",
             missingGlobe: "The specified globe is null or undefined.",
+            missingId: "The specified id is null or undefined.",
             missingImage: "The specified image is null or undefined.",
             missingImageFormat: "The specified image format is null or undefined.",
             missingIndices: "The specified indices array is null or undefined.",
@@ -154,6 +155,7 @@ define(function () {
             missingVector: "The specified vector is null or undefined.",
             missingVertex: "The specified vertex is null or undefined.",
             missingViewport: "The specified viewport is null or undefined.",
+            missingWebCoverageService: "The specified WebCoverageService is null or undefined.",
             missingWorldWindow: "The specified WorldWindow is null or undefined.",
             notYetImplemented: "This function is not yet implemented",
             unsupportedVersion: "The specified version is not supported."

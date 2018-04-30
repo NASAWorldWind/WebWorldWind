@@ -63,13 +63,12 @@ define([
 
         /**
          * Returns the GetCoverage base url as detailed in the capabilities document
-         * @param coverageId the coverage id or name
          */
         WcsCapabilities.prototype.getCoverageBaseUrl = function () {
             if (this.version === "1.0.0") {
-                return this.capability.request.getCoverage.get
+                return this.capability.request.getCoverage.get;
             } else if (this.version === "2.0.1" || this.version === "2.0.0") {
-                return this.operationsMetadata.getOperationMetadataByName("GetCoverage").dcp[0].getMethods[0].url
+                return this.operationsMetadata.getOperationMetadataByName("GetCoverage").dcp[0].getMethods[0].url;
             }
 
             return null;
