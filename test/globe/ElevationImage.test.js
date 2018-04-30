@@ -32,7 +32,7 @@ define([
 
                 it("Correctly finds min/max elevations respecting NO_DATA values", function () {
                     var w = 5, h = 5;
-                    var image = new ElevationImage("/test", new Sector(-1, 1, -1, 1), w, h);
+                    var image = new ElevationImage(new Sector(-1, 1, -1, 1), w, h);
                     image.imageData = [];
                     for (var i = 0; i < w * h; i++) {
                         image.imageData.push(ElevationImage.NO_DATA);

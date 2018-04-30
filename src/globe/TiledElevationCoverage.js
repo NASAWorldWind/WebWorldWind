@@ -21,7 +21,6 @@ define(['../util/AbsentResourceList',
         '../error/ArgumentError',
         '../globe/ElevationCoverage',
         '../globe/ElevationImage',
-        '../globe/ElevationTile',
         '../formats/geotiff/GeoTiffReader',
         '../util/LevelSet',
         '../util/Logger',
@@ -34,7 +33,6 @@ define(['../util/AbsentResourceList',
               ArgumentError,
               ElevationCoverage,
               ElevationImage,
-              ElevationTile,
               GeoTiffReader,
               LevelSet,
               Logger,
@@ -209,7 +207,7 @@ define(['../util/AbsentResourceList',
             var hasCompleteCoverage = true;
 
             for (var i = 0, len = this.currentTiles.length; i < len; i++) {
-                var image = this.currentTiles[i].image();
+                var image = this.imageCache.entryForKey(this.currentTiles[i].tileKey);
                 if (image && image.hasData) {
                     var imageMin = image.minElevation;
                     if (result[0] > imageMin) {
@@ -277,17 +275,15 @@ define(['../util/AbsentResourceList',
                 deltaLon = level.tileDelta.longitude,
                 r = Tile.computeRow(deltaLat, latitude),
                 c = Tile.computeColumn(deltaLon, longitude),
-                tile,
+                tileKey,
                 image = null;
 
             for (var i = level.levelNumber; i >= 0; i--) {
-                tile = this.tileCache.entryForKey(i + "." + r + "." + c);
-                if (tile) {
-                    image = tile.image();
-                    if (image) {
-                        var elevation = image.elevationAtLocation(latitude, longitude);
-                        return isNaN(elevation) ? null : elevation;
-                    }
+                tileKey = Tile.computeTileKey(i, r, c);
+                image = this.imageCache.entryForKey(tileKey);
+                if (image) {
+                    var elevation = image.elevationAtLocation(latitude, longitude);
+                    return isNaN(elevation) ? null : elevation;
                 }
 
                 r = Math.floor(r / 2);
@@ -311,9 +307,7 @@ define(['../util/AbsentResourceList',
             });
 
             for (var i = 0, len = this.currentTiles.length; i < len; i++) {
-                var tile = this.currentTiles[i],
-                    image = tile.image();
-
+                var image = this.imageCache.entryForKey(this.currentTiles[i].tileKey);
                 if (image) {
                     image.elevationsForGrid(sector, numLat, numLon, result);
                 }
@@ -443,23 +437,15 @@ define(['../util/AbsentResourceList',
 
         // Internal. Intentionally not documented.
         TiledElevationCoverage.prototype.lookupImage = function (levelNumber, row, column, retrieveTiles) {
-            var tile = this.tileForLevel(levelNumber, row, column),
-                image = tile.image();
+            var tileKey = Tile.computeTileKey(levelNumber, row, column),
+                image = this.imageCache.entryForKey(tileKey);
 
-            // If the tile's elevations have expired, cause it to be re-retrieved. Note that the current,
-            // expired elevations are still used until the updated ones arrive.
             if (image == null && retrieveTiles) {
+                var tile = this.tileForLevel(levelNumber, row, column);
                 this.retrieveTileImage(tile);
             }
 
             return image;
-        };
-
-        // Intentionally not documented.
-        TiledElevationCoverage.prototype.createTile = function (sector, level, row, column) {
-            var imagePath = this.cachePath + "/" + level.levelNumber + "/" + row + "/" + row + "_" + column + ".bil";
-
-            return new ElevationTile(sector, level, row, column, imagePath, this.imageCache);
         };
 
         // Intentionally not documented.
@@ -541,7 +527,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.tileForLevel = function (levelNumber, row, column) {
-            var tileKey = levelNumber + "." + row + "." + column,
+            var tileKey = Tile.computeTileKey(levelNumber, row, column),
                 tile = this.tileCache.entryForKey(tileKey);
 
             if (tile) {
@@ -551,7 +537,7 @@ define(['../util/AbsentResourceList',
             var level = this.levels.level(levelNumber),
                 sector = Tile.computeSector(level, row, column);
 
-            tile = this.createTile(sector, level, row, column);
+            tile = new Tile(sector, level, row, column);
             this.tileCache.putEntry(tileKey, tile, tile.size());
 
             return tile;
@@ -559,7 +545,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.isTileImageInMemory = function (tile) {
-            return this.imageCache.containsKey(tile.imagePath);
+            return this.imageCache.containsKey(tile.tileKey);
         };
 
         // Intentionally not documented.
@@ -569,7 +555,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.retrieveTileImage = function (tile) {
-            if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+            if (this.currentRetrievals.indexOf(tile.tileKey) < 0) {
 
                 if (this.currentRetrievals.length > this.retrievalQueueSize) {
                     return;
@@ -586,7 +572,7 @@ define(['../util/AbsentResourceList',
                 xhr.responseType = 'arraybuffer';
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
-                        elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
+                        elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
 
                         var contentType = xhr.getResponseHeader("content-type");
 
@@ -596,25 +582,25 @@ define(['../util/AbsentResourceList',
                                 || contentType === "application/octet-stream") {
                                 Logger.log(Logger.LEVEL_INFO, "Elevations retrieval succeeded: " + url);
                                 elevationCoverage.loadElevationImage(tile, xhr);
-                                elevationCoverage.absentResourceList.unmarkResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.unmarkResourceAbsent(tile.tileKey);
 
                                 // Send an event to request a redraw.
                                 var e = document.createEvent('Event');
                                 e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
                                 window.dispatchEvent(e);
                             } else if (contentType === "text/xml") {
-                                elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                                 Logger.log(Logger.LEVEL_WARNING,
                                     "Elevations retrieval failed (" + xhr.statusText + "): " + url + ".\n "
                                     + String.fromCharCode.apply(null, new Uint8Array(xhr.response)));
                             } else {
-                                elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                                 Logger.log(Logger.LEVEL_WARNING,
                                     "Elevations retrieval failed: " + url + ". " + "Unexpected content type "
                                     + contentType);
                             }
                         } else {
-                            elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                            elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                             Logger.log(Logger.LEVEL_WARNING,
                                 "Elevations retrieval failed (" + xhr.statusText + "): " + url);
                         }
@@ -622,26 +608,26 @@ define(['../util/AbsentResourceList',
                 };
 
                 xhr.onerror = function () {
-                    elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
-                    elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                    elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval failed: " + url);
                 };
 
                 xhr.ontimeout = function () {
-                    elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
-                    elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                    elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval timed out: " + url);
                 };
 
                 xhr.send(null);
 
-                this.currentRetrievals.push(tile.imagePath);
+                this.currentRetrievals.push(tile.tileKey);
             }
         };
 
         // Intentionally not documented
-        TiledElevationCoverage.prototype.removeFromCurrentRetrievals = function (imagePath) {
-            var index = this.currentRetrievals.indexOf(imagePath);
+        TiledElevationCoverage.prototype.removeFromCurrentRetrievals = function (tileKey) {
+            var index = this.currentRetrievals.indexOf(tileKey);
             if (index > -1) {
                 this.currentRetrievals.splice(index, 1);
             }
@@ -649,7 +635,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.loadElevationImage = function (tile, xhr) {
-            var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight),
+            var elevationImage = new ElevationImage(tile.sector, tile.tileWidth, tile.tileHeight),
                 geoTiff;
 
             if (this.retrievalImageFormat === "application/bil16") {
@@ -666,7 +652,7 @@ define(['../util/AbsentResourceList',
 
             if (elevationImage.imageData) {
                 elevationImage.findMinAndMaxElevation();
-                this.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
+                this.imageCache.putEntry(tile.tileKey, elevationImage, elevationImage.size);
                 this.timestamp = Date.now();
             }
         };
