@@ -40,10 +40,6 @@ define([
                 coverageSector: Sector.FULL_SPHERE,
                 resolution: 0.008333333333333,
                 retrievalImageFormat: "application/bil16",
-                levelZeroDelta: new Location(45, 45),
-                numLevels: 6,
-                tileWidth: 256,
-                tileHeight: 256,
                 minElevation: -11000,
                 maxElevation: 8850,
                 urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "GEBCO", "", "1.3.0")
