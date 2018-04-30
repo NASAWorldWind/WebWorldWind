@@ -115,7 +115,6 @@ define([
                 resolution: this.resolution,
                 coverageSector: this.sector,
                 retrievalImageFormat: this.determineFormatFromService(),
-                cachePath: this.coverageId,
                 minElevation: -11000,
                 maxElevation: 8850,
                 levelZeroDelta: WcsCoverage.DEFAULT_LEVEL_ZERO_DELTA,
