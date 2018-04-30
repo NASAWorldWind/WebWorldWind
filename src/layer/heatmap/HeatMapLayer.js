@@ -37,7 +37,24 @@ define([
 
         this.displayName = displayName;
 
-        this._data = measuredLocations;
+        var data = {};
+        var lat, lon;
+        for(lat = -90; lat < 90; lat++ ) {
+            data[lat] = {};
+            for(lon = -180; lon < 180; lon++) {
+                data[lat][lon] = [];
+            }
+        }
+
+        var latitude, longitude;
+        measuredLocations.forEach(function(measured){
+            latitude = Math.floor(measured.latitude);
+            longitude = Math.floor(measured.longitude);
+            data[latitude][longitude].push(measured);
+        });
+        this._data = data;
+        // Use other structure than filtering for the geographical data? Each of the tiles receive a value.
+        // Object representing the lat and lon?
 
         this._intervalType = IntervalType.CONTINUOUS;
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
@@ -45,7 +62,7 @@ define([
         this._blur = 10;
         this._incrementPerIntensity = 0.025;
 
-        this.setGradient();
+        this.setGradient(measuredLocations);
     };
 
     HeatMapLayer.prototype = Object.create(TiledImageLayer.prototype);
@@ -151,16 +168,42 @@ define([
      * @returns {Object[]}
      */
     HeatMapLayer.prototype.filterGeographically = function(data, sector) {
-        return data.filter(function(element){
-            return sector.containsLocation(element.latitude, element.longitude);
-        });
+        var minLatitude = Math.floor(sector.minLatitude);
+        var maxLatitude = Math.floor(sector.maxLatitude);
+        var minLongitude = Math.floor(sector.minLongitude);
+        var maxLongitude = Math.floor(sector.maxLongitude);
+        if(minLatitude < -90) {
+            minLatitude = -90;
+        }
+        if(minLongitude < -180) {
+            minLongitude = -180;
+        }
+        if(maxLatitude > 89) {
+            maxLatitude = 89;
+        }
+        if(maxLongitude > 179) {
+            maxLongitude = 179;
+        }
+
+        var lat, lon;
+        var result = [];
+        for(lat = minLatitude; lat <= maxLatitude; lat++) {
+            for(lon = minLongitude; lon <= maxLongitude; lon++ ) {
+                data[lat][lon].forEach(function(element){
+                    if(sector.containsLocation(element.latitude, element.longitude)) {
+                        result.push(element);
+                    }
+                });
+            }
+        }
+
+        return result;
     };
 
     /**
      * It sets gradient based on the Scale and IntervalType.
      */
-    HeatMapLayer.prototype.setGradient = function() {
-        var data = this._data;
+    HeatMapLayer.prototype.setGradient = function(data) {
         var intervalType = this.intervalType;
         var scale = this.scale;
 
