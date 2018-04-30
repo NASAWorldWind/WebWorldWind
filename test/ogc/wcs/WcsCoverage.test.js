@@ -60,7 +60,6 @@ define([
                 var wcsCoverage = new WcsCoverage("id", mockWebCoverageService);
                 var elevationConfig = wcsCoverage.elevationConfig;
 
-                expect(elevationConfig.cachePath).toBe("id");
                 expect(elevationConfig.coverageSector).toBeSector(mockSector);
                 expect(elevationConfig.resolution).toBe(resolution);
                 expect(elevationConfig.retrievalImageFormat).toBe("image/tiff");
