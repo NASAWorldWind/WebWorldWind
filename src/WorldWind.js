@@ -80,7 +80,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GroundProgram',
         './util/HashMap',
         './layer/heatmap/HeatMapLayer',
-        './layer/heatmap/HeatMapQuadTree',
         './layer/heatmap/HeatMapTile',
         './util/HighlightController',
         './formats/kml/util/ImagePyramid',
@@ -178,7 +177,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './projections/ProjectionPolarEquidistant',
         './projections/ProjectionUPS',
         './projections/ProjectionWgs84',
-        './util/QuadTree',
         './geom/Rectangle',
         './render/Renderable',
         './layer/RenderableLayer',
@@ -333,7 +331,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GroundProgram,
               HashMap,
               HeatMapLayer,
-              HeatMapQuadTree,
               HeatMapTile,
               HighlightController,
               ImagePyramid,
@@ -431,7 +428,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ProjectionPolarEquidistant,
               ProjectionUPS,
               ProjectionWgs84,
-              QuadTree,
               Rectangle,
               Renderable,
               RenderableLayer,
@@ -807,7 +803,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HashMap'] = HashMap;
         WorldWind['HeatMapLayer'] = HeatMapLayer;
-        WorldWind['HeatMapQuadTree'] = HeatMapQuadTree;
         WorldWind['HeatMapTile'] = HeatMapTile;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
@@ -856,7 +851,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ProjectionPolarEquidistant'] = ProjectionPolarEquidistant;
         WorldWind['ProjectionUPS'] = ProjectionUPS;
         WorldWind['ProjectionWgs84'] = ProjectionWgs84;
-        WorldWind['QuadTree'] = QuadTree;
         WorldWind['Rectangle'] = Rectangle;
         WorldWind['Renderable'] = Renderable;
         WorldWind['RenderableLayer'] = RenderableLayer;

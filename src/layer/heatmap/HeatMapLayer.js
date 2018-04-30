@@ -1,7 +1,6 @@
 define([
     '../../error/ArgumentError',
     './ColoredTile',
-    './HeatMapQuadTree',
     '../../util/ImageSource',
     './IntervalType',
     '../../geom/Location',
@@ -11,7 +10,6 @@ define([
     '../../util/WWUtil'
 ], function (ArgumentError,
              ColoredTile,
-             HeatMapQuadTree,
              ImageSource,
              IntervalType,
              Location,
@@ -39,19 +37,7 @@ define([
 
         this.displayName = displayName;
 
-        this._data = new HeatMapQuadTree({
-            bounds: {
-                x: 0,
-                y: 0,
-                width: 360,
-                height: 180
-            },
-            maxObjects: Math.ceil(measuredLocations.length / Math.pow(4, 4)),
-            maxLevels: 4
-        });
-        measuredLocations.forEach(function(location){
-            this._data.insert(location);
-        }.bind(this));
+        this._data = measuredLocations;
 
         this._intervalType = IntervalType.CONTINUOUS;
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
@@ -165,11 +151,8 @@ define([
      * @returns {Object[]}
      */
     HeatMapLayer.prototype.filterGeographically = function(data, sector) {
-        return data.retrieve({
-            x: sector.minLongitude,
-            y: sector.minLatitude,
-            width: Math.ceil(sector.maxLongitude - sector.minLongitude),
-            height: Math.ceil(sector.maxLatitude - sector.minLatitude)
+        return data.filter(function(element){
+            return sector.containsLocation(element.latitude, element.longitude);
         });
     };
 
@@ -177,12 +160,7 @@ define([
      * It sets gradient based on the Scale and IntervalType.
      */
     HeatMapLayer.prototype.setGradient = function() {
-        var data = this._data.retrieve({
-            x: -180,
-            y: -90,
-            width: 360,
-            height: 180
-        });
+        var data = this._data;
         var intervalType = this.intervalType;
         var scale = this.scale;
 
