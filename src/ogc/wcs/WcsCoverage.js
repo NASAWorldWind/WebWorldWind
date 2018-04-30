@@ -112,16 +112,16 @@ define([
         // Internal use only
         WcsCoverage.prototype.createElevationConfiguration = function () {
             return {
-                coverageSector: this.sector,
                 resolution: this.resolution,
+                coverageSector: this.sector,
                 retrievalImageFormat: this.determineFormatFromService(),
+                cachePath: this.coverageId,
+                minElevation: -11000,
+                maxElevation: 8850,
                 levelZeroDelta: WcsCoverage.DEFAULT_LEVEL_ZERO_DELTA,
                 numLevels: WcsCoverage.calculateNumberOfLevels(this.resolution),
                 tileWidth: WcsCoverage.DEFAULT_TILE_WIDTH,
                 tileHeight: WcsCoverage.DEFAULT_TILE_HEIGHT,
-                cachePath: this.coverageId,
-                minElevation: -11000,
-                maxElevation: 8850,
                 urlBuilder: new WcsUrlBuilder(this)
             };
         };
