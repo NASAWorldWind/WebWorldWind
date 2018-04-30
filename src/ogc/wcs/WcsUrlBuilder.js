@@ -99,6 +99,7 @@ define([
         WcsUrlBuilder.prototype.buildUrl20x = function (tile, format, requestUrl) {
             var sector = tile.sector, latLabel, lonLabel, coverageDescription, scaleLabels, axisLabels;
 
+            // find the associated coverage description
             for (var i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
                 if (this.coverageId === this.service.coverageDescriptions.coverages[i].coverageId) {
                     coverageDescription = this.service.coverageDescriptions.coverages[i];
@@ -119,7 +120,8 @@ define([
             requestUrl += "&VERSION=" + this.service.capabilities.version;
             requestUrl += "&COVERAGEID=" + this.coverageId;
             requestUrl += "&FORMAT=" + format;
-            requestUrl += "&SCALESIZE=" + scaleLabels[0] + "(" + tile.tileWidth + ")," + scaleLabels[1] + "(" + tile.tileHeight + ")";
+            requestUrl += "&SCALESIZE=" + scaleLabels[0] + "(" + tile.tileWidth + "),";
+            requestUrl += scaleLabels[1] + "(" + tile.tileHeight + ")";
             requestUrl += "&OVERVIEWPOLICY=NEAREST"; // specific to geoserver to increase performance
             requestUrl += "&SUBSET=" + latLabel + "(" + sector.minLatitude + "," + sector.maxLatitude + ")";
             requestUrl += "&SUBSET=" + lonLabel + "(" + sector.minLongitude + "," + sector.maxLongitude + ")";
