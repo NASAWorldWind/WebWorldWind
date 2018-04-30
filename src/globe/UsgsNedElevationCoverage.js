@@ -46,7 +46,6 @@ define([
                 numLevels: 12,
                 tileWidth: 256,
                 tileHeight: 256,
-                cachePath: "UsgsNedElevations256",
                 minElevation: -11000,
                 maxElevation: 8850,
                 urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "USGS-NED", "", "1.3.0")

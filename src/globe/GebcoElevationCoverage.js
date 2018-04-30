@@ -44,7 +44,6 @@ define([
                 numLevels: 6,
                 tileWidth: 256,
                 tileHeight: 256,
-                cachePath: "GebcoElevations256",
                 minElevation: -11000,
                 maxElevation: 8850,
                 urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "GEBCO", "", "1.3.0")
