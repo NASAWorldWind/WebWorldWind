@@ -35,7 +35,7 @@ define([
 
                 var levels = WcsCoverage.calculateNumberOfLevels(0.0003433227539);
 
-                expect(levels).toBe(11);
+                expect(levels).toBe(10);
             });
         });
 
@@ -64,7 +64,7 @@ define([
                 expect(elevationConfig.coverageSector).toBeSector(mockSector);
                 expect(elevationConfig.resolution).toBe(resolution);
                 expect(elevationConfig.retrievalImageFormat).toBe("image/tiff");
-                expect(elevationConfig.numLevels).toBe(11);
+                expect(elevationConfig.numLevels).toBe(10);
             });
         });
     });
