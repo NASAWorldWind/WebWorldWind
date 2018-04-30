@@ -46,9 +46,9 @@ imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         // Use a REST elevation coverage rather than the defaults.
-        var dted0Coverage = new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0");
+        var dted0 = new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0");
         wwd.globe.elevationModel.removeAllCoverages();
-        wwd.globe.elevationModel.addCoverage(dted0Coverage);
+        wwd.globe.elevationModel.addCoverage(dted0);
 
         // Add the REST Blue Marble layer that retrieves imagery from local standalone data.
         var blueMarble = new WorldWind.BMNGRestLayer(null, "../standalonedata/Earth/BlueMarble256/");
