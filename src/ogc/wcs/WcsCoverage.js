@@ -76,7 +76,7 @@ define([
              * A configuration object for use by TiledElevationCoverage.
              * @type {{}}
              */
-            this.elevationConfiguration = this.createElevationConfiguration();
+            this.elevationConfig = this.createElevationConfig();
         };
 
         /**
@@ -110,7 +110,7 @@ define([
         WcsCoverage.DEFAULT_LEVEL_ZERO_DELTA = new Location(45, 45);
 
         // Internal use only
-        WcsCoverage.prototype.createElevationConfiguration = function () {
+        WcsCoverage.prototype.createElevationConfig = function () {
             return {
                 resolution: this.resolution,
                 coverageSector: this.sector,

@@ -58,7 +58,7 @@ define([
                     }
                 };
                 var wcsCoverage = new WcsCoverage("id", mockWebCoverageService);
-                var elevationConfig = wcsCoverage.elevationConfiguration;
+                var elevationConfig = wcsCoverage.elevationConfig;
 
                 expect(elevationConfig.cachePath).toBe("id");
                 expect(elevationConfig.coverageSector).toBeSector(mockSector);
