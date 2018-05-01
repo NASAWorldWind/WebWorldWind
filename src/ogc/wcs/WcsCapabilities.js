@@ -61,6 +61,19 @@ define([
             this.assembleDocument();
         };
 
+        /**
+         * Returns the GetCoverage base url as detailed in the capabilities document
+         */
+        WcsCapabilities.prototype.getCoverageBaseUrl = function () {
+            if (this.version === "1.0.0") {
+                return this.capability.request.getCoverage.get;
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                return this.operationsMetadata.getOperationMetadataByName("GetCoverage").dcp[0].getMethods[0].url;
+            }
+
+            return null;
+        };
+
         // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDocument = function () {
             // Determine version and update sequence

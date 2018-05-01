@@ -69,8 +69,7 @@ define([
         WcsCoverageDescriptions.prototype.getSector = function (coverageId) {
             if (!coverageId) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSector",
-                        "The specified coverage id was null or not defined."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSector", "missingId"));
             }
             var coverage = this.getCoverage(coverageId), envelope;
 
@@ -105,8 +104,7 @@ define([
         WcsCoverageDescriptions.prototype.getResolution = function (coverageId) {
             if (!coverageId) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getResolution",
-                        "The specified coverage id was null or not defined."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getResolution", "missingId"));
             }
             var coverage = this.getCoverage(coverageId), sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
                 xRes, yRes;
@@ -140,8 +138,7 @@ define([
         WcsCoverageDescriptions.prototype.getSupportedCrs = function (coverageId) {
             if (!coverageId) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSupportedCrs",
-                        "The specified coverage id was null or not defined."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSupportedCrs", "missingId"));
             }
             var coverage = this.getCoverage(coverageId), crses = [];
 
