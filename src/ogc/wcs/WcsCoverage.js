@@ -18,10 +18,12 @@
  */
 define([
         '../../error/ArgumentError',
-        '../../util/Logger'
+        '../../util/Logger',
+        '../../ogc/wcs/WcsUrlBuilder'
     ],
     function (ArgumentError,
-              Logger) {
+              Logger,
+              WcsUrlBuilder) {
         "use strict";
 
         /**
@@ -34,14 +36,12 @@ define([
         var WcsCoverage = function (coverageId, webCoverageService) {
             if (!coverageId) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor",
-                        "The specified coverage id is null or undefined."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor", "missingId"));
             }
 
             if (!webCoverageService) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor",
-                        "The specified WebCoverageService is null or undefined."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverage", "constructor", "missingWebCoverageService"));
             }
 
             /**
@@ -51,7 +51,7 @@ define([
             this.coverageId = coverageId;
 
             /**
-             * The WebCoverageService responsible for managing this Coveragea and Web Coverage Service.
+             * The WebCoverageService responsible for managing this Coverage and Web Coverage Service.
              * @type {WebCoverageService}
              */
             this.service = webCoverageService;
@@ -72,13 +72,63 @@ define([
              * A configuration object for use by TiledElevationCoverage.
              * @type {{}}
              */
-            this.elevationConfiguration = this.createElevationConfiguration();
+            this.elevationConfig = this.createElevationConfig();
+        };
+
+        /**
+         * Preferred formats used for fuzzy comparison to available formats.
+         * @type {string[]}
+         */
+        WcsCoverage.PREFERRED_FORMATS = {
+            "GeoTIFF" : true,
+            "image/tiff": true,
+            "TIFF": true
+        };
+
+        /**
+         * The default data format.
+         * @type {string}
+         */
+        WcsCoverage.DEFAULT_FORMAT = "image/tiff";
+
+        // Internal use only
+        WcsCoverage.prototype.createElevationConfig = function () {
+            return {
+                resolution: this.resolution,
+                coverageSector: this.sector,
+                retrievalImageFormat: this.determineFormatFromService(),
+                urlBuilder: new WcsUrlBuilder(this.coverageId, this.service)
+            };
         };
 
         // Internal use only
-        WcsCoverage.prototype.createElevationConfiguration = function () {
-            // TODO
-            return {};
+        WcsCoverage.prototype.determineFormatFromService = function () {
+            var version = this.service.capabilities.version, availableFormats, format, coverageDescription, i, len;
+
+            // find the service supported format identifiers
+            if (version === "1.0.0") {
+                // find the associated coverage description
+                for (i = 0, len = this.service.coverageDescriptions.coverages.length; i < len; i++) {
+                    if (this.coverageId === this.service.coverageDescriptions.coverages[i].name) {
+                        availableFormats = this.service.coverageDescriptions.coverages[i].supportedFormats.formats;
+                        break;
+                    }
+                }
+            } else if (version === "2.0.1" || version === "2.0.0") {
+                availableFormats = this.service.capabilities.serviceMetadata.formatsSupported;
+            }
+
+            if (!availableFormats) {
+                return WcsCoverage.DEFAULT_FORMAT;
+            }
+
+            for (i = 0, len = availableFormats.length; i < len; i++) {
+                if (WcsCoverage.PREFERRED_FORMATS.hasOwnProperty(availableFormats[i])) {
+                    return availableFormats[i];
+                }
+            }
+
+            return WcsCoverage.DEFAULT_FORMAT;
         };
 
         return WcsCoverage;
