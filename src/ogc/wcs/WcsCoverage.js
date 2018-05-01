@@ -51,7 +51,7 @@ define([
             this.coverageId = coverageId;
 
             /**
-             * The WebCoverageService responsible for managing this Coveragea and Web Coverage Service.
+             * The WebCoverageService responsible for managing this Coverage and Web Coverage Service.
              * @type {WebCoverageService}
              */
             this.service = webCoverageService;
