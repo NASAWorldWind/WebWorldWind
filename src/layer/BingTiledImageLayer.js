@@ -60,8 +60,6 @@ define([
             this.detectBlankImages = true;
 
             this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
-            // TODO: CORS issues, insecure protocol when retrieving logo from web service.
-            //this.attributionImage = "http://dev.virtualearth.net/Branding/logo_powered_by.png";
 
             this.attribution = this.createBingLogotype();
         };
@@ -71,16 +69,6 @@ define([
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
-                // Draw Bing attribution in upper right corner. Offset vertically when the coordinates display is placed
-                // at the top of the canvas depending on canvas width, as defined in CanvasDisplayLayer.
-                if (dc.currentGlContext.canvas.clientWidth >= 650) {
-                    // Large canvas, draw attribution in upper left corner.
-                    this.attribution.screenOffset.y = 0;
-                } else {
-                    // Medium/Small canvas, offset vertically to avoid cluttering.
-                    this.attribution.screenOffset.y = 21;
-                }
-
                 this.attribution.render(dc);
             }
         };
@@ -102,11 +90,11 @@ define([
 
         BingTiledImageLayer.prototype.createBingLogotype = function () {
             // Locate Bing logo in the upper left corner
-            var offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_INSET_PIXELS, 0);
+            var offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
             var logotype = new ScreenImage(offset, this.attributionImage);
             // Align the logo using as reference point its upper left corner
-            logotype.imageOffset.y = 1;
-            logotype.imageOffset.x = 0;
+            logotype.imageOffset.y = 0;
+            logotype.imageOffset.x = 1;
             // Make logo semi-transparent
             logotype.imageColor = new Color(1, 1, 1, 0.5);
             return logotype;
