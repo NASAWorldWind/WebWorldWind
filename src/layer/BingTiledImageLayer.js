@@ -42,7 +42,7 @@ define([
          * @classdesc Provides an abstract base layer for Bing imagery. This class is not intended to be constructed
          * independently but as a base layer for subclasses.
          * See {@link BingAerialLayer}, {@link BingAerialWithLabelsLayer} and {@link BingRoadsLayer}.
-         * 
+         *
          * @param {String} displayName This layer's display name.
          */
         var BingTiledImageLayer = function (displayName) {
