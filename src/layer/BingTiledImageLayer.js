@@ -41,11 +41,11 @@ define([
          * @augments MercatorTiledImageLayer
          * @classdesc Provides an abstract base layer for Bing imagery. This class is not intended to be constructed
          * independently but as a base layer for subclasses.
+         *
          * See {@link BingAerialLayer}, {@link BingAerialWithLabelsLayer} and {@link BingRoadsLayer}.
          * @param {String} displayName This layer's display name.
          */
         var BingTiledImageLayer = function (displayName) {
-
             this.imageSize = 256;
 
             MercatorTiledImageLayer.call(this,
@@ -59,9 +59,9 @@ define([
 
             this.detectBlankImages = true;
 
-            this.logoImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
+            this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
             // TODO: CORS issues, insecure protocol
-            //this.logoImage = "http://dev.virtualearth.net/Branding/logo_powered_by.png";
+            //this.attributionImage = "http://dev.virtualearth.net/Branding/logo_powered_by.png";
 
             this.attribution = this.createBingLogotype();
         };
@@ -70,7 +70,6 @@ define([
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
-
             if (this.inCurrentFrame) {
                 // Draw Bing attribution in upper right corner. Offset vertically when the coordinates display is placed
                 // at the top of the canvas depending on canvas width, as defined in CanvasDisplayLayer.
@@ -104,7 +103,7 @@ define([
         BingTiledImageLayer.prototype.createBingLogotype = function () {
             // Locate Bing logo in the upper left corner
             var offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_INSET_PIXELS, 0);
-            var logotype = new ScreenImage(offset, this.logoImage);
+            var logotype = new ScreenImage(offset, this.attributionImage);
             // Align the logo using as reference point its upper left corner
             logotype.imageOffset.y = 1;
             logotype.imageOffset.x = 0;
