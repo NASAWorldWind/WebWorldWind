@@ -43,7 +43,6 @@ define([
          * @augments MercatorTiledImageLayer
          * @classdesc Provides an abstract base layer for Bing imagery. This class is not intended to be constructed
          * independently but as a base layer for subclasses.
-         * @param (logoOffset) Offset Optional offset indicating the Bing logo attribution placement on the screen.
          * @param (logoPosition) String Optional positioning of the Bing logo in the left canvas side, either top or
          * bottom of the canvas. Defaults to top.
          * See {@link BingAerialLayer}, {@link BingAerialWithLabelsLayer} and {@link BingRoadsLayer}.
@@ -52,7 +51,7 @@ define([
          */
         var BingTiledImageLayer = function (displayName, logoPosition) {
 
-            var logotypePosition = logoPosition ? logoPosition : "top";
+            var logotypePosition = logoPosition ? logoPosition : "bottom";
 
             this.imageSize = 256;
 
@@ -71,22 +70,25 @@ define([
 
             this.logo = this.createLogotype();
 
-            this.logoPosition = logotypePosition;
+            //this.logoPosition = logotypePosition;
+            this.logoPosition = "bottom";
         };
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
+
             var canvasWidth = dc.currentGlContext.canvas.clientWidth;
 
             // Draw Bing logo in selected position.
-            if (this.logoPosition = "top") {
+            if (this.logoPosition === "top") {
                 // Top left was selected. Draw in top left corner when CoordinatesDisplayLayer is being drawn at the
                 // bottom of the screen
 
                 this.logo.screenOffset.xUnits = WorldWind.OFFSET_FRACTION;
                 this.logo.screenOffset.x = 0;
                 this.logo.screenOffset.yUnits = WorldWind.OFFSET_INSET_PIXELS;
+
                 this.logo.imageOffset.y = 1;
                 this.logo.imageOffset.x = 0;
 
@@ -96,13 +98,35 @@ define([
                     this.logo.screenOffset.y = 21;
                 }
 
-            } else if (this.logoPosition = "bottom") {
-                // Bottom left was selected. Draw in lower left corner when the view controls are not visible, or
-                // right above them when they are.
-                // dc.layers.indexOf("ViewControlsLayer")
-
             }
 
+            if (this.logoPosition === "bottom") {
+                // Bottom left was selected. Draw in lower left corner when the view controls are not visible, or
+                // right above them when they are.
+                var viewControlsIndex = this.isViewControlsLayerEnabled(dc);
+
+                if (viewControlsIndex !== -1) { // View controls layer exists
+                    if (dc.layers[viewControlsIndex]) {
+                        console.log("View controls are in view");
+                        //View controls are in view. Offset logo appropriately.
+                        this.logo.screenOffset.xUnits = WorldWind.OFFSET_FRACTION;
+                        this.logo.screenOffset.x = 0;
+                        this.logo.screenOffset.yUnits = WorldWind.OFFSET_PIXELS;
+                        this.logo.screenOffset.y = 60;
+
+                        this.logo.imageOffset.y = 0;
+                        this.logo.imageOffset.x = 0;
+                    } else {
+                        // View controls are not in view. Draw logo in lower left corner.
+                        console.log("not in view");
+
+                    }
+                } else { // View controls layer is disabled. Draw logo in lower left corner.
+                    console.log("view controls disabled");
+                }
+            }
+
+            ViewControlsLayer.prototype.doRender.call(this, dc);
 
 
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
@@ -129,11 +153,18 @@ define([
         BingTiledImageLayer.prototype.createLogotype = function () {
             var offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
             var logotype = new ScreenImage(offset, this.logoImage);
-
             logotype.imageColor = new Color(1, 1, 1, 0.5);
-
-
             return logotype;
+        };
+
+        BingTiledImageLayer.prototype.isViewControlsLayerEnabled = function (dc) {
+            var index;
+            for (var i = 0, len = dc.layers.length; i < len; i++) {
+                // TODO: Make layer detection more robust i.e. not to rely on display name
+                console.log(!(dc.layers[i].displayName === "View Controls"));
+                index = (dc.layers[i].displayName === "View Controls") ? i : -1;
+            }
+            return index;
         };
 
         return BingTiledImageLayer;
