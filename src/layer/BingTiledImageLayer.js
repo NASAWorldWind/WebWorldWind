@@ -92,15 +92,11 @@ define([
             // Locate Bing logo in the lower right corner
             var offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
             var logotype = new ScreenImage(offset, this.attributionImage);
-            // Align the logo using as reference point its lower right corner
+            // Align the logo replicating the alignment given by ScreenCreditsController
             logotype.imageOffset.xUnits = WorldWind.OFFSET_INSET_PIXELS;
             logotype.imageOffset.yUnits = WorldWind.OFFSET_INSET_PIXELS;
-            logotype.imageOffset.x = -10;
+            logotype.imageOffset.x = -5;
             logotype.imageOffset.y = 35;
-            // Position logo with a 5px margin
-            // logotype.screenOffset.xUnits = WorldWind.OFFSET_PIXELS;
-            // logotype.screenOffset.yUnits = WorldWind.OFFSET_PIXELS;
-            //logotype.imageOffset.x = 5;
 
             // Make logo semi-transparent
             logotype.imageColor = new Color(1, 1, 1, 0.5);
