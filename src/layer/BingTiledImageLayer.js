@@ -42,7 +42,6 @@ define([
          * @classdesc Provides an abstract base layer for Bing imagery. This class is not intended to be constructed
          * independently but as a base layer for subclasses.
          * See {@link BingAerialLayer}, {@link BingAerialWithLabelsLayer} and {@link BingRoadsLayer}.
-         *
          * @param {String} displayName This layer's display name.
          */
         var BingTiledImageLayer = function (displayName) {
@@ -61,16 +60,29 @@ define([
             this.detectBlankImages = true;
 
             this.logoImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
+            // TODO: CORS issues, insecure protocol
+            //this.logoImage = "http://dev.virtualearth.net/Branding/logo_powered_by.png";
 
-            this.logo = this.createLogotype();
+            this.attribution = this.createBingLogotype();
         };
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
+
             if (this.inCurrentFrame) {
-                this.logo.render(dc);
+                // Draw Bing attribution in upper right corner. Offset vertically when the coordinates display is placed
+                // at the top of the canvas depending on canvas width, as defined in CanvasDisplayLayer.
+                if (dc.currentGlContext.canvas.clientWidth >= 650) {
+                    // Large canvas, draw attribution in upper left corner.
+                    this.attribution.screenOffset.y = 0;
+                } else {
+                    // Medium/Small canvas, offset vertically to avoid cluttering.
+                    this.attribution.screenOffset.y = 21;
+                }
+
+                this.attribution.render(dc);
             }
         };
 
@@ -89,13 +101,13 @@ define([
             return 256 << (levelNumber + 1);
         };
 
-        BingTiledImageLayer.prototype.createLogotype = function () {
-            // Locate Bing logo in the lower right corner
-            var offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
+        BingTiledImageLayer.prototype.createBingLogotype = function () {
+            // Locate Bing logo in the upper left corner
+            var offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_INSET_PIXELS, 0);
             var logotype = new ScreenImage(offset, this.logoImage);
-            // Align the logo using as reference point its lower right corner
-            logotype.imageOffset.y = 0;
-            logotype.imageOffset.x = 1;
+            // Align the logo using as reference point its upper left corner
+            logotype.imageOffset.y = 1;
+            logotype.imageOffset.x = 0;
             // Make logo semi-transparent
             logotype.imageColor = new Color(1, 1, 1, 0.5);
             return logotype;
