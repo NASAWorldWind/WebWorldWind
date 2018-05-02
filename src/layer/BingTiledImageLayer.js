@@ -60,7 +60,7 @@ define([
             this.detectBlankImages = true;
 
             this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
-            // TODO: CORS issues, insecure protocol
+            // TODO: CORS issues, insecure protocol when retrieving logo from web service.
             //this.attributionImage = "http://dev.virtualearth.net/Branding/logo_powered_by.png";
 
             this.attribution = this.createBingLogotype();
