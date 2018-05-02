@@ -96,7 +96,7 @@ define([
             logotype.imageOffset.xUnits = WorldWind.OFFSET_INSET_PIXELS;
             logotype.imageOffset.yUnits = WorldWind.OFFSET_INSET_PIXELS;
             logotype.imageOffset.x = -5;
-            logotype.imageOffset.y = 35;
+            logotype.imageOffset.y = 36;
 
             // Make logo semi-transparent
             logotype.imageColor = new Color(1, 1, 1, 0.5);
