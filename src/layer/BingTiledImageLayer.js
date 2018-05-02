@@ -89,10 +89,10 @@ define([
         };
 
         BingTiledImageLayer.prototype.createBingLogotype = function () {
-            // Locate Bing logo in the upper left corner
+            // Locate Bing logo in the lower right corner
             var offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
             var logotype = new ScreenImage(offset, this.attributionImage);
-            // Align the logo using as reference point its upper left corner
+            // Align the logo using as reference point its lower right corner
             logotype.imageOffset.y = 0;
             logotype.imageOffset.x = 1;
             // Make logo semi-transparent
