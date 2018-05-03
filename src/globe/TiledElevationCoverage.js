@@ -251,7 +251,7 @@ define(['../util/AbsentResourceList',
         };
 
         // Documented in super class
-        TiledElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        TiledElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingSector"));
@@ -263,17 +263,8 @@ define(['../util/AbsentResourceList',
                         "The specified number of latitudinal or longitudinal positions is less than one."));
             }
 
-            if (!targetResolution) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingTargetResolution"));
-            }
-
-            if (!result) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingResult"));
-            }
-
-            var level = this.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
+            var gridResolution = sector.deltaLatitude() / (numLat - 1) * Angle.DEGREES_TO_RADIANS;
+            var level = this.levels.levelForTexelSize(gridResolution);
             if (this.pixelIsPoint) {
                 return this.pointElevationsForGrid(sector, numLat, numLon, level, result);
             } else {

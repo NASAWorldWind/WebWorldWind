@@ -55,7 +55,7 @@ define([
             return this.maxElevation;
         };
 
-        MockCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        MockCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
             for (var i = 0, n = result.length; i < n; i++) {
                 result[i] = this.maxElevation;
             }
