@@ -18,12 +18,18 @@
  */
 define([
         '../geom/Angle',
+        '../util/Color',
         '../geom/Location',
+        '../util/Offset',
+        '../shapes/ScreenImage',
         '../geom/Sector',
         '../layer/MercatorTiledImageLayer'
     ],
     function (Angle,
+              Color,
               Location,
+              Offset,
+              ScreenImage,
               Sector,
               MercatorTiledImageLayer) {
         "use strict";
@@ -53,7 +59,9 @@ define([
 
             this.detectBlankImages = true;
 
-            this.creditImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
+            this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
+
+            this.attribution = this.createBingLogotype();
         };
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
@@ -61,7 +69,7 @@ define([
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
-                dc.screenCreditController.addImageCredit(this.creditImage);
+                this.attribution.render(dc);
             }
         };
 
@@ -78,6 +86,21 @@ define([
         // Determines the Bing map size for a specified level number.
         BingTiledImageLayer.prototype.mapSizeForLevel = function (levelNumber) {
             return 256 << (levelNumber + 1);
+        };
+
+        BingTiledImageLayer.prototype.createBingLogotype = function () {
+            // Locate Bing logo in the lower right corner
+            var offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
+            var logotype = new ScreenImage(offset, this.attributionImage);
+            // Align the logo replicating the alignment given by ScreenCreditsController
+            logotype.imageOffset.xUnits = WorldWind.OFFSET_INSET_PIXELS;
+            logotype.imageOffset.yUnits = WorldWind.OFFSET_INSET_PIXELS;
+            logotype.imageOffset.x = -5;
+            logotype.imageOffset.y = 36;
+
+            // Make logo semi-transparent
+            logotype.imageColor = new Color(1, 1, 1, 0.5);
+            return logotype;
         };
 
         return BingTiledImageLayer;
