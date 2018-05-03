@@ -115,7 +115,7 @@ define([
              * @type {String}
              * @readonly
              */
-            this.tileKey = level.levelNumber.toString() + "." + row.toString() + "." + column.toString();
+            this.tileKey = Tile.computeTileKey(level.levelNumber, row, column);
 
             /**
              * The Cartesian bounding box of this tile.
@@ -401,6 +401,18 @@ define([
 
             globe.computePointFromPosition(this.sector.centroidLatitude(), this.sector.centroidLongitude(), 0,
                 this.referencePoint);
+        };
+
+        /**
+         * Computes a key that uniquely identifies a tile within its level set.
+         *
+         * @param {Number} levelNumber The tile's level number in a tile pyramid.
+         * @param {Number} row The tile's row in the specified level in a tile pyramid.
+         * @param {Number} column The tile's column in the specified level in a tile pyramid.
+         * @returns {String} A string key uniquely identifying a tile with the specified level, row, and column.
+         */
+        Tile.computeTileKey = function (levelNumber, row, column) {
+            return levelNumber + "." + row + "." + column;
         };
 
         /**

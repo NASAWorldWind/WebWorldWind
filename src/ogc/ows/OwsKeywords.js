@@ -36,7 +36,7 @@ define([
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
-                if (child.localName.toLowerCase() === "keyword") {
+                if (child.localName === "keyword") {
                     this.keywords = this.keywords || [];
                     this.keywords.push(new OwsLanguageString(child));
                 }

@@ -60,7 +60,19 @@ define([
 
             var updateSequence = wcsCaps.updateSequence;
 
-            expect(updateSequence).toBe("5");
+            expect(updateSequence).toBe("11");
+        });
+
+        describe("Utility Methods", function () {
+
+            it("should provide the get coverage base url", function () {
+                var wcsCaps = new WcsCapabilities(xmlDom);
+                var expectedUrl = "http://localhost:8080/geoserver/wcs?";
+
+                var actualUrl = wcsCaps.getCoverageBaseUrl();
+
+                expect(actualUrl).toBe(expectedUrl);
+            });
         });
 
         describe("Service Identification", function () {
@@ -123,12 +135,12 @@ define([
 
         describe("Contents", function () {
 
-            it("should provide a coverageId of test:pacificnw_usgs_ned_10m", function () {
+            it("should provide a coverageId of testing__pacificnw_usgs_ned_10m", function () {
                 var wcsCaps = new WcsCapabilities(xmlDom);
 
-                var coverageId = wcsCaps.coverages[0].coverageId;
+                var coverageId = wcsCaps.coverages[1].coverageId;
 
-                expect(coverageId).toBe("test__pacificnw_usgs_ned_10m");
+                expect(coverageId).toBe("testing__pacificnw_usgs_ned_10m");
             });
         });
     });
@@ -166,17 +178,29 @@ define([
 
             var updateSequence = wcsCaps.updateSequence;
 
-            expect(updateSequence).toBe("5");
+            expect(updateSequence).toBe("11");
+        });
+
+        describe("Utility Methods", function () {
+
+            it("should provide the get coverage base url", function () {
+                var wcsCaps = new WcsCapabilities(xmlDom);
+                var expectedUrl = "http://localhost:8080/geoserver/wcs?";
+
+                var actualUrl = wcsCaps.getCoverageBaseUrl();
+
+                expect(actualUrl).toBe(expectedUrl);
+            });
         });
 
         describe("Coverages", function () {
 
-            it("should provide a name of test:pacificnw_usgs_ned_10m", function () {
+            it("should provide a name of testing:pacificnw_usgs_ned_10m", function () {
                 var wcsCaps = new WcsCapabilities(xmlDom);
 
-                var name = wcsCaps.coverages[0].name;
+                var name = wcsCaps.coverages[1].name;
 
-                expect(name).toBe("test:pacificnw_usgs_ned_10m");
+                expect(name).toBe("testing:pacificnw_usgs_ned_10m");
             });
 
             it("should have a bounding box with the correct order", function () {

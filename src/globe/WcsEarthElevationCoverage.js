@@ -37,16 +37,17 @@ define([
          * @deprecated
          */
         var WcsEarthElevationCoverage = function () {
-            TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "image/tiff", "EarthElevations256", 256, 256, 900);
+            TiledElevationCoverage.call(this, {
+                coverageSector: Sector.FULL_SPHERE,
+                resolution: 0.008333333333333,
+                retrievalImageFormat: "image/tiff",
+                minElevation: -11000,
+                maxElevation: 8850,
+                urlBuilder: new WcsTileUrlBuilder("https://worldwind26.arc.nasa.gov/wms2",
+                    "NASA_SRTM30_900m_Tiled", "1.0.0")
+            });
 
             this.displayName = "WCS Earth Elevation Coverage";
-            this.minElevation = -11000; // Depth of Marianas Trench, in meters
-            this.maxElevation = 8850; // Height of Mt. Everest
-            this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images
-
-            this.urlBuilder = new WcsTileUrlBuilder("https://worldwind26.arc.nasa.gov/wms2",
-                "NASA_SRTM30_900m_Tiled", "1.0.0");
         };
 
         WcsEarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
