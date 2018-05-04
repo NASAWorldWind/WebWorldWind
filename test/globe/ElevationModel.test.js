@@ -20,8 +20,13 @@ define([
     'src/geom/Sector',
     'src/globe/EarthElevationModel',
     'src/globe/Tessellator',
+    'src/globe/GebcoElevationCoverage',
+    'src/globe/AsterV2ElevationCoverage',
+    'src/globe/UsgsNedElevationCoverage',
+    'src/globe/UsgsNedHiElevationCoverage',
     'src/globe/TiledElevationCoverage'
-], function (ElevationModel, Angle, Location, Sector, EarthElevationModel, Tessellator, TiledElevationCoverage) {
+], function (ElevationModel, Angle, Location, Sector, EarthElevationModel, Tessellator, GebcoElevationCoverage,
+             AsterV2ElevationCoverage, UsgsNedElevationCoverage, UsgsNedHiElevationCoverage, TiledElevationCoverage) {
     "use strict";
     describe("ElevationModel tests", function () {
 
@@ -247,45 +252,20 @@ define([
 
                 for (var i = 0; i < ts.maximumSubdivisionDepth; i++) {
                     var l = ts.levels.levels[i];
-                    var targetResolutionOverride = ts.coverageTargetResolution(l.levelNumber, l.texelSize);
-                    var coverageList = em.sortForTargetResolution(targetResolutionOverride);
-                    var preferredCoverage = coverageList[coverageList.length - 1];
-                    if (l.levelNumber < 7) {
-                        expect(preferredCoverage.cachePath).toEqual("GebcoElevations256");
+                    var targetResolution = ts.coverageTargetResolution(l.texelSize);
+                    var preferredIndex = em.preferredCoverageIndex(Sector.FULL_SPHERE, null, targetResolution);
+                    var preferredCoverage = em.coverages[preferredIndex];
+                    if (l.levelNumber < 6) {
+                        expect(preferredCoverage instanceof GebcoElevationCoverage).toBe(true);
                     }
                     else if (l.levelNumber < 10) {
-                        expect(preferredCoverage.cachePath).toEqual("AsterV2Elevations256");
+                        expect(preferredCoverage instanceof AsterV2ElevationCoverage).toBe(true);
                     }
                     else {
-                        expect(preferredCoverage.cachePath.indexOf("UsgsNed")).toEqual(0);
+                        expect((preferredCoverage instanceof UsgsNedElevationCoverage) ||
+                            (preferredCoverage instanceof UsgsNedHiElevationCoverage)).toBe(true);
                     }
                 }
-            });
-
-            it("Sorts coverages by target resolution when required, uses cached version when possible", function () {
-                var em = new EarthElevationModel();
-                var res = 0.00431;
-                expect(em.sortTargetResolution).toBeCloseTo(res, 5);
-
-                var coverageList1 = em.sortForTargetResolution(res);
-                var preferredCoverage = coverageList1[coverageList1.length - 1];
-                expect(preferredCoverage.cachePath).toEqual("GebcoElevations256");
-
-                res = res - 0.0005;
-                var coverageList2 = em.sortForTargetResolution(res);
-                preferredCoverage = coverageList2[coverageList2.length - 1];
-                expect(preferredCoverage.cachePath).toEqual("AsterV2Elevations256");
-
-                expect(coverageList1 !== coverageList2).toBe(true);
-
-                coverageList1 = em.sortForTargetResolution(res);
-                expect(coverageList1 === coverageList2).toBe(true);
-
-                res = em.coverages[2].resolution;
-                coverageList2 = em.sortForTargetResolution(res);
-                preferredCoverage = coverageList2[coverageList2.length - 1];
-                expect(preferredCoverage.cachePath.indexOf("UsgsNed")).toEqual(0);
-                expect(coverageList1 !== coverageList2).toBe(true);
             });
         });
 
