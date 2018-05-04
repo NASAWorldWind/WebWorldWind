@@ -39,13 +39,8 @@ define([
         var WcsEarthElevationCoverage = function () {
             TiledElevationCoverage.call(this, {
                 coverageSector: Sector.FULL_SPHERE,
-                resolution: 900,
+                resolution: 0.008333333333333,
                 retrievalImageFormat: "image/tiff",
-                levelZeroDelta: new Location(45, 45),
-                numLevels: 12,
-                tileWidth: 256,
-                tileHeight: 256,
-                cachePath: "EarthElevations256",
                 minElevation: -11000,
                 maxElevation: 8850,
                 urlBuilder: new WcsTileUrlBuilder("https://worldwind26.arc.nasa.gov/wms2",

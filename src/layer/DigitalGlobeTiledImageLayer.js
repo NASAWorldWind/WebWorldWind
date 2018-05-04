@@ -140,7 +140,7 @@ define([
         DigitalGlobeTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
-                dc.screenCreditController.addStringCredit("\u00A9 Digital Globe", Color.DARK_GRAY);
+                dc.screenCreditController.addCredit("\u00A9 Digital Globe", Color.DARK_GRAY);
             }
         };
 

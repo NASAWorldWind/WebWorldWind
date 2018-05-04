@@ -31,7 +31,6 @@ define([
                 numLevels: 1,
                 tileWidth: 256,
                 tileHeight: 256,
-                cachePath: "MockElevations256",
                 minElevation: minElevation ? minElevation : -11000,
                 maxElevation: maxElevation ? maxElevation : 8850
             });
@@ -56,7 +55,7 @@ define([
             return this.maxElevation;
         };
 
-        MockCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        MockCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
             for (var i = 0, n = result.length; i < n; i++) {
                 result[i] = this.maxElevation;
             }

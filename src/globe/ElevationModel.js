@@ -325,7 +325,7 @@ define(['../error/ArgumentError',
             for (i = n - 1; !resultFilled && i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
-                    resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
+                    resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, result);
                     if (resultFilled) {
                         resolution = coverage.resolution;
                     }

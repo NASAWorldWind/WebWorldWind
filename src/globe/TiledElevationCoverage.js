@@ -21,9 +21,9 @@ define(['../util/AbsentResourceList',
         '../error/ArgumentError',
         '../globe/ElevationCoverage',
         '../globe/ElevationImage',
-        '../globe/ElevationTile',
         '../formats/geotiff/GeoTiffReader',
         '../util/LevelSet',
+        '../geom/Location',
         '../util/Logger',
         '../cache/MemoryCache',
         '../geom/Sector',
@@ -34,9 +34,9 @@ define(['../util/AbsentResourceList',
               ArgumentError,
               ElevationCoverage,
               ElevationImage,
-              ElevationTile,
               GeoTiffReader,
               LevelSet,
+              Location,
               Logger,
               MemoryCache,
               Sector,
@@ -48,29 +48,44 @@ define(['../util/AbsentResourceList',
          * @alias TiledElevationCoverage
          * @constructor
          * @classdesc Represents the elevations for an area, often but not necessarily the whole globe.
-         * @param {{}} config Configuration information for the layer with the following properties:
+         * @param {{}} config Configuration properties for the coverage:
          * <ul>
-         *     <li>coverageSector: {Sector} The sector this coverage spans. (Required)</li>
-         *     <li>resolution: {Number}The resolution of the coverage, in degrees. (To compute degrees from meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.) (Required)</li>
-         *     <li>retrievalImageFormat: {String} The mime type of the elevation data retrieved by this coverage. (Required)</li>
-         *     <li>levelZeroDelta: {Location} The size of top-level tiles, in degrees. (Required)</li>
-         *     <li>numLevels: {Number} The number of levels used to represent this coverage's resolution pyramid. (Required)</li>
-         *     <li>tileWidth: {Number} The number of intervals (cells) in the longitudinal direction of this elevation model's elevation tiles. (Required)</li>
-         *     <li>tileHeight: {Number}The number of intervals (cells) in the latitudinal direction of this elevation model's elevation tiles. (Required)</li>
-         *     <li>cachePath: {String} A string unique to this coverage relative to other coverages used by the application. (Required)</li>
-         *     <li>minElevation: {Number} This coverage's minimum elevation in meters. (Optional)</li>
-         *     <li>maxElevation: {Number} This coverage's maximum elevation in meters. (Optional)</li>
-         *     <li>urlBuilder: {UrlBuilder} The factory to create URLs for data requests. (Optional)</li>
+         *     <li>coverageSector: {Sector} The sector this coverage spans.</li>
+         *     <li>resolution: {Number} The resolution of the coverage, in degrees. (To compute degrees from meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)</li>
+         *     <li>retrievalImageFormat: {String} The mime type of the elevation data retrieved by this coverage.</li>
+         *     <li>minElevation (optional): {Number} The coverage's minimum elevation in meters.</li>
+         *     <li>maxElevation (optional): {Number} Te coverage's maximum elevation in meters.</li>
+         *     <li>urlBuilder (optional): {UrlBuilder} The factory to create URLs for elevation data requests.</li>
          * <ul>
-         * @throws {ArgumentError} If the specified configuration is null or undefined.
+         * @throws {ArgumentError} If any required configuration parameter is null or undefined.
          */
         var TiledElevationCoverage = function (config) {
-            ElevationCoverage.call(this, config.resolution);
-
             if (!config) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingConfig"));
             }
+
+            if (!config.coverageSector) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingSector"));
+            }
+
+            if (!config.resolution) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingResolution"));
+            }
+
+            if (!config.retrievalImageFormat) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingImageFormat"));
+            }
+
+            ElevationCoverage.call(this, config.resolution);
+
+            var firstLevelDelta = 45,
+                tileWidth = 256,
+                lastLevel = LevelSet.numLevelsForResolution(firstLevelDelta / tileWidth, config.resolution),
+                numLevels = Math.ceil(lastLevel); // match or exceed the specified resolution
 
             /**
              * The sector this coverage spans.
@@ -85,12 +100,6 @@ define(['../util/AbsentResourceList',
              * @readonly
              */
             this.retrievalImageFormat = config.retrievalImageFormat;
-
-            /** A unique string identifying this coverage relative to other coverages in use.
-             * @type {String}
-             * @readonly
-             */
-            this.cachePath = config.cachePath;
 
             /**
              * This coverage's minimum elevation in meters.
@@ -114,11 +123,13 @@ define(['../util/AbsentResourceList',
             this.pixelIsPoint = false;
 
             /**
-             * The {@link LevelSet} created during construction of this coverage.
+             * The {@link LevelSet} dividing this coverage's geographic domain into a multi-resolution, hierarchical
+             * collection of tiles.
              * @type {LevelSet}
              * @readonly
              */
-            this.levels = new LevelSet(this.coverageSector, config.levelZeroDelta, config.numLevels, config.tileWidth, config.tileHeight);
+            this.levels = new LevelSet(this.coverageSector, new Location(firstLevelDelta, firstLevelDelta),
+                numLevels, tileWidth, tileWidth);
 
             /**
              * Internal use only
@@ -209,7 +220,7 @@ define(['../util/AbsentResourceList',
             var hasCompleteCoverage = true;
 
             for (var i = 0, len = this.currentTiles.length; i < len; i++) {
-                var image = this.currentTiles[i].image();
+                var image = this.imageCache.entryForKey(this.currentTiles[i].tileKey);
                 if (image && image.hasData) {
                     var imageMin = image.minElevation;
                     if (result[0] > imageMin) {
@@ -240,7 +251,7 @@ define(['../util/AbsentResourceList',
         };
 
         // Documented in super class
-        TiledElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        TiledElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingSector"));
@@ -252,17 +263,8 @@ define(['../util/AbsentResourceList',
                         "The specified number of latitudinal or longitudinal positions is less than one."));
             }
 
-            if (!targetResolution) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingTargetResolution"));
-            }
-
-            if (!result) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingResult"));
-            }
-
-            var level = this.levels.levelForTexelSize(targetResolution * Angle.DEGREES_TO_RADIANS);
+            var gridResolution = sector.deltaLatitude() / (numLat - 1) * Angle.DEGREES_TO_RADIANS;
+            var level = this.levels.levelForTexelSize(gridResolution);
             if (this.pixelIsPoint) {
                 return this.pointElevationsForGrid(sector, numLat, numLon, level, result);
             } else {
@@ -277,17 +279,15 @@ define(['../util/AbsentResourceList',
                 deltaLon = level.tileDelta.longitude,
                 r = Tile.computeRow(deltaLat, latitude),
                 c = Tile.computeColumn(deltaLon, longitude),
-                tile,
+                tileKey,
                 image = null;
 
             for (var i = level.levelNumber; i >= 0; i--) {
-                tile = this.tileCache.entryForKey(i + "." + r + "." + c);
-                if (tile) {
-                    image = tile.image();
-                    if (image) {
-                        var elevation = image.elevationAtLocation(latitude, longitude);
-                        return isNaN(elevation) ? null : elevation;
-                    }
+                tileKey = Tile.computeTileKey(i, r, c);
+                image = this.imageCache.entryForKey(tileKey);
+                if (image) {
+                    var elevation = image.elevationAtLocation(latitude, longitude);
+                    return isNaN(elevation) ? null : elevation;
                 }
 
                 r = Math.floor(r / 2);
@@ -311,9 +311,7 @@ define(['../util/AbsentResourceList',
             });
 
             for (var i = 0, len = this.currentTiles.length; i < len; i++) {
-                var tile = this.currentTiles[i],
-                    image = tile.image();
-
+                var image = this.imageCache.entryForKey(this.currentTiles[i].tileKey);
                 if (image) {
                     image.elevationsForGrid(sector, numLat, numLon, result);
                 }
@@ -443,23 +441,15 @@ define(['../util/AbsentResourceList',
 
         // Internal. Intentionally not documented.
         TiledElevationCoverage.prototype.lookupImage = function (levelNumber, row, column, retrieveTiles) {
-            var tile = this.tileForLevel(levelNumber, row, column),
-                image = tile.image();
+            var tileKey = Tile.computeTileKey(levelNumber, row, column),
+                image = this.imageCache.entryForKey(tileKey);
 
-            // If the tile's elevations have expired, cause it to be re-retrieved. Note that the current,
-            // expired elevations are still used until the updated ones arrive.
             if (image == null && retrieveTiles) {
+                var tile = this.tileForLevel(levelNumber, row, column);
                 this.retrieveTileImage(tile);
             }
 
             return image;
-        };
-
-        // Intentionally not documented.
-        TiledElevationCoverage.prototype.createTile = function (sector, level, row, column) {
-            var imagePath = this.cachePath + "/" + level.levelNumber + "/" + row + "/" + row + "_" + column + ".bil";
-
-            return new ElevationTile(sector, level, row, column, imagePath, this.imageCache);
         };
 
         // Intentionally not documented.
@@ -541,7 +531,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.tileForLevel = function (levelNumber, row, column) {
-            var tileKey = levelNumber + "." + row + "." + column,
+            var tileKey = Tile.computeTileKey(levelNumber, row, column),
                 tile = this.tileCache.entryForKey(tileKey);
 
             if (tile) {
@@ -551,7 +541,7 @@ define(['../util/AbsentResourceList',
             var level = this.levels.level(levelNumber),
                 sector = Tile.computeSector(level, row, column);
 
-            tile = this.createTile(sector, level, row, column);
+            tile = new Tile(sector, level, row, column);
             this.tileCache.putEntry(tileKey, tile, tile.size());
 
             return tile;
@@ -559,7 +549,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.isTileImageInMemory = function (tile) {
-            return this.imageCache.containsKey(tile.imagePath);
+            return this.imageCache.containsKey(tile.tileKey);
         };
 
         // Intentionally not documented.
@@ -569,7 +559,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.retrieveTileImage = function (tile) {
-            if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+            if (this.currentRetrievals.indexOf(tile.tileKey) < 0) {
 
                 if (this.currentRetrievals.length > this.retrievalQueueSize) {
                     return;
@@ -586,7 +576,7 @@ define(['../util/AbsentResourceList',
                 xhr.responseType = 'arraybuffer';
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4) {
-                        elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
+                        elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
 
                         var contentType = xhr.getResponseHeader("content-type");
 
@@ -596,25 +586,25 @@ define(['../util/AbsentResourceList',
                                 || contentType === "application/octet-stream") {
                                 Logger.log(Logger.LEVEL_INFO, "Elevations retrieval succeeded: " + url);
                                 elevationCoverage.loadElevationImage(tile, xhr);
-                                elevationCoverage.absentResourceList.unmarkResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.unmarkResourceAbsent(tile.tileKey);
 
                                 // Send an event to request a redraw.
                                 var e = document.createEvent('Event');
                                 e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
                                 window.dispatchEvent(e);
                             } else if (contentType === "text/xml") {
-                                elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                                 Logger.log(Logger.LEVEL_WARNING,
                                     "Elevations retrieval failed (" + xhr.statusText + "): " + url + ".\n "
                                     + String.fromCharCode.apply(null, new Uint8Array(xhr.response)));
                             } else {
-                                elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                                 Logger.log(Logger.LEVEL_WARNING,
                                     "Elevations retrieval failed: " + url + ". " + "Unexpected content type "
                                     + contentType);
                             }
                         } else {
-                            elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                            elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                             Logger.log(Logger.LEVEL_WARNING,
                                 "Elevations retrieval failed (" + xhr.statusText + "): " + url);
                         }
@@ -622,26 +612,26 @@ define(['../util/AbsentResourceList',
                 };
 
                 xhr.onerror = function () {
-                    elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
-                    elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                    elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval failed: " + url);
                 };
 
                 xhr.ontimeout = function () {
-                    elevationCoverage.removeFromCurrentRetrievals(tile.imagePath);
-                    elevationCoverage.absentResourceList.markResourceAbsent(tile.imagePath);
+                    elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval timed out: " + url);
                 };
 
                 xhr.send(null);
 
-                this.currentRetrievals.push(tile.imagePath);
+                this.currentRetrievals.push(tile.tileKey);
             }
         };
 
         // Intentionally not documented
-        TiledElevationCoverage.prototype.removeFromCurrentRetrievals = function (imagePath) {
-            var index = this.currentRetrievals.indexOf(imagePath);
+        TiledElevationCoverage.prototype.removeFromCurrentRetrievals = function (tileKey) {
+            var index = this.currentRetrievals.indexOf(tileKey);
             if (index > -1) {
                 this.currentRetrievals.splice(index, 1);
             }
@@ -649,7 +639,7 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.loadElevationImage = function (tile, xhr) {
-            var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight),
+            var elevationImage = new ElevationImage(tile.sector, tile.tileWidth, tile.tileHeight),
                 geoTiff;
 
             if (this.retrievalImageFormat === "application/bil16") {
@@ -666,7 +656,7 @@ define(['../util/AbsentResourceList',
 
             if (elevationImage.imageData) {
                 elevationImage.findMinAndMaxElevation();
-                this.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
+                this.imageCache.putEntry(tile.tileKey, elevationImage, elevationImage.size);
                 this.timestamp = Date.now();
             }
         };
