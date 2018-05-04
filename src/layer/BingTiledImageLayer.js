@@ -62,15 +62,15 @@ define([
             this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
 
             /**
-             * An {@link Offset} indicating where to place the Bing logo on the canvas.
+             * An {@link Offset} indicating where to place the Bing logo on the screen.
              * @type {Offset}
              * @default A value of (WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5) provides a
-             * 5px margin below and in the right side of the logo, placing it in the lower right corner of the canvas.
+             * 5px margin inset from the lower right corner of the screen.
              */
             this.logoPlacement = new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5);
 
             /**
-             * An {@link Offset} indicating the alignment of the Bing logo relative to the logo placement.
+             * An {@link Offset} indicating the alignment of the Bing logo relative to the placement position.
              * @type {Offset}
              * @default Lower right corner of the logo.
              */
