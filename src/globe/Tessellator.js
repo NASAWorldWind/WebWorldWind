@@ -964,7 +964,7 @@ define(['../geom/Angle',
         /**
          * Internal use only.
          * TODO: Remove this function when Tessellator and ElevationModel are refactored
-         * Artificially calculates an adjusted target resolution for the given level number and texel size to more
+         * Artificially calculates an adjusted target resolution for the given texel size to more
          * optimally select elevation coverages until later refactoring.
          * @returns {Number} An adjusted target resolution in degrees.
          * @ignore
