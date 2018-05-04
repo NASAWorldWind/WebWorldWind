@@ -61,11 +61,20 @@ define([
 
             this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
 
-            // Bing logo placement on the screen. Lower right corner by default.
+            /**
+             * An {@link Offset} indicating where to place the Bing logo on the screen.
+             * @type {Offset}
+             * @default The lower right corner of the window.
+             */
             this.logoPlacement = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
 
-            // Bing logo alignment relative to its placement position. Replicates alignment
-            // by ScreenCreditController by default.
+            /**
+             * An {@link Offset} indicating the alignment of the Bing logo relative to the
+             * logo placement. A value of {WorldWind.OFFSET_INSET_PIXELS, -5, WorldWind.OFFSET_INSET_PIXELS 36}
+             * replicates the alignment of screen credits for this particular image file.
+             * @type {Offset}
+             * @default A margin of 5px from the bottom and right side of the canvas.
+             */
             this.logoAlignment = new Offset(WorldWind.OFFSET_INSET_PIXELS, -5, WorldWind.OFFSET_INSET_PIXELS, 36);
 
             this.attribution = new ScreenImage(this.logoPlacement, this.attributionImage);
