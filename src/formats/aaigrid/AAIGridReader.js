@@ -118,9 +118,7 @@ define([
             var bufferView = new Uint8Array(dataSource);
 
             //the maximum number of arguments a function can take
-            //todo run more tests
             var step = 65535;
-
             for (var i = 0, len = bufferView.length; i < len; i += step) {
                 if (i + step > len) {
                     step = len - i;
@@ -232,8 +230,8 @@ define([
                 parserCompletionCallback(null, xhr);
             };
 
-            xhr.responseType = 'arraybuffer';
             xhr.open("GET", url, true);
+            xhr.responseType = 'arraybuffer';
 
             xhr.send(null);
         };
