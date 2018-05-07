@@ -61,6 +61,19 @@ define([
             this.assembleDocument();
         };
 
+        /**
+         * Returns the GetCoverage base url as detailed in the capabilities document
+         */
+        WcsCapabilities.prototype.getCoverageBaseUrl = function () {
+            if (this.version === "1.0.0") {
+                return this.capability.request.getCoverage.get;
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                return this.operationsMetadata.getOperationMetadataByName("GetCoverage").dcp[0].getMethods[0].url;
+            }
+
+            return null;
+        };
+
         // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDocument = function () {
             // Determine version and update sequence
@@ -247,30 +260,59 @@ define([
             return request;
         };
 
-        // Internal use only. This flattens the DCPType structure to provide a simplified object model.
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDCPType100 = function (element) {
-            var children = element.children || element.childNodes, dcptype = {}, httpChild, method, onlineResource, url;
+            var children = element.children || element.childNodes, dcpType = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "DCPType") {
-                    // Traverse the DCPType element to determine the GET/POST urls
-                    httpChild = child.children || child.childNodes;
-                    httpChild = httpChild[0];
-                    method = httpChild.children || httpChild.childNodes;
-                    method = method[0];
-                    onlineResource = method.children || method.childNodes;
-                    onlineResource = onlineResource[0];
-                    url = onlineResource.getAttribute("xlink:href");
-                    if (method.localName === "Get") {
-                        dcptype.get = url;
-                    } else if (method.localName === "Post") {
-                        dcptype.post = url;
-                    }
+                    this.assembleHttp100(child, dcpType);
                 }
             }
 
-            return dcptype;
+            return dcpType;
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCapabilities.prototype.assembleHttp100 = function (element, dcpType) {
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "HTTP") {
+                    return this.assembleMethod100(child, dcpType);
+                }
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCapabilities.prototype.assembleMethod100 = function (element, dcpType) {
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Get") {
+                    dcpType["get"] = this.assembleOnlineResource100(child);
+                } else if (child.localName === "Post") {
+                    dcpType["post"] = this.assembleOnlineResource100(child);
+                }
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCapabilities.prototype.assembleOnlineResource100 = function (element) {
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "OnlineResource") {
+                    return child.getAttribute("xlink:href");
+                }
+            }
         };
 
         // Internal. Intentionally not documented.

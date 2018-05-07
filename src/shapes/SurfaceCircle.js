@@ -169,7 +169,7 @@ define(['../error/ArgumentError',
 
         // Internal use only. Intentionally not documented.
         SurfaceCircle.prototype.moveTo = function (globe, position) {
-            this.center = this.computeShiftedLocations(globe, this.getReferencePosition(), position, [this.center])[0];
+            this.center = position;
         };
 
         /**

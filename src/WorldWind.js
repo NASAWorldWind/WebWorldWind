@@ -232,9 +232,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
         './ogc/wcs/WcsCapabilities',
-        './ogc/wcs/WcsDescribeCoverage',
+        './ogc/wcs/WcsCoverage',
+        './ogc/wcs/WcsCoverageDescriptions',
         './globe/WcsEarthElevationCoverage',
         './util/WcsTileUrlBuilder',
+        './ogc/wcs/WebCoverageService',
         './ogc/WfsCapabilities',
         './formats/wkt/Wkt',
         './formats/wkt/WktElements',
@@ -482,9 +484,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ViewControlsLayer,
               ViewVolume,
               WcsCapabilities,
-              WcsDescribeCoverage,
+              WcsCoverage,
+              WcsCoverageDescriptions,
               WcsEarthElevationCoverage,
               WcsTileUrlBuilder,
+              WebCoverageService,
               WfsCapabilities,
               Wkt,
               WktElements,
@@ -917,9 +921,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
         WorldWind['WcsCapabilities'] = WcsCapabilities;
-        WorldWind['WcsDescribeCoverage'] = WcsDescribeCoverage;
+        WorldWind['WcsCoverage'] = WcsCoverage;
+        WorldWind['WcsCoverageDescriptions'] = WcsCoverageDescriptions;
         WorldWind['WcsEarthElevationCoverage'] = WcsEarthElevationCoverage;
         WorldWind['WcsTileUrlBuilder'] = WcsTileUrlBuilder;
+        WorldWind['WebCoverageService'] = WebCoverageService;
         WorldWind['WfsCapabilities'] = WfsCapabilities;
         WorldWind['Wkt'] = Wkt;
         WorldWind['WktElements'] = WktElements;
