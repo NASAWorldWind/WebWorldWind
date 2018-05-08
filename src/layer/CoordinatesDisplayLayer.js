@@ -146,9 +146,9 @@ define([
                 canvasWidth = dc.currentGlContext.canvas.clientWidth,
                 x, y, yUnitsScreen, yUnitsText, hideEyeAlt;
 
-            if (canvasWidth > 650) { // large canvas, align the text with bottom center
+            if (canvasWidth > 650) { // large canvas, align the text with bottom center, 20px margin from the bottom
                 x = (canvasWidth / 2) - 50;
-                y = 5;
+                y = 20;
                 yUnitsScreen = WorldWind.OFFSET_PIXELS;
                 yUnitsText = 0;
             } else if (canvasWidth > 400) { // medium canvas, align the text in the top left

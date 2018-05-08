@@ -67,7 +67,7 @@ define([
              * @default A value of (WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5) provides a
              * 5px margin inset from the lower right corner of the screen.
              */
-            this.logoPlacement = new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5);
+            this.logoPlacement = new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 20);
 
             /**
              * An {@link Offset} indicating the alignment of the Bing logo relative to the placement position.
