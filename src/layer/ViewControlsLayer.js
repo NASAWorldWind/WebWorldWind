@@ -106,7 +106,7 @@ define([
             /**
              * An {@link Offset} indicating where to place the controls on the screen.
              * @type {Offset}
-             * @default The lower left corner of the window, with a 20px margin from the bottom side of the screen.
+             * @default The lower left corner of the window, with 20px vertical and 5px horizontal margins.
              */
             this.placement = new Offset(WorldWind.OFFSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 20);
 
