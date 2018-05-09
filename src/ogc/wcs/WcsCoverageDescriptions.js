@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * @exports WcsDescribeCoverage
+ * @exports WcsCoverageDescriptions
  */
 define([
         '../../error/ArgumentError',
@@ -22,32 +22,34 @@ define([
         '../../ogc/gml/GmlDomainSet',
         '../../ogc/gml/GmlRectifiedGrid',
         '../../util/Logger',
-        '../../ogc/ows/OwsKeywords'
+        '../../ogc/ows/OwsKeywords',
+        '../../geom/Sector'
     ],
     function (ArgumentError,
               GmlBoundedBy,
               GmlDomainSet,
               GmlRectifiedGrid,
               Logger,
-              OwsKeywords) {
+              OwsKeywords,
+              Sector) {
         "use strict";
 
         /**
          * Constructs a simple javascript object representation of an OGC WCS Describe Coverage XML response.
-         * @alias WcsDescribeCoverage
+         * @alias WcsCoverageDescriptions
          * @constructor
-         * @classdesc Represents the common properties of a WCS DescribeCoverage document. Common properties are parsed
-         * and mapped to a plain javascript object model. Most fields can be accessed as properties named according to
-         * their document names converted to camel case. This model supports version 1.0.0 and 2.0.x of the WCS
-         * specification. Not all properties are mapped to this representative javascript object model, but the provided
-         * XML DOM is maintained in xmlDom property for reference.
+         * @classdesc Represents the common properties of a WCS CoverageDescription document. Common properties are
+         * parsed and mapped to a plain javascript object model. Most fields can be accessed as properties named
+         * according to their document names converted to camel case. This model supports version 1.0.0 and 2.0.x of the
+         * WCS specification. Not all properties are mapped to this representative javascript object model, but the
+         * provided XML DOM is maintained in xmlDom property for reference.
          * @param {{}} xmlDom an XML DOM representing the WCS DescribeCoverage document.
          * @throws {ArgumentError} If the specified XML DOM is null or undefined.
          */
-        var WcsDescribeCoverage = function (xmlDom) {
+        var WcsCoverageDescriptions = function (xmlDom) {
             if (!xmlDom) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsDescribeCoverage", "constructor", "missingDom"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "constructor", "missingDom"));
             }
 
             /**
@@ -59,15 +61,123 @@ define([
             this.assembleDocument();
         };
 
+        /**
+         * Get the bounding Sector for the provided coverage id or name.
+         * @param coverageId the coverageId or name
+         * @returns {Sector} the bounding Sector
+         */
+        WcsCoverageDescriptions.prototype.getSector = function (coverageId) {
+            if (!coverageId) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSector", "missingId"));
+            }
+            var coverage = this.getCoverage(coverageId), envelope;
+
+            if (!coverage) {
+                return null;
+            }
+
+            if (this.version === "1.0.0") {
+                envelope = coverage.lonLatEnvelope.pos;
+                return new Sector(
+                    envelope[0][1],
+                    envelope[1][1],
+                    envelope[0][0],
+                    envelope[1][0]);
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                envelope = coverage.boundedBy.envelope;
+                return new Sector(
+                    envelope.lower[0],
+                    envelope.upper[0],
+                    envelope.lower[1],
+                    envelope.upper[1]);
+            }
+
+            return null;
+        };
+
+        /**
+         * Calculates the resolution of the provided coverage id in degrees.
+         * @param coverageId the coverage id or name
+         * @returns {number} resolution in degrees
+         */
+        WcsCoverageDescriptions.prototype.getResolution = function (coverageId) {
+            if (!coverageId) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getResolution", "missingId"));
+            }
+            var coverage = this.getCoverage(coverageId), sector = this.getSector(coverageId), xLow, yLow, xHigh, yHigh,
+                xRes, yRes;
+
+            if (!coverage) {
+                return null;
+            }
+
+            if (this.version === "1.0.0") {
+                xLow = coverage.domainSet.spatialDomain.rectifiedGrid.limits.low[0];
+                yLow = coverage.domainSet.spatialDomain.rectifiedGrid.limits.low[1];
+                xHigh = coverage.domainSet.spatialDomain.rectifiedGrid.limits.high[0];
+                yHigh = coverage.domainSet.spatialDomain.rectifiedGrid.limits.high[1];
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                xLow = coverage.domainSet.rectifiedGrid.limits.low[0];
+                yLow = coverage.domainSet.rectifiedGrid.limits.low[1];
+                xHigh = coverage.domainSet.rectifiedGrid.limits.high[0];
+                yHigh = coverage.domainSet.rectifiedGrid.limits.high[1];
+            }
+
+            xRes = sector.deltaLongitude() / (xHigh - xLow);
+            yRes = sector.deltaLatitude() / (yHigh - yLow);
+
+            return Math.max(xRes, yRes);
+        };
+
+        /**
+         * Returns an array of the supported coordinates reference systems for the provided coverage.
+         * @param coverageId the coverage id or name
+         */
+        WcsCoverageDescriptions.prototype.getSupportedCrs = function (coverageId) {
+            if (!coverageId) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCoverageDescriptions", "getSupportedCrs", "missingId"));
+            }
+            var coverage = this.getCoverage(coverageId), crses = [];
+
+            if (!coverage) {
+                return null;
+            }
+
+            if (this.version === "1.0.0") {
+                return coverage.supportedCrs.requests;
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                crses.push(coverage.boundedBy.envelope.srsName);
+                return crses;
+            }
+
+            return null;
+        };
+
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleDocument = function () {
+        WcsCoverageDescriptions.prototype.getCoverage = function (coverageId) {
+            for (var i = 0, len = this.coverages.length; i < len; i++) {
+                if (coverageId === (this.coverages[i].coverageId || this.coverages[i].name)) {
+                    return this.coverages[i];
+                }
+            }
+
+            return null;
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCoverageDescriptions.prototype.assembleDocument = function () {
             // Determine version and update sequence
             var root = this.xmlDom.documentElement;
 
             if (root.localName === "CoverageDescription") {
                 this.assembleDocument100(root);
+                this.version = "1.0.0";
             } else if (root.localName === "CoverageDescriptions") {
                 this.assembleDocument20x(root);
+                this.version = root.getAttribute("version") || "2.0.1"; // work around for geoserver bug
             } else {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WcsCapabilities", "assembleDocument", "unsupportedVersion"));
@@ -75,7 +185,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleDocument100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleDocument100 = function (element) {
             this.version = element.getAttribute("version");
 
             var children = element.children || element.childNodes;
@@ -91,7 +201,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleDocument20x = function (element) {
+        WcsCoverageDescriptions.prototype.assembleDocument20x = function (element) {
             var children = element.children || element.childNodes;
 
             for (var c = 0; c < children.length; c++) {
@@ -105,7 +215,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleCoverages100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleCoverages100 = function (element) {
             var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -138,7 +248,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleCoverages20x = function (element) {
+        WcsCoverageDescriptions.prototype.assembleCoverages20x = function (element) {
             var children = element.children || element.childNodes, coverage = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
@@ -162,7 +272,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleServiceParameters20x = function (element) {
+        WcsCoverageDescriptions.prototype.assembleServiceParameters20x = function (element) {
             var children = element.children || element.childNodes, serviceParameters = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -180,7 +290,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleLonLatEnvelope100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleLonLatEnvelope100 = function (element) {
             var children = element.children || element.childNodes, latLonEnvelope = {};
 
             latLonEnvelope.srsName = element.getAttribute("srsName");
@@ -190,7 +300,7 @@ define([
 
                 if (child.localName === "pos") {
                     latLonEnvelope.pos = latLonEnvelope.pos || [];
-                    latLonEnvelope.pos.push(WcsDescribeCoverage.parseSpacedFloatArray(child.textContent));
+                    latLonEnvelope.pos.push(WcsCoverageDescriptions.parseSpacedFloatArray(child.textContent));
                 }
             }
 
@@ -198,7 +308,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleSupportedCrs100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleSupportedCrs100 = function (element) {
             var children = element.children || element.childNodes, supportedCrs = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -225,7 +335,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleSupportedFormats100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleSupportedFormats100 = function (element) {
             var children = element.children || element.childNodes, supportedFormats = {};
 
             supportedFormats.nativeFormat = element.getAttribute("nativeFormat");
@@ -243,7 +353,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleSupportedInterpolations100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleSupportedInterpolations100 = function (element) {
             var children = element.children || element.childNodes, supportedInterpolations = {};
 
             supportedInterpolations.default = element.getAttribute("default");
@@ -261,7 +371,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleDomainSet100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleDomainSet100 = function (element) {
             var children = element.children || element.childNodes, domainSet = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -276,7 +386,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleSpatialDomain100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleSpatialDomain100 = function (element) {
             var children = element.children || element.childNodes, spatialDomain = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -293,7 +403,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleRangeSet100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleRangeSet100 = function (element) {
             var children = element.children || element.childNodes, rangeSet = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -307,7 +417,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleRangeSetElement100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleRangeSetElement100 = function (element) {
             var children = element.children || element.childNodes, rangeSet = {};
 
             rangeSet.semantic = element.getAttribute("semantic");
@@ -330,7 +440,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleRangeSetAxisDescription100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleRangeSetAxisDescription100 = function (element) {
             var children = element.children || element.childNodes, axisDescriptions = [];
 
             for (var c = 0; c < children.length; c++) {
@@ -345,7 +455,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleRangeSetAxisDescriptionElement100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleRangeSetAxisDescriptionElement100 = function (element) {
             var children = element.children || element.childNodes, axisDescription = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -364,7 +474,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.prototype.assembleRangeSetValues100 = function (element) {
+        WcsCoverageDescriptions.prototype.assembleRangeSetValues100 = function (element) {
             var children = element.children || element.childNodes, values = {};
 
             for (var c = 0; c < children.length; c++) {
@@ -380,7 +490,7 @@ define([
         };
 
         // Internal. Intentionally not documented.
-        WcsDescribeCoverage.parseSpacedFloatArray = function (line) {
+        WcsCoverageDescriptions.parseSpacedFloatArray = function (line) {
             var result = [], elements = line.split(/\s+/);
 
             for (var i = 0; i < elements.length; i++) {
@@ -390,5 +500,5 @@ define([
             return result;
         };
 
-        return WcsDescribeCoverage;
+        return WcsCoverageDescriptions;
     });

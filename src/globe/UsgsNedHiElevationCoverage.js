@@ -38,15 +38,16 @@ define([
         var UsgsNedHiElevationCoverage = function () {
             // Hawaii Extent: (-178.443593, 18.865460) - (-154.755792, 28.517269)
             // TODO: Remove this class when the server NO_DATA value issue is resolved.
-            TiledElevationCoverage.call(this,
-                new Sector(18.865460, 28.517269, -178.443593, -154.755792), new Location(45, 45), 12, "application/bil16",
-                "UsgsNedHiElevations256", 256, 256, 0.000092592592593);
+            TiledElevationCoverage.call(this, {
+                coverageSector: new Sector(18.865460, 28.517269, -178.443593, -154.755792),
+                resolution: 0.000092592592593,
+                retrievalImageFormat: "application/bil16",
+                minElevation: -11000,
+                maxElevation: 8850,
+                urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "USGS-NED", "", "1.3.0")
+            });
 
             this.displayName = "USGS NED Hawaii Elevation Coverage";
-            this.minElevation = -11000;
-            this.maxElevation = 8850;
-            this.pixelIsPoint = false;
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "USGS-NED", "", "1.3.0");
         };
 
         UsgsNedHiElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);

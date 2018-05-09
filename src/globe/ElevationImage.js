@@ -32,21 +32,12 @@ define([
          * @constructor
          * @classdesc Holds elevation values for an elevation tile.
          * This class is typically not used directly by applications.
-         * @param {String} imagePath A string uniquely identifying this elevation image relative to other elevation
-         * images.
          * @param {Sector} sector The sector spanned by this elevation image.
          * @param {Number} imageWidth The number of longitudinal sample points in this elevation image.
          * @param {Number} imageHeight The number of latitudinal sample points in this elevation image.
-         * @throws {ArgumentError} If the specified image path is null, undefined or empty, or the specified
-         * sector is null or undefined.
+         * @throws {ArgumentError} If the sector is null or undefined
          */
-        var ElevationImage = function (imagePath, sector, imageWidth, imageHeight) {
-            if (!imagePath || (imagePath.length < 1)) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "constructor",
-                        "The specified image path is null, undefined or zero length."));
-            }
-
+        var ElevationImage = function (sector, imageWidth, imageHeight) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "constructor", "missingSector"));
@@ -58,13 +49,6 @@ define([
              * @readonly
              */
             this.sector = sector;
-
-            /**
-             * A string uniquely identifying this elevation image.
-             * @type {String}
-             * @readonly
-             */
-            this.imagePath = imagePath;
 
             /**
              * The number of longitudinal sample points in this elevation image.
