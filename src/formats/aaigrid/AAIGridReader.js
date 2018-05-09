@@ -31,7 +31,7 @@ define([
 
         /**
          * Constructs an AAIGrid reader object for the specified data source.
-         * Call [getData]{@link AAIGridReader#getData} to retrieve the data as a typed array.
+         * Call [getImageData]{@link AAIGridReader#getImageData} to retrieve the data as a typed array.
          * Use [metadata]{@link AAIGridReader#metadata} to access the metadata of this AAIGrid.
          * @alias AAIGridReader
          * @constructor
@@ -81,7 +81,7 @@ define([
          *
          * @return {Int16Array|Float32Array} The content of the AAIGrid.
          */
-        AAIGridReader.prototype.getData = function () {
+        AAIGridReader.prototype.getImageData = function () {
             return this._values;
         };
 

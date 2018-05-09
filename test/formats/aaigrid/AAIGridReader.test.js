@@ -51,8 +51,8 @@ define([
             expect(reader.metadata.yllcorner).toBe(10);
             expect(reader.metadata.cellsize).toBe(1.090909090909);
             expect(reader.metadata.NODATA_value).toBe(-500);
-            expect(reader.getData() instanceof Int16Array).toBe(true);
-            expect(reader.getData()).toEqual(expectedValues);
+            expect(reader.getImageData() instanceof Int16Array).toBe(true);
+            expect(reader.getImageData()).toEqual(expectedValues);
         });
 
         it('Should parse a string data source with float values', function () {
@@ -85,8 +85,8 @@ define([
             expect(reader.metadata.yllcorner).toBe(10);
             expect(reader.metadata.cellsize).toBe(1.090909090909);
             expect(reader.metadata.NODATA_value).toBe(-500);
-            expect(reader.getData() instanceof Float32Array).toBe(true);
-            expect(reader.getData()).toEqual(expectedValues);
+            expect(reader.getImageData() instanceof Float32Array).toBe(true);
+            expect(reader.getImageData()).toEqual(expectedValues);
         });
 
         it('Should parse an array buffer data source', function (done) {
@@ -94,7 +94,7 @@ define([
 
             xhr.onload = function () {
                 var reader = new AAIGridReader(this.response);
-                var imageData = reader.getData();
+                var imageData = reader.getImageData();
 
                 expect(reader.metadata.ncols).toBe(33);
                 expect(reader.metadata.nrows).toBe(33);
@@ -124,7 +124,7 @@ define([
         it('Should fetch and parse a file', function (done) {
             var url = '../base/test/formats/aaigrid/aaigrid-tile.asc';
             AAIGridReader.retrieveFromUrl(url, function (reader) {
-                var imageData = reader.getData();
+                var imageData = reader.getImageData();
 
                 expect(reader.metadata.ncols).toBe(33);
                 expect(reader.metadata.nrows).toBe(33);
