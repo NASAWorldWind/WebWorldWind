@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * @exports AAIGridReader
  */
-
 define([
         './AAIGridConstants',
         './AAIGridMetadata',
@@ -30,15 +30,14 @@ define([
         'use strict';
 
         /**
-         * Constructs a AAIGrid reader object for a specified dataSource.
-         * Call [getImageData]{@link AAIGridReader#getImageData} to retrieve the elevations as a typed array of
-         * elevation values.
-         * Call [metadata]{@link AAIGridReader#metadata} to retrieve the metadata for this AAIGrid
+         * Constructs an AAIGrid reader object for the specified data source.
+         * Call [getData]{@link AAIGridReader#getData} to retrieve the data as a typed array.
+         * Use [metadata]{@link AAIGridReader#metadata} to access the metadata of this AAIGrid.
          * @alias AAIGridReader
          * @constructor
-         * @classdesc Parses a AAIGrid and creates a typed array with the elevation values.
-         * @param {String | ArrayBuffer} dataSource The data source for the AAIGrid
-         * @throws {ArgumentError} If the specified dataSource not a string or an array buffer
+         * @classdesc Parses an AAIGrid and creates a typed array with its values.
+         * @param {String|ArrayBuffer} dataSource The data source for the AAIGrid.
+         * @throws {ArgumentError} If the specified data source is not a string or an array buffer.
          */
         var AAIGridReader = function (dataSource) {
             if (!dataSource) {
@@ -78,11 +77,11 @@ define([
         });
 
         /**
-         * Returns the contents of the AAIGrid as a Int16Array or Float32Array.
+         * Returns the content of the AAIGrid as an Int16Array or Float32Array.
          *
-         * @return {Int16Array | Float32Array}
+         * @return {Int16Array|Float32Array} The content of the AAIGrid.
          */
-        AAIGridReader.prototype.getImageData = function () {
+        AAIGridReader.prototype.getData = function () {
             return this._values;
         };
 
@@ -91,11 +90,9 @@ define([
          * Decodes an arrayBuffer as a string.
          * If the dataSource is a string, no decoding takes place, the string is immediately returned.
          *
-         * @param {String | ArrayBuffer} dataSource
-         *
-         * @throws {ArgumentError} If the specified dataSource not a string or an array buffer
-         *
-         * @return {String} The decoded arrayBuffer
+         * @param {String|ArrayBuffer} dataSource
+         * @throws {ArgumentError} If the specified data source is not a string or an array buffer.
+         * @return {String} The decoded array buffer.
          */
         AAIGridReader.prototype.decodeData = function (dataSource) {
             if (typeof dataSource !== 'string' && !(dataSource instanceof ArrayBuffer)) {
@@ -113,12 +110,11 @@ define([
                 return decoder.decode(dataSource);
             }
 
-            //for old browsers
+            // The procedure below is for old browsers.
             var dataString = '';
             var bufferView = new Uint8Array(dataSource);
 
-            //the maximum number of arguments a function can take
-            var step = 65535;
+            var step = 65535; // The maximum number of arguments a function can take
             for (var i = 0, len = bufferView.length; i < len; i += step) {
                 if (i + step > len) {
                     step = len - i;
@@ -134,8 +130,7 @@ define([
          * Parses the AAIGrid.
          *
          * @param {String} dataString
-         *
-         * @throws {ArgumentError} If the specified dataSource not a string
+         * @throws {ArgumentError} If the specified data source is not a string.
          */
         AAIGridReader.prototype.parse = function (dataString) {
             if (typeof dataString !== 'string') {
@@ -199,15 +194,30 @@ define([
         };
 
         /**
-         * Attempts to retrieve the AAIGrid data from the provided URL, parse the data and return a AAIGridReader
+         * Attempts to retrieve the AAIGrid data from the provided URL, parse the data and return an AAIGridReader
          * using the provided parserCompletionCallback.
          *
-         * @param {String} url An url pointing to an external resource
-         * @param {Function} parserCompletionCallback Function to execute when the retrieval finishes, taking two arguments:
-         * AAIGridReader instance in case of success, otherwise null
-         * XMLHttpRequest instance
+         * @param {String} url An URL pointing to an external resource.
+         * @param {Function} parserCompletionCallback A function to execute when the retrieval finishes, taking two
+         * arguments:
+         * <ul>
+         *     <li>AAIGridReader instance in case of success, otherwise null</li>
+         *     <li>XMLHttpRequest instance</li>
+         * </ul>
          */
         AAIGridReader.retrieveFromUrl = function (url, parserCompletionCallback) {
+            if (!url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "AAIGridReader", "retrieveFromUrl",
+                        "missingUrl"));
+            }
+
+            if (!parserCompletionCallback) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "AAIGridReader", "retrieveFromUrl",
+                        "The specified callback is null or undefined."));
+            }
+
             var xhr = new XMLHttpRequest();
 
             xhr.onload = function () {
@@ -232,7 +242,6 @@ define([
 
             xhr.open("GET", url, true);
             xhr.responseType = 'arraybuffer';
-
             xhr.send(null);
         };
 

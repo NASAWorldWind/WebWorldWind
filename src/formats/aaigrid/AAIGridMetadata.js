@@ -19,10 +19,10 @@ define([],
         'use strict';
 
         /**
-         * Provides AAIGrid metadata.
+         * Creates a new container for AAIGrid metadata.
          * @alias AAIGridMetadata
          * @constructor
-         * @classdesc Contains all of the AAIGrid metadata for a AAIGrid file.
+         * @classdesc Contains all metadata for an AAIGrid file.
          */
         var AAIGridMetadata = function () {
             // Documented in defineProperties below.
