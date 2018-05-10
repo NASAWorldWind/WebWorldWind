@@ -75,11 +75,11 @@ define(['../gesture/GestureRecognizer'],
 
         // Documented in superclass.
         ClickRecognizer.prototype.mouseDown = function (event) {
-            if (this.state != WorldWind.POSSIBLE) {
+            if (this.state !== WorldWind.POSSIBLE) {
                 return;
             }
 
-            if (this.button != event.button) {
+            if (this.button !== event.button) {
                 this.state = WorldWind.FAILED;
             } else {
                 var click = {
@@ -93,7 +93,7 @@ define(['../gesture/GestureRecognizer'],
 
         // Documented in superclass.
         ClickRecognizer.prototype.mouseMove = function (event) {
-            if (this.state != WorldWind.POSSIBLE) {
+            if (this.state !== WorldWind.POSSIBLE) {
                 return;
             }
 
@@ -107,16 +107,16 @@ define(['../gesture/GestureRecognizer'],
 
         // Documented in superclass.
         ClickRecognizer.prototype.mouseUp = function (event) {
-            if (this.state != WorldWind.POSSIBLE) {
+            if (this.state !== WorldWind.POSSIBLE) {
                 return;
             }
 
-            if (this.mouseButtonMask != 0) {
+            if (this.mouseButtonMask !== 0) {
                 return; // wait until the last button is up
             }
 
             var clickCount = this.clicks.length;
-            if (clickCount == this.numberOfClicks) {
+            if (clickCount === this.numberOfClicks) {
                 this.clientX = this.clicks[0].clientX;
                 this.clientY = this.clicks[0].clientY;
                 this.state = WorldWind.RECOGNIZED;
@@ -127,7 +127,7 @@ define(['../gesture/GestureRecognizer'],
 
         // Documented in superclass.
         ClickRecognizer.prototype.touchStart = function (touch) {
-            if (this.state != WorldWind.POSSIBLE) {
+            if (this.state !== WorldWind.POSSIBLE) {
                 return;
             }
 
@@ -143,7 +143,7 @@ define(['../gesture/GestureRecognizer'],
 
             self.timeout = window.setTimeout(function () {
                 self.timeout = null;
-                if (self.state == WorldWind.POSSIBLE) {
+                if (self.state === WorldWind.POSSIBLE) {
                     self.state = WorldWind.FAILED; // fail if we haven't already reached a terminal state
                 }
             }, delay);
