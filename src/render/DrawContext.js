@@ -18,6 +18,7 @@
  */
 define([
         '../error/ArgumentError',
+        '../layer/BingLogoLayer',
         '../util/Color',
         '../util/FrameStatistics',
         '../render/FramebufferTexture',
@@ -45,6 +46,7 @@ define([
         '../util/WWMath'
     ],
     function (ArgumentError,
+              BingLogoLayer,
               Color,
               FrameStatistics,
               FramebufferTexture,
@@ -143,6 +145,12 @@ define([
              * @type {ScreenCreditController}
              */
             this.screenCreditController = new ScreenCreditController();
+
+            /**
+             * The Layer responsible for displaying the Bing logo alongside Bing's imagery layers.
+             * @type {BingLogoLayer}
+             */
+            this.bingLogoLayer = new BingLogoLayer();
 
             /**
              * A shared TextRenderer instance.

@@ -29,6 +29,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './BasicWorldWindowController',
         './layer/BingAerialLayer',
         './layer/BingAerialWithLabelsLayer',
+        './layer/BingLogoLayer',
         './layer/BingRoadsLayer',
         './layer/BingWMSLayer',
         './layer/BMNGLandsatLayer',
@@ -281,6 +282,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               BasicWorldWindowController,
               BingAerialLayer,
               BingAerialWithLabelsLayer,
+              BingLogoLayer,
               BingRoadsLayer,
               BingWMSLayer,
               BMNGLandsatLayer,
@@ -755,6 +757,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['BasicWorldWindowController'] = BasicWorldWindowController;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
         WorldWind['BingAerialWithLabelsLayer'] = BingAerialWithLabelsLayer;
+        WorldWind['BingLogoLayer'] = BingLogoLayer;
         WorldWind['BingRoadsLayer'] = BingRoadsLayer;
         WorldWind['BingWMSLayer'] = BingWMSLayer;
         WorldWind['BMNGLandsatLayer'] = BMNGLandsatLayer;
