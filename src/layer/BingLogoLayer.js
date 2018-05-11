@@ -29,15 +29,14 @@ define([
         "use strict";
 
         /**
-         * Constructs a base Bing layer. This constructor is meant to be called only by subclasses.
-         * @alias BingTiledImageLayer
+         * A Layer that displays the Bing logo.
+         * @alias BingLogoLayer
          * @constructor
-         * @augments MercatorTiledImageLayer
-         * @classdesc Provides an abstract base layer for Bing imagery. This class is not intended to be constructed
-         * independently but as a base layer for subclasses.
-         * See {@link BingAerialLayer}, {@link BingAerialWithLabelsLayer} and {@link BingRoadsLayer}.
-         *
-         * @param {String} displayName This layer's display name.
+         * @augments Layer
+         * @classdesc Displays the Bing logo in order to provide attributions to layers with imagery provided by Bing.
+         * Attached to the {@link DrawContext} and added to the {@link WorldWindow} as an 'internal' Layer. It's
+         * disabled by default and meant to be commanded to draw the Bing logo by {@link BingTiledImageLayer}
+         * and its subclasses.
          */
         var BingLogoLayer = function () {
             Layer.call(this, "BingLogoLayer");
@@ -63,7 +62,7 @@ define([
 
             this.attribution = new ScreenImage(this.logoPlacement, this.attributionImage);
 
-            // Make Bing logo semi transparent.
+            // Make Bing logo semi-transparent.
             this.attribution.imageColor = new Color(1, 1, 1, 0.5);
         };
 

@@ -146,6 +146,10 @@ define([
              */
             this.screenCreditController = new ScreenCreditController();
 
+            /**
+             * The Layer responsible for displaying the Bing logo alongside Bing's imagery layers.
+             * @type {BingLogoLayer}
+             */
             this.bingLogoLayer = new BingLogoLayer();
 
             /**

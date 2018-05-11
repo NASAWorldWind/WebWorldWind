@@ -18,18 +18,12 @@
  */
 define([
         '../geom/Angle',
-        '../util/Color',
         '../geom/Location',
-        '../util/Offset',
-        '../shapes/ScreenImage',
         '../geom/Sector',
         '../layer/MercatorTiledImageLayer'
     ],
     function (Angle,
-              Color,
               Location,
-              Offset,
-              ScreenImage,
               Sector,
               MercatorTiledImageLayer) {
         "use strict";
@@ -64,7 +58,8 @@ define([
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
-            if(this.inCurrentFrame){
+            // Draw the Bing logo to provide the appropriate attribution
+            if (this.inCurrentFrame) {
                 dc.bingLogoLayer.doRender(dc);
             } else {
                 dc.bingLogoLayer.enabled = false;
