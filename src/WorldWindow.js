@@ -825,6 +825,7 @@ define([
             dc.navigator = this.navigator;
             dc.layers = this.layers.slice();
             dc.layers.push(dc.screenCreditController);
+            dc.layers.push(dc.bingLogoLayer);
             this.computeDrawContext();
             dc.verticalExaggeration = this.verticalExaggeration;
             dc.surfaceOpacity = this.surfaceOpacity;

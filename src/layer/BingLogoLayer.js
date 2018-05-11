@@ -39,10 +39,12 @@ define([
          *
          * @param {String} displayName This layer's display name.
          */
-        var BingLogoLayer = function (displayName) {
+        var BingLogoLayer = function () {
             Layer.call(this, "BingLogoLayer");
 
             this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
+
+            this.enabled = false;
 
             /**
              * An {@link Offset} indicating where to place the Bing logo on the screen.
