@@ -5,6 +5,7 @@ define([
     './IntervalType',
     '../../geom/Location',
     '../../util/Logger',
+    '../../geom/MeasuredLocation',
     '../TiledImageLayer',
     '../../geom/Sector',
     '../../util/WWUtil'
@@ -14,6 +15,7 @@ define([
              IntervalType,
              Location,
              Logger,
+             MeasuredLocation,
              TiledImageLayer,
              Sector,
              WWUtil) {
@@ -39,15 +41,15 @@ define([
 
         var data = {};
         var lat, lon;
-        for(lat = -90; lat < 90; lat++ ) {
+        for (lat = -90; lat < 90; lat++) {
             data[lat] = {};
-            for(lon = -180; lon < 180; lon++) {
+            for (lon = -180; lon < 180; lon++) {
                 data[lat][lon] = [];
             }
         }
 
         var latitude, longitude;
-        measuredLocations.forEach(function(measured){
+        measuredLocations.forEach(function (measured) {
             latitude = Math.floor(measured.latitude);
             longitude = Math.floor(measured.longitude);
             data[latitude][longitude].push(measured);
@@ -75,10 +77,10 @@ define([
          * @type {IntervalType}
          */
         intervalType: {
-            get: function() {
+            get: function () {
                 return this._intervalType;
             },
-            set: function(intervalType) {
+            set: function (intervalType) {
                 this._intervalType = intervalType;
                 this.setGradient();
             }
@@ -91,10 +93,10 @@ define([
          * @type {String[]}
          */
         scale: {
-            get: function() {
+            get: function () {
                 return this._scale;
             },
-            set: function(scale) {
+            set: function (scale) {
                 this._scale = scale;
                 this.setGradient();
             }
@@ -106,10 +108,10 @@ define([
          * @type {String[]}
          */
         gradient: {
-            get: function() {
+            get: function () {
                 return this._gradient;
             },
-            set: function(gradient) {
+            set: function (gradient) {
                 this._gradient = gradient;
             }
         },
@@ -121,10 +123,10 @@ define([
          * @type {Function|Number}
          */
         radius: {
-            get: function() {
+            get: function () {
                 return this._radius;
             },
-            set: function(radius) {
+            set: function (radius) {
                 this._radius = radius;
             }
         },
@@ -135,10 +137,10 @@ define([
          * @type {Number}
          */
         blur: {
-            get: function() {
+            get: function () {
                 return this._blur;
             },
-            set: function(blur) {
+            set: function (blur) {
                 this._blur = blur;
             }
         },
@@ -150,10 +152,10 @@ define([
          * @type {Number}
          */
         incrementPerIntensity: {
-            get: function() {
+            get: function () {
                 return this._incrementPerIntensity;
             },
-            set: function(incrementPerIntensity) {
+            set: function (incrementPerIntensity) {
                 this._incrementPerIntensity = incrementPerIntensity;
             }
         }
@@ -167,33 +169,57 @@ define([
      * @param sector
      * @returns {Object[]}
      */
-    HeatMapLayer.prototype.filterGeographically = function(data, sector) {
+    HeatMapLayer.prototype.filterGeographically = function (data, sector) {
         var minLatitude = Math.floor(sector.minLatitude);
         var maxLatitude = Math.floor(sector.maxLatitude);
         var minLongitude = Math.floor(sector.minLongitude);
         var maxLongitude = Math.floor(sector.maxLongitude);
-        if(minLatitude < -90) {
+
+        var extraLongitudeBefore = 0, extraLongitudeAfter = 0;
+
+        if (minLatitude < -90) {
             minLatitude = -90;
         }
-        if(minLongitude < -180) {
-            minLongitude = -180;
-        }
-        if(maxLatitude > 89) {
+        if (maxLatitude > 89) {
             maxLatitude = 89;
         }
-        if(maxLongitude > 179) {
+
+        if (minLongitude < -180) {
+            extraLongitudeBefore = Math.abs(minLongitude - (-180));
+            minLongitude = -180;
+        }
+        if (maxLongitude > 179) {
+            extraLongitudeAfter = Math.abs(maxLongitude - 180);
             maxLongitude = 179;
         }
 
-        var lat, lon;
         var result = [];
-        for(lat = minLatitude; lat <= maxLatitude; lat++) {
-            for(lon = minLongitude; lon <= maxLongitude; lon++ ) {
-                data[lat][lon].forEach(function(element){
-                    if(sector.containsLocation(element.latitude, element.longitude)) {
-                        result.push(element);
-                    }
-                });
+        var lat, lon;
+        this.gatherGeographical(data, result, sector, minLatitude, maxLatitude, minLongitude, maxLongitude);
+
+        if (extraLongitudeBefore !== 0) {
+            var beforeSector = new Sector(minLatitude, maxLatitude, 179 - extraLongitudeBefore, 179);
+            for (lat = minLatitude; lat <= maxLatitude; lat++) {
+                for (lon = 179 - extraLongitudeBefore; lon <= 179; lon++) {
+                    data[lat][lon].forEach(function (element) {
+                        if (beforeSector.containsLocation(element.latitude, element.longitude)) {
+                            result.push(new MeasuredLocation(element.latitude, -360 + element.longitude, element.measure));
+                        }
+                    });
+                }
+            }
+        }
+        if (extraLongitudeAfter !== 0) {
+            var afterSector = new Sector(minLatitude, maxLatitude, -180, -180 + extraLongitudeAfter);
+
+            for (lat = minLatitude; lat <= maxLatitude; lat++) {
+                for (lon = -180; lon <= -180 + extraLongitudeAfter; lon++) {
+                    data[lat][lon].forEach(function (element) {
+                        if (afterSector.containsLocation(element.latitude, element.longitude)) {
+                            result.push(new MeasuredLocation(element.latitude, 360 + element.longitude, element.measure));
+                        }
+                    });
+                }
             }
         }
 
@@ -201,38 +227,62 @@ define([
     };
 
     /**
+     * Internal method to gather the geographical data for given sector and boundingBox.
+     * @private
+     * @param data
+     * @param result
+     * @param sector
+     * @param minLatitude
+     * @param maxLatitude
+     * @param minLongitude
+     * @param maxLongitude
+     */
+    HeatMapLayer.prototype.gatherGeographical = function (data, result, sector, minLatitude, maxLatitude, minLongitude, maxLongitude) {
+        var lat, lon;
+        for (lat = minLatitude; lat <= maxLatitude; lat++) {
+            for (lon = minLongitude; lon <= maxLongitude; lon++) {
+                data[lat][lon].forEach(function (element) {
+                    if (sector.containsLocation(element.latitude, element.longitude)) {
+                        result.push(element);
+                    }
+                });
+            }
+        }
+    };
+
+    /**
      * It sets gradient based on the Scale and IntervalType.
      */
-    HeatMapLayer.prototype.setGradient = function(data) {
+    HeatMapLayer.prototype.setGradient = function (data) {
         var intervalType = this.intervalType;
         var scale = this.scale;
 
         var gradient = {};
-        if(intervalType === IntervalType.CONTINUOUS) {
-            scale.forEach(function(color, index){
+        if (intervalType === IntervalType.CONTINUOUS) {
+            scale.forEach(function (color, index) {
                 gradient[index / scale.length] = color;
             });
-        } else if(intervalType === IntervalType.QUANTILES) {
+        } else if (intervalType === IntervalType.QUANTILES) {
             // Equal amount of pieces in each group.
-            data.sort(function(item1, item2){
-                if(item1.measure < item2.measure){
+            data.sort(function (item1, item2) {
+                if (item1.measure < item2.measure) {
                     return -1;
-                } else if(item1.measure > item2.measure) {
+                } else if (item1.measure > item2.measure) {
                     return 1;
                 } else {
                     return 0;
                 }
             });
             var max = data[data.length - 1].measure;
-            if(data.length >= scale.length) {
-                scale.forEach(function(color, index){
+            if (data.length >= scale.length) {
+                scale.forEach(function (color, index) {
                     // What is the fraction of the colors
                     var fractionDecidingTheScale = index / scale.length; // Kolik je na nte pozice z maxima.
                     var pointInScale = data[Math.floor(fractionDecidingTheScale * data.length)].intensity / max;
                     gradient[pointInScale] = color;
                 });
             } else {
-                scale.forEach(function(color, index){
+                scale.forEach(function (color, index) {
                     gradient[index / scale.length] = color;
                 });
             }
@@ -254,7 +304,7 @@ define([
                 layer = this,
                 radius = this.radius;
 
-            if(typeof this.radius === 'function') {
+            if (typeof this.radius === 'function') {
                 radius = this.radius(tile.sector, this.tileWidth, this.tileHeight);
             }
 
@@ -267,7 +317,9 @@ define([
                 tile.sector.minLongitude - longitudeChange,
                 tile.sector.maxLongitude + longitudeChange
             );
+            console.log(extendedSector);
             var data = this.filterGeographically(this._data, extendedSector);
+            console.log(data);
 
             // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
             // of the tile width / tile height. The size you need to actually take into account differs.
@@ -320,7 +372,7 @@ define([
      * @param options.incrementPerIntensity {Number}
      * @return {HeatMapTile} Implementation of the HeatMapTile used for this instance of the layer.
      */
-    HeatMapLayer.prototype.createHeatMapTile = function(data, options) {
+    HeatMapLayer.prototype.createHeatMapTile = function (data, options) {
         return new ColoredTile(data, options);
     };
 

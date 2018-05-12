@@ -25,14 +25,18 @@ requirejs(['./WorldWindShim',
 
         // Generate 500 random points to display on the HeatMap with varying intensity over the area of the US
         var locations = [];
-        var intensities = [];
         for (var i = 0; i < 500; i++) {
-            locations.push(new WorldWind.MeasuredLocation(30 + (20 * Math.random()), -130 + (50 * Math.random())),
-                Math.ceil(100 * Math.random()));
+            locations.push(
+                new WorldWind.MeasuredLocation(
+                    30 + (20 * Math.random()),
+                    -130 + (50 * Math.random()),
+                    Math.ceil(100 * Math.random())
+                )
+            );
         }
 
         //
-        var heatMapLayer = new WorldWind.HeatMapLayer("HeatMap", locations, intensities);
+        var heatMapLayer = new WorldWind.HeatMapLayer("HeatMap", locations);
 
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
