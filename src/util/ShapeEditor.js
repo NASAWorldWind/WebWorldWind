@@ -221,7 +221,7 @@ define([
 
             //Internal use only. Intentionally not documented.
             var handleClick = function (recognizer) {
-                if(this.shape === null || recognizer.state !== WorldWind.RECOGNIZED)
+                if(this.shape === null || recognizer.state !== WorldWind.RECOGNIZED || shapeEditor.isDragging === true)
                     return;
 
                 var x = recognizer._clientX,
