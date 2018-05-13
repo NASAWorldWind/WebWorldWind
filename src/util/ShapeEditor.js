@@ -22,7 +22,9 @@ define([
         '../shapes/Annotation',
         '../shapes/AnnotationAttributes',
         '../error/ArgumentError',
+        '../gesture/ClickRecognizer',
         '../util/Color',
+        '../gesture/DragRecognizer',
         '../util/Font',
         '../util/Insets',
         '../geom/Location',
@@ -46,7 +48,9 @@ define([
               Annotation,
               AnnotationAttributes,
               ArgumentError,
+              ClickRecognizer,
               Color,
+              DragRecognizer,
               Font,
               Insets,
               Location,
@@ -216,51 +220,12 @@ define([
             this.lastY = null;
 
             //Internal use only. Intentionally not documented.
-            this.currentEvent = null;
-
-            var shapeEditor = this;
-
-            var handleMouseMove = function (event) {
-                if(this.shape === null)
+            var handleClick = function (recognizer) {
+                if(this.shape === null || recognizer.state !== WorldWind.RECOGNIZED)
                     return;
 
-                if (shapeEditor.isDragging === false) {
-                    return;
-                }
-
-                var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX, event.clientY);
-                var terrainObject;
-
-                if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                    terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint).terrainObject();
-                }
-
-                if (!terrainObject) {
-                    return;
-                }
-
-                if (shapeEditor.currentSizingMarker instanceof Placemark &&
-                    shapeEditor.currentSizingMarker.userProperties.isControlPoint) {
-                    shapeEditor.reshapeShape(terrainObject);
-                    shapeEditor.updateControlPoints();
-                }
-                else if (shapeEditor.shape instanceof SurfaceShape) {
-                    shapeEditor.dragWholeShape(event);
-                    shapeEditor.updateControlPoints();
-                    shapeEditor.updateShapeAnnotation();
-                }
-
-                event.preventDefault();
-            };
-
-            var handleMouseDown = function (event) {
-                if(this.shape === null)
-                    return;
-
-                shapeEditor.currentEvent = event;
-
-                var x = event.clientX,
-                    y = event.clientY;
+                var x = recognizer._clientX,
+                    y = recognizer._clientY;
 
                 shapeEditor.startX = x;
                 shapeEditor.startY = y;
@@ -273,18 +238,16 @@ define([
                     for (var p = 0; p < pickList.objects.length; p++) {
                         if (!pickList.objects[p].isTerrain) {
                             if (shapeEditor.shape && pickList.objects[p].userObject === shapeEditor.shape) {
-                                event.preventDefault();
                                 shapeEditor.isDragging = true;
                                 shapeEditor.originalAttributes = shapeEditor.shape.attributes;
                                 shapeEditor.originalHighlightAttributes = shapeEditor.shape.highlightAttributes;
                                 shapeEditor.makeShadowShape();
 
                                 //set previous position
-                                shapeEditor.setPreviousPosition(event);
+                                shapeEditor.setPreviousPosition(recognizer);
                             }
                             else if (pickList.objects[p].userObject instanceof Placemark &&
                                 pickList.objects[p].userObject.userProperties.isControlPoint) {
-                                event.preventDefault();
                                 shapeEditor.currentSizingMarker = pickList.objects[p].userObject;
                                 shapeEditor.isDragging = true;
                                 shapeEditor.originalAttributes = shapeEditor.shape.attributes;
@@ -292,95 +255,88 @@ define([
                                 shapeEditor.makeShadowShape();
 
                                 //set previous position
-                                shapeEditor.setPreviousPosition(event);
+                                shapeEditor.setPreviousPosition(recognizer);
                             }
                         }
                     }
                 }
             };
 
-            var handleMouseUp = function (event) {
-                if(this.shape === null)
+            //Internal use only. Intentionally not documented.
+            var handleDrag = function (recognizer) {
+                if (shapeEditor.isDragging === false) {
                     return;
-
-                var x = event.clientX,
-                    y = event.clientY;
-
-                if (shapeEditor.shape && shapeEditor.shadowLayer.renderables.length > 0) {
-                    shapeEditor.removeShadowShape();
-                    shapeEditor.updateAnnotation(null);
                 }
 
-                if (shapeEditor.currentSizingMarker instanceof Placemark &&
+                if (recognizer.state !== WorldWind.ENDED) {
+                    var mousePoint = shapeEditor.worldWindow.canvasCoordinates(recognizer._clientX, recognizer._clientY);
+                    var terrainObject;
+
+                    if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
+                        terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint).terrainObject();
+                    }
+
+                    if (!terrainObject) {
+                        return;
+                    }
+
+                    if (shapeEditor.currentSizingMarker instanceof Placemark &&
                         shapeEditor.currentSizingMarker.userProperties.isControlPoint) {
-                    if (event.altKey) {
-                        var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX, event.clientY);
-                        var terrainObject;
+                        shapeEditor.reshapeShape(terrainObject);
+                        shapeEditor.updateControlPoints();
+                    }
+                    else if (shapeEditor.shape instanceof SurfaceShape) {
+                        shapeEditor.dragWholeShape(recognizer);
+                        shapeEditor.updateControlPoints();
+                        shapeEditor.updateShapeAnnotation();
+                    }
+                }
+                else {
+                    // move the shape to the new position and clean shadow
+                    var x = recognizer._clientX,
+                        y = recognizer._clientY;
 
-                        if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                            terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint).terrainObject();
-                        }
+                    if (shapeEditor.shape && shapeEditor.shadowLayer.renderables.length > 0) {
+                        shapeEditor.removeShadowShape();
+                        shapeEditor.updateAnnotation(null);
+                    }
 
-                        if (terrainObject) {
-                            shapeEditor.reshapeShape(terrainObject);
-                            shapeEditor.updateControlPoints();
-                            shapeEditor.updateAnnotation(null);
+                    if (shapeEditor.currentSizingMarker instanceof Placemark &&
+                        shapeEditor.currentSizingMarker.userProperties.isControlPoint) {
+                        shapeEditor.isDragging = false;
+                        shapeEditor.currentSizingMarker = null;
+                        return;
+                    }
+
+                    var redrawRequired = false;
+
+                    var pickList = shapeEditor.worldWindow.pick(shapeEditor.worldWindow.canvasCoordinates(x, y));
+                    if (pickList.objects.length > 0) {
+                        for (var p = 0; p < pickList.objects.length; p++) {
+                            if (!pickList.objects[p].isTerrain) {
+                                redrawRequired = true;
+                                break;
+                            }
                         }
                     }
+
                     shapeEditor.isDragging = false;
                     shapeEditor.currentSizingMarker = null;
-                    return;
-                }
 
-                var redrawRequired = false;
-
-                var pickList = shapeEditor.worldWindow.pick(shapeEditor.worldWindow.canvasCoordinates(x, y));
-                if (pickList.objects.length > 0) {
-                    for (var p = 0; p < pickList.objects.length; p++) {
-                        if (!pickList.objects[p].isTerrain) {
-                            if (shapeEditor.startX === shapeEditor.lastX &&
-                                shapeEditor.startY === shapeEditor.lastY) {
-                                if (event.shiftKey) {
-                                    var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX,
-                                        event.clientY);
-                                    var terrainObject;
-
-                                    if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                                        terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint)
-                                            .terrainObject();
-                                    }
-
-                                    if (terrainObject) {
-                                        shapeEditor.addNearestLocation(terrainObject.position, 0,
-                                            shapeEditor.shape.boundaries);
-                                    }
-                                }
-                            }
-
-                            redrawRequired = true;
-                            break;
-                        }
+                    // Update the window if we changed anything.
+                    if (redrawRequired) {
+                        shapeEditor.worldWindow.redraw();
                     }
-                }
-
-                shapeEditor.isDragging = false;
-                shapeEditor.currentSizingMarker = null;
-
-                // Update the window if we changed anything.
-                if (redrawRequired) {
-                    shapeEditor.worldWindow.redraw();
                 }
             };
 
-            if (window.PointerEvent) {
-                this.worldWindow.addEventListener("pointerup", handleMouseUp);
-                this.worldWindow.addEventListener("pointerdown", handleMouseDown);
-                this.worldWindow.addEventListener("pointermove", handleMouseMove, false);
-            } else {
-                this.worldWindow.addEventListener("mouseup", handleMouseUp);
-                this.worldWindow.addEventListener("mousedown", handleMouseDown);
-                this.worldWindow.addEventListener("mousemove", handleMouseMove, false);
-            }
+            // Intentionally not documented.
+            this.clickRecognizer = new ClickRecognizer(this.worldWindow, handleClick);
+
+            // Intentionally not documented.
+            this.dragRecognizer = new DragRecognizer(this.worldWindow, handleDrag);
+
+            var shapeEditor = this;
         };
 
         /**
@@ -644,10 +600,14 @@ define([
         };
 
         /**
-         * Moves the entire shape according to a specified event.
-         * @param {Event} event
+         * Moves the entire shape according to a specified recognizer.
+         * @param {DragRecognizer} recognizer
          */
-        ShapeEditor.prototype.dragWholeShape = function (event) {
+        ShapeEditor.prototype.dragWholeShape = function (recognizer) {
+            if (recognizer !== this.dragRecognizer) {
+                return;
+            }
+
             var refPos = this.shape.getReferencePosition();
             if (refPos === null) {
                 return;
@@ -661,11 +621,11 @@ define([
             this.worldWindow.drawContext.project(refPoint, screenRefPoint);
 
             // Compute screen-coord delta since last event.
-            var dx = event.clientX - this.lastX;
-            var dy = event.clientY - this.lastY;
+            var dx = recognizer._clientX - this.lastX;
+            var dy = recognizer._clientY - this.lastY;
 
-            this.lastX = event.clientX;
-            this.lastY = event.clientY;
+            this.lastX = recognizer._clientX;
+            this.lastY = recognizer._clientY;
 
             // Find intersection of screen coord ref-point with globe.
             var x = screenRefPoint[0] + dx;
@@ -1063,9 +1023,9 @@ define([
             }
         };
 
-        ShapeEditor.prototype.setPreviousPosition = function (event) {
-            var mousePoint = this.worldWindow.canvasCoordinates(event.clientX,
-                event.clientY);
+        ShapeEditor.prototype.setPreviousPosition = function (recognizer) {
+            var mousePoint = this.worldWindow.canvasCoordinates(recognizer._clientX,
+                recognizer._clientY);
             if (this.worldWindow.viewport.containsPoint(mousePoint)) {
                 var terrainObject = this.worldWindow.pickTerrain(mousePoint).terrainObject();
                 if (terrainObject) {
@@ -1110,25 +1070,13 @@ define([
             }
             else if (boundaries.length >= 2) {
                 //poly without whole
-                for (var i = 0; i < boundaries.length; i++) {
+                for (var i = 0, len = boundaries.length; i < len; i++) {
                     if (controlPoint.userProperties.purpose == ShapeEditor.LOCATION) {
                         if (controlPoint.userProperties.id == k) {
-                            if (this.currentEvent.altKey) {
-                                //remove location
-                                var minSize = this.shape instanceof SurfacePolygon ? 3 : 2;
-                                if (boundaries.length > minSize) {
-                                    // Delete the control point.
-                                    boundaries.splice(i, 1);
-                                    this.shape.boundaries = boundaries;
-                                    this.removeControlPoints();
-                                }
-                            }
-                            else {
-                                newPos = this.moveLocation(controlPoint, terrainPosition);
-                                boundaries[i] = newPos;
-                                this.shape.boundaries = boundaries;
-                                controlPoint.position = newPos;
-                            }
+                            newPos = this.moveLocation(controlPoint, terrainPosition);
+                            boundaries[i] = newPos;
+                            this.shape.boundaries = boundaries;
+                            controlPoint.position = newPos;
                             break;
                         }
                     } else if (controlPoint.userProperties.purpose == ShapeEditor.ROTATION) {
