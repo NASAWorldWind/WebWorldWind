@@ -80,11 +80,11 @@ define([
 
             // Make Bing logo semi transparent.
             this.attribution.imageColor = new Color(1, 1, 1, 0.5);
-
-            // Store last time the logo was rendered as a static member as a way to prevent subclasses from drawing
-            // more than one logo at a time.
-            BingTiledImageLayer.lastTimeLogoWasRendered = 0;
         };
+
+        // Store last time the logo was rendered as a static member as a way to prevent subclasses from drawing
+        // more than one logo at a time.
+        BingTiledImageLayer.lastTimeLogoWasRendered = 0;
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
