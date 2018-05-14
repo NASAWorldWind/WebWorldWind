@@ -25,7 +25,6 @@ define([], function(){
      * @param options.width {Number} Width of the Canvas to be created in pixels.
      * @param options.height {Number} Height of the Canvas to be created in pixels.
      * @param options.radius {Number} Radius of the data point in pixels.
-     * @param options.blur {Number} Blur of the HeatMap element in the pixels.
      * @param options.incrementPerIntensity {Number}
      */
     var HeatMapTile = function(data, options) {
@@ -33,12 +32,11 @@ define([], function(){
 
         this._sector = options.sector;
 
-        this._canvas = this.createCanvas(options.width + 2 * options.radius, options.height + 2 * options.radius);
+        this._canvas = this.createCanvas(options.width, options.height);
         this._width = options.width;
         this._height = options.height;
 
         this._radius = options.radius;
-        this._blur = options.blur;
 
         this._incrementPerIntensity = options.incrementPerIntensity;
     };
@@ -70,7 +68,7 @@ define([], function(){
         var shape = this.shape();
 
         var ctx = this._canvas.getContext('2d');
-        ctx.clearRect(0,0, this._width + 2 * this._radius, this._height + 2 * this._radius);
+        ctx.clearRect(0,0, this._width, this._height);
 
         for(var i = 0; i < this._data.length; i++) {
             var location = this._data[i];
@@ -79,7 +77,7 @@ define([], function(){
             ctx.drawImage(shape, this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
         }
 
-        return this.clip(this._canvas, this._radius, this._radius, this._width, this._height);
+        return this._canvas;
     };
 
     /**
@@ -95,22 +93,6 @@ define([], function(){
         canvas.height = height;
 
         return canvas;
-    };
-
-    /**
-     * Internal method for clipping the canvas to some size. The size + offset must be smaller than the area
-     * @protected
-     * @param canvas {HTMLCanvasElement} Canvas to clip
-     * @param x {Number} Start position for clipping with respect to width
-     * @param y {Number} Start position for clipping with respect to height
-     * @param width {Number} Width of the clip area
-     * @param height {Number} Height of the clip area.
-     * @returns {HTMLCanvasElement} Clipped canvas.
-     */
-    HeatMapTile.prototype.clip = function(canvas, x, y, width, height) {
-        var result = this.createCanvas(width, height);
-        result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(x, y, width, height), 0, 0);
-        return result;
     };
 
     /**

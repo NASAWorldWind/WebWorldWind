@@ -1,6 +1,7 @@
 define([
     '../../error/ArgumentError',
     './ColoredTile',
+    './HeatMapTile',
     '../../util/ImageSource',
     './IntervalType',
     '../../geom/Location',
@@ -11,6 +12,7 @@ define([
     '../../util/WWUtil'
 ], function (ArgumentError,
              ColoredTile,
+             HeatMapTile,
              ImageSource,
              IntervalType,
              Location,
@@ -308,7 +310,7 @@ define([
                 radius = this.radius(tile.sector, this.tileWidth, this.tileHeight);
             }
 
-            var extensionFactor = 1;
+            var extensionFactor = 1;  // Instead only the radius is needed.
             var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude) * extensionFactor;
             var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude) * extensionFactor;
             var extendedSector = new Sector(
@@ -317,9 +319,8 @@ define([
                 tile.sector.minLongitude - longitudeChange,
                 tile.sector.maxLongitude + longitudeChange
             );
-            console.log(extendedSector);
+
             var data = this.filterGeographically(this._data, extendedSector);
-            console.log(data);
 
             // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
             // of the tile width / tile height. The size you need to actually take into account differs.

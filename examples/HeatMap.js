@@ -23,13 +23,13 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // Generate 500 random points to display on the HeatMap with varying intensity over the area of the US
+        // Generate 10000 random points to display on the HeatMap with varying intensity over the area of the whole world.
         var locations = [];
-        for (var i = 0; i < 500; i++) {
+        for (var i = 0; i < 10000; i++) {
             locations.push(
                 new WorldWind.MeasuredLocation(
-                    30 + (20 * Math.random()),
-                    -130 + (50 * Math.random()),
+                    -89 + (179 * Math.random()),
+                    -179 + (359 * Math.random()),
                     Math.ceil(100 * Math.random())
                 )
             );
