@@ -84,17 +84,17 @@ define([
 
         // Store last time the logo was rendered as a static member as a way to prevent subclasses from drawing
         // more than one logo at a time.
-        BingTiledImageLayer.lastTimeLogoWasRendered = 0;
+        BingTiledImageLayer.logoLastFrameTime = 0;
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
-            if (this.inCurrentFrame && BingTiledImageLayer.lastTimeLogoWasRendered !== dc.timestamp) {
+            if (this.inCurrentFrame && BingTiledImageLayer.logoLastFrameTime !== dc.timestamp) {
                 this.attribution.screenOffset = this.logoPlacement;
                 this.attribution.imageOffset = this.logoAlignment;
                 this.attribution.render(dc);
-                BingTiledImageLayer.lastTimeLogoWasRendered = this.attribution.lastFrameTime;
+                BingTiledImageLayer.logoLastFrameTime = this.attribution.lastFrameTime;
             }
         };
 
