@@ -81,18 +81,20 @@ define([
             // Make Bing logo semi transparent.
             this.attribution.imageColor = new Color(1, 1, 1, 0.5);
 
-            // Make logo a static member so a single instance is shared between all subclasses.
-            BingTiledImageLayer.bingLogo = this.attribution;
+            // Store last time the logo was rendered as a static member as a way to prevent subclasses from drawing
+            // more than one logo at a time.
+            BingTiledImageLayer.lastTimeLogoWasRendered = 0;
         };
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
-            if (this.inCurrentFrame) {
-                BingTiledImageLayer.bingLogo.screenOffset = this.logoPlacement;
-                BingTiledImageLayer.bingLogo.imageOffset = this.logoAlignment;
-                BingTiledImageLayer.bingLogo.render(dc);
+            if (this.inCurrentFrame && BingTiledImageLayer.lastTimeLogoWasRendered !== dc.timestamp) {
+                this.attribution.screenOffset = this.logoPlacement;
+                this.attribution.imageOffset = this.logoAlignment;
+                this.attribution.render(dc);
+                BingTiledImageLayer.lastTimeLogoWasRendered = this.attribution.lastFrameTime;
             }
         };
 
