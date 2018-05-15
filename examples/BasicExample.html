@@ -14,16 +14,14 @@
     <div class="jumbotron hidden-xs">
         <h1 style="text-align:center">WorldWind Basic Example</h1>
     </div>
+
+    <!-- Creates a UI for the LayerManager module, that shows WorldWind's built-in projections, layers, and search
+        capabilities. -->
     <div class="row">
         <div class="col-sm-3">
             <h4>Projection</h4>
             <div class="dropdown" id="projectionDropdown">
             </div>
-            <br>
-            <h4>Layers</h4>
-            <div class="list-group" id="layerList">
-            </div>
-            <br>
             <h4>Destination</h4>
             <div class="input-group" id="searchBox">
                 <input type="text" class="form-control" placeholder="GoTo" id="searchText"/>
@@ -33,7 +31,13 @@
                     </button>
                 </span>
             </div>
+            <br>
+            <h4>Layers</h4>
+            <div class="list-group" id="layerList">
+            </div>
+            <br>
         </div>
+
         <div class="col-sm-9" id="globe">
             <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto">
                 Your browser does not support HTML5 Canvas.
