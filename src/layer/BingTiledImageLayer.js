@@ -82,7 +82,7 @@ define([
             // Store last time the logo was rendered to prevent subclasses from drawing more than one logo at a time.
             BingTiledImageLayer.logoLastFrameTime = 0;
         };
-        
+
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
