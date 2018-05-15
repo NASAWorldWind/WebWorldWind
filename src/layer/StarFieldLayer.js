@@ -207,10 +207,10 @@ define([
             var gl = dc.currentGlContext;
             var program = dc.currentProgram;
 
-            var eyePoint = dc.navigatorState.eyePoint;
+            var eyePoint = dc.eyePoint;
             var eyePosition = dc.globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], {});
             var scale = Math.max(eyePosition.altitude * 1.5, this._minScale);
-            this._matrix.copy(dc.navigatorState.modelviewProjection);
+            this._matrix.copy(dc.modelviewProjection);
             this._matrix.multiplyByScale(scale, scale, scale);
             program.loadModelviewProjection(gl, this._matrix);
 

@@ -98,7 +98,7 @@ define([],
 
             if (size > 1) {
                 for (var i = 0; i < size; i++) {
-                    if (this.objects[[i].isOnTop]) {
+                    if (this.objects[i].isOnTop) {
                         return this.objects[i];
                     }
                 }

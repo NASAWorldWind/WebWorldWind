@@ -164,7 +164,7 @@ define([
 
                 if (dc.pickPoint) {
                     if (this.labelBounds.containsPoint(
-                            dc.navigatorState.convertPointToViewport(dc.pickPoint, Annotation.scratchPoint))) {
+                            dc.convertPointToViewport(dc.pickPoint, Annotation.scratchPoint))) {
                         po.labelPicked = true;
                     }
                 }
@@ -266,33 +266,24 @@ define([
 
             // Wraps the text based and the width and height that were set for the
             // annotation
-            this.label = dc.textSupport.wrap(
+            this.label = dc.textRenderer.wrap(
                 this.label,
-                this.attributes.width, this.attributes.height,
-                this.attributes.textAttributes.font);
+                this.attributes.width, this.attributes.height);
 
             // Compute the annotation's model point.
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
-            this.eyeDistance = dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = dc.eyePoint.distanceTo(this.placePoint);
 
             // Compute the annotation's screen point in the OpenGL coordinate system of the WorldWindow
             // by projecting its model coordinate point onto the viewport. Apply a depth offset in order
             // to cause the annotation to appear above nearby terrain.
-            if (!dc.navigatorState.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
+            if (!dc.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
                 return null;
             }
 
-            var labelFont = this.attributes.textAttributes.font;
-            var labelKey = this.label + labelFont.toString();
-
-            this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-
-            if (!this.labelTexture) {
-                this.labelTexture = dc.textSupport.createTexture(dc, this.label, labelFont, false);
-                dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-            }
+            this.labelTexture = dc.createTextTexture(this.label, this.attributes.textAttributes);
 
             w = this.labelTexture.imageWidth;
             h = this.labelTexture.imageHeight;
@@ -331,7 +322,7 @@ define([
                 leaderOffsetY = 0;
             }
 
-            if (this.attributes.stateKey != this.lastStateKey) {
+            if (this.attributes.stateKey !== this.lastStateKey) {
                 this.calloutPoints = this.createCallout(
                     width, height,
                     leaderOffsetX, leaderOffsetY,
@@ -460,11 +451,11 @@ define([
                 this.pickColor = dc.uniquePickColor();
             }
 
-            program.loadOpacity(gl, this.attributes.opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.attributes.opacity * this.layer.opacity);
 
             // Attributes have changed. We need to track this because the callout vbo data may
             // have changed if scaled or text wrapping changes callout dimensions
-            var calloutAttributesChanged = (this.attributes.stateKey != this.lastStateKey);
+            var calloutAttributesChanged = (this.attributes.stateKey !== this.lastStateKey);
 
             // Create new cache key if callout drawing points have changed
             if (!this.calloutCacheKey || calloutAttributesChanged) {
@@ -521,7 +512,7 @@ define([
             Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
             program.loadTextureMatrix(gl, Annotation.matrix);
 
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : Color.WHITE);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 

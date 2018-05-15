@@ -294,7 +294,7 @@ define([
                 program = dc.currentProgram,
                 currentData = this.currentData,
                 hasTexture = this.texCoords && !!this.activeAttributes.imageSource,
-                vboId, opacity, color, pickColor, textureBound;
+                vboId, color, pickColor, textureBound;
 
             if (dc.pickingMode) {
                 pickColor = dc.uniquePickColor();
@@ -353,12 +353,10 @@ define([
                 }
 
                 color = this.activeAttributes.interiorColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
-
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                gl.depthMask(opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 if (hasTexture && (!dc.pickingMode || !this.pickTransparentImagePixels)) {
                     this.activeTexture = dc.gpuResourceCache.resourceForKey(this.activeAttributes.imageSource);
@@ -453,13 +451,11 @@ define([
                 this.applyMvpMatrixForOutline(dc);
 
                 color = this.activeAttributes.outlineColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
-
                 // Disable writing the shape's fragments to the depth buffer when the interior is
                 // semi-transparent.
-                gl.depthMask(opacity >= 1 || dc.pickingMode);
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 
@@ -490,14 +486,14 @@ define([
             if (dc.pickingMode) {
                 var pickPosition = this.computePickPosition(dc);
                 var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, pickPosition,
-                    dc.currentLayer, false);
+                    this.layer, false);
                 dc.resolvePick(po);
             }
         };
 
         AbstractMesh.prototype.computePickPosition = function (dc) {
             var currentData = this.currentData,
-                line = dc.navigatorState.rayFromScreenPoint(dc.pickPoint),
+                line = dc.pickRay,
                 localLineOrigin = new Vec3(line.origin[0], line.origin[1], line.origin[2]).subtract(
                     currentData.referencePoint),
                 localLine = new Line(localLineOrigin, line.direction),
@@ -509,10 +505,10 @@ define([
 
                 if (intersectionPoints.length > 1) {
                     // Find the intersection nearest the eye point.
-                    var distance2 = iPoint.distanceToSquared(dc.navigatorState.eyePoint);
+                    var distance2 = iPoint.distanceToSquared(dc.eyePoint);
 
                     for (var i = 1; i < intersectionPoints.length; i++) {
-                        var d2 = intersectionPoints[i].distanceToSquared(dc.navigatorState.eyePoint);
+                        var d2 = intersectionPoints[i].distanceToSquared(dc.eyePoint);
                         if (d2 < distance2) {
                             distance2 = d2;
                             iPoint = intersectionPoints[i];
@@ -546,7 +542,7 @@ define([
 
                 var applyLighting = !dc.pickMode && this.currentData.normals && this.activeAttributes.applyLighting;
                 if (applyLighting) {
-                    dc.currentProgram.loadModelviewInverse(gl, dc.navigatorState.modelviewNormalTransform);
+                    dc.currentProgram.loadModelviewInverse(gl, dc.modelviewNormalTransform);
                 }
             }
 

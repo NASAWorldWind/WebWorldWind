@@ -115,7 +115,7 @@ define([
              * @type {String}
              * @readonly
              */
-            this.tileKey = level.levelNumber.toString() + "." + row.toString() + "." + column.toString();
+            this.tileKey = Tile.computeTileKey(level.levelNumber, row, column);
 
             /**
              * The Cartesian bounding box of this tile.
@@ -322,8 +322,8 @@ define([
             // window-size dependent and results in selecting an excessive number of tiles when the window is large.
 
             var cellSize = dc.globe.equatorialRadius * this.texelSize,
-                distance = this.distanceTo(dc.navigatorState.eyePoint),
-                pixelSize = dc.navigatorState.pixelSizeAtDistance(distance);
+                distance = this.distanceTo(dc.eyePoint),
+                pixelSize = dc.pixelSizeAtDistance(distance);
 
             return cellSize > Math.max(detailFactor * pixelSize, 0.5);
         };
@@ -372,9 +372,10 @@ define([
             var globe = dc.globe,
                 verticalExaggeration = dc.verticalExaggeration,
                 extremes = globe.minAndMaxElevationsForSector(this.sector),
-                minHeight = extremes ? (extremes[0] * verticalExaggeration) : 0,
-                maxHeight = extremes ? (extremes[1] * verticalExaggeration) : 0;
-            if (minHeight == maxHeight) {
+                minHeight = extremes[0] * verticalExaggeration,
+                maxHeight = extremes[1] * verticalExaggeration;
+
+            if (minHeight === maxHeight) {
                 minHeight = maxHeight + 10; // TODO: Determine if this is necessary.
             }
 
@@ -400,6 +401,18 @@ define([
 
             globe.computePointFromPosition(this.sector.centroidLatitude(), this.sector.centroidLongitude(), 0,
                 this.referencePoint);
+        };
+
+        /**
+         * Computes a key that uniquely identifies a tile within its level set.
+         *
+         * @param {Number} levelNumber The tile's level number in a tile pyramid.
+         * @param {Number} row The tile's row in the specified level in a tile pyramid.
+         * @param {Number} column The tile's column in the specified level in a tile pyramid.
+         * @returns {String} A string key uniquely identifying a tile with the specified level, row, and column.
+         */
+        Tile.computeTileKey = function (levelNumber, row, column) {
+            return levelNumber + "." + row + "." + column;
         };
 
         /**

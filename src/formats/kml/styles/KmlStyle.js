@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,12 +152,12 @@ define([
         }
     });
 
-    KmlStyle.prototype.generate = function(options) {
+    KmlStyle.prototype.generate = function(options, fileCache) {
         options = options || {};
         var style = this || {};
 
         if(style.kmlIconStyle) {
-            KmlIconStyle.update(style.kmlIconStyle, options);
+            KmlIconStyle.update(style.kmlIconStyle, options, fileCache);
         }
         if(style.kmlListStyle) {
             KmlListStyle.update(style.kmlListStyle, options);
@@ -232,6 +232,7 @@ define([
         attributes._offset = attributes._offset || new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
         attributes._scale = attributes._scale || 1;
         attributes._depthTest = attributes._depthTest || false;
+        attributes._outlineColor = attributes._outlineColor || Color.RED;
 
         return attributes;
     };

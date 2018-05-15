@@ -83,7 +83,8 @@ define([
             //"pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6IjljZjQwNmEyMTNhOWUyMWM5NWUzYWIwOGNhYTY2ZDViIn0.Ju3tOUUUc0C_gcCSAVpFIA";
 
             this.displayName = displayName;
-            this.pickEnabled = false;
+            // TODO: Picking is enabled as a temporary measure for screen credit hyperlinks to work (see Layer.render)
+            this.pickEnabled = true;
 
             // Create a canvas we can use when unprojecting retrieved images.
             this.destCanvas = document.createElement("canvas");
@@ -95,8 +96,12 @@ define([
             this.urlBuilder = {
                 urlForTile: function (tile, imageFormat) {
                     if (!self.metadataRetrievalInProcess) {
-                        return self.urlTemplate.replace("{z}", (tile.level.levelNumber + 1)).
-                            replace("{x}", tile.column).replace("{y}", tile.row);
+                        return self.urlTemplate.replace(
+                            "{z}",
+                            (tile.level.levelNumber + 1)).replace("{x}",
+                            tile.column).replace("{y}",
+                            tile.row
+                        );
                     } else {
                         return null;
                     }
@@ -135,7 +140,7 @@ define([
         DigitalGlobeTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
-                dc.screenCreditController.addStringCredit("\u00A9 Digital Globe", Color.DARK_GRAY);
+                dc.screenCreditController.addCredit("\u00A9 Digital Globe", Color.DARK_GRAY);
             }
         };
 

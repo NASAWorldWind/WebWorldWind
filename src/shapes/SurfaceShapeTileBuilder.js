@@ -27,7 +27,6 @@ define([
         '../util/Logger',
         '../geom/Matrix',
         '../cache/MemoryCache',
-        '../navigate/NavigatorState',
         '../error/NotYetImplementedError',
         '../pick/PickedObject',
         '../geom/Rectangle',
@@ -50,7 +49,6 @@ define([
               Logger,
               Matrix,
               MemoryCache,
-              NavigatorState,
               NotYetImplementedError,
               PickedObject,
               Rectangle,
@@ -64,7 +62,7 @@ define([
               Tile) {
         "use strict";
 
-        var SurfaceShapeTileBuilder = function() {
+        var SurfaceShapeTileBuilder = function () {
             // Parameterize top level subdivision in one place.
 
             // TilesInTopLevel describes the most coarse tile structure.
@@ -130,7 +128,7 @@ define([
         /**
          * Clear all transient state from the surface shape tile builder.
          */
-        SurfaceShapeTileBuilder.prototype.clear = function() {
+        SurfaceShapeTileBuilder.prototype.clear = function () {
             this.surfaceShapeTiles.splice(0, this.surfaceShapeTiles.length);
             this.surfaceShapes.splice(0, this.surfaceShapes.length);
         };
@@ -140,7 +138,7 @@ define([
          *
          * @param {SurfaceShape} surfaceShape A surfave shape to be processed.
          */
-        SurfaceShapeTileBuilder.prototype.insertSurfaceShape = function(surfaceShape) {
+        SurfaceShapeTileBuilder.prototype.insertSurfaceShape = function (surfaceShape) {
             this.surfaceShapes.push(surfaceShape);
         };
 
@@ -150,7 +148,7 @@ define([
          *
          * @param {DrawContext} dc The drawing context.
          */
-        SurfaceShapeTileBuilder.prototype.doRender = function(dc) {
+        SurfaceShapeTileBuilder.prototype.doRender = function (dc) {
             if (dc.pickingMode) {
                 // Picking rendering strategy:
                 //  1) save all tiles created prior to picking,
@@ -274,7 +272,7 @@ define([
          *
          * @throws {ArgumentError} If the draw context is null.
          */
-        SurfaceShapeTileBuilder.prototype.buildTiles = function(dc) {
+        SurfaceShapeTileBuilder.prototype.buildTiles = function (dc) {
             if (!dc) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "SurfaceShapeTileBuilder", "buildTiles", "missingDc"));
@@ -311,7 +309,7 @@ define([
          *
          * @param {DrawContext} dc The DrawContext to assemble tiles for.
          */
-        SurfaceShapeTileBuilder.prototype.assembleTiles = function(dc) {
+        SurfaceShapeTileBuilder.prototype.assembleTiles = function (dc) {
             var tile, idxShape, lenShapes, idxTile, lenTiles, idxSector, lenSectors;
 
             // Create a set of top level tiles only if that set doesn't exist yet.
@@ -454,7 +452,7 @@ define([
          * @param {DrawContext} dc The draw context.
          * @param {SurfaceShapeTile} tile The tile to add.
          */
-        SurfaceShapeTileBuilder.prototype.addTile = function(dc, tile) {
+        SurfaceShapeTileBuilder.prototype.addTile = function (dc, tile) {
             if (dc.pickingMode) {
                 tile.pickSequence = SurfaceShapeTileBuilder.pickSequence;
             }
@@ -482,11 +480,11 @@ define([
          *
          * @return {SurfaceShapeTile} a new SurfaceShapeTile.
          */
-        SurfaceShapeTileBuilder.prototype.createTile = function(sector, level, row, column) {
+        SurfaceShapeTileBuilder.prototype.createTile = function (sector, level, row, column) {
             return new SurfaceShapeTile(sector, level, row, column);
         };
 
-        SurfaceShapeTileBuilder.prototype.createTopLevelTiles = function() {
+        SurfaceShapeTileBuilder.prototype.createTopLevelTiles = function () {
             Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles);
         };
 
@@ -500,14 +498,14 @@ define([
          *
          * @return {Boolean} true if the tile intersects the draw context's frustum; false otherwise.
          */
-        SurfaceShapeTileBuilder.prototype.intersectsFrustum = function(dc, tile) {
+        SurfaceShapeTileBuilder.prototype.intersectsFrustum = function (dc, tile) {
             if (dc.globe.projectionLimits && !tile.sector.overlaps(dc.globe.projectionLimits)) {
                 return false;
             }
 
             tile.update(dc);
 
-            return tile.extent.intersectsFrustum(dc.pickingMode ? dc.pickFrustum : dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.pickingMode ? dc.pickFrustum : dc.frustumInModelCoordinates);
         };
 
         /**
@@ -520,7 +518,7 @@ define([
          *
          * @return {Boolean} true if the tile meets the rendering criteria; false otherwise.
          */
-        SurfaceShapeTileBuilder.prototype.meetsRenderCriteria = function(dc, levels, tile) {
+        SurfaceShapeTileBuilder.prototype.meetsRenderCriteria = function (dc, levels, tile) {
             return tile.level.levelNumber == levels.lastLevel().levelNumber || !tile.mustSubdivide(dc, this.detailControl);
         };
 

@@ -19,7 +19,7 @@
 define([
         '../../error/ArgumentError',
         '../../geom/Sector',
-        '../../ogc/wmts/OwsDescription',
+        '../../ogc/ows/OwsDescription',
         '../../util/Logger'
     ],
     function (ArgumentError,

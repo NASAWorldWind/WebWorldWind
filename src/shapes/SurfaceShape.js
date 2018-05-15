@@ -21,6 +21,7 @@ define([
         '../geom/Angle',
         '../error/ArgumentError',
         '../geom/BoundingBox',
+        '../util/Color',
         '../geom/Location',
         '../util/Logger',
         '../cache/MemoryCache',
@@ -31,12 +32,14 @@ define([
         '../geom/Sector',
         '../shapes/ShapeAttributes',
         '../error/UnsupportedOperationError',
+        '../geom/Vec3',
         '../util/WWMath'
     ],
     function (AbstractError,
               Angle,
               ArgumentError,
               BoundingBox,
+              Color,
               Location,
               Logger,
               MemoryCache,
@@ -47,6 +50,7 @@ define([
               Sector,
               ShapeAttributes,
               UnsupportedOperationError,
+              Vec3,
               WWMath) {
         "use strict";
 
@@ -443,7 +447,7 @@ define([
         // Internal function. Intentionally not documented.
         SurfaceShape.prototype.computeBoundaries = function (globe) {
             // This method is in the base class and should be overridden if the boundaries are generated.
-
+            // TODO: Incorrect error class
             throw new AbstractError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "SurfaceShape", "computeBoundaries", "abstractInvocation"));
         };
@@ -454,7 +458,7 @@ define([
                 if (dc.pickingMode) {
                     return this.currentData.extent.intersectsFrustum(dc.pickFrustum);
                 } else {
-                    return this.currentData.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                    return this.currentData.extent.intersectsFrustum(dc.frustumInModelCoordinates);
                 }
             } else {
                 return true;
@@ -771,6 +775,37 @@ define([
 
         };
 
+        /**
+         * Computes a new set of locations translated from a specified location to a new location for a shape.
+         *
+         * @param {Globe} globe The globe on which to compute a new set of locations.
+         * @param {Location} oldLocation The original reference location.
+         * @param {Location} newLocation The new reference location.
+         * @param {Location[]} locations The locations to translate.
+         *
+         * @return {Location[]} The translated locations.
+         */
+        SurfaceShape.prototype.computeShiftedLocations = function(globe, oldLocation, newLocation, locations) {
+            var newLocations = [];
+            var result = new Vec3(0, 0, 0);
+            var newPos = new WorldWind.Position(0, 0, 0);
+
+            var oldPoint = globe.computePointFromLocation(oldLocation.latitude, oldLocation.longitude,
+                new Vec3(0, 0, 0));
+            var newPoint = globe.computePointFromLocation(newLocation.latitude, newLocation.longitude,
+                new Vec3(0, 0, 0));
+            var delta = newPoint.subtract(oldPoint);
+
+            for (var i = 0, len = locations.length; i < len; i++) {
+                globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
+                result.add(delta);
+                globe.computePositionFromPoint(result[0], result[1], result[2], newPos);
+                newLocations.push(new Location(newPos.latitude, newPos.longitude));
+            }
+
+            return newLocations;
+        };
+
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.prepareSectors = function () {
             this.determineSectors();
@@ -947,43 +982,47 @@ define([
          */
         SurfaceShape.prototype.renderToTexture = function (dc, ctx2D, xScale, yScale, dx, dy) {
             var attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
+            if (!attributes) {
+                return;
+            }
+
             var drawInterior = (!this._isInteriorInhibited && attributes.drawInterior);
             var drawOutline = (attributes.drawOutline && attributes.outlineWidth > 0);
-
             if (!drawInterior && !drawOutline) {
                 return;
             }
 
-            if (dc.pickingMode && !this.pickColor) {
-                this.pickColor = dc.uniquePickColor();
-            }
-
             if (dc.pickingMode) {
-                var pickColor = this.pickColor.toHexString();
+                if (!this.pickColor) {
+                    this.pickColor = dc.uniquePickColor();
+                }
+                ctx2D.fillStyle = this.pickColor.toCssColorString();
+                ctx2D.strokeStyle = ctx2D.fillStyle;
+                ctx2D.lineWidth = attributes.outlineWidth;
+            } else {
+                var ic = attributes.interiorColor,
+                    oc = attributes.outlineColor;
+                ctx2D.fillStyle = new Color(ic.red, ic.green, ic.blue, ic.alpha * this.layer.opacity).toCssColorString();
+                ctx2D.strokeStyle = new Color(oc.red, oc.green, oc.blue, oc.alpha * this.layer.opacity).toCssColorString();
+                ctx2D.lineWidth = attributes.outlineWidth;
             }
 
             if (this.crossesAntiMeridian || this.containsPole) {
                 if (drawInterior) {
                     this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
-                    ctx2D.fillStyle = dc.pickingMode ? pickColor : attributes.interiorColor.toRGBAString();
                     ctx2D.fill();
                 }
                 if (drawOutline) {
                     this.draw(this._outlineGeometry, ctx2D, xScale, yScale, dx, dy);
-                    ctx2D.lineWidth = attributes.outlineWidth;
-                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
                     ctx2D.stroke();
                 }
             }
             else {
                 this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
                 if (drawInterior) {
-                    ctx2D.fillStyle = dc.pickingMode ? pickColor : attributes.interiorColor.toRGBAString();
                     ctx2D.fill();
                 }
                 if (drawOutline) {
-                    ctx2D.lineWidth = attributes.outlineWidth;
-                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
                     ctx2D.stroke();
                 }
             }
