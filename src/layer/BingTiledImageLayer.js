@@ -76,25 +76,28 @@ define([
              */
             this.logoAlignment = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
 
-            this.attribution = new ScreenImage(this.logoPlacement, this.attributionImage);
-
             // Make Bing logo semi transparent.
-            this.attribution.imageColor = new Color(1, 1, 1, 0.5);
+            //this.attribution.imageColor = new Color(1, 1, 1, 0.5);
+
+            this.logoLastFrameTime = 0;
+
+            BingTiledImageLayer.attribution = new ScreenImage(this.logoPlacement, this.attributionImage);
+            BingTiledImageLayer.attribution.imageColor = new Color(1, 1, 1, 0.5);
         };
 
         // Store last time the logo was rendered as a static member as a way to prevent subclasses from drawing
         // more than one logo at a time.
-        BingTiledImageLayer.logoLastFrameTime = 0;
+        // BingTiledImageLayer.logoLastFrameTime = 0;
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
-            if (this.inCurrentFrame && BingTiledImageLayer.logoLastFrameTime !== dc.timestamp) {
-                this.attribution.screenOffset = this.logoPlacement;
-                this.attribution.imageOffset = this.logoAlignment;
-                this.attribution.render(dc);
-                BingTiledImageLayer.logoLastFrameTime = this.attribution.lastFrameTime;
+            if (this.inCurrentFrame && this.logoLastFrameTime !== dc.timestamp) {
+                BingTiledImageLayer.attribution.screenOffset = this.logoPlacement;
+                BingTiledImageLayer.attribution.imageOffset = this.logoAlignment;
+                BingTiledImageLayer.attribution.render(dc);
+                this.logoLastFrameTime = BingTiledImageLayer.attribution.lastFrameTime;
             }
         };
 
