@@ -40,6 +40,6 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
+        // Creates a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
     });
