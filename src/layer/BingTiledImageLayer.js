@@ -76,19 +76,13 @@ define([
              */
             this.logoAlignment = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
 
-            // Make Bing logo semi transparent.
-            //this.attribution.imageColor = new Color(1, 1, 1, 0.5);
-
-            this.logoLastFrameTime = 0;
-
+            // Set the logo attribution as a "static" member
             BingTiledImageLayer.attribution = new ScreenImage(this.logoPlacement, this.attributionImage);
-            BingTiledImageLayer.attribution.imageColor = new Color(1, 1, 1, 0.5);
+            BingTiledImageLayer.attribution.imageColor = new Color(1, 1, 1, 0.5); // Make Bing logo semi transparent.
+            // Store last time the logo was rendered to prevent subclasses from drawing more than one logo at a time.
+            BingTiledImageLayer.logoLastFrameTime = 0;
         };
-
-        // Store last time the logo was rendered as a static member as a way to prevent subclasses from drawing
-        // more than one logo at a time.
-        // BingTiledImageLayer.logoLastFrameTime = 0;
-
+        
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
