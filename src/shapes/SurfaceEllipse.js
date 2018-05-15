@@ -186,7 +186,7 @@ define([
 
         // Internal. Intentionally not documented.
         SurfaceEllipse.prototype.computeBoundaries = function(dc) {
-            if (this.majorRadius == 0 && this.minorRadius == 0) {
+            if (this.majorRadius === 0 && this.minorRadius === 0) {
                 return null;
             }
 
@@ -198,7 +198,7 @@ define([
             this._boundaries = new Array(numLocations);
 
             for (var i = 0; i < numLocations; i++) {
-                var angle = (i != numLocations - 1) ? i * da : 0,
+                var angle = (i !== numLocations - 1) ? i * da : 0,
                     xLength = this.majorRadius * Math.cos(angle),
                     yLength = this.minorRadius * Math.sin(angle),
                     distance = Math.sqrt(xLength * xLength + yLength * yLength);
