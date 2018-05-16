@@ -44,7 +44,7 @@ define([
                         "missingSector"));
             }
 
-            if (!oridinal) {
+            if (typeof ordinal !== "number") {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
                         "The specified oridinal is null or undefined."));
@@ -102,13 +102,13 @@ define([
          * @returns {Sector} a Sector representing the geographic coverage of the row and column in this TileMatrix
          */
         TileMatrix.prototype.tileSector = function (row, column) {
-            if (!row) {
+            if (typeof row !== "number") {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "tileSector",
                         "missingRow"));
             }
 
-            if (!row) {
+            if (typeof column !== "number") {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "tileSector",
                         "missingColumn"));
@@ -116,8 +116,8 @@ define([
 
             var deltaLat = this.sector.deltaLatitude() / this.matrixHeight;
             var deltaLon = this.sector.deltaLongitude() / this.matrixWidth;
-            var minLat = this.sector.maxLatitude() - deltaLat * (row + 1);
-            var minLon = this.sector.minLongitude() + deltaLon * column;
+            var minLat = this.sector.maxLatitude - deltaLat * (row + 1);
+            var minLon = this.sector.minLongitude + deltaLon * column;
 
             return new Sector(minLat, minLat + deltaLat, minLon, minLon + deltaLon);
         };
