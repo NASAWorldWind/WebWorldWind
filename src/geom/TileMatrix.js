@@ -44,31 +44,31 @@ define([
                         "missingSector"));
             }
 
-            if (typeof ordinal !== "number") {
+            if (ordinal < 0) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
                         "The specified oridinal is null or undefined."));
             }
 
-            if (!matrixWidth) {
+            if (matrixWidth < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
                         "missingMatrixWidth"));
             }
 
-            if (!matrixHeight) {
+            if (matrixHeight < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
                         "missingMatrixHeight"));
             }
 
-            if (!tileWidth) {
+            if (tileWidth < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
                         "missingTileWidth"));
             }
 
-            if (!tileHeight) {
+            if (tileHeight < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
                         "missingTileHeight"));
@@ -102,13 +102,13 @@ define([
          * @returns {Sector} a Sector representing the geographic coverage of the row and column in this TileMatrix
          */
         TileMatrix.prototype.tileSector = function (row, column) {
-            if (typeof row !== "number") {
+            if (row < 0 || row >= this.matrixHeight) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "tileSector",
                         "missingRow"));
             }
 
-            if (typeof column !== "number") {
+            if (column < 0 || column >= this.matrixWidth) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "tileSector",
                         "missingColumn"));
