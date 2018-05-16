@@ -304,26 +304,13 @@ define([
             var imagePath = tile.imagePath,
                 cache = dc.gpuResourceCache,
                 layer = this,
-                radius = this.radius;
+                radius = this.calculateRadius(tile.sector),
+                extensionFactor =1;
 
-            if (typeof this.radius === 'function') {
-                radius = this.radius(tile.sector, this.tileWidth, this.tileHeight);
-            }
 
-            var extensionFactor = 1;  // Instead only the radius is needed.
-            var latitudeChange = (tile.sector.maxLatitude - tile.sector.minLatitude) * extensionFactor;
-            var longitudeChange = (tile.sector.maxLongitude - tile.sector.minLongitude) * extensionFactor;
-            var extendedSector = new Sector(
-                tile.sector.minLatitude - latitudeChange,
-                tile.sector.maxLatitude + latitudeChange,
-                tile.sector.minLongitude - longitudeChange,
-                tile.sector.maxLongitude + longitudeChange
-            );
-
+            var extendedSector = this.calculateExtendedSector(tile.sector, extensionFactor);
             var data = this.filterGeographically(this._data, extendedSector);
 
-            // You need to take into account bigger area. Generate the tile for it and then clip it. Something like 10%
-            // of the tile width / tile height. The size you need to actually take into account differs.
             var canvas = this.createHeatMapTile(data, {
                 sector: extendedSector,
 
@@ -358,6 +345,41 @@ define([
                 }
             }
         }
+    };
+
+    /**
+     * It returns radius used to draw the points relevant to the HeatMap.
+     * @protected
+     * @param sector {Sector} Sector to be used for the calculation of the radius.
+     * @return {Number} Pixels representing the radius.
+     */
+    HeatMapLayer.prototype.calculateRadius = function(sector) {
+        var radius = this.radius;
+
+        if (typeof this.radius === 'function') {
+            radius = this.radius(sector, this.tileWidth, this.tileHeight);
+        }
+
+        return radius;
+    };
+
+    /**
+     * This method calculates the new sector for which the data will be filtered and which will be drawn on the tile.
+     * The standard version just applies extension factor to the difference between minimum and maximum.
+     * @protected
+     * @param sector {Sector} Sector to use as basis for the extension.
+     * @param extensionFactor {Number} How many times will be the extension used.
+     * @return {Sector} New extended sector.
+     */
+    HeatMapLayer.prototype.calculateExtendedSector = function(sector, extensionFactor) {
+        var latitudeChange = (sector.maxLatitude - sector.minLatitude) * extensionFactor;
+        var longitudeChange = (sector.maxLongitude - sector.minLongitude) * extensionFactor;
+        return new Sector(
+            sector.minLatitude - latitudeChange,
+            sector.maxLatitude + latitudeChange,
+            sector.minLongitude - longitudeChange,
+            sector.maxLongitude + longitudeChange
+        );
     };
 
     /**
