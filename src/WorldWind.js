@@ -956,7 +956,22 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             gpuCacheSize: 250e6,
             baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../'),
             layerRetrievalQueueSize: 16,
-            coverageRetrievalQueueSize: 16
+            coverageRetrievalQueueSize: 16,
+
+            /**
+             * An {@link Offset} indicating where to place the Bing logo on the screen.
+             * @type {Offset}
+             * @default A value of (WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5) provides a
+             * 5px margin inset from the lower right corner of the screen.
+             */
+            bingLogoPlacement: new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5),
+
+            /**
+             * An {@link Offset} indicating the alignment of the Bing logo relative to the placement position.
+             * @type {Offset}
+             * @default Lower right corner of the logo.
+             */
+            bingLogoAlignment: new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0)
         };
 
         /**

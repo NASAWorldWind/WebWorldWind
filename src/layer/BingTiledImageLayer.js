@@ -58,40 +58,21 @@ define([
             this.pickEnabled = true;
 
             this.detectBlankImages = true;
-
-            this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
-
-            /**
-             * An {@link Offset} indicating where to place the Bing logo on the screen.
-             * @type {Offset}
-             * @default A value of (WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5) provides a
-             * 5px margin inset from the lower right corner of the screen.
-             */
-            this.logoPlacement = new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5);
-
-            /**
-             * An {@link Offset} indicating the alignment of the Bing logo relative to the placement position.
-             * @type {Offset}
-             * @default Lower right corner of the logo.
-             */
-            this.logoAlignment = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
-
-            // Set the logo attribution as a "static" member
-            BingTiledImageLayer.attribution = new ScreenImage(this.logoPlacement, this.attributionImage);
-            BingTiledImageLayer.attribution.imageColor = new Color(1, 1, 1, 0.5); // Make Bing logo semi transparent.
-            // Store last time the logo was rendered to prevent subclasses from drawing more than one logo at a time.
-            BingTiledImageLayer.logoLastFrameTime = 0;
         };
+
+        // Internal use only. Intentionally not documented.
+        BingTiledImageLayer.logoImage = null;
+
+        // Internal use only. Intentionally not documented.
+        BingTiledImageLayer.logoLastFrameTime = 0;
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
-            if (this.inCurrentFrame && BingTiledImageLayer.logoLastFrameTime !== dc.timestamp) {
-                BingTiledImageLayer.attribution.screenOffset = this.logoPlacement;
-                BingTiledImageLayer.attribution.imageOffset = this.logoAlignment;
-                BingTiledImageLayer.attribution.render(dc);
-                BingTiledImageLayer.logoLastFrameTime = BingTiledImageLayer.attribution.lastFrameTime;
+
+            if (this.inCurrentFrame) {
+                this.renderLogo(dc);
             }
         };
 
@@ -105,12 +86,25 @@ define([
             this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 1, 1));
         };
 
+        BingTiledImageLayer.prototype.renderLogo = function (dc) {
+            if (!BingTiledImageLayer.logoImage) {
+                BingTiledImageLayer.logoImage = new ScreenImage(WorldWind.configuration.bingLogoPlacement,
+                    WorldWind.configuration.baseUrl + "images/powered-by-bing.png");
+                BingTiledImageLayer.logoImage.imageColor = new Color(1, 1, 1, 0.5); // Make Bing logo semi transparent.
+            }
+
+            if (BingTiledImageLayer.logoLastFrameTime !== dc.timestamp) {
+                BingTiledImageLayer.logoImage.screenOffset = WorldWind.configuration.bingLogoPlacement;
+                BingTiledImageLayer.logoImage.imageOffset = WorldWind.configuration.bingLogoAlignment;
+                BingTiledImageLayer.logoImage.render(dc);
+                BingTiledImageLayer.logoLastFrameTime = dc.timestamp;
+            }
+        };
+
         // Determines the Bing map size for a specified level number.
         BingTiledImageLayer.prototype.mapSizeForLevel = function (levelNumber) {
             return 256 << (levelNumber + 1);
         };
 
         return BingTiledImageLayer;
-    }
-)
-;
+    });
