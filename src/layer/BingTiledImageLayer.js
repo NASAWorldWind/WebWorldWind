@@ -87,7 +87,7 @@ define([
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
-            if (this.inCurrentFrame && this.logoLastFrameTime !== dc.timestamp) {
+            if (this.inCurrentFrame && BingTiledImageLayer.logoLastFrameTime !== dc.timestamp) {
                 BingTiledImageLayer.attribution.screenOffset = this.logoPlacement;
                 BingTiledImageLayer.attribution.imageOffset = this.logoAlignment;
                 BingTiledImageLayer.attribution.render(dc);
