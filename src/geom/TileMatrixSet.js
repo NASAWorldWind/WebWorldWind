@@ -28,7 +28,14 @@ define([
               TileMatrix) {
         "use strict";
 
-        var TileMatrixSet = function(sector, tileMatrixList) {
+        /**
+         * TileMatrixSet defines a generic tiled space as defined by a geographic bounding area and an array of
+         * TileMatrix objects which define the tiled space at different resolutions.
+         * @param sector the geographic bounding area of this TileMatrixSet
+         * @param tileMatrixList the array of TileMatrix objects forming this TileMatrixSet
+         * @constructor
+         */
+        var TileMatrixSet = function (sector, tileMatrixList) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "constructor", "missingSector"));
@@ -40,57 +47,58 @@ define([
                         "The specified TileMatrix list is null or undefined."));
             }
 
-            this.sector = new Sector(sector.minLatitude, sector.maxLatitude, sector.minLongitude, sector.maxLongitude);
+            this.sector = sector;
 
-            this.entries = [];
-            for (var i = 0, len = tileMatrixList.length; i < len; i++) {
-                entries.push(tileMatrixList[i]);
-            }
+            this.entries = tileMatrixList;
         };
 
-        TileMatrixSet.createQuadTreeTileMatrixSet = function (sector, matrixWidth, matrixHeight, tileWidth, numLevels) {
+        /**
+         * Create a TileMatrixSet based on a quad division technique given the provided initial starting conditions.
+         * @param sector the geographic bounding area of the TileMatrixSet
+         * @param matrixWidth the number of tiles in the x direction at the initial level
+         * @param matrixHeight the number of tiles in the y direction at the initial level
+         * @param tileWidth the number of pixels or points in the x direction of a tile
+         * @param tileHeight the number of pixels or points in the y direction of a tile
+         * @param numLevels the number of resolution levels this TileMatrixSet should contain
+         * @returns {TileMatrixSet} fully configured TileMatrixSet
+         */
+        TileMatrixSet.fromTilePyramid = function (sector, matrixWidth, matrixHeight, tileWidth, tileHeight, numLevels) {
             if (!sector) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "createQuadTreeTileMatrixSet",
-                        "missingSector"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingSector"));
             }
 
             if (matrixWidth <= 0) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "createQuadTreeTileMatrixSet",
-                        "The specified matrix width is invalid"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingMatrixWidth"));
             }
 
             if (matrixHeight <= 0) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "createQuadTreeTileMatrixSet",
-                        "The specified matrix height is invalid"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingMatrixHeight"));
             }
 
             if (tileWidth <= 0) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "createQuadTreeTileMatrixSet",
-                        "The specified tile width is invalid"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingTileWidth"));
+            }
+
+            if (tileHeight <= 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingTileHeight"));
             }
 
             if (numLevels <= 0) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "createQuadTreeTileMatrixSet",
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid",
                         "The specified number of levels is invalid"));
             }
 
             var tileMatrices = [], matrix, idx;
 
             for (idx = 0; idx < numLevels; idx++) {
-                matrix = new TileMatrix();
-                matrix.sector.copy(sector);
-                matrix.ordinal = idx;
-                matrix.matrixWidth = matrixWidth;
-                matrix.matrixHeight = matrixHeight;
-                matrix.tileWidth = tileWidth;
-                matrix.tileHeight = tileHeight;
+                matrix = new TileMatrix(sector, idx, matrixWidth, matrixHeight, tileWidth, tileHeight);
                 tileMatrices.push(matrix);
-
                 matrixWidth *= 2;
                 matrixHeight *= 2;
             }
@@ -98,16 +106,25 @@ define([
             return new TileMatrixSet(sector, tileMatrices);
         };
 
-        TileMatrixSet.prototype.count = function () {
-            return this.entries.length;
-        };
+        /**
+         * Determines the index of the TileMatrix with the closest resolution to the provided value.
+         * @param degreesPerPixel the target resolution
+         * @returns {number} the index of the TileMatrix within this TileMatrixSet's entries array
+         */
+        TileMatrixSet.prototype.indexOfMatrixNearest = function (degreesPerPixel) {
+            var nearestIdx = -1, nearestDelta2 = Number.MAX_VALUE, delta, delta2;
 
-        TileMatrixSet.prototype.matrix = function (index) {
-            if (index < 0 || index >= this.entries.length) {
-                return null;
-            } else {
-                return this.entries[index];
+            for (var idx = 0, len = this.entries.length; idx < len; idx++) {
+                delta = (this.entries[idx].degreesPerPixel() - degreesPerPixel);
+                delta2 = delta * delta;
+
+                if (nearestDelta2 > delta2) {
+                    nearestDelta2 = delta2;
+                    nearestIdx = idx;
+                }
             }
+
+            return nearestIdx;
         };
 
         return TileMatrixSet;
