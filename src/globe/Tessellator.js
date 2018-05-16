@@ -16,7 +16,7 @@
 /**
  * @exports Tessellator
  */
-define([
+define(['../geom/Angle',
         '../error/ArgumentError',
         '../shaders/BasicProgram',
         '../globe/Globe',
@@ -39,7 +39,8 @@ define([
         '../util/WWMath',
         '../util/WWUtil'
     ],
-    function (ArgumentError,
+    function (Angle,
+              ArgumentError,
               BasicProgram,
               Globe,
               GpuProgram,
@@ -960,6 +961,18 @@ define([
             }
         };
 
+        /**
+         * Internal use only.
+         * TODO: Remove this function when Tessellator and ElevationModel are refactored
+         * Artificially calculates an adjusted target resolution for the given texel size to more
+         * optimally select elevation coverages until later refactoring.
+         * @returns {Number} An adjusted target resolution in degrees.
+         * @ignore
+         */
+        Tessellator.prototype.coverageTargetResolution = function (texelSize) {
+            return (texelSize / 8) * Angle.RADIANS_TO_DEGREES;
+        };
+
         Tessellator.prototype.regenerateTileGeometry = function (dc, tile) {
             var numLat = tile.tileHeight + 1, // num points in each dimension is 1 more than the number of tile cells
                 numLon = tile.tileWidth + 1,
@@ -979,7 +992,8 @@ define([
 
             // Retrieve the elevations for all points in the tile.
             WWUtil.fillArray(elevations, 0);
-            dc.globe.elevationsForGrid(tile.sector, numLat, numLon, tile.texelSize, elevations);
+
+            dc.globe.elevationsForGrid(tile.sector, numLat, numLon, this.coverageTargetResolution(tile.texelSize), elevations);
 
             // Modify the elevations around the tile's border to match neighbors of lower resolution, if any.
             if (this.mustAlignNeighborElevations(dc, tile)) {
@@ -1026,7 +1040,8 @@ define([
 
             // Retrieve the previous level elevations, using 1/2 the number of tile cells.
             WWUtil.fillArray(prevElevations, 0);
-            dc.globe.elevationsForGrid(tile.sector, prevNumLat, prevNumLon, prevLevel.texelSize, prevElevations);
+
+            dc.globe.elevationsForGrid(tile.sector, prevNumLat, prevNumLon, this.coverageTargetResolution(prevLevel.texelSize), prevElevations);
 
             // Use previous level elevations along the north edge when the northern neighbor is lower resolution.
             neighborLevel = tile.neighborLevel(WorldWind.NORTH);

@@ -18,12 +18,18 @@
  */
 define([
         '../geom/Angle',
+        '../util/Color',
         '../geom/Location',
+        '../util/Offset',
+        '../shapes/ScreenImage',
         '../geom/Sector',
         '../layer/MercatorTiledImageLayer'
     ],
     function (Angle,
+              Color,
               Location,
+              Offset,
+              ScreenImage,
               Sector,
               MercatorTiledImageLayer) {
         "use strict";
@@ -47,11 +53,33 @@ define([
                 this.imageSize, this.imageSize);
 
             this.displayName = displayName;
-            this.pickEnabled = false;
+
+            // TODO: Picking is enabled as a temporary measure for screen credit hyperlinks to work (see Layer.render)
+            this.pickEnabled = true;
 
             this.detectBlankImages = true;
 
-            this.creditImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png"
+            this.attributionImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
+
+            /**
+             * An {@link Offset} indicating where to place the Bing logo on the screen.
+             * @type {Offset}
+             * @default A value of (WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5) provides a
+             * 5px margin inset from the lower right corner of the screen.
+             */
+            this.logoPlacement = new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5);
+
+            /**
+             * An {@link Offset} indicating the alignment of the Bing logo relative to the placement position.
+             * @type {Offset}
+             * @default Lower right corner of the logo.
+             */
+            this.logoAlignment = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
+
+            this.attribution = new ScreenImage(this.logoPlacement, this.attributionImage);
+
+            // Make Bing logo semi transparent.
+            this.attribution.imageColor = new Color(1, 1, 1, 0.5);
         };
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
@@ -59,7 +87,9 @@ define([
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
             if (this.inCurrentFrame) {
-                dc.screenCreditController.addImageCredit(this.creditImage);
+                this.attribution.screenOffset = this.logoPlacement;
+                this.attribution.imageOffset = this.logoAlignment;
+                this.attribution.render(dc);
             }
         };
 

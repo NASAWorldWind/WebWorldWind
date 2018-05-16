@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:WCS_Capabilities xmlns:wcs="http://www.opengis.net/wcs" xmlns:gml="http://www.opengis.net/gml" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0.0" xsi:schemaLocation="http://www.opengis.net/wcs http://localhost:8080/geoserver/schemas/wcs/1.0.0/wcsCapabilities.xsd" updateSequence="11">
+    <wcs:Service>
+        <wcs:description />
+        <wcs:name>WCS</wcs:name>
+        <wcs:label />
+        <wcs:responsibleParty>
+            <wcs:individualName />
+            <wcs:contactInfo>
+                <wcs:phone />
+                <wcs:address />
+            </wcs:contactInfo>
+        </wcs:responsibleParty>
+        <wcs:fees>NONE</wcs:fees>
+        <wcs:accessConstraints>NONE</wcs:accessConstraints>
+    </wcs:Service>
+    <wcs:Capability>
+        <wcs:Request>
+            <wcs:GetCapabilities>
+                <wcs:DCPType>
+                    <wcs:HTTP>
+                        <wcs:Get>
+                            <wcs:OnlineResource xlink:href="http://localhost:8080/geoserver/wcs?" />
+                        </wcs:Get>
+                    </wcs:HTTP>
+                </wcs:DCPType>
+                <wcs:DCPType>
+                    <wcs:HTTP>
+                        <wcs:Post>
+                            <wcs:OnlineResource xlink:href="http://localhost:8080/geoserver/wcs?" />
+                        </wcs:Post>
+                    </wcs:HTTP>
+                </wcs:DCPType>
+            </wcs:GetCapabilities>
+            <wcs:DescribeCoverage>
+                <wcs:DCPType>
+                    <wcs:HTTP>
+                        <wcs:Get>
+                            <wcs:OnlineResource xlink:href="http://localhost:8080/geoserver/wcs?" />
+                        </wcs:Get>
+                    </wcs:HTTP>
+                </wcs:DCPType>
+                <wcs:DCPType>
+                    <wcs:HTTP>
+                        <wcs:Post>
+                            <wcs:OnlineResource xlink:href="http://localhost:8080/geoserver/wcs?" />
+                        </wcs:Post>
+                    </wcs:HTTP>
+                </wcs:DCPType>
+            </wcs:DescribeCoverage>
+            <wcs:GetCoverage>
+                <wcs:DCPType>
+                    <wcs:HTTP>
+                        <wcs:Get>
+                            <wcs:OnlineResource xlink:href="http://localhost:8080/geoserver/wcs?" />
+                        </wcs:Get>
+                    </wcs:HTTP>
+                </wcs:DCPType>
+                <wcs:DCPType>
+                    <wcs:HTTP>
+                        <wcs:Post>
+                            <wcs:OnlineResource xlink:href="http://localhost:8080/geoserver/wcs?" />
+                        </wcs:Post>
+                    </wcs:HTTP>
+                </wcs:DCPType>
+            </wcs:GetCoverage>
+        </wcs:Request>
+        <wcs:Exception>
+            <wcs:Format>application/vnd.ogc.se_xml</wcs:Format>
+        </wcs:Exception>
+    </wcs:Capability>
+    <wcs:ContentMetadata>
+        <wcs:CoverageOfferingBrief>
+            <wcs:description>Generated from GeoTIFF</wcs:description>
+            <wcs:name>testing:gebco</wcs:name>
+            <wcs:label>gebco</wcs:label>
+            <wcs:lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+                <gml:pos>-180.0 -90.0</gml:pos>
+                <gml:pos>180.0 90.0</gml:pos>
+            </wcs:lonLatEnvelope>
+            <wcs:keywords>
+                <wcs:keyword>gebco</wcs:keyword>
+                <wcs:keyword>WCS</wcs:keyword>
+                <wcs:keyword>GeoTIFF</wcs:keyword>
+            </wcs:keywords>
+        </wcs:CoverageOfferingBrief>
+        <wcs:CoverageOfferingBrief>
+            <wcs:description>Generated from GeoTIFF</wcs:description>
+            <wcs:name>testing:pacificnw_usgs_ned_10m</wcs:name>
+            <wcs:label>pacificnw_usgs_ned_10m</wcs:label>
+            <wcs:lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+                <gml:pos>-123.0005555556 43.9994444441653</gml:pos>
+                <gml:pos>-117.99944444420979 49.000555555555515</gml:pos>
+            </wcs:lonLatEnvelope>
+            <wcs:keywords>
+                <wcs:keyword>pacificnw_usgs_ned_10m</wcs:keyword>
+                <wcs:keyword>WCS</wcs:keyword>
+                <wcs:keyword>GeoTIFF</wcs:keyword>
+            </wcs:keywords>
+        </wcs:CoverageOfferingBrief>
+    </wcs:ContentMetadata>
+</wcs:WCS_Capabilities>

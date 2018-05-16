@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,11 @@ define([
     'src/geom/Angle',
     'src/globe/Globe',
     'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/geom/Plane',
     'src/geom/Rectangle',
     'src/geom/Vec3'
-], function (Matrix, Angle, Globe, EarthElevationModel, Plane, Rectangle, Vec3) {
+], function (Matrix, Angle, Globe, EarthElevationModel, ElevationModel, Plane, Rectangle, Vec3) {
     "use strict";
 
     describe("Matrix Tests", function () {
@@ -527,7 +528,7 @@ define([
 
             it("Multiplies the matrix correctly", function () {
                 var targetMatrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
 
                 targetMatrix.extractRotationAngles(result);
 
@@ -886,7 +887,7 @@ define([
 
             it("Returns the eye point correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractEyePoint(result);
 
                 expect(result).toEqual(new Vec3(-116, -137, -158));
@@ -905,7 +906,7 @@ define([
 
             it("Returns the vector correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractForwardVector(result);
 
                 expect(result).toEqual(new Vec3(-8, -9, -10));

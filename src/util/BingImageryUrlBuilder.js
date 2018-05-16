@@ -72,7 +72,7 @@ define([
 
                 Logger.log(Logger.LEVEL_WARNING, "WARNING: You are using a limited use, non-production Bing Maps key.\n" +
                 "If you are developing an app or a web page this violates the Bing Terms of Use.\n" +
-                "Please visit https://www.microsoft.com/maps/choose-your-bing-maps-API.aspx to obtain your own key for your application.\n" +
+                "Please visit https://www.microsoft.com/en-us/maps/create-a-bing-maps-key to obtain your own key for your application.\n" +
                 "Specify that key to WorldWind by setting the WorldWind.BingMapsKey property to your key " +
                 "prior to creating any Bing Maps layers.\n");
             }

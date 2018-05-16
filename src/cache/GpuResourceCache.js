@@ -180,6 +180,15 @@ define([
 
             return resource;
         };
+        
+        /**
+         * Sets a resource's aging factor (multiplier).
+         * @param {String} key The key of the resource to modify. If null or undefined, the resource's cache entry is not modified.
+         * @param {Number} agingFactor A multiplier applied to the age of the resource.
+         */
+        GpuResourceCache.prototype.setResourceAgingFactor = function (key, agingFactor) {
+            this.entries.setEntryAgingFactor(key, agingFactor);
+        };
 
         /**
          * Indicates whether a specified resource is in this cache.

@@ -14,41 +14,43 @@
  * limitations under the License.
  */
 /**
- * @exports WcsEarthElevationModel
+ * @exports WcsEarthElevationCoverage
  */
 define([
         '../geom/Location',
         '../geom/Sector',
-        '../globe/ElevationModel',
+        '../globe/TiledElevationCoverage',
         '../util/WcsTileUrlBuilder'
     ],
     function (Location,
               Sector,
-              ElevationModel,
+              TiledElevationCoverage,
               WcsTileUrlBuilder) {
         "use strict";
 
         /**
          * Constructs an Earth elevation model.
-         * @alias WcsEarthElevationModel
+         * @alias WcsEarthElevationCoverage
          * @constructor
-         * @augments ElevationModel
+         * @augments TiledElevationCoverage
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
+         * @deprecated
          */
-        var WcsEarthElevationModel = function () {
-            ElevationModel.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "image/tiff", "EarthElevations256", 256, 256);
+        var WcsEarthElevationCoverage = function () {
+            TiledElevationCoverage.call(this, {
+                coverageSector: Sector.FULL_SPHERE,
+                resolution: 0.008333333333333,
+                retrievalImageFormat: "image/tiff",
+                minElevation: -11000,
+                maxElevation: 8850,
+                urlBuilder: new WcsTileUrlBuilder("https://worldwind26.arc.nasa.gov/wms2",
+                    "NASA_SRTM30_900m_Tiled", "1.0.0")
+            });
 
-            this.displayName = "WCS Earth Elevation Model";
-            this.minElevation = -11000; // Depth of Marianas Trench, in meters
-            this.maxElevation = 8850; // Height of Mt. Everest
-            this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images
-
-            this.urlBuilder = new WcsTileUrlBuilder("https://worldwind26.arc.nasa.gov/wms2",
-                "NASA_SRTM30_900m_Tiled", "1.0.0");
+            this.displayName = "WCS Earth Elevation Coverage";
         };
 
-        WcsEarthElevationModel.prototype = Object.create(ElevationModel.prototype);
+        WcsEarthElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        return WcsEarthElevationModel;
+        return WcsEarthElevationCoverage;
     });

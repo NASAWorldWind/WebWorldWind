@@ -16,7 +16,6 @@
 define([
     'src/BasicWorldWindowController',
     'src/render/DrawContext',
-    'src/globe/EarthElevationModel',
     'src/globe/Globe',
     'src/globe/Globe2D',
     'src/geom/Matrix',
@@ -26,7 +25,7 @@ define([
     'src/geom/Vec3',
     'src/WorldWind',
     'src/WorldWindow'
-], function (BasicWorldWindowController, DrawContext, EarthElevationModel, Globe, Globe2D, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
+], function (BasicWorldWindowController, DrawContext, Globe, Globe2D, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
 
     var MockGlContext = function () {
@@ -54,6 +53,7 @@ define([
             return {left: 339.5, top: 225};
         }
     };
+    wwd.layers = [];
     wwd.scratchModelview = Matrix.fromIdentity();
     wwd.scratchProjection = Matrix.fromIdentity();
     wwd.resetDrawContext();

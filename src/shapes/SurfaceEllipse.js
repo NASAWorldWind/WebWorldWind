@@ -212,6 +212,16 @@ define([
             }
         };
 
+        // Internal use only. Intentionally not documented.
+        SurfaceEllipse.prototype.getReferencePosition = function () {
+            return this.center;
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceEllipse.prototype.moveTo = function (globe, position) {
+            this.center = position;
+        };
+
         /**
          * The minimum number of intervals the ellipse generates.
          * @type {Number}

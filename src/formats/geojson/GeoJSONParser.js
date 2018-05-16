@@ -83,7 +83,8 @@ define(['../../error/ArgumentError',
          * This function enables the application to assign independent attributes to each
          * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
          * feature.
-         * @param {String} dataSource The data source of the GeoJSON. Can be a string or an URL to a GeoJSON.
+         * @param {String|Object} dataSource The data source of the GeoJSON. Can be a URL to an external resource,
+         * or a JSON string, or a JavaScript object representing a parsed GeoJSON string.
          * @throws {ArgumentError} If the specified data source is null or undefined.
          */
         var GeoJSONParser = function (dataSource) {
@@ -125,7 +126,7 @@ define(['../../error/ArgumentError',
             /**
              * The GeoJSON data source as specified to this GeoJSON's constructor.
              * @memberof GeoJSONParser.prototype
-             * @type {String}
+             * @type {String|Object}
              * @readonly
              */
             dataSource: {
@@ -260,11 +261,19 @@ define(['../../error/ArgumentError',
 
             this._layer = layer || new RenderableLayer();
 
-            if (this.isDataSourceJson()){
-                this.parse(this.dataSource);
-            }
-            else {
-                this.requestUrl(this.dataSource);
+            var dataSourceType = (typeof this.dataSource);
+            if (dataSourceType === 'string') {
+                var obj = GeoJSONParser.tryParseJSONString(this.dataSource);
+                if (obj !== null) {
+                    this.handle(obj);
+                } else {
+                    this.requestUrl(this.dataSource);
+                }
+            } else if (dataSourceType === 'object') {
+                this.handle(this.dataSource);
+            } else {
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "load",
+                    "Unsupported data source type: " + dataSourceType);
             }
         };
 
@@ -313,7 +322,7 @@ define(['../../error/ArgumentError',
             xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        this.parse(xhr.response);
+                        this.handle(GeoJSONParser.tryParseJSONString(xhr.response));
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -333,37 +342,31 @@ define(['../../error/ArgumentError',
             xhr.send(null);
         };
 
-        // Parse GeoJSON string using built in method JSON.parse(). Internal use only.
-        GeoJSONParser.prototype.parse = function (geoJSONString) {
-            try {
-                this._geoJSONObject = JSON.parse(geoJSONString);
+        // Handles the object created from the GeoJSON data source. Internal use only.
+        GeoJSONParser.prototype.handle = function (obj) {
+            if (!obj) {
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "handle", "Invalid GeoJSON object");
             }
-            catch (e) {
-                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
-                    "invalidGeoJSONObject")
+
+            this._geoJSONObject = obj;
+
+            if (Object.prototype.toString.call(this.geoJSONObject) === '[object Array]') {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "handle",
+                        "invalidGeoJSONObjectLength"));
             }
-            finally {
-                if (this.geoJSONObject){
-                    if (Object.prototype.toString.call(this.geoJSONObject) === '[object Array]') {
-                        throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
-                                "invalidGeoJSONObjectLength"));
-                    }
 
-                    if (this.geoJSONObject.hasOwnProperty(GeoJSONConstants.FIELD_TYPE)) {
-                        this.setGeoJSONType();
-                        this.setGeoJSONCRS();
-                    }
-                    else{
-                        throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
-                                "missingGeoJSONType"));
-                    }
+            if (this.geoJSONObject.hasOwnProperty(GeoJSONConstants.FIELD_TYPE)) {
+                this.setGeoJSONType();
+                this.setGeoJSONCRS();
+            } else {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "handle",
+                        "missingGeoJSONType"));
+            }
 
-                    if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
-                        this._parserCompletionCallback(this.layer);
-                    }
-                }
+            if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
+                this._parserCompletionCallback(this.layer);
             }
         };
 
@@ -1108,17 +1111,17 @@ define(['../../error/ArgumentError',
         };
 
         /**
-        * Indicate whether the data source is of a JSON type.
-        * @returns {Boolean} True if the data source is of JSON type.
-        */
-        GeoJSONParser.prototype.isDataSourceJson = function() {
+         * Tries to parse a JSON string into a JavaScript object.
+         * @param {String} str the string to try to parse.
+         * @returns {Object} the object if the string is valid JSON; otherwise null.
+         */
+        GeoJSONParser.tryParseJSONString = function (str) {
             try {
-                JSON.parse(this.dataSource);
+                return JSON.parse(str);
             } catch (e) {
-                return false;
+                return null;
             }
-            return true;
-        }
+        };
 
         return GeoJSONParser;
     }

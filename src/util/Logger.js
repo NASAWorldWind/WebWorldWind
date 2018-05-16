@@ -102,11 +102,13 @@ define(function () {
             invalidWidth: "The specified width is zero or negative.",
             invalidSize: "The specified size is zero or negative.",
             missingAltitudeMode: "The specified altitude mode is null or undefined.",
+            missingArrayBuffer: "The specified array buffer is null or undefined",
             missingAttributeName: "The specified DBase attribute file name is null or undefined.",
             missingArray: "The specified array is null, undefined or of insufficient length.",
             missingBoundaries: "The specified boundaries array is null or undefined.",
             missingBuffer: "The specified buffer descriptor is null or undefined.",
             missingColor: "The specified color is null or undefined.",
+            missingConfig: "The specified config is null or undefined.",
             missingDc: "The specified draw context is null or undefined.",
             missingDomElement: "The specified DOM element is null or undefined.",
             missingEntry: "The specified entry is null or undefined.",
@@ -115,7 +117,9 @@ define(function () {
             missingFunction: "The specified function is null or undefined.",
             missingGlContext: "The specified WebGL rendering context is null or undefined.",
             missingGlobe: "The specified globe is null or undefined.",
+            missingId: "The specified id is null or undefined.",
             missingImage: "The specified image is null or undefined.",
+            missingImageFormat: "The specified image format is null or undefined.",
             missingIndices: "The specified indices array is null or undefined.",
             missingKey: "The specified key is null or undefined.",
             missingLevel: "The specified level is null or undefined.",
@@ -136,6 +140,7 @@ define(function () {
             missingProjection: "The specified projection is null or undefined.",
             missingRectangle: "The specified rectangle is null or undefined.",
             missingRenderable: "The specified renderable is null or undefined.",
+            missingResolution: "The specified resolution is null, undefined, or zero.",
             missingResource: "The specified resource is null or undefined.",
             missingResult: "The specified result variable is null or undefined.",
             missingResults: "The specified results array is null or undefined.",
@@ -150,8 +155,10 @@ define(function () {
             missingVector: "The specified vector is null or undefined.",
             missingVertex: "The specified vertex is null or undefined.",
             missingViewport: "The specified viewport is null or undefined.",
+            missingWebCoverageService: "The specified WebCoverageService is null or undefined.",
             missingWorldWindow: "The specified WorldWindow is null or undefined.",
-            notYetImplemented: "This function is not yet implemented"
+            notYetImplemented: "This function is not yet implemented",
+            unsupportedVersion: "The specified version is not supported."
         }
     };
 
