@@ -307,15 +307,16 @@ define([
                 radius = this.calculateRadius(tile.sector),
                 extensionFactor =1;
 
-
+            var extendedWidth = Math.ceil(extensionFactor * this.tileWidth);
+            var extendedHeight = Math.ceil(extensionFactor * this.tileHeight);
             var extendedSector = this.calculateExtendedSector(tile.sector, extensionFactor);
             var data = this.filterGeographically(this._data, extendedSector);
 
             var canvas = this.createHeatMapTile(data, {
                 sector: extendedSector,
 
-                width: this.tileWidth + 2 * Math.ceil(extensionFactor * this.tileWidth),
-                height: this.tileHeight + 2 * Math.ceil(extensionFactor * this.tileHeight),
+                width: this.tileWidth + 2 * extendedWidth,
+                height: this.tileHeight + 2 * extendedHeight,
                 radius: radius,
                 blur: this.blur,
 
@@ -326,7 +327,9 @@ define([
             var result = document.createElement('canvas');
             result.height = this.tileHeight;
             result.width = this.tileWidth;
-            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(Math.ceil(extensionFactor * this.tileWidth), Math.ceil(extensionFactor * this.tileHeight), this.tileWidth, this.tileHeight), 0, 0);
+            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(
+                extendedWidth, extendedHeight, this.tileWidth, this.tileHeight), 0, 0
+            );
 
             var texture = layer.createTexture(dc, tile, result);
             layer.removeFromCurrentRetrievals(imagePath);
