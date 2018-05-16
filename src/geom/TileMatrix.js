@@ -53,37 +53,55 @@ define([
             if (matrixWidth < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
-                        "missingMatrixWidth"));
+                        "invalidWidth"));
             }
 
             if (matrixHeight < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
-                        "missingMatrixHeight"));
+                        "invalidHeight"));
             }
 
             if (tileWidth < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
-                        "missingTileWidth"));
+                        "invalidWidth"));
             }
 
             if (tileHeight < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
-                        "missingTileHeight"));
+                        "invalidHeight"));
             }
 
+            /**
+             * The geographic coverage area of this TileMatrix.
+             */
             this.sector = sector;
 
+            /**
+             * The index position of this TileMatrix in the TileMatrixSet.
+             */
             this.ordinal = ordinal;
 
+            /**
+             * The number of pixels or points of tiles in the horizontal or x direction.
+             */
             this.tileWidth = tileWidth;
 
+            /**
+             * The number of pixels or points of tiles in the vertical or y direction.
+             */
             this.tileHeight = tileHeight;
 
+            /**
+             * The number of tiles in the horizontal or x direction.
+             */
             this.matrixWidth = matrixWidth;
 
+            /**
+             * The number of tiles in the vertical or y direction.
+             */
             this.matrixHeight = matrixHeight;
         };
 
@@ -105,13 +123,13 @@ define([
             if (row < 0 || row >= this.matrixHeight) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "tileSector",
-                        "missingRow"));
+                        "invalidRod"));
             }
 
             if (column < 0 || column >= this.matrixWidth) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "tileSector",
-                        "missingColumn"));
+                        "invalidColumn"));
             }
 
             var deltaLat = this.sector.deltaLatitude() / this.matrixHeight;

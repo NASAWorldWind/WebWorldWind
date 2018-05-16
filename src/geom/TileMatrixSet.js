@@ -47,8 +47,14 @@ define([
                         "The specified TileMatrix list is null or undefined."));
             }
 
+            /**
+             * The geographic coverage of this TileMatrixSet.
+             */
             this.sector = sector;
 
+            /**
+             * An array of TileMatrix objects defining this TileMatrixSet.
+             */
             this.entries = tileMatrixList;
         };
 
@@ -70,22 +76,22 @@ define([
 
             if (matrixWidth < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingMatrixWidth"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "invalidWidth"));
             }
 
             if (matrixHeight < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingMatrixHeight"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "invalidHeight"));
             }
 
             if (tileWidth < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingTileWidth"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "invalidWidth"));
             }
 
             if (tileHeight < 1) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingTileHeight"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "invalidHeight"));
             }
 
             if (numLevels < 1) {
