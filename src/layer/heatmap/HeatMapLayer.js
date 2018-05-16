@@ -304,16 +304,16 @@ define([
             var imagePath = tile.imagePath,
                 cache = dc.gpuResourceCache,
                 layer = this,
-                radius = this.calculateRadius(tile.sector),
-                extensionFactor =1;
+                radius = this.calculateRadius(tile.sector);
 
-            var extendedWidth = Math.ceil(extensionFactor * this.tileWidth);
-            var extendedHeight = Math.ceil(extensionFactor * this.tileHeight);
-            var extendedSector = this.calculateExtendedSector(tile.sector, extensionFactor);
-            var data = this.filterGeographically(this._data, extendedSector);
+            var extended = this.calculateExtendedSector(tile.sector);
+            var extendedWidth = Math.ceil(extended.extensionFactor * this.tileWidth);
+            var extendedHeight = Math.ceil(extended.extensionFactor * this.tileHeight);
+
+            var data = this.filterGeographically(this._data, extended.sector);
 
             var canvas = this.createHeatMapTile(data, {
-                sector: extendedSector,
+                sector: extended.sector,
 
                 width: this.tileWidth + 2 * extendedWidth,
                 height: this.tileHeight + 2 * extendedHeight,
@@ -356,7 +356,7 @@ define([
      * @param sector {Sector} Sector to be used for the calculation of the radius.
      * @return {Number} Pixels representing the radius.
      */
-    HeatMapLayer.prototype.calculateRadius = function(sector) {
+    HeatMapLayer.prototype.calculateRadius = function (sector) {
         var radius = this.radius;
 
         if (typeof this.radius === 'function') {
@@ -371,18 +371,22 @@ define([
      * The standard version just applies extension factor to the difference between minimum and maximum.
      * @protected
      * @param sector {Sector} Sector to use as basis for the extension.
-     * @param extensionFactor {Number} How many times will be the extension used.
-     * @return {Sector} New extended sector.
+     * @return {Object} .sector New extended sector.
+     *                  .extensionFactor The factor by which the area is changed.
      */
-    HeatMapLayer.prototype.calculateExtendedSector = function(sector, extensionFactor) {
+    HeatMapLayer.prototype.calculateExtendedSector = function (sector) {
+        var extensionFactor = 1;
         var latitudeChange = (sector.maxLatitude - sector.minLatitude) * extensionFactor;
         var longitudeChange = (sector.maxLongitude - sector.minLongitude) * extensionFactor;
-        return new Sector(
-            sector.minLatitude - latitudeChange,
-            sector.maxLatitude + latitudeChange,
-            sector.minLongitude - longitudeChange,
-            sector.maxLongitude + longitudeChange
-        );
+        return {
+            sector: new Sector(
+                sector.minLatitude - latitudeChange,
+                sector.maxLatitude + latitudeChange,
+                sector.minLongitude - longitudeChange,
+                sector.maxLongitude + longitudeChange
+            ),
+            extensionFactor: extensionFactor
+        };
     };
 
     /**
