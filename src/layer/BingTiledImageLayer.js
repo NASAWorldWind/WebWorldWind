@@ -91,7 +91,7 @@ define([
                 BingTiledImageLayer.attribution.screenOffset = this.logoPlacement;
                 BingTiledImageLayer.attribution.imageOffset = this.logoAlignment;
                 BingTiledImageLayer.attribution.render(dc);
-                this.logoLastFrameTime = BingTiledImageLayer.attribution.lastFrameTime;
+                BingTiledImageLayer.logoLastFrameTime = BingTiledImageLayer.attribution.lastFrameTime;
             }
         };
 
