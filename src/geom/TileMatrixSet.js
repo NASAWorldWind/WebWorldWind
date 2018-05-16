@@ -68,27 +68,27 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingSector"));
             }
 
-            if (matrixWidth <= 0) {
+            if (matrixWidth < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingMatrixWidth"));
             }
 
-            if (matrixHeight <= 0) {
+            if (matrixHeight < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingMatrixHeight"));
             }
 
-            if (tileWidth <= 0) {
+            if (tileWidth < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingTileWidth"));
             }
 
-            if (tileHeight <= 0) {
+            if (tileHeight < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid", "missingTileHeight"));
             }
 
-            if (numLevels <= 0) {
+            if (numLevels < 1) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "fromTilePyramid",
                         "The specified number of levels is invalid"));
@@ -112,6 +112,12 @@ define([
          * @returns {number} the index of the TileMatrix within this TileMatrixSet's entries array
          */
         TileMatrixSet.prototype.indexOfMatrixNearest = function (degreesPerPixel) {
+            if (degreesPerPixel < 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "indexOfMatrixNearest",
+                        "The specified resolution is invalid"));
+            }
+
             var nearestIdx = -1, nearestDelta2 = Number.MAX_VALUE, delta, delta2;
 
             for (var idx = 0, len = this.entries.length; idx < len; idx++) {
