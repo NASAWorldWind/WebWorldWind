@@ -1,12 +1,13 @@
 requirejs([
-    '../src/WorldWind'
+    '../src/WorldWind',
+    './Util'
     ],
-    function (WorldWind) {
+    function (WorldWind, Util) {
         "use strict";
 
         var statusDialog = document.getElementById("status-dialog");
         var statusOutput = document.getElementById("output");
-        var globeCanvas = document.getElementById("globe");
+        var navigateButton = document.getElementById("navigate-button");
 
         var updateStatus = function (statusMessage) {
             var children = statusDialog.childNodes;
@@ -19,16 +20,34 @@ requirejs([
 
         updateStatus("Initializing globe...");
 
-        var wwd = new WorldWind.WorldWindow(globeCanvas);
-        wwd.globe.elevationModel.removeAllCoverages(); // Don't want delays associated with parsing and changing terrain
-        var bmnglayer = new WorldWind.BMNGOneImageLayer();
-        bmnglayer.minActiveAltitude = 0;
-        wwd.addLayer(bmnglayer); // Don't want any imaging processing delays
+        var wwd = Util.initializeLowResourceWorldWindow("globe");
+        var util = new Util(wwd);
 
         updateStatus("Globe Loaded, ready for testing");
 
-        var runNavigation = function () {
-
+        // second move
+        var operationsComplete = 0;
+        var moving = false;
+        var moveTwo = function () {
+            // wait until previous moves are complete
+            operationsComplete++;
+            if (operationsComplete > 1) {
+                util.changeHeading(90, 1, 50, function() {
+                    updateStatus("Move Complete");
+                    moving = false;
+                    operationsComplete = 0;
+                });
+            }
         };
 
+        // first move
+        var moveOne = function () {
+            if (!moving) {
+                moving = true;
+                util.changeRange(1e5, 5e4, 50, moveTwo);
+                util.changeTilt(50, 0.25, 50,  moveTwo);
+            }
+        };
+
+        navigateButton.addEventListener("click", moveOne);
     });
