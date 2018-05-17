@@ -44,8 +44,8 @@ requirejs([
         var moveOne = function () {
             if (!moving) {
                 moving = true;
-                util.changeRange(1e5, 5e4, 50, moveTwo);
-                util.changeTilt(50, 0.25, 50,  moveTwo);
+                util.changeRange(8e5, 5e4, 50, moveTwo);
+                util.changeTilt(75, 0.25, 50,  moveTwo);
             }
         };
 
