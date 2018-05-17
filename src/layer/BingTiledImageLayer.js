@@ -87,11 +87,9 @@ define([
         };
 
         BingTiledImageLayer.prototype.renderLogo = function (dc) {
-            if (!BingTiledImageLayer.logoImage) {
-                BingTiledImageLayer.logoImage = new ScreenImage(WorldWind.configuration.bingLogoPlacement,
-                    WorldWind.configuration.baseUrl + "images/powered-by-bing.png");
-                BingTiledImageLayer.logoImage.imageColor = new Color(1, 1, 1, 0.5); // Make Bing logo semi transparent.
-            }
+            BingTiledImageLayer.logoImage = new ScreenImage(WorldWind.configuration.bingLogoPlacement,
+                WorldWind.configuration.bingLogoUrl);
+            BingTiledImageLayer.logoImage.imageColor = new Color(1, 1, 1, 0.5); // Make Bing logo semi transparent.
 
             if (BingTiledImageLayer.logoLastFrameTime !== dc.timestamp) {
                 BingTiledImageLayer.logoImage.screenOffset = WorldWind.configuration.bingLogoPlacement;

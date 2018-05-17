@@ -974,5 +974,4 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
 
         return WorldWind;
     }
-)
-;
+);
