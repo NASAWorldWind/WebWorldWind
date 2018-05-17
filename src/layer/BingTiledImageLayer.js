@@ -87,8 +87,6 @@ define([
         };
 
         BingTiledImageLayer.prototype.renderLogo = function (dc) {
-            // Assigning ScreenImage to logoImage in here due to circular dependency of
-            // WorldWind module not allowing it in static member declaration.
             BingTiledImageLayer.logoImage = new ScreenImage(WorldWind.configuration.bingLogoPlacement,
                 WorldWind.configuration.bingLogoUrl);
             BingTiledImageLayer.logoImage.imageColor = new Color(1, 1, 1, 0.5); // Make Bing logo semi transparent.
