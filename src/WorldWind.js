@@ -949,6 +949,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
          *     <li><code>baseUrl</code>: The URL of the directory containing the WorldWind Library and its resources.</li>
          *     <li><code>layerRetrievalQueueSize</code>: The number of concurrent tile requests allowed per layer. The default is 16.</li>
          *     <li><code>coverageRetrievalQueueSize</code>: The number of concurrent tile requests allowed per elevation coverage. The default is 16.</li>
+         *     <li><code>bingLogoPlacement</code>: An {@link Offset} to place a Bing logo attribution. The default is a 5px margin inset from the lower right corner of the screen.</li>
+         *     <li><code>bingLogoAlignment</code>: An {@link Offset} to align the Bing logo relative to its placement position. The default is the lower right corner of the logo.</li>
          * </ul>
          * @type {{gpuCacheSize: number}}
          */
@@ -956,7 +958,9 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             gpuCacheSize: 250e6,
             baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../'),
             layerRetrievalQueueSize: 16,
-            coverageRetrievalQueueSize: 16
+            coverageRetrievalQueueSize: 16,
+            bingLogoPlacement: new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5),
+            bingLogoAlignment: new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0)
         };
 
         /**
@@ -970,5 +974,4 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
 
         return WorldWind;
     }
-)
-;
+);
