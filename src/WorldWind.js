@@ -963,9 +963,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             bingLogoUrl: {
                 get: function () {
                     return this.baseUrl + "images/powered-by-bing.png";
-                },
-                set: function (value) {
-                    this.bingLogoUrl = value;
                 }
             },
             bingLogoPlacement: new Offset(WorldWind.OFFSET_INSET_PIXELS, 5, WorldWind.OFFSET_PIXELS, 5),
