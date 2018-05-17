@@ -103,7 +103,7 @@ define([
             var tileMatrices = [], matrix, idx;
 
             for (idx = 0; idx < numLevels; idx++) {
-                matrix = new TileMatrix(sector, idx, matrixWidth, matrixHeight, tileWidth, tileHeight);
+                matrix = new TileMatrix(sector, matrixWidth, matrixHeight, tileWidth, tileHeight);
                 tileMatrices.push(matrix);
                 matrixWidth *= 2;
                 matrixHeight *= 2;

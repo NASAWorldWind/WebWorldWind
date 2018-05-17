@@ -30,24 +30,17 @@ define([
          * TileMatrix is a collection of tiles for a fixed resolution (degrees per pixel). It contains the dimensions of
          * the tile in pixels and the dimension of the matrix in tiles.
          * @param sector the geographic coverage of this TileMatrix
-         * @param ordinal the index of this TileMatrix in the TileMatrixSet
          * @param matrixWidth the number of tiles in the x direction
          * @param matrixHeight the number of tiles in the y direction
          * @param tileWidth the number of pixels or points in the x direction
          * @param tileHeight the number of pixels or points in the y direction
          * @constructor
          */
-        var TileMatrix = function (sector, ordinal, matrixWidth, matrixHeight, tileWidth, tileHeight) {
+        var TileMatrix = function (sector, matrixWidth, matrixHeight, tileWidth, tileHeight) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
                         "missingSector"));
-            }
-
-            if (ordinal < 0) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrix", "constructor",
-                        "The specified oridinal is null or undefined."));
             }
 
             if (matrixWidth < 1) {
@@ -78,11 +71,6 @@ define([
              * The geographic coverage area of this TileMatrix.
              */
             this.sector = sector;
-
-            /**
-             * The index position of this TileMatrix in the TileMatrixSet.
-             */
-            this.ordinal = ordinal;
 
             /**
              * The number of pixels or points of tiles in the horizontal or x direction.
