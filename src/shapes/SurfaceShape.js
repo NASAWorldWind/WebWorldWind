@@ -222,7 +222,7 @@ define([
                         }
 
                         // If the attributes state key changed, ...
-                        if (currentAttributesStateKey != this._attributesStateKey) {
+                        if (currentAttributesStateKey !== this._attributesStateKey) {
                             this._attributesStateKey = currentAttributesStateKey;
                             this.stateKeyInvalid = true;
                         }
@@ -555,7 +555,7 @@ define([
                 next = locations[idx];
 
                 // Detect whether the next location and the first location are the same.
-                isNextFirst = next.latitude == first.latitude && next.longitude == first.longitude;
+                isNextFirst = next.latitude === first.latitude && next.longitude === first.longitude;
 
                 // Inhibit interpolation if either endpoint if the first location,
                 // except for the first segement which will be the actual first location or that location
@@ -583,7 +583,7 @@ define([
             // Force the closing of the border.
             if (!this._isInteriorInhibited) {
                 // Avoid duplication if the first endpoint was already emitted.
-                if (prev.latitude != first.latitude || prev.longitude != first.longitude) {
+                if (prev.latitude !== first.latitude || prev.longitude !== first.longitude) {
                     this.interpolateEdge(prev, first, this._locations);
                     this._locations.push(first);
                 }
