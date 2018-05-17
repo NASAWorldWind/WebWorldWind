@@ -98,8 +98,10 @@ define(function () {
         messageTable: { // KEEP THIS TABLE IN ALPHABETICAL ORDER
             abstractInvocation: "The function called is abstract and must be overridden in a subclass.",
             indexOutOfRange: "The specified index is out of range.",
+            invalidColumn: "The specified column is out of range.",
             invalidHeight: "The specified height is zero or negative.",
             invalidWidth: "The specified width is zero or negative.",
+            invalidRow: "The specified row is out of range.",
             invalidSize: "The specified size is zero or negative.",
             missingAltitudeMode: "The specified altitude mode is null or undefined.",
             missingArrayBuffer: "The specified array buffer is null or undefined",
