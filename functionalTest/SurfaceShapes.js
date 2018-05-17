@@ -8,6 +8,7 @@ requirejs([
         var statusDialog = document.getElementById("status-dialog");
         var statusOutput = document.getElementById("output");
         var navigateButton = document.getElementById("navigate-button");
+        var staticShapesButton = document.getElementById("static-button");
 
         var updateStatus = function (statusMessage) {
             var children = statusDialog.childNodes;
@@ -54,8 +55,9 @@ requirejs([
         navigateButton.addEventListener("click", moveOne);
 
         var stats = [], min = Number.MAX_VALUE, max = -Number.MAX_VALUE;
-        wwd.redrawCallbacks.push(function (worldwindow, stage) {
-            if (stage === WorldWind.BEFORE_REDRAW) {
+
+        var metricCapture = function (worldwindow, stage) {
+            if (stage === WorldWind.AFTER_REDRAW) {
                 if (moving && !navigationComplete) {
                     var frametime = worldwindow.frameStatistics.frameTime;
                     stats.push(frametime);
@@ -65,18 +67,39 @@ requirejs([
 
                 if (navigationComplete) {
                     var canvas = document.createElement("canvas");
-                    canvas.setAttribute("width", Math.ceil(stats.length) + "");
-                    canvas.setAttribute("height", Math.ceil(max - min) * 50 + "");
+                    canvas.setAttribute("width", 500);
+                    canvas.setAttribute("height", 500);
                     var ctx = canvas.getContext("2d");
                     ctx.beginPath();
-                    ctx.moveTo(0, Math.floor(max - stats[0]) * 50);
-                    for (var i = 1, len = stats.length; i < len; i++) {
-                        ctx.lineTo(i, Math.floor(stats[i]) * 50);
+                    var x = Math.floor(1 / len * 500);
+                    var y = Math.floor((max - stats[1]) * 500 / (max - min));
+                    ctx.moveTo(x, y);
+                    for (var i = 2, len = stats.length; i < len; i++) {
+                        x = Math.floor(i / len * 500);
+                        var y = Math.floor((max - stats[i]) * 500 / (max - min));
+                        ctx.lineTo(x, y);
                     }
                     ctx.stroke();
                     statusOutput.appendChild(canvas);
+                    var idx = worldwindow.redrawCallbacks.indexOf(metricCapture);
+                    worldwindow.redrawCallbacks.splice(idx, 1);
                 }
 
             }
+        };
+
+        wwd.redrawCallbacks.push(metricCapture);
+
+        staticShapesButton.addEventListener("click", function () {
+            var layer = new WorldWind.RenderableLayer("Test Layer");
+            wwd.addLayer(layer);
+            for (var i = 0; i < 2000; i++) {
+                var shapeLocation = new WorldWind.Location(Math.random() * 22.5 + 15.0, -80 - Math.random() * 45);
+                var minorAxis = Math.random() * 100000 + 10000;
+                var majorAxis = Math.random() * 500000 + 10000;
+                var heading = Math.random() * 360;
+                layer.addRenderable(new WorldWind.SurfaceEllipse(shapeLocation, majorAxis, minorAxis, heading));
+            }
+            wwd.redraw();
         });
     });
