@@ -103,14 +103,12 @@ define([
              * The number of tiles in the vertical or y direction.
              */
             this.matrixHeight = matrixHeight;
-        };
 
-        /**
-         * Calculate the resolution of this TileMatrix in degrees per pixel
-         * @returns {number} degress per pixel resolution
-         */
-        TileMatrix.prototype.degreesPerPixel = function () {
-            return this.sector.deltaLatitude() / (this.matrixHeight * this.tileHeight);
+            /**
+             * The resolution in degrees per pixel of this TileMatrix.
+             * @type {number}
+             */
+            this.degreesPerPixel = this.sector.deltaLatitude() / (this.matrixHeight * this.tileHeight);
         };
 
         /**

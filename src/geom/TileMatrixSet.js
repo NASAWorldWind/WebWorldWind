@@ -127,7 +127,7 @@ define([
             var nearestIdx = -1, nearestDelta2 = Number.MAX_VALUE, delta, delta2;
 
             for (var idx = 0, len = this.entries.length; idx < len; idx++) {
-                delta = (this.entries[idx].degreesPerPixel() - degreesPerPixel);
+                delta = (this.entries[idx].degreesPerPixel - degreesPerPixel);
                 delta2 = delta * delta;
 
                 if (nearestDelta2 > delta2) {

@@ -91,7 +91,7 @@ define([
             var tileMatrix = new TileMatrix(sector, ordinal, matrixWidth, matrixHeight, tileWidth, tileHeight);
             var expectedResolution = 180 / (matrixHeight * tileHeight);
 
-            var actualResolution = tileMatrix.degreesPerPixel();
+            var actualResolution = tileMatrix.degreesPerPixel;
 
             expect(actualResolution).toBe(expectedResolution);
         });
@@ -106,7 +106,7 @@ define([
             var tileMatrix = new TileMatrix(sector, ordinal, matrixWidth, matrixHeight, tileWidth, tileHeight);
             var expectedResolution = 90 / (matrixHeight * tileHeight);
 
-            var actualResolution = tileMatrix.degreesPerPixel();
+            var actualResolution = tileMatrix.degreesPerPixel;
 
             expect(actualResolution).toBe(expectedResolution);
         });
