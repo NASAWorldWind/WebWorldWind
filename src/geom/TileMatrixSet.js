@@ -118,7 +118,7 @@ define([
          * @returns {number} the index of the TileMatrix within this TileMatrixSet's entries array
          */
         TileMatrixSet.prototype.indexOfMatrixNearest = function (degreesPerPixel) {
-            if (degreesPerPixel < 0) {
+            if (degreesPerPixel <= 0) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TileMatrixSet", "indexOfMatrixNearest",
                         "The specified resolution is invalid"));
