@@ -28,6 +28,7 @@ requirejs([
         // second move
         var operationsComplete = 0;
         var moving = false;
+        var navigationComplete = false;
         var moveTwo = function () {
             // wait until previous moves are complete
             operationsComplete++;
@@ -36,6 +37,7 @@ requirejs([
                     updateStatus("Move Complete");
                     moving = false;
                     operationsComplete = 0;
+                    navigationComplete = true;
                 });
             }
         };
@@ -50,4 +52,31 @@ requirejs([
         };
 
         navigateButton.addEventListener("click", moveOne);
+
+        var stats = [], min = Number.MAX_VALUE, max = -Number.MAX_VALUE;
+        wwd.redrawCallbacks.push(function (worldwindow, stage) {
+            if (stage === WorldWind.BEFORE_REDRAW) {
+                if (moving && !navigationComplete) {
+                    var frametime = worldwindow.frameStatistics.frameTime;
+                    stats.push(frametime);
+                    min = Math.min(min, frametime);
+                    max = Math.max(max, frametime);
+                }
+
+                if (navigationComplete) {
+                    var canvas = document.createElement("canvas");
+                    canvas.setAttribute("width", Math.ceil(stats.length) + "");
+                    canvas.setAttribute("height", Math.ceil(max - min) * 50 + "");
+                    var ctx = canvas.getContext("2d");
+                    ctx.beginPath();
+                    ctx.moveTo(0, Math.floor(max - stats[0]) * 50);
+                    for (var i = 1, len = stats.length; i < len; i++) {
+                        ctx.lineTo(i, Math.floor(stats[i]) * 50);
+                    }
+                    ctx.stroke();
+                    statusOutput.appendChild(canvas);
+                }
+
+            }
+        });
     });
