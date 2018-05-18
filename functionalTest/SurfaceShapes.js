@@ -21,6 +21,7 @@ requirejs([
 
         updateStatus("Initializing globe...");
         var wwd = Util.initializeLowResourceWorldWindow("globe");
+        var util = new Util(wwd);
         updateStatus("Globe Loaded, ready for testing");
 
         // moving state
@@ -36,6 +37,9 @@ requirejs([
             tilt: {
                 goal: 75,
                 step: 0.75
+            },
+            onComplete: function () {
+                updateStatus("First move complete...");
             }
         };
 
@@ -43,6 +47,9 @@ requirejs([
             heading: {
                 goal: 135,
                 step: 1
+            },
+            onComplete: function () {
+                updateStatus("Second move complete");
             }
         };
 
@@ -54,61 +61,22 @@ requirejs([
             longitude: {
                 goal: -70,
                 step: 0.25
+            },
+            onComplete: function () {
+                moving = false;
+                navigationComplete = true;
+                updateStatus("Move Complete");
             }
-        };
-
-        var onMoveComplete = function () {
-            moving = false;
-            navigationComplete = true;
-            updateStatus("Move Complete");
         };
 
         var onClickMove = function () {
             if (!moving) {
                 moving = true;
-                Util.move(wwd, [moveOne, moveTwo, moveThree], onMoveComplete);
+                util.move([moveOne, moveTwo, moveThree]);
             }
         };
 
-        navigateButton.addEventListener("click", onClickMove);
-
-        var stats = [], min = Number.MAX_VALUE, max = -Number.MAX_VALUE;
-
-        var metricCapture = function (worldwindow, stage) {
-            if (stage === WorldWind.AFTER_REDRAW) {
-                if (moving && !navigationComplete) {
-                    var frametime = worldwindow.frameStatistics.frameTime;
-                    stats.push(frametime);
-                    min = Math.min(min, frametime);
-                    max = Math.max(max, frametime);
-                }
-
-                if (navigationComplete) {
-                    var canvas = document.createElement("canvas");
-                    canvas.setAttribute("width", 500);
-                    canvas.setAttribute("height", 500);
-                    var ctx = canvas.getContext("2d");
-                    ctx.beginPath();
-                    var x = Math.floor(1 / len * 500);
-                    var y = Math.floor((max - stats[1]) * 500 / (max - min));
-                    ctx.moveTo(x, y);
-                    for (var i = 2, len = stats.length; i < len; i++) {
-                        x = Math.floor(i / len * 500);
-                        var y = Math.floor((max - stats[i]) * 500 / (max - min));
-                        ctx.lineTo(x, y);
-                    }
-                    ctx.stroke();
-                    statusOutput.appendChild(canvas);
-                    var idx = worldwindow.redrawCallbacks.indexOf(metricCapture);
-                    worldwindow.redrawCallbacks.splice(idx, 1);
-                }
-
-            }
-        };
-
-        wwd.redrawCallbacks.push(metricCapture);
-
-        staticShapesButton.addEventListener("click", function () {
+        var onGenerateShapesClick = function () {
             var layer = new WorldWind.RenderableLayer("Test Layer");
             wwd.addLayer(layer);
             for (var i = 0; i < 2000; i++) {
@@ -119,5 +87,30 @@ requirejs([
                 layer.addRenderable(new WorldWind.SurfaceEllipse(shapeLocation, majorAxis, minorAxis, heading));
             }
             wwd.redraw();
-        });
+        };
+
+        // Temporary metric capture framework
+        var stats = [], min = Number.MAX_VALUE, max = -Number.MAX_VALUE;
+        var metricCapture = function (worldwindow, stage) {
+            if (stage === WorldWind.AFTER_REDRAW) {
+                if (moving && !navigationComplete) {
+                    var frametime = worldwindow.frameStatistics.frameTime;
+                    stats.push(frametime);
+                    min = Math.min(min, frametime);
+                    max = Math.max(max, frametime);
+                }
+
+                if (navigationComplete) {
+                    navigationComplete = false;
+                    // clean up the data
+                    stats.shift();
+                    stats.pop();
+                    statusOutput.appendChild(Util.generateResultsSummary(stats, "Frame Times"));
+                }
+            }
+        };
+        wwd.redrawCallbacks.push(metricCapture);
+
+        navigateButton.addEventListener("click", onClickMove);
+        staticShapesButton.addEventListener("click", onGenerateShapesClick);
     });
