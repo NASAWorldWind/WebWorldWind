@@ -20,39 +20,57 @@ requirejs([
         };
 
         updateStatus("Initializing globe...");
-
         var wwd = Util.initializeLowResourceWorldWindow("globe");
-        var util = new Util(wwd);
-
         updateStatus("Globe Loaded, ready for testing");
 
-        // second move
-        var operationsComplete = 0;
+        // moving state
         var moving = false;
         var navigationComplete = false;
-        var moveTwo = function () {
-            // wait until previous moves are complete
-            operationsComplete++;
-            if (operationsComplete > 1) {
-                util.changeHeading(90, 1, 50, function() {
-                    updateStatus("Move Complete");
-                    moving = false;
-                    operationsComplete = 0;
-                    navigationComplete = true;
-                });
+
+        // moves
+        var moveOne = {
+            range: {
+                goal: 8e5,
+                step: 5e4
+            },
+            tilt: {
+                goal: 75,
+                step: 0.75
             }
         };
 
-        // first move
-        var moveOne = function () {
+        var moveTwo = {
+            heading: {
+                goal: 135,
+                step: 1
+            }
+        };
+
+        var moveThree = {
+            latitude: {
+                goal: wwd.navigator.lookAtLocation.latitude,
+                step: 1
+            },
+            longitude: {
+                goal: -70,
+                step: 0.25
+            }
+        };
+
+        var onMoveComplete = function () {
+            moving = false;
+            navigationComplete = true;
+            updateStatus("Move Complete");
+        };
+
+        var onClickMove = function () {
             if (!moving) {
                 moving = true;
-                util.changeRange(8e5, 5e4, 50, moveTwo);
-                util.changeTilt(75, 0.25, 50,  moveTwo);
+                Util.move(wwd, [moveOne, moveTwo, moveThree], onMoveComplete);
             }
         };
 
-        navigateButton.addEventListener("click", moveOne);
+        navigateButton.addEventListener("click", onClickMove);
 
         var stats = [], min = Number.MAX_VALUE, max = -Number.MAX_VALUE;
 
@@ -94,7 +112,7 @@ requirejs([
             var layer = new WorldWind.RenderableLayer("Test Layer");
             wwd.addLayer(layer);
             for (var i = 0; i < 2000; i++) {
-                var shapeLocation = new WorldWind.Location(Math.random() * 22.5 + 15.0, -80 - Math.random() * 45);
+                var shapeLocation = new WorldWind.Location(Math.random() * 45 + 15.0, -80 - Math.random() * 90);
                 var minorAxis = Math.random() * 100000 + 10000;
                 var majorAxis = Math.random() * 500000 + 10000;
                 var heading = Math.random() * 360;
