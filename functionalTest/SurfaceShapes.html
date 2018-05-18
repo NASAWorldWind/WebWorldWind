@@ -16,23 +16,12 @@
             width: 100%;
             height: 100vh;
         }
-
         #buttons {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            z-index: 10000;
+            padding-top: 10px;
         }
     </style>
 </head>
 <body>
-<div id="buttons">
-    <div class="btn-group" role="group" aria-label="Basic example">
-        <button id="navigate-button" type="button" class="btn btn-secondary">Run Navigation</button>
-        <button id="static-button" type="button" class="btn btn-secondary">Static Shapes</button>
-        <button type="button" class="btn btn-secondary">Dynamic Shapes</button>
-    </div>
-</div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-xl-8 col-lg-12">
@@ -41,12 +30,20 @@
             </canvas>
         </div>
         <div class="col-xl-4 col-lg-12">
-            <h2 id="status-dialog">
+            <div id="buttons">
+                <button id="navigate-button" type="button" class="btn btn-secondary">Run Navigation</button>
+                <button id="static-button" type="button" class="btn btn-secondary">Static Shapes</button>
+                <button type="button" class="btn btn-secondary">Dynamic Shapes</button>
+                <hr>
+            </div>
+            <div>
+                <h2 id="status-dialog">
 
-            </h2>
-            <hr>
-            <div id="output">
+                </h2>
+                <hr>
+                <div id="output">
 
+                </div>
             </div>
         </div>
     </div>
