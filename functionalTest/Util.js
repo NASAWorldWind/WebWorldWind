@@ -130,7 +130,7 @@ define([
         stddev = Util.calculateStdDev(dataArray);
 
         // bin the data
-        bins = Util.binValues(dataArray, 2);
+        bins = Util.binValues(dataArray, 5);
 
         // create the html elements displaying the data
         var encDiv = document.createElement("div");
@@ -154,6 +154,8 @@ define([
 
         var canvas = Util.generateSimplePlot(bins, 500, 500, true);
         encDiv.appendChild(canvas);
+
+        encDiv.appendChild(Util.generateTextOutput(dataArray));
 
         return encDiv;
     };
@@ -248,6 +250,37 @@ define([
         return canvas;
     };
 
+    Util.generateTextOutput = function (data) {
+        var textOutput = document.createElement("textarea");
+        textOutput.value = data.join(",");
+        textOutput.setAttribute("id", "text-data-output");
+
+        var copyToClipboardButton = document.createElement("button");
+        copyToClipboardButton.appendChild(document.createTextNode("Copy to Clipboard"));
+        copyToClipboardButton.addEventListener("click", function () {
+            textOutput.select();
+
+            try {
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Copying text command was ' + msg);
+            } catch (err) {
+                console.log('Oops, unable to copy');
+            }
+        });
+
+        var outputDiv = document.createElement("div");
+        outputDiv.appendChild(textOutput);
+        var buttonDiv = document.createElement("div");
+        buttonDiv.appendChild(copyToClipboardButton);
+
+        var div = document.createElement("div");
+        div.appendChild(outputDiv);
+        div.appendChild(buttonDiv);
+
+        return div;
+    };
+
     // Internal use only
     Util.calculateNextValue = function (currentValue, goal, step) {
         var diff = currentValue - goal;
@@ -262,6 +295,6 @@ define([
             return null;
         }
     };
-    
+
     return Util;
 });
