@@ -79,8 +79,8 @@ requirejs([
         var onGenerateShapesClick = function () {
             var layer = new WorldWind.RenderableLayer("Test Layer");
             wwd.addLayer(layer);
-            for (var i = 0; i < 2000; i++) {
-                var shapeLocation = new WorldWind.Location(Math.random() * 45 + 15.0, -80 - Math.random() * 90);
+            for (var i = 0; i < 10000; i++) {
+                var shapeLocation = new WorldWind.Location(Math.random() * 160 - 80, Math.random() * 340 - 170);
                 var minorAxis = Math.random() * 100000 + 10000;
                 var majorAxis = Math.random() * 500000 + 10000;
                 var heading = Math.random() * 360;
