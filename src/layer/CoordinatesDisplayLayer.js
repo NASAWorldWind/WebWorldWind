@@ -148,7 +148,7 @@ define([
 
             if (canvasWidth > 650) { // large canvas, align the text with bottom center
                 x = (canvasWidth / 2) - 50;
-                y = 10;
+                y = 9;
                 yUnitsScreen = WorldWind.OFFSET_PIXELS;
                 yUnitsText = 0;
             } else if (canvasWidth > 400) { // medium canvas, align the text in the top left

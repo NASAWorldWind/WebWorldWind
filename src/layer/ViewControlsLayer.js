@@ -108,7 +108,7 @@ define([
              * @type {Offset}
              * @default The lower left corner of the window with a 10px margin.
              */
-            this.placement = new Offset(WorldWind.OFFSET_PIXELS, 10, WorldWind.OFFSET_PIXELS, 10);
+            this.placement = new Offset(WorldWind.OFFSET_PIXELS, 9, WorldWind.OFFSET_PIXELS, 9);
 
             /**
              * An {@link Offset} indicating the alignment of the control collection relative to the
