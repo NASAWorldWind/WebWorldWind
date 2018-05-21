@@ -43,9 +43,9 @@ define([
 
         var data = {};
         var lat, lon;
-        for (lat = -90; lat < 90; lat++) {
+        for (lat = -90; lat <= 90; lat++) {
             data[lat] = {};
-            for (lon = -180; lon < 180; lon++) {
+            for (lon = -180; lon <= 180; lon++) {
                 data[lat][lon] = [];
             }
         }
@@ -179,20 +179,20 @@ define([
 
         var extraLongitudeBefore = 0, extraLongitudeAfter = 0;
 
-        if (minLatitude < -90) {
+        if (minLatitude <= -90) {
             minLatitude = -90;
         }
-        if (maxLatitude > 89) {
-            maxLatitude = 89;
+        if (maxLatitude >= 90) {
+            maxLatitude = 90;
         }
 
-        if (minLongitude < -180) {
+        if (minLongitude <= -180) {
             extraLongitudeBefore = Math.abs(minLongitude - (-180));
             minLongitude = -180;
         }
-        if (maxLongitude > 179) {
+        if (maxLongitude >= 180) {
             extraLongitudeAfter = Math.abs(maxLongitude - 180);
-            maxLongitude = 179;
+            maxLongitude = 180;
         }
 
         var result = [];
@@ -200,9 +200,9 @@ define([
         this.gatherGeographical(data, result, sector, minLatitude, maxLatitude, minLongitude, maxLongitude);
 
         if (extraLongitudeBefore !== 0) {
-            var beforeSector = new Sector(minLatitude, maxLatitude, 179 - extraLongitudeBefore, 179);
+            var beforeSector = new Sector(minLatitude, maxLatitude, 180 - extraLongitudeBefore, 180);
             for (lat = minLatitude; lat <= maxLatitude; lat++) {
-                for (lon = 179 - extraLongitudeBefore; lon <= 179; lon++) {
+                for (lon = 180 - extraLongitudeBefore; lon <= 180; lon++) {
                     data[lat][lon].forEach(function (element) {
                         if (beforeSector.containsLocation(element.latitude, element.longitude)) {
                             result.push(new MeasuredLocation(element.latitude, -360 + element.longitude, element.measure));
