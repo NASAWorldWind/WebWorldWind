@@ -5,10 +5,11 @@ requirejs([
     function (WorldWind, Util) {
         "use strict";
 
-        var navigateButton = document.getElementById("navigate-button");
-        var staticShapesButton = document.getElementById("static-button");
-        var dynamicShapesButton = document.getElementById("dynamic-button");
+        // Define shape counts for testing
+        var dynamicShapeCount = 100; // of each type of shape (circle, ellipse, etc.)
+        var staticShapeCount = 1000; // of each type of shape (circle, ellipse, etc.)
 
+        // Initialize Globe
         var wwd = Util.initializeLowResourceWorldWindow("globe");
         var testLayer = new WorldWind.RenderableLayer("Test Layer");
         wwd.addLayer(testLayer);
@@ -16,7 +17,7 @@ requirejs([
 
         util.setStatusMessage("Globe loaded, ready for testing...");
 
-        // moves
+        // Navigation Moves for Testing
         var moveZero = {
             latitude: {
                 goal: wwd.navigator.lookAtLocation.latitude,
@@ -93,8 +94,7 @@ requirejs([
             }
         };
 
-
-
+        // Utility functions
         var generateShapeAttributes = function () {
             var sa = new WorldWind.ShapeAttributes();
             var r = Math.random();
@@ -200,6 +200,7 @@ requirejs([
             wwd.redraw();
         };
 
+        // Click Event Callbacks
         var onMoveClick = function () {
             if (!util.isMoving()) {
                 util.startMetricCapture();
@@ -209,6 +210,8 @@ requirejs([
 
         var onStaticShapesClick = function () {
             generateShapes(1000);
+            wwd.redraw();
+            onMoveClick();
         };
 
         var onDynamicShapesClick = function () {
@@ -249,7 +252,14 @@ requirejs([
             };
 
             wwd.redrawCallbacks.push(onRedrawMoveShapes);
+            wwd.redraw();
+            onMoveClick();
         };
+
+        // Click Event Assignments
+        var navigateButton = document.getElementById("navigate-button");
+        var staticShapesButton = document.getElementById("static-button");
+        var dynamicShapesButton = document.getElementById("dynamic-button");
 
         navigateButton.addEventListener("click", onMoveClick);
         staticShapesButton.addEventListener("click", onStaticShapesClick);

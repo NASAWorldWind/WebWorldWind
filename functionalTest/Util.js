@@ -161,6 +161,8 @@ define([
         return function (worldwindow, stage) {
 
             if (self.captureMetrics && stage === WorldWind.AFTER_REDRAW) {
+
+                // Copy all of the individual frame metrics
                 var frameStatistics = {};
 
                 frameStatistics.frameTime = worldwindow.frameStatistics.frameTime;
@@ -210,7 +212,7 @@ define([
         // calculate standard deviation
         stddev = Util.calculateStdDev(dataArray);
 
-        // bin the data
+        // bin the data on 5 second bins
         bins = Util.binValues(dataArray, 5);
 
         // create the html elements displaying the data

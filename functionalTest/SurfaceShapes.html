@@ -16,9 +16,6 @@
             width: 100%;
             height: 100vh;
         }
-        #buttons {
-            padding-top: 10px;
-        }
         textarea {
             width: 100%;
             padding: 5px;
@@ -28,18 +25,34 @@
 <body>
 <div class="container-fluid">
     <div class="row">
+
+        <!-- Globe Column -->
         <div class="col-xl-8 col-lg-12">
             <canvas id="globe">
                 Browser Does Not Support HTML5
             </canvas>
         </div>
+
+        <!-- User Interface, Status, and Result Output -->
         <div class="col-xl-4 col-lg-12">
+
+            <!-- Test Description/Controls -->
+            <div>
+                <h2>
+                    Test Options
+                </h2>
+                <p>
+                    Reload the page between tests.
+                </p>
+            </div>
             <div id="buttons">
-                <button id="navigate-button" type="button" class="btn btn-secondary">Run Navigation</button>
+                <button id="navigate-button" type="button" class="btn btn-secondary">No Shapes</button>
                 <button id="static-button" type="button" class="btn btn-secondary">Static Shapes</button>
                 <button id="dynamic-button" type="button" class="btn btn-secondary">Dynamic Shapes</button>
             </div>
             <hr>
+
+            <!-- Status and Results Output -->
             <div>
                 <div id="status-output">
 
