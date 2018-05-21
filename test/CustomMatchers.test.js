@@ -43,5 +43,23 @@ define([], function () {
         };
     };
 
+    CustomMatchers.toBeSector = function (util, customEqualityTesters) {
+        return {
+            compare: function (actual, expected) {
+                var doMatch = (actual.minLatitude === expected.minLatitude) &&
+                        (actual.maxLatitude === expected.maxLatitude) &&
+                        (actual.minLongitude === expected.minLongitude) &&
+                        (actual.maxLongitude === expected.maxLongitude);
+                return {
+                    pass: doMatch,
+                    message: "Expected minLat: " + actual.minLatitude + ", maxLat: " + actual.maxLatitude
+                        + ", minLon: " + actual.minLongitude + ", maxLon: " + actual.maxLongitude
+                        + " to equal " + "minLat: " + expected.minLatitude + ", maxLat: " + expected.maxLatitude
+                        + ", minLon: " + expected.minLongitude + ", maxLon: " + expected.maxLongitude
+                }
+            }
+        }
+    };
+
     return CustomMatchers;
 });

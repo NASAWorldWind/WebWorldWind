@@ -69,8 +69,8 @@ define([
                 // The pattern for this attribute is described in the WMTS Capabilities document and demonstrated at EOX
                 // Maps site: http://maps.eox.at/
                 if (this.inCurrentFrame) {
-                    dc.screenCreditController.addStringCredit("OpenStreetMap ©", Color.DARK_GRAY);
-                    dc.screenCreditController.addStringCredit("EOX.at ©", Color.DARK_GRAY);
+                    dc.screenCreditController.addCredit("OpenStreetMap ©", Color.DARK_GRAY);
+                    dc.screenCreditController.addCredit("EOX.at ©", Color.DARK_GRAY);
                 }
             }
         };

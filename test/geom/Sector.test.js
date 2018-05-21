@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@ define([
     'src/geom/Sector',
     'src/geom/Location',
     'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/geom/BoundingBox',
     'src/geom/Vec3',
     'src/globe/Globe'
-], function (Sector, Location, EarthElevationModel, BoundingBox, Vec3, Globe) {
+], function (Sector, Location, EarthElevationModel, ElevationModel, BoundingBox, Vec3, Globe) {
     "use strict";
 
     describe("Sector Tests", function () {

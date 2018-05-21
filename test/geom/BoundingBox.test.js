@@ -16,22 +16,23 @@
 define([
     'src/geom/BoundingBox',
     'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/globe/Globe',
     'src/geom/Plane',
     'src/geom/Sector',
     'src/geom/Vec3',
     'test/CustomMatchers.test'
-], function (
-    BoundingBox,
-    EarthElevationModel,
-    Globe,
-    Plane,
-    Sector,
-    Vec3,
-    CustomMatchers) {
+], function (BoundingBox,
+             EarthElevationModel,
+             ElevationModel,
+             Globe,
+             Plane,
+             Sector,
+             Vec3,
+             CustomMatchers) {
     "use strict";
 
-    beforeEach(function() {
+    beforeEach(function () {
         jasmine.addMatchers(CustomMatchers);
     });
 

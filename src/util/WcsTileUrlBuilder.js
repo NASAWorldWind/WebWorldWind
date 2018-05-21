@@ -34,6 +34,7 @@ define([
          * @param {String} wcsVersion The version of the WCS server. May be null, in which case version 1.0.0 is
          * assumed.
          * @constructor
+         * @deprecated
          */
         var WcsTileUrlBuilder = function (serviceAddress, coverageName, wcsVersion) {
             if (!serviceAddress || (serviceAddress.length === 0)) {

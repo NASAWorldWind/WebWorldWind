@@ -16,9 +16,10 @@
 define([
     'src/geom/Location',
     'src/geom/Angle',
-    'src/globe/Globe',
-    'src/globe/EarthElevationModel'
-], function (Location, Angle, Globe, EarthElevationModel) {
+    'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
+    'src/globe/Globe'
+], function (Location, Angle, EarthElevationModel, ElevationModel, Globe) {
     "use strict";
 
     describe("Location Tests", function () {
