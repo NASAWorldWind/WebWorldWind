@@ -92,12 +92,13 @@ define([
                 }
             }
 
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
+            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
 
             var credit = new ScreenText(screenOffset, creditString);
+            credit.attributes.font = new Font(10);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
-            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
 
             // Append new user property to store URL for hyperlinking.
             // (See BasicWorldWindowController.handleClickOrTap).
@@ -110,15 +111,18 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var creditOrdinal = 1,
+            var textMetrics = {},
                 i,
                 len;
 
+            textMetrics.width = 0;
             for (i = 0, len = this.credits.length; i < len; i++) {
-                this.credits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.credits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+                this.credits[i].screenOffset.x += (textMetrics.width) * i;
+                if (i < len - 1) {
+                    this.credits[i].text += ", ";
+                }
+                textMetrics = dc.ctx2D.measureText(this.credits[i].text);
                 this.credits[i].render(dc);
-                creditOrdinal++;
             }
         };
 
