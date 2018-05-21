@@ -9,9 +9,15 @@ define([
 
         this.wwd = worldwindow;
 
-        this.wwd.redrawCallbacks.push(this.onRedraw());
-
         this.moveQueue = [];
+
+        this.frameStats = [];
+
+        this.captureMetrics = false;
+
+        this.wwd.redrawCallbacks.push(this.onRedrawMove());
+
+        this.wwd.redrawCallbacks.push(this.onRedrawMetricCapture());
 
         this.statusOutput = document.getElementById("status-output");
 
@@ -24,8 +30,13 @@ define([
         var bmnglayer = new WorldWind.BMNGOneImageLayer();
         bmnglayer.minActiveAltitude = 0;
         wwd.addLayer(bmnglayer); // Don't want any imaging processing delays
+        wwd.redraw();
         
         return wwd;
+    };
+
+    Util.prototype.isMoving = function () {
+        return this.moveQueue.length > 0;
     };
 
     Util.prototype.setStatusMessage = function (value) {
@@ -36,6 +47,11 @@ define([
         Util.setElementValue(this.resultsOutput, value);
     };
 
+    Util.prototype.appendOutputMessage = function (value) {
+        this.resultsOutput.appendChild(document.createElement("hr"));
+        Util.appendElementValue(this.resultsOutput, value);
+    };
+
     Util.setElementValue = function (element, value) {
         var children = element.childNodes;
 
@@ -44,6 +60,10 @@ define([
             element.removeChild(children[c]);
         }
 
+        Util.appendElementValue(element, value);
+    };
+
+    Util.appendElementValue = function (element, value) {
         if (typeof value === "string") {
             value = document.createElement("h3").appendChild(document.createTextNode(value));
         }
@@ -51,7 +71,7 @@ define([
         element.appendChild(value);
     };
 
-    Util.prototype.onRedraw = function () {
+    Util.prototype.onRedrawMove = function () {
 
         var self = this;
 
@@ -134,6 +154,31 @@ define([
         };
     };
 
+    Util.prototype.onRedrawMetricCapture = function () {
+
+        var self = this;
+
+        return function (worldwindow, stage) {
+
+            if (self.captureMetrics && stage === WorldWind.AFTER_REDRAW) {
+                var frameStatistics = {};
+
+                frameStatistics.frameTime = worldwindow.frameStatistics.frameTime;
+                frameStatistics.tesselationTime = worldwindow.frameStatistics.tessellationTime;
+                frameStatistics.layerRenderingTime = worldwindow.frameStatistics.layerRenderingTime;
+                frameStatistics.orderedRenderingTime = worldwindow.frameStatistics.orderedRenderingTime;
+                frameStatistics.terrainTileCount = worldwindow.frameStatistics.terrainTileCount;
+                frameStatistics.imageTileCount = worldwindow.frameStatistics.imageTileCount;
+                frameStatistics.renderedTileCount = worldwindow.frameStatistics.renderedTileCount;
+                frameStatistics.tileUpdateCount = worldwindow.frameStatistics.tileUpdateCount;
+                frameStatistics.textureLoadCount = worldwindow.frameStatistics.textureLoadCount;
+                frameStatistics.vboLoadCount = worldwindow.frameStatistics.vboLoadCount;
+
+                self.frameStats.push(frameStatistics);
+            }
+        };
+    };
+
     Util.prototype.move = function (endStates) {
 
         if (Array.isArray(endStates)) {
@@ -145,6 +190,15 @@ define([
         }
 
         this.wwd.redraw();
+    };
+
+    Util.prototype.startMetricCapture = function () {
+        this.frameStats = [];
+        this.captureMetrics = true;
+    };
+
+    Util.prototype.stopMetricCapture = function () {
+        this.captureMetrics = false;
     };
 
     Util.generateResultsSummary = function (dataArray, title) {
