@@ -5,24 +5,13 @@ requirejs([
     function (WorldWind, Util) {
         "use strict";
 
-        var statusDialog = document.getElementById("status-dialog");
-        var statusOutput = document.getElementById("output");
         var navigateButton = document.getElementById("navigate-button");
         var staticShapesButton = document.getElementById("static-button");
 
-        var updateStatus = function (statusMessage) {
-            var children = statusDialog.childNodes;
-            for (var c = 0; c < children.length; c++) {
-                statusDialog.removeChild(children[c]);
-            }
-
-            statusDialog.appendChild(document.createTextNode(statusMessage));
-        };
-
-        updateStatus("Initializing globe...");
         var wwd = Util.initializeLowResourceWorldWindow("globe");
         var util = new Util(wwd);
-        updateStatus("Globe Loaded, ready for testing");
+
+        util.setStatusMessage("Globe loaded, ready for testing...");
 
         // moving state
         var moving = false;
@@ -39,7 +28,7 @@ requirejs([
                 step: 0.75
             },
             onComplete: function () {
-                updateStatus("First move complete...");
+                util.setStatusMessage("First move complete...");
             }
         };
 
@@ -49,7 +38,7 @@ requirejs([
                 step: 1
             },
             onComplete: function () {
-                updateStatus("Second move complete");
+                util.setStatusMessage("Second move complete");
             }
         };
 
@@ -65,7 +54,7 @@ requirejs([
             onComplete: function () {
                 moving = false;
                 navigationComplete = true;
-                updateStatus("Move Complete");
+                util.setStatusMessage("Move Complete");
             }
         };
 
@@ -105,7 +94,7 @@ requirejs([
                     // clean up the data
                     stats.shift();
                     stats.pop();
-                    statusOutput.appendChild(Util.generateResultsSummary(stats, "Frame Times"));
+                    util.setOutputMessage(Util.generateResultsSummary(stats, "Frame Times"));
                 }
             }
         };

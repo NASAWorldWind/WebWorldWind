@@ -12,6 +12,10 @@ define([
         this.wwd.redrawCallbacks.push(this.onRedraw());
 
         this.moveQueue = [];
+
+        this.statusOutput = document.getElementById("status-output");
+
+        this.resultsOutput = document.getElementById("results-output");
     };
 
     Util.initializeLowResourceWorldWindow = function (canvasId) {
@@ -22,6 +26,29 @@ define([
         wwd.addLayer(bmnglayer); // Don't want any imaging processing delays
         
         return wwd;
+    };
+
+    Util.prototype.setStatusMessage = function (value) {
+        Util.setElementValue(this.statusOutput, value);
+    };
+
+    Util.prototype.setOutputMessage = function (value) {
+        Util.setElementValue(this.resultsOutput, value);
+    };
+
+    Util.setElementValue = function (element, value) {
+        var children = element.childNodes;
+
+        // remove existing nodes
+        for (var c = 0; c < children.length; c++) {
+            element.removeChild(children[c]);
+        }
+
+        if (typeof value === "string") {
+            value = document.createElement("h3").appendChild(document.createTextNode(value));
+        }
+
+        element.appendChild(value);
     };
 
     Util.prototype.onRedraw = function () {
