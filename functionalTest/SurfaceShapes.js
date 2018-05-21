@@ -84,43 +84,52 @@ requirejs([
                 });
                 stats.shift();
                 stats.pop();
-                util.setOutputMessage(Util.generateResultsSummary(stats, "Frame Time"));
+                util.setOutputMessage(Util.generateResultsSummary(stats, "Frame Times"));
                 stats = util.frameStats.map(function (frameStat) {
                     return frameStat.layerRenderingTime;
                 });
-                stats.shift();
-                stats.pop();
-                util.appendOutputMessage(Util.generateResultsSummary(stats, "Layer Rendering Time"));
             }
         };
 
         // Utility functions
+
+        // This is a pseudo random number generator which allows a seed, providing repeatable conditions
+        var nextFloat = function (seed) {
+            seed = seed % 2147483647;
+            return function () {
+                seed = seed * 16807 % 2147483647;
+                return (seed - 1) / 2147483646;
+            };
+        };
+        // Assign the PRNG to the function which will be used by the testing for content generation
+        var rand = nextFloat(1234);
+
         var generateShapeAttributes = function () {
             var sa = new WorldWind.ShapeAttributes();
-            var r = Math.random();
+            var r = rand();
 
             sa.drawInterior = false;
             sa.drawOutline = false;
 
             if (r < 0.3333) {
                 sa.drawInterior = true;
-                sa.interiorColor = new WorldWind.Color(Math.random(), Math.random(), Math.random(), Math.random());
+                sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
             } else if (r < 0.6666) {
                 sa.drawOutline = true;
-                sa.outlineColor = new WorldWind.Color(Math.random(), Math.random(), Math.random(), Math.random());
+                sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
             } else {
                 sa.drawInterior = true;
-                sa.interiorColor = new WorldWind.Color(Math.random(), Math.random(), Math.random(), Math.random());
+                sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
                 sa.drawOutline = true;
-                sa.outlineColor = new WorldWind.Color(Math.random(), Math.random(), Math.random(), Math.random());
+                sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
             }
 
             return sa;
         };
 
         var generateLocation = function () {
-            var lat = 180 * Math.random() - 90;
-            var lon = 360 * Math.random() - 180;
+            var lat = 180 * rand() - 90;
+            var lon = 360 * rand() - 180;
 
             return new WorldWind.Location(lat, lon);
         };
@@ -131,7 +140,7 @@ requirejs([
             // Surface Circles
             for (i = 0; i < count; i++) {
                 sa = generateShapeAttributes();
-                radius = Math.random() * 1000000;
+                radius = rand() * 1000000;
                 shape = new WorldWind.SurfaceCircle(generateLocation(), radius, sa);
                 testLayer.addRenderable(shape);
             }
@@ -139,9 +148,9 @@ requirejs([
             // Surface Ellipse
             for (i = 0; i < count; i++) {
                 sa = generateShapeAttributes();
-                majorAxis = Math.random() * 1000000;
-                minorAxis = Math.random() * 500000;
-                heading = Math.random() * 360;
+                majorAxis = rand() * 1000000;
+                minorAxis = rand() * 500000;
+                heading = rand() * 360;
                 shape = new WorldWind.SurfaceEllipse(generateLocation(), majorAxis, minorAxis, heading, sa);
                 testLayer.addRenderable(shape);
             }
@@ -153,8 +162,8 @@ requirejs([
                 locations = [];
                 locations.push(topLocation);
                 for (j = 0; j < 2; j++) {
-                    lat = Math.min(90, Math.max(-90, topLocation.latitude - Math.random() * 8));
-                    lon = Math.min(180, Math.max(-180, topLocation.longitude - Math.random() * 8));
+                    lat = Math.min(90, Math.max(-90, topLocation.latitude - rand() * 8));
+                    lon = Math.min(180, Math.max(-180, topLocation.longitude - rand() * 8));
                     locations.push(new WorldWind.Location(lat, lon));
                 }
                 shape = new WorldWind.SurfacePolygon(locations, sa);
@@ -168,8 +177,8 @@ requirejs([
                 locations = [];
                 locations.push(topLocation);
                 for (j = 0; j < 2; j++) {
-                    lat = Math.min(90, Math.max(-90, topLocation.latitude - Math.random() * 8));
-                    lon = Math.min(180, Math.max(-180, topLocation.longitude - Math.random() * 8));
+                    lat = Math.min(90, Math.max(-90, topLocation.latitude - rand() * 8));
+                    lon = Math.min(180, Math.max(-180, topLocation.longitude - rand() * 8));
                     locations.push(new WorldWind.Location(lat, lon));
                 }
                 shape = new WorldWind.SurfacePolyline(locations, sa);
@@ -179,9 +188,9 @@ requirejs([
             // Surface Rectangle
             for (i = 0; i < count; i++) {
                 sa = generateShapeAttributes();
-                majorAxis = 1000000 * Math.random();
-                minorAxis = 500000 * Math.random();
-                heading = 360 * Math.random();
+                majorAxis = 1000000 * rand();
+                minorAxis = 500000 * rand();
+                heading = 360 * rand();
                 shape = new WorldWind.SurfaceRectangle(generateLocation(), majorAxis, minorAxis, heading, sa);
                 testLayer.addRenderable(shape);
             }
@@ -190,11 +199,12 @@ requirejs([
             for (i = 0; i < count; i++) {
                 sa = generateShapeAttributes();
                 topLocation = generateLocation();
-                majorAxis = 8 * Math.random();
-                minorAxis = 4 * Math.random();
+                majorAxis = 8 * rand();
+                minorAxis = 4 * rand();
                 sector = new WorldWind.Sector(topLocation.latitude, topLocation.latitude + majorAxis,
                     topLocation.longitude, topLocation.longitude + minorAxis);
                 shape = new WorldWind.SurfaceSector(sector, sa);
+                testLayer.addRenderable(shape);
             }
 
             wwd.redraw();
@@ -230,19 +240,19 @@ requirejs([
                             if (shape instanceof WorldWind.SurfaceCircle || shape instanceof WorldWind.SurfaceEllipse
                                 || shape instanceof WorldWind.SurfaceRectangle) {
                                 var center = shape.center;
-                                center.latitude += Math.random() * 0.5 - 0.25;
-                                center.longitude += Math.random() * 0.5 - 0.25;
+                                center.latitude += rand() * 0.5 - 0.25;
+                                center.longitude += rand() * 0.5 - 0.25;
                                 shape.center = center;
                             } else if (shape instanceof WorldWind.SurfacePolygon
                                 || shape instanceof WorldWind.SurfacePolyline) {
                                 var boundaries = shape.boundaries;
-                                boundaries[0].latitude += Math.random() * 0.5 - 0.25;
-                                boundaries[0].longitude += Math.random() * 0.5 - 0.25;
+                                boundaries[0].latitude += rand() * 0.5 - 0.25;
+                                boundaries[0].longitude += rand() * 0.5 - 0.25;
                                 shape.boundaries = boundaries;
                             } else if (shape instanceof WorldWind.SurfaceSector) {
                                 var sector = shape.sector;
-                                sector.minLongitude += Math.random() * 0.5 - 0.25;
-                                sector.minLatitude += Math.random() * 0.5 - 0.25;
+                                sector.minLongitude += rand() * 0.5 - 0.25;
+                                sector.minLatitude += rand() * 0.5 - 0.25;
                                 shape.sector = sector;
                             }
 
