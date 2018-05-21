@@ -119,6 +119,8 @@ define([
                 this.credits[i].screenOffset.x += (creditWidth) * i;
                 if (i < len - 1) {
                     this.credits[i].text += ", ";
+                } else {
+                    this.credits[i].text += ".";
                 }
                 creditWidth = dc.ctx2D.measureText(this.credits[i].text).width;
                 this.credits[i].render(dc);
