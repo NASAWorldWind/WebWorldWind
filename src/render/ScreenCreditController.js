@@ -111,17 +111,16 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var textMetrics = {},
+            var creditWidth = 0,
                 i,
                 len;
 
-            textMetrics.width = 0;
             for (i = 0, len = this.credits.length; i < len; i++) {
-                this.credits[i].screenOffset.x += (textMetrics.width) * i;
+                this.credits[i].screenOffset.x += (creditWidth) * i;
                 if (i < len - 1) {
                     this.credits[i].text += ", ";
                 }
-                textMetrics = dc.ctx2D.measureText(this.credits[i].text);
+                creditWidth = dc.ctx2D.measureText(this.credits[i].text).width;
                 this.credits[i].render(dc);
             }
         };
