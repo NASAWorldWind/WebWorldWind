@@ -30,12 +30,16 @@ requirejs([
         wwd.addLayer(bmngLayer);
         wwd.addLayer(openSearchLayer);
 
+        wwd.navigator.lookAtLocation.latitude = 46.50;
+        wwd.navigator.lookAtLocation.longitude = 6.56;
+        wwd.navigator.range = 2750 * 1e3;
+
         openSearchLayer.shapeConfigurationCallback = shapeConfigurationCallback;
 
         // ************************************************************************************************************
         // This performs a 2-step search for Earth Observation products using the OpenSearch service and layer.
 
-        var url = 'http://geo.spacebel.be/opensearch/description.xml';
+        var url = 'https://fedeo.esa.int/opensearch/description.xml';
 
         var openSearchService = new WorldWind.OpenSearchService();
 
@@ -43,6 +47,7 @@ requirejs([
         openSearchService.discover({url : url})
             .then(function (service) {
                 var searchParams = [
+                    {name: 'query', value: 'LAI'},
                     {name: 'organisationName', value: 'VITO'}
                 ];
 
@@ -52,7 +57,7 @@ requirejs([
             .then(function (response) {
                 // Get the first feature with one or more search links
                 var feature = response.features.filter(function (feature) {
-                    return !!feature.links.search;
+                    return feature.properties.identifier == 'urn:eop:VITO:CGS_S2_LAI';
                 })[0];
 
                 var productSearchUrl = feature.links.search[0].href;
@@ -62,8 +67,8 @@ requirejs([
             })
             .then(function (layer) {
                 var searchParams = [
-                    {name: 'startDate', value: new Date('2000-01-01T00:00:00Z')},
-                    {name: 'endDate', value: new Date('2018-03-01T00:00:00Z')}
+                    {name: 'startDate', value: new Date('2018-01-01T00:00:00Z')},
+                    {name: 'endDate', value: new Date('2018-01-31T00:00:00Z')}
                 ];
 
                 // Search for products using the given parameters
