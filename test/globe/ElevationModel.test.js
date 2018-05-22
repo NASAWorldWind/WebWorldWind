@@ -15,33 +15,55 @@
  */
 define([
     'src/globe/ElevationModel',
+    'src/geom/Angle',
     'src/geom/Location',
     'src/geom/Sector',
+    'src/globe/EarthElevationModel',
+    'src/globe/Tessellator',
+    'src/globe/GebcoElevationCoverage',
+    'src/globe/AsterV2ElevationCoverage',
+    'src/globe/UsgsNedElevationCoverage',
+    'src/globe/UsgsNedHiElevationCoverage',
     'src/globe/TiledElevationCoverage'
-], function (ElevationModel, Location, Sector, TiledElevationCoverage) {
+], function (ElevationModel, Angle, Location, Sector, EarthElevationModel, Tessellator, GebcoElevationCoverage,
+             AsterV2ElevationCoverage, UsgsNedElevationCoverage, UsgsNedHiElevationCoverage, TiledElevationCoverage) {
     "use strict";
     describe("ElevationModel tests", function () {
 
         var MockCoverage = function (resolution, minElevation, maxElevation) {
-            TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 1, "application/bil16", "MockElevations256", 256, 256, resolution);
+            TiledElevationCoverage.call(this, {
+                coverageSector: Sector.FULL_SPHERE,
+                resolution: resolution,
+                retrievalImageFormat: "application/bil16",
+                levelZeroDelta: new Location(45, 45),
+                numLevels: 1,
+                tileWidth: 256,
+                tileHeight: 256,
+                minElevation: minElevation ? minElevation : -11000,
+                maxElevation: maxElevation ? maxElevation : 8850
+            });
 
             this.displayName = "Mock Elevation Coverage";
-            this.minElevation = minElevation ? minElevation : -11000;
-            this.maxElevation = maxElevation ? maxElevation : 8850;
         };
 
         MockCoverage.prototype = Object.create(TiledElevationCoverage.prototype);
 
-        MockCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
-            return [this.minElevation, this.maxElevation];
+        MockCoverage.prototype.minAndMaxElevationsForSector = function (sector, result) {
+            if (result[0] > this.minElevation) {
+                result[0] = this.minElevation;
+            }
+            if (result[1] < this.maxElevation) {
+                result[1] = this.maxElevation;
+            }
+
+            return true;
         };
 
         MockCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
             return this.maxElevation;
         };
 
-        MockCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        MockCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
             for (var i = 0, n = result.length; i < n; i++) {
                 result[i] = this.maxElevation;
             }
@@ -58,7 +80,7 @@ define([
         };
 
         describe("Missing parameter tests", function () {
-            it("Correctly rejects calls with missing parameters", function () {
+            it("Correctly rejects calls with missing or invalid parameters", function () {
                 var elevationModel = new ElevationModel();
                 expect(function () {
                     elevationModel.addCoverage();
@@ -87,6 +109,12 @@ define([
                 expect(function () {
                     elevationModel.minAndMaxElevationsForSector();
                 }).toThrow();
+                expect(function () {
+                    elevationModel.bestCoverageAtLocation(0, 0);
+                }).toThrow();
+                expect(function () {
+                    elevationModel.bestCoverageAtLocation(0, 0, -1);
+                }).toThrow();
             });
         });
 
@@ -95,13 +123,13 @@ define([
                 var n = 12;
                 var em = new ElevationModel();
                 for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(n - i + 1, -i - 1, i + 1);
+                    var c = new MockCoverage(i + 1, -i - 1, i + 1);
                     em.addCoverage(c);
                 }
 
                 var minMax = em.minAndMaxElevationsForSector(new Sector(-1, 1, -1, 1));
-                expect(minMax[0]).toEqual(-n);
-                expect(minMax[1]).toEqual(n);
+                expect(minMax[0]).toEqual(-1);
+                expect(minMax[1]).toEqual(1);
             });
 
             it("Returns correct min and max elevations for a sector when some coverages are disabled", function () {
@@ -110,25 +138,70 @@ define([
                 for (var i = 0; i < n; i++) {
                     var c = new MockCoverage(i + 1, -i - 1, i + 1);
                     em.addCoverage(c);
+                    if (i < 2) {
+                        c.enabled = false;
+                    }
                 }
 
-                em.coverages[0].enabled = false;
-                em.coverages[1].enabled = false;
                 var minMax = em.minAndMaxElevationsForSector(new Sector(-1, 1, -1, 1));
-                expect(minMax[0]).toEqual(-10);
-                expect(minMax[1]).toEqual(10);
+                expect(minMax[0]).toEqual(-3);
+                expect(minMax[1]).toEqual(3);
             });
 
             it("Returns correct elevation for a location", function () {
                 var em = new ElevationModel();
                 var n = 12;
-                for (var i = 0; i < n; i++) {
-                    var c = new MockCoverage(n - i + 1, -i - 1, i + 1);
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
                     em.addCoverage(c);
                 }
 
                 var e = em.elevationAtLocation(0, 0);
-                expect(e).toEqual(n);
+                expect(e).toEqual(1);
+            });
+
+            it("Returns correct best coverage for a location", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
+                    em.addCoverage(c);
+                }
+
+                c = em.bestCoverageAtLocation(0, 0, 6.7);
+                expect(c.resolution).toEqual(7);
+                c = em.bestCoverageAtLocation(0, 0, 6.2);
+                expect(c.resolution).toEqual(6);
+            });
+
+            it("Returns correct best coverage for a location with some coverages disabled", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
+                    em.addCoverage(c);
+                    if (i === 6 || i === 7) {
+                        c.enabled = false;
+                    }
+                }
+
+                c = em.bestCoverageAtLocation(0, 0, 6.7);
+                expect(c.resolution).toEqual(8);
+                c = em.bestCoverageAtLocation(0, 0, 6.2);
+                expect(c.resolution).toEqual(5);
+            });
+
+            it("Returns null best coverage for a location with no available coverages", function () {
+                var em = new ElevationModel();
+                var n = 12;
+                for (var i = n; i >= 1; i--) {
+                    var c = new MockCoverage(i, -i, i);
+                    em.addCoverage(c);
+                    c.enabled = false;
+                }
+
+                c = em.bestCoverageAtLocation(0, 0, 6.7);
+                expect(c).toEqual(null);
             });
 
             it("Returns correct elevation for a location when some coverages are disabled", function () {
@@ -171,6 +244,28 @@ define([
                 var result = [0];
                 em.elevationsForGrid(new Sector(-1, 1, -1, 1), 1, 1, 1, result);
                 expect(result[0]).toEqual(n - 2);
+            });
+
+            it("Prioritizes coverages correctly according to resolution", function () {
+                var em = new EarthElevationModel();
+                var ts = new Tessellator();
+
+                for (var i = 0; i < ts.maximumSubdivisionDepth; i++) {
+                    var l = ts.levels.levels[i];
+                    var targetResolution = ts.coverageTargetResolution(l.texelSize);
+                    var preferredIndex = em.preferredCoverageIndex(Sector.FULL_SPHERE, null, targetResolution);
+                    var preferredCoverage = em.coverages[preferredIndex];
+                    if (l.levelNumber < 6) {
+                        expect(preferredCoverage instanceof GebcoElevationCoverage).toBe(true);
+                    }
+                    else if (l.levelNumber < 10) {
+                        expect(preferredCoverage instanceof AsterV2ElevationCoverage).toBe(true);
+                    }
+                    else {
+                        expect((preferredCoverage instanceof UsgsNedElevationCoverage) ||
+                            (preferredCoverage instanceof UsgsNedHiElevationCoverage)).toBe(true);
+                    }
+                }
             });
         });
 
@@ -387,6 +482,7 @@ define([
             });
         });
     });
-});
+})
+;
 
 

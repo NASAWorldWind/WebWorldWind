@@ -97,13 +97,30 @@ define(['../error/ArgumentError',
         /**
          * Returns the minimum and maximum elevations within a specified sector.
          * @param {Sector} sector The sector for which to determine extreme elevations.
-         * @returns {Number[]} An array containing the minimum and maximum elevations within the specified sector,
-         * or null if the specified sector is outside this elevation model's coverage area or if the server data is not yet
-         * available.
-         * @throws {ArgumentError} If the specified sector is null or undefined.
+         * @param {Number[]} result An array in which to return the requested minimum and maximum elevations.
+         * @returns {Boolean} true if the coverage completely fills the sector with data, false otherwise.
+         * @throws {ArgumentError} If any argument is null or undefined
          */
-        ElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector) {
-            return [0, 0];
+        ElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector, result) {
+            if (!sector) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "minAndMaxElevationsForSector", "missingSector"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "minAndMaxElevationsForSector", "missingResult"));
+            }
+
+            if (result[0] > 0) { // min elevation
+                result[0] = 0;
+            }
+
+            if (result[1] < 0) { // max elevation
+                result[1] = 0;
+            }
+
+            return true;
         };
 
         /**
@@ -122,14 +139,12 @@ define(['../error/ArgumentError',
          * @param {Sector} sector The sector for which to determine the elevations.
          * @param {Number} numLat The number of latitudinal sample locations within the sector.
          * @param {Number} numLon The number of longitudinal sample locations within the sector.
-         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
-         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
          * @param {Number[]} result An array in which to return the requested elevations.
          * @returns {Boolean} true if the result array was completely filled with elevation data, false otherwise.
          * @throws {ArgumentError} If the specified sector or result array is null or undefined, or if either of the
          * specified numLat or numLon values is less than one.
          */
-        ElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, targetResolution, result) {
+        ElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationCoverage", "elevationsForGrid", "missingSector"));

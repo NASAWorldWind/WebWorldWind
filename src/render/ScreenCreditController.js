@@ -23,7 +23,6 @@ define([
         '../layer/Layer',
         '../util/Logger',
         '../util/Offset',
-        '../shapes/ScreenImage',
         '../shapes/ScreenText'
     ],
     function (ArgumentError,
@@ -32,7 +31,6 @@ define([
               Layer,
               Logger,
               Offset,
-              ScreenImage,
               ScreenText) {
         "use strict";
 
@@ -47,10 +45,7 @@ define([
             Layer.call(this, "ScreenCreditController");
 
             // Internal. Intentionally not documented.
-            this.imageCredits = [];
-
-            // Internal. Intentionally not documented.
-            this.textCredits = [];
+            this.credits = [];
 
             // Internal. Intentionally not documented.
             this.margin = 5;
@@ -69,70 +64,37 @@ define([
          * Clears all credits from this controller.
          */
         ScreenCreditController.prototype.clear = function () {
-            this.imageCredits = [];
-            this.textCredits = [];
+            this.credits = [];
         };
 
         /**
-         * Adds an image credit to this controller.
-         * @param {String} imageUrl The URL of the image to display in the credits area.
-         * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
-         * @throws {ArgumentError} If the specified URL is null or undefined.
-         */
-        ScreenCreditController.prototype.addImageCredit = function (imageUrl, hyperlinkUrl) {
-            if (!imageUrl) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
-            }
-
-            // Verify if image credit is not already in controller, if it is, don't add it.
-            for (var i = 0, len = this.imageCredits.length; i < len; i++) {
-                if (this.imageCredits[i].imageSource === imageUrl) {
-                    return;
-                }
-            }
-
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
-            var credit = new ScreenImage(screenOffset, imageUrl);
-            credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
-
-            // Append new user property to store URL for hyperlinking.
-            // (See BasicWorldWindowController.handleClickOrTap).
-            if (hyperlinkUrl) {
-                credit.userProperties.url = hyperlinkUrl;
-            }
-
-            this.imageCredits.push(credit);
-        };
-
-        /**
-         * Adds a string credit to this controller.
-         * @param {String} stringCredit The string to display in the credits area.
+         * Adds a credit to this controller.
+         * @param {String} creditString The text to display in the credits area.
          * @param {Color} color The color with which to draw the string.
          * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
-        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color, hyperlinkUrl) {
-            if (!stringCredit) {
+        ScreenCreditController.prototype.addCredit = function (creditString, color, hyperlinkUrl) {
+            if (!creditString) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addCredit", "missingText"));
             }
 
             if (!color) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addCredit", "missingColor"));
             }
 
             // Verify if text credit is not already in controller, if it is, don't add it.
-            for (var i = 0, len = this.textCredits.length; i < len; i++) {
-                if (this.textCredits[i].text === stringCredit) {
+            for (var i = 0, len = this.credits.length; i < len; i++) {
+                if (this.credits[i].text === creditString) {
                     return;
                 }
             }
 
             var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
 
-            var credit = new ScreenText(screenOffset, stringCredit);
+            var credit = new ScreenText(screenOffset, creditString);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
             credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
@@ -143,7 +105,7 @@ define([
                 credit.userProperties.url = hyperlinkUrl;
             }
 
-            this.textCredits.push(credit);
+            this.credits.push(credit);
         };
 
         // Internal use only. Intentionally not documented.
@@ -152,17 +114,10 @@ define([
                 i,
                 len;
 
-            for (i = 0, len = this.imageCredits.length; i < len; i++) {
-                this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.imageCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
-                this.imageCredits[i].render(dc);
-                creditOrdinal++;
-            }
-
-            for (i = 0, len = this.textCredits.length; i < len; i++) {
-                this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.textCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
-                this.textCredits[i].render(dc);
+            for (i = 0, len = this.credits.length; i < len; i++) {
+                this.credits[i].screenOffset.x = dc.viewport.width - (this.margin);
+                this.credits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+                this.credits[i].render(dc);
                 creditOrdinal++;
             }
         };

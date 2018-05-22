@@ -115,5 +115,16 @@ define([
         SurfacePolyline.prototype.computeBoundaries = function(dc) {
         };
 
+        // Internal use only. Intentionally not documented.
+        SurfacePolyline.prototype.getReferencePosition = function () {
+            return this.boundaries.length > 1 ? this.boundaries[0] : null;
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfacePolyline.prototype.moveTo = function (globe, position) {
+            this.boundaries = this.computeShiftedLocations(globe, this.getReferencePosition(), position,
+                this._boundaries);
+        };
+
         return SurfacePolyline;
     });

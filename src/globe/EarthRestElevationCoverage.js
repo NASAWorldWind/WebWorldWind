@@ -17,38 +17,47 @@
  * @exports EarthRestElevationCoverage
  */
 define([
+        '../util/LevelSet',
         '../geom/Location',
         '../geom/Sector',
         '../util/LevelRowColumnUrlBuilder',
         '../globe/TiledElevationCoverage'
     ],
-    function (Location,
+    function (LevelSet,
+              Location,
               Sector,
               LevelRowColumnUrlBuilder,
               TiledElevationCoverage) {
         "use strict";
 
-        ///**
-        // * Constructs an elevation coverage for Earth using a REST interface to retrieve the elevations from the server.
-        // * @alias EarthRestElevationCoverage
-        // * @constructor
-        // * @classdesc Represents an Earth elevation coverage spanning the globe and using a REST interface to retrieve
-        // * the elevations from the server.
-        // * See [LevelRowColumnUrlBuilder]{@link LevelRowColumnUrlBuilder} for a description of the REST interface.
-        // * @param {String} serverAddress The server address of the tile service. May be null, in which case the
-        // * current origin is used (see <code>window.location</code>.
-        // * @param {String} pathToData The path to the data directory relative to the specified server address.
-        // * May be null, in which case the server address is assumed to be the full path to the data directory.
-        // * @param {String} displayName The display name to associate with this elevation coverage.
-        // */
-        var EarthRestElevationCoverage = function (serverAddress, pathToData, displayName, resolution) {
-            TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(60, 60), 5, "application/bil16", "EarthElevations", 512, 512, resolution);
+        /**
+         * Constructs an elevation coverage for Earth using a REST interface to retrieve the elevations from the server.
+         * @alias EarthRestElevationCoverage
+         * @constructor
+         * @classdesc Represents an Earth elevation coverage spanning the globe and using a REST interface to retrieve
+         * the elevations from the server.
+         * See [LevelRowColumnUrlBuilder]{@link LevelRowColumnUrlBuilder} for a description of the REST interface.
+         * @param {String} serverAddress The server address of the tile service. May be null, in which case the
+         * current origin is used (see <code>window.location</code>.
+         * @param {String} pathToData The path to the data directory relative to the specified server address.
+         * May be null, in which case the server address is assumed to be the full path to the data directory.
+         * @param {String} displayName The display name to associate with this elevation coverage.
+         */
+        var EarthRestElevationCoverage = function (serverAddress, pathToData, displayName) {
+            TiledElevationCoverage.call(this, {
+                coverageSector: Sector.FULL_SPHERE,
+                resolution: 0.00732421875,
+                retrievalImageFormat: "application/bil16",
+                minElevation: -11000,
+                maxElevation: 8850,
+                urlBuilder: new LevelRowColumnUrlBuilder(serverAddress, pathToData)
+            });
 
-            this.displayName = displayName;
-            this.minElevation = -11000; // Depth of Marianas Trench, in meters
-            this.maxElevation = 8850; // Height of Mt. Everest
-            this.urlBuilder = new LevelRowColumnUrlBuilder(serverAddress, pathToData);
+            this.displayName = displayName || "Earth Elevations";
+
+            // Override the default computed LevelSet. EarthRestElevationCoverage accesses a fixed set of tiles with
+            // a 60x60 top level tile delta, 5 levels, and tile dimensions of 512x512 pixels.
+            this.levels = new LevelSet(Sector.FULL_SPHERE, new Location(60, 60), 5, 512, 512);
         };
 
         EarthRestElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);

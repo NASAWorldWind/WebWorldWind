@@ -17,8 +17,12 @@
  * @exports ElevationModel
  */
 define(['../error/ArgumentError',
+        '../geom/Angle',
+        '../geom/Location',
         '../util/Logger'],
     function (ArgumentError,
+              Angle,
+              Location,
               Logger) {
         "use strict";
 
@@ -54,6 +58,8 @@ define(['../error/ArgumentError',
              */
             this.coverages = [];
 
+            this.scratchLocation = new Location(0, 0);
+
             this.computeStateKey();
 
         };
@@ -81,7 +87,7 @@ define(['../error/ArgumentError',
             },
 
             /**
-             * This model's minimum elevation in meters across all coverages.
+             * This model's minimum elevation in meters across all enabled coverages.
              * @type {Number}
              * @readonly
              */
@@ -89,20 +95,19 @@ define(['../error/ArgumentError',
                 get: function () {
                     var minElevation = Number.MAX_VALUE;
 
-                    var i, len;
-                    for (i = 0, len = this.coverages.length; i < len; i++) {
+                    for (var i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
                         if (coverage.enabled && coverage.minElevation < minElevation) {
                             minElevation = coverage.minElevation;
                         }
                     }
 
-                    return minElevation;
+                    return (minElevation !== Number.MAX_VALUE) ? minElevation : 0; // no coverages or all coverages disabled
                 }
             },
 
             /**
-             * This model's maximum elevation in meters across all coverages.
+             * This model's maximum elevation in meters across all enabled coverages.
              * @type {Number}
              * @readonly
              */
@@ -110,15 +115,14 @@ define(['../error/ArgumentError',
                 get: function () {
                     var maxElevation = -Number.MAX_VALUE;
 
-                    var i, len;
-                    for (i = 0, len = this.coverages.length; i < len; i++) {
+                    for (var i = 0, len = this.coverages.length; i < len; i++) {
                         var coverage = this.coverages[i];
-                        if (coverage.enabled && maxElevation < coverage.maxElevation) {
+                        if (coverage.enabled && coverage.maxElevation > maxElevation) {
                             maxElevation = coverage.maxElevation;
                         }
                     }
 
-                    return maxElevation;
+                    return (maxElevation !== -Number.MAX_VALUE) ? maxElevation : 0; // no coverages or all coverages disabled
                 }
             }
         });
@@ -162,6 +166,7 @@ define(['../error/ArgumentError',
             if (this.coverages.length > 1) {
                 this.coverages.sort(this.coverageComparator);
             }
+
             this.computeStateKey();
         };
 
@@ -246,34 +251,23 @@ define(['../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "minAndMaxElevationsForSector", "missingSector"));
             }
 
-            var i,
-                n = this.coverages.length,
-                coverageResult;
+            // Initialize the min and max elevations to the largest and smallest numbers, respectively. This has the
+            // effect of moving the extremes with each subsequent coverage as needed, without unintentionally capturing
+            // zero elevation. If we initialized this array with zeros the result would always contain zero, even when
+            // elevations in the sector are all above or below zero. This is critical for tile bounding boxes.
 
             var result = [Number.MAX_VALUE, -Number.MAX_VALUE];
-            var failoverResult = null;
-            for (i = n - 1; i >= 0; i--) {
+
+            for (var i = this.coverages.length - 1; i >= 0; i--) {
                 var coverage = this.coverages[i];
                 if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
-                    if (failoverResult === null) {
-                        failoverResult = [coverage.minElevation, coverage.maxElevation];
-                    }
-                    coverageResult = coverage.minAndMaxElevationsForSector(sector);
-                    if (coverageResult) {
-                        result[0] = Math.min(result[0], coverageResult[0]);
-                        result[1] = Math.max(result[1], coverageResult[1]);
+                    if (coverage.minAndMaxElevationsForSector(sector, result)) {
+                        break; // coverage completely fills the sector, ignore the remaining coverages
                     }
                 }
             }
 
-            if (result[0] === Number.MAX_VALUE) {
-                if (failoverResult === null) {
-                    return [0, 0];
-                }
-
-                return failoverResult;
-            }
-            return result;
+            return (result[0] !== Number.MAX_VALUE) ? result : [0, 0]; // no coverages, all coverages disabled, or no coverages intersect the sector
         };
 
         /**
@@ -296,6 +290,67 @@ define(['../error/ArgumentError',
             }
 
             return 0;
+        };
+
+        /**
+         * Internal use only
+         * Returns the index of the coverage most closely matching the supplied resolution and overlapping the supplied
+         * sector or point area of interest. At least one area of interest parameter must be non-null.
+         * @param {Sector} sector An optional sector area of interest. Setting this parameter to null will cause it to be ignored.
+         * @param {Location} location An optional point area of interest. Setting this parameter to null will cause it to be ignored.
+         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
+         * @returns {Number} The index of the coverage most closely matching the requested resolution.
+         * @ignore
+         */
+        ElevationModel.prototype.preferredCoverageIndex = function (sector, location, targetResolution) {
+
+            var i,
+                n = this.coverages.length,
+                minResDiff = Number.MAX_VALUE,
+                minDiffIdx = -1;
+
+            for (i = 0; i < n; i++) {
+                var coverage = this.coverages[i],
+                    validCoverage = coverage.enabled && ((sector !== null && coverage.coverageSector.intersects(sector)) ||
+                        (location !== null && coverage.coverageSector.containsLocation(location.latitude, location.longitude)));
+                if (validCoverage) {
+                    var resDiff = Math.abs(coverage.resolution - targetResolution);
+                    if (resDiff > minResDiff) {
+                        return minDiffIdx;
+                    }
+                    minResDiff = resDiff;
+                    minDiffIdx = i;
+                }
+            }
+
+            return minDiffIdx;
+        };
+
+        /**
+         * Returns the best coverage available for a particular resolution,
+         * @param {Number} latitude The location's latitude in degrees.
+         * @param {Number} longitude The location's longitude in degrees.
+         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
+         * @returns {ElevationCoverage} The coverage most closely matching the requested resolution. Returns null if no coverage is available at this
+         * location.
+         * @throws {ArgumentError} If the specified resolution is not positive.
+         */
+        ElevationModel.prototype.bestCoverageAtLocation = function (latitude, longitude, targetResolution) {
+
+            if (!targetResolution || targetResolution < 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "bestCoverageAtLocation", "invalidResolution"));
+            }
+
+            this.scratchLocation.set(latitude, longitude);
+            var preferredIndex = this.preferredCoverageIndex(null, this.scratchLocation, targetResolution);
+            if (preferredIndex >= 0) {
+                return this.coverages[preferredIndex];
+            }
+
+            return null;
         };
 
         /**
@@ -334,25 +389,31 @@ define(['../error/ArgumentError',
             }
 
             result.fill(NaN);
-            var resolution = Number.MAX_VALUE, i, n = this.coverages.length, resultFilled = false;
-            for (i = n - 1; !resultFilled && i >= 0; i--) {
-                var coverage = this.coverages[i];
-                if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
-                    resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
-                    if (resultFilled) {
-                        resolution = coverage.resolution;
+            var resolution = Number.MAX_VALUE,
+                resultFilled = false,
+                preferredIndex = this.preferredCoverageIndex(sector, null, targetResolution);
+
+            if (preferredIndex >= 0) {
+                for (var i = preferredIndex; !resultFilled && i >= 0; i--) {
+                    var coverage = this.coverages[i];
+                    if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
+                        resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, result);
+                        if (resultFilled) {
+                            resolution = coverage.resolution;
+                        }
                     }
                 }
             }
 
             if (!resultFilled) {
-                n = result.length;
+                var n = result.length;
                 for (i = 0; i < n; i++) {
                     if (isNaN(result[i])) {
                         result[i] = 0;
                     }
                 }
             }
+
             return resolution;
         };
 
