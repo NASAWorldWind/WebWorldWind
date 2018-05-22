@@ -1,6 +1,6 @@
 define([
         '../src/WorldWind',
-        '../src/Util/WWUtil'
+        '../src/util/WWUtil'
     ],
     function (WorldWind, WWUtil) {
         "use strict";
