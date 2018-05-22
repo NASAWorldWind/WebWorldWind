@@ -44,17 +44,25 @@ define([
         var ScreenCreditController = function () {
             Layer.call(this, "ScreenCreditController");
 
+            /**
+             * An {@link Offset} indicating where to place the attributions on the screen.
+             * @type {Offset}
+             * @default The lower left corner of the window with an 11px left margin and a 2px bottom margin.
+             */
+            this.creditPlacement = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
+
+            /**
+             * The amount of horizontal spacing between adjacent attributions.
+             * @type {number}
+             * @default An 11px margin between attributions.
+             */
+            this.creditMargin = 11;
+
             // Apply 50% opacity to all shapes rendered by this layer.
             this.opacity = 0.5;
 
             // Internal. Intentionally not documented.
             this.credits = [];
-
-            // Internal. Intentionally not documented.
-            this.placement = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
-
-            // Internal. Intentionally not documented.
-            this.creditMargin = 11;
         };
 
         ScreenCreditController.prototype = Object.create(Layer.prototype);
@@ -108,7 +116,7 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var point = this.placement.offsetForSize(dc.viewport.width, dc.viewport.height);
+            var point = this.creditPlacement.offsetForSize(dc.viewport.width, dc.viewport.height);
 
             for (var i = 0, len = this.credits.length; i < len; i++) {
                 // Place the credit text on screen and render it.
