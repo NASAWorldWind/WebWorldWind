@@ -20,10 +20,13 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create and add imagery and WorldWindow UI layers.
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: false},
@@ -36,27 +39,24 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
+        // Create and add Atmosphere layer.
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(atmosphereLayer);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
+        // Atmosphere layer has a Sun simulation as a feature. In this example,
+        // the simulation is displayed when checking the appropriate checkbox.
         var sunSimulationCheckBox = document.getElementById('sun-simulation');
-        var sunInterval = 0;
-        var timeStamp = Date.now();
         sunSimulationCheckBox.addEventListener('change', onSunCheckBoxClick, false);
 
-        function onSunCheckBoxClick() {
-            if (this.checked) {
-                runSunSimulation();
-            }
-            else {
-                atmosphereLayer.time = null;
-                clearInterval(sunInterval);
-                wwd.redraw();
-            }
-        }
+        // The Atmosphere layer requires a given date to simulate the Sun position at that time.
+        // In this case the current date will be given.
+        var timeStamp = Date.now();
+
+        // Update the Sun position in 3 minute steps, every 64 ms in real time. Then redraw the scene.
+        var sunInterval = 0;
 
         function runSunSimulation() {
             sunInterval = setInterval(function () {
@@ -66,6 +66,17 @@ requirejs(['./WorldWindShim',
             }, 64);
         }
 
+        function onSunCheckBoxClick() {
+            if (this.checked) {
+                runSunSimulation();
+            }
+            else {
+                // Remove Sun simulation and redraw the scene.
+                atmosphereLayer.time = null;
+                clearInterval(sunInterval);
+                wwd.redraw();
+            }
+        }
     });
 
 
