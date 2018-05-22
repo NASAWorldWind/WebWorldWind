@@ -44,18 +44,17 @@ define([
         var ScreenCreditController = function () {
             Layer.call(this, "ScreenCreditController");
 
+            // Apply 50% opacity to all shapes rendered by this layer.
+            this.opacity = 0.5;
+
             // Internal. Intentionally not documented.
             this.credits = [];
 
             // Internal. Intentionally not documented.
-            this.margin = 5;
+            this.placement = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
 
             // Internal. Intentionally not documented.
-            this.creditSpacing = 21;
-
-            // Internal. Intentionally not documented.
-            this.opacity = 0.5;
-
+            this.creditMargin = 11;
         };
 
         ScreenCreditController.prototype = Object.create(Layer.prototype);
@@ -92,9 +91,7 @@ define([
                 }
             }
 
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
-
-            var credit = new ScreenText(screenOffset, creditString);
+            var credit = new ScreenText(new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0), creditString);
             credit.attributes.font = new Font(10);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
@@ -111,19 +108,20 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var creditWidth = 0,
-                i,
-                len;
+            var point = this.placement.offsetForSize(dc.viewport.width, dc.viewport.height);
 
-            for (i = 0, len = this.credits.length; i < len; i++) {
-                this.credits[i].screenOffset.x += (creditWidth) * i;
-                if (i < len - 1) {
-                    this.credits[i].text += ", ";
-                } else {
-                    this.credits[i].text += ".";
-                }
-                creditWidth = dc.ctx2D.measureText(this.credits[i].text).width;
+            for (var i = 0, len = this.credits.length; i < len; i++) {
+                // Place the credit text on screen and render it.
+                this.credits[i].screenOffset.x = point[0];
+                this.credits[i].screenOffset.y = point[1];
                 this.credits[i].render(dc);
+
+                // Advance the screen position for the next credit.
+                dc.textRenderer.typeFace = this.credits[i].attributes.font;
+                dc.textRenderer.outlineWidth = this.credits[i].attributes.outlineWidth;
+                dc.textRenderer.enableOutline = this.credits[i].attributes.enableOutline;
+                point[0] += dc.textRenderer.textSize(this.credits[i].text)[0];
+                point[0] += this.creditMargin;
             }
         };
 
