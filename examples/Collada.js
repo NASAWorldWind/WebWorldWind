@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-require(['./WorldWindShim', './LayerManager'],
+requirejs(['./WorldWindShim',
+        './LayerManager'],
     function (WorldWind, LayerManager) {
     "use strict";
 
