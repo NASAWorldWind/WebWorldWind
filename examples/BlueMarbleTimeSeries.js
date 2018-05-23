@@ -23,10 +23,13 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create and add layers to the WorldWindow.
         var backgroundLayer = new WorldWind.BMNGOneImageLayer();
         backgroundLayer.hide = true; // Don't show it in the layer manager.
         wwd.addLayer(backgroundLayer);
@@ -40,7 +43,7 @@ requirejs(['./WorldWindShim',
         // which is initiated below.
         wwd.addLayer(blueMarbleTimeSeries);
 
-        // Create a compass and view controls.
+        // WorldWind UI layers.
         wwd.addLayer(new WorldWind.CompassLayer());
         wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));

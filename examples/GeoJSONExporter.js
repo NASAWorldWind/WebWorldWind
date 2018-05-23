@@ -22,16 +22,21 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialLayer(null), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -41,6 +46,9 @@ requirejs(['./WorldWindShim',
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManger = new LayerManager(wwd);
 
         // Create a layer and some surface shapes
         var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
@@ -113,7 +121,5 @@ requirejs(['./WorldWindShim',
         }
         document.getElementById("exportGeoJSONBtn").onclick = onExportGeoJSON;
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
     });
 

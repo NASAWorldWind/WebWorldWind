@@ -26,9 +26,11 @@ requirejs([
         var wwd = new WorldWind.WorldWindow("canvasOne");
         var layerManager;
 
-        // Add imagery layers
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layer.
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
@@ -319,6 +321,7 @@ requirejs([
                         wwd.addLayer(surfaceLayerArrayGlobal[i]);
                     }
 
+                    // Create a layer manager for controlling layer visibility.
                     layerManager = new LayerManager(wwd);
                     layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
                     isFirstSceneDraw = true;

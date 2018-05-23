@@ -19,6 +19,7 @@
 requirejs(['./WorldWindShim'], function () {
     "use strict";
 
+    // Tell WorldWind to log only warnings.
     WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
     // Make a layer that shows a Path and is shared among the WorldWindows.
