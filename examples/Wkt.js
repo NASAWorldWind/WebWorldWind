@@ -28,8 +28,9 @@ requirejs(['./WorldWindShim',
 
         // Create and add layers to the WorldWindow.
         var layers = [
-            // Imagery layer.
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
