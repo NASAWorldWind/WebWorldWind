@@ -134,26 +134,81 @@ define([
             }
         };
 
-        SVSurfacePolyline.prototype.assembleElementArray = function () {
-            var cubes = this.locations.length - 1, baseIdx = 0, idx = 0;
-            this.elementArray = new Uint16Array(14 * cubes);
+        SVSurfacePolyline.prototype.assembleElementArray = function (dc) {
+            // var cubes = this.locations.length - 1, baseIdx = 0, idx = 0;
+            // this.elementArray = new Uint16Array(14 * cubes);
+            //
+            // for (var i = 0; i < cubes; i++) {
+            //     this.elementArray[idx++] = baseIdx + 3;
+            //     this.elementArray[idx++] = baseIdx + 2;
+            //     this.elementArray[idx++] = baseIdx + 7;
+            //     this.elementArray[idx++] = baseIdx + 6;
+            //     this.elementArray[idx++] = baseIdx + 4;
+            //     this.elementArray[idx++] = baseIdx + 2;
+            //     this.elementArray[idx++] = baseIdx + 0;
+            //     this.elementArray[idx++] = baseIdx + 3;
+            //     this.elementArray[idx++] = baseIdx + 1;
+            //     this.elementArray[idx++] = baseIdx + 7;
+            //     this.elementArray[idx++] = baseIdx + 5;
+            //     this.elementArray[idx++] = baseIdx + 4;
+            //     this.elementArray[idx++] = baseIdx + 1;
+            //     this.elementArray[idx++] = baseIdx + 0;
+            //     baseIdx += 14;
+            // }
 
-            for (var i = 0; i < cubes; i++) {
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx + 0;
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 5;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx + 0;
-                baseIdx += 14;
+            // try explicitly defining the triangles to ensure winding order is correct
+            var elements = [];
+            elements.push(2);
+            elements.push(0);
+            elements.push(1);
+
+            elements.push(1);
+            elements.push(3);
+            elements.push(2);
+
+            elements.push(0);
+            elements.push(4);
+            elements.push(1);
+
+            elements.push(4);
+            elements.push(5);
+            elements.push(1);
+
+            elements.push(7);
+            elements.push(3);
+            elements.push(1);
+
+            elements.push(1);
+            elements.push(5);
+            elements.push(7);
+
+            elements.push(6);
+            elements.push(4);
+            elements.push(0);
+
+            elements.push(0);
+            elements.push(2);
+            elements.push(6);
+
+            elements.push(3);
+            elements.push(7);
+            elements.push(6);
+
+            elements.push(6);
+            elements.push(2);
+            elements.push(3);
+
+            elements.push(7);
+            elements.push(4);
+            elements.push(6);
+
+            elements.push(4);
+            elements.push(7);
+            elements.push(5);
+
+            this.elementArray = new Uint16Array(elements.length);
+            for (var i = 0; i < elements.length; i++) {
+                this.elementArray[i] = elements[i];
             }
         };
 
@@ -230,10 +285,44 @@ define([
             gl.vertexAttribPointer(this.program.posLocation, 3, gl.FLOAT, false, 6 * 4, 0);
             gl.vertexAttribPointer(this.program.offsetDirectionLocation, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
 
-            gl.drawElements(gl.TRIANGLE_STRIP, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
+            // gl.frontFace(gl.CCW);
+            // gl.cullFace(gl.BACK);
+            // this.drawShadowVolume(dc);
+
+            gl.colorMask(false, false, false, false);
+            gl.depthMask(false);
+            gl.enable(gl.STENCIL_TEST);
+            gl.clear(gl.STENCIL_BUFFER_BIT);
+
+            gl.cullFace(gl.FRONT);
+            gl.stencilFunc(gl.ALWAYS, 0, 255);
+            gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP);
+
+            this.drawShadowVolume(dc);
+
+            gl.cullFace(gl.BACK);
+            gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP);
+
+            this.drawShadowVolume(dc);
+
+            gl.disable(gl.CULL_FACE);
+            gl.colorMask(true, true, true, true);
+            gl.depthMask(true);
+            gl.stencilFunc(gl.NOTEQUAL, 0, 255);
+            gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
+
+            this.drawShadowVolume(dc);
+
+            gl.disable(gl.STENCIL_TEST);
 
             gl.disableVertexAttribArray(this.program.posLocation);
             gl.disableVertexAttribArray(this.program.offsetDirectionLocation);
+
+        };
+
+        SVSurfacePolyline.prototype.drawShadowVolume = function (dc) {
+            var gl = dc.currentGlContext;
+            gl.drawElements(gl.TRIANGLES, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
         };
 
         return SVSurfacePolyline;

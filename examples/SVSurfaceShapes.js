@@ -32,12 +32,12 @@ requirejs(['./WorldWindShim',
          * Added imagery layers.
          */
         var layers = [
-            {layer: new WorldWind.ShowTessellationLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
+            {layer: new WorldWind.BMNGLandsatLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
+            {layer: new WorldWind.ShowTessellationLayer(), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -54,18 +54,21 @@ requirejs(['./WorldWindShim',
         sa.outlineWidth = 6;
 
         var locations = [
-            new WorldWind.Location(30, 0),
-            new WorldWind.Location(50, 0)
+            new WorldWind.Location(30, -100),
+            new WorldWind.Location(50, -70)
         ];
 
         var shape = new WorldWind.SVSurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
         locations = [
-            new WorldWind.Location(25, 0),
-            new WorldWind.Location(0, 0)
+            new WorldWind.Location(29.98, -100),
+            new WorldWind.Location(49.98, -70)
         ];
 
+        sa = new WorldWind.ShapeAttributes();
+        sa.outlineColor = WorldWind.Color.WHITE;
+        sa.outlineWidth = 6;
         shape = new WorldWind.SurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
     }
