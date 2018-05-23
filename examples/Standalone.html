@@ -40,6 +40,8 @@ imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
 
     // Define the event listener to initialize Web WorldWind.
     function eventWindowLoaded() {
+
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create a WorldWindow for the canvas.
