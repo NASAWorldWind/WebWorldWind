@@ -14,6 +14,7 @@ define([
                     'uniform float offsetScale;\n' +
                     'void main() {\n' +
                     '   gl_Position = mvpMatrix * (pos + offsetDirection * offsetScale);\n' +
+                // '   gl_Position = mvpMatrix * pos;\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
@@ -49,12 +50,6 @@ define([
         };
 
         SVSurfacePolylineProgram.prototype.loadOffsetScale = function (gl, offsetScale) {
-            if (!offsetScale) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "SVSurfacePolylineProgram", "loadOffsetScale",
-                        "The provided offset scale was null or undefined"));
-            }
-
             gl.uniform1f(this.offsetScaleLocation, offsetScale);
         };
 

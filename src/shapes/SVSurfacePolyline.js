@@ -56,7 +56,7 @@ define([
 
         SVSurfacePolyline.prototype.assembleVertexArray = function (dc) {
             var cubes = this.locations.length - 1;
-            this.vertexArray = new Float64Array((8 * 6) * cubes);
+            this.vertexArray = new Float32Array((8 * 6) * cubes);
             var point = new Vec3(), previousPoint = new Vec3(), offset = new Vec3(), loc, upperLimit, idx = 0;
 
             // TODO dynamic determination of upper portion of cube or a adaptive cube
@@ -135,7 +135,7 @@ define([
 
         SVSurfacePolyline.prototype.assembleElementArray = function () {
             var cubes = this.locations.length - 1, baseIdx = 0, idx = 0;
-            this.elementArray = new Int16Array(14 * cubes);
+            this.elementArray = new Uint16Array(14 * cubes);
 
             for (var i = 0; i < cubes; i++) {
                 this.elementArray[idx++] = baseIdx + 3;
@@ -173,11 +173,11 @@ define([
             // determine the necessary spacing based on distance
             var nearestDistance = this.calculateNearestDistanceToCamera(dc);
             // TODO transformation to maintain constant screen size, not this proportional guess
-            var offset = 200 * (nearestDistance / 50000);
-            console.log(offset);
+            //var offset = nearestDistance / 100;
+            var offset = 1000;
 
             var gl = dc.currentGlContext, vboId, eboId, refreshVbo, refreshEbo;
-
+            gl.enable(gl.DEPTH_TEST);
             if (!this.program) {
                 this.program = new SVSurfacePolylineProgram(gl);
             }
@@ -227,10 +227,10 @@ define([
             gl.enableVertexAttribArray(this.program.posLocation);
             gl.enableVertexAttribArray(this.program.offsetDirectionLocation);
 
-            gl.vertexAttribPointer(this.program.posLocation, 3, gl.FLOAT, false, 3 * 4, 0);
-            gl.vertexAttribPointer(this.program.offsetDirectionLocation, 3, gl.FLOAT, false, 3 * 4, 3 * 4);
+            gl.vertexAttribPointer(this.program.posLocation, 3, gl.FLOAT, false, 6 * 4, 0);
+            gl.vertexAttribPointer(this.program.offsetDirectionLocation, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
 
-            gl.drawElements(gl.TRIANGLE_STRIP, 12, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLE_STRIP, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
 
             gl.disableVertexAttribArray(this.program.posLocation);
             gl.disableVertexAttribArray(this.program.offsetDirectionLocation);
