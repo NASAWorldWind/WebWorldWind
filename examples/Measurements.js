@@ -31,13 +31,18 @@ requirejs([
         var projectedAreaSpan = document.getElementById('projected-area');
         var terrainAreaSpan = document.getElementById('terrain-area');
 
+        // Tell WorldWind to log only warnings.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWinow.
         var wwd = new WorldWind.WorldWindow('canvasOne');
 
+        // Create and add layers to the WorldWindow.
+        // Imagery layers.
         var BNMGLayer = new WorldWind.BMNGLayer();
-        var CoordinatesDisplayLayer = new WorldWind.CoordinatesDisplayLayer(wwd);
         var pathLayer = new WorldWind.RenderableLayer('Path');
+        // WorldWindow UI layer.
+        var CoordinatesDisplayLayer = new WorldWind.CoordinatesDisplayLayer(wwd);
         wwd.addLayer(BNMGLayer);
         wwd.addLayer(CoordinatesDisplayLayer);
         wwd.addLayer(pathLayer);

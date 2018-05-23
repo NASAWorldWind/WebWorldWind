@@ -28,13 +28,13 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        /**
-         * Added imagery layers.
-         */
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
