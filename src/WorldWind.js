@@ -206,6 +206,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './render/SurfaceTile',
         './render/SurfaceTileRenderer',
         './shaders/SurfaceTileRendererProgram',
+        './shapes/SVSurfacePolyline',
+        './shaders/SVSurfacePolylineProgram',
         './gesture/TapRecognizer',
         './layer/TectonicPlatesLayer',
         './globe/Terrain',
@@ -458,6 +460,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               SurfaceTile,
               SurfaceTileRenderer,
               SurfaceTileRendererProgram,
+              SVSurfacePolyline,
+              SVSurfacePolylineProgram,
               TapRecognizer,
               TectonicPlatesLayer,
               Terrain,
@@ -881,6 +885,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['SurfaceTile'] = SurfaceTile;
         WorldWind['SurfaceTileRenderer'] = SurfaceTileRenderer;
         WorldWind['SurfaceTileRendererProgram'] = SurfaceTileRendererProgram;
+        WorldWind['SVSurfacePolyline'] = SVSurfacePolyline;
+        WorldWind['SVSurfacePolylineProgram'] = SVSurfacePolylineProgram;
         WorldWind['TapRecognizer'] = TapRecognizer;
         WorldWind['TectonicPlatesLayer'] = TectonicPlatesLayer;
         WorldWind['Terrain'] = Terrain;
