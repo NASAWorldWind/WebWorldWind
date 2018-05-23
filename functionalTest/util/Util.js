@@ -235,9 +235,6 @@ define([
         list.appendChild(li);
         li.appendChild(document.createTextNode("Min: " + min));
 
-        var canvas = Util.generateSimplePlot(bins, 500, 500, true);
-        encDiv.appendChild(canvas);
-
         encDiv.appendChild(Util.generateTextOutput(dataArray));
 
         return encDiv;
