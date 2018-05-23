@@ -26,9 +26,11 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // Create and add imagery and WorldWindow UI layers.
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: false},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: false},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: false}
@@ -39,12 +41,12 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create and add Atmosphere layer.
+        // The Sun simulation is a feature of Atmosphere layer. We'll create and add the layer.
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(atmosphereLayer);
 
-        // Atmosphere layer has a Sun simulation as a feature. We'll provide it with a date to simulate the Sun
-        // position at that time. In this case the current date will be given.
+        // Atmosphere layer requires a date to simulate the Sun position at that time.
+        // In this case the current date will be given to initialize the simulation.
         var timeStamp = Date.now();
 
         // Update the Sun position in 3 minute steps, every 32 ms in real time. Then redraw the scene.
