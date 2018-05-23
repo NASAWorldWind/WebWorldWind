@@ -47,9 +47,6 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
-
         // Create a layer and some surface shapes
         var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
         wwd.addLayer(shapesLayer);
@@ -121,5 +118,8 @@ requirejs(['./WorldWindShim',
         }
         document.getElementById("exportGeoJSONBtn").onclick = onExportGeoJSON;
 
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManger = new LayerManager(wwd);
     });
 

@@ -41,7 +41,7 @@ requirejs([
         // Imagery layers.
         var BNMGLayer = new WorldWind.BMNGLayer();
         var pathLayer = new WorldWind.RenderableLayer('Path');
-        // WorldWindow UI layers.
+        // WorldWindow UI layer.
         var CoordinatesDisplayLayer = new WorldWind.CoordinatesDisplayLayer(wwd);
         wwd.addLayer(BNMGLayer);
         wwd.addLayer(CoordinatesDisplayLayer);
