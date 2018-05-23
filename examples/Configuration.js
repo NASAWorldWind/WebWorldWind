@@ -23,7 +23,7 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
-        // Tell WorldWind to log only warnings.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Configure the amount of GPU memory to use.
