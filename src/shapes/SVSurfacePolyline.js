@@ -71,6 +71,7 @@ define([
                 offset.copy(point);
                 offset.normalize();
                 previousPoint.normalize();
+                //offset.cross(previousPoint).normalize().multiply(1000000);
                 offset.cross(previousPoint).normalize();
 
                 this.vertexArray[idx++] = point[0]; // 0
@@ -173,8 +174,7 @@ define([
             // determine the necessary spacing based on distance
             var nearestDistance = this.calculateNearestDistanceToCamera(dc);
             // TODO transformation to maintain constant screen size, not this proportional guess
-            //var offset = nearestDistance / 100;
-            var offset = 1000;
+            var offset = nearestDistance / 200;
 
             var gl = dc.currentGlContext, vboId, eboId, refreshVbo, refreshEbo;
             gl.enable(gl.DEPTH_TEST);
@@ -188,7 +188,7 @@ define([
             this.program.loadColor(gl, this.attributes.outlineColor);
             this.program.loadOffsetScale(gl, offset);
 
-            // Vertex Bufer
+            // Vertex Buffer
             if (!this.vboCacheKey) {
                 this.vboCacheKey = "SVSurfacePolylineVBOCache" + SVSurfacePolyline.cacheIdCounter++;
             }

@@ -33,7 +33,7 @@ requirejs(['./WorldWindShim',
          */
         var layers = [
             {layer: new WorldWind.ShowTessellationLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: true},
+            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
@@ -54,16 +54,16 @@ requirejs(['./WorldWindShim',
         sa.outlineWidth = 6;
 
         var locations = [
-            new WorldWind.Location(30, -100),
-            new WorldWind.Location(50, -70)
+            new WorldWind.Location(30, 0),
+            new WorldWind.Location(50, 0)
         ];
 
         var shape = new WorldWind.SVSurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
         locations = [
-            new WorldWind.Location(35, -100),
-            new WorldWind.Location(55, -70)
+            new WorldWind.Location(25, 0),
+            new WorldWind.Location(0, 0)
         ];
 
         shape = new WorldWind.SurfacePolyline(locations, sa);

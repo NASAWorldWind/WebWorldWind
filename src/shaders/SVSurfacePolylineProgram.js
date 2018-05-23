@@ -13,8 +13,9 @@ define([
                     'uniform mat4 mvpMatrix;\n' +
                     'uniform float offsetScale;\n' +
                     'void main() {\n' +
-                    '   gl_Position = mvpMatrix * (pos + offsetDirection * offsetScale);\n' +
-                // '   gl_Position = mvpMatrix * pos;\n' +
+                    '   vec4 offset = vec4(offsetDirection.x * offsetScale, offsetDirection.y * offsetScale, offsetDirection.z * offsetScale, 1.0);\n' +
+                    '   vec4 scaledPos = vec4(pos.x + offset.x, pos.y + offset.y, pos.z + offset.z, 1.0);\n' +
+                    '   gl_Position = mvpMatrix * scaledPos;\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
