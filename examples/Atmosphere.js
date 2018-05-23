@@ -43,40 +43,20 @@ requirejs(['./WorldWindShim',
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(atmosphereLayer);
 
+        // Atmosphere layer has a Sun simulation as a feature. We'll provide it with a date to simulate the Sun
+        // position at that time. In this case the current date will be given.
+        var timeStamp = Date.now();
+
+        // Update the Sun position in 3 minute steps, every 32 ms in real time. Then redraw the scene.
+        setInterval(function () {
+            timeStamp += 180 * 1000;
+            atmosphereLayer.time = new Date(timeStamp);
+            wwd.redraw();
+        }, 64);
+
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
-        // Atmosphere layer has a Sun simulation as a feature. In this example,
-        // the simulation is displayed when checking the appropriate checkbox.
-        var sunSimulationCheckBox = document.getElementById('sun-simulation');
-        sunSimulationCheckBox.addEventListener('change', onSunCheckBoxClick, false);
-
-        // The Atmosphere layer requires a given date to simulate the Sun position at that time.
-        // In this case the current date will be given.
-        var timeStamp = Date.now();
-
-        // Update the Sun position in 3 minute steps, every 64 ms in real time. Then redraw the scene.
-        var sunInterval = 0;
-
-        function runSunSimulation() {
-            sunInterval = setInterval(function () {
-                timeStamp += 180 * 1000;
-                atmosphereLayer.time = new Date(timeStamp);
-                wwd.redraw();
-            }, 64);
-        }
-
-        function onSunCheckBoxClick() {
-            if (this.checked) {
-                runSunSimulation();
-            }
-            else {
-                // Remove Sun simulation and redraw the scene.
-                atmosphereLayer.time = null;
-                clearInterval(sunInterval);
-                wwd.redraw();
-            }
-        }
     });
 
 
