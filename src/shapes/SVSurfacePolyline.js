@@ -60,7 +60,7 @@ define([
             var point = new Vec3(), previousPoint = new Vec3(), offset = new Vec3(), loc, upperLimit, idx = 0;
 
             // TODO dynamic determination of upper portion of cube or a adaptive cube
-            upperLimit = WorldWind.EARTH_RADIUS - 0.5 * Math.sqrt(2 * Math.pow(WorldWind.EARTH_RADIUS, 2)) + 9000;
+            upperLimit = this.determineMaximumArcLength(dc) + 20000;
 
             for (var i = 1; i <= cubes; i++) {
 
@@ -315,6 +315,8 @@ define([
 
             gl.disable(gl.STENCIL_TEST);
 
+            this.drawDiagnosticShadowVolume(dc);
+
             gl.disableVertexAttribArray(this.program.posLocation);
             gl.disableVertexAttribArray(this.program.offsetDirectionLocation);
 
@@ -323,6 +325,42 @@ define([
         SVSurfacePolyline.prototype.drawShadowVolume = function (dc) {
             var gl = dc.currentGlContext;
             gl.drawElements(gl.TRIANGLES, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
+        };
+
+        SVSurfacePolyline.prototype.drawDiagnosticShadowVolume = function (dc) {
+            var gl = dc.currentGlContext;
+            gl.drawElements(gl.LINE_STRIP, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
+        };
+
+        SVSurfacePolyline.prototype.determineMaximumArcLength = function (dc) {
+            var maxAngle = -Number.MAX_VALUE, points = [], i, j, len = this.locations.length, loc, p, m, pointOne,
+                pointTwo, angle, scratch = new Vec3(), c;
+
+            for (i = 0; i < len; i++) {
+                loc = this.locations[i];
+                p = dc.globe.computePointFromLocation(loc.latitude, loc.longitude, new Vec3());
+                m = p.magnitude();
+                points.push({
+                    vec: p,
+                    mag: m
+                });
+            }
+
+            for (i = 0; i < len; i++) {
+                pointOne = points[i];
+                for (j = 0; j < len; j++) {
+                    if (i !== j) {
+                        scratch.copy(pointOne.vec);
+                        pointTwo = points[j];
+                        angle = Math.acos(scratch.dot(pointTwo.vec) / (pointOne.mag * pointTwo.mag));
+                        maxAngle = Math.max(maxAngle, angle);
+                    }
+                }
+            }
+
+            c = Math.sin(Math.PI / 2 - maxAngle / 2) * WorldWind.EARTH_RADIUS / Math.sin(Math.PI / 2);
+
+            return WorldWind.EARTH_RADIUS - c;
         };
 
         return SVSurfacePolyline;

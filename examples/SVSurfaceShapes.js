@@ -63,7 +63,8 @@ requirejs(['./WorldWindShim',
 
         locations = [
             new WorldWind.Location(29.98, -100),
-            new WorldWind.Location(49.98, -70)
+            new WorldWind.Location(49.98, -70),
+            new WorldWind.Location(20, -100)
         ];
 
         sa = new WorldWind.ShapeAttributes();
