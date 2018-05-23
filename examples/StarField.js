@@ -28,7 +28,7 @@ requirejs([
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow('canvasOne');
 
-        // Create layers.
+        // Create imagery layers.
         var BMNGLayer = new WorldWind.BMNGLayer();
         var starFieldLayer = new WorldWind.StarFieldLayer();
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
