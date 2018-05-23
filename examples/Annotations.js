@@ -19,7 +19,7 @@ requirejs(['./WorldWindShim',
               AnnotationController) {
         "use strict";
 
-        // Tell WorldWind to log only warnings.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create the WorldWindow.
@@ -27,8 +27,10 @@ requirejs(['./WorldWindShim',
 
         // Create and add imagery and WorldWindow UI layers.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
