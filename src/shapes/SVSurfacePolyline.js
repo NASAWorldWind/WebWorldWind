@@ -133,7 +133,7 @@ define([
 
         SVSurfacePolyline.prototype.assembleElementArray = function (dc) {
             var cubes = this.locations.length - 1, baseIdx = 0, idx = 0, i;
-            this.elementArray = new Int16Array((36 + 10) * cubes);
+            this.elementArray = new Int16Array((36 + 37) * cubes);
 
             for (i = 0; i < cubes; i++) {
 
@@ -184,18 +184,46 @@ define([
                 baseIdx = idx;
             }
 
-            for (i = 1; i < cubes; i++) {
+            baseIdx = 0;
+            for (i = 0; i < cubes; i++) {
                 // Volume Outline
                 this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx;
                 this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 5;
+                this.elementArray[idx++] = baseIdx + 7;
                 this.elementArray[idx++] = baseIdx + 4;
                 this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 1;
                 this.elementArray[idx++] = baseIdx + 5;
                 this.elementArray[idx++] = baseIdx + 7;
                 this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 6;
                 this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 5;
+                this.elementArray[idx++] = baseIdx + 1;
                 // increment base
                 baseIdx = idx;
             }
@@ -218,7 +246,7 @@ define([
             // determine the necessary spacing based on distance
             var nearestDistance = this.calculateNearestDistanceToCamera(dc);
             // TODO transformation to maintain constant screen size, not this proportional guess
-            var offset = nearestDistance / 200;
+            var offset = nearestDistance / 20;
 
             var gl = dc.currentGlContext, vboId, eboId, refreshVbo, refreshEbo;
             gl.enable(gl.DEPTH_TEST);
@@ -319,8 +347,8 @@ define([
 
         SVSurfacePolyline.prototype.drawDiagnosticShadowVolume = function (dc) {
             var gl = dc.currentGlContext;
-            var elements = 10 * (this.locations.length - 1);
-            var offset = 2 * (36 * (this.locations.length - 1));
+            var elements = 37 * (this.locations.length - 1);
+            var offset = 2 /*unsigned short size*/ * (36 * (this.locations.length - 1));
             this.program.loadColor(gl, WorldWind.Color.RED);
             gl.drawElements(gl.LINE_STRIP, elements, gl.UNSIGNED_SHORT, offset);
         };
