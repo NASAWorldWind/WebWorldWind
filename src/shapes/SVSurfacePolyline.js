@@ -133,7 +133,7 @@ define([
 
         SVSurfacePolyline.prototype.assembleElementArray = function (dc) {
             var cubes = this.locations.length - 1, baseIdx = 0, idx = 0, i;
-            this.elementArray = new Uint16Array(36 * cubes);
+            this.elementArray = new Int16Array((36 + 10) * cubes);
 
             for (i = 0; i < cubes; i++) {
 
@@ -181,17 +181,23 @@ define([
                 this.elementArray[idx++] = baseIdx + 6;
                 this.elementArray[idx++] = baseIdx + 2;
                 // increment base
+                baseIdx = idx;
+            }
 
+            for (i = 1; i < cubes; i++) {
                 // Volume Outline
-                // top
-                for (var s = 0; s < 8; s++) {
-                    for (var t = 0; t < 8; t++) {
-                        if (s !== t) {
-                            this.elementArray[idx++] = baseIdx +
-                        }
-                    }
-                }
-                baseIdx += 36;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 5;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 3;
+                // increment base
+                baseIdx = idx;
             }
         };
 
@@ -212,7 +218,7 @@ define([
             // determine the necessary spacing based on distance
             var nearestDistance = this.calculateNearestDistanceToCamera(dc);
             // TODO transformation to maintain constant screen size, not this proportional guess
-            var offset = nearestDistance / 50;
+            var offset = nearestDistance / 200;
 
             var gl = dc.currentGlContext, vboId, eboId, refreshVbo, refreshEbo;
             gl.enable(gl.DEPTH_TEST);
@@ -307,13 +313,16 @@ define([
 
         SVSurfacePolyline.prototype.drawShadowVolume = function (dc) {
             var gl = dc.currentGlContext;
-            gl.drawElements(gl.TRIANGLES, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
+            var elements = 36 * (this.locations.length - 1);
+            gl.drawElements(gl.TRIANGLES, elements, gl.UNSIGNED_SHORT, 0);
         };
 
         SVSurfacePolyline.prototype.drawDiagnosticShadowVolume = function (dc) {
             var gl = dc.currentGlContext;
+            var elements = 10 * (this.locations.length - 1);
+            var offset = 2 * (36 * (this.locations.length - 1));
             this.program.loadColor(gl, WorldWind.Color.RED);
-            gl.drawElements(gl.LINE_STRIP, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.LINE_STRIP, elements, gl.UNSIGNED_SHORT, offset);
         };
 
         SVSurfacePolyline.prototype.calculateVolumeHeight = function (dc) {

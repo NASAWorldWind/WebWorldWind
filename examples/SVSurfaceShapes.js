@@ -33,7 +33,7 @@ requirejs(['./WorldWindShim',
          */
         var layers = [
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
+            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
