@@ -18,7 +18,7 @@ requirejs(['./WorldWindShim',
     function (WorldWind,
               LayerManager) {
 
-        // Tell WorldWind to log only warnings.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create the WorldWindow.
