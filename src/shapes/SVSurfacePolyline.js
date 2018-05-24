@@ -133,100 +133,34 @@ define([
 
         SVSurfacePolyline.prototype.assembleElementArray = function (dc) {
             var cubes = this.locations.length - 1, baseIdx = 0, idx = 0, i;
-            this.elementArray = new Int16Array((36 + 37) * cubes);
+            this.elementArray = new Int16Array(18 * cubes);
 
             for (i = 0; i < cubes; i++) {
 
-                // Volume Triangles
-                // top
                 this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx;
-                // bottom
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 5;
                 this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 7;
-                // positive offset side
-                this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx + 6;
-                // negative offset side
                 this.elementArray[idx++] = baseIdx + 1;
                 this.elementArray[idx++] = baseIdx + 5;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 7;
                 this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 1;
-                // start cap
-                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx + 6;
                 this.elementArray[idx++] = baseIdx;
                 this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 5;
-                this.elementArray[idx++] = baseIdx + 1;
-                // end cap
-                this.elementArray[idx++] = baseIdx + 2;
+
                 this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx;
+
+                this.elementArray[idx++] = baseIdx + 5;
+                this.elementArray[idx++] = baseIdx + 4;
                 this.elementArray[idx++] = baseIdx + 7;
                 this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 2;
-                // increment base
+
                 baseIdx = idx;
             }
 
-            baseIdx = 0;
-            for (i = 0; i < cubes; i++) {
-                // Volume Outline
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 5;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx + 5;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 3;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx + 7;
-                this.elementArray[idx++] = baseIdx + 6;
-                this.elementArray[idx++] = baseIdx + 2;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 1;
-                this.elementArray[idx++] = baseIdx;
-                this.elementArray[idx++] = baseIdx + 4;
-                this.elementArray[idx++] = baseIdx + 5;
-                this.elementArray[idx++] = baseIdx + 1;
-                // increment base
-                baseIdx = idx;
-            }
         };
 
         SVSurfacePolyline.prototype.calculateNearestDistanceToCamera = function (dc) {
@@ -246,7 +180,7 @@ define([
             // determine the necessary spacing based on distance
             var nearestDistance = this.calculateNearestDistanceToCamera(dc);
             // TODO transformation to maintain constant screen size, not this proportional guess
-            var offset = nearestDistance / 20;
+            var offset = nearestDistance / 500;
 
             var gl = dc.currentGlContext, vboId, eboId, refreshVbo, refreshEbo;
             gl.enable(gl.DEPTH_TEST);
@@ -302,10 +236,6 @@ define([
             gl.vertexAttribPointer(this.program.posLocation, 3, gl.FLOAT, false, 6 * 4, 0);
             gl.vertexAttribPointer(this.program.offsetDirectionLocation, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
 
-            // gl.frontFace(gl.CCW);
-            // gl.cullFace(gl.BACK);
-            // this.drawShadowVolume(dc);
-
             gl.colorMask(false, false, false, false);
             gl.depthMask(false);
             gl.enable(gl.STENCIL_TEST);
@@ -313,16 +243,15 @@ define([
 
             gl.cullFace(gl.FRONT);
             gl.stencilFunc(gl.ALWAYS, 0, 255);
-            gl.stencilOp(gl.KEEP, gl.INCR, gl.KEEP);
+            gl.stencilOp(gl.INCR, gl.INCR, gl.KEEP);
 
             this.drawShadowVolume(dc);
 
             gl.cullFace(gl.BACK);
-            gl.stencilOp(gl.KEEP, gl.DECR, gl.KEEP);
+            gl.stencilOp(gl.DECR, gl.DECR, gl.KEEP);
 
             this.drawShadowVolume(dc);
 
-            gl.disable(gl.CULL_FACE);
             gl.colorMask(true, true, true, true);
             gl.depthMask(true);
             gl.stencilFunc(gl.NOTEQUAL, 0, 255);
@@ -331,6 +260,7 @@ define([
             this.drawShadowVolume(dc);
 
             gl.disable(gl.STENCIL_TEST);
+            gl.cullFace(gl.BACK);
 
             this.drawDiagnosticShadowVolume(dc);
 
@@ -341,16 +271,15 @@ define([
 
         SVSurfacePolyline.prototype.drawShadowVolume = function (dc) {
             var gl = dc.currentGlContext;
-            var elements = 36 * (this.locations.length - 1);
-            gl.drawElements(gl.TRIANGLES, elements, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLE_STRIP, 10, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLE_STRIP, 4, gl.UNSIGNED_SHORT, 10 * 2);
+            gl.drawElements(gl.TRIANGLE_STRIP, 4, gl.UNSIGNED_SHORT, (10 + 4) * 2);
         };
 
         SVSurfacePolyline.prototype.drawDiagnosticShadowVolume = function (dc) {
             var gl = dc.currentGlContext;
-            var elements = 37 * (this.locations.length - 1);
-            var offset = 2 /*unsigned short size*/ * (36 * (this.locations.length - 1));
             this.program.loadColor(gl, WorldWind.Color.RED);
-            gl.drawElements(gl.LINE_STRIP, elements, gl.UNSIGNED_SHORT, offset);
+            gl.drawElements(gl.LINE_STRIP, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
         };
 
         SVSurfacePolyline.prototype.calculateVolumeHeight = function (dc) {
