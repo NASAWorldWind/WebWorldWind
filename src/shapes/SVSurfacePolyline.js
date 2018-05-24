@@ -57,158 +57,141 @@ define([
         SVSurfacePolyline.prototype.assembleVertexArray = function (dc) {
             var cubes = this.locations.length - 1;
             this.vertexArray = new Float32Array((8 * 6) * cubes);
-            var point = new Vec3(), previousPoint = new Vec3(), offset = new Vec3(), loc, upperLimit, idx = 0;
+            var endPoint = new Vec3(), startPoint = new Vec3(), normal = new Vec3(), loc, upperLimit, idx = 0;
 
-            // TODO dynamic determination of upper portion of cube or a adaptive cube
-            upperLimit = this.determineMaximumArcLength(dc) + 20000;
+            upperLimit = this.calculateVolumeHeight(dc) + 20000;
 
             for (var i = 1; i <= cubes; i++) {
 
+                loc = this.locations[i - 1];
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, startPoint);
                 loc = this.locations[i];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, point);
-                loc = this.locations[i - 1];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, previousPoint);
-                offset.copy(point);
-                offset.normalize();
-                previousPoint.normalize();
-                //offset.cross(previousPoint).normalize().multiply(1000000);
-                offset.cross(previousPoint).normalize();
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, endPoint);
+                normal.copy(startPoint).normalize();
+                endPoint.normalize();
+                normal.cross(endPoint).normalize();
 
-                this.vertexArray[idx++] = point[0]; // 0
-                this.vertexArray[idx++] = point[1];
-                this.vertexArray[idx++] = point[2];
-                this.vertexArray[idx++] = offset[0];
-                this.vertexArray[idx++] = offset[1];
-                this.vertexArray[idx++] = offset[2];
-                this.vertexArray[idx++] = point[0]; // 1
-                this.vertexArray[idx++] = point[1];
-                this.vertexArray[idx++] = point[2];
-                this.vertexArray[idx++] = -offset[0];
-                this.vertexArray[idx++] = -offset[1];
-                this.vertexArray[idx++] = -offset[2];
-
-                loc = this.locations[i - 1];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, point);
-                this.vertexArray[idx++] = point[0]; // 2
-                this.vertexArray[idx++] = point[1];
-                this.vertexArray[idx++] = point[2];
-                this.vertexArray[idx++] = offset[0];
-                this.vertexArray[idx++] = offset[1];
-                this.vertexArray[idx++] = offset[2];
-                this.vertexArray[idx++] = point[0]; // 3
-                this.vertexArray[idx++] = point[1];
-                this.vertexArray[idx++] = point[2];
-                this.vertexArray[idx++] = -offset[0];
-                this.vertexArray[idx++] = -offset[1];
-                this.vertexArray[idx++] = -offset[2];
+                this.vertexArray[idx++] = startPoint[0]; // 0
+                this.vertexArray[idx++] = startPoint[1];
+                this.vertexArray[idx++] = startPoint[2];
+                this.vertexArray[idx++] = normal[0];
+                this.vertexArray[idx++] = normal[1];
+                this.vertexArray[idx++] = normal[2];
+                this.vertexArray[idx++] = startPoint[0]; // 1
+                this.vertexArray[idx++] = startPoint[1];
+                this.vertexArray[idx++] = startPoint[2];
+                this.vertexArray[idx++] = -normal[0];
+                this.vertexArray[idx++] = -normal[1];
+                this.vertexArray[idx++] = -normal[2];
 
                 loc = this.locations[i];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -20000, point);
-                this.vertexArray[idx++] = point[0]; // 4
-                this.vertexArray[idx++] = point[1];
-                this.vertexArray[idx++] = point[2];
-                this.vertexArray[idx++] = offset[0];
-                this.vertexArray[idx++] = offset[1];
-                this.vertexArray[idx++] = offset[2];
-                this.vertexArray[idx++] = point[0]; // 5
-                this.vertexArray[idx++] = point[1];
-                this.vertexArray[idx++] = point[2];
-                this.vertexArray[idx++] = -offset[0];
-                this.vertexArray[idx++] = -offset[1];
-                this.vertexArray[idx++] = -offset[2];
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, endPoint);
+                this.vertexArray[idx++] = endPoint[0]; // 2
+                this.vertexArray[idx++] = endPoint[1];
+                this.vertexArray[idx++] = endPoint[2];
+                this.vertexArray[idx++] = normal[0];
+                this.vertexArray[idx++] = normal[1];
+                this.vertexArray[idx++] = normal[2];
+                this.vertexArray[idx++] = endPoint[0]; // 3
+                this.vertexArray[idx++] = endPoint[1];
+                this.vertexArray[idx++] = endPoint[2];
+                this.vertexArray[idx++] = -normal[0];
+                this.vertexArray[idx++] = -normal[1];
+                this.vertexArray[idx++] = -normal[2];
 
                 loc = this.locations[i - 1];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -20000, previousPoint);
-                this.vertexArray[idx++] = previousPoint[0]; // 6
-                this.vertexArray[idx++] = previousPoint[1];
-                this.vertexArray[idx++] = previousPoint[2];
-                this.vertexArray[idx++] = offset[0];
-                this.vertexArray[idx++] = offset[1];
-                this.vertexArray[idx++] = offset[2];
-                this.vertexArray[idx++] = previousPoint[0]; // 7
-                this.vertexArray[idx++] = previousPoint[1];
-                this.vertexArray[idx++] = previousPoint[2];
-                this.vertexArray[idx++] = -offset[0];
-                this.vertexArray[idx++] = -offset[1];
-                this.vertexArray[idx++] = -offset[2];
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -20000, startPoint);
+                this.vertexArray[idx++] = startPoint[0]; // 4
+                this.vertexArray[idx++] = startPoint[1];
+                this.vertexArray[idx++] = startPoint[2];
+                this.vertexArray[idx++] = normal[0];
+                this.vertexArray[idx++] = normal[1];
+                this.vertexArray[idx++] = normal[2];
+                this.vertexArray[idx++] = startPoint[0]; // 5
+                this.vertexArray[idx++] = startPoint[1];
+                this.vertexArray[idx++] = startPoint[2];
+                this.vertexArray[idx++] = -normal[0];
+                this.vertexArray[idx++] = -normal[1];
+                this.vertexArray[idx++] = -normal[2];
+
+                loc = this.locations[i];
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -20000, endPoint);
+                this.vertexArray[idx++] = endPoint[0]; // 6
+                this.vertexArray[idx++] = endPoint[1];
+                this.vertexArray[idx++] = endPoint[2];
+                this.vertexArray[idx++] = normal[0];
+                this.vertexArray[idx++] = normal[1];
+                this.vertexArray[idx++] = normal[2];
+                this.vertexArray[idx++] = endPoint[0]; // 7
+                this.vertexArray[idx++] = endPoint[1];
+                this.vertexArray[idx++] = endPoint[2];
+                this.vertexArray[idx++] = -normal[0];
+                this.vertexArray[idx++] = -normal[1];
+                this.vertexArray[idx++] = -normal[2];
             }
         };
 
         SVSurfacePolyline.prototype.assembleElementArray = function (dc) {
-            // var cubes = this.locations.length - 1, baseIdx = 0, idx = 0;
-            // this.elementArray = new Uint16Array(14 * cubes);
-            //
-            // for (var i = 0; i < cubes; i++) {
-            //     this.elementArray[idx++] = baseIdx + 3;
-            //     this.elementArray[idx++] = baseIdx + 2;
-            //     this.elementArray[idx++] = baseIdx + 7;
-            //     this.elementArray[idx++] = baseIdx + 6;
-            //     this.elementArray[idx++] = baseIdx + 4;
-            //     this.elementArray[idx++] = baseIdx + 2;
-            //     this.elementArray[idx++] = baseIdx + 0;
-            //     this.elementArray[idx++] = baseIdx + 3;
-            //     this.elementArray[idx++] = baseIdx + 1;
-            //     this.elementArray[idx++] = baseIdx + 7;
-            //     this.elementArray[idx++] = baseIdx + 5;
-            //     this.elementArray[idx++] = baseIdx + 4;
-            //     this.elementArray[idx++] = baseIdx + 1;
-            //     this.elementArray[idx++] = baseIdx + 0;
-            //     baseIdx += 14;
-            // }
+            var cubes = this.locations.length - 1, baseIdx = 0, idx = 0, i;
+            this.elementArray = new Uint16Array(36 * cubes);
 
-            // try explicitly defining the triangles to ensure winding order is correct
-            var elements = [];
-            elements.push(2);
-            elements.push(0);
-            elements.push(1);
+            for (i = 0; i < cubes; i++) {
 
-            elements.push(1);
-            elements.push(3);
-            elements.push(2);
+                // Volume Triangles
+                // top
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx;
+                // bottom
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 5;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 7;
+                // positive offset side
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx + 6;
+                // negative offset side
+                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx + 5;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx + 1;
+                // start cap
+                this.elementArray[idx++] = baseIdx + 1;
+                this.elementArray[idx++] = baseIdx;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 4;
+                this.elementArray[idx++] = baseIdx + 5;
+                this.elementArray[idx++] = baseIdx + 1;
+                // end cap
+                this.elementArray[idx++] = baseIdx + 2;
+                this.elementArray[idx++] = baseIdx + 3;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 7;
+                this.elementArray[idx++] = baseIdx + 6;
+                this.elementArray[idx++] = baseIdx + 2;
+                // increment base
 
-            elements.push(0);
-            elements.push(4);
-            elements.push(1);
-
-            elements.push(4);
-            elements.push(5);
-            elements.push(1);
-
-            elements.push(7);
-            elements.push(3);
-            elements.push(1);
-
-            elements.push(1);
-            elements.push(5);
-            elements.push(7);
-
-            elements.push(6);
-            elements.push(4);
-            elements.push(0);
-
-            elements.push(0);
-            elements.push(2);
-            elements.push(6);
-
-            elements.push(3);
-            elements.push(7);
-            elements.push(6);
-
-            elements.push(6);
-            elements.push(2);
-            elements.push(3);
-
-            elements.push(7);
-            elements.push(4);
-            elements.push(6);
-
-            elements.push(4);
-            elements.push(7);
-            elements.push(5);
-
-            this.elementArray = new Uint16Array(elements.length);
-            for (var i = 0; i < elements.length; i++) {
-                this.elementArray[i] = elements[i];
+                // Volume Outline
+                // top
+                for (var s = 0; s < 8; s++) {
+                    for (var t = 0; t < 8; t++) {
+                        if (s !== t) {
+                            this.elementArray[idx++] = baseIdx +
+                        }
+                    }
+                }
+                baseIdx += 36;
             }
         };
 
@@ -229,7 +212,7 @@ define([
             // determine the necessary spacing based on distance
             var nearestDistance = this.calculateNearestDistanceToCamera(dc);
             // TODO transformation to maintain constant screen size, not this proportional guess
-            var offset = nearestDistance / 200;
+            var offset = nearestDistance / 50;
 
             var gl = dc.currentGlContext, vboId, eboId, refreshVbo, refreshEbo;
             gl.enable(gl.DEPTH_TEST);
@@ -329,10 +312,11 @@ define([
 
         SVSurfacePolyline.prototype.drawDiagnosticShadowVolume = function (dc) {
             var gl = dc.currentGlContext;
+            this.program.loadColor(gl, WorldWind.Color.RED);
             gl.drawElements(gl.LINE_STRIP, this.elementArray.length, gl.UNSIGNED_SHORT, 0);
         };
 
-        SVSurfacePolyline.prototype.determineMaximumArcLength = function (dc) {
+        SVSurfacePolyline.prototype.calculateVolumeHeight = function (dc) {
             var maxAngle = -Number.MAX_VALUE, points = [], i, j, len = this.locations.length, loc, p, m, pointOne,
                 pointTwo, angle, scratch = new Vec3(), c;
 
