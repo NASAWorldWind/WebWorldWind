@@ -44,18 +44,25 @@ define([
         var ScreenCreditController = function () {
             Layer.call(this, "ScreenCreditController");
 
-            // Internal. Intentionally not documented.
-            this.credits = [];
+            /**
+             * An {@link Offset} indicating where to place the attributions on the screen.
+             * @type {Offset}
+             * @default The lower left corner of the window with an 11px left margin and a 2px bottom margin.
+             */
+            this.creditPlacement = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
 
-            // Internal. Intentionally not documented.
-            this.margin = 5;
+            /**
+             * The amount of horizontal spacing between adjacent attributions.
+             * @type {number}
+             * @default An 11px margin between attributions.
+             */
+            this.creditMargin = 11;
 
-            // Internal. Intentionally not documented.
-            this.creditSpacing = 21;
-
-            // Internal. Intentionally not documented.
+            // Apply 50% opacity to all shapes rendered by this layer.
             this.opacity = 0.5;
 
+            // Internal. Intentionally not documented.
+            this.credits = [];
         };
 
         ScreenCreditController.prototype = Object.create(Layer.prototype);
@@ -92,12 +99,11 @@ define([
                 }
             }
 
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
-
-            var credit = new ScreenText(screenOffset, creditString);
+            var credit = new ScreenText(new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0), creditString);
+            credit.attributes.font = new Font(10);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
-            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
 
             // Append new user property to store URL for hyperlinking.
             // (See BasicWorldWindowController.handleClickOrTap).
@@ -110,15 +116,20 @@ define([
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var creditOrdinal = 1,
-                i,
-                len;
+            var point = this.creditPlacement.offsetForSize(dc.viewport.width, dc.viewport.height);
 
-            for (i = 0, len = this.credits.length; i < len; i++) {
-                this.credits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.credits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
+            for (var i = 0, len = this.credits.length; i < len; i++) {
+                // Place the credit text on screen and render it.
+                this.credits[i].screenOffset.x = point[0];
+                this.credits[i].screenOffset.y = point[1];
                 this.credits[i].render(dc);
-                creditOrdinal++;
+
+                // Advance the screen position for the next credit.
+                dc.textRenderer.typeFace = this.credits[i].attributes.font;
+                dc.textRenderer.outlineWidth = this.credits[i].attributes.outlineWidth;
+                dc.textRenderer.enableOutline = this.credits[i].attributes.enableOutline;
+                point[0] += dc.textRenderer.textSize(this.credits[i].text)[0];
+                point[0] += this.creditMargin;
             }
         };
 
