@@ -19,7 +19,7 @@ requirejs(['./WorldWindShim',
     function (WorldWind, LayerManager) {
     "use strict";
 
-    // Tell WorldWindow to log only warnings.
+        // Tell WorldWind to log only warnings and errors.
     WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
     // Create the WorldWindow.
