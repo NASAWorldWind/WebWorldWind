@@ -19,6 +19,18 @@ define([], function () {
     var CustomMatchers = function () {
     };
 
+    CustomMatchers.toBeVec2 = function (util, customEqualityTesters) {
+        return {
+            compare: function (actual, expected) {
+                var xpass = (actual[0] === expected[0]),
+                    ypass = (actual[1] === expected[1]);
+                return {
+                    pass: xpass && ypass
+                }
+            }
+        };
+    };
+
     CustomMatchers.toBeVec3 = function (util, customEqualityTesters) {
         return {
             compare: function (actual, expected) {
@@ -27,6 +39,18 @@ define([], function () {
                     zpass = (actual[2] === expected[2]);
                 return {
                     pass: xpass && ypass && zpass
+                }
+            }
+        };
+    };
+
+    CustomMatchers.toBeCloseToVec2 = function (util, customEqualityTesters) {
+        return {
+            compare: function (actual, expected, precision) {
+                var xpass = CustomMatchers.compareNumbers(actual[0], expected[0], precision),
+                    ypass = CustomMatchers.compareNumbers(actual[1], expected[1], precision);
+                return {
+                    pass: xpass && ypass
                 }
             }
         };
@@ -73,16 +97,12 @@ define([], function () {
     CustomMatchers.toBeSector = function (util, customEqualityTesters) {
         return {
             compare: function (actual, expected) {
-                var doMatch = (actual.minLatitude === expected.minLatitude) &&
-                        (actual.maxLatitude === expected.maxLatitude) &&
-                        (actual.minLongitude === expected.minLongitude) &&
-                        (actual.maxLongitude === expected.maxLongitude);
+                var minlatpass = (actual.minLatitude === expected.minLatitude),
+                    maxlatpass = (actual.maxLatitude === expected.maxLatitude),
+                    minlonpass = (actual.minLongitude === expected.minLongitude),
+                    maxlonpass = (actual.maxLongitude === expected.maxLongitude);
                 return {
-                    pass: doMatch,
-                    message: "Expected minLat: " + actual.minLatitude + ", maxLat: " + actual.maxLatitude
-                        + ", minLon: " + actual.minLongitude + ", maxLon: " + actual.maxLongitude
-                        + " to equal " + "minLat: " + expected.minLatitude + ", maxLat: " + expected.maxLatitude
-                        + ", minLon: " + expected.minLongitude + ", maxLon: " + expected.maxLongitude
+                    pass: minlatpass && maxlatpass && minlonpass && maxlonpass
                 }
             }
         }
