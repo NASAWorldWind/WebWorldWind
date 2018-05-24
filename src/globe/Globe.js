@@ -86,16 +86,16 @@ define([
             var f = 1 / WorldWind.WGS84_INVERSE_FLATTENING;
 
             /**
-             * This globe's polar radius in meters. Taken from NGA.STND.0036_1.0.0_WGS84, section 3.2.
+             * This globe's polar radius in meters.
              * @type {Number}
-             * @default WGS 84 semi-minor axis (6356752.3142 meters)
+             * @default WGS 84 semi-minor axis (6356752.3142 meters). Taken from NGA.STND.0036_1.0.0_WGS84, section 3.2.
              */
             this.polarRadius = this.equatorialRadius * (1 - f);
 
             /**
-             * This globe's eccentricity squared. Taken from NGA.STND.0036_1.0.0_WGS84, section 3.3.
+             * This globe's eccentricity squared.
              * @type {Number}
-             * @default WGS 84 first eccentricity squared (6.694379990141e-3)
+             * @default WGS 84 first eccentricity squared (6.694379990141e-3). Taken from NGA.STND.0036_1.0.0_WGS84, section 3.3.
              */
             this.eccentricitySquared = (2 * f) - (f * f);
 
