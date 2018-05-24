@@ -181,7 +181,7 @@ define([
                 this.elementArray[idx++] = baseIdx + 6;
                 this.elementArray[idx++] = baseIdx + 2;
                 // increment base
-                baseIdx = idx;
+                baseIdx += 8;
             }
 
             baseIdx = 0;
@@ -225,7 +225,7 @@ define([
                 this.elementArray[idx++] = baseIdx + 5;
                 this.elementArray[idx++] = baseIdx + 1;
                 // increment base
-                baseIdx = idx;
+                baseIdx += 8;
             }
         };
 
@@ -341,11 +341,11 @@ define([
         };
 
         SVSurfacePolyline.prototype.drawDiagnosticShadowVolume = function (dc) {
-            var gl = dc.currentGlContext;
-            var elements = 37 * (this.locations.length - 1);
-            var offset = 2 /*unsigned short size*/ * (36 * (this.locations.length - 1));
-            this.program.loadColor(gl, WorldWind.Color.RED);
-            gl.drawElements(gl.LINE_STRIP, elements, gl.UNSIGNED_SHORT, offset);
+            // var gl = dc.currentGlContext;
+            // var elements = 37 * (this.locations.length - 1);
+            // var offset = 2 /*unsigned short size*/ * (36 * (this.locations.length - 1));
+            // this.program.loadColor(gl, WorldWind.Color.RED);
+            // gl.drawElements(gl.LINE_STRIP, elements, gl.UNSIGNED_SHORT, offset);
         };
 
         SVSurfacePolyline.prototype.calculateVolumeHeight = function (dc) {
