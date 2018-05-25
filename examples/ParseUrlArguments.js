@@ -19,32 +19,6 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
-        var parseArgs = function () {
-            var result = {};
-
-            var queryString = window.location.href.split("?");
-            if (queryString && queryString.length > 1) {
-                var args = queryString[1].split("&");
-
-                for (var a = 0; a < args.length; a++) {
-                    var arg = args[a].split("=");
-
-                    if (arg[0] === "pos") {
-                        // arg format is "pos=lat,lon,alt"
-                        var position = arg[1].split(","),
-                            lat = parseFloat(position[0]),
-                            lon = parseFloat(position[1]),
-                            alt = parseFloat(position[2]);
-                        result.position = new WorldWind.Position(lat, lon, alt);
-                    }
-                }
-            }
-
-            return result;
-        };
-
-        var args = parseArgs();
-
         // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
@@ -70,11 +44,39 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
+        // Function to obtain arguments from query string.
+        var parseArgs = function () {
+            var result = {};
+
+            var queryString = window.location.href.split("?");
+            if (queryString && queryString.length > 1) {
+                var args = queryString[1].split("&");
+
+                for (var a = 0; a < args.length; a++) {
+                    var arg = args[a].split("=");
+
+                    // Obtain geographic position to redirect WorldWindow camera view.
+                    if (arg[0] === "pos") {
+                        // arg format is "pos=lat,lon,alt"
+                        var position = arg[1].split(","),
+                            lat = parseFloat(position[0]),
+                            lon = parseFloat(position[1]),
+                            alt = parseFloat(position[2]);
+                        result.position = new WorldWind.Position(lat, lon, alt);
+                    }
+                }
+            }
+
+            return result;
+        };
+
+        var args = parseArgs();
 
         // Now move the view to the requested position.
         if (args.position) {
             wwd.goTo(args.position);
         }
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });
