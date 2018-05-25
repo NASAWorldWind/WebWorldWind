@@ -47,7 +47,9 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        var peaks = new GeographicTextPeaks().peaks, // Obtain array of U.S. peaks from a separate file.
+        // The U.S. peaks data array is retrieved from a different module out of convenience to avoid declaring it here.
+        // See GeographicTextPeaks.js.
+        var peaks = new GeographicTextPeaks().peaks,
             text,
             textAttributes = new WorldWind.TextAttributes(null),
             textLayer = new WorldWind.RenderableLayer("U.S.A. Peaks");
