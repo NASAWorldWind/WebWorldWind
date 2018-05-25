@@ -53,14 +53,14 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(shapesLayer);
 
         var sa = new WorldWind.ShapeAttributes();
-        sa.outlineColor = WorldWind.Color.GREEN;
+        sa.outlineColor = new WorldWind.Color(0, 1, 0, 0.3);
         sa.outlineWidth = 6;
 
         var locations = [
             new WorldWind.Location(36.2, -113.11),
             new WorldWind.Location(36.2, -112),
-            new WorldWind.Location(36.25, -113.11),
-            new WorldWind.Location(36.25, -112)
+            // new WorldWind.Location(36.25, -113.11),
+            // new WorldWind.Location(36.25, -112)
         ];
 
         var shape = new WorldWind.SVSurfacePolyline(locations, sa);
@@ -77,5 +77,12 @@ requirejs(['./WorldWindShim',
         sa.outlineWidth = 6;
         shape = new WorldWind.SurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
+
+        wwd.navigator.lookAtLocation.latitude = 36.2;
+        wwd.navigator.lookAtLocation.longitude = -112.98;
+        wwd.navigator.range = 100000;
+        wwd.navigator.heading = 45;
+        wwd.navigator.tilt = 60;
+        wwd.redraw();
     }
 );
