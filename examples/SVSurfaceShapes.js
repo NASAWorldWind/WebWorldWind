@@ -66,6 +66,15 @@ requirejs(['./WorldWindShim',
         var shape = new WorldWind.SVSurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
+        var locations = [
+            new WorldWind.Location(36.15, -113.06),
+            new WorldWind.Location(36.25, -113.06),
+            // new WorldWind.Location(36.25, -113.11),
+            // new WorldWind.Location(36.25, -112)
+        ];
+        shape = new WorldWind.SVSurfacePolyline(locations, sa);
+        shapesLayer.addRenderable(shape);
+
         locations = [
             new WorldWind.Location(29.98, -100),
             new WorldWind.Location(49.98, -70),

@@ -1,9 +1,10 @@
 define([
         '../render/Renderable',
+        '../geom/Sector',
         '../shaders/SVSurfacePolylineProgram',
         '../geom/Vec3'
     ],
-    function (Renderable, SVSurfacePolylineProgram, Vec3) {
+    function (Renderable,Sector, SVSurfacePolylineProgram, Vec3) {
         "use strict";
 
         var SVSurfacePolyline = function (locations, attributes) {
@@ -22,6 +23,10 @@ define([
             this.vboCacheKey = null;
 
             this.eboCacheKey = null;
+
+            this.sector = new Sector();
+
+            this.minMax;
         };
 
         SVSurfacePolyline.prototype = Object.create(Renderable.prototype);
@@ -37,12 +42,27 @@ define([
             if (!this.enabled) {
                 return;
             }
+            if (this.sector.isEmpty()) {
+                this.generateSector(dc);
+            }
+            var latestMinMax = dc.globe.elevationModel.minAndMaxElevationsForSector(this.sector);
 
-            if (this.mustGenerateGeometry()) {
+            if (this.mustGenerateGeometry() || !this.isMinMaxSame(latestMinMax)) {
+                this.minMax = latestMinMax;
+                this.vboCacheKey = null;
                 this.assembleGeometry(dc);
             }
 
             dc.addSurfaceRenderable(this);
+        };
+
+        SVSurfacePolyline.prototype.isMinMaxSame = function (latestMinMax) {
+            return this.minMax[0] === latestMinMax[0] && this.minMax[1] === latestMinMax[1];
+        };
+
+        SVSurfacePolyline.prototype.generateSector = function (dc) {
+            this.sector.setToBoundingSector(this.locations);
+            this.minMax = dc.globe.elevationModel.minAndMaxElevationsForSector(this.sector);
         };
 
         SVSurfacePolyline.prototype.mustGenerateGeometry = function () {
@@ -57,9 +77,10 @@ define([
         SVSurfacePolyline.prototype.assembleVertexArray = function (dc) {
             var cubes = this.locations.length - 1;
             this.vertexArray = new Float32Array((8 * 6) * cubes);
-            var endPoint = new Vec3(), startPoint = new Vec3(), normal = new Vec3(), loc, upperLimit, idx = 0;
+            var endPoint = new Vec3(), startPoint = new Vec3(), normal = new Vec3(), loc, lowerLimit, upperLimit, idx = 0;
 
-            upperLimit = this.calculateVolumeHeight(dc) + 20000;
+            upperLimit = this.calculateVolumeHeight(dc) + this.minMax[1] * dc.verticalExaggeration;
+            lowerLimit = this.minMax[0];
 
             for (var i = 1; i <= cubes; i++) {
 
@@ -100,7 +121,7 @@ define([
                 this.vertexArray[idx++] = -normal[2];
 
                 loc = this.locations[i - 1];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -20000, startPoint);
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, lowerLimit, startPoint);
                 this.vertexArray[idx++] = startPoint[0]; // 4
                 this.vertexArray[idx++] = startPoint[1];
                 this.vertexArray[idx++] = startPoint[2];
@@ -115,7 +136,7 @@ define([
                 this.vertexArray[idx++] = -normal[2];
 
                 loc = this.locations[i];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -20000, endPoint);
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, lowerLimit, endPoint);
                 this.vertexArray[idx++] = endPoint[0]; // 6
                 this.vertexArray[idx++] = endPoint[1];
                 this.vertexArray[idx++] = endPoint[2];
