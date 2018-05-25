@@ -45,6 +45,7 @@ requirejs([
         // WorldWindow UI layer.
         var CoordinatesDisplayLayer = new WorldWind.CoordinatesDisplayLayer(wwd);
         wwd.addLayer(BNMGLayer);
+        // Add atmosphere layer on top of base imagery layer.
         wwd.addLayer(AtmosphereLayer);
         wwd.addLayer(pathLayer);
         wwd.addLayer(CoordinatesDisplayLayer);

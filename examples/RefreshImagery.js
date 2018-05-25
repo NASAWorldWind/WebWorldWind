@@ -33,8 +33,9 @@ requirejs(['./WorldWindShim',
 
         // Create and add layers to the WorldWindow, including our previously created layer to be refreshed.
         var layers = [
-            // Imagery layers.
+            // Imagery layer.
             {layer: layerToRefresh, enabled: true},
+            // Add atmosphere layer on top of imagery layer.
             {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},

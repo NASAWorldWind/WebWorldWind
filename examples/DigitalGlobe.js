@@ -36,6 +36,7 @@ requirejs(['./WorldWindShim',
                 enabled: true},
             {layer: new WorldWind.DigitalGlobeTiledImageLayer("Digital Globe with Roads", "digitalglobe.n6nhclo2", accessToken),
                 enabled: false},
+            // Add atmosphere layer on top of all base layers.
             {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWind UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},

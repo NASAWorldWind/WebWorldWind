@@ -43,7 +43,7 @@ requirejs(['./WorldWindShim',
         // which is initiated below.
         wwd.addLayer(blueMarbleTimeSeries);
 
-        // Add Atmosphere layer.
+        // Add atmosphere layer on top of base imagery layer.
         wwd.addLayer(new WorldWind.AtmosphereLayer());
         // Add WorldWind UI layers.
         wwd.addLayer(new WorldWind.CompassLayer());

@@ -36,6 +36,7 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.BMNGOneImageLayer(), enabled: true},
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.ShowTessellationLayer(), enabled: true},
+            // Add atmosphere layer on top of all base layers.
             {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},

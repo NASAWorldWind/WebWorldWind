@@ -33,6 +33,7 @@ requirejs(['./WorldWindShim',
         {layer: new WorldWind.BingAerialLayer(null), enabled: false},
         {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
         {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
+        // Add atmosphere layer on top of all base layers.
         {layer: new WorldWind.AtmosphereLayer(), enabled: true},
         // WorldWindow UI layers.
         {layer: new WorldWind.CompassLayer(), enabled: true},

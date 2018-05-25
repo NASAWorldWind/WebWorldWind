@@ -30,6 +30,7 @@ requirejs(['./WorldWindShim',
         var layers = [
             // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
+            // Add atmosphere layer on top of base layer.
             {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
