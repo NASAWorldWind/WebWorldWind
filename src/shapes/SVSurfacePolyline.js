@@ -259,8 +259,7 @@ define([
             }
             gl.depthFunc(gl.LEQUAL);
 
-            gl.stencilFuncSeparate(gl.FRONT, gl.ALWAYS, 0, 255);
-            gl.stencilFuncSeparate(gl.BACK, gl.ALWAYS, 0, 255);
+            gl.stencilFunc(gl.ALWAYS, 0, 255);
             gl.stencilOpSeparate(gl.FRONT, gl.KEEP, gl.DECR, gl.KEEP);
             gl.stencilOpSeparate(gl.BACK, gl.KEEP, gl.INCR, gl.KEEP);
 
@@ -285,7 +284,7 @@ define([
 
             // Apply the stencil test to drawing
             gl.stencilFunc(gl.NOTEQUAL, 0, 255);
-            // gl.stencilOp(gl.REPLACE, gl.REPLACE, gl.REPLACE);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // maintain the stencil values
 
             this.drawShadowVolume(dc);
 
