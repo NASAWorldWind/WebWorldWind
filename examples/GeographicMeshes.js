@@ -59,6 +59,8 @@ requirejs(['./WorldWindShim',
             meshPositions.push(row);
         }
 
+        // Create a mesh with a texture image.
+
         // Create the mesh.
         var mesh = new WorldWind.GeographicMesh(meshPositions, null);
 
@@ -85,6 +87,7 @@ requirejs(['./WorldWindShim',
 
         // Create a mesh that displays a custom image.
 
+        // Create custom image with a 2D canvas.
         var canvas = document.createElement("canvas"),
             ctx2d = canvas.getContext("2d"),
             size = 64, c = size / 2 - 0.5, innerRadius = 5, outerRadius = 20;
@@ -124,7 +127,7 @@ requirejs(['./WorldWindShim',
         mesh.attributes = meshAttributes;
 
         // Create and assign the mesh's highlight attributes.
-        var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
+        highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
         highlightAttributes.outlineColor = WorldWind.Color.WHITE;
         mesh.highlightAttributes = highlightAttributes;
 
