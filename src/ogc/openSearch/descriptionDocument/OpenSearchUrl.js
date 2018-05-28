@@ -150,6 +150,18 @@ define([
                 get: function () {
                     return this._relations;
                 }
+            },
+
+            paramsByName: {
+                get: function() {
+                    return this._paramsByName;
+                }
+            },
+
+            staticParams: {
+                get: function() {
+                    return this._staticParams;
+                }
             }
         });
 

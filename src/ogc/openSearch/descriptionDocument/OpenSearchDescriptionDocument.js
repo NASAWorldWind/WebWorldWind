@@ -67,6 +67,11 @@ define([
             this._attribution = OpenSearchUtils.getChildTextContent(xmlRoot, 'Attribution', ns);
             this._syndicationRight = OpenSearchUtils.getChildTextContent(xmlRoot, 'SyndicationRight', ns);
             this._adultContent = OpenSearchUtils.getChildTextContent(xmlRoot, 'AdultContent', ns);
+            if(this._adultContent === 'false') {
+                this._adultContent = false;
+            } else if(this._adultContent === 'true') {
+                this._adultContent = true;
+            }
             this._languages = OpenSearchUtils.getXmlElements(xmlRoot, 'Language', ns).map(OpenSearchUtils.getTextContent);
             this._inputEncodings = OpenSearchUtils.getXmlElements(xmlRoot, 'InputEncoding', ns).map(OpenSearchUtils.getTextContent);
             this._outputEncodings = OpenSearchUtils.getXmlElements(xmlRoot, 'OutputEncoding', ns).map(OpenSearchUtils.getTextContent);
@@ -261,6 +266,12 @@ define([
             var image = {};
             OpenSearchUtils.getNodeAttributes(node, image);
             image.src = node.textContent;
+            if(image.height) {
+                image.height = Number(image.height);
+            }
+            if(image.width) {
+                image.width = Number(image.width);
+            }
             return image;
         };
 
