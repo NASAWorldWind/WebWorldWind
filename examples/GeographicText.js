@@ -47,28 +47,34 @@ requirejs(['./WorldWindShim',
 
         var text,
             textAttributes = new WorldWind.TextAttributes(null),
-            textLayer = new WorldWind.RenderableLayer("Colorado Peaks"),
+            textLayer = new WorldWind.RenderableLayer("Oregon Peaks"),
 
-            // A list of prominent peaks in the State of Colorado. Retrieved from:
+            // A list of prominent peaks in the State of Oregon. Retrieved from:
             // https://en.wikipedia.org/wiki/List_of_Ultras_of_the_United_States
             peaks = [
                 {
-                    'name': "Mount Elbert",
-                    'elevation': 4401,
-                    'latitude': 39.1178,
-                    'longitude': -106.4454
+                    'name': "South Sister",
+                    'elevation': 3159,
+                    'latitude': 44.1035,
+                    'longitude': -121.7693
                 },
                 {
-                    'name': "Pikes Peak",
-                    'elevation': 4302,
-                    'latitude': 38.8405,
-                    'longitude': -105.0442
+                    'name': "Mount\nHood",
+                    'elevation': 3429,
+                    'latitude': 45.3735,
+                    'longitude': -121.6959
                 },
                 {
-                    'name': "Blanca Peak",
-                    'elevation': 4376,
-                    'latitude': 37.5775,
-                    'longitude': -105.4856
+                    'name': "Sacajawea Peak",
+                    'elevation': 3000,
+                    'latitude': 45.2450,
+                    'longitude': -117.2929
+                },
+                {
+                    'name': "Mount Jefferson",
+                    'elevation': 3201,
+                    'latitude': 44.6743,
+                    'longitude': -121.7996
                 }
             ];
 
@@ -98,8 +104,8 @@ requirejs(['./WorldWindShim',
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
-        // Point the camera and zoom to the State of Colorado. Observe the decluttering feature
-        // according to camera altitude and text label length.
-        wwd.goTo(new WorldWind.Position(39.14, -105.54, 500000));
+        // Point the camera and zoom to the State of Oregon. Observe the decluttering feature
+        // according to camera altitude while zooming.
+        wwd.goTo(new WorldWind.Position(44.00, -120.33, 800000));
 
     });
