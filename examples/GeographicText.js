@@ -47,12 +47,32 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // The U.S. peaks data array is retrieved from a different module out of convenience to avoid declaring it here.
-        // See GeographicTextPeaks.js.
-        var peaks = new GeographicTextPeaks().peaks,
-            text,
+        var text,
             textAttributes = new WorldWind.TextAttributes(null),
-            textLayer = new WorldWind.RenderableLayer("U.S.A. Peaks");
+            textLayer = new WorldWind.RenderableLayer("Colorado Peaks"),
+            peaks = [
+                {
+                    'name': "Mount Elbert",
+                    'state': "Colorado",
+                    'elevation': 4401,
+                    'latitude': 39.1178,
+                    'longitude': -106.4454
+                },
+                {
+                    'name': "Pikes Peak",
+                    'state': "Colorado",
+                    'elevation': 4302,
+                    'latitude': 38.8405,
+                    'longitude': -105.0442
+                },
+                {
+                    'name': "Blanca Peak",
+                    'state': "Colorado",
+                    'elevation': 4376,
+                    'latitude': 37.5775,
+                    'longitude': -105.4856
+                }
+            ];
 
         // Set up the common text attributes.
         textAttributes.color = WorldWind.Color.CYAN;
