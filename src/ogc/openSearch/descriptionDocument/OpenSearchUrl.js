@@ -18,12 +18,14 @@
  */
 
 define([
+        '../../../util/Logger',
         '../OpenSearchConstants',
         '../OpenSearchNamespaces',
         './OpenSearchParameter',
         '../OpenSearchUtils'
     ],
-    function (OpenSearchConstants,
+    function (Logger,
+              OpenSearchConstants,
               OpenSearchNamespaces,
               OpenSearchParameter,
               OpenSearchUtils) {
@@ -338,6 +340,10 @@ define([
                     })
                 );
             });
+
+            Logger.logMessage(Logger.LEVEL_WARNING, 'OpenSearchUrl', 'isCompatible', 'Missing required params: ', missingRequiredParams.map(function(param){
+                return param.name + ': ' + param.value;
+            }).join(','));
 
             return missingRequiredParams.length === 0;
         };

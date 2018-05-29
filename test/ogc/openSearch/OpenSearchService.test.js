@@ -14,21 +14,52 @@
  * limitations under the License.
  */
 define([
+    'src/ogc/openSearch/OpenSearchConstants',
     'src/ogc/openSearch/OpenSearchService'
-], function (OpenSearchService) {
+], function (OpenSearchConstants,
+             OpenSearchService) {
     "use strict";
     var openSearchService = new OpenSearchService();
 
     describe("Open Search Support", function(){
-        describe("Discover", function(){
-            var validDescriptionDocument;
-            beforeAll(function(done){
-                openSearchService.discover({url: '../base/test/ogc/openSearch/osDescription.xml'}).then(function(result){
-                    validDescriptionDocument = result.descriptionDocument;
-                    done();
-                });
-            });
+        var validDescriptionDocument,
+            validCollectionsDocument,
+            validProductsDocument;
 
+        beforeAll(function(done){
+            var service;
+            openSearchService.discover({url: '../base/test/ogc/openSearch/osDescription.xml'}).then(function(result){
+                service = result;
+                validDescriptionDocument = result.descriptionDocument;
+                return service.search([
+                    {name: 'query', value: 'LAI'},
+                    {name: 'startDate', value: '2017-05-28T14:51:34Z'},
+                    {name: 'endDate', value: '2018-05-28T14:51:34Z'},
+                    {name: 'organisationName', value:'VITO'},
+                    {name: 'platform', value: ''},
+                    {name: 'instrument', value: ''}
+                ], {relation: OpenSearchConstants.COLLECTION})
+            }).then(function(result){
+                validCollectionsDocument = result;
+                return service.search([
+                    {name: 'startDate', value: '2017-05-28T14:51:34Z'},
+                    {name: 'endDate', value: '2018-05-28T14:51:34Z'},
+                    {name: 'parentIdentifier', value: 'EOP:VITO:PDF:urn:eop:VITO:CGS_S2_LAI'},
+                    {name: 'organisationName', value:'VITO'},
+                    {name: 'platform', value: ''},
+                    {name: 'instrument', value: ''}
+                ]);
+            }).then(function(result){
+                console.log('ValidProductsDocument ', result);
+                validProductsDocument = result;
+                done();
+            }).catch(function(err){
+                fail(err);
+                done(err);
+            })
+        });
+
+        describe("Discover", function(){
             it('contains Short Name', function(){
                 expect(validDescriptionDocument.shortName).toBe('FEDEO');
             });
@@ -352,11 +383,135 @@ define([
                     expect(validDescriptionDocument.outputEncodings[0]).toBe('UTF-8');
                 });
             });
-
-
         });
 
-        describe("Search", function(){
+        describe("Search Collections", function(){
+            describe('properties', function(){
+                it('contains creator', function(){
+                    expect(validCollectionsDocument.properties.creator).toBe('FEDEO Clearinghouse');
+                });
+
+                it('contains rights', function(){
+                    expect(validCollectionsDocument.properties.rights).toBe('Copyright 2016-2018, European Space Agency');
+                });
+
+                it('contains title', function(){
+                    expect(validCollectionsDocument.properties.title).toBe('FEDEO Clearinghouse - Search Response');
+                });
+
+                it('contains totalResults', function(){
+                    expect(validCollectionsDocument.properties.totalResults).toBe(4);
+                });
+
+                it('contains startIndex', function(){
+                    expect(validCollectionsDocument.properties.startIndex).toBe(1);
+                });
+
+                it('contains itemsPerPage', function(){
+                    expect(validCollectionsDocument.properties.itemsPerPage).toBe(10);
+                });
+
+                it('contains query', function(){
+                    expect(validCollectionsDocument.properties.query).toBe('xmlns:eo="http://a9.com/-/opensearch/extensions/eo/1.0/" dc:type="collection" eo:organisationName="VITO" os:searchTerms="LAI" role="request" time:end="2018-05-28T14:51:34Z" time:start="2017-05-28T14:51:34Z"');
+                });
+
+                describe('links', function(){
+                    it('contains self', function(){
+                        expect(validCollectionsDocument.properties.links.self[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&query=LAI&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&organisationName=VITO&platform=&instrument=&status=4,0');
+                    });
+
+                    it('contains describedby', function(){
+                        expect(validCollectionsDocument.properties.links.describedby[0].href).toBe('http://fedeo.esa.int/opensearch/FedEO_OSGW_Service.xml');
+                    });
+
+                    it('contains first', function(){
+                        expect(validCollectionsDocument.properties.links.first.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&query=LAI&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&organisationName=VITO&platform=&instrument=&startRecord=1&status=4,0');
+                    });
+
+                    it('contains last', function(){
+                        expect(validCollectionsDocument.properties.links.last.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&query=LAI&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&organisationName=VITO&platform=&instrument=&startRecord=1&status=4,0');
+                    });
+
+                    it('contains search', function(){
+                        expect(validCollectionsDocument.properties.links.search[0].href).toBe('http://fedeo.esa.int/opensearch/description.xml');
+                    });
+                })
+            });
+
+            describe('features', function(){
+                var first;
+                beforeAll(function(){
+                    first = validCollectionsDocument.features[0];
+                });
+
+                it('contains 4 features', function(){
+                    expect(validCollectionsDocument.features.length).toBe(4);
+                });
+
+                describe('first', function(){
+                    it('contains id', function(){
+                        expect(first.id).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&parentIdentifier=EOP%3AEUMETSAT&uid=EO%3AEUM%3ADAT%3APROBA-V%3ALAI-V2');
+                    });
+
+                    it('contains type', function(){
+                        expect(first.type).toBe('Feature');
+                    });
+
+                    describe('properties', function(){
+                        it('contains title', function(){
+                            expect(first.properties.title).toBe('Leaf Area Index V2 - PROBA-V - Africa');
+                        });
+
+                        it('contains identifier', function(){
+                            expect(first.properties.identifier).toBe('EO:EUM:DAT:PROBA-V:LAI-V2');
+                        });
+
+                        describe('categories', function(){
+                            it('contains 13 categories', function(){
+                                expect(first.properties.categories.length).toBe(13);
+                            });
+
+                            describe('first', function(){
+                                var firstCategory;
+                                beforeAll(function(){
+                                    firstCategory = first.properties.categories[0];
+                                });
+
+                                it('has label', function(){
+                                    expect(firstCategory.label).toBe('Atmospheric conditions');
+                                });
+
+                                it('has term', function(){
+                                    expect(firstCategory.term).toBe('Atmospheric conditions');
+                                });
+                            });
+                        });
+                    });
+
+                    describe('links', function(){
+                        describe('alternates', function(){
+                            it('contains the 10 alternates', function(){
+                                expect(first.links.alternates.length).toBe(10);
+                            });
+                        });
+
+                        describe('search', function(){
+                            it('contains href', function(){
+                                expect(first.links.search[0].href).toBe('http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:EUMETSAT:EO:EUM:DAT:PROBA-V:LAI-V2');
+                            })
+                        });
+
+                        describe('icon', function(){
+                            it('contains href', function(){
+                                expect(first.links.icon[0].href).toBe('http://131.176.197.12/opensearch/images/eumetsat.jpg');
+                            })
+                        });
+                    });
+                })
+            });
+        });
+
+        describe("Search Products", function(){
 
         });
     })
