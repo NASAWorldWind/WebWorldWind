@@ -17,11 +17,9 @@
  * Illustrates how to display text at geographic positions.
  */
 requirejs(['./WorldWindShim',
-        './LayerManager',
-        './GeographicTextPeaks'],
+        './LayerManager'],
     function (WorldWind,
-              LayerManager,
-              GeographicTextPeaks) {
+              LayerManager) {
         "use strict";
 
         // Tell WorldWind to log only warnings and errors.
@@ -50,24 +48,24 @@ requirejs(['./WorldWindShim',
         var text,
             textAttributes = new WorldWind.TextAttributes(null),
             textLayer = new WorldWind.RenderableLayer("Colorado Peaks"),
+
+            // A list of prominent peaks in the State of Colorado. Retrieved from:
+            // https://en.wikipedia.org/wiki/List_of_Ultras_of_the_United_States
             peaks = [
                 {
                     'name': "Mount Elbert",
-                    'state': "Colorado",
                     'elevation': 4401,
                     'latitude': 39.1178,
                     'longitude': -106.4454
                 },
                 {
                     'name': "Pikes Peak",
-                    'state': "Colorado",
                     'elevation': 4302,
                     'latitude': 38.8405,
                     'longitude': -105.0442
                 },
                 {
                     'name': "Blanca Peak",
-                    'state': "Colorado",
                     'elevation': 4376,
                     'latitude': 37.5775,
                     'longitude': -105.4856
@@ -85,7 +83,7 @@ requirejs(['./WorldWindShim',
             var peak = peaks[i],
                 peakPosition = new WorldWind.Position(peak.latitude, peak.longitude, peak.elevation);
 
-            text = new WorldWind.GeographicText(peakPosition, peak.name + "\n" + peak.state);
+            text = new WorldWind.GeographicText(peakPosition, peak.name + "\n" + peak.elevation + " m");
 
             // Set the text attributes for this shape.
             text.attributes = textAttributes;
@@ -99,5 +97,9 @@ requirejs(['./WorldWindShim',
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
+
+        // Point the camera and zoom to the State of Colorado. Observe the decluttering feature
+        // according to camera altitude and text label length.
+        wwd.goTo(new WorldWind.Position(39.14, -105.54, 500000));
 
     });
