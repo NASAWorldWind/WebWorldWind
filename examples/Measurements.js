@@ -31,7 +31,7 @@ requirejs([
         var projectedAreaSpan = document.getElementById('projected-area');
         var terrainAreaSpan = document.getElementById('terrain-area');
 
-        // Tell WorldWind to log only warnings.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create the WorldWinow.
