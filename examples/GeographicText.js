@@ -52,30 +52,10 @@ requirejs(['./WorldWindShim',
             // A list of prominent peaks in the State of Oregon. Retrieved from:
             // https://en.wikipedia.org/wiki/List_of_Ultras_of_the_United_States
             peaks = [
-                {
-                    'name': "South Sister",
-                    'elevation': 3159,
-                    'latitude': 44.1035,
-                    'longitude': -121.7693
-                },
-                {
-                    'name': "Mount\nHood",
-                    'elevation': 3429,
-                    'latitude': 45.3735,
-                    'longitude': -121.6959
-                },
-                {
-                    'name': "Sacajawea Peak",
-                    'elevation': 3000,
-                    'latitude': 45.2450,
-                    'longitude': -117.2929
-                },
-                {
-                    'name': "Mount Jefferson",
-                    'elevation': 3201,
-                    'latitude': 44.6743,
-                    'longitude': -121.7996
-                }
+                {'name': "South Sister", 'elevation': 3159, 'latitude': 44.1035, 'longitude': -121.7693},
+                {'name': "Mount Hood", 'elevation': 3429, 'latitude': 45.3735, 'longitude': -121.6959},
+                {'name': "Sacajawea Peak", 'elevation': 3000, 'latitude': 45.2450, 'longitude': -117.2929},
+                {'name': "Mount Jefferson", 'elevation': 3201, 'latitude': 44.6743, 'longitude': -121.7996}
             ];
 
         // Set up the common text attributes.
@@ -104,8 +84,8 @@ requirejs(['./WorldWindShim',
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
 
-        // Point the camera and zoom to the State of Oregon. Observe the decluttering feature
-        // according to camera altitude while zooming.
+        // Point the camera and zoom to the State of Oregon.
+        // Observe the decluttering feature according to camera altitude while zooming.
         wwd.goTo(new WorldWind.Position(44.00, -120.33, 800000));
 
     });
