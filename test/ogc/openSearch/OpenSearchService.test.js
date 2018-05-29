@@ -512,7 +512,91 @@ define([
         });
 
         describe("Search Products", function(){
+            it('contains type', function(){
+                expect(validProductsDocument.type).toBe('FeatureCollection');
+            });
 
+            describe('features', function(){
+
+            });
+
+            describe('properties', function(){
+                it('contains creator', function(){
+                    expect(validProductsDocument.properties.creator).toBe('FEDEO Clearinghouse');
+                });
+
+                it('contains rights', function(){
+                    expect(validProductsDocument.properties.rights).toBe('Copyright 2016-2018, European Space Agency');
+                });
+
+                it('contains title', function(){
+                    expect(validProductsDocument.properties.title).toBe('FEDEO Clearinghouse - Search Response');
+                });
+
+                it('contains total results', function(){
+                    expect(validProductsDocument.properties.totalResults).toBe(2492);
+                });
+
+                it('contains items per page', function(){
+                    expect(validProductsDocument.properties.itemsPerPage).toBe(10);
+                });
+
+                it('contains start index', function(){
+                    expect(validProductsDocument.properties.startIndex).toBe(1);
+                });
+
+                it('contains query', function(){
+                    expect(validProductsDocument.properties.query).toBe('eo:organisationName="VITO" eo:parentIdentifier="urn:eop:VITO:CGS_S2_LAI" role="request" time:end="2018-05-28T14:51:34Z" time:start="2017-05-28T14:51:34Z"');
+                });
+
+                describe('links', function(){
+                    beforeAll(function(){
+                        console.log(validProductsDocument.properties.links.alternates);
+                        console.log(validProductsDocument.properties.links.describedby);
+                    });
+
+                    it('contains self', function(){
+                        expect(validProductsDocument.properties.links.self[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=');
+                    });
+
+                    describe('alternates', function(){
+                        var first;
+                        beforeAll(function(){
+                            first = validProductsDocument.properties.links.alternates[0];
+                        });
+
+                        it('contains 2', function(){
+                            expect(validProductsDocument.properties.links.alternates.length).toBe(2);
+                        });
+
+                        describe('first', function(){
+                            it('has href', function(){
+                                expect(first.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/metalink%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=');
+                            })
+                        });
+                    });
+
+                    it('contains describedby', function(){
+                        expect(validProductsDocument.properties.links.describedby[0].href).toBe('http://SERVER_NAME/opensearch/FedEO_OSGW_Service.xml');
+                    });
+
+                    it('contains first', function(){
+                        expect(validProductsDocument.properties.links.first.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=&startRecord=1');
+                    });
+
+                    it('contains next', function(){
+                        expect(validProductsDocument.properties.links.next.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=&startRecord=11');
+                    });
+
+                    it('contains last', function(){
+                        expect(validProductsDocument.properties.links.last.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=&startRecord=2491');
+                    });
+
+                    it('contains search', function(){
+                        expect(validProductsDocument.properties.links.search[0].href).toBe('http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=urn%3Aeop%3AVITO%3ACGS_S2_LAI');
+                    })
+                })
+            });
         });
     })
 });
