@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <title>Surface Shape Performance Functional Test</title>
+
+    <style>
+        #globe {
+            background-color: black;
+            width: 100%;
+            height: 100vh;
+        }
+        textarea {
+            width: 100%;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Globe Column -->
+        <div class="col-xl-8 col-lg-12">
+            <canvas id="globe">
+                Browser Does Not Support HTML5
+            </canvas>
+        </div>
+
+        <!-- User Interface, Status, and Result Output -->
+        <div class="col-xl-4 col-lg-12">
+
+            <!-- Test Description/Controls -->
+            <div>
+                <h2>
+                    Surface Shape Performance Tests
+                </h2>
+                <p>
+                    Reload the page between tests. Once the test has been completed, a statistical summary of the frame
+                    times and a distribution of the frame times grouped by five second durations is displayed. Below the
+                    frame time distribution plot, a text area with the actual frame times is displayed as well as a
+                    button which automates copying of the data to the clipboard.
+                </p>
+            </div>
+            <div id="buttons">
+                <h3>Available Tests:</h3>
+                <button id="navigate-button" type="button" class="btn btn-secondary">No Shapes</button>
+                <button id="static-button" type="button" class="btn btn-secondary">Static Shapes</button>
+                <button id="dynamic-button" type="button" class="btn btn-secondary">Dynamic Shapes</button>
+            </div>
+            <hr>
+
+            <!-- Status and Results Output -->
+            <div>
+                <div id="status-output">
+
+                </div>
+                <hr>
+                <div id="results-output">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<script data-main="SurfaceShapePerformance" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js" integrity="sha256-0SGl1PJNDyJwcV5T+weg2zpEMrh7xvlwO4oXgvZCeZk=" crossorigin="anonymous"></script>
+</body>
+</html>
