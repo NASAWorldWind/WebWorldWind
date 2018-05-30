@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * Illustrates how to consume imagery from a Web Map Tile Service (WMTS).
+ */
 requirejs([
         './WorldWindShim',
         '../examples/LayerManager'

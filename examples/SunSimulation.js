@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * Illustrates how to display a sunlight time of day simulation utilizing the atmosphere layer.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
