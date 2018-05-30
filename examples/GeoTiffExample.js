@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to load and display GeoTiff file format.
+ * Illustrates how to load and display a GeoTiff file.
  */
 
 requirejs(['./WorldWindShim',
