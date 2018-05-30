@@ -6,7 +6,7 @@ requirejs([
         "use strict";
 
         // Define shape counts for testing
-        var dynamicShapeCount = 100; // of each type of shape (circle, ellipse, etc.)
+        var dynamicShapeCount = 500; // of each type of shape (circle, ellipse, etc.)
         var staticShapeCount = 1000; // of each type of shape (circle, ellipse, etc.)
 
         // Set the base url to use the root images directory
@@ -111,21 +111,22 @@ requirejs([
             var sa = new WorldWind.ShapeAttributes();
             var r = rand();
 
-            sa.drawInterior = false;
+            sa.drawInterior = true;
             sa.drawOutline = false;
 
-            if (r < 0.3333) {
-                sa.drawInterior = true;
-                sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            } else if (r < 0.6666) {
-                sa.drawOutline = true;
-                sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            } else {
-                sa.drawInterior = true;
-                sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-                sa.drawOutline = true;
-                sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            }
+            sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+            // if (r < 0.3333) {
+            //     sa.drawInterior = true;
+            //     sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+            // } else if (r < 0.6666) {
+            //     sa.drawOutline = true;
+            //     sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+            // } else {
+            //     sa.drawInterior = true;
+            //     sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+            //     sa.drawOutline = true;
+            //     sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+            // }
 
             return sa;
         };
@@ -148,67 +149,67 @@ requirejs([
                 testLayer.addRenderable(shape);
             }
 
-            // Surface Ellipse
-            for (i = 0; i < count; i++) {
-                sa = generateShapeAttributes();
-                majorAxis = rand() * 1000000;
-                minorAxis = rand() * 500000;
-                heading = rand() * 360;
-                shape = new WorldWind.SurfaceEllipse(generateLocation(), majorAxis, minorAxis, heading, sa);
-                testLayer.addRenderable(shape);
-            }
-
-            // Surface Polygon
-            for (i = 0; i < count; i++) {
-                sa = generateShapeAttributes();
-                topLocation = generateLocation();
-                locations = [];
-                locations.push(topLocation);
-                for (j = 0; j < 2; j++) {
-                    lat = Math.min(90, Math.max(-90, topLocation.latitude - rand() * 8));
-                    lon = Math.min(180, Math.max(-180, topLocation.longitude - rand() * 8));
-                    locations.push(new WorldWind.Location(lat, lon));
-                }
-                shape = new WorldWind.SurfacePolygon(locations, sa);
-                testLayer.addRenderable(shape);
-            }
-
-            // Surface Polyline
-            for (i = 0; i < count; i++) {
-                sa = generateShapeAttributes();
-                topLocation = generateLocation();
-                locations = [];
-                locations.push(topLocation);
-                for (j = 0; j < 2; j++) {
-                    lat = Math.min(90, Math.max(-90, topLocation.latitude - rand() * 8));
-                    lon = Math.min(180, Math.max(-180, topLocation.longitude - rand() * 8));
-                    locations.push(new WorldWind.Location(lat, lon));
-                }
-                shape = new WorldWind.SurfacePolyline(locations, sa);
-                testLayer.addRenderable(shape);
-            }
-
-            // Surface Rectangle
-            for (i = 0; i < count; i++) {
-                sa = generateShapeAttributes();
-                majorAxis = 1000000 * rand();
-                minorAxis = 500000 * rand();
-                heading = 360 * rand();
-                shape = new WorldWind.SurfaceRectangle(generateLocation(), majorAxis, minorAxis, heading, sa);
-                testLayer.addRenderable(shape);
-            }
-
-            // Surface Sector
-            for (i = 0; i < count; i++) {
-                sa = generateShapeAttributes();
-                topLocation = generateLocation();
-                majorAxis = 8 * rand();
-                minorAxis = 4 * rand();
-                sector = new WorldWind.Sector(topLocation.latitude, topLocation.latitude + majorAxis,
-                    topLocation.longitude, topLocation.longitude + minorAxis);
-                shape = new WorldWind.SurfaceSector(sector, sa);
-                testLayer.addRenderable(shape);
-            }
+            // // Surface Ellipse
+            // for (i = 0; i < count; i++) {
+            //     sa = generateShapeAttributes();
+            //     majorAxis = rand() * 1000000;
+            //     minorAxis = rand() * 500000;
+            //     heading = rand() * 360;
+            //     shape = new WorldWind.SurfaceEllipse(generateLocation(), majorAxis, minorAxis, heading, sa);
+            //     testLayer.addRenderable(shape);
+            // }
+            //
+            // // Surface Polygon
+            // for (i = 0; i < count; i++) {
+            //     sa = generateShapeAttributes();
+            //     topLocation = generateLocation();
+            //     locations = [];
+            //     locations.push(topLocation);
+            //     for (j = 0; j < 2; j++) {
+            //         lat = Math.min(90, Math.max(-90, topLocation.latitude - rand() * 8));
+            //         lon = Math.min(180, Math.max(-180, topLocation.longitude - rand() * 8));
+            //         locations.push(new WorldWind.Location(lat, lon));
+            //     }
+            //     shape = new WorldWind.SurfacePolygon(locations, sa);
+            //     testLayer.addRenderable(shape);
+            // }
+            //
+            // // Surface Polyline
+            // for (i = 0; i < count; i++) {
+            //     sa = generateShapeAttributes();
+            //     topLocation = generateLocation();
+            //     locations = [];
+            //     locations.push(topLocation);
+            //     for (j = 0; j < 2; j++) {
+            //         lat = Math.min(90, Math.max(-90, topLocation.latitude - rand() * 8));
+            //         lon = Math.min(180, Math.max(-180, topLocation.longitude - rand() * 8));
+            //         locations.push(new WorldWind.Location(lat, lon));
+            //     }
+            //     shape = new WorldWind.SurfacePolyline(locations, sa);
+            //     testLayer.addRenderable(shape);
+            // }
+            //
+            // // Surface Rectangle
+            // for (i = 0; i < count; i++) {
+            //     sa = generateShapeAttributes();
+            //     majorAxis = 1000000 * rand();
+            //     minorAxis = 500000 * rand();
+            //     heading = 360 * rand();
+            //     shape = new WorldWind.SurfaceRectangle(generateLocation(), majorAxis, minorAxis, heading, sa);
+            //     testLayer.addRenderable(shape);
+            // }
+            //
+            // // Surface Sector
+            // for (i = 0; i < count; i++) {
+            //     sa = generateShapeAttributes();
+            //     topLocation = generateLocation();
+            //     majorAxis = 8 * rand();
+            //     minorAxis = 4 * rand();
+            //     sector = new WorldWind.Sector(topLocation.latitude, topLocation.latitude + majorAxis,
+            //         topLocation.longitude, topLocation.longitude + minorAxis);
+            //     shape = new WorldWind.SurfaceSector(sector, sa);
+            //     testLayer.addRenderable(shape);
+            // }
 
             wwd.redraw();
         };
@@ -222,13 +223,13 @@ requirejs([
         };
 
         var onStaticShapesClick = function () {
-            generateShapes(1000);
+            generateShapes(staticShapeCount);
             wwd.redraw();
             onMoveClick();
         };
 
         var onDynamicShapesClick = function () {
-            generateShapes(100);
+            generateShapes(dynamicShapeCount);
 
             var onRedrawMoveShapes = function (worldwindow, stage) {
                 if (stage === WorldWind.AFTER_REDRAW) {
@@ -243,8 +244,8 @@ requirejs([
                             if (shape instanceof WorldWind.SurfaceCircle || shape instanceof WorldWind.SurfaceEllipse
                                 || shape instanceof WorldWind.SurfaceRectangle) {
                                 var center = shape.center;
-                                center.latitude += rand() * 0.5 - 0.25;
-                                center.longitude += rand() * 0.5 - 0.25;
+                                center.latitude += rand() * 5 - 2.5;
+                                center.longitude += rand() * 5 - 2.5;
                                 shape.center = center;
                             } else if (shape instanceof WorldWind.SurfacePolygon
                                 || shape instanceof WorldWind.SurfacePolyline) {

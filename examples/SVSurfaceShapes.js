@@ -48,6 +48,8 @@ requirejs(['./WorldWindShim',
             }
         }
 
+        new LayerManager(wwd);
+
         // Create a layer to hold the surface shapes.
         var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
         wwd.addLayer(shapesLayer);
@@ -87,11 +89,14 @@ requirejs(['./WorldWindShim',
         shape = new WorldWind.SurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
-        wwd.navigator.lookAtLocation.latitude = 36.2;
-        wwd.navigator.lookAtLocation.longitude = -112.98;
-        wwd.navigator.range = 100000;
-        wwd.navigator.heading = 45;
-        wwd.navigator.tilt = 60;
-        wwd.redraw();
+        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(45, -90), 100000);
+        shapesLayer.addRenderable(shape);
+
+        // wwd.navigator.lookAtLocation.latitude = 36.2;
+        // wwd.navigator.lookAtLocation.longitude = -112.98;
+        // wwd.navigator.range = 100000;
+        // wwd.navigator.heading = 45;
+        // wwd.navigator.tilt = 60;
+        // wwd.redraw();
     }
 );

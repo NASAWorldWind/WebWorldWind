@@ -20,6 +20,7 @@ define(['../error/ArgumentError',
         '../geom/Location',
         '../util/Logger',
         '../geom/Matrix',
+        '../geom/Sector',
         '../shapes/ShapeAttributes',
         '../shapes/SurfaceShape',
         '../shaders/SurfaceShapesSVProgram',
@@ -29,6 +30,7 @@ define(['../error/ArgumentError',
               Location,
               Logger,
               Matrix,
+              Sector,
               ShapeAttributes,
               SurfaceShape,
               SurfaceShapesSVProgram,
@@ -150,8 +152,27 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.render = function (dc) {
             var vbo, ebo, program, scratchMatrix = SurfaceCircleSV.MATRIX,
-                transformationMatrix = SurfaceCircleSV.MATRIX2, gl = dc.currentGlContext;
+                transformationMatrix = SurfaceCircleSV.MATRIX2, gl = dc.currentGlContext, sector;
             if (!this.enabled) {
+                return;
+            }
+
+            if (!this._boundaries) {
+                this.computeBoundaries(dc);
+            }
+
+            if (!this.currentData) {
+                this.currentData = {};
+            }
+
+            if (this._sectors.length === 0) {
+                sector = new Sector();
+                sector.setToBoundingSector(this._boundaries);
+                this._sectors.push(sector);
+                this.computeExtent(dc);
+            }
+
+            if (!this.intersectsFrustum(dc)) {
                 return;
             }
 
@@ -266,11 +287,9 @@ define(['../error/ArgumentError',
         };
 
         SurfaceCircleSV.prototype.assembleVertexArray = function (dc) {
-            var upperLimit = 100000, lowerLimit = -5000, idx = 0, loc, point = SurfaceCircleSV.POINT;
+            var upperLimit = 80000, lowerLimit = -5000, idx = 0, loc, point = SurfaceCircleSV.POINT;
 
             dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, upperLimit, this._centerPoint);
-
-            this.computeBoundaries(dc);
 
             this._vertexArray = new Float32Array((2 + this._boundaries.length * 2) * 3); // the middle two coordinates plus the exterior
 
@@ -376,8 +395,11 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.reset = function () {
             this._vertexArray = null;
+            this._elementArray = null;
             this._vboCacheKey = null;
             this._elementCacheKey = null;
+            this._boundaries = null;
+            this._sectors = [];
         };
 
         /**

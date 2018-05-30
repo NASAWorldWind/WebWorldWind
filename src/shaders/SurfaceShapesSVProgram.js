@@ -12,9 +12,10 @@ define([
                     'uniform mat4 mvpMatrix;\n' +
                     'void main() {\n' +
                     '   gl_Position = mvpMatrix * pos;\n' +
-                    '   if(gl_Position.z > gl_Position.w) {\n' +
-                    '       gl_Position.z = gl_Position.w;\n' +
-                    '   }\n' +
+                    '   gl_Position.z = min(gl_Position.z, gl_Position.w);\n' +
+                    // '   if(gl_Position.z > gl_Position.w) {\n' +
+                    // '       gl_Position.z = gl_Position.w;\n' +
+                    // '   }\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
