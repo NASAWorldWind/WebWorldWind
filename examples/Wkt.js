@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * Illustrates how to load and display Well-Known Text (WKT) data.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
