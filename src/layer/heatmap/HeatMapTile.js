@@ -124,9 +124,11 @@ define([], function(){
     };
 
     /**
+     * It calculates position in pixels of the point based on its latitude.
      * @param location {Location} Location to transform
      * @param sector {Sector} Sector to which transform
      * @param height {Number} Height of the tile to draw to.
+     * @private
      * @returns {number} Position on the height in pixels. THe result needs to start with 0
      */
     HeatMapTile.prototype.latitudeInSector = function(location, sector, height) {
