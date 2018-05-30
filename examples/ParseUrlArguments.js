@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to parse the arguments in the browser's URL.
+ * Illustrates how to retrieve arguments in the browser's URL in order to interact with the globe.
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],

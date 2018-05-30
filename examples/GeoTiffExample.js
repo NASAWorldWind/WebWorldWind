@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to use the GeoTiff format with the WorldWind globe.
+ * Illustrates how to load and display GeoTiff file format.
  */
 
 requirejs(['./WorldWindShim',

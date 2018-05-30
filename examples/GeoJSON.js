@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to use the GeoJSON format with a WorldWind globe.
+ * Illustrates how to load and display GeoJSON data.
  */
 
 requirejs(['./WorldWindShim',

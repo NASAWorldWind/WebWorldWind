@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to create a digital globe layer.
+ * Illustrates how to consume imagery from a DigitalGlobe service.
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],

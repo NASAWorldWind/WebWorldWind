@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to load a collada onto the globe.
+ * Illustrates how to load and display a Collada 3D model onto the globe.
  */
 
 requirejs(['./WorldWindShim',

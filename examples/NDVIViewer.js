@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to view NDVI data.
+ * Exemplifies how to display and analyze NDVI data.
  */
 requirejs([
         './WorldWindShim',
