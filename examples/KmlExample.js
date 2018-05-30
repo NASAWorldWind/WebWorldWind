@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to use view the contents of a KML file.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

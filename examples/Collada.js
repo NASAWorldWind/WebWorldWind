@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to load a collada onto the globe.
+ */
 
 requirejs(['./WorldWindShim',
         './LayerManager'],

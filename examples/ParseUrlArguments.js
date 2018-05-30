@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to parse the arguments in the browser's URL.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
