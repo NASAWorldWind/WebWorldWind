@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to export surface shapes in Well-Known Text.
+ * Illustrates how to export surface shapes in Well-Known Text (WKT).
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],

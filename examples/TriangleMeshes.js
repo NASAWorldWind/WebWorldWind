@@ -16,7 +16,6 @@
 /**
  * Illustrates how to display TriangleMesh shapes.
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
