@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to perform picking in a region around the pointing cursor.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

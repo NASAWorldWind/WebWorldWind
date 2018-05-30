@@ -15,9 +15,7 @@
  */
 /**
  * Tests changing the state of SurfaceShape types with a timer.
- *
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
