@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to retrieve arguments in the browser's URL in order to interact with the globe.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,

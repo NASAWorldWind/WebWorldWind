@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to add a custom annotation and enables the user to interactively modify its appearance.
+ */
 requirejs(['./WorldWindShim',
         './AnnotationController'],
     function (WorldWind,

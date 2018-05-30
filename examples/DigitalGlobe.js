@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to consume imagery from a DigitalGlobe service.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
