@@ -217,10 +217,38 @@ define(['../error/ArgumentError',
             gl.enableVertexAttribArray(program.posLocation);
             gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 3 * 4, 0);
 
+            // Setup the stencil including disabling drawing to the scene
+            gl.colorMask(false, false, false, false);
+            gl.depthMask(false);
+            gl.enable(gl.STENCIL_TEST);
+            gl.clear(gl.STENCIL_BUFFER_BIT);
+            gl.stencilFunc(gl.ALWAYS, 0, 255);
+            gl.disable(gl.CULL_FACE);
+
+            // z-fail
+            gl.stencilOpSeparate(gl.FRONT, gl.KEEP, gl.DECR_WRAP, gl.KEEP);
+            gl.stencilOpSeparate(gl.BACK, gl.KEEP, gl.INCR_WRAP, gl.KEEP);
+
+            // Populate the stencil against the depth buffer and shadow volume
+            this.drawVolume(dc);
+
+            // Enable the scene drawing
+            gl.colorMask(true, true, true, true);
+
+            // Apply the stencil test to drawing
+            gl.stencilFunc(gl.NOTEQUAL, 0, 255);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // maintain the stencil values
+
+            gl.disable(gl.DEPTH_TEST);
             this.drawVolume(dc);
 
             gl.disableVertexAttribArray(program.posLocation);
 
+            gl.enable(gl.DEPTH_TEST);
+            gl.enable(gl.CULL_FACE);
+            // Suspend stencil testing
+            gl.disable(gl.STENCIL_TEST);
+            gl.depthMask(true);
         };
 
         SurfaceCircleSV.prototype.drawVolume = function (dc) {

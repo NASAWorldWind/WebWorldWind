@@ -193,7 +193,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/StarFieldProgram',
         './util/SunPosition',
         './shapes/SurfaceImage',
-        './shapes/SurfaceCircle',
+        './shapes/SurfaceCircleSV',
         './shapes/SurfaceEllipse',
         './shapes/SurfacePolygon',
         './shapes/SurfacePolyline',
