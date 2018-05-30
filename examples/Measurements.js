@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to measure shape distance and area.
+ * Illustrates how to measure a shape's distance and area.
  */
 
 requirejs([
