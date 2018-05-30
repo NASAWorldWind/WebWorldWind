@@ -43,12 +43,15 @@ requirejs([
         // Create and add layers to the WorldWindow.
         // Imagery layers.
         var BNMGLayer = new WorldWind.BMNGLayer();
+        var AtmosphereLayer = new WorldWind.AtmosphereLayer();
         var pathLayer = new WorldWind.RenderableLayer('Path');
         // WorldWindow UI layer.
         var CoordinatesDisplayLayer = new WorldWind.CoordinatesDisplayLayer(wwd);
         wwd.addLayer(BNMGLayer);
-        wwd.addLayer(CoordinatesDisplayLayer);
+        // Add atmosphere layer on top of base imagery layer.
+        wwd.addLayer(AtmosphereLayer);
         wwd.addLayer(pathLayer);
+        wwd.addLayer(CoordinatesDisplayLayer);
 
         var pathPositions = [
             new WorldWind.Position(41.8267, -98.7686, 0),
