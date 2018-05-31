@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ *  Illustrates how to show the starfield layer above the globe.
+ */
 requirejs([
         './WorldWindShim',
         './LayerManager'

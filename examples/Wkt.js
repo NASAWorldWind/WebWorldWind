@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * Illustrates how to load and display Well-Known Text (WKT) data.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
@@ -30,6 +32,8 @@ requirejs(['./WorldWindShim',
         var layers = [
             // Imagery layer.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
+            // Add atmosphere layer on top of base layer.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
