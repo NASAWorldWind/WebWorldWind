@@ -238,7 +238,7 @@ define(['../error/ArgumentError',
             gl.stencilOpSeparate(gl.BACK, gl.KEEP, gl.INCR_WRAP, gl.KEEP);
 
             // Populate the stencil against the depth buffer and shadow volume
-            this.drawVolume(dc);
+            gl.drawElements(gl.TRIANGLE_STRIP, this._elementArray.length, gl.UNSIGNED_SHORT, 0);
 
             // Enable the scene drawing
             gl.colorMask(true, true, true, true);
@@ -248,7 +248,7 @@ define(['../error/ArgumentError',
             gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // maintain the stencil values
 
             gl.disable(gl.DEPTH_TEST);
-            this.drawVolume(dc);
+            gl.drawElements(gl.TRIANGLE_STRIP, this._elementArray.length, gl.UNSIGNED_SHORT, 0);
 
             gl.disableVertexAttribArray(program.posLocation);
 
@@ -257,45 +257,36 @@ define(['../error/ArgumentError',
             // Suspend stencil testing
             gl.disable(gl.STENCIL_TEST);
             gl.depthMask(true);
-        };
 
-        SurfaceCircleSV.prototype.drawVolume = function (dc) {
-            var gl = dc.currentGlContext, boundaryCount = this._boundaries.length, top = this._topAttrs,
-                bottom = this._bottomAttrs, sides = this._sidesAttrs;
-
-            // top
-            gl.drawElements(gl.TRIANGLE_FAN, top.count, gl.UNSIGNED_SHORT, top.offset * 2);
-
-            // bottom
-            gl.drawElements(gl.TRIANGLE_FAN, bottom.count, gl.UNSIGNED_SHORT, bottom.offset * 2);
-
-            // sides
-            gl.drawElements(gl.TRIANGLE_STRIP, sides.count, gl.UNSIGNED_SHORT, sides.offset * 2);
+            // gl.disable(gl.DEPTH_TEST);
+            // gl.disable(gl.CULL_FACE);
+            // gl.drawElements(gl.TRIANGLE_STRIP, this._elementArray.length, gl.UNSIGNED_SHORT, 0);
+            // gl.enable(gl.DEPTH_TEST);
+            // gl.enable(gl.CULL_FACE);
+            // gl.disableVertexAttribArray(program.posLocation);
         };
 
         SurfaceCircleSV.prototype.assembleVertexArray = function (dc) {
             var upperLimit = 80000, lowerLimit = -5000, idx = 0, loc, point = SurfaceCircleSV.POINT;
-
-            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, upperLimit, this._centerPoint);
-
             this._vertexArray = new Float32Array((2 + this._boundaries.length * 2) * 3); // the middle two coordinates plus the exterior
 
             // let's start with the top center and bottom center, then top and bottom rim
+            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, lowerLimit, this._centerPoint);
             this._vertexArray[idx++] = 0;
             this._vertexArray[idx++] = 0;
             this._vertexArray[idx++] = 0;
-            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, lowerLimit, point);
+            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, upperLimit, point);
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
             this._vertexArray[idx++] = point[1] - this._centerPoint[1];
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
 
             for (var i = 0, len = this._boundaries.length; i < len; i++) {
                 loc = this._boundaries[i];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, point);
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, lowerLimit, point);
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, lowerLimit, point);
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, upperLimit, point);
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
@@ -304,33 +295,23 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.assembleElementArray = function (dc) {
             // build an element buffer the triangle strip which makes up the sides
-            var boundarySize = this._boundaries.length, capSize = boundarySize + 1, sideSize = boundarySize * 2,
-                idx = 0, i;
-            this._elementArray = new Int16Array(2 * capSize + sideSize);
+            var boundarySize = this._boundaries.length, sections = (boundarySize - 1) / 2, idx = 0, i;
 
-            // top cap - fan
-            this._topAttrs.offset = 0;
-            this._elementArray[idx++] = 0;
-            for (i = 0; i < boundarySize; i++) {
-                this._elementArray[idx++] = 2 * (boundarySize - i);
-            }
-            this._topAttrs.count = boundarySize + 1;
+            this._elementArray = new Int16Array(sections * 10 + 1);
 
-            // bottom cap - fan
-            this._bottomAttrs.offset = this._topAttrs.count;
-            this._elementArray[idx++] = 1;
-            for (i = 0; i < boundarySize; i++) {
-                this._elementArray[idx++] = 2 * i + 3;
+            for (i = 0; i < sections; i++) {
+                this._elementArray[idx++] = 0;
+                this._elementArray[idx++] = 2 + i * 4;
+                this._elementArray[idx++] = 4 + i * 4;
+                this._elementArray[idx++] = 3 + i * 4;
+                this._elementArray[idx++] = 5 + i * 4;
+                this._elementArray[idx++] = 1;
+                this._elementArray[idx++] = 5 + i * 4;
+                this._elementArray[idx++] = 7 + i * 4;
+                this._elementArray[idx++] = 4 + i * 4;
+                this._elementArray[idx++] = 6 + i * 4;
             }
-            this._bottomAttrs.count = boundarySize + 1;
-
-            // sides - triangle strip
-            this._sidesAttrs.offset = 2 * (boundarySize + 1);
-            for (i = 1; i <= boundarySize; i++) {
-                this._elementArray[idx++] = i * 2 + 1;
-                this._elementArray[idx++] = i * 2;
-            }
-            this._sidesAttrs.count = boundarySize * 2;
+            this._elementArray[idx] = 0;
         };
 
         // Internal use only. Intentionally not documented.
