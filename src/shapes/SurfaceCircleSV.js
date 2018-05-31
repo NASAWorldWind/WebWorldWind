@@ -89,8 +89,6 @@ define(['../error/ArgumentError',
 
             this._elementCacheKey;
 
-            this._programCacheKey;
-
             this._topAttrs = {};
 
             this._bottomAttrs = {};
@@ -190,10 +188,6 @@ define(['../error/ArgumentError',
                 this._elementCacheKey = "SurfaceCircleSVElementArray" + SurfaceCircleSV.CACHE_ID++;
             }
 
-            if (!this._programCacheKey) {
-                this._programCacheKey = "SurfaceCircleSVProgram" + SurfaceCircleSV.CACHE_ID++;
-            }
-
             vbo = dc.gpuResourceCache.resourceForKey(this._vboCacheKey);
             if (!vbo) {
                 vbo = gl.createBuffer();
@@ -214,14 +208,7 @@ define(['../error/ArgumentError',
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
             }
 
-            program = dc.gpuResourceCache.resourceForKey(this._programCacheKey);
-            if (!program) {
-                program = new SurfaceShapesSVProgram(gl);
-                dc.bindProgram(program);
-                dc.gpuResourceCache.putResource(this._programCacheKey, program, program.size);
-            } else {
-                dc.bindProgram(program);
-            }
+            program = dc.findAndBindProgram(SurfaceShapesSVProgram);
 
             // setup the mvp matrix
             transformationMatrix.setToIdentity();
