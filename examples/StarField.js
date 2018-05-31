@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ *  Illustrates how to show the starfield layer above the globe.
+ */
 requirejs([
         './WorldWindShim',
         './LayerManager'
@@ -22,17 +24,20 @@ requirejs([
               LayerManager) {
         'use strict';
 
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow('canvasOne');
 
+        // Create imagery layers.
         var BMNGLayer = new WorldWind.BMNGLayer();
         var starFieldLayer = new WorldWind.StarFieldLayer();
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
-        wwd.addLayer(BMNGLayer);
 
-        //IMPORTANT: add the starFieldLayer before the atmosphereLayer
-        wwd.addLayer(starFieldLayer);
+        // Add previously created layers to the WorldWindow.
+        wwd.addLayer(BMNGLayer);
+        wwd.addLayer(starFieldLayer); //IMPORTANT: add the starFieldLayer before the atmosphereLayer
         wwd.addLayer(atmosphereLayer);
 
         var date = new Date();

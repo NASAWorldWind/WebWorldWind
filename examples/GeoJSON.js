@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2015-2018 WorldWind Contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to load and display GeoJSON data.
+ */
 
 requirejs(['./WorldWindShim',
         './LayerManager'],
@@ -20,16 +23,26 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
+            // Add atmosphere layer on top of base layer.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
 
         for (var l = 0; l < layers.length; l++) {
             layers[l].layer.enabled = layers[l].enabled;
@@ -67,7 +80,7 @@ requirejs(['./WorldWindShim',
                     0.3 * configuration.attributes.interiorColor.green,
                     0.7 * configuration.attributes.interiorColor.blue,
                     1.0);
-                configuration.attributes.outlineWidth = 1.0;
+                configuration.attributes.outlineWidth = 2.0;
             }
             else if (geometry.isPolygonType() || geometry.isMultiPolygonType()) {
                 configuration.attributes = new WorldWind.ShapeAttributes(null);
@@ -77,7 +90,7 @@ requirejs(['./WorldWindShim',
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
-                    0.1);
+                    0.5);
                 // Paint the outline in a darker variant of the interior color.
                 configuration.attributes.outlineColor = new WorldWind.Color(
                     0.5 * configuration.attributes.interiorColor.red,
@@ -91,99 +104,76 @@ requirejs(['./WorldWindShim',
 
         var parserCompletionCallback = function (layer) {
             wwd.addLayer(layer);
+            layerManager.synchronizeLayerList();
         };
 
         var resourcesUrl = "https://worldwind.arc.nasa.gov/web/examples/data/geojson-data/";
 
         // Polygon test
-        var polygonLayer = new WorldWind.RenderableLayer("Polygon");
+        var polygonLayer = new WorldWind.RenderableLayer("Polygon - Romania");
         var polygonGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "PolygonTest.geojson");
         polygonGeoJSON.load(null, shapeConfigurationCallback, polygonLayer);
         wwd.addLayer(polygonLayer);
 
         // MultiPolygon test
-        var multiPolygonLayer = new WorldWind.RenderableLayer("MultiPolygon");
+        var multiPolygonLayer = new WorldWind.RenderableLayer("MultiPolygon - Italy");
         var multiPolygonGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "MultiPolygonTest.geojson");
         multiPolygonGeoJSON.load(null, shapeConfigurationCallback, multiPolygonLayer);
         wwd.addLayer(multiPolygonLayer);
 
         //Point test
-        var pointLayer = new WorldWind.RenderableLayer("Point");
+        var pointLayer = new WorldWind.RenderableLayer("Point - Bucharest");
         var pointGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "PointTest.geojson");
         pointGeoJSON.load(null, shapeConfigurationCallback, pointLayer);
         wwd.addLayer(pointLayer);
 
         //MultiPoint test
-        var multiPointLayer = new WorldWind.RenderableLayer("MultiPoint");
+        var multiPointLayer = new WorldWind.RenderableLayer("MultiPoint - Italy");
         var multiPointGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "MultiPointTest.geojson");
         multiPointGeoJSON.load(null, shapeConfigurationCallback, multiPointLayer);
         wwd.addLayer(multiPointLayer);
 
         //LineString test
-        var lineStringLayer = new WorldWind.RenderableLayer("LineString");
-        var lineStringDataSource = '{ "type": "LineString", "coordinates": [[28.609974323244046, 44.202662372914631] , [ 26.098000795350401, 44.435317663494573]] }';
+        var lineStringLayer = new WorldWind.RenderableLayer("LineString - Cluj - Bologna");
+        var lineStringDataSource = '{ "type": "LineString", "coordinates": [[23.62364, 46.77121] , [ 11.34262, 44.49489]] }';
         var lineStringGeoJSON = new WorldWind.GeoJSONParser(lineStringDataSource);
         lineStringGeoJSON.load(null, shapeConfigurationCallback, lineStringLayer);
         wwd.addLayer(lineStringLayer);
 
         //MultiLineString test
-        var multiLineStringLayer = new WorldWind.RenderableLayer("MultiLineString");
+        var multiLineStringLayer = new WorldWind.RenderableLayer("MultiLineString - Danube");
         var multiLineStringGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "MultiLineStringTest.geojson");
         multiLineStringGeoJSON.load(null, shapeConfigurationCallback, multiLineStringLayer);
         wwd.addLayer(multiLineStringLayer);
 
         // GeometryCollection test with a callback function
-        var geometryCollectionLayer = new WorldWind.RenderableLayer("GeometryCollection");
+        var geometryCollectionLayer = new WorldWind.RenderableLayer("GeometryCollection - Greece");
         var geometryCollectionGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "GeometryCollectionFeatureTest.geojson");
         geometryCollectionGeoJSON.load(parserCompletionCallback, shapeConfigurationCallback, geometryCollectionLayer);
 
         // Feature test
-        var featureLayer = new WorldWind.RenderableLayer("Feature - USA");
+        var featureLayer = new WorldWind.RenderableLayer("Feature - Germany");
         var featureGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "FeatureTest.geojson");
         featureGeoJSON.load(null, shapeConfigurationCallback, featureLayer);
         wwd.addLayer(featureLayer);
 
-        // Feature collection tests
+        // Feature collection test
 
-        //World Borders
-        var worldBordersLayer = new WorldWind.RenderableLayer("World Borders");
-        var worldBordersGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "world_borders.geojson");
-        worldBordersGeoJSON.load(null, shapeConfigurationCallback, worldBordersLayer);
-        wwd.addLayer(worldBordersLayer);
-
-        //World Main Cities
-        var worldMainCitiesLayer = new WorldWind.RenderableLayer("World Main Cities");
-        var worldMainCitiesGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "world_main_cities.geojson");
-        worldMainCitiesGeoJSON.load(null, shapeConfigurationCallback, worldMainCitiesLayer);
-        wwd.addLayer(worldMainCitiesLayer);
-
-        //World Rivers
-        var worldRiversLayer = new WorldWind.RenderableLayer("World Rivers");
-        var worldRiversGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "world_rivers.geojson");
-        worldRiversGeoJSON.load(null, shapeConfigurationCallback, worldRiversLayer);
-        wwd.addLayer(worldRiversLayer);
+        // Feature collection - Spain and Portugal
+        var spainLayer = new WorldWind.RenderableLayer("Feature Collection - Spain & Portugal");
+        var spainGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "FeatureCollectionTest_Spain_Portugal.geojson");
+        spainGeoJSON.load(null, shapeConfigurationCallback, spainLayer);
+        wwd.addLayer(spainLayer);
 
         //CRS Reprojection test
 
         //USA EPSG:3857 named
-        var usa3857Layer = new WorldWind.RenderableLayer("USA 3857-named");
-        var usa3857GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "usa_epsg3857_named.geojson");
-        usa3857GeoJSON.load(null, shapeConfigurationCallback, usa3857Layer);
-        wwd.addLayer(usa3857Layer);
+        var ch3857Layer = new WorldWind.RenderableLayer("Switzerland 3857");
+        var ch3857GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "FeatureCollectionTest_EPSG3857_Switzerland.geojson");
+        ch3857GeoJSON.load(null, shapeConfigurationCallback, ch3857Layer);
+        wwd.addLayer(ch3857Layer);
 
-        //USA EPSG:3857 linked
-        var usa3857Layer = new WorldWind.RenderableLayer("USA 3857-linked");
-        var usa3857GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "usa_epsg3857_linked.geojson");
-        usa3857GeoJSON.load(null, shapeConfigurationCallback, usa3857Layer);
-        wwd.addLayer(usa3857Layer);
+        layerManager.synchronizeLayerList();
 
-        //USA EPSG:4326
-        var usa4326Layer = new WorldWind.RenderableLayer("USA-4326");
-        var usa4326GeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "usa_epsg4326.geojson");
-        usa4326GeoJSON.load(null, shapeConfigurationCallback, usa4326Layer);
-        wwd.addLayer(usa4326Layer);
-
-
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
+        layerManager.goToAnimator.goTo(new WorldWind.Location(38.72, 14.91))
     });
