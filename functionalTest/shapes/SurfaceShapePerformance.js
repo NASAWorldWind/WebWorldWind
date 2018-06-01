@@ -111,22 +111,24 @@ requirejs([
             var sa = new WorldWind.ShapeAttributes();
             var r = rand();
 
-            sa.drawInterior = true;
+            sa.drawInterior = false;
             sa.drawOutline = false;
 
-            sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            // if (r < 0.3333) {
-            //     sa.drawInterior = true;
-            //     sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            // } else if (r < 0.6666) {
-            //     sa.drawOutline = true;
-            //     sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            // } else {
-            //     sa.drawInterior = true;
-            //     sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            //     sa.drawOutline = true;
-            //     sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
-            // }
+            // sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+            if (r < 0.3333) {
+                sa.drawInterior = true;
+                sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+            } else if (r < 0.6666) {
+                sa.drawOutline = true;
+                sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+                sa.outlineWidth = rand() * 10;
+            } else {
+                sa.drawInterior = true;
+                sa.interiorColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+                sa.drawOutline = true;
+                sa.outlineColor = new WorldWind.Color(rand(), rand(), rand(), rand());
+                sa.outlineWidth = rand() * 10;
+            }
 
             return sa;
         };
