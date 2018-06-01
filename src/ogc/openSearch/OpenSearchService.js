@@ -108,8 +108,8 @@ define([
          *                      .then(result => console.log(result))
          *                      .catch(err => console.error(err));
          */
-        OpenSearchService.prototype.discover = function (options) {
-            var self = this;
+        OpenSearchService.create = function(options){
+            var service = new OpenSearchService();
             var requestOptions = new OpenSearchRequest(options);
             requestOptions.method = requestOptions.method || 'GET';
             if (!requestOptions.url) {
@@ -119,8 +119,8 @@ define([
             return OpenSearchUtils.fetch(requestOptions)
                 .then(function (responseText) {
                     var xmlRoot = OpenSearchUtils.parseXml(responseText);
-                    self._descriptionDocument = new OpenSearchDescriptionDocument(xmlRoot);
-                    return self;
+                    service._descriptionDocument = new OpenSearchDescriptionDocument(xmlRoot);
+                    return service;
                 });
         };
 
