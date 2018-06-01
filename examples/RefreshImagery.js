@@ -48,12 +48,12 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Set up to refresh the imagery periodically.
         setInterval(function () {
             layerToRefresh.refresh();
             wwd.redraw();
-        }, 20000); // refresh every 20 seconds
+        }, 20000); // Refresh every 20 seconds.
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });
