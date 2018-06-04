@@ -49,9 +49,6 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Web Map Service information from NASA's Near Earth Observations WMS
         var serviceAddress = "https://neo.sci.gsfc.nasa.gov/wms/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
         // Named layer displaying Average Temperature data
@@ -81,5 +78,8 @@ requirejs(['./WorldWindShim',
         };
 
         $.get(serviceAddress).done(createLayer).fail(logError);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
 
     });

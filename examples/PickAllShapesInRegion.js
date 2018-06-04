@@ -103,9 +103,6 @@ requirejs(['./WorldWindShim',
         placemarkLayer.displayName = "Placemarks";
         wwd.addLayer(placemarkLayer);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Now set up to handle picking.
 
         var highlightedItems = [];
@@ -157,4 +154,7 @@ requirejs(['./WorldWindShim',
 
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });
