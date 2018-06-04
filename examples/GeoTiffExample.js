@@ -55,9 +55,6 @@ requirejs(['./WorldWindShim',
         // Add GeoTiff to the WorldWindow's layer list. Disabled until its image is loaded.
         wwd.addLayer(geoTiffLayer);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         var resourceUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
 
         // Define a parser completion callback
@@ -86,4 +83,7 @@ requirejs(['./WorldWindShim',
 
         // Load the GeoTiff using the Reader's built in XHR retrieval function
         WorldWind.GeoTiffReader.retrieveFromUrl(resourceUrl, parserCallback);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });
