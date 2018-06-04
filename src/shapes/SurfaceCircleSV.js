@@ -221,6 +221,9 @@ define(['../error/ArgumentError',
             }
 
             gl.enableVertexAttribArray(program.posLocation);
+            gl.enableVertexAttribArray(program.prevPosLocation);
+            gl.enableVertexAttribArray(program.nextPosLocation);
+            gl.enableVertexAttribArray(program.directionLocation);
 
             this.beginStencilTest(dc);
 
@@ -229,6 +232,9 @@ define(['../error/ArgumentError',
                 program.loadScaleSize(gl, 0); // don't need to calculate the offset for drawing the interior
 
                 gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 8 * 4, 0);
+                gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
+                gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 0, 32 * 4);
+                gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 0, 19 * 4);
 
                 this.drawInterior(dc);
             }
@@ -237,25 +243,20 @@ define(['../error/ArgumentError',
                 program.loadColor(gl, attributes.outlineColor);
                 program.loadScaleSize(gl, attributes.outlineWidth * 10000);
 
-                gl.enableVertexAttribArray(program.prevPosLocation);
-                gl.enableVertexAttribArray(program.nextPosLocation);
-                gl.enableVertexAttribArray(program.directionLocation);
-
                 gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 4 * 4, 16 * 4);
                 gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 4 * 4, 0);
                 gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 4 * 4, 32 * 4);
                 gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 4 * 4, 19 * 4);
 
                 this.drawOutline(dc);
-
-                gl.disableVertexAttribArray(program.prevPosLocation);
-                gl.disableVertexAttribArray(program.nextPosLocation);
-                gl.disableVertexAttribArray(program.directionLocation);
             }
 
             this.endStencilTest(dc);
 
             gl.disableVertexAttribArray(program.posLocation);
+            gl.disableVertexAttribArray(program.prevPosLocation);
+            gl.disableVertexAttribArray(program.nextPosLocation);
+            gl.disableVertexAttribArray(program.directionLocation);
         };
 
         SurfaceCircleSV.prototype.drawInterior = function (dc) {
@@ -331,15 +332,16 @@ define(['../error/ArgumentError',
             this._vertexArray = new Float32Array(vertices);
 
             // let's start with the bottom center, then top center, then bottom and top rim
-            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, limits.min, this._centerPoint);
-            this._vertexArray[idx++] = 0;
-            this._vertexArray[idx++] = 0;
-            this._vertexArray[idx++] = 0;
+            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, 0, this._centerPoint);
+            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, limits.min, point);
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
             this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
             // duplicate vertex used for outline
-            this._vertexArray[idx++] = 0; //  (not used, vertex stride only)
-            this._vertexArray[idx++] = 0; //  (not used, vertex stride only)
-            this._vertexArray[idx++] = 0; //  (not used, vertex stride only)
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
             this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
             dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, limits.max, point);
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
@@ -347,9 +349,9 @@ define(['../error/ArgumentError',
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
             this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
             // duplicate vertex used for outline
-            this._vertexArray[idx++] = 0; //  (not used, vertex stride only)
-            this._vertexArray[idx++] = 0; //  (not used, vertex stride only)
-            this._vertexArray[idx++] = 0; //  (not used, vertex stride only)
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
             this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
 
             // iterate through the boundaries storing relative to center coordinates
