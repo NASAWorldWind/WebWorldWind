@@ -121,10 +121,9 @@ requirejs(['./WorldWindShim',
         shape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(shape);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Now set up to handle highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
-    }
-);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
+    });
