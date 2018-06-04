@@ -83,11 +83,10 @@ requirejs(['./WorldWindShim',
         // Add the text layer to the WorldWindow's layer list.
         wwd.addLayer(textLayer);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Point the camera and zoom to the State of Oregon.
         // Observe the decluttering feature according to camera altitude while zooming.
         wwd.goTo(new WorldWind.Position(44.00, -120.33, 800000));
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

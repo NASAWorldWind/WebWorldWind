@@ -44,7 +44,6 @@ requirejs([
         starFieldLayer.time = date;
         atmosphereLayer.time = date;
 
-        var layerManager = new LayerManager(wwd);
         wwd.redraw();
 
         wwd.redrawCallbacks.push(runSunSimulation);
@@ -76,4 +75,6 @@ requirejs([
             }
         }
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

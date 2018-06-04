@@ -98,9 +98,6 @@ requirejs(['./WorldWindShim',
         // Add the text layer to the WorldWindow's layer list.
         wwd.addLayer(textLayer);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Set up to handle picking.
         var handlePick = (function (o) {
             var pickPoint = wwd.canvasCoordinates(o.clientX, o.clientY);
@@ -123,4 +120,7 @@ requirejs(['./WorldWindShim',
 
         // Listen for taps on mobile devices and highlight text that the user taps.
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

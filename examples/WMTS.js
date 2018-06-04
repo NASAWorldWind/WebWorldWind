@@ -51,9 +51,6 @@ requirejs([
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Web Map Tiling Service information from
         var serviceAddress = "https://tiles.geoservice.dlr.de/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0";
         // Layer displaying Global Hillshade based on GMTED2010
@@ -82,4 +79,6 @@ requirejs([
 
         $.get(serviceAddress).done(createLayer).fail(logError);
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });
