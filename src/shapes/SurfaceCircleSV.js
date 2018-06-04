@@ -262,10 +262,10 @@ define(['../error/ArgumentError',
             var gl = dc.currentGlContext;
 
             this.prepareStencil(dc);
-            gl.drawElements(gl.TRIANGLE_STRIP, this._interiorElements, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, this._interiorElements, gl.UNSIGNED_SHORT, 0);
 
             this.applyStencilTest(dc);
-            gl.drawElements(gl.TRIANGLE_STRIP, this._interiorElements, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, this._interiorElements, gl.UNSIGNED_SHORT, 0);
         };
 
         SurfaceCircleSV.prototype.drawOutline = function (dc) {
@@ -418,26 +418,32 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.assembleElementArray = function (dc) {
             // build an element buffer the triangle strip which makes up the sides
-            var boundarySize = this._boundaries.length, sections = (boundarySize - 1) / 2, idx = 0, i,
-                interiorElements = sections * 10 + 1, outlineElements = (boundarySize - 1) * 10;
+            var boundarySize = this._boundaries.length, sections = boundarySize - 1, idx = 0, i, offset,
+                interiorElements = sections * 4 * 3, outlineElements = (boundarySize - 1) * 10;
 
             this._elementArray = new Int16Array(interiorElements + outlineElements);
             this._interiorElements = interiorElements;
             this._outlineElements = outlineElements;
 
             for (i = 0; i < sections; i++) {
+                offset = i * 2;
+                // bottom
                 this._elementArray[idx++] = 0;
-                this._elementArray[idx++] = 2 + i * 4;
-                this._elementArray[idx++] = 4 + i * 4;
-                this._elementArray[idx++] = 3 + i * 4;
-                this._elementArray[idx++] = 5 + i * 4;
+                this._elementArray[idx++] = 2 + offset;
+                this._elementArray[idx++] = 4 + offset;
+                // top
                 this._elementArray[idx++] = 1;
-                this._elementArray[idx++] = 5 + i * 4;
-                this._elementArray[idx++] = 7 + i * 4;
-                this._elementArray[idx++] = 4 + i * 4;
-                this._elementArray[idx++] = 6 + i * 4;
+                this._elementArray[idx++] = 5 + offset;
+                this._elementArray[idx++] = 3 + offset;
+                // top side
+                this._elementArray[idx++] = 3 + offset;
+                this._elementArray[idx++] = 5 + offset;
+                this._elementArray[idx++] = 4 + offset;
+                // bottom side
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 2 + offset;
+                this._elementArray[idx++] = 3 + offset;
             }
-            this._elementArray[idx++] = 0;
 
             // the shadow volume "wall" to provide the outline
             for (i = 0; i < boundarySize - 1; i++) {
