@@ -77,5 +77,4 @@ requirejs([
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
-
     });
