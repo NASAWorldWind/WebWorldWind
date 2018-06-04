@@ -28,11 +28,27 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create and add layers to the WorldWindow.
+        var layers = [
+            // Imagery layers.
+            {layer: new WorldWind.BMNGLayer(), enabled: true},
+            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
+            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // WorldWindow UI layers.
+            {layer: new WorldWind.CompassLayer(), enabled: true},
+            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+        ];
+
+        for (var l = 0; l < layers.length; l++) {
+            layers[l].layer.enabled = layers[l].enabled;
+            wwd.addLayer(layers[l].layer);
+        }
+
         // Tell the WorldWindow that we want deep picking.
         wwd.deepPicking = true;
 
         // Now set up to handle picking.
-
         var highlightedItems = [];
 
         // The common pick-handling function.
@@ -96,23 +112,6 @@ requirejs(['./WorldWindShim',
 
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
-
-        // Create and add layers to the WorldWindow.
-        var layers = [
-            // Imagery layers.
-            {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            // WorldWindow UI layers.
-            {layer: new WorldWind.CompassLayer(), enabled: true},
-            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
-        ];
-
-        for (var l = 0; l < layers.length; l++) {
-            layers[l].layer.enabled = layers[l].enabled;
-            wwd.addLayer(layers[l].layer);
-        }
 
         // Define the images we'll use for the placemarks.
         var images = [

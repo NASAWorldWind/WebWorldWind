@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to load and display GeoJSON data.
+ */
 
 requirejs(['./WorldWindShim',
         './LayerManager'],
@@ -28,8 +31,10 @@ requirejs(['./WorldWindShim',
 
         // Create and add layers to the WorldWindow.
         var layers = [
-            // Imagery layer.
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
+            // Add atmosphere layer on top of base layer.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},

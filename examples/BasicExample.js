@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to build a basic WorldWind globe.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
@@ -34,6 +37,8 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
             {layer: new WorldWind.OpenStreetMapImageLayer(null), enabled: false},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},

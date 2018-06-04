@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * Illustrates how to consume imagery from a Web Map Tile Service (WMTS).
+ */
 requirejs([
         './WorldWindShim',
         '../examples/LayerManager'
@@ -36,6 +38,8 @@ requirejs([
             {layer: new WorldWind.BingAerialLayer(null), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
             {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},

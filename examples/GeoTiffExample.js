@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to load and display a GeoTiff file.
+ */
 
 requirejs(['./WorldWindShim',
            './LayerManager'],
@@ -31,6 +34,8 @@ requirejs(['./WorldWindShim',
             //Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
