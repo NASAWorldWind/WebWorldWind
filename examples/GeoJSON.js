@@ -41,9 +41,6 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         for (var l = 0; l < layers.length; l++) {
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
@@ -173,7 +170,8 @@ requirejs(['./WorldWindShim',
         ch3857GeoJSON.load(null, shapeConfigurationCallback, ch3857Layer);
         wwd.addLayer(ch3857Layer);
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
         layerManager.synchronizeLayerList();
-
         layerManager.goToAnimator.goTo(new WorldWind.Location(38.72, 14.91))
     });
