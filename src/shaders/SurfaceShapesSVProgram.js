@@ -39,8 +39,6 @@ define([
 
             this.directionLocation = this.attributeLocation(gl, "direction");
 
-            // this.screenSizeLocation = this.uniformLocation(gl, "screenSize");
-
             this.mvpMatrixLocation = this.uniformLocation(gl, "mvpMatrix");
 
             this.scaleSizeLocation = this.uniformLocation(gl, "scaleSize");
