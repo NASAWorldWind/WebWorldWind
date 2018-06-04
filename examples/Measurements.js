@@ -90,5 +90,6 @@ requirejs([
             terrainAreaSpan.textContent = (terrainArea / 1e6).toFixed(3);
         }
 
+        // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
     });

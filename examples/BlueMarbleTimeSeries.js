@@ -50,9 +50,6 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Ensure that the background and other control layers are displayed while the blue marble layer is
         // being pre-populated.
         wwd.redraw();
@@ -85,4 +82,7 @@ requirejs(['./WorldWindShim',
                 }, 200);
             }
         }, 200);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });
