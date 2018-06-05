@@ -273,10 +273,10 @@ define(['../error/ArgumentError',
             var gl = dc.currentGlContext;
 
             this.prepareStencil(dc);
-            gl.drawElements(gl.TRIANGLE_STRIP, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
+            gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
 
             this.applyStencilTest(dc);
-            gl.drawElements(gl.TRIANGLE_STRIP, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
+            gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
         };
 
         SurfaceCircleSV.prototype.beginStencilTest = function (dc) {
@@ -326,9 +326,10 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.assembleVertexArray = function (dc) {
             var limits = this.calculateVolumeVerticalLimit(dc), idx = 0, loc, point = SurfaceCircleSV.POINT,
-                boundaryLength = this._boundaries.length, offsetIdx = 32;
-            var vertices = (1 /*center*/ + boundaryLength /*exterior*/ + 2 /*outline wrap*/)
-                * (4 /*4 verts per point(top x2, bottom x2*/ * 4 /*x, y, z, direction*/);
+                boundaryLength = this._boundaries.length, offsetIdx = 32, i,
+                vertices = (1 /*center*/ + boundaryLength /*exterior*/ + 2 /*outline wrap*/)
+                    * (4 /*4 verts per point(top x2, bottom x2*/ * 4 /*x, y, z, direction*/);
+
             this._vertexArray = new Float32Array(vertices);
 
             // let's start with the bottom center, then top center, then bottom and top rim
@@ -337,25 +338,25 @@ define(['../error/ArgumentError',
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
             this._vertexArray[idx++] = point[1] - this._centerPoint[1];
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-            this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
-            // duplicate vertex used for outline
+            this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
+            // duplicate vertex used for outline (not used, for vertex stride only)
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
             this._vertexArray[idx++] = point[1] - this._centerPoint[1];
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-            this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
+            this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
             dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, limits.max, point);
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
             this._vertexArray[idx++] = point[1] - this._centerPoint[1];
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-            this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
-            // duplicate vertex used for outline
+            this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
+            // duplicate vertex used for outline (not used, for vertex stride only)
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
             this._vertexArray[idx++] = point[1] - this._centerPoint[1];
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-            this._vertexArray[idx++] = 0; // normal placeholder (not used, vertex stride only)
+            this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
 
             // iterate through the boundaries storing relative to center coordinates
-            for (var i = 0; i < boundaryLength; i++) {
+            for (i = 0; i < boundaryLength; i++) {
                 loc = this._boundaries[i];
                 dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.min, point);
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
@@ -379,29 +380,12 @@ define(['../error/ArgumentError',
                 this._vertexArray[idx++] = -0.5; // normal placeholder
             }
 
-            // repeat the first two sections for use by the interpolation technique
-            for (var i = 1; i < 2; i++) {
-                loc = this._boundaries[i];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.min, point);
-                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = 0.5; // normal placeholder
-                // duplicate vertex used for outline
-                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = -0.5; // normal placeholder
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.max, point);
-                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = 0.5; // normal placeholder
-                // duplicate vertex used for outline
-                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = -0.5; // normal placeholder
+            // repeat the second two slices for use by the normal interpolation technique
+            for (i = 0; i < 8; i++) {
+                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
+                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
+                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
+                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
             }
         };
 
@@ -411,8 +395,8 @@ define(['../error/ArgumentError',
         };
 
         SurfaceCircleSV.prototype.assembleElementArray = function (dc) {
-            // build an element buffer the triangle strip which makes up the sides
-            var boundarySize = this._boundaries.length, slices = boundarySize - 1, idx = 0, i, offset, nextOffset,
+            // build an element buffer describing the triangles used to form the volume and volume wall
+            var boundarySize = this._boundaries.length, slices = boundarySize - 1, idx = 0, i, offset,
                 interiorElements = slices * 4 * 3, outlineElements = slices * 8 * 3;
 
             this._elementArray = new Int16Array(interiorElements + outlineElements);
@@ -440,7 +424,7 @@ define(['../error/ArgumentError',
             }
 
             // the shadow volume "wall" to provide the outline
-            for (i = 0; i < slices; i++) {
+            for (i = 0; i < (slices + 1); i++) {
                 offset = i * 4;
                 this._elementArray[idx++] = 5 + offset;
                 this._elementArray[idx++] = 9 + offset;
