@@ -378,39 +378,31 @@ define(['../error/ArgumentError',
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
                 this._vertexArray[idx++] = -0.5; // normal placeholder
             }
-            // duplicate the second boundary location vertices to complete the outline wrap
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-            this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
+
+            // repeat the first two sections for use by the interpolation technique
+            for (var i = 1; i < 2; i++) {
+                loc = this._boundaries[i];
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.min, point);
+                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+                this._vertexArray[idx++] = 0.5; // normal placeholder
+                // duplicate vertex used for outline
+                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+                this._vertexArray[idx++] = -0.5; // normal placeholder
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.max, point);
+                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+                this._vertexArray[idx++] = 0.5; // normal placeholder
+                // duplicate vertex used for outline
+                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+                this._vertexArray[idx++] = -0.5; // normal placeholder
+            }
         };
 
         SurfaceCircleSV.prototype.calculateVolumeVerticalLimit = function (dc) {
@@ -420,14 +412,14 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.assembleElementArray = function (dc) {
             // build an element buffer the triangle strip which makes up the sides
-            var boundarySize = this._boundaries.length, sections = boundarySize - 1, idx = 0, i, offset,
-                interiorElements = sections * 4 * 3, outlineElements = (boundarySize - 1) * 10;
+            var boundarySize = this._boundaries.length, slices = boundarySize - 1, idx = 0, i, offset, nextOffset,
+                interiorElements = slices * 4 * 3, outlineElements = slices * 8 * 3;
 
             this._elementArray = new Int16Array(interiorElements + outlineElements);
             this._interiorElements = interiorElements;
             this._outlineElements = outlineElements;
 
-            for (i = 0; i < sections; i++) {
+            for (i = 0; i < slices; i++) {
                 offset = i * 2;
                 // bottom
                 this._elementArray[idx++] = 0;
@@ -448,17 +440,32 @@ define(['../error/ArgumentError',
             }
 
             // the shadow volume "wall" to provide the outline
-            for (i = 0; i < boundarySize - 1; i++) {
-                this._elementArray[idx++] = 5 + i * 4;
-                this._elementArray[idx++] = 9 + i * 4;
-                this._elementArray[idx++] = 7 + i * 4;
-                this._elementArray[idx++] = 11 + i * 4;
-                this._elementArray[idx++] = 6 + i * 4;
-                this._elementArray[idx++] = 10 + i * 4;
-                this._elementArray[idx++] = 4 + i * 4;
-                this._elementArray[idx++] = 8 + i * 4;
-                this._elementArray[idx++] = 5 + i * 4;
-                this._elementArray[idx++] = 9 + i * 4;
+            for (i = 0; i < slices; i++) {
+                offset = i * 4;
+                this._elementArray[idx++] = 5 + offset;
+                this._elementArray[idx++] = 9 + offset;
+                this._elementArray[idx++] = 11 + offset;
+                this._elementArray[idx++] = 11 + offset;
+                this._elementArray[idx++] = 7 + offset;
+                this._elementArray[idx++] = 5 + offset;
+                this._elementArray[idx++] = 7 + offset;
+                this._elementArray[idx++] = 11 + offset;
+                this._elementArray[idx++] = 10 + offset;
+                this._elementArray[idx++] = 10 + offset;
+                this._elementArray[idx++] = 6 + offset;
+                this._elementArray[idx++] = 7 + offset;
+                this._elementArray[idx++] = 6 + offset;
+                this._elementArray[idx++] = 10 + offset;
+                this._elementArray[idx++] = 8 + offset;
+                this._elementArray[idx++] = 8 + offset;
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 6 + offset;
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 8 + offset;
+                this._elementArray[idx++] = 9 + offset;
+                this._elementArray[idx++] = 9 + offset;
+                this._elementArray[idx++] = 5 + offset;
+                this._elementArray[idx++] = 4 + offset;
             }
         };
 
