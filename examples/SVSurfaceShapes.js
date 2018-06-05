@@ -84,13 +84,14 @@ requirejs(['./WorldWindShim',
         ];
 
         sa = new WorldWind.ShapeAttributes();
-        sa.outlineColor = WorldWind.Color.WHITE;
+        sa.outlineColor = new WorldWind.Color(0, 1, 0, 0.5);
         sa.outlineWidth = 6;
-        sa.interiorColor = WorldWind.Color.RED;
+        sa.interiorColor = new WorldWind.Color(0, 0, 1, 0.7);
         shape = new WorldWind.SurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
-        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(0, 0), 100000);
+        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(38, -104), 100000, sa);
+        shape.debug = true;
         shapesLayer.addRenderable(shape);
 
         // wwd.navigator.lookAtLocation.latitude = 36.2;

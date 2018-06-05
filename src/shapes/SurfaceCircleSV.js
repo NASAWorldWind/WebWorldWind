@@ -17,6 +17,7 @@
  * @exports SurfaceCircleSV
  */
 define(['../error/ArgumentError',
+        '../util/Color',
         '../geom/Location',
         '../util/Logger',
         '../geom/Matrix',
@@ -27,6 +28,7 @@ define(['../error/ArgumentError',
         '../geom/Vec3'
     ],
     function (ArgumentError,
+              Color,
               Location,
               Logger,
               Matrix,
@@ -253,6 +255,10 @@ define(['../error/ArgumentError',
 
             this.endStencilTest(dc);
 
+            if (this.debug) {
+                this.drawDebug(dc, attributes.outlineWidth);
+            }
+
             gl.disableVertexAttribArray(program.posLocation);
             gl.disableVertexAttribArray(program.prevPosLocation);
             gl.disableVertexAttribArray(program.nextPosLocation);
@@ -277,6 +283,30 @@ define(['../error/ArgumentError',
 
             this.applyStencilTest(dc);
             gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
+        };
+
+        SurfaceCircleSV.prototype.drawDebug = function (dc, outlineWidth) {
+            var gl = dc.currentGlContext, program = dc.currentProgram;
+
+            program.loadColor(gl, Color.WHITE);
+            program.loadScaleSize(gl, 0); // don't need to calculate the offset for drawing the interior
+
+            gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 8 * 4, 0);
+            gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 0, 32 * 4);
+            gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 0, 19 * 4);
+
+            gl.drawElements(gl.LINE_STRIP, this._interiorElements, gl.UNSIGNED_SHORT, 0);
+
+            program.loadColor(gl, Color.GREEN);
+            program.loadScaleSize(gl, outlineWidth * 10000);
+
+            gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 4 * 4, 16 * 4);
+            gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 4 * 4, 0);
+            gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 4 * 4, 32 * 4);
+            gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 4 * 4, 19 * 4);
+
+            gl.drawElements(gl.LINE_STRIP, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
         };
 
         SurfaceCircleSV.prototype.beginStencilTest = function (dc) {
