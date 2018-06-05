@@ -80,7 +80,7 @@ requirejs(['./WorldWindShim',
         var highlightAttributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
         highlightAttributes.imageScale = 1.2;
 
-        // Create the placemark with the attributes defined above at the desired position.
+        // Create the placemark with the attributes defined above.
         var placemarkPosition = new WorldWind.Position(47.684444, -121.129722, 1e2);
         var placemark = new WorldWind.Placemark(placemarkPosition, false, placemarkAttributes);
         // Draw placemark at altitude defined above, relative to the terrain.
