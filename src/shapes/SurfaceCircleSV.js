@@ -339,7 +339,7 @@ define(['../error/ArgumentError',
 
             // Apply the stencil test to drawing
             gl.stencilFunc(gl.NOTEQUAL, 0, 255);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // maintain the stencil values
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.ZERO); // reset stencil to zero after successful fragment modification
 
             gl.disable(gl.DEPTH_TEST);
         };
