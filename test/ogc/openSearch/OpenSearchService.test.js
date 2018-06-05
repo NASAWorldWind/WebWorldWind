@@ -19,7 +19,7 @@ define([
 ], function (OpenSearchConstants,
              OpenSearchService) {
     "use strict";
-    var openSearchService = new OpenSearchService();
+    var openSearchService;
 
     describe("Open Search Support", function(){
         var validDescriptionDocument,
@@ -28,7 +28,7 @@ define([
 
         beforeAll(function(done){
             var service;
-            openSearchService.discover({url: '../base/test/ogc/openSearch/osDescription.xml'}).then(function(result){
+            OpenSearchService.create({url: '../base/test/ogc/openSearch/osDescription.xml'}).then(function(result){
                 service = result;
                 validDescriptionDocument = result.descriptionDocument;
                 return service.search([
@@ -514,10 +514,6 @@ define([
         describe("Search Products", function(){
             it('contains type', function(){
                 expect(validProductsDocument.type).toBe('FeatureCollection');
-            });
-
-            describe('features', function(){
-
             });
 
             describe('properties', function(){

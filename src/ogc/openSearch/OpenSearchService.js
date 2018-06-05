@@ -156,17 +156,18 @@ define([
 
             if (openSearchUrl.method === 'GET') {
                 requestOptions.url = openSearchUrl.createRequestUrl(searchParams);
-            }
-            else if (openSearchUrl.encType === 'application/x-www-form-urlencoded' ||
+            } else if (openSearchUrl.encType === 'application/x-www-form-urlencoded' ||
                 openSearchUrl.encType === 'multipart/form-data') {
                 requestOptions.url = openSearchUrl._baseUrl;
                 requestOptions.body = openSearchUrl.createRequestBody(searchParams);
                 requestOptions.addHeader('Content-Type', openSearchUrl.encType);
-            }
-            else {
+            } else {
                 return Promise.reject(new Error('OpenSearchService search - unsupported encoding'));
             }
 
+            // Get Metadata for the products.
+            // Get available collections.
+              // Collection has parameters, metadata and all the information as part of the source.
             return OpenSearchUtils.fetch(requestOptions)
                 .then(function (response) {
                     var responseParser = self.getParser(openSearchUrl.type, requestOptions.relation);
@@ -174,7 +175,18 @@ define([
                         throw new Error('OpenSearchService search - no suitable response parser found');
                     }
                     return responseParser.parse(response, requestOptions.relation);
+                    // What are the possible results of this?
                 });
+        };
+
+        OpenSearchService.prototype.collections = function() {
+            // It doesn't have to contain the information.
+        };
+
+        OpenSearchService.prototype.products = function(){
+            // It must contain the geographical information that we can display.
+            // Each product must also contain the associated metadata.
+            // It should return the collection of the products.
         };
 
         /**
@@ -193,6 +205,7 @@ define([
             return OpenSearchUtils.arrayFind(this._descriptionDocument.urls, predicate, context);
         };
 
+        // Do ParserRegistry belong to the OpenSearchService?
         /**
          * Registers a parser for the specified mime type and relation.
          *

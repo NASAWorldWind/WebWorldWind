@@ -159,7 +159,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/openSearch/OpenSearchConstants',
         './ogc/openSearch/descriptionDocument/OpenSearchDescriptionDocument',
         './ogc/openSearch/responseFormats/atomParser/OpenSearchGeoRssParser',
-        './layer/OpenSearchLayer',
         './ogc/openSearch/OpenSearchNamespaces',
         './ogc/openSearch/descriptionDocument/OpenSearchParameter',
         './ogc/openSearch/responseFormats/OpenSearchParserRegistry',
@@ -423,7 +422,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               OpenSearchConstants,
               OpenSearchDescriptionDocument,
               OpenSearchGeoRssParser,
-              OpenSearchLayer,
               OpenSearchNamespaces,
               OpenSearchParameter,
               OpenSearchParserRegistry,
@@ -876,7 +874,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['OpenSearchConstants'] = OpenSearchConstants;
         WorldWind['OpenSearchDescriptionDocument'] = OpenSearchDescriptionDocument;
         WorldWind['OpenSearchGeoRssParser'] = OpenSearchGeoRssParser;
-        WorldWind['OpenSearchLayer'] = OpenSearchLayer;
         WorldWind['OpenSearchNamespaces'] = OpenSearchNamespaces;
         WorldWind['OpenSearchParameter'] = OpenSearchParameter;
         WorldWind['OpenSearchParserRegistry'] = OpenSearchParserRegistry;
