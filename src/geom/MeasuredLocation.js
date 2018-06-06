@@ -17,8 +17,10 @@
  * @exports MeasuredLocation
  */
 define([
+    './Angle',
     './Location'
-], function (Location) {
+], function (Angle,
+             Location) {
     "use strict";
 
     /**
@@ -44,11 +46,15 @@ define([
     MeasuredLocation.prototype = Object.create(Location.prototype);
 
     /**
-     * A measured location with latitude, longitude and measure all set to 0.
-     * @constant
-     * @type {MeasuredLocation}
+     * Creates a measured location from angles specified in radians.
+     * @param {Number} latitudeRadians The latitude in radians.
+     * @param {Number} longitudeRadians The longitude in radians.
+     * @param {Number} measure The measure in arbitrary unit
+     * @returns {Location} The new location with latitude and longitude in degrees.
      */
-    MeasuredLocation.ZERO = new MeasuredLocation(0, 0, 0);
+    MeasuredLocation.fromRadians = function(latitudeRadians, longitudeRadians, measure) {
+        return new MeasuredLocation(latitudeRadians * Angle.RADIANS_TO_DEGREES, longitudeRadians * Angle.RADIANS_TO_DEGREES, measure);
+    };
 
     /**
      * Copies this measured location to the latitude, longitude and measure of a specified measured location.
