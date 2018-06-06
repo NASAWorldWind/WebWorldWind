@@ -31,11 +31,13 @@ requirejs([
         var wwd = new WorldWind.WorldWindow('canvasOne');
 
         // Create imagery layers.
+        var BMNGOneImageLayer = new WorldWind.BMNGOneImageLayer();
         var BMNGLayer = new WorldWind.BMNGLayer();
         var starFieldLayer = new WorldWind.StarFieldLayer();
         var atmosphereLayer = new WorldWind.AtmosphereLayer();
 
         // Add previously created layers to the WorldWindow.
+        wwd.addLayer(BMNGOneImageLayer);
         wwd.addLayer(BMNGLayer);
         wwd.addLayer(starFieldLayer); //IMPORTANT: add the starFieldLayer before the atmosphereLayer
         wwd.addLayer(atmosphereLayer);
@@ -44,30 +46,13 @@ requirejs([
         starFieldLayer.time = date;
         atmosphereLayer.time = date;
 
-        wwd.redraw();
-
         wwd.redrawCallbacks.push(runSunSimulation);
 
-        var sunSimulationCheckBox = document.getElementById('stars-simulation');
-        var doRunSimulation = false;
         var timeStamp = Date.now();
-        var factor = 1;
-
-        sunSimulationCheckBox.addEventListener('change', onSunCheckBoxClick, false);
-
-        function onSunCheckBoxClick() {
-            doRunSimulation = this.checked;
-            if (!doRunSimulation) {
-                var date = new Date();
-                starFieldLayer.time = date;
-                atmosphereLayer.time = date;
-            }
-            wwd.redraw();
-        }
 
         function runSunSimulation(wwd, stage) {
-            if (stage === WorldWind.AFTER_REDRAW && doRunSimulation) {
-                timeStamp += (factor * 60 * 1000);
+            if (stage === WorldWind.AFTER_REDRAW) {
+                timeStamp += (60 * 1000); // Increase the time in the simulation by a minute.
                 var date = new Date(timeStamp);
                 starFieldLayer.time = date;
                 atmosphereLayer.time = date;
