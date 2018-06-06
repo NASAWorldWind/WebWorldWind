@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * @exports MeasuredLocation
+ */
 define([
     './Location'
 ], function (Location) {
+    "use strict";
 
     /**
-     * It constructs measured location from a specified latitude, longitude and measure.
-     * @classdesc It represents a pair of latitude and longitude with associated measure.
+     * Constructs a measured location from a specified latitude and longitude in degrees associated with a measure.
      * @alias MeasuredLocation
-     * @augments Location
-     * @param latitude {Number} The latitude in degrees
-     * @param longitude {Number} The longitude in degrees
-     * @param measure {Number} The measure associated with the location
      * @constructor
+     * @classdesc Represents a latitude, longitude pair in degrees with an associated measure.
+     * @augments Location
+     * @param {Number} latitude The latitude in degrees.
+     * @param {Number} longitude The longitude in degrees.
+     * @param {Number} measure The measure in an arbitrary unit.
      */
     var MeasuredLocation = function (latitude, longitude, measure) {
         Location.call(this, latitude, longitude);
 
         /**
-         * The measure (intensity) associated with current location.
+         * The measure in an arbitrary unit.
          * @type {Number}
          */
         this.measure = measure;
@@ -40,16 +44,17 @@ define([
     MeasuredLocation.prototype = Object.create(Location.prototype);
 
     /**
-     * Measured Location with latitude, longitude and measure all set to 0.
+     * A measured location with latitude, longitude and measure all set to 0.
      * @constant
      * @type {MeasuredLocation}
      */
-    MeasuredLocation.ZERO = new MeasuredLocation(0,0,0);
+    MeasuredLocation.ZERO = new MeasuredLocation(0, 0, 0);
 
     /**
-     * It copies latitude, longitude and measure from passed in MeasuredLocation to current location.
-     * @param measuredLocation {MeasuredLocation} The location to copy on this one.
-     * @return {MeasuredLocation} This location with updated properties.
+     * Copies this measured location to the latitude, longitude and measure of a specified measured location.
+     * @param {MeasuredLocation} measuredLocation The measured location to copy.
+     * @return {MeasuredLocation} This measured location, set to the values of the specified measured location.
+     * @throws {ArgumentError} If the specified measured location is null or undefined.
      */
     MeasuredLocation.prototype.copy = function (measuredLocation) {
         Location.prototype.copy.call(this, measuredLocation);
@@ -60,11 +65,12 @@ define([
     };
 
     /**
-     * It sets current properties to the ones passed in.
-     * @param latitude {Number} The latitude to set
-     * @param longitude {Number} The longitude to set
-     * @param measure {Number} The measure to set.
-     * @return {MeasuredLocation} This location set to the specified location.
+     * Sets this measured location to the latitude, longitude and measure.
+     * @param {Number} latitude The latitude to set
+     * @param {Number} longitude The longitude to set
+     * @param {Number} measure The measure to set.
+     * @return {MeasuredLocation} This measured location, set to the values of the specified latitude, longitude and
+     * measure.
      */
     MeasuredLocation.prototype.set = function (latitude, longitude, measure) {
         Location.prototype.set.call(this, latitude, longitude);
@@ -75,14 +81,14 @@ define([
     };
 
     /**
-     * It indicates whether this location is equal to a passed in measured location.
-     * @param measuredLocation {MeasuredLocation} The location to compare.
-     * @returns {boolean} <code>true</code> if this location is equal to the passed in location, otherwise
-     * <code>false</code>.
+     * Indicates whether this measured location is equal to a specified measured location.
+     * @param {MeasuredLocation} measuredLocation The measured location to compare this one to.
+     * @returns {Boolean} <code>true</code> if this measured location is equal to the specified measured location,
+     * otherwise <code>false</code>.
      */
-    MeasuredLocation.prototype.equals = function(measuredLocation) {
-        return Location.prototype.equals.call(this, measuredLocation) &&
-            (this.measure === measuredLocation.measure);
+    MeasuredLocation.prototype.equals = function (measuredLocation) {
+        return Location.prototype.equals.call(this, measuredLocation)
+            && this.measure === measuredLocation.measure;
     };
 
     return MeasuredLocation;
