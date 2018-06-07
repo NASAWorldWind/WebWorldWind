@@ -149,7 +149,7 @@ define(['../error/ArgumentError',
         });
 
         SurfaceCircleSV.prototype.render = function (dc) {
-            var vbo, ebo, program, scratchMatrix = SurfaceCircleSV.MATRIX,
+            var vbo, ebo, program, scratchMatrix = SurfaceCircleSV.MATRIX, p = SurfaceCircleSV.POINT,
                 transformationMatrix = SurfaceCircleSV.MATRIX2, gl = dc.currentGlContext, sector;
             if (!this.enabled) {
                 return;
@@ -229,9 +229,17 @@ define(['../error/ArgumentError',
 
             this.beginStencilTest(dc);
 
+            p.copy(dc.eyePoint);
+            p.subtract(this._centerPoint);
+            program.loadEyePosition(gl, p);
+            program.loadPixelSizeFactor(gl, dc.pixelSizeFactor);
+            program.loadPixelSizeOffset(gl, dc.pixelSizeOffset);
+            program.loadCameraAltitude(gl, dc.eyePosition.altitude);
+
             if (attributes.drawInterior) {
                 program.loadColor(gl, attributes.interiorColor);
-                program.loadScaleSize(gl, 0); // don't need to calculate the offset for drawing the interior
+                program.loadOutlineWidth(gl, 0);
+
 
                 gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 8 * 4, 0);
                 gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
@@ -243,7 +251,7 @@ define(['../error/ArgumentError',
 
             if (attributes.drawOutline) {
                 program.loadColor(gl, attributes.outlineColor);
-                program.loadScaleSize(gl, attributes.outlineWidth * 10000);
+                program.loadOutlineWidth(gl, attributes.outlineWidth);
 
                 gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 4 * 4, 16 * 4);
                 gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 4 * 4, 0);
@@ -256,7 +264,7 @@ define(['../error/ArgumentError',
             this.endStencilTest(dc);
 
             if (this.debug) {
-                this.drawDebug(dc, attributes.outlineWidth);
+                this.drawDebug(dc, attributes.outlineWidth, attributes);
             }
 
             gl.disableVertexAttribArray(program.posLocation);
@@ -285,11 +293,18 @@ define(['../error/ArgumentError',
             gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
         };
 
-        SurfaceCircleSV.prototype.drawDebug = function (dc, outlineWidth) {
+        SurfaceCircleSV.prototype.drawDebug = function (dc, outlineWidth, attributes) {
             var gl = dc.currentGlContext, program = dc.currentProgram;
 
+            var p = SurfaceCircleSV.POINT;
+            p.copy(dc.eyePoint);
+            p.subtract(this._centerPoint);
+
             program.loadColor(gl, Color.WHITE);
-            program.loadScaleSize(gl, 0); // don't need to calculate the offset for drawing the interior
+            program.loadOutlineWidth(gl, 0);
+            program.loadPixelSizeFactor(gl, dc.pixelSizeFactor);
+            program.loadPixelSizeOffset(gl, dc.pixelSizeOffset);
+            program.loadEyePosition(gl, p);
 
             gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 8 * 4, 0);
             gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
@@ -299,7 +314,10 @@ define(['../error/ArgumentError',
             gl.drawElements(gl.LINE_STRIP, this._interiorElements, gl.UNSIGNED_SHORT, 0);
 
             program.loadColor(gl, Color.GREEN);
-            program.loadScaleSize(gl, outlineWidth * 10000);
+            program.loadOutlineWidth(gl, attributes.outlineWidth);
+            program.loadPixelSizeFactor(gl, dc.pixelSizeFactor);
+            program.loadPixelSizeOffset(gl, dc.pixelSizeOffset);
+            program.loadEyePosition(gl, p);
 
             gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 4 * 4, 16 * 4);
             gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 4 * 4, 0);
