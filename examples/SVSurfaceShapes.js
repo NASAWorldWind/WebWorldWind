@@ -85,14 +85,31 @@ requirejs(['./WorldWindShim',
 
         sa = new WorldWind.ShapeAttributes();
         sa.outlineColor = new WorldWind.Color(0, 1, 0, 0.5);
-        sa.outlineWidth = 6;
+        sa.outlineWidth = 1;
         sa.interiorColor = new WorldWind.Color(0, 0, 1, 0.7);
+        sa.drawInterior = true;
         shape = new WorldWind.SurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
-        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(38, -104), 100000, sa);
-        shape.debug = true;
+        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(38, -104), 1000000, sa);
+        shape.debug = false;
         shapesLayer.addRenderable(shape);
+
+        var onDebugClick = function (ev) {
+            shape.debug = ev.target.checked;
+            wwd.redraw();
+        };
+
+        var onWidthInput = function (ev) {
+            sa.outlineWidth = ev.target.value / 10;
+            wwd.redraw();
+        };
+
+        var debugCheckBox = document.getElementById("debug-volume-checkbox");
+        debugCheckBox.addEventListener('click', onDebugClick);
+
+        var widthSlider = document.getElementById("outline-width-slider");
+        widthSlider.addEventListener('input', onWidthInput);
 
         // wwd.navigator.lookAtLocation.latitude = 36.2;
         // wwd.navigator.lookAtLocation.longitude = -112.98;
