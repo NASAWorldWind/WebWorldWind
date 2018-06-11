@@ -13,19 +13,19 @@ define([
                     'attribute vec3 nextPos;\n' +
                     'attribute float direction;\n' +
                     'uniform mat4 mvpMatrix;\n' +
-                'uniform vec3 eyePos;\n' +
-                'uniform float pixelSizeFactor;\n' +
-                'uniform float pixelSizeOffset;\n' +
-                'uniform float outlineWidth;\n' +
-                'uniform float cameraAltitude;\n' +
+                    'uniform vec3 eyePos;\n' +
+                    'uniform float pixelSizeFactor;\n' +
+                    'uniform float pixelSizeOffset;\n' +
+                    'uniform float outlineWidth;\n' +
+                    'uniform float cameraAltitude;\n' +
                     'void main() {\n' +
                     '   vec3 tangent = normalize(nextPos - prevPos);\n' +
                     '   vec3 normPos = normalize(pos);\n' +
                     '   vec3 nadir = normalize(cross(tangent, normPos));\n' +
                     '   vec3 offset = normalize(cross(nadir, tangent));\n' +
-                '   float distance = max(0.01, min(length(eyePos - pos), cameraAltitude));\n' +
-                '   float pixelSize = outlineWidth * (pixelSizeFactor * distance + pixelSizeOffset);\n' +
-                '   normPos = pos + (offset * direction * pixelSize);\n' +
+                    '   float distance = max(0.01, min(length(eyePos - pos), cameraAltitude));\n' +
+                    '   float pixelSize = outlineWidth * (pixelSizeFactor * distance + pixelSizeOffset);\n' +
+                    '   normPos = pos + (offset * direction * pixelSize);\n' +
                     '   gl_Position = mvpMatrix * vec4(normPos, 1.0);\n' +
                     '   gl_Position.z = min(gl_Position.z, gl_Position.w);\n' +
                     '}',
