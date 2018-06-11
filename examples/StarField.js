@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 /**
- *  Illustrates how to show the starfield layer above the globe.
+ *  Illustrates how to show the starfield layer above the globe, displaying a starry sky.
+ *  This requires a dark background for the WorldWindow's canvas.
  */
 requirejs([
         './WorldWindShim',
@@ -42,23 +43,24 @@ requirejs([
         wwd.addLayer(starFieldLayer); //IMPORTANT: add the starFieldLayer before the atmosphereLayer
         wwd.addLayer(atmosphereLayer);
 
+        // Attach a time property to the starfield and atmosphere layers.
         var date = new Date();
         starFieldLayer.time = date;
         atmosphereLayer.time = date;
 
-        wwd.redrawCallbacks.push(runSunSimulation);
-
         var timeStamp = Date.now();
 
-        function runSunSimulation(wwd, stage) {
-            if (stage === WorldWind.AFTER_REDRAW) {
+        // Animate the starry sky as well as the globe's day/night cycle with the atmosphere layer.
+        function runDayCycleAnimation() {
                 timeStamp += (60 * 1000); // Increase the time in the simulation by a minute.
                 var date = new Date(timeStamp);
                 starFieldLayer.time = date;
                 atmosphereLayer.time = date;
-                wwd.redraw();
-            }
+            wwd.redraw(); // Update the WorldWindow.
+            requestAnimationFrame(runDayCycleAnimation);
         }
+
+        requestAnimationFrame(runDayCycleAnimation);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
