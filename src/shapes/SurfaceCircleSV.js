@@ -237,6 +237,7 @@ define(['../error/ArgumentError',
 
             program = dc.findAndBindProgram(SurfaceShapesSVProgram);
             program.loadTextureUnit(gl, gl.TEXTURE0);
+            this.activeTexture.bind(dc);
 
             // setup the mvp matrix
             transformationMatrix.setToIdentity();
@@ -321,13 +322,11 @@ define(['../error/ArgumentError',
 
             this.applyStencilTest(dc);
             program.loadTextureEnabled(gl, true);
-            if (this.activeTexture.bind(dc)) {
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
-            }
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
             program.loadTextureEnabled(gl, false);
         };
 
