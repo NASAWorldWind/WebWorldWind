@@ -116,8 +116,8 @@ requirejs(['./WorldWindShim',
 
             document.getElementById("geoJSONTxtArea").value = exportedGeoJSON;
         }
-        document.getElementById("exportGeoJSONBtn").onclick = onExportGeoJSON;
 
+        document.getElementById("exportGeoJSONBtn").onclick = onExportGeoJSON;
 
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
