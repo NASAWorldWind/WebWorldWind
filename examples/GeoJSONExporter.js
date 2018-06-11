@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Illustrates how to export surface shapes in GeoJSON.
  */
@@ -49,29 +50,28 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer and some surface shapes
+        // Create a layer to contain all surface shapes.
         var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
         wwd.addLayer(shapesLayer);
 
-        var boundary = [];
-        boundary.push(new WorldWind.Location(40, -100));
-        boundary.push(new WorldWind.Location(45, -110));
-        boundary.push(new WorldWind.Location(40, -120));
+        // Create and add different surface shapes to export to GeoJSON.
+        // For more information on surface shapes, see the SurfaceShapes example.
 
+        // Set common attributes for all surface shapes.
         var attributes = new WorldWind.ShapeAttributes(null);
         attributes.outlineColor = WorldWind.Color.BLUE;
+        attributes.outlineWidth = 2;
         attributes.interiorColor = new WorldWind.Color(1, 1, 1, 1.0);
 
-        var shape = new WorldWind.SurfacePolyline(boundary, attributes);
+        // Create a polyline with three points.
+        var boundary = [];
+        boundary.push(new WorldWind.Location(40, -100));
+        boundary.push(new WorldWind.Location(50, -110));
+        boundary.push(new WorldWind.Location(40, -120));
+        var polyline = new WorldWind.SurfacePolyline(boundary, attributes);
+        shapesLayer.addRenderable(polyline);
 
-        boundary = [];
-        boundary.push(new WorldWind.Location(35, -90));
-        boundary.push(new WorldWind.Location(39, -100));
-        boundary.push(new WorldWind.Location(35, -110));
-
-        shape = new WorldWind.SurfacePolygon(boundary, attributes);
-        shapesLayer.addRenderable(shape);
-
+        // Create a triangle polygon with a hole in it.
         var boundaries = [];
         boundaries[0] = []; // outer boundary
         boundaries[0].push(new WorldWind.Location(40, -70));
@@ -81,9 +81,20 @@ requirejs(['./WorldWindShim',
         boundaries[1].push(new WorldWind.Location(41, -87));
         boundaries[1].push(new WorldWind.Location(44, -80));
         boundaries[1].push(new WorldWind.Location(41, -73));
-        shape = new WorldWind.SurfacePolygon(boundaries, attributes);
-        shapesLayer.addRenderable(shape);
+        var hollowTriangle = new WorldWind.SurfacePolygon(boundaries, attributes);
+        shapesLayer.addRenderable(hollowTriangle);
 
+        // Create an ellipse.
+        var ellipseCenter = new WorldWind.Location(35.00, -104.95);
+        var ellipse = new WorldWind.SurfaceEllipse(ellipseCenter, 300e3, 200e3, 0, attributes);
+        shapesLayer.addRenderable(ellipse);
+
+        // Create a sector.
+        var sector = new WorldWind.Sector(33, 37, -88, -83);
+        var surfaceSector = new WorldWind.SurfaceSector(sector, attributes);
+        shapesLayer.addRenderable(surfaceSector);
+
+        // Create a placemark.
         var placemark = new WorldWind.Placemark(new WorldWind.Position(41, -95, 0), true, null);
         var placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
         placemarkAttributes.imageScale = 1;
@@ -92,25 +103,12 @@ requirejs(['./WorldWindShim',
             WorldWind.OFFSET_FRACTION, 0.5,
             WorldWind.OFFSET_FRACTION, 1.5);
         placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/white-dot.png";
-
         placemark.label = "Test point";
         placemark.altitudeMode = WorldWind.CLAMP_TO_GROUND;
         placemark.attributes = placemarkAttributes;
         shapesLayer.addRenderable(placemark);
 
-        shape = new WorldWind.SurfaceEllipse(new WorldWind.Location(30.00, -104.95), 300e3, 200e3, 0, attributes);
-        shapesLayer.addRenderable(shape);
-
-        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(35.76, -113.7), 200e3, attributes);
-        shapesLayer.addRenderable(shape);
-
-        shape = new WorldWind.SurfaceRectangle(new WorldWind.Location(30.73, -96.49), 200e3, 300e3, 30, attributes);
-        shapesLayer.addRenderable(shape);
-
-        shape = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -88, -83), attributes);
-        shapesLayer.addRenderable(shape);
-
-        // Export the surface shapes on click
+        // Export the surface shapes on click and display them in a text box.
         function onExportGeoJSON() {
 
             // This is the actual export action.
@@ -124,4 +122,3 @@ requirejs(['./WorldWindShim',
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
     });
-
