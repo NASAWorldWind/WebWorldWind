@@ -96,6 +96,21 @@ define(['../error/ArgumentError',
             this._outlineElements;
 
             this._centerPoint = new Vec3();
+
+            this.activeTexture = null;
+
+            var canvas = document.createElement('canvas');
+            canvas.setAttribute('width', 16);
+            canvas.setAttribute('height', 16);
+            var ctx2d = canvas.getContext('2d');
+            ctx2d.fillStyle = 'rgba(0, 0, 0, 0)';
+            ctx2d.fillRect(0, 0, 16, 16);
+            ctx2d.fillStyle = 'rgba(255, 255, 255, 1.0)';
+            ctx2d.fillRect(0, 0, 8, 16);
+
+            document.getElementsByTagName('body')[0].appendChild(canvas);
+
+            this.outlineStippleImageSource = new WorldWind.ImageSource(canvas);
         };
 
         SurfaceCircleSV.prototype = Object.create(SurfaceShape.prototype);
@@ -147,6 +162,10 @@ define(['../error/ArgumentError',
                 }
             }
         });
+
+        SurfaceCircleSV.prototype.getActiveTexture = function (dc) {
+            return dc.gpuResourceCache.resourceForKey(this.outlineStippleImageSource);
+        };
 
         SurfaceCircleSV.prototype.render = function (dc) {
             var vbo, ebo, program, scratchMatrix = SurfaceCircleSV.MATRIX, p = SurfaceCircleSV.POINT,
@@ -208,7 +227,16 @@ define(['../error/ArgumentError',
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
             }
 
+            this.activeTexture = this.getActiveTexture(dc);
+            if (!this.activeTexture) {
+                this.activeTexture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.outlineStippleImageSource);
+                if (!this.activeTexture) {
+                    return null;
+                }
+            }
+
             program = dc.findAndBindProgram(SurfaceShapesSVProgram);
+            program.loadTextureUnit(gl, gl.TEXTURE0);
 
             // setup the mvp matrix
             transformationMatrix.setToIdentity();
@@ -239,7 +267,7 @@ define(['../error/ArgumentError',
             if (attributes.drawInterior) {
                 program.loadColor(gl, attributes.interiorColor);
                 program.loadOutlineWidth(gl, 0);
-
+                program.loadTextureEnabled(gl, false);
 
                 gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 8 * 4, 0);
                 gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
@@ -252,6 +280,7 @@ define(['../error/ArgumentError',
             if (attributes.drawOutline) {
                 program.loadColor(gl, attributes.outlineColor);
                 program.loadOutlineWidth(gl, attributes.outlineWidth);
+                program.loadStippleFactor(gl, 0.000001);
 
                 gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 4 * 4, 16 * 4);
                 gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 4 * 4, 0);
@@ -259,6 +288,7 @@ define(['../error/ArgumentError',
                 gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 4 * 4, 19 * 4);
 
                 this.drawOutline(dc);
+
             }
 
             this.endStencilTest(dc);
@@ -284,13 +314,21 @@ define(['../error/ArgumentError',
         };
 
         SurfaceCircleSV.prototype.drawOutline = function (dc) {
-            var gl = dc.currentGlContext;
+            var gl = dc.currentGlContext, program = dc.currentProgram;
 
             this.prepareStencil(dc);
             gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
 
             this.applyStencilTest(dc);
-            gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
+            program.loadTextureEnabled(gl, true);
+            if (this.activeTexture.bind(dc)) {
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
+            }
+            program.loadTextureEnabled(gl, false);
         };
 
         SurfaceCircleSV.prototype.drawDebug = function (dc, outlineWidth, attributes) {
@@ -374,7 +412,8 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.assembleVertexArray = function (dc) {
             var limits = this.calculateVolumeVerticalLimit(dc), idx = 0, loc, point = SurfaceCircleSV.POINT,
-                boundaryLength = this._boundaries.length, offsetIdx = 32, i,
+                lastPoint = SurfaceCircleSV.POINT2, boundaryLength = this._boundaries.length, offsetIdx = 32, i,
+                outlinePathLength = 0, lastPathLength = 0,
                 vertices = (1 /*center*/ + boundaryLength /*exterior*/ + 2 /*outline wrap*/)
                     * (4 /*4 verts per point(top x2, bottom x2*/ * 4 /*x, y, z, direction*/);
 
@@ -407,33 +446,43 @@ define(['../error/ArgumentError',
             for (i = 0; i < boundaryLength; i++) {
                 loc = this._boundaries[i];
                 dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.min, point);
+                if (i > 0) {
+                    lastPathLength = point.distanceTo(lastPoint);
+                    outlinePathLength += lastPathLength;
+                }
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = 0.5; // normal placeholder
+                this._vertexArray[idx++] = outlinePathLength; // normal placeholder
                 // duplicate vertex used for outline
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = -0.5; // normal placeholder
+                this._vertexArray[idx++] = -outlinePathLength; // normal placeholder
                 dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.max, point);
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = 0.5; // normal placeholder
+                this._vertexArray[idx++] = outlinePathLength; // normal placeholder
                 // duplicate vertex used for outline
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = -0.5; // normal placeholder
+                this._vertexArray[idx++] = -outlinePathLength; // normal placeholder
+
+                // set the last point
+                lastPoint.copy(point);
             }
 
             // repeat the second two slices for use by the normal interpolation technique
             for (i = 0; i < 8; i++) {
+                outlinePathLength += lastPathLength;
                 this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
                 this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
                 this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
+                // TODO - fix the normal
+                this._vertexArray[idx++] = this._vertexArray[offsetIdx] / Math.abs(this._vertexArray[offsetIdx]) * outlinePathLength;
+                offsetIdx++;
             }
         };
 
@@ -572,6 +621,8 @@ define(['../error/ArgumentError',
         SurfaceCircleSV.CACHE_ID = 0;
 
         SurfaceCircleSV.POINT = new Vec3();
+
+        SurfaceCircleSV.POINT2 = new Vec3();
 
         SurfaceCircleSV.MATRIX = new Matrix();
 

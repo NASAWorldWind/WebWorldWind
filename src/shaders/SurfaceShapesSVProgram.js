@@ -18,6 +18,8 @@ define([
                     'uniform float pixelSizeOffset;\n' +
                     'uniform float outlineWidth;\n' +
                     'uniform float cameraAltitude;\n' +
+                    'uniform float stippleFactor;\n' +
+                    'varying vec2 outlineTexCoord;\n' +
                     'void main() {\n' +
                     '   vec3 tangent = normalize(nextPos - prevPos);\n' +
                     '   vec3 normPos = normalize(pos);\n' +
@@ -25,14 +27,26 @@ define([
                     '   vec3 offset = normalize(cross(nadir, tangent));\n' +
                     '   float distance = max(0.01, min(length(eyePos - pos), cameraAltitude));\n' +
                     '   float pixelSize = outlineWidth * (pixelSizeFactor * distance + pixelSizeOffset);\n' +
-                    '   normPos = pos + (offset * direction * pixelSize);\n' +
+                    '   float stippleLength = abs(direction);\n' +
+                    '   normPos = pos + (offset * (direction / abs(direction) * 0.5) * pixelSize);\n' +
                     '   gl_Position = mvpMatrix * vec4(normPos, 1.0);\n' +
                     '   gl_Position.z = min(gl_Position.z, gl_Position.w);\n' +
+                    '   outlineTexCoord = vec2(stippleLength / 10000.0, 0.5);\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
                     'uniform vec4 color;\n' +
-                    'void main() {gl_FragColor = color;}';
+                    'uniform bool enableTexture;\n' +
+                    'uniform sampler2D textureSampler;\n' +
+                    'varying vec2 outlineTexCoord;\n' +
+                    'void main() {\n' +
+                    '   if (enableTexture ) {\n' +
+                    '       vec4 textureColor = texture2D(textureSampler, outlineTexCoord);\n' +
+                    '       gl_FragColor = textureColor * color;\n' +
+                    '   } else {\n' +
+                    '       gl_FragColor = color;\n' +
+                    '   }\n' +
+                    '}';
 
             // Call to the superclass, which performs shader program compiling and linking.
             GpuProgram.call(this, gl, vertexShaderSource, fragmentShaderSource);
@@ -56,6 +70,12 @@ define([
             this.outlineWidthLocation = this.uniformLocation(gl, "outlineWidth");
 
             this.cameraAltitudeLocation = this.uniformLocation(gl, "cameraAltitude");
+
+            this.textureUnitLocation = this.uniformLocation(gl, "textureSampler");
+
+            this.stippleFactorLocation = this.uniformLocation(gl, "stippleFactor");
+
+            this.enableTextureLocation = this.uniformLocation(gl, "enableTexture");
 
             this.colorLocation = this.uniformLocation(gl, "color");
         };
@@ -92,6 +112,18 @@ define([
 
         SurfaceShapesSVProgram.prototype.loadCameraAltitude = function (gl, alt) {
             gl.uniform1f(this.cameraAltitudeLocation, alt);
+        };
+
+        SurfaceShapesSVProgram.prototype.loadTextureUnit = function (gl, unit) {
+            gl.uniform1i(this.textureUnitLocation, unit - gl.TEXTURE0);
+        };
+
+        SurfaceShapesSVProgram.prototype.loadStippleFactor = function (gl, factor) {
+            gl.uniform1f(this.stippleFactorLocation, factor);
+        };
+
+        SurfaceShapesSVProgram.prototype.loadTextureEnabled = function (gl, enable) {
+            gl.uniform1i(this.enableTextureLocation, enable ? 1 : 0);
         };
 
         SurfaceShapesSVProgram.prototype.loadColor = function (gl, color) {
