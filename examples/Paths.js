@@ -55,7 +55,7 @@ requirejs(['./WorldWindShim',
 
         // Create the path.
         var path = new WorldWind.Path(pathPositions, null);
-        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND; // TODO: Ask about the usefulness of setting this other than CLAMP_TO_GROUND.
+        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND; // The path's altitude stays relative to the terrain's altitude.
         path.followTerrain = true;
         path.extrude = true; // Make it a curtain.
         path.useSurfaceShapeFor2D = true; // Use a surface shape in 2D mode.
