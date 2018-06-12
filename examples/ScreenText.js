@@ -52,47 +52,45 @@ requirejs(['./WorldWindShim',
             textLayer = new WorldWind.RenderableLayer("Screen Text");
 
         // Set up the common text attributes.
-        textAttributes.color = WorldWind.Color.RED;
+        textAttributes.color = WorldWind.Color.WHITE;
+        textAttributes.font = new WorldWind.Font(20);
 
-        // Create a screen text shape and its attributes.
+        // Create screen text shapes and their attributes.
+        // Indicate the text's placement on the screen by using an offset as an argument to construct a new ScreenText.
+        // Use TextAttributes.offset to position the text relative to the specified screen offset.
+
+        // We will exemplify ScreenText creation in two ways.
+        // In the first two ScreenTexts, we define the desired screen position and alignment by directly setting the
+        // offset values at ScreenText creation. With the "Center" ScreenText, the offset values are edited
+        // after ScreenText creation, overwriting the screenOffset and screenText attributes offset values.
+
+        // Left
         screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1), "Upper Left");
+            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5), "Left");
+        textAttributes = new WorldWind.TextAttributes(textAttributes);
+        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
+        screenText.attributes = textAttributes;
+        textLayer.addRenderable(screenText);
+
+        // Right
+        screenText = new WorldWind.ScreenText(
+            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5), "Right");
+        textAttributes = new WorldWind.TextAttributes(textAttributes);
+        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+        screenText.attributes = textAttributes;
+        textLayer.addRenderable(screenText);
+
+        // Center
+        var offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
+        screenText = new WorldWind.ScreenText(offset, "Center");
         textAttributes = new WorldWind.TextAttributes(textAttributes);
         // Use offset to position the upper left corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1);
+        textAttributes.offset = offset;
+        screenText.screenOffset.x = 0.5;
+        screenText.screenOffset.y = 0.5;
         screenText.attributes = textAttributes;
-        textLayer.addRenderable(screenText);
-
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0), "Lower Left");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the lower left corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
-        screenText.attributes = textAttributes;
-        textLayer.addRenderable(screenText);
-
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 1), "Upper Right");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the upper right corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 1);
-        screenText.attributes = textAttributes;
-        textLayer.addRenderable(screenText);
-
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0), "Lower Right");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the lower right corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
-        screenText.attributes = textAttributes;
-        textLayer.addRenderable(screenText);
-
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5), "Center");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the center of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = textAttributes;
+        screenText.attributes.offset.x = 0.5;
+        screenText.attributes.offset.y = 0.5;
         textLayer.addRenderable(screenText);
 
         // Add the text layer to the WorldWindow's layer list.
@@ -100,27 +98,4 @@ requirejs(['./WorldWindShim',
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
-
-        // Set up to handle picking.
-        var handlePick = (function (o) {
-            var pickPoint = wwd.canvasCoordinates(o.clientX, o.clientY);
-
-            var pickList = wwd.pick(pickPoint);
-            if (pickList.objects.length > 0) {
-                for (var p = 0; p < pickList.objects.length; p++) {
-                    var pickedObject = pickList.objects[p];
-                    if (!pickedObject.isTerrain) {
-                        if (pickedObject.userObject instanceof WorldWind.ScreenText) {
-                            console.log(pickedObject.userObject.text);
-                        }
-                    }
-                }
-            }
-        }).bind(this);
-
-        // Listen for mouse moves and highlight text that the cursor rolls over.
-        wwd.addEventListener("mousemove", handlePick);
-
-        // Listen for taps on mobile devices and highlight text that the user taps.
-        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     });
