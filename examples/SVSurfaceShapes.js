@@ -86,7 +86,7 @@ requirejs(['./WorldWindShim',
         sa = new WorldWind.ShapeAttributes();
         sa.outlineColor = new WorldWind.Color(0, 1, 0, 0.6);
         sa.outlineWidth = 3;
-        sa.outlineStippleFactor = 1;
+        sa.outlineStippleFactor = 1/100;
         sa.drawOutline = true;
         sa.interiorColor = new WorldWind.Color(0, 0, 1, 0.7);
         sa.drawInterior = true;

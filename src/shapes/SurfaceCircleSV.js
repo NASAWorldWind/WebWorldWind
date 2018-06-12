@@ -95,6 +95,8 @@ define(['../error/ArgumentError',
 
             this._outlineElements = {};
 
+            this._stippleElements = {};
+
             this._centerPoint = new Vec3();
 
             this.activeTexture = null;
@@ -299,12 +301,10 @@ define(['../error/ArgumentError',
 
                 if (attributes.outlineStippleFactor && this.activeTexture.bind(dc)) {
                     program.loadTextureEnabled(gl, true);
-                    program.loadOutlineWidth(gl, attributes.outlineWidth * 10);
+                    program.loadOutlineWidth(gl, attributes.outlineWidth * 1000);
                     this.setTextureWrapAndFilter(dc);
-                    gl.frontFace(gl.CW);
-                    gl.drawElements(gl.TRIANGLES, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
+                    gl.drawElements(gl.TRIANGLES, this._stippleElements.elementCount, gl.UNSIGNED_SHORT, this._stippleElements.elementOffset);
                     program.loadTextureEnabled(gl, false);
-                    gl.frontFace(gl.CCW);
                 } else {
                     gl.drawElements(gl.TRIANGLES, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
                 }
@@ -375,8 +375,15 @@ define(['../error/ArgumentError',
 
             this.setOutlineVertexAttribPointers(dc);
             gl.disable(gl.CULL_FACE);
-            gl.drawElements(gl.TRIANGLES, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
+            gl.drawElements(gl.LINE_STRIP, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
             gl.enable(gl.CULL_FACE);
+
+            program.loadOutlineWidth(gl, attributes.outlineWidth * 1000);
+            gl.disable(gl.DEPTH_TEST);
+            program.loadTextureEnabled(gl, true);
+            gl.drawElements(gl.TRIANGLES, this._stippleElements.elementCount, gl.UNSIGNED_SHORT, this._stippleElements.elementOffset);
+            gl.enable(gl.DEPTH_TEST);
+
         };
 
         SurfaceCircleSV.prototype.beginStencilTest = function (dc) {
@@ -538,7 +545,7 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.calculateVolumeVerticalLimits = function (dc) {
             // TODO upper and lower limit defined by circle size
-            return {min: -11000, max: 80000};
+            return {min: 500, max: 10000};
         };
 
         SurfaceCircleSV.prototype.assembleElementArray = function (dc) {
@@ -547,9 +554,10 @@ define(['../error/ArgumentError',
                 slices = boundarySize - 1,
                 idx = 0, i, offset,
                 interiorElements = slices * 4 /*triangles*/ * 3 /*vertices per triangle*/, // including top, side, and bottom
-                outlineElements = slices * 8 /*triangles*/ * 3 /*vertices per triangle*/;
+                outlineElements = slices * 8 /*triangles*/ * 3 /*vertices per triangle*/,
+                stippleElements = slices * 2 /*triangles*/ * 3 /*vertices per triangle*/;
 
-            this._elementArray = new Int16Array(interiorElements + outlineElements);
+            this._elementArray = new Int16Array(interiorElements + outlineElements + stippleElements);
 
             this._interiorElements.elementCount = interiorElements;
             this._interiorElements.elementOffset = 0;
@@ -563,6 +571,14 @@ define(['../error/ArgumentError',
             this._outlineElements.prevOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES;
             this._outlineElements.nextOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 8 /*vertices*/ * 4 /*size of one float in bytes*/;
             this._outlineElements.directionOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 4 /*vertices*/ * 4 /*size of one float in bytes*/ + 3 * 4 /*offset into the vertex to get the direction*/;
+
+            this._stippleElements.elementCount = stippleElements;
+            this._stippleElements.elementOffset = (interiorElements + outlineElements) * 2;
+            this._stippleElements.stride = 4 /*components*/ * 4 /*size of one float in bytes*/;
+            this._stippleElements.posOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 4 /*vertices*/ * 4 /*size of one float in bytes*/;
+            this._stippleElements.prevOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES;
+            this._stippleElements.nextOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 8 /*vertices*/ * 4 /*size of one float in bytes*/;
+            this._stippleElements.directionOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 4 /*vertices*/ * 4 /*size of one float in bytes*/ + 3 * 4 /*offset into the vertex to get the direction*/;
 
             // Generate the triangles for displaying the interior of a circle. Each slice has a triangle on the top, one
             // on the bottom, and two making up the outside. The interior isn't subject to scaling, so it does not
@@ -645,6 +661,20 @@ define(['../error/ArgumentError',
                     }
                 });
                 console.log("The largest index found: " + (maximumIndex + 2) + " and the largest index possible: " + (this._vertexArray.length / 4 - 1));
+            }
+
+            // Generate triangles for the bottom of the scalable volume for mapping the stipple texture
+            startIdx = idx;
+            for (i = 0; i < slices; i++) {
+                offset = i * 4;
+                // interior triangle
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 1 + offset;
+                this._elementArray[idx++] = 5 + offset;
+                // exterior triangle
+                this._elementArray[idx++] = 1 + offset;
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = offset;
             }
         };
 
