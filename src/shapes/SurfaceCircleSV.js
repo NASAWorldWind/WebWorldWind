@@ -708,13 +708,13 @@ define(['../error/ArgumentError',
          * The minimum number of intervals the circle generates.
          * @type {Number}
          */
-        SurfaceCircleSV.MIN_NUM_INTERVALS = 4;
+        SurfaceCircleSV.MIN_NUM_INTERVALS = 8;
 
         /**
          * The default number of intervals the circle generates.
          * @type {Number}
          */
-        SurfaceCircleSV.DEFAULT_NUM_INTERVALS = 4;
+        SurfaceCircleSV.DEFAULT_NUM_INTERVALS = 64;
 
         SurfaceCircleSV.CACHE_ID = 0;
 

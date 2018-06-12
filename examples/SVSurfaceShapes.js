@@ -89,7 +89,7 @@ requirejs(['./WorldWindShim',
         sa.outlineStippleFactor = 1;
         sa.drawOutline = true;
         sa.interiorColor = new WorldWind.Color(0, 0, 1, 0.7);
-        sa.drawInterior = false;
+        sa.drawInterior = true;
         shape = new WorldWind.SurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
