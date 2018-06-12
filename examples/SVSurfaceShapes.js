@@ -84,14 +84,16 @@ requirejs(['./WorldWindShim',
         ];
 
         sa = new WorldWind.ShapeAttributes();
-        sa.outlineColor = new WorldWind.Color(0, 1, 0, 1);
-        sa.outlineWidth = 1;
+        sa.outlineColor = new WorldWind.Color(0, 1, 0, 0.6);
+        sa.outlineWidth = 3;
+        sa.outlineStippleFactor = 1;
+        sa.drawOutline = true;
         sa.interiorColor = new WorldWind.Color(0, 0, 1, 0.7);
         sa.drawInterior = false;
         shape = new WorldWind.SurfacePolyline(locations, sa);
         shapesLayer.addRenderable(shape);
 
-        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(38, -104), 1000000, sa);
+        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(38, -104), 100000, sa);
         shape.debug = false;
         shapesLayer.addRenderable(shape);
 

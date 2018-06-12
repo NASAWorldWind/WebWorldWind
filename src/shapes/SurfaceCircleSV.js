@@ -91,9 +91,9 @@ define(['../error/ArgumentError',
 
             this._elementCacheKey;
 
-            this._interiorElements;
+            this._interiorElements = {};
 
-            this._outlineElements;
+            this._outlineElements = {};
 
             this._centerPoint = new Vec3();
 
@@ -103,10 +103,16 @@ define(['../error/ArgumentError',
             canvas.setAttribute('width', 16);
             canvas.setAttribute('height', 16);
             var ctx2d = canvas.getContext('2d');
+
+            // clear it all
             ctx2d.fillStyle = 'rgba(0, 0, 0, 0)';
             ctx2d.fillRect(0, 0, 16, 16);
+
             ctx2d.fillStyle = 'rgba(255, 255, 255, 1.0)';
             ctx2d.fillRect(0, 0, 8, 16);
+            ctx2d.fillRect(10, 0, 4, 16);
+
+
 
             document.getElementsByTagName('body')[0].appendChild(canvas);
 
@@ -169,7 +175,7 @@ define(['../error/ArgumentError',
 
         SurfaceCircleSV.prototype.render = function (dc) {
             var vbo, ebo, program, scratchMatrix = SurfaceCircleSV.MATRIX, p = SurfaceCircleSV.POINT,
-                transformationMatrix = SurfaceCircleSV.MATRIX2, gl = dc.currentGlContext, sector;
+                transformationMatrix = SurfaceCircleSV.MATRIX2, gl = dc.currentGlContext, sector, attributes;
             if (!this.enabled) {
                 return;
             }
@@ -235,21 +241,23 @@ define(['../error/ArgumentError',
                 }
             }
 
-            program = dc.findAndBindProgram(SurfaceShapesSVProgram);
-            program.loadTextureUnit(gl, gl.TEXTURE0);
-            this.activeTexture.bind(dc);
-
+            // Establish drawing constant properties to be loaded into shader
+            // eye point relative to center
+            p.copy(dc.eyePoint);
+            p.subtract(this._centerPoint);
             // setup the mvp matrix
             transformationMatrix.setToIdentity();
             transformationMatrix.setToTranslation(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2]);
             scratchMatrix.copy(dc.modelviewProjection);
             scratchMatrix.multiplyMatrix(transformationMatrix);
-            program.loadModelviewProjection(gl, scratchMatrix);
 
-            var attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
-            if (!attributes) {
-                return;
-            }
+            program = dc.findAndBindProgram(SurfaceShapesSVProgram);
+            program.loadEyePosition(gl, p);
+            program.loadModelviewProjection(gl, scratchMatrix);
+            program.loadPixelSizeFactor(gl, dc.pixelSizeFactor);
+            program.loadPixelSizeOffset(gl, dc.pixelSizeOffset);
+            program.loadCameraAltitude(gl, dc.eyePosition.altitude);
+            program.loadTextureUnit(gl, gl.TEXTURE0);
 
             gl.enableVertexAttribArray(program.posLocation);
             gl.enableVertexAttribArray(program.prevPosLocation);
@@ -258,44 +266,54 @@ define(['../error/ArgumentError',
 
             this.beginStencilTest(dc);
 
-            p.copy(dc.eyePoint);
-            p.subtract(this._centerPoint);
-            program.loadEyePosition(gl, p);
-            program.loadPixelSizeFactor(gl, dc.pixelSizeFactor);
-            program.loadPixelSizeOffset(gl, dc.pixelSizeOffset);
-            program.loadCameraAltitude(gl, dc.eyePosition.altitude);
+            attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
+            if (!attributes) {
+                return;
+            }
 
             if (attributes.drawInterior) {
                 program.loadColor(gl, attributes.interiorColor);
-                program.loadOutlineWidth(gl, 0);
+                program.loadOutlineWidth(gl, 0); // prevents offset of vertex
                 program.loadTextureEnabled(gl, false);
 
-                gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 8 * 4, 0);
-                gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
-                gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 0, 32 * 4);
-                gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 0, 19 * 4);
+                this.setInteriorVertexAttribPointers(dc);
 
-                this.drawInterior(dc);
+                this.prepareStencil(dc);
+                gl.drawElements(gl.TRIANGLES, this._interiorElements.elementCount, gl.UNSIGNED_SHORT, 0);
+
+                this.applyStencilTest(dc);
+                gl.drawElements(gl.TRIANGLES, this._interiorElements.elementCount, gl.UNSIGNED_SHORT, 0);
             }
 
             if (attributes.drawOutline) {
                 program.loadColor(gl, attributes.outlineColor);
+                program.loadStippleFactor(gl, attributes.outlineStippleFactor || 1);
                 program.loadOutlineWidth(gl, attributes.outlineWidth);
-                program.loadStippleFactor(gl, 0.000001);
 
-                gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 4 * 4, 16 * 4);
-                gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 4 * 4, 0);
-                gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 4 * 4, 32 * 4);
-                gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 4 * 4, 19 * 4);
+                this.setOutlineVertexAttribPointers(dc);
 
-                this.drawOutline(dc);
+                this.prepareStencil(dc);
+                gl.drawElements(gl.TRIANGLES, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
 
+                this.applyStencilTest(dc);
+
+                if (attributes.outlineStippleFactor && this.activeTexture.bind(dc)) {
+                    program.loadTextureEnabled(gl, true);
+                    program.loadOutlineWidth(gl, attributes.outlineWidth * 10);
+                    this.setTextureWrapAndFilter(dc);
+                    gl.frontFace(gl.CW);
+                    gl.drawElements(gl.TRIANGLES, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
+                    program.loadTextureEnabled(gl, false);
+                    gl.frontFace(gl.CCW);
+                } else {
+                    gl.drawElements(gl.TRIANGLES, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
+                }
             }
 
             this.endStencilTest(dc);
 
             if (this.debug) {
-                this.drawDebug(dc, attributes.outlineWidth, attributes);
+                this.drawDebug(dc, attributes);
             }
 
             gl.disableVertexAttribArray(program.posLocation);
@@ -304,64 +322,61 @@ define(['../error/ArgumentError',
             gl.disableVertexAttribArray(program.directionLocation);
         };
 
-        SurfaceCircleSV.prototype.drawInterior = function (dc) {
-            var gl = dc.currentGlContext;
-
-            this.prepareStencil(dc);
-            gl.drawElements(gl.TRIANGLES, this._interiorElements, gl.UNSIGNED_SHORT, 0);
-
-            this.applyStencilTest(dc);
-            gl.drawElements(gl.TRIANGLES, this._interiorElements, gl.UNSIGNED_SHORT, 0);
-        };
-
-        SurfaceCircleSV.prototype.drawOutline = function (dc) {
+        SurfaceCircleSV.prototype.setInteriorVertexAttribPointers = function (dc) {
             var gl = dc.currentGlContext, program = dc.currentProgram;
 
-            this.prepareStencil(dc);
-            gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
+            gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, this._interiorElements.stride, this._interiorElements.posOffset);
+            // the following attribute pointers don't matter during interior drawing
+            gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 0, 0);
+        };
 
-            this.applyStencilTest(dc);
-            program.loadTextureEnabled(gl, true);
+        SurfaceCircleSV.prototype.setOutlineVertexAttribPointers = function (dc) {
+            var gl = dc.currentGlContext, program = dc.currentProgram;
+
+            gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, this._outlineElements.stride, this._outlineElements.posOffset);
+            gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, this._outlineElements.stride, this._outlineElements.prevOffset);
+            gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, this._outlineElements.stride, this._outlineElements.nextOffset);
+            gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, this._outlineElements.stride, this._outlineElements.directionOffset);
+        };
+
+        SurfaceCircleSV.prototype.setTextureWrapAndFilter = function (dc) {
+            var gl = dc.currentGlContext;
+
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.drawElements(gl.TRIANGLES, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
-            program.loadTextureEnabled(gl, false);
         };
 
-        SurfaceCircleSV.prototype.drawDebug = function (dc, outlineWidth, attributes) {
+        SurfaceCircleSV.prototype.drawDebug = function (dc, attributes) {
             var gl = dc.currentGlContext, program = dc.currentProgram;
 
             var p = SurfaceCircleSV.POINT;
             p.copy(dc.eyePoint);
             p.subtract(this._centerPoint);
 
-            program.loadColor(gl, Color.WHITE);
+            program.loadColor(gl, new Color(1, 1, 1, 0.5));
             program.loadOutlineWidth(gl, 0);
             program.loadPixelSizeFactor(gl, dc.pixelSizeFactor);
             program.loadPixelSizeOffset(gl, dc.pixelSizeOffset);
             program.loadEyePosition(gl, p);
 
-            gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 8 * 4, 0);
-            gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 0, 32 * 4);
-            gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 0, 19 * 4);
+            this.setInteriorVertexAttribPointers(dc);
 
-            gl.drawElements(gl.LINE_STRIP, this._interiorElements, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.LINE_STRIP, 12, gl.UNSIGNED_SHORT, 0);
 
-            program.loadColor(gl, Color.GREEN);
+            program.loadColor(gl, new Color(0, 1, 1, 0.5));
             program.loadOutlineWidth(gl, attributes.outlineWidth);
             program.loadPixelSizeFactor(gl, dc.pixelSizeFactor);
             program.loadPixelSizeOffset(gl, dc.pixelSizeOffset);
             program.loadEyePosition(gl, p);
 
-            gl.vertexAttribPointer(program.posLocation, 3, gl.FLOAT, false, 4 * 4, 16 * 4);
-            gl.vertexAttribPointer(program.prevPosLocation, 3, gl.FLOAT, false, 4 * 4, 0);
-            gl.vertexAttribPointer(program.nextPosLocation, 3, gl.FLOAT, false, 4 * 4, 32 * 4);
-            gl.vertexAttribPointer(program.directionLocation, 1, gl.FLOAT, false, 4 * 4, 19 * 4);
-
-            gl.drawElements(gl.LINE_STRIP, this._outlineElements, gl.UNSIGNED_SHORT, 2 * this._interiorElements);
+            this.setOutlineVertexAttribPointers(dc);
+            gl.disable(gl.CULL_FACE);
+            gl.drawElements(gl.TRIANGLES, this._outlineElements.elementCount, gl.UNSIGNED_SHORT, this._outlineElements.elementOffset);
+            gl.enable(gl.CULL_FACE);
         };
 
         SurfaceCircleSV.prototype.beginStencilTest = function (dc) {
@@ -410,142 +425,226 @@ define(['../error/ArgumentError',
         };
 
         SurfaceCircleSV.prototype.assembleVertexArray = function (dc) {
-            var limits = this.calculateVolumeVerticalLimit(dc), idx = 0, loc, point = SurfaceCircleSV.POINT,
-                lastPoint = SurfaceCircleSV.POINT2, boundaryLength = this._boundaries.length, offsetIdx = 32, i,
-                outlinePathLength = 0, lastPathLength = 0,
-                vertices = (1 /*center*/ + boundaryLength /*exterior*/ + 2 /*outline wrap*/)
-                    * (4 /*4 verts per point(top x2, bottom x2*/ * 4 /*x, y, z, direction*/);
+            var verticalLimits = this.calculateVolumeVerticalLimits(dc),
+                idx = 0, loc, i,
+                point = SurfaceCircleSV.POINT,
+                lastPoint = SurfaceCircleSV.POINT2,
+                boundaryLength = this._boundaries.length,
+                outlinePathLength = 0,
+                lastPathLength = 0,
+                // the this._boundaries array includes duplicate start/stop locations for surface circle
+                vertices = (boundaryLength /*exterior*/ + 2 /*outline wrap*/)
+                    * (4 /*4 verts per point(top x2, bottom x2*/ * 4 /*x, y, z, direction*/)
+                    + (2 /*center top and bottom*/ * 4 /*x, y, z, direction*/);
 
             this._vertexArray = new Float32Array(vertices);
 
-            // let's start with the bottom center, then top center, then bottom and top rim
             dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, 0, this._centerPoint);
-            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, limits.min, point);
+
+            // Start with the bottom center, then top center, then bottom and top rim.
+            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, verticalLimits.min, point);
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
             this._vertexArray[idx++] = point[1] - this._centerPoint[1];
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-            this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
-            // duplicate vertex used for outline (not used, for vertex stride only)
-            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-            this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
-            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, limits.max, point);
-            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-            this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
-            // duplicate vertex used for outline (not used, for vertex stride only)
+            this._vertexArray[idx++] = 0; // normal placeholder (not used, maintains vertex stride only)
+            dc.globe.computePointFromPosition(this.center.latitude, this.center.longitude, verticalLimits.max, point);
             this._vertexArray[idx++] = point[0] - this._centerPoint[0];
             this._vertexArray[idx++] = point[1] - this._centerPoint[1];
             this._vertexArray[idx++] = point[2] - this._centerPoint[2];
             this._vertexArray[idx++] = 0; // normal placeholder (not used, for vertex stride only)
 
-            // iterate through the boundaries storing relative to center coordinates
+            // Iterate through the boundaries storing relative to center coordinates - the boundaries includes a
+            // duplicate closing location. Start at the penultimate location to build the offset direction control
+            // point. Work from bottom outside point, to bottom inside, to top outside, and top inside. The control
+            // points (start and end) only require two vertices for calculation, but to maintain stride values, they are
+            // duplicated two times to produce the unneeded inside and outside points.
+            loc = this._boundaries[boundaryLength - 2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, verticalLimits.min, point);
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, verticalLimits.max, point);
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+
+            // Iterate through the generated boundary points, including the duplicate start/end point.
             for (i = 0; i < boundaryLength; i++) {
                 loc = this._boundaries[i];
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.min, point);
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, verticalLimits.min, point);
                 if (i > 0) {
                     lastPathLength = point.distanceTo(lastPoint);
                     outlinePathLength += lastPathLength;
                 }
+                // the outline path length value is signed to indicate vertex direction when volume is scaled
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = outlinePathLength; // normal placeholder
+                this._vertexArray[idx++] = outlinePathLength;
                 // duplicate vertex used for outline
                 this._vertexArray[idx++] = point[0] - this._centerPoint[0];
                 this._vertexArray[idx++] = point[1] - this._centerPoint[1];
                 this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = -outlinePathLength; // normal placeholder
-                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, limits.max, point);
-                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = outlinePathLength; // normal placeholder
-                // duplicate vertex used for outline
-                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
-                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
-                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
-                this._vertexArray[idx++] = -outlinePathLength; // normal placeholder
-
+                this._vertexArray[idx++] = -outlinePathLength;
                 // set the last point
                 lastPoint.copy(point);
+                dc.globe.computePointFromPosition(loc.latitude, loc.longitude, verticalLimits.max, point);
+                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+                this._vertexArray[idx++] = outlinePathLength;
+                // duplicate vertex used for outline
+                this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+                this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+                this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+                this._vertexArray[idx++] = -outlinePathLength;
             }
 
-            // repeat the second two slices for use by the normal interpolation technique
-            for (i = 0; i < 8; i++) {
-                outlinePathLength += lastPathLength;
-                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-                this._vertexArray[idx++] = this._vertexArray[offsetIdx++];
-                // TODO - fix the normal
-                this._vertexArray[idx++] = this._vertexArray[offsetIdx] / Math.abs(this._vertexArray[offsetIdx]) * outlinePathLength;
-                offsetIdx++;
+            // Add a duplicate second boundary point vertex positions to provide the end control point
+            loc = this._boundaries[1];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, verticalLimits.min, point);
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, verticalLimits.max, point);
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+            this._vertexArray[idx++] = point[0] - this._centerPoint[0];
+            this._vertexArray[idx++] = point[1] - this._centerPoint[1];
+            this._vertexArray[idx++] = point[2] - this._centerPoint[2];
+            this._vertexArray[idx++] = 0; // doesn't matter, only the position is used for outline direction calculation
+
+            if (this.debug) {
+                console.log("The maximum vertex index filled: " + (idx - 1) + " and the array size: " + this._vertexArray.length);
             }
         };
 
-        SurfaceCircleSV.prototype.calculateVolumeVerticalLimit = function (dc) {
+        SurfaceCircleSV.prototype.calculateVolumeVerticalLimits = function (dc) {
             // TODO upper and lower limit defined by circle size
             return {min: -11000, max: 80000};
         };
 
         SurfaceCircleSV.prototype.assembleElementArray = function (dc) {
             // build an element buffer describing the triangles used to form the volume and volume wall
-            var boundarySize = this._boundaries.length, slices = boundarySize - 1, idx = 0, i, offset,
-                interiorElements = slices * 4 * 3, outlineElements = slices * 8 * 3;
+            var boundarySize = this._boundaries.length,
+                slices = boundarySize - 1,
+                idx = 0, i, offset,
+                interiorElements = slices * 4 /*triangles*/ * 3 /*vertices per triangle*/, // including top, side, and bottom
+                outlineElements = slices * 8 /*triangles*/ * 3 /*vertices per triangle*/;
 
             this._elementArray = new Int16Array(interiorElements + outlineElements);
-            this._interiorElements = interiorElements;
-            this._outlineElements = outlineElements;
 
+            this._interiorElements.elementCount = interiorElements;
+            this._interiorElements.elementOffset = 0;
+            this._interiorElements.stride = 4 /*components*/ * 4 /*size of one float in bytes*/;
+            this._interiorElements.posOffset = 0;
+
+            this._outlineElements.elementCount = outlineElements;
+            this._outlineElements.elementOffset = interiorElements * 2;
+            this._outlineElements.stride = 4 /*components*/ * 4 /*size of one float in bytes*/;
+            this._outlineElements.posOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 4 /*vertices*/ * 4 /*size of one float in bytes*/;
+            this._outlineElements.prevOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES;
+            this._outlineElements.nextOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 8 /*vertices*/ * 4 /*size of one float in bytes*/;
+            this._outlineElements.directionOffset = SurfaceCircleSV.BOUNDARY_OFFSET_BYTES + 4 /*components*/ * 4 /*vertices*/ * 4 /*size of one float in bytes*/ + 3 * 4 /*offset into the vertex to get the direction*/;
+
+            // Generate the triangles for displaying the interior of a circle. Each slice has a triangle on the top, one
+            // on the bottom, and two making up the outside. The interior isn't subject to scaling, so it does not
+            // matter whether the interior or exterior points are used. For consistency, the interior ones are used.
             for (i = 0; i < slices; i++) {
-                offset = i * 2;
+                offset = i * 4;
                 // bottom
                 this._elementArray[idx++] = 0;
-                this._elementArray[idx++] = 2 + offset;
-                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 7 + offset;
+                this._elementArray[idx++] = 11 + offset;
                 // top
                 this._elementArray[idx++] = 1;
-                this._elementArray[idx++] = 5 + offset;
-                this._elementArray[idx++] = 3 + offset;
+                this._elementArray[idx++] = 13 + offset;
+                this._elementArray[idx++] = 9 + offset;
                 // top side
-                this._elementArray[idx++] = 3 + offset;
-                this._elementArray[idx++] = 5 + offset;
-                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 9 + offset;
+                this._elementArray[idx++] = 13 + offset;
+                this._elementArray[idx++] = 7 + offset;
                 // bottom side
-                this._elementArray[idx++] = 4 + offset;
-                this._elementArray[idx++] = 2 + offset;
-                this._elementArray[idx++] = 3 + offset;
+                this._elementArray[idx++] = 11 + offset;
+                this._elementArray[idx++] = 7 + offset;
+                this._elementArray[idx++] = 13 + offset;
             }
 
-            // the shadow volume "wall" to provide the outline
-            for (i = 0; i < (slices + 1); i++) {
+            if (this.debug) {
+                console.log("The maximum interior index filled: " + (idx - 1) + " and the declared array size: " + this._elementArray.length);
+                var maximumIndex = -Number.MAX_VALUE;
+                this._elementArray.forEach(function (value) {
+                    maximumIndex = Math.max(value, maximumIndex);
+                });
+                console.log("The largest index found: " + maximumIndex + " and the largest index possible: " + (this._vertexArray.length / 4 - 1));
+            }
+
+            // Generate the triangles for displaying a scalable, conforming volume to the outline of the surface circle.
+            // Note that the indexes do not match the vertices described for the interior volume due to the two center
+            // points being skipped.
+            var startIdx = idx;
+            for (i = 0; i < slices; i++) {
                 offset = i * 4;
-                this._elementArray[idx++] = 5 + offset;
-                this._elementArray[idx++] = 9 + offset;
-                this._elementArray[idx++] = 11 + offset;
-                this._elementArray[idx++] = 11 + offset;
-                this._elementArray[idx++] = 7 + offset;
+                // interior top triangle
+                this._elementArray[idx++] = 3 + offset;
                 this._elementArray[idx++] = 5 + offset;
                 this._elementArray[idx++] = 7 + offset;
-                this._elementArray[idx++] = 11 + offset;
-                this._elementArray[idx++] = 10 + offset;
-                this._elementArray[idx++] = 10 + offset;
-                this._elementArray[idx++] = 6 + offset;
-                this._elementArray[idx++] = 7 + offset;
-                this._elementArray[idx++] = 6 + offset;
-                this._elementArray[idx++] = 10 + offset;
-                this._elementArray[idx++] = 8 + offset;
-                this._elementArray[idx++] = 8 + offset;
-                this._elementArray[idx++] = 4 + offset;
-                this._elementArray[idx++] = 6 + offset;
-                this._elementArray[idx++] = 4 + offset;
-                this._elementArray[idx++] = 8 + offset;
-                this._elementArray[idx++] = 9 + offset;
-                this._elementArray[idx++] = 9 + offset;
+                // interior bottom triangle
                 this._elementArray[idx++] = 5 + offset;
+                this._elementArray[idx++] = 3 + offset;
+                this._elementArray[idx++] = 1 + offset;
+                // top inner triangle
+                this._elementArray[idx++] = 6 + offset;
+                this._elementArray[idx++] = 3 + offset;
+                this._elementArray[idx++] = 7 + offset;
+                // top outer triangle
+                this._elementArray[idx++] = 3 + offset;
+                this._elementArray[idx++] = 6 + offset;
+                this._elementArray[idx++] = 2 + offset;
+                // exterior top triangle
                 this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 2 + offset;
+                this._elementArray[idx++] = 6 + offset;
+                // exterior bottom triangle
+                this._elementArray[idx++] = 2 + offset;
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = offset;
+                // bottom inner triangle
+                this._elementArray[idx++] = 1 + offset;
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 5 + offset;
+                // bottom outer triangle
+                this._elementArray[idx++] = 4 + offset;
+                this._elementArray[idx++] = 1 + offset;
+                this._elementArray[idx++] = offset;
+            }
+
+            if (this.debug) {
+                console.log("The maximum index filled: " + (idx - 1) + " and the array size: " + this._elementArray.length);
+                var maximumIndex = -Number.MAX_VALUE;
+                this._elementArray.forEach(function (value, index) {
+                    if (index >= startIdx) {
+                        maximumIndex = Math.max(value, maximumIndex);
+                    }
+                });
+                console.log("The largest index found: " + (maximumIndex + 2) + " and the largest index possible: " + (this._vertexArray.length / 4 - 1));
             }
         };
 
@@ -609,13 +708,13 @@ define(['../error/ArgumentError',
          * The minimum number of intervals the circle generates.
          * @type {Number}
          */
-        SurfaceCircleSV.MIN_NUM_INTERVALS = 8;
+        SurfaceCircleSV.MIN_NUM_INTERVALS = 4;
 
         /**
          * The default number of intervals the circle generates.
          * @type {Number}
          */
-        SurfaceCircleSV.DEFAULT_NUM_INTERVALS = 64;
+        SurfaceCircleSV.DEFAULT_NUM_INTERVALS = 4;
 
         SurfaceCircleSV.CACHE_ID = 0;
 
@@ -626,6 +725,8 @@ define(['../error/ArgumentError',
         SurfaceCircleSV.MATRIX = new Matrix();
 
         SurfaceCircleSV.MATRIX2 = new Matrix();
+
+        SurfaceCircleSV.BOUNDARY_OFFSET_BYTES = 2 /*vertices*/ * 4 /*x, y, z, direction*/ * 4 /*size of byte*/;
 
         return SurfaceCircleSV;
     });

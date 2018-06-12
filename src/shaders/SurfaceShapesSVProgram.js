@@ -31,7 +31,7 @@ define([
                     '   normPos = pos + (offset * (direction / abs(direction) * 0.5) * pixelSize);\n' +
                     '   gl_Position = mvpMatrix * vec4(normPos, 1.0);\n' +
                     '   gl_Position.z = min(gl_Position.z, gl_Position.w);\n' +
-                    '   outlineTexCoord = vec2(stippleLength / 10000.0, 0.5);\n' +
+                    '   outlineTexCoord = vec2(stippleLength / (pixelSize / stippleFactor), 0.5);\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
