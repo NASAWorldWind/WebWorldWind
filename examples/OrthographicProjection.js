@@ -12,6 +12,8 @@ requirejs(['./WorldWindShim'],
                 x = radius * Math.sin(lat * Math.PI / 180) * Math.cos(lon * Math.PI / 180);
                 y = radius * Math.sin(lat * Math.PI / 180) * Math.sin(lon * Math.PI / 180);
                 z = radius * Math.cos(lat * Math.PI / 180);
+                // simulate terrain
+                // z += Math.random() * 0.15;
 
                 vertices.push(x);
                 vertices.push(y);
