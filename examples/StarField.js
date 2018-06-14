@@ -53,6 +53,8 @@ requirejs([
 
         simulationDate = Date.now(); // Begin the simulation at the current time as provided by the browser.
 
+        requestAnimationFrame(runAnimation);
+
         function runAnimation() {
             now = Date.now();
             if (lastFrame) {
@@ -75,8 +77,6 @@ requirejs([
             lastFrame = now;
             requestAnimationFrame(runAnimation);
         }
-
-        requestAnimationFrame(runAnimation);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
