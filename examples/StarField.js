@@ -48,19 +48,35 @@ requirejs([
         starFieldLayer.time = date;
         atmosphereLayer.time = date;
 
-        var timeStamp = Date.now();
-
         // Animate the starry sky as well as the globe's day/night cycle with the atmosphere layer.
-        function runDayCycleAnimation() {
-                timeStamp += (60 * 1000); // Increase the time in the simulation by a minute.
-                var date = new Date(timeStamp);
-                starFieldLayer.time = date;
-                atmosphereLayer.time = date;
-            wwd.redraw(); // Update the WorldWindow.
-            requestAnimationFrame(runDayCycleAnimation);
+        var lastFrame, timeToAdvance, frameTime, now, simulationDate;
+
+        simulationDate = Date.now(); // Begin the simulation at the current time as provided by the browser.
+
+        function runAnimation() {
+            now = Date.now();
+            if (lastFrame) {
+                frameTime = now - lastFrame; // The amount of time taken to render each frame.
+
+                // The amount of time to advance the simulation, per frame, in order to achieve a constant
+                // rate of 3 hrs per second in real time, regardless of frame rate.
+                // The constant value of 10800 ms is the time to advance at the aforementioned rate assuming an
+                // hypothetical frame time equal to 1 ms (frame time is typically ~16 ms at 60Hz).
+                // This constant modulates the simulation advancement in each step, proportionally to the frame time.
+                timeToAdvance = frameTime * 10800;
+
+                simulationDate += timeToAdvance; // Advance the simulation time.
+
+                // Update the date in both the Starfield and Atmosphere layers.
+                starFieldLayer.time = new Date(simulationDate);
+                atmosphereLayer.time = new Date(simulationDate);
+                wwd.redraw(); // Update the WorldWindow scene.
+            }
+            lastFrame = now;
+            requestAnimationFrame(runAnimation);
         }
 
-        requestAnimationFrame(runDayCycleAnimation);
+        requestAnimationFrame(runAnimation);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
