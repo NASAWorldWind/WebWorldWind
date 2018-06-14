@@ -6,9 +6,13 @@
 <canvas id="globe" width="800" height="800"></canvas>
 <div>
     <span><input id="orthographic-checkbox" type="checkbox"> Orthographic</span>
-    <input id="azimuth-slider" type="range" min="0" max="7200" value="1800">
-    <input id="tilt-slider" type="range" min="0" max="900" value="450">
+    <input id="azimuth-slider" type="range" min="0" max="3600" value="1800">
+    <input id="tilt-slider" type="range" min="1" max="900" value="450">
     <input id="range-slider" type="range" min="0" max="500" value="300">
+</div>
+<div>
+    <input id="image-tilt-slider" type="range" min="1" max="900" value="450">
+    <input id="image-rotation-slider" type="range" min="0" max="3600" value="0">
 </div>
 <script data-main="OrthographicProjection" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.min.js"></script>
 <script id="vertex-shader" type="application/x-sh">

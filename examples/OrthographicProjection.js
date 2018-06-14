@@ -97,19 +97,17 @@ requirejs(['./WorldWindShim'],
             bottom = nearRect.getMinY(),
             top = nearRect.getMaxY();
         var near = 0.01;
-        var far = 20;
+        var far = 6;
         var tx = - (right + left) / (right - left);
         var ty = - (top + bottom) / (top - bottom);
         var tz = - (far + near) / (far - near);
 
-        var ortho = new WorldWind.Matrix(
+        return new WorldWind.Matrix(
             2 / (right - left), 0, 0, tx,
             0, 2 / (top - bottom), 0, ty,
             0, 0, -2 / (far - near), tz,
             0, 0, 0, 1
         );
-
-        return ortho;
     };
 
     var canvas = document.getElementById("globe");
@@ -120,6 +118,8 @@ requirejs(['./WorldWindShim'],
     var tiltSlider = document.getElementById("tilt-slider");
     var rangeSlider = document.getElementById("range-slider");
     var orthgraphicCheckbox = document.getElementById("orthographic-checkbox");
+        var imageTiltSlider = document.getElementById("image-tilt-slider");
+        var imageRotationSlider = document.getElementById("image-rotation-slider");
     var program;
     var sceneMvpLocation;
     var textureMvpLocation;
@@ -135,12 +135,23 @@ requirejs(['./WorldWindShim'],
     var textureMvp = new WorldWind.Matrix();
     var cameraPosition = new WorldWind.Vec3(0, 0, 5);
     var center = new WorldWind.Vec3(0, 0, 0);
-    var image = document.createElement("canvas");
-    image.setAttribute("height", 128);
-    image.setAttribute("width", 128);
-    var ctx = image.getContext("2d");
-    ctx.fillStyle = "rgba(200, 200, 200, 1)";
-    ctx.fillRect(0, 0, 128, 128);
+        var surfaceCanvas = document.createElement("canvas");
+        surfaceCanvas.setAttribute("height", 128);
+        surfaceCanvas.setAttribute("width", 128);
+        var ctx = surfaceCanvas.getContext("2d");
+        ctx.fillStyle = "rgba(200, 200, 200, 0.5)";
+        ctx.fillRect(0, 0, 64, 64);
+        ctx.fillStyle = "rgba(150, 150, 150, 0.5)";
+        ctx.fillRect(64, 0, 64, 64);
+        ctx.fillStyle = "rgba(100, 100, 100, 0.5)";
+        ctx.fillRect(0, 64, 64, 64);
+        ctx.fillStyle = "rgba(50, 50, 50, 0.5)";
+        ctx.fillRect(64, 64, 64, 64);
+        ctx.strokeStyle = "rgba(0, 0, 0, 1)";
+        ctx.strokeRect(8, 8, 112, 112);
+        ctx.strokeRect(16, 16, 96, 96);
+        document.body.appendChild(surfaceCanvas);
+        var texture = new WorldWind.Texture(gl, surfaceCanvas);
 
     var resetGl = function () {
         gl.enable(gl.DEPTH_TEST);
@@ -217,15 +228,20 @@ requirejs(['./WorldWindShim'],
         if (orthgraphicCheckbox.checked) {
             sceneProjection = createOrthoProjectionMatrix(cameraPosition.magnitude());
         } else {
-            sceneProjection = new WorldWind.Matrix().setToPerspectiveProjection(800, 700, 0.01, 20);
+            sceneProjection = new WorldWind.Matrix().setToPerspectiveProjection(800, 700, 0.01, 6);
         }
         sceneMvp.setToMultiply(sceneProjection, sceneModelView);
     };
 
     var setupTextureMvp = function () {
-        var texturePosition = new WorldWind.Vec3(1, 0, 1);
+        var x = Math.sin(imageTiltSlider.value / 10 * Math.PI / 180) * 2;
+        var z = Math.cos(imageTiltSlider.value / 10 * Math.PI / 180) * 2;
+        var texturePosition = new WorldWind.Vec3(x, 0, z);
 
-        var textureModelView = fromViewLookAt(texturePosition, center, new WorldWind.Vec3(0, 0, 1));
+        var y = Math.sin(imageRotationSlider.value / 10 * Math.PI / 180) * 2;
+        z = Math.cos(imageRotationSlider.value / 10 * Math.PI / 180) * 2;
+
+        var textureModelView = fromViewLookAt(texturePosition, center, new WorldWind.Vec3(0, y, z));
         var sceneProjection = createOrthoProjectionMatrix(texturePosition.magnitude());
         textureMvp.setToMultiply(sceneProjection, textureModelView);
     };
@@ -248,7 +264,7 @@ requirejs(['./WorldWindShim'],
         gl.enableVertexAttribArray(colorLocation);
 
         gl.vertexAttribPointer(vertexLocation, 3, gl.FLOAT, false, 6 * 4, 0);
-        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
+        gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 3 * 4);
 
         gl.drawArrays(gl.LINE_STRIP, 0, vertexArray.length / 6);
     };
@@ -268,16 +284,12 @@ requirejs(['./WorldWindShim'],
         }
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementBuffer);
 
-        if (!textureId) {
-            textureId = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, textureId);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
-        }
-        gl.bindTexture(gl.TEXTURE_2D, textureId);
+        texture.bind({
+            currentGlContext: gl, frameStatistics: {
+                incrementTextureLoadCount: function (n) {
+                }
+            }
+        });
 
         gl.useProgram(program);
 
@@ -285,7 +297,7 @@ requirejs(['./WorldWindShim'],
         gl.uniformMatrix4fv(sceneMvpLocation, false, columnMajorArray);
         columnMajorArray = textureMvp.columnMajorComponents(new Float32Array(16));
         gl.uniformMatrix4fv(textureMvpLocation, false, columnMajorArray);
-        gl.uniform1i(textureLocation, gl.TEXTURE0 - gl.TEXTURE0);
+        gl.uniform1i(textureLocation, 0);
 
         gl.enableVertexAttribArray(vertexLocation);
         gl.enableVertexAttribArray(colorLocation);
@@ -302,8 +314,10 @@ requirejs(['./WorldWindShim'],
         resetGl();
         setupSceneMvp();
         setupTextureMvp();
-        //drawWireframeGlobe();
-        drawGlobe();
+        if (texture) {
+            drawGlobe();
+        }
+        drawWireframeGlobe();
     }, 30);
 
     });
