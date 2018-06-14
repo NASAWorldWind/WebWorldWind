@@ -1,0 +1,42 @@
+<html>
+<head>
+    <title>Orthographic Projection Testing</title>
+</head>
+<body>
+<canvas id="globe" width="800" height="800"></canvas>
+<div>
+    <span><input id="orthographic-checkbox" type="checkbox"> Orthographic</span>
+    <input id="azimuth-slider" type="range" min="0" max="7200" value="1800">
+    <input id="tilt-slider" type="range" min="0" max="900" value="450">
+    <input id="range-slider" type="range" min="0" max="500" value="300">
+</div>
+<script data-main="OrthographicProjection" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.min.js"></script>
+<script id="vertex-shader" type="application/x-sh">
+    attribute vec3 vertex;
+    attribute vec3 color;
+    uniform mat4 sceneMvp;
+    uniform mat4 textureMvp;
+    varying vec2 texCoords;
+    varying vec4 outColor;
+    void main() {
+        gl_Position = sceneMvp * vec4(vertex, 1.0);
+        vec4 orthoPos = textureMvp * vec4(vertex, 1.0);
+        texCoords = vec2(orthoPos.s + 0.5, orthoPos.t + 0.5);
+        outColor = vec4(color, 1.0);
+    }
+</script>
+<script id="fragment-shader" type="application/x-sh">
+    precision mediump float;
+    uniform sampler2D textureSampler;
+    varying vec4 outColor;
+    varying vec2 texCoords;
+    void main() {
+        if (texCoords.s < 1.0 && texCoords.s > 0.0 && texCoords.t < 1.0 && texCoords.t > 0.0) {
+            gl_FragColor = texture2D(textureSampler, texCoords);
+        } else {
+            gl_FragColor = outColor;
+        }
+     }
+</script>
+</body>
+</html>
