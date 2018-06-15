@@ -113,6 +113,11 @@ requirejs(['./WorldWindShim',
         var widthSlider = document.getElementById("outline-width-slider");
         widthSlider.addEventListener('input', onWidthInput);
 
+        var dots = new WorldWind.SurfaceOrtho();
+        var dotLayer = new WorldWind.RenderableLayer();
+        dotLayer.addRenderable(dots);
+        wwd.addLayer(dotLayer);
+
         // wwd.navigator.lookAtLocation.latitude = 36.2;
         // wwd.navigator.lookAtLocation.longitude = -112.98;
         // wwd.navigator.range = 100000;

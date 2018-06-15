@@ -267,7 +267,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WWMath',
         './util/WWMessage',
         './util/WWUtil',
-        './util/XmlDocument'],
+        './util/XmlDocument',
+        './shapes/SurfaceOrtho'],
     function (AbstractError,
               Angle,
               Annotation,
@@ -521,7 +522,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WWMath,
               WWMessage,
               WWUtil,
-              XmlDocument
+              XmlDocument,
+              SurfaceOrtho
     ) {
         "use strict";
         /**
@@ -945,6 +947,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWUtil'] = WWUtil;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['WorldWindowController'] = WorldWindowController;
+        WorldWind['SurfaceOrtho'] = SurfaceOrtho;
 
         /**
          * Holds configuration parameters for WorldWind. Applications may modify these parameters prior to creating
