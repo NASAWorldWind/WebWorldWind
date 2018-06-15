@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/**
+ * @exports AAIGridMetadata
+ */
 define([],
     function () {
         'use strict';
 
         /**
-         * Creates a new container for AAIGrid metadata.
+         * Constructs a new container for AAIGrid metadata.
          * @alias AAIGridMetadata
          * @constructor
-         * @classdesc Contains all metadata for an AAIGrid file.
+         * @classdesc Contains the metadata for an AAIGrid file.
          */
         var AAIGridMetadata = function () {
             // Documented in defineProperties below.
@@ -118,7 +120,7 @@ define([],
 
             /**
              * The value that is regarded as "missing" or "not applicable".
-             * This value is optional and if not present it's value will be undefined.
+             * This value is optional. If not present, its value is <code>undefined</code>.
              * @memberof AAIGridMetadata.prototype
              * @type {Number|undefined}
              */

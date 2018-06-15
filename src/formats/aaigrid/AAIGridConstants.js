@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 define([],
     function () {
         'use strict';
 
         /**
-         * Provides AAIGrid constants.
+         * Provides constants for the AAIGridReader.
          * @exports AAIGridConstants
          */
         var AAIGridConstants = {

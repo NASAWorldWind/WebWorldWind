@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
  * @exports AAIGridReader
  */
@@ -90,9 +89,9 @@ define([
          * Decodes an arrayBuffer as a string.
          * If the dataSource is a string, no decoding takes place, the string is immediately returned.
          *
-         * @param {String|ArrayBuffer} dataSource
-         * @throws {ArgumentError} If the specified data source is not a string or an array buffer.
+         * @param {String|ArrayBuffer} dataSource The data source to decode.
          * @return {String} The decoded array buffer.
+         * @throws {ArgumentError} If the specified data source is not a string or an array buffer.
          */
         AAIGridReader.prototype.decodeData = function (dataSource) {
             if (typeof dataSource !== 'string' && !(dataSource instanceof ArrayBuffer)) {
@@ -129,7 +128,7 @@ define([
          * Internal. Applications should not call this method.
          * Parses the AAIGrid.
          *
-         * @param {String} dataString
+         * @param {String} dataString The string to parse.
          * @throws {ArgumentError} If the specified data source is not a string.
          */
         AAIGridReader.prototype.parse = function (dataString) {
@@ -201,15 +200,14 @@ define([
          * @param {Function} parserCompletionCallback A function to execute when the retrieval finishes, taking two
          * arguments:
          * <ul>
-         *     <li>AAIGridReader instance in case of success, otherwise null</li>
+         *     <li>AAIGridReader instance in case of success, otherwise <code>null</code></li>
          *     <li>XMLHttpRequest instance</li>
          * </ul>
          */
         AAIGridReader.retrieveFromUrl = function (url, parserCompletionCallback) {
             if (!url) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "AAIGridReader", "retrieveFromUrl",
-                        "missingUrl"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "AAIGridReader", "retrieveFromUrl", "missingUrl"));
             }
 
             if (!parserCompletionCallback) {
