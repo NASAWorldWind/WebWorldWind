@@ -23,14 +23,21 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
         var layerToRefresh = new WorldWind.BMNGLayer();
 
+        // Create and add layers to the WorldWindow, including our previously created layer to be refreshed.
         var layers = [
+            // Imagery layer.
             {layer: layerToRefresh, enabled: true},
+            // Add atmosphere layer on top of imagery layer.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -41,12 +48,12 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Set up to refresh the imagery periodically.
         setInterval(function () {
             layerToRefresh.refresh();
             wwd.redraw();
-        }, 20000); // refresh every 20 seconds
+        }, 20000); // Refresh every 20 seconds.
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

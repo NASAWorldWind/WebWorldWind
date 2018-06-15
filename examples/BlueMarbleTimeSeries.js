@@ -23,10 +23,13 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create a background layer.
         var backgroundLayer = new WorldWind.BMNGOneImageLayer();
         backgroundLayer.hide = true; // Don't show it in the layer manager.
         wwd.addLayer(backgroundLayer);
@@ -40,13 +43,12 @@ requirejs(['./WorldWindShim',
         // which is initiated below.
         wwd.addLayer(blueMarbleTimeSeries);
 
-        // Create a compass and view controls.
+        // Add atmosphere layer on top of base imagery layer.
+        wwd.addLayer(new WorldWind.AtmosphereLayer());
+        // Add WorldWind UI layers.
         wwd.addLayer(new WorldWind.CompassLayer());
         wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
-
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
 
         // Ensure that the background and other control layers are displayed while the blue marble layer is
         // being pre-populated.
@@ -80,4 +82,7 @@ requirejs(['./WorldWindShim',
                 }, 200);
             }
         }, 200);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

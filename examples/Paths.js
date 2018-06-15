@@ -28,13 +28,15 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        /**
-         * Added imagery layers.
-         */
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -53,16 +55,16 @@ requirejs(['./WorldWindShim',
 
         // Create the path.
         var path = new WorldWind.Path(pathPositions, null);
-        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND; // TODO: Ask about the usefulness of setting this other than CLAMP_TO_GROUND.
         path.followTerrain = true;
-        path.extrude = true; // make it a curtain
-        path.useSurfaceShapeFor2D = true; // use a surface shape in 2D mode
+        path.extrude = true; // Make it a curtain.
+        path.useSurfaceShapeFor2D = true; // Use a surface shape in 2D mode.
 
         // Create and assign the path's attributes.
         var pathAttributes = new WorldWind.ShapeAttributes(null);
         pathAttributes.outlineColor = WorldWind.Color.BLUE;
         pathAttributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
-        pathAttributes.drawVerticals = path.extrude; // draw verticals only when extruding
+        pathAttributes.drawVerticals = path.extrude; //Draw verticals only when extruding.
         path.attributes = pathAttributes;
 
         // Create and assign the path's highlight attributes.
@@ -77,9 +79,9 @@ requirejs(['./WorldWindShim',
         pathsLayer.addRenderable(path);
         wwd.addLayer(pathsLayer);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Now set up to handle highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });
