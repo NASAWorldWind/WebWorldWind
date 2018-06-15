@@ -49,11 +49,13 @@ define([
      * Creates a measured location from angles specified in radians.
      * @param {Number} latitudeRadians The latitude in radians.
      * @param {Number} longitudeRadians The longitude in radians.
-     * @param {Number} measure The measure in arbitrary unit
+     * @param {Number} measure The measure in an arbitrary unit.
      * @returns {Location} The new location with latitude and longitude in degrees.
      */
     MeasuredLocation.fromRadians = function(latitudeRadians, longitudeRadians, measure) {
-        return new MeasuredLocation(latitudeRadians * Angle.RADIANS_TO_DEGREES, longitudeRadians * Angle.RADIANS_TO_DEGREES, measure);
+        return new MeasuredLocation(latitudeRadians * Angle.RADIANS_TO_DEGREES,
+                                    longitudeRadians * Angle.RADIANS_TO_DEGREES,
+                                    measure);
     };
 
     /**
