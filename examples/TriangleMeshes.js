@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to display TriangleMesh shapes.
+ * Illustrates how to display shapes built with triangles.
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],
@@ -46,6 +46,8 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
+        // Create a mesh that displays a texture image from an image file.
+
         var altitude = 100e3,
             numRadialPositions = 40,
             meshPositions = [],
@@ -55,7 +57,6 @@ requirejs(['./WorldWindShim',
             meshRadius = 5; // degrees
 
         // Create the mesh's positions, which are the center point of a circle followed by points on the circle.
-
         meshPositions.push(new WorldWind.Position(35, -115, altitude)); // the mesh center
         texCoords.push(new WorldWind.Vec2(0.5, 0.5));
 
@@ -93,7 +94,7 @@ requirejs(['./WorldWindShim',
         meshAttributes.outlineColor = WorldWind.Color.BLUE;
         meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.7);
         meshAttributes.imageSource = "data/400x230-splash-nww.png";
-        meshAttributes.applyLighting = true;
+        meshAttributes.applyLighting = true; // TODO: Doesn't seem to change anything.
 
         // Create the mesh's highlight attributes.
         var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
@@ -113,7 +114,7 @@ requirejs(['./WorldWindShim',
         meshLayer.addRenderable(mesh);
         wwd.addLayer(meshLayer);
 
-        // Create a mesh that displays a custom image.
+        // Create a mesh that displays a custom image created with a 2D canvas.
 
         var canvas = document.createElement("canvas"),
             ctx2d = canvas.getContext("2d"),
@@ -144,9 +145,11 @@ requirejs(['./WorldWindShim',
             meshPositions.push(new WorldWind.Position(lat, lon, altitude));
         }
 
+        // Use the same attributes as before, except for the image source, which is now the custom image.
         meshAttributes = new WorldWind.ShapeAttributes(meshAttributes);
         meshAttributes.imageSource = new WorldWind.ImageSource(canvas);
 
+        // Use the same highlight attributes as the previous shape. Point the image source to the custom image.
         highlightAttributes = new WorldWind.ShapeAttributes(highlightAttributes);
         highlightAttributes.imageSource = new WorldWind.ImageSource(canvas);
 
