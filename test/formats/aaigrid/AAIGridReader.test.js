@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 define([
     'src/formats/aaigrid/AAIGridReader'
 ], function (AAIGridReader) {
@@ -21,7 +20,7 @@ define([
 
     describe('AAIGridReader parsing', function () {
 
-        it('Should parse a string data source with int values', function () {
+        it('should parse a string data source with int values', function () {
             var dataSource =
                 'ncols        5\n' +
                 'nrows        5\n' +
@@ -55,7 +54,7 @@ define([
             expect(reader.getImageData()).toEqual(expectedValues);
         });
 
-        it('Should parse a string data source with float values', function () {
+        it('should parse a string data source with float values', function () {
             var dataSource =
                 'ncols        5\n' +
                 'nrows        5\n' +
@@ -89,7 +88,7 @@ define([
             expect(reader.getImageData()).toEqual(expectedValues);
         });
 
-        it('Should parse an array buffer data source', function (done) {
+        it('should parse an array buffer data source', function (done) {
             var xhr = new XMLHttpRequest();
 
             xhr.onload = function () {
@@ -121,7 +120,7 @@ define([
 
     describe('AAIGridReader retrieve from url', function () {
 
-        it('Should fetch and parse a file', function (done) {
+        it('should fetch and parse a file', function (done) {
             var url = '../base/test/formats/aaigrid/aaigrid-tile.asc';
             AAIGridReader.retrieveFromUrl(url, function (reader) {
                 var imageData = reader.getImageData();
