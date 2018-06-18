@@ -92,14 +92,14 @@ requirejs(['./WorldWindShim',
         // Create the mesh's attributes. Light this mesh.
         var meshAttributes = new WorldWind.ShapeAttributes(null);
         meshAttributes.outlineColor = WorldWind.Color.BLUE;
-        meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.7);
+        meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
         meshAttributes.imageSource = "data/400x230-splash-nww.png";
-        meshAttributes.applyLighting = true; // TODO: Doesn't seem to change anything.
+        meshAttributes.applyLighting = true;
 
         // Create the mesh's highlight attributes.
         var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
-        highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
+        highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.5);
         highlightAttributes.applyLighting = false;
 
         // Create the mesh.
