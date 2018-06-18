@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 /**
- *  Illustrates how to show the starfield layer above the globe, displaying a starry sky.
- *  This requires a dark background for the WorldWindow's canvas.
+ *  Illustrates how to animate the passage of time with a day/night cycle on the surface of the globe,
+ *  as well as the starry sky above the Earth (with realistic star positions).
  */
 requirejs([
         './WorldWindShim',
@@ -40,15 +40,21 @@ requirejs([
         // Add previously created layers to the WorldWindow.
         wwd.addLayer(BMNGOneImageLayer);
         wwd.addLayer(BMNGLayer);
-        wwd.addLayer(starFieldLayer); //IMPORTANT: add the starFieldLayer before the atmosphereLayer
+
+        // Use the StarField layer to show stars and the Sun around the globe, and the Atmosphere layer to display
+        // the night side of the Earth.
+        // The StarField layer should be added before the Atmosphere layer.
+        // The StarField layer requires a dark canvas background color.
+        wwd.addLayer(starFieldLayer);
         wwd.addLayer(atmosphereLayer);
 
-        // Attach a time property to the starfield and atmosphere layers.
+        // Set a date property to the StarField and Atmosphere layers.
         var date = new Date();
         starFieldLayer.time = date;
         atmosphereLayer.time = date;
 
-        // Animate the starry sky as well as the globe's day/night cycle with the atmosphere layer.
+        // Animate the starry sky as well as the globe's day/night cycle.
+        // In this example, each full day/night cycle lasts 8 seconds in real time.
         var lastFrame, timeToAdvance, frameTime, now, simulationDate;
 
         simulationDate = Date.now(); // Begin the simulation at the current time as provided by the browser.
@@ -60,11 +66,11 @@ requirejs([
             if (lastFrame) {
                 frameTime = now - lastFrame; // The amount of time taken to render each frame.
 
-                // The amount of time to advance the simulation, per frame, in order to achieve a constant
-                // rate of 3 hrs per second in real time, regardless of frame rate.
-                // The constant value of 10800 ms is the time to advance at the aforementioned rate assuming an
+                // The amount of time to advance the simulation, per frame.
+                // The constant value of 10800 ms is the time to advance at the rate mentioned above, assuming an
                 // hypothetical frame time equal to 1 ms (frame time is typically ~16 ms at 60Hz).
-                // This constant modulates the simulation advancement in each step, proportionally to the frame time.
+                // This constant modulates the simulation advancement in each step, proportionally to the frame time
+                // in order to adjust the animation speed accordingly to the frame rate.
                 timeToAdvance = frameTime * 10800;
 
                 simulationDate += timeToAdvance; // Advance the simulation time.
