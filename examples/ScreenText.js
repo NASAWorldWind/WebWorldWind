@@ -90,7 +90,7 @@ requirejs(['./WorldWindShim',
         screenText.screenOffset.x = 0.5;
         screenText.screenOffset.y = 0.5;
         screenText.attributes = textAttributes;
-        // Align the ScreenText to its center point with its TextAttributes offset.
+        // Align the ScreenText to its center point with its attributes offset.
         screenText.attributes.offset.x = 0.5;
         screenText.attributes.offset.y = 0.5;
         textLayer.addRenderable(screenText);
