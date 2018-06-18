@@ -1001,6 +1001,32 @@ define([
             return this;
         };
 
+        Matrix.prototype.setToOrthographicProjection = function (left, right, bottom, top, near, far) {
+
+            // Row 1
+            this[0] = 2 / (right - left);
+            this[1] = 0;
+            this[2] = 0;
+            this[3] = - (right + left) / (right - left);
+            // Row 2
+            this[4] = 0;
+            this[5] = 2 / (top - bottom);
+            this[6] = 0;
+            this[7] = - (top + bottom) / (top - bottom);
+            // Row 3
+            this[8] = 0;
+            this[9] = 0;
+            this[10] = -2 / (far - near);
+            this[11] = - (far + near) / (far - near);
+            // Row 4
+            this[12] = 0;
+            this[13] = 0;
+            this[14] = 0;
+            this[15] = 1;
+
+            return this;
+        };
+
         /**
          * Sets this matrix to a screen projection matrix for the specified viewport dimensions.
          * <p>

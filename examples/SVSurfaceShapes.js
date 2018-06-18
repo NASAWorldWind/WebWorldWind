@@ -113,7 +113,7 @@ requirejs(['./WorldWindShim',
         var widthSlider = document.getElementById("outline-width-slider");
         widthSlider.addEventListener('input', onWidthInput);
 
-        var dots = new WorldWind.SurfaceOrtho();
+        var dots = new WorldWind.SurfaceOrtho(new WorldWind.Position(0, 0, 0), 10000, document.getElementById("surface-image"));
         var dotLayer = new WorldWind.RenderableLayer();
         dotLayer.addRenderable(dots);
         wwd.addLayer(dotLayer);
@@ -124,5 +124,11 @@ requirejs(['./WorldWindShim',
         // wwd.navigator.heading = 45;
         // wwd.navigator.tilt = 60;
         // wwd.redraw();
+
+        // setInterval(function () {
+        //     var position = dots.location;
+        //     position.latitude += 0.1;
+        // }, 1000);
+
     }
 );

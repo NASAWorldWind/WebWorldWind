@@ -55,11 +55,11 @@
     varying vec4 outColor;
     varying vec2 texCoords;
     void main() {
-        if (texCoords.s < 1.0 && texCoords.s > 0.0 && texCoords.t < 1.0 && texCoords.t > 0.0) {
-            gl_FragColor = texture2D(textureSampler, texCoords);
-        } else {
-            gl_FragColor = outColor;
-        }
+    if (texCoords.s < 1.0 && texCoords.s > 0.0 && texCoords.t < 1.0 && texCoords.t > 0.0) {
+        gl_FragColor = texture2D(textureSampler, texCoords);
+    } else {
+        gl_FragColor = outColor;
+    }
      }
 </script>
 </body>
