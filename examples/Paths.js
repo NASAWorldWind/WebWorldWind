@@ -55,16 +55,16 @@ requirejs(['./WorldWindShim',
 
         // Create the path.
         var path = new WorldWind.Path(pathPositions, null);
-        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND; // TODO: Ask about the usefulness of setting this other than CLAMP_TO_GROUND.
         path.followTerrain = true;
-        path.extrude = true; // make it a curtain
-        path.useSurfaceShapeFor2D = true; // use a surface shape in 2D mode
+        path.extrude = true; // Make it a curtain.
+        path.useSurfaceShapeFor2D = true; // Use a surface shape in 2D mode.
 
         // Create and assign the path's attributes.
         var pathAttributes = new WorldWind.ShapeAttributes(null);
         pathAttributes.outlineColor = WorldWind.Color.BLUE;
         pathAttributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
-        pathAttributes.drawVerticals = path.extrude; // draw verticals only when extruding
+        pathAttributes.drawVerticals = path.extrude; //Draw verticals only when extruding.
         path.attributes = pathAttributes;
 
         // Create and assign the path's highlight attributes.
