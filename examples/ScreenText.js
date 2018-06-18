@@ -55,9 +55,9 @@ requirejs(['./WorldWindShim',
         textAttributes.color = WorldWind.Color.WHITE;
         textAttributes.font = new WorldWind.Font(20);
 
-        // Create screen text shapes and their attributes.
-        // Indicate the text's placement on the screen by using an offset as an argument to construct a new ScreenText.
-        // Use TextAttributes.offset to position the text relative to the specified screen offset.
+        // Create ScreenText shapes and their attributes.
+        // Indicate the shape's placement on the screen by using an offset as an argument to construct a new ScreenText.
+        // Use ScreenText.attributes.offset to position the text relative to the specified screen offset.
 
         // We will exemplify ScreenText creation in two ways.
         // In the first two ScreenTexts, we define the desired screen position and alignment by directly setting the
@@ -81,14 +81,16 @@ requirejs(['./WorldWindShim',
         textLayer.addRenderable(screenText);
 
         // Center
+        // Create an offset to feed it to the ScreenText constructor. Its offset values are irrelevant
+        // and will be overwritten after the ScreenText's creation.
         var offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
         screenText = new WorldWind.ScreenText(offset, "Center");
         textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the upper left corner of the text string at the shape's screen location.
-        textAttributes.offset = offset;
+        // Edit the screen offset values to position the ScreenText at the center of the screen.
         screenText.screenOffset.x = 0.5;
         screenText.screenOffset.y = 0.5;
         screenText.attributes = textAttributes;
+        // Align the ScreenText to its center point with its TextAttributes offset.
         screenText.attributes.offset.x = 0.5;
         screenText.attributes.offset.y = 0.5;
         textLayer.addRenderable(screenText);
