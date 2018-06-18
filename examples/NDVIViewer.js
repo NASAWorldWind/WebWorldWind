@@ -45,6 +45,11 @@ requirejs([
             wwd.addLayer(layers[l].layer);
         }
 
+        // Create a layer manager for controlling layer visibility.
+        layerManager = new LayerManager(wwd);
+        layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
+        isFirstSceneDraw = true;
+
         var dataJsonUrl = './data/analyticalSurfaces.json';
         var colorPaletteArray = [
             0.0, 25.5, 0.701, 0.921, 1.0, 1.0,
@@ -325,11 +330,6 @@ requirejs([
                         }));
                         wwd.addLayer(surfaceLayerArrayGlobal[i]);
                     }
-
-                    // Create a layer manager for controlling layer visibility.
-                    layerManager = new LayerManager(wwd);
-                    layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
-                    isFirstSceneDraw = true;
 
                     //start load async other scenes
                     for (var j = 0; j < analyticalSurfaceDataObject.length; j++) {
