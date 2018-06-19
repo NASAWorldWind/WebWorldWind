@@ -45,7 +45,7 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Example showing the usage of Well Known Text collection in real life.
+        // Parse a WKT collection and add it as a Layer.
         var defaultLayer = new WorldWind.RenderableLayer("WKT Geometry Collection");
         new WorldWind.Wkt("" +
             "GEOMETRYCOLLECTION(" +
@@ -57,7 +57,8 @@ requirejs(['./WorldWindShim',
             ")").load(null, null, defaultLayer);
         wwd.addLayer(defaultLayer);
 
-        // Using the callback mechanism presented in the Wkt parser to update the shapes as well as showing the information about the successful rendering.
+        // Using the callback mechanism presented in the Wkt parser to update the shapes as well as
+        // showing a message that confirms a successful rendering.
         var customCallbackLayer = new WorldWind.RenderableLayer("WKT Multi Polygon");
         new WorldWind.Wkt("MULTIPOLYGON (((50 -60, 55 -70, 50 -80)),((30 -60, 35 -70, 30 -80)))").load(
             function completionCallback(wkt, objects) {
@@ -67,7 +68,7 @@ requirejs(['./WorldWindShim',
                 wkt.defaultParserCompletionCallback(wkt, objects);
             },
             function shapeConfigurationCallback(shape) {
-                if (shape.type == WorldWind.WktType.SupportedGeometries.MULTI_POLYGON) {
+                if (shape.type === WorldWind.WktType.SupportedGeometries.MULTI_POLYGON) {
                     var shapeAttributes = new WorldWind.ShapeAttributes(null);
                     shapeAttributes.interiorColor = WorldWind.Color.GREEN;
                     return {
@@ -79,7 +80,7 @@ requirejs(['./WorldWindShim',
         );
         wwd.addLayer(customCallbackLayer);
 
-        // Allow for parsing of your own Well known text data
+        // Allow for parsing of Well-Known Text from the app's text box (entered by the user).
         var wktLayer = new WorldWind.RenderableLayer('WKT Custom');
         $('#showWkt').click(function () {
             new WorldWind.Wkt($('#wkt').val()).load(null, null, wktLayer);
