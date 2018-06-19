@@ -362,12 +362,6 @@ define([
                     "missingResult"));
             }
 
-            // For backwards compatibility, check whether the projection defines a surfaceNormalAtLocation function
-            // before calling it. If it's not available, use the old code to compute the normal.
-            if (this.projection.surfaceNormalAtLocation) {
-                return this.projection.surfaceNormalAtLocation(this, latitude, longitude, result);
-            }
-
             if (this.is2D()) {
                 result[0] = 0;
                 result[1] = 0;
@@ -379,11 +373,13 @@ define([
             var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
                 cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
                 sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
-                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS);
+                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS),
+                eqSquared = this.equatorialRadius * this.equatorialRadius,
+                polSquared = this.polarRadius * this.polarRadius;
 
-            result[0] = cosLat * sinLon;
-            result[1] = sinLat;
-            result[2] = cosLat * cosLon;
+            result[0] = cosLat * sinLon / eqSquared;
+            result[1] = (1 - this.eccentricitySquared) * sinLat / polSquared;
+            result[2] = cosLat * cosLon / eqSquared;
 
             return result.normalize();
         };
