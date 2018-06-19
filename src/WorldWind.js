@@ -150,6 +150,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/Logger',
         './navigate/LookAtNavigator',
         './geom/Matrix',
+        './geom/MeasuredLocation',
         './util/measure/MeasurerUtils',
         './cache/MemoryCache',
         './cache/MemoryCacheListener',
@@ -405,6 +406,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Logger,
               LookAtNavigator,
               Matrix,
+              MeasuredLocation,
               MeasurerUtils,
               MemoryCache,
               MemoryCacheListener,
@@ -849,6 +851,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Logger'] = Logger;
         WorldWind['LookAtNavigator'] = LookAtNavigator;
         WorldWind['Matrix'] = Matrix;
+        WorldWind['MeasuredLocation'] = MeasuredLocation;
         WorldWind['MeasurerUtils'] = MeasurerUtils;
         WorldWind['MemoryCache'] = MemoryCache;
         WorldWind['MemoryCacheListener'] = MemoryCacheListener;
