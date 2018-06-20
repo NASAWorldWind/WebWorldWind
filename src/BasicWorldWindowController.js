@@ -22,6 +22,7 @@ define([
         './gesture/ClickRecognizer',
         './gesture/DragRecognizer',
         './gesture/GestureRecognizer',
+        './geom/Location',
         './util/Logger',
         './geom/Matrix',
         './gesture/PanRecognizer',
@@ -40,6 +41,7 @@ define([
               ClickRecognizer,
               DragRecognizer,
               GestureRecognizer,
+              Location,
               Logger,
               Matrix,
               PanRecognizer,
@@ -118,6 +120,11 @@ define([
             this.beginTilt = 0;
             this.beginRange = 0;
             this.lastRotation = 0;
+            this.dragDelta = new Vec2(0, 0);
+            this.dragVelocity = new Vec2(0, 0);
+            this.dragLastLocation = new Location(0, 0);
+            this.dragLastTimestamp = new Date();
+            this.flingAnimationId = -1;
         };
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
@@ -202,6 +209,8 @@ define([
             var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
                 this.lastPoint.set(0, 0);
+                this.dragLastTimestamp = new Date();
+                this.cancelFlingAnimation();
             } else if (state === WorldWind.CHANGED) {
                 // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
                 // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
@@ -222,9 +231,88 @@ define([
 
                 navigator.lookAtLocation.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
                 navigator.lookAtLocation.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
-                this.lastPoint.set(tx, ty);
                 this.applyLimits();
                 this.wwd.redraw();
+
+                // Track state for possible fling behaviour
+                var now = new Date();
+                var elapsedTime = now - this.dragLastTimestamp;
+                this.dragVelocity.set(
+                    (tx - this.lastPoint[0]) / (elapsedTime / 1000),
+                    (ty - this.lastPoint[1]) / (elapsedTime / 1000)
+                );
+                this.dragLastTimestamp = now;
+
+                this.dragDelta.set(
+                    this.dragLastLocation.latitude - navigator.lookAtLocation.latitude,
+                    this.dragLastLocation.longitude - navigator.lookAtLocation.longitude
+                );
+                this.dragLastLocation.copy(navigator.lookAtLocation);
+
+                this.lastPoint.set(tx, ty);
+
+            } else if (state === WorldWind.ENDED) {
+                var minVelocity = 100; // pixels per second
+                var animationDuration = 1500; // ms
+
+                if (Math.abs(this.dragVelocity[0]) > minVelocity || Math.abs(this.dragVelocity[1]) > minVelocity) {
+
+                    // Initial delta at the beginning of this animation
+                    var initialDelta = new Vec2();
+                    initialDelta.copy(this.dragDelta);
+
+                    // Current delta for this animation
+                    var currentDelta = new Vec2();
+                    currentDelta.copy(this.dragDelta);
+
+                    // Last location set by this animation
+                    var lastLocation = new Location();
+                    lastLocation.copy(this.dragLastLocation);
+
+                    // Start time of this animation
+                    var startTime = new Date();
+
+                    // Animation Loop
+                    var controller = this;
+                    var animate = function() {
+                        if (!lastLocation.equals(navigator.lookAtLocation)) {
+                            // The navigator was changed externally. Aborting the animation.
+                            return;
+                        }
+                        // Apply the delta to the current lookAt location
+                        navigator.lookAtLocation.latitude -= currentDelta[0];
+                        navigator.lookAtLocation.longitude -= currentDelta[1];
+                        controller.applyLimits();
+                        controller.wwd.redraw();
+
+                        // Save the new current lookAt location
+                        lastLocation.copy(navigator.lookAtLocation);
+
+                        // Compute the next velocity using a sinusoidal out easing
+                        var elapsed = (new Date() - startTime) / animationDuration;
+                        elapsed = elapsed > 1 ? 1 : elapsed;
+                        var value = Math.sin(elapsed * Math.PI / 2);
+                        currentDelta.set(
+                            initialDelta[0] - initialDelta[0] * value,
+                            initialDelta[1] - initialDelta[1] * value
+                        );
+
+                        // If there is still a delta to apply, request a new frame
+                        if (currentDelta[0] > 0 || currentDelta[1] > 0) {
+                            controller.flingAnimationId = requestAnimationFrame(animate);
+                        } else {
+                            controller.flingAnimationId = -1;
+                        }
+                    };
+                    this.flingAnimationId = requestAnimationFrame(animate);
+                }
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.cancelFlingAnimation = function () {
+            if (this.flingAnimationId !== -1) {
+                cancelAnimationFrame(this.flingAnimationId);
             }
         };
 
