@@ -54,7 +54,7 @@ define([
         };
 
         /**
-         * A Location with latitude and longitude both 0.
+         * A location with latitude and longitude both 0.
          * @constant
          * @type {Location}
          */
@@ -63,7 +63,7 @@ define([
         /**
          * Creates a location from angles specified in radians.
          * @param {Number} latitudeRadians The latitude in radians.
-         * @param {Number} longitudeRadians The longitude in radians
+         * @param {Number} longitudeRadians The longitude in radians.
          * @returns {Location} The new location with latitude and longitude in degrees.
          */
         Location.fromRadians = function (latitudeRadians, longitudeRadians) {
@@ -90,10 +90,9 @@ define([
 
         /**
          * Sets this location to the latitude and longitude.
-         * @param {number} latitude The latitude to set.
-         * @param {number} longitude The longitude to set.
-         * @returns {Location} This location, set to the values of the specified location.
-         * @throws {ArgumentError} If the specified location is null or undefined.
+         * @param {Number} latitude The latitude to set.
+         * @param {Number} longitude The longitude to set.
+         * @returns {Location} This location, set to the values of the specified latitude and longitude.
          */
         Location.prototype.set = function (latitude, longitude) {
             this.latitude = latitude;
@@ -105,7 +104,7 @@ define([
         /**
          * Indicates whether this location is equal to a specified location.
          * @param {Location} location The location to compare this one to.
-         * @returns {boolean} <code>true</code> if this location is equal to the specified location, otherwise
+         * @returns {Boolean} <code>true</code> if this location is equal to the specified location, otherwise
          * <code>false</code>.
          */
         Location.prototype.equals = function (location) {
