@@ -275,6 +275,8 @@ define([
                     // Animation Loop
                     var controller = this;
                     var animate = function() {
+                        controller.flingAnimationId = -1;
+
                         if (!lastLocation.equals(navigator.lookAtLocation)) {
                             // The navigator was changed externally. Aborting the animation.
                             return;
@@ -300,8 +302,6 @@ define([
                         // If there is still a delta to apply, request a new frame
                         if (currentDelta[0] > 0 || currentDelta[1] > 0) {
                             controller.flingAnimationId = requestAnimationFrame(animate);
-                        } else {
-                            controller.flingAnimationId = -1;
                         }
                     };
                     this.flingAnimationId = requestAnimationFrame(animate);
