@@ -47,6 +47,14 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
+        // Create a placemark layer to hold all the placemarks.
+        var placemarkLayer = new WorldWind.RenderableLayer();
+        placemarkLayer.displayName = "Placemarks";
+        wwd.addLayer(placemarkLayer);
+
+        // Create and add a grid of placemarks over the US.
+        // See PlacemarksAndPicking example for more information on placemark creation and attributes.
+
         var images = [
             "plain-black.png",
             "plain-blue.png",
@@ -75,7 +83,6 @@ requirejs(['./WorldWindShim',
             placemark,
             placemarkAttributes = new WorldWind.PlacemarkAttributes(null),
             highlightAttributes,
-            placemarkLayer = new WorldWind.RenderableLayer(),
             latitude = 47, longitude = -122,
             latDelta = 2, lonDelta = 2;
 
@@ -85,6 +92,7 @@ requirejs(['./WorldWindShim',
             WorldWind.OFFSET_FRACTION, 0.0);
         placemarkAttributes.imageColor = WorldWind.Color.WHITE;
 
+        // Add every placemark to form a grid.
         for (var j = 0; j < 10; j++) {
             latitude -= j > 0 ? latDelta : 0;
             for (var i = 0, len = images.length; i < len; i++) {
@@ -100,10 +108,7 @@ requirejs(['./WorldWindShim',
             }
         }
 
-        placemarkLayer.displayName = "Placemarks";
-        wwd.addLayer(placemarkLayer);
-
-        // Now set up to handle picking.
+        // Set the picking event handling.
 
         var highlightedItems = [];
 
