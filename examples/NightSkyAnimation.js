@@ -34,10 +34,6 @@ requirejs([
         // Create imagery layers.
         var BMNGOneImageLayer = new WorldWind.BMNGOneImageLayer();
         var BMNGLayer = new WorldWind.BMNGLayer();
-        var starFieldLayer = new WorldWind.StarFieldLayer();
-        var atmosphereLayer = new WorldWind.AtmosphereLayer();
-
-        // Add previously created layers to the WorldWindow.
         wwd.addLayer(BMNGOneImageLayer);
         wwd.addLayer(BMNGLayer);
 
@@ -45,44 +41,42 @@ requirejs([
         // the night side of the Earth.
         // The StarField layer should be added before the Atmosphere layer.
         // The StarField layer requires a dark canvas background color.
+        var starFieldLayer = new WorldWind.StarFieldLayer();
+        var atmosphereLayer = new WorldWind.AtmosphereLayer();
         wwd.addLayer(starFieldLayer);
         wwd.addLayer(atmosphereLayer);
 
-        // Set a date property to the StarField and Atmosphere layers.
-        var date = new Date();
-        starFieldLayer.time = date;
-        atmosphereLayer.time = date;
+        // Set a date property for the StarField and Atmosphere layers to the current date and time.
+        var now = new Date();
+        starFieldLayer.time = now;
+        atmosphereLayer.time = now;
 
         // Animate the starry sky as well as the globe's day/night cycle.
         // In this example, each full day/night cycle lasts 8 seconds in real time.
-        var lastFrame, timeToAdvance, frameTime, now, simulationDate;
+        var simulatedMillisPerDay = 8000;
 
-        simulationDate = Date.now(); // Begin the simulation at the current time as provided by the browser.
+        // Begin the simulation at the current time as provided by the browser.
+        var startTimeMillis = Date.now();
 
-        requestAnimationFrame(runAnimation);
+        function runSimulation() {
+            // Compute the number of simulated days (or fractions of a day) since the simulation began.
+            var elapsedTimeMillis = Date.now() - startTimeMillis;
+            var simulatedDays = elapsedTimeMillis / simulatedMillisPerDay;
 
-        function runAnimation() {
-            now = Date.now();
-            if (lastFrame) {
-                frameTime = now - lastFrame; // The amount of time taken to render each frame.
+            // Compute a real date in the future given the simulated number of days.
+            var millisPerDay = 24 * 3600 * 1000; // 24 hours/day * 3600 seconds/hour * 1000 milliseconds/second
+            var simulatedMillis = simulatedDays * millisPerDay;
+            var simulatedDate = new Date(startTimeMillis + simulatedMillis);
 
-                // The amount of time to advance the simulation, per frame.
-                // The constant value of 10800 ms is the time to advance at the rate mentioned above, assuming an
-                // hypothetical frame time equal to 1 ms (frame time is typically ~16 ms at 60Hz).
-                // This constant modulates the simulation advancement in each step, proportionally to the frame time
-                // in order to adjust the animation speed accordingly to the frame rate.
-                timeToAdvance = frameTime * 10800;
+            // Update the date in both the Starfield and the Atmosphere layers.
+            starFieldLayer.time = simulatedDate;
+            atmosphereLayer.time = simulatedDate;
+            wwd.redraw(); // Update the WorldWindow scene.
 
-                simulationDate += timeToAdvance; // Advance the simulation time.
-
-                // Update the date in both the Starfield and Atmosphere layers.
-                starFieldLayer.time = new Date(simulationDate);
-                atmosphereLayer.time = new Date(simulationDate);
-                wwd.redraw(); // Update the WorldWindow scene.
-            }
-            lastFrame = now;
-            requestAnimationFrame(runAnimation);
+            requestAnimationFrame(runSimulation);
         }
+
+        requestAnimationFrame(runSimulation);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
