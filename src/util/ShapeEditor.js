@@ -82,7 +82,7 @@ define([
          * @param {WorldWindow} worldWindow The World Window to associate this shape editor controller with.
          * @throws {ArgumentError} If the specified world window is null or undefined.
          */
-        var ShapeEditor = function (worldWindow, shape) {
+        var ShapeEditor = function (worldWindow) {
             if (!worldWindow) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ShapeEditor", "constructor",
                     "missingWorldWindow"));
@@ -98,7 +98,7 @@ define([
              * The shape associated with the editor.
              * @type {Object}
              */
-            this.shape = shape;
+            this.shape = null;
 
             /**
              * The layer holding the editor's control points.
@@ -546,18 +546,35 @@ define([
             this.angleControlPointAttributes.imageScale = 6;
         };
 
-        ShapeEditor.prototype.setArmed = function (armed) {
-            if (!this.armed && armed) {
+        /**
+         * Enables the ShapeEditor for the specified shape.
+         * @param {SurfaceShape} shape The shape that will be edited.
+         * @throws {ArgumentError} If the specified shape is null or not an instance of SurfaceShape.
+         */
+        ShapeEditor.prototype.edit = function (shape) {
+            if (shape != null && shape instanceof SurfaceShape) {
+                this.shape = shape;
                 this.enable();
+                this.armed = true;
+            } else {
+                this.stop();
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ShapeEditor", "edit",
+                    "missingShape"));
             }
-            else if (this.armed && !armed) {
-                this.disable();
-                this.shape = null;
-            }
-
-            this.armed = armed;
         };
 
+        /**
+         * Stops the editing action and cleans up the allocated resources.
+         */
+        ShapeEditor.prototype.stop = function () {
+            this.disable();
+            this.shape = null;
+            this.armed = false;
+        };
+
+        /**
+         * Called by {@link ShapeEditor#edit} to enable resources used for editing.
+         */
         ShapeEditor.prototype.enable = function () {
             if (this.worldWindow.indexOfLayer(this.controlPointLayer) == -1) {
                 this.worldWindow.addLayer(this.controlPointLayer);
@@ -580,7 +597,7 @@ define([
         };
 
         /**
-         * Called by {@link ShapeEditorController#setArmed} to remove resources no longer needed after editing.
+         * Called by {@link ShapeEditor#stop} to remove resources no longer needed after editing.
          */
         ShapeEditor.prototype.disable = function () {
             this.removeControlPoints();

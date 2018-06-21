@@ -83,13 +83,11 @@ requirejs(['./WorldWindShim',
         // Create a layer manager for controlling layer visibility.
         var layerManger = new LayerManager(wwd);
 
-        var shapeEditor = new WorldWind.ShapeEditor(wwd, null);
+        var shapeEditor = new WorldWind.ShapeEditor(wwd);
 
         document.getElementById("editPolyBtn").addEventListener("click", function(){
             if(document.getElementById("editPolyBtn").innerHTML === "Start edit polygon"){
-                shapeEditor.shape = polyShape;
-                shapeEditor.shape.highlighted = true;
-                shapeEditor.setArmed(true);
+                shapeEditor.edit(polyShape);
 
                 document.getElementById("editPolyBtn").innerHTML = "Stop edit polygon";
                 document.getElementById("editCircleBtn").disabled = true;
@@ -97,7 +95,7 @@ requirejs(['./WorldWindShim',
             }
             else{
                 shapeEditor.shape.highlighted = false;
-                shapeEditor.setArmed(false);
+                shapeEditor.stop();
 
                 document.getElementById("editPolyBtn").innerHTML = "Start edit polygon";
                 document.getElementById("editCircleBtn").disabled = false;
@@ -107,9 +105,8 @@ requirejs(['./WorldWindShim',
 
         document.getElementById("editCircleBtn").addEventListener("click", function(){
             if(document.getElementById("editCircleBtn").innerHTML === "Start edit circle"){
-                shapeEditor.shape = circleShape;
+                shapeEditor.edit(circleShape);
                 shapeEditor.shape.highlighted = true;
-                shapeEditor.setArmed(true);
 
                 document.getElementById("editCircleBtn").innerHTML = "Stop edit circle";
                 document.getElementById("editPolyBtn").disabled = true;
@@ -117,7 +114,7 @@ requirejs(['./WorldWindShim',
             }
             else{
                 shapeEditor.shape.highlighted = false;
-                shapeEditor.setArmed(false);
+                shapeEditor.stop();
 
                 document.getElementById("editCircleBtn").innerHTML = "Start edit circle";
                 document.getElementById("editPolyBtn").disabled = false;
@@ -127,9 +124,8 @@ requirejs(['./WorldWindShim',
 
         document.getElementById("editEllipseBtn").addEventListener("click", function(){
             if(document.getElementById("editEllipseBtn").innerHTML === "Start edit ellipse"){
-                shapeEditor .shape = ellipseShape;
+                shapeEditor.edit(ellipseShape);
                 shapeEditor.shape.highlighted = true;
-                shapeEditor.setArmed(true);
 
                 document.getElementById("editEllipseBtn").innerHTML = "Stop edit ellipse";
                 document.getElementById("editCircleBtn").disabled = true;
@@ -137,7 +133,7 @@ requirejs(['./WorldWindShim',
             }
             else{
                 shapeEditor.shape.highlighted = false;
-                shapeEditor.setArmed(false);
+                shapeEditor.stop();
 
                 document.getElementById("editEllipseBtn").innerHTML = "Start edit ellipse";
                 document.getElementById("editCircleBtn").disabled = false;
