@@ -191,7 +191,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/ScreenText',
         './geom/Sector',
         './shapes/ShapeAttributes',
-        './util/ShapeEditor',
+        './util/editor/ShapeEditor',
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
         './shaders/SkyProgram',
