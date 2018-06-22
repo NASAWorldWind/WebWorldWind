@@ -261,10 +261,6 @@ define([
                     var initialDelta = new Vec2();
                     initialDelta.copy(this.dragDelta);
 
-                    // Current delta for this animation
-                    var currentDelta = new Vec2();
-                    currentDelta.copy(this.dragDelta);
-
                     // Last location set by this animation
                     var lastLocation = new Location();
                     lastLocation.copy(this.dragLastLocation);
@@ -281,26 +277,26 @@ define([
                             // The navigator was changed externally. Aborting the animation.
                             return;
                         }
+
+                        // Compute the delta to apply using a sinusoidal out easing
+                        var elapsed = (new Date() - startTime) / animationDuration;
+                        elapsed = elapsed > 1 ? 1 : elapsed;
+                        var value = Math.sin(elapsed * Math.PI / 2);
+
+                        var deltaLatitude = initialDelta[0] - initialDelta[0] * value;
+                        var deltaLongitude = initialDelta[1] - initialDelta[1] * value;
+
                         // Apply the delta to the current lookAt location
-                        navigator.lookAtLocation.latitude -= currentDelta[0];
-                        navigator.lookAtLocation.longitude -= currentDelta[1];
+                        navigator.lookAtLocation.latitude -= deltaLatitude;
+                        navigator.lookAtLocation.longitude -= deltaLongitude;
                         controller.applyLimits();
                         controller.wwd.redraw();
 
                         // Save the new current lookAt location
                         lastLocation.copy(navigator.lookAtLocation);
 
-                        // Compute the next velocity using a sinusoidal out easing
-                        var elapsed = (new Date() - startTime) / animationDuration;
-                        elapsed = elapsed > 1 ? 1 : elapsed;
-                        var value = Math.sin(elapsed * Math.PI / 2);
-                        currentDelta.set(
-                            initialDelta[0] - initialDelta[0] * value,
-                            initialDelta[1] - initialDelta[1] * value
-                        );
-
-                        // If there is still a delta to apply, request a new frame
-                        if (currentDelta[0] > 0 || currentDelta[1] > 0) {
+                        // If we haven't reached the animation duration, request a new frame
+                        if (elapsed < 1) {
                             controller.flingAnimationId = requestAnimationFrame(animate);
                         }
                     };
