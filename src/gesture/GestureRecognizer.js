@@ -595,6 +595,13 @@ define([
         };
 
         // Intentionally not documented.
+        GestureRecognizer.prototype.updateTranslationVelocity = function(dx, dy) {
+            var elapsedTime = (new Date() - this._lastEventTime) / 1000;
+            this._translationVelocityX = dx / elapsedTime;
+            this._translationVelocityY = dy / elapsedTime;
+        }
+
+        // Intentionally not documented.
         GestureRecognizer.prototype.onGestureEvent = function (event) {
             if (!this.enabled) {
                 return;
@@ -676,6 +683,8 @@ define([
                 this._clientStartY = event.clientY;
                 this._translationX = 0;
                 this._translationY = 0;
+                this._translationVelocityX = 0;
+                this._translationVelocityY = 0;
             }
 
             this._mouseButtonMask |= buttonBit;
@@ -700,9 +709,7 @@ define([
             this._translationX = this._translationX * (1 - w) + dx * w;
             this._translationY = this._translationY * (1 - w) + dy * w;
 
-            var elapsedTime = (new Date() - this._lastEventTime) / 1000;
-            this.endVelocityX = dx / elapsedTime;
-            this.endVelocityY = dy / elapsedTime;
+            this.updateTranslationVelocity(dx, dy);
 
             this.mouseMove(event);
         };
@@ -734,6 +741,8 @@ define([
                 this._clientStartY = event.clientY;
                 this._translationX = 0;
                 this._translationY = 0;
+                this._translationVelocityX = 0;
+                this._translationVelocityY = 0;
                 this._touchCentroidShiftX = 0;
                 this._touchCentroidShiftY = 0;
             } else {
@@ -767,9 +776,7 @@ define([
             this._translationX = this._translationX * (1 - w) + dx * w;
             this._translationY = this._translationY * (1 - w) + dy * w;
 
-            var elapsedTime = (new Date() - this._lastEventTime) / 1000;
-            this.endVelocityX = dx / elapsedTime;
-            this.endVelocityY = dy / elapsedTime;
+            this.updateTranslationVelocity(dx, dy);
 
             this.touchMove(touch);
         };
