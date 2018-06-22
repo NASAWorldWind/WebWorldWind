@@ -595,11 +595,11 @@ define([
         };
 
         // Intentionally not documented.
-        GestureRecognizer.prototype.updateTranslationVelocity = function(dx, dy) {
+        GestureRecognizer.prototype.updateTranslationVelocity = function(newClientX, newClientY) {
             var elapsedTime = (new Date() - this._lastEventTime) / 1000;
-            this._translationVelocityX = dx / elapsedTime;
-            this._translationVelocityY = dy / elapsedTime;
-        }
+            this._translationVelocityX = (newClientX - this._clientX) / elapsedTime;
+            this._translationVelocityY = (newClientY - this._clientY) / elapsedTime;
+        };
 
         // Intentionally not documented.
         GestureRecognizer.prototype.onGestureEvent = function (event) {
@@ -701,6 +701,8 @@ define([
                 return; // ignore redundant mouse move events
             }
 
+            this.updateTranslationVelocity(event.clientX, event.clientY);
+
             var dx = event.clientX - this._clientStartX,
                 dy = event.clientY - this._clientStartY,
                 w = this._translationWeight;
@@ -708,8 +710,6 @@ define([
             this._clientY = event.clientY;
             this._translationX = this._translationX * (1 - w) + dx * w;
             this._translationY = this._translationY * (1 - w) + dy * w;
-
-            this.updateTranslationVelocity(dx, dy);
 
             this.mouseMove(event);
         };
@@ -767,16 +767,17 @@ define([
             touch.clientX = event.clientX;
             touch.clientY = event.clientY;
 
-            var centroid = this.touchCentroid(),
-                dx = centroid.clientX - this._clientStartX + this._touchCentroidShiftX,
+            var centroid = this.touchCentroid();
+
+            this.updateTranslationVelocity(centroid.clientX, centroid.clientY);
+
+            var dx = centroid.clientX - this._clientStartX + this._touchCentroidShiftX,
                 dy = centroid.clientY - this._clientStartY + this._touchCentroidShiftY,
                 w = this._translationWeight;
             this._clientX = centroid.clientX;
             this._clientY = centroid.clientY;
             this._translationX = this._translationX * (1 - w) + dx * w;
             this._translationY = this._translationY * (1 - w) + dy * w;
-
-            this.updateTranslationVelocity(dx, dy);
 
             this.touchMove(touch);
         };
