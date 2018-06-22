@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -55,7 +56,7 @@ requirejs(['./WorldWindShim',
 
         // Create the path.
         var path = new WorldWind.Path(pathPositions, null);
-        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND; // TODO: Ask about the usefulness of setting this other than CLAMP_TO_GROUND.
+        path.altitudeMode = WorldWind.RELATIVE_TO_GROUND; // The path's altitude stays relative to the terrain's altitude.
         path.followTerrain = true;
         path.extrude = true; // Make it a curtain.
         path.useSurfaceShapeFor2D = true; // Use a surface shape in 2D mode.
