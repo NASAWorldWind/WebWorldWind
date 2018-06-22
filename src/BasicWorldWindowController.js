@@ -154,6 +154,10 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.gestureStateChanged = function (recognizer) {
+            if (recognizer.state === WorldWind.BEGAN || recognizer.state === WorldWind.RECOGNIZED) {
+                this.cancelFlingAnimation();
+            }
+
             if (recognizer === this.primaryDragRecognizer || recognizer === this.panRecognizer) {
                 this.handlePanOrDrag(recognizer);
             }
@@ -211,7 +215,6 @@ define([
             if (state === WorldWind.BEGAN) {
                 this.lastPoint.set(0, 0);
                 this.dragLastTimestamp = new Date();
-                this.cancelFlingAnimation();
             } else if (state === WorldWind.CHANGED) {
                 // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
                 // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
@@ -310,6 +313,7 @@ define([
         BasicWorldWindowController.prototype.cancelFlingAnimation = function () {
             if (this.flingAnimationId !== -1) {
                 cancelAnimationFrame(this.flingAnimationId);
+                this.flingAnimationId = -1;
             }
         };
 
@@ -456,6 +460,8 @@ define([
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleWheelEvent = function (event) {
+            this.cancelFlingAnimation();
+
             var navigator = this.wwd.navigator;
             // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
             // browsers and input devices.
