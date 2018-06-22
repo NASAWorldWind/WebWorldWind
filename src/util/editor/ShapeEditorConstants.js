@@ -43,7 +43,9 @@ define([],
             RIGHT_WIDTH: "rightWidth",
 
             // Indicates that a control point is associated with the outer radius of a shape.
-            OUTER_RADIUS: "outerRadius"
+            OUTER_RADIUS: "outerRadius",
+
+            DRAG: "drag"
         };
 
         return ShapeEditorConstants;

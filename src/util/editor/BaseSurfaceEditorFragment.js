@@ -18,9 +18,15 @@
  */
 define([
         '../../geom/Angle',
+        '../../shapes/Path',
+        '../../geom/Position',
+        '../../shapes/ShapeAttributes',
         '../../geom/Vec3'
     ],
     function (Angle,
+              Path,
+              Position,
+              ShapeAttributes,
               Vec3) {
         "use strict";
 
@@ -80,8 +86,7 @@ define([
 
             var positions = [];
             positions.push(centerPosition, controlPointPosition);
-            var rotationLine = accessories[0];
-            rotationLine.positions = positions;
+            accessories[0].positions = positions;
         };
 
         /**
@@ -110,6 +115,26 @@ define([
             }
 
             return (count === 0) ? 0 : totalDistance / globe.equatorialRadius;
+        };
+
+        /**
+         * Set up the Path for the rotation line.
+         */
+        BaseSurfaceEditorFragment.prototype.makeAccessory = function (accessories, attributes) {
+            var pathPositions = [];
+            pathPositions.push(new Position(0, 0, 0));
+            pathPositions.push(new Position(0, 0, 0));
+            var rotationLine = new Path(pathPositions, null);
+            rotationLine.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            rotationLine.followTerrain = true;
+
+            var pathAttributes = new ShapeAttributes(null);
+            pathAttributes.outlineColor = attributes.imageColor;
+            pathAttributes.outlineWidth = 2;
+
+            rotationLine.attributes = pathAttributes;
+
+            accessories.push(rotationLine);
         };
 
         return BaseSurfaceEditorFragment;

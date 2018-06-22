@@ -38,7 +38,7 @@ define([
         SurfaceRectangleEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
 
         //Internal use only. Intentionally not documented.
-        SurfaceRectangleEditorFragment.prototype.canEdit = function (shape) {
+        SurfaceRectangleEditorFragment.prototype.canHandle = function (shape) {
             return shape instanceof SurfaceRectangle;
         };
 
@@ -54,7 +54,52 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfaceRectangleEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, currentEvent) {
+        SurfaceRectangleEditorFragment.prototype.getShapeCenter = function (shape) {
+            return null;
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfaceRectangleEditorFragment.prototype.initializeControlElements = function (shape, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
+            var controlPoint;
+
+            controlPoint = new Placemark(
+                Location.ZERO,
+                false,
+                sizeControlPointAttributes
+            );
+            controlPoint.userProperties.isControlPoint = true;
+            controlPoint.userProperties.id = 0;
+            controlPoint.userProperties.purpose = ShapeEditorConstants.WIDTH;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            controlPoints.push(controlPoint);
+
+            controlPoint = new Placemark(
+                Location.ZERO,
+                false,
+                sizeControlPointAttributes
+            );
+            controlPoint.userProperties.isControlPoint = true;
+            controlPoint.userProperties.id = 1;
+            controlPoint.userProperties.purpose = ShapeEditorConstants.HEIGHT;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            controlPoints.push(controlPoint);
+
+            controlPoint = new Placemark(
+                Location.ZERO,
+                false,
+                angleControlPointAttributes
+            );
+            controlPoint.userProperties.isControlPoint = true;
+            controlPoint.userProperties.id = 1;
+            controlPoint.userProperties.purpose = ShapeEditorConstants.ROTATION;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            controlPoints.push(controlPoint);
+
+            this.makeAccessory(accessories, angleControlPointAttributes);
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfaceRectangleEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, alternateAction) {
             var terrainPoint = globe.computePointFromPosition(
                 terrainPosition.latitude,
                 terrainPosition.longitude,
@@ -101,7 +146,7 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfaceRectangleEditorFragment.prototype.updateControlPoints = function (shape, globe, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
+        SurfaceRectangleEditorFragment.prototype.updateControlElements = function (shape, globe, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
             var widthLocation = Location.greatCircleLocation(
                 shape.center,
                 90 + shape.heading,
@@ -120,50 +165,13 @@ define([
                 0.7 * shape.height / globe.equatorialRadius,
                 new Location(0, 0));
 
-            if (controlPoints.length > 0) {
-                controlPoints[0].position = widthLocation;
-                controlPoints[1].position = heightLocation;
-                controlPoints[2].position = rotationLocation;
-            }
-            else {
-                var controlPoint;
-
-                controlPoint = new Placemark(
-                    widthLocation,
-                    false,
-                    sizeControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = 0;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.WIDTH;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-
-                controlPoint = new Placemark(
-                    heightLocation,
-                    false,
-                    sizeControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = 1;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.HEIGHT;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-
-                controlPoint = new Placemark(
-                    rotationLocation,
-                    false,
-                    angleControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = 1;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.ROTATION;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-            }
-
+            controlPoints[0].position = widthLocation;
             controlPoints[0].userProperties.size = shape.width;
+
+            controlPoints[1].position = heightLocation;
             controlPoints[1].userProperties.size = shape.height;
+
+            controlPoints[2].position = rotationLocation;
             controlPoints[2].userProperties.rotation = shape.heading;
 
             this.updateOrientationLine(shape.center, rotationLocation, accessories);

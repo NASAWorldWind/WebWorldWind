@@ -42,7 +42,7 @@ define([
         SurfacePolygonEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
 
         //Internal use only. Intentionally not documented.
-        SurfacePolygonEditorFragment.prototype.canEdit = function (shape) {
+        SurfacePolygonEditorFragment.prototype.canHandle = function (shape) {
             return shape instanceof SurfacePolygon;
         };
 
@@ -52,7 +52,12 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfacePolygonEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, currentEvent) {
+        SurfacePolygonEditorFragment.prototype.getShapeCenter = function (shape) {
+            return null;
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfacePolygonEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, alternateAction) {
             var boundaries = shape.boundaries;
 
             var k = 0;

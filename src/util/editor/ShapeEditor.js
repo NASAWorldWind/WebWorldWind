@@ -32,6 +32,7 @@ define([
         '../../geom/Position',
         '../../layer/RenderableLayer',
         '../../shapes/ShapeAttributes',
+        './ShapeEditorConstants',
         '../../shapes/SurfaceEllipse',
         './SurfaceEllipseEditorFragment',
         '../../shapes/SurfaceCircle',
@@ -61,6 +62,7 @@ define([
               Position,
               RenderableLayer,
               ShapeAttributes,
+              ShapeEditorConstants,
               SurfaceEllipse,
               SurfaceEllipseEditorFragment,
               SurfaceCircle,
@@ -73,7 +75,7 @@ define([
               SurfaceRectangleEditorFragment,
               SurfaceShape,
               Vec2,
-              Vec3) {
+              Vec3) { // FIXME Remove unnecessary items from this list
         "use strict";
 
         /**
@@ -98,132 +100,37 @@ define([
                     "missingWorldWindow"));
             }
 
-            /**
-             * The World Window associated with the shape editor controller.
-             * @type {WorldWindow}
-             */
-            this.worldWindow = worldWindow;
+            this._worldWindow = worldWindow;
 
-            /**
-             * The shape associated with the editor.
-             * @type {Object}
-             */
-            this.shape = null;
+            this._shape = null;
 
-            /**
-             * The layer holding the editor's control points.
-             * @type {RenderableLayer}
-             */
-            this.controlPointLayer = new RenderableLayer();
+            this._moveControlPointAttributes = new PlacemarkAttributes(null);
+            this._moveControlPointAttributes.imageColor = WorldWind.Color.BLUE;
+            this._moveControlPointAttributes.imageScale = 6;
 
-            /**
-             * The layer holding the rotation line.
-             * @type {RenderableLayer}
-             */
-            this.accessoryLayer = new RenderableLayer();
-            this.accessoryLayer.pickEnabled = false;
+            this._resizeControlPointAttributes = new PlacemarkAttributes(null);
+            this._resizeControlPointAttributes.imageColor = WorldWind.Color.CYAN;
+            this._resizeControlPointAttributes.imageScale = 6;
 
-            /**
-             * The layer holding the control point's annotation.
-             * @type {RenderableLayer}
-             */
-            this.annotationLayer = new RenderableLayer();
-            this.annotationLayer.pickEnabled = false;
+            this._rotateControlPointAttributes = new PlacemarkAttributes(null);
+            this._rotateControlPointAttributes.imageColor = WorldWind.Color.GREEN;
+            this._rotateControlPointAttributes.imageScale = 6;
 
-            /**
-             * The layer holding a shadow copy of the shape while the shape is being moved or sized.
-             * @type {RenderableLayer}
-             */
-            this.shadowLayer = new RenderableLayer();
-            this.shadowLayer.pickEnabled = false;
-
-            /**
-             * The control point annotation.
-             * @type {Annotation}
-             */
-            this.annotation = null;
-
-            /**
-             * Indicates whether the editor is ready for editing.
-             * @type {boolean}
-             */
-            this.armed = false;
-
-            /**
-             * Indicates whether the editor is in the midst of an editing operation.
-             * @type {boolean}
-             */
-            this.active = false;
-
-            /**
-             * The terrain position associated with the cursor during the just previous drag event.
-             * @type {Position}
-             */
-            this.previousPosition = null;
-
-            /**
-             * The placemark associated with the current sizing operation.
-             * @type {Placemark}
-             */
-            this.currentSizingMarker = null;
-
-            /**
-             * The attributes associated with the shape when the editor is constructed. These are swapped out during
-             * editing operations in order to make the shape semi-transparent.
-             * @type {ShapeAttributes}
-             */
-            this.originalAttributes = new ShapeAttributes(null);
-
-            /**
-             * The highlight attributes associated with the shape when the editor is constructed. These are swapped out
-             * during editing operations in order to make the shape semi-transparent.
-             * @type {ShapeAttributes}
-             */
-            this.originalHighlightAttributes = new ShapeAttributes(null);
-
-            /**
-             * Attributes used to represent shape vertices.
-             * @type {PlacemarkAttributes}
-             */
-            this.locationControlPointAttributes = new PlacemarkAttributes(null);
-
-            /**
-             * Attributes used to represent shape size.
-             * @type {PlacemarkAttributes}
-             */
-            this.sizeControlPointAttributes = new PlacemarkAttributes(null);
-
-            /**
-             * Attributes used to represent shape rotation.
-             * @type {PlacemarkAttributes}
-             */
-            this.angleControlPointAttributes = new PlacemarkAttributes(null);
-
-            this.makeControlPointAttributes();
-
-            this.makeAnnotation();
+            this._annotationAttributes = new AnnotationAttributes(null);
+            this._annotationAttributes.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            this._annotationAttributes.cornerRadius = 5;
+            this._annotationAttributes.backgroundColor = new Color(0.67, 0.67, 0.67, 0.8);
+            this._annotationAttributes._leaderGapHeight = 0;
+            this._annotationAttributes.drawLeader = false;
+            this._annotationAttributes.scale = 1;
+            this._annotationAttributes._textAttributes.color = Color.BLACK;
+            this._annotationAttributes._textAttributes.font = new Font(10);
+            this._annotationAttributes.insets = new Insets(5, 5, 5, 5);
 
             //Internal use only. Intentionally not documented.
-            this.isDragging = false;
+            this.annotation = new WorldWind.Annotation(new WorldWind.Position(0, 0, 0), this._annotationAttributes);
 
             //Internal use only. Intentionally not documented.
-            this.startX = null;
-
-            //Internal use only. Intentionally not documented.
-            this.startY = null;
-
-            //Internal use only. Intentionally not documented.
-            this.lastX = null;
-
-            //Internal use only. Intentionally not documented.
-            this.lastY = null;
-
-            //Internal use only. Intentionally not documented.
-            this.currentEvent = null;
-
-            //Internal use only. Intentionally not documented.
-            this.activeEditorFragment = null;
-
             this.editorFragments = [
                 new SurfaceCircleEditorFragment(),
                 new SurfaceEllipseEditorFragment(),
@@ -232,541 +139,451 @@ define([
                 new SurfaceRectangleEditorFragment()
             ];
 
-            this.worldWindow.worldWindowController.addGestureListener(this);
+            //Internal use only. Intentionally not documented.
+            this.controlPointsLayer = new RenderableLayer("Shape Editor Control Points");
+
+            //Internal use only. Intentionally not documented.
+            this.accessoriesLayer = new RenderableLayer("Shape Editor Accessories");
+            this.accessoriesLayer.pickEnabled = false;
+
+            //Internal use only. Intentionally not documented.
+            this.annotationLayer = new RenderableLayer("Shape Editor Annotation");
+            this.annotationLayer.pickEnabled = false;
+            this.annotationLayer.enabled = false;
+            this.annotationLayer.addRenderable(this.annotation);
+
+            //Internal use only. Intentionally not documented.
+            this.shadowShapeLayer = new RenderableLayer("Shape Editor Shadow Shape");
+            this.shadowShapeLayer.pickEnabled = false;
+
+            //Internal use only. Intentionally not documented.
+            this.activeEditorFragment = null;
+
+            //Internal use only. Intentionally not documented.
+            this.actionType = null;
+
+            //Internal use only. Intentionally not documented.
+            this.actionControlPoint = null;
+
+            //Internal use only. Intentionally not documented.
+            this.actionControlPosition = null;
+
+            //Internal use only. Intentionally not documented.
+            this.actionSecondaryBehavior = false;
+
+            //Internal use only. Intentionally not documented.
+            this.actionStartX = null;
+
+            //Internal use only. Intentionally not documented.
+            this.actionStartY = null;
+
+            //Internal use only. Intentionally not documented.
+            this.actionCurrentX = null;
+
+            //Internal use only. Intentionally not documented.
+            this.actionCurrentY = null;
+
+            //Internal use only. Intentionally not documented.
+            this.originalHighlightAttributes = new ShapeAttributes(null);
+
+            this._worldWindow.worldWindowController.addGestureListener(this);
+        };
+
+        Object.defineProperties(ShapeEditor.prototype, {
+            /**
+             * The World Window associated with this shape editor.
+             * @memberof ShapeEditor.prototype
+             * @type {WorldWindow}
+             * @readonly
+             */
+            worldWindow: {
+                get: function () {
+                    return this._worldWindow;
+                }
+            },
+
+            /**
+             * The shape currently being edited.
+             * @memberof ShapeEditor.prototype
+             * @type {Object}
+             * @readonly
+             */
+            shape: {
+                get: function () {
+                    return this._shape;
+                }
+            },
+
+            /**
+             * Attribuets used for the control points that move the boundaries of the shape.
+             * @memberof ShapeEditor.prototype
+             * @type {PlacemarkAttributes}
+             */
+            moveControlPointAttributes: {
+                get: function () {
+                    return this._moveControlPointAttributes;
+                },
+                set: function (value) {
+                    this._moveControlPointAttributes = value;
+                }
+            },
+
+            /**
+             * Attributes used for the control points that resize the shape.
+             * @memberof ShapeEditor.prototype
+             * @type {PlacemarkAttributes}
+             */
+            resizeControlPointAttributes: {
+                get: function () {
+                    return this._resizeControlPointAttributes;
+                },
+                set: function (value) {
+                    this._resizeControlPointAttributes = value;
+                }
+            },
+
+            /**
+             * Attributes used for the control points that rotate the shape.
+             * @memberof ShapeEditor.prototype
+             * @type {PlacemarkAttributes}
+             */
+            rotateControlPointAttributes: {
+                get: function () {
+                    return this._rotateControlPointAttributes;
+                },
+                set: function (value) {
+                    this._rotateControlPointAttributes = value;
+                }
+            },
+
+            /**
+             * Attributes used for the annotation.
+             * @memberof ShapeEditor.prototype
+             * @type {AnnotationAttributes}
+             */
+            annotationAttributes: {
+                get: function () {
+                    return this._annotationAttributes;
+                },
+                set: function (value) {
+                    this._annotationAttributes = value;
+                    this.annotation.attributes = value;
+                }
+            }
+        });
+
+        /**
+         * Edits the specified shape. Currently, only surface shapes are supported.
+         * @param {SurfaceShape} shape The shape to edit.
+         * @return {Boolean} <code>true</code> if the editor could start the edition of the specified shape; otherwise
+         * <code>false</code>.
+         */
+        ShapeEditor.prototype.edit = function (shape) {
+            this.stop();
+
+            // Look for a fragment that can handle the specified shape
+            for (var i = 0, len = this.editorFragments.length; i < len; i++) {
+                var editorFragment = this.editorFragments[i];
+                if (editorFragment.canHandle(shape)) {
+                    this.activeEditorFragment = editorFragment;
+                }
+            }
+
+            // If we have a fragment for this shape, accept the shape and start the edition
+            if (this.activeEditorFragment != null) {
+                this._shape = shape;
+                this.initializeControlElements();
+                return true;
+            }
+
+            return false;
+        };
+
+        /**
+         * Stops the current edition activity if any.
+         * @return {SurfaceShape} The shape being edited if any; otherwise <code>null</code>.
+         */
+        ShapeEditor.prototype.stop = function () {
+            this.removeControlElements();
+
+            var currentShape = this._shape;
+            this._shape = null;
+            return currentShape;
+        };
+
+        // Called by {@link ShapeEditor#edit} to initialize the control elements used for editing.
+        ShapeEditor.prototype.initializeControlElements = function () {
+            if (this._worldWindow.indexOfLayer(this.shadowShapeLayer) == -1) {
+                this._worldWindow.insertLayer(0, this.shadowShapeLayer);
+            }
+
+            if (this._worldWindow.indexOfLayer(this.controlPointsLayer) == -1) {
+                this._worldWindow.addLayer(this.controlPointsLayer);
+            }
+
+            if (this._worldWindow.indexOfLayer(this.accessoriesLayer) == -1) {
+                this._worldWindow.addLayer(this.accessoriesLayer);
+            }
+
+            if (this._worldWindow.indexOfLayer(this.annotationLayer) == -1) {
+                this._worldWindow.addLayer(this.annotationLayer);
+            }
+
+            this.activeEditorFragment.initializeControlElements(
+                this._shape,
+                this.controlPointsLayer.renderables,
+                this.accessoriesLayer.renderables,
+                this._resizeControlPointAttributes,
+                this._rotateControlPointAttributes,
+                this._moveControlPointAttributes
+            );
+
+            this.updateControlElements();
+        };
+
+        // Called by {@link ShapeEditor#stop} to remove the control elements used for editing.
+        ShapeEditor.prototype.removeControlElements = function () {
+            this._worldWindow.removeLayer(this.controlPointsLayer);
+            this.controlPointsLayer.removeAllRenderables();
+
+            this._worldWindow.removeLayer(this.accessoriesLayer);
+            this.accessoriesLayer.removeAllRenderables();
+
+            this._worldWindow.removeLayer(this.shadowShapeLayer);
+            this.shadowShapeLayer.removeAllRenderables();
+
+            this._worldWindow.removeLayer(this.annotationLayer);
         };
 
         //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.handleMouseMove = function (event) {
-            var shapeEditor = this;
-
-            if(this.shape === null)
-                return;
-
-            if (shapeEditor.isDragging === false) {
+        ShapeEditor.prototype.onGestureEvent = function (event) {
+            if(this._shape === null) {
                 return;
             }
 
-            var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX, event.clientY);
-            var terrainObject;
-
-            if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint).terrainObject();
+            if (event.type === "pointerup" || event.type === "mouseup") {
+                this.handleMouseUp(event);
+            } else if (event.type === "pointerdown" || event.type === "mousedown") {
+                this.handleMouseDown(event);
+            } else if (event.type === "pointermove" || event.type === "mousemove") {
+                this.handleMouseMove(event);
             }
-
-            if (!terrainObject) {
-                return;
-            }
-
-            if (shapeEditor.currentSizingMarker instanceof Placemark &&
-                shapeEditor.currentSizingMarker.userProperties.isControlPoint) {
-                shapeEditor.reshapeShape(terrainObject);
-                shapeEditor.updateControlPoints();
-            }
-            else if (shapeEditor.shape instanceof SurfaceShape) {
-                shapeEditor.dragWholeShape(event);
-                shapeEditor.updateControlPoints();
-                shapeEditor.updateShapeAnnotation();
-            }
-
-            event.preventDefault();
         };
 
         //Internal use only. Intentionally not documented.
         ShapeEditor.prototype.handleMouseDown = function (event) {
-            var shapeEditor = this;
-
-            if(this.shape === null)
-                return;
-
-            shapeEditor.currentEvent = event;
-
             var x = event.clientX,
                 y = event.clientY;
 
-            shapeEditor.startX = x;
-            shapeEditor.startY = y;
-            shapeEditor.lastX = x;
-            shapeEditor.lastY = y;
+            this.actionStartX = x;
+            this.actionStartY = y;
+            this.actionCurrentX = x;
+            this.actionCurrentY = y;
 
-            var pickList = shapeEditor.worldWindow.pick(shapeEditor.worldWindow.canvasCoordinates(x, y));
+            var mousePoint = this._worldWindow.canvasCoordinates(x, y);
+            var pickList = this._worldWindow.pick(mousePoint);
 
-            if (pickList.objects.length > 0) {
-                for (var p = 0; p < pickList.objects.length; p++) {
-                    if (!pickList.objects[p].isTerrain) {
-                        if (shapeEditor.shape && pickList.objects[p].userObject === shapeEditor.shape) {
-                            event.preventDefault();
-                            shapeEditor.isDragging = true;
-                            shapeEditor.originalAttributes = shapeEditor.shape.attributes;
-                            shapeEditor.originalHighlightAttributes = shapeEditor.shape.highlightAttributes;
-                            shapeEditor.makeShadowShape();
+            for (var p = 0, len = pickList.objects.length; p < len; p++) {
+                var object = pickList.objects[p];
 
-                            //set previous position
-                            shapeEditor.setPreviousPosition(event);
-                        }
-                        else if (pickList.objects[p].userObject instanceof Placemark &&
-                            pickList.objects[p].userObject.userProperties.isControlPoint) {
-                            event.preventDefault();
-                            shapeEditor.currentSizingMarker = pickList.objects[p].userObject;
-                            shapeEditor.isDragging = true;
-                            shapeEditor.originalAttributes = shapeEditor.shape.attributes;
-                            shapeEditor.originalHighlightAttributes = shapeEditor.shape.highlightAttributes;
-                            shapeEditor.makeShadowShape();
+                if (!object.isTerrain) {
+                    var userObject = object.userObject;
+                    var terrainObject = pickList.terrainObject();
 
-                            //set previous position
-                            shapeEditor.setPreviousPosition(event);
-                        }
+                    if (userObject === this._shape) {
+                        this.beginAction(terrainObject.position, event.altKey);
+                        event.preventDefault();
+                        break;
+
+                    } else if (userObject instanceof Placemark && userObject.userProperties.isControlPoint) {
+                        this.beginAction(terrainObject.position, event.altKey, userObject);
+                        event.preventDefault();
+                        break;
                     }
+                }
+            }
+        };
+
+        // Internal use only. Intentionally not documented.
+        ShapeEditor.prototype.handleMouseMove = function (event) {
+            if (this.actionType) {
+
+                var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
+                var terrainObject = this._worldWindow.pickTerrain(mousePoint).terrainObject();
+
+                if (terrainObject) {
+                    if (this.actionType === ShapeEditorConstants.DRAG) {
+                        this.drag(event.clientX, event.clientY);
+
+                    } else {
+                        this.reshape(terrainObject.position);
+                    }
+
+                    event.preventDefault();
                 }
             }
         };
 
         //Internal use only. Intentionally not documented.
         ShapeEditor.prototype.handleMouseUp = function (event) {
-            var shapeEditor = this;
-
-            if(this.shape === null)
-                return;
-
             var x = event.clientX,
                 y = event.clientY;
 
-            if (shapeEditor.shape && shapeEditor.shadowLayer.renderables.length > 0) {
-                shapeEditor.removeShadowShape();
-                shapeEditor.updateAnnotation(null);
-            }
+            if (this.actionType) {
+                if (this.actionControlPoint) {
+                    if (event.altKey) { // FIXME What is this for?
+                        var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
+                        var terrainObject;
 
-            if (shapeEditor.currentSizingMarker instanceof Placemark &&
-                shapeEditor.currentSizingMarker.userProperties.isControlPoint) {
-                if (event.altKey) {
-                    var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX, event.clientY);
-                    var terrainObject;
+                        if (this._worldWindow.viewport.containsPoint(mousePoint)) {
+                            terrainObject = this._worldWindow.pickTerrain(mousePoint).terrainObject();
+                        }
 
-                    if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                        terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint).terrainObject();
-                    }
-
-                    if (terrainObject) {
-                        shapeEditor.reshapeShape(terrainObject);
-                        shapeEditor.updateControlPoints();
-                        shapeEditor.updateAnnotation(null);
+                        if (terrainObject) {
+                            this.reshape(terrainObject.position);
+                        }
                     }
                 }
-                shapeEditor.isDragging = false;
-                shapeEditor.currentSizingMarker = null;
-                return;
-            }
 
-            var redrawRequired = false;
+                this.endAction();
 
-            var pickList = shapeEditor.worldWindow.pick(shapeEditor.worldWindow.canvasCoordinates(x, y));
-            if (pickList.objects.length > 0) {
-                for (var p = 0; p < pickList.objects.length; p++) {
-                    if (!pickList.objects[p].isTerrain) {
-                        if (shapeEditor.startX === shapeEditor.lastX &&
-                            shapeEditor.startY === shapeEditor.lastY) {
-                            if (event.shiftKey) {
-                                var mousePoint = shapeEditor.worldWindow.canvasCoordinates(event.clientX,
-                                    event.clientY);
-                                var terrainObject;
+            } else {
+                var pickList = this._worldWindow.pick(this._worldWindow.canvasCoordinates(x, y));
+                if (pickList.objects.length > 0) {
+                    for (var p = 0, len = pickList.objects.length; p < len; p++) {
+                        if (!pickList.objects[p].isTerrain) {
+                            if (this.actionStartX === this.actionCurrentX &&
+                                this.actionStartY === this.actionCurrentY) { // FIXME Is this check needed?
+                                if (event.shiftKey) {
+                                    var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
+                                    var terrainObject;
 
-                                if (shapeEditor.worldWindow.viewport.containsPoint(mousePoint)) {
-                                    terrainObject = shapeEditor.worldWindow.pickTerrain(mousePoint)
-                                        .terrainObject();
-                                }
+                                    if (this._worldWindow.viewport.containsPoint(mousePoint)) {
+                                        terrainObject = this._worldWindow.pickTerrain(mousePoint).terrainObject();
+                                    }
 
-                                if (terrainObject) {
-                                    shapeEditor.addNearestLocation(terrainObject.position, 0,
-                                        shapeEditor.shape.boundaries);
+                                    if (terrainObject) {
+                                        this.addNewControlPoint(terrainObject.position, 0, this._shape.boundaries);
+                                        break;
+                                    }
                                 }
                             }
                         }
-
-                        redrawRequired = true;
-                        break;
                     }
                 }
             }
-
-            shapeEditor.isDragging = false;
-            shapeEditor.currentSizingMarker = null;
-
-            // Update the window if we changed anything.
-            if (redrawRequired) {
-                shapeEditor.worldWindow.redraw();
-            }
         };
 
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.onGestureEvent = function (event) {
-            if (!this.armed) {
-                return;
+        ShapeEditor.prototype.beginAction = function (initialPosition, alternateAction, controlPoint) {
+            // Define the active transformation
+            if (controlPoint) {
+                this.actionType = controlPoint.userProperties.purpose;
+            } else {
+                this.actionType = ShapeEditorConstants.DRAG;
             }
+            this.actionControlPoint = controlPoint;
+            this.actionControlPosition = initialPosition;
+            this.actionSecondaryBehavior = alternateAction;
 
-            try {
-                if (event.type === "pointerup" || event.type === "mouseup") {
-                    this.handleMouseUp(event);
-                } else if (event.type === "pointerdown" || event.type === "mousedown") {
-                    this.handleMouseDown(event);
-                } else if (event.type === "pointermove" || event.type === "mousemove") {
-                    this.handleMouseMove(event);
-                }
-            } catch (error) {
-                console.log(error); // FIXME Remove this
-                Logger.logMessage(Logger.LEVEL_SEVERE, "ShapeEditor", "handleEvent",
-                    "Error handling event.\n" + error.toString());
-            }
-        };
-
-        /**
-         * Remove the control points.
-         */
-        ShapeEditor.prototype.removeControlPoints = function () {
-            this.controlPointLayer.removeAllRenderables();
-        };
-
-        /**
-         * Creates and returns the stationary shape displayed during editing operations.
-         * @returns {SurfaceShape} The new shadow shape created, or null if the shape type is not recognized.
-         */
-        ShapeEditor.prototype.doMakeShadowShape = function () {
-            return this.activeEditorFragment.createShadowShape(this.shape);
-        };
-
-        /**
-         * Creates the shape that will remain at the same location and is the same size as the shape to be edited.
-         */
-        ShapeEditor.prototype.makeShadowShape = function () {
-            var shadowShape = this.doMakeShadowShape();
-            if (shadowShape == null) {
-                return;
-            }
+            // Place a shadow shape at the original location of the shape
+            this.originalHighlightAttributes = this._shape.highlightAttributes;
 
             var editingAttributes = new ShapeAttributes(this.originalHighlightAttributes);
+            editingAttributes.interiorColor.alpha = editingAttributes.interiorColor.alpha * 0.7;
 
-            if (editingAttributes.interiorColor.alpha === 1) {
-                editingAttributes.interiorColor.alpha = 0.7;
-            }
-
-            this.shape.highlightAttributes = editingAttributes;
-
-            shadowShape.highlighted = true;
+            var shadowShape = this.activeEditorFragment.createShadowShape(this._shape);
             shadowShape.highlightAttributes = new ShapeAttributes(this.originalHighlightAttributes);
+            shadowShape.highlighted = true;
 
-            this.shadowLayer.addRenderable(shadowShape);
-            this.worldWindow.redraw();
+            this.shadowShapeLayer.addRenderable(shadowShape);
+
+            this._worldWindow.redraw();
         };
 
-        /**
-         * Remove the shadow shape.
-         */
-        ShapeEditor.prototype.removeShadowShape = function () {
-            this.shadowLayer.removeAllRenderables();
+        ShapeEditor.prototype.endAction = function () {
+            this.shadowShapeLayer.removeAllRenderables();
 
-            // Restore the original highlight attributes.
-            this.shape.highlightAttributes = this.originalHighlightAttributes;
+            this._shape.highlightAttributes = this.originalHighlightAttributes;
+            
+            this.hideAnnotation();
 
-            this.worldWindow.redraw();
+            this.actionControlPoint = null;
+            this.actionType = null;
+            this.actionControlPosition = null;
+
+            this._worldWindow.redraw();
         };
 
-        /**
-         * Set up the Annotation.
-         */
-        ShapeEditor.prototype.makeAnnotation = function () {
-            var annotationAttributes = new AnnotationAttributes(null);
-            annotationAttributes.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-            annotationAttributes.cornerRadius = 5;
-            annotationAttributes.backgroundColor = new Color(0.67, 0.67, 0.67, 0.8);
-            annotationAttributes._leaderGapHeight = 0;
-            annotationAttributes.drawLeader = false;
-            annotationAttributes.scale = 1;
-            annotationAttributes._textAttributes.color = Color.BLACK;
-            annotationAttributes._textAttributes.font = new Font(10);
-            annotationAttributes.insets = new Insets(5, 5, 5, 5);
-
-            this.annotation = new WorldWind.Annotation(
-                new WorldWind.Position(0, 0, 0), annotationAttributes);
-            this.annotation.text = "";
-            this.annotationLayer.addRenderable(this.annotation);
-            this.annotationLayer.enabled = false;
-        };
-
-        /**
-         * Updates the annotation indicating the edited shape's center. If the  shape has no designated center, this
-         * method prevents the annotation from displaying.
-         */
-        ShapeEditor.prototype.updateShapeAnnotation = function () {
-            var center = this.getShapeCenter();
-
-            if (center != null) {
-                var dummyMarker = new Placemark(
-                    new Position(center.latitude, center.longitude, 0),
-                    null);
-                dummyMarker.userProperties.isControlPoint = true;
-                dummyMarker.userProperties.id = 0;
-                dummyMarker.userProperties.purpose = ShapeEditor.ANNOTATION;
-                this.updateAnnotation(dummyMarker);
-            }
-            else {
-                this.updateAnnotation(null);
-            }
-        };
-
-        /**
-         * Remove the annotation.
-         */
-        ShapeEditor.prototype.removeAnnotation = function () {
-            this.annotationLayer.removeAllRenderables();
-        };
-
-        ShapeEditor.prototype.makeControlPointAttributes = function () {
-            this.locationControlPointAttributes.imageColor = WorldWind.Color.BLUE;
-            this.locationControlPointAttributes.imageScale = 6;
-
-            this.sizeControlPointAttributes.imageColor = WorldWind.Color.CYAN;
-            this.sizeControlPointAttributes.imageScale = 6;
-
-            this.angleControlPointAttributes.imageColor = WorldWind.Color.GREEN;
-            this.angleControlPointAttributes.imageScale = 6;
-        };
-
-        /**
-         * Enables the ShapeEditor for the specified shape.
-         * @param {SurfaceShape} shape The shape that will be edited.
-         * @throws {ArgumentError} If the specified shape is null or not an instance of SurfaceShape.
-         */
-        ShapeEditor.prototype.edit = function (shape) {
-            this.activeEditorFragment = null;
-            for (var i = 0; i < this.editorFragments.length; i++) {
-                if (this.editorFragments[i].canEdit(shape)) {
-                    this.activeEditorFragment = this.editorFragments[i];
-                }
-            }
-
-            if (this.activeEditorFragment != null) {
-                this.shape = shape;
-                this.enable();
-                this.armed = true;
-            } else {
-                this.stop();
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ShapeEditor", "edit",
-                    "missingShape"));
-            }
-        };
-
-        /**
-         * Stops the editing action and cleans up the allocated resources.
-         */
-        ShapeEditor.prototype.stop = function () {
-            this.disable();
-            this.shape = null;
-            this.armed = false;
-        };
-
-        /**
-         * Called by {@link ShapeEditor#edit} to enable resources used for editing.
-         */
-        ShapeEditor.prototype.enable = function () {
-            if (this.worldWindow.indexOfLayer(this.controlPointLayer) == -1) {
-                this.worldWindow.addLayer(this.controlPointLayer);
-            }
-
-            if (this.worldWindow.indexOfLayer(this.accessoryLayer) == -1) {
-                this.worldWindow.addLayer(this.accessoryLayer);
-            }
-            this.makeAccessory();
-
-            if (this.worldWindow.indexOfLayer(this.annotationLayer) == -1) {
-                this.worldWindow.addLayer(this.annotationLayer);
-            }
-
-            if (this.worldWindow.indexOfLayer(this.shadowLayer) == -1) {
-                this.worldWindow.insertLayer(0, this.shadowLayer);
-            }
-
-            this.updateControlPoints();
-        };
-
-        /**
-         * Called by {@link ShapeEditor#stop} to remove resources no longer needed after editing.
-         */
-        ShapeEditor.prototype.disable = function () {
-            this.removeControlPoints();
-            this.worldWindow.removeLayer(this.controlPointLayer);
-
-            this.removeAccessory();
-            this.worldWindow.removeLayer(this.accessoryLayer);
-
-            this.worldWindow.removeLayer(this.annotationLayer);
-
-            this.worldWindow.removeLayer(this.shadowLayer);
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.formatLatitude = function (number) {
-            var suffix = number < 0 ? "\u00b0S" : "\u00b0N";
-            return Math.abs(number).toFixed(4) + suffix;
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.formatLongitude = function (number) {
-            var suffix = number < 0 ? "\u00b0W" : "\u00b0E";
-            return Math.abs(number).toFixed(4) + suffix;
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.formatLength = function (number) {
-            var suffix = " km";
-            return Math.abs(number / 1000.0).toFixed(3) + suffix;
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.formatRotation = function (rotation) {
-            return rotation.toFixed(4) + "°";
-        };
-
-        ShapeEditor.prototype.updateControlPoints = function () {
-            this.activeEditorFragment.updateControlPoints(
-                this.shape,
-                this.worldWindow.globe,
-                this.controlPointLayer.renderables,
-                this.accessoryLayer.renderables,
-                this.sizeControlPointAttributes,
-                this.angleControlPointAttributes,
-                this.locationControlPointAttributes
+        ShapeEditor.prototype.reshape = function (newPosition) {
+            this.activeEditorFragment.reshape(
+                this._shape,
+                this._worldWindow.globe,
+                this.actionControlPoint,
+                newPosition,
+                this.actionControlPosition,
+                this.actionSecondaryBehavior
             );
+
+            this.actionControlPosition = newPosition;
+
+            this.updateControlElements();
+            this.updateAnnotation(this.actionControlPoint);
+
+            this._worldWindow.redraw();
         };
 
-        /**
-         * Set up the Path for the rotation line.
-         */
-        ShapeEditor.prototype.makeAccessory = function () {
-            var pathPositions = [];
-            pathPositions.push(new Position(0, 0, 0));
-            pathPositions.push(new Position(0, 0, 0));
-            var rotationLine = new Path(pathPositions, null);
-            rotationLine.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-            rotationLine.followTerrain = true;
+        ShapeEditor.prototype.drag = function (clientX, clientY) {
+            // FIXME To be reviewed
+            var refPos = this._shape.getReferencePosition();
 
-            var pathAttributes = new ShapeAttributes(null);
-            pathAttributes.outlineColor = Color.GREEN;
-            pathAttributes.outlineWidth = 2;
-            rotationLine.attributes = pathAttributes;
-
-            this.accessoryLayer.addRenderable(rotationLine);
-        };
-
-        /**
-         * Remove the orientation line.
-         */
-        ShapeEditor.prototype.removeAccessory = function () {
-            this.accessoryLayer.removeAllRenderables();
-        };
-
-        /**
-         * Moves the entire shape according to a specified event.
-         * @param {Event} event
-         */
-        ShapeEditor.prototype.dragWholeShape = function (event) {
-            var refPos = this.shape.getReferencePosition();
-            if (refPos === null) {
-                return;
-            }
-
-            var refPoint = new Vec3(0, 0, 0);
-            this.worldWindow.globe.computePointFromPosition(refPos.latitude, refPos.longitude, 0,
-                refPoint);
+            var refPoint = this._worldWindow.globe.computePointFromPosition(
+                refPos.latitude,
+                refPos.longitude,
+                0,
+                new Vec3(0, 0, 0)
+            );
 
             var screenRefPoint = new Vec3(0, 0, 0);
-            this.worldWindow.drawContext.project(refPoint, screenRefPoint);
+            this._worldWindow.drawContext.project(refPoint, screenRefPoint);
 
-            // Compute screen-coord delta since last event.
-            var dx = event.clientX - this.lastX;
-            var dy = event.clientY - this.lastY;
+            var dx = clientX - this.actionCurrentX;
+            var dy = clientY - this.actionCurrentY;
 
-            this.lastX = event.clientX;
-            this.lastY = event.clientY;
+            this.actionCurrentX = clientX;
+            this.actionCurrentY = clientY;
 
-            // Find intersection of screen coord ref-point with globe.
+            // Find intersection of the screen coordinates ref-point with globe
             var x = screenRefPoint[0] + dx;
-            var y = this.worldWindow.canvas.height - screenRefPoint[1] + dy;
+            var y = this._worldWindow.canvas.height - screenRefPoint[1] + dy;
 
-            var ray = this.worldWindow.rayThroughScreenPoint(new Vec2(x, y));
+            var ray = this._worldWindow.rayThroughScreenPoint(new Vec2(x, y));
 
             var intersection = new Vec3(0, 0, 0);
-            if (this.worldWindow.globe.intersectsLine(ray, intersection)) {
+            if (this._worldWindow.globe.intersectsLine(ray, intersection)) {
                 var p = new Position(0, 0, 0);
-                this.worldWindow.globe.computePositionFromPoint(intersection[0], intersection[1],
+                this._worldWindow.globe.computePositionFromPoint(intersection[0], intersection[1],
                     intersection[2], p);
-                this.shape.moveTo(this.worldWindow.globe, new WorldWind.Location(p.latitude, p.longitude));
+                this._shape.moveTo(this._worldWindow.globe, new WorldWind.Location(p.latitude, p.longitude));
             }
+
+            this.updateControlElements();
+            this.updateShapeAnnotation();
+
+            this._worldWindow.redraw();
         };
 
-        /**
-         * Modifies the shape's locations, size or rotation. This method is called when a control point is dragged.
-         *
-         * @param {PickedObject} terrainObject The terrain object.
-         */
-        ShapeEditor.prototype.reshapeShape = function (terrainObject) {
-            if (!this.previousPosition) {
-                this.previousPosition = terrainObject.position;
-                return;
-            }
-
-            this.doReshapeShape(this.currentSizingMarker, terrainObject.position);
-
-            this.previousPosition = terrainObject.position;
-        };
-
-        /**
-         * Called by {@link ShapeEditor#reshapeShape} to perform the actual shape modification.
-         * Subclasses should override this method if they provide editing for shapes other than those supported by
-         * the basic editor.
-         *
-         * @param {Placemark} controlPoint The control point selected.
-         * @param {Position} terrainPosition The terrain position under the cursor.
-         */
-        ShapeEditor.prototype.doReshapeShape = function (controlPoint, terrainPosition) {
-            if (!controlPoint) {
-                return;
-            }
-            this.activeEditorFragment.reshape(
-                this.shape,
-                this.worldWindow.globe,
-                controlPoint,
-                terrainPosition,
-                this.previousPosition,
-                this.currentEvent
+        ShapeEditor.prototype.updateControlElements = function () {
+            this.activeEditorFragment.updateControlElements(
+                this._shape,
+                this._worldWindow.globe,
+                this.controlPointsLayer.renderables,
+                this.accessoriesLayer.renderables
             );
-            this.updateAnnotation(controlPoint);
-            this.currentSizingMarker.position = terrainPosition;
-            this.worldWindow.redraw();
         };
 
-        /**
-         *
-         * @returns {Location} The shape's center location, or null if the shape has no designated center.
-         */
-        ShapeEditor.prototype.getShapeCenter = function () {
-            var center = null;
-
-            if (this.shape instanceof SurfaceEllipse || this.shape instanceof SurfaceRectangle) {
-                center = this.shape.center;
-            }
-
-            return center;
-        };
-
-        /**
-         * Updates the annotation associated with a specified control point.
-         * @param {Placemark} controlPoint The control point.
-         */
         ShapeEditor.prototype.updateAnnotation = function (controlPoint) {
-            if (!controlPoint) {
-                this.annotationLayer.enabled = false;
-                return;
-            }
-
             this.annotationLayer.enabled = true;
+
             this.annotation.position = new Position(
                 controlPoint.position.latitude,
                 controlPoint.position.longitude,
@@ -781,12 +598,149 @@ define([
                 annotationText = this.formatRotation(controlPoint.userProperties.rotation);
             }
             else {
-                annotationText = this.formatLatitude(controlPoint.position.latitude) + " " +
-                    this.formatLongitude(controlPoint.position.longitude);
+                annotationText = this.formatLatitude(controlPoint.position.latitude)
+                    + " "
+                    + this.formatLongitude(controlPoint.position.longitude);
             }
-
             this.annotation.text = annotationText;
         };
+
+        ShapeEditor.prototype.hideAnnotation = function (controlPoint) {
+            this.annotationLayer.enabled = false;
+        };
+
+        ShapeEditor.prototype.updateShapeAnnotation = function () {
+            var center = this.activeEditorFragment.getShapeCenter(this._shape);
+
+            if (center !== null) {
+                var dummyMarker = new Placemark(
+                    new Position(center.latitude, center.longitude, 0),
+                    null
+                );
+                dummyMarker.userProperties.isControlPoint = true;
+                dummyMarker.userProperties.id = 0;
+                dummyMarker.userProperties.purpose = ShapeEditor.ANNOTATION;
+                this.updateAnnotation(dummyMarker);
+
+            } else {
+                this.hideAnnotation();
+            }
+        };
+
+        ShapeEditor.prototype.formatLatitude = function (number) {
+            var suffix = number < 0 ? "\u00b0S" : "\u00b0N";
+            return Math.abs(number).toFixed(4) + suffix;
+        };
+
+        ShapeEditor.prototype.formatLongitude = function (number) {
+            var suffix = number < 0 ? "\u00b0W" : "\u00b0E";
+            return Math.abs(number).toFixed(4) + suffix;
+        };
+
+        ShapeEditor.prototype.formatLength = function (number) {
+            var suffix = " km";
+            return Math.abs(number / 1000.0).toFixed(3) + suffix;
+        };
+
+        ShapeEditor.prototype.formatRotation = function (rotation) {
+            return rotation.toFixed(4) + "°";
+        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /**
+         * Inserts the location nearest to a specified position on an edge of a specified list of locations into the
+         * appropriate place in that list.
+         * @param {Position} terrainPosition The position to find a nearest point for.
+         * @param {Number} altitude The altitude to use when determining the nearest point. Can be approximate and is
+         * not necessarily the altitude of the terrain position.
+         * @param {Location[]} locations The list of locations. This list is modified by this method to contain the new
+         * location on an edge nearest the specified terrain position.
+         */
+        ShapeEditor.prototype.addNewControlPoint = function (terrainPosition, altitude, locations) {
+            var globe = this._worldWindow.globe;
+
+            // Find the nearest edge to the picked point and insert a new position on that edge.
+            var pointPicked = globe.computePointFromPosition(
+                terrainPosition.latitude,
+                terrainPosition.longitude,
+                altitude,
+                new Vec3(0, 0, 0)
+            );
+
+            var nearestPoint = null;
+            var nearestSegmentIndex = 0;
+            var nearestDistance = Number.MAX_VALUE;
+            for (var i = 1; i <= locations.length; i++) // <= is intentional, to handle the closing segment
+            {
+                // Skip the closing segment if the shape is not a polygon.
+                if (!(this._shape instanceof SurfacePolygon ) && i == locations.length) {
+                    continue;
+                }
+
+                var locationA = locations[i - 1];
+                var locationB = locations[i == locations.length ? 0 : i];
+
+                var pointA = globe.computePointFromPosition(
+                    locationA.latitude,
+                    locationA.longitude,
+                    altitude,
+                    new Vec3(0, 0, 0)
+                );
+
+                var pointB = this._worldWindow.globe.computePointFromPosition(
+                    locationB.latitude,
+                    locationB.longitude,
+                    altitude,
+                    new Vec3(0, 0, 0)
+                );
+
+                var pointOnEdge = this.nearestPointOnSegment(pointA, pointB, new Vec3(pointPicked[0], pointPicked[1], pointPicked[2]));
+
+                var distance = pointOnEdge.distanceTo(pointPicked);
+                if (distance < nearestDistance) {
+                    nearestPoint = pointOnEdge;
+                    nearestSegmentIndex = i;
+                    nearestDistance = distance;
+                }
+            }
+
+            if (nearestPoint) {
+                // Compute the location of the nearest point and add it to the shape.
+                var nearestLocation = this._worldWindow.globe.computePositionFromPoint(
+                    nearestPoint[0],
+                    nearestPoint[1],
+                    nearestPoint[2],
+                    new Position(0, 0, 0)
+                );
+
+                if (nearestSegmentIndex == locations.length)
+                    locations.push(nearestLocation);
+                else
+                    locations.splice(nearestSegmentIndex, 0, nearestLocation);
+
+                this.removeControlPoints();
+                this._shape.boundaries = locations;
+                this.updateControlElements();
+            }
+        };
+
+
 
         /**
          * Computes the point on a specified line segment that is nearest a specified point.
@@ -812,98 +766,6 @@ define([
             }
             else {
                 return Vec3.fromLine(p1, dot, dir); // FIXME This is broken
-            }
-        };
-
-        /**
-         * Inserts the location nearest to a specified position on an edge of a specified list of locations into the
-         * appropriate place in that list.
-         * @param {Position} terrainPosition The position to find a nearest point for.
-         * @param {Number} altitude The altitude to use when determining the nearest point. Can be approximate and is
-         * not necessarily the altitude of the terrain position.
-         * @param {Location[]} locations The list of locations. This list is modified by this method to contain the new
-         * location on an edge nearest the specified terrain position.
-         */
-        ShapeEditor.prototype.addNearestLocation = function (terrainPosition, altitude, locations) {
-            var globe = this.worldWindow.globe;
-
-            // Find the nearest edge to the picked point and insert a new position on that edge.
-            var pointPicked = globe.computePointFromPosition(
-                terrainPosition.latitude,
-                terrainPosition.longitude,
-                altitude,
-                new Vec3(0, 0, 0)
-            );
-
-            var nearestPoint = null;
-            var nearestSegmentIndex = 0;
-            var nearestDistance = Number.MAX_VALUE;
-            for (var i = 1; i <= locations.length; i++) // <= is intentional, to handle the closing segment
-            {
-                // Skip the closing segment if the shape is not a polygon.
-                if (!(this.shape instanceof SurfacePolygon ) && i == locations.length) {
-                    continue;
-                }
-
-                var locationA = locations[i - 1];
-                var locationB = locations[i == locations.length ? 0 : i];
-
-                var pointA = globe.computePointFromPosition(
-                    locationA.latitude,
-                    locationA.longitude,
-                    altitude,
-                    new Vec3(0, 0, 0)
-                );
-
-                var pointB = this.worldWindow.globe.computePointFromPosition(
-                    locationB.latitude,
-                    locationB.longitude,
-                    altitude,
-                    new Vec3(0, 0, 0)
-                );
-
-                var pointOnEdge = this.nearestPointOnSegment(pointA, pointB, new Vec3(pointPicked[0], pointPicked[1], pointPicked[2]));
-
-                var distance = pointOnEdge.distanceTo(pointPicked);
-                if (distance < nearestDistance) {
-                    nearestPoint = pointOnEdge;
-                    nearestSegmentIndex = i;
-                    nearestDistance = distance;
-                }
-            }
-
-            if (nearestPoint) {
-                // Compute the location of the nearest point and add it to the shape.
-                var nearestLocation = this.worldWindow.globe.computePositionFromPoint(
-                    nearestPoint[0],
-                    nearestPoint[1],
-                    nearestPoint[2],
-                    new Position(0, 0, 0)
-                );
-
-                if (nearestSegmentIndex == locations.length)
-                    locations.push(nearestLocation);
-                else
-                    locations.splice(nearestSegmentIndex, 0, nearestLocation);
-
-                this.removeControlPoints();
-                this.shape.boundaries = locations;
-                this.updateControlPoints();
-            }
-        };
-
-        ShapeEditor.prototype.setPreviousPosition = function (event) {
-            var mousePoint = this.worldWindow.canvasCoordinates(event.clientX,
-                event.clientY);
-            if (this.worldWindow.viewport.containsPoint(mousePoint)) {
-                var terrainObject = this.worldWindow.pickTerrain(mousePoint).terrainObject();
-                if (terrainObject) {
-                    this.previousPosition = new Position(
-                        terrainObject.position.latitude,
-                        terrainObject.position.longitude,
-                        terrainObject.position.altitude
-                    );
-                }
             }
         };
 

@@ -38,7 +38,7 @@ define([
         SurfacePolylineEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
 
         //Internal use only. Intentionally not documented.
-        SurfacePolylineEditorFragment.prototype.canEdit = function (shape) {
+        SurfacePolylineEditorFragment.prototype.canHandle = function (shape) {
             return shape instanceof SurfacePolyline;
         };
 
@@ -48,7 +48,12 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfacePolylineEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, currentEvent) {
+        SurfacePolylineEditorFragment.prototype.getShapeCenter = function (shape) {
+            return null;
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfacePolylineEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, alternateAction) {
             var delta = this.computeControlPointDelta(globe, previousPosition, terrainPosition);
             var centerPoint = globe.computePointFromPosition(
                 shape.center.latitude,

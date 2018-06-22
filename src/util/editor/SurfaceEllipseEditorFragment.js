@@ -38,7 +38,7 @@ define([
         SurfaceEllipseEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
 
         //Internal use only. Intentionally not documented.
-        SurfaceEllipseEditorFragment.prototype.canEdit = function (shape) {
+        SurfaceEllipseEditorFragment.prototype.canHandle = function (shape) {
             return shape instanceof SurfaceEllipse;
         };
 
@@ -54,7 +54,52 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfaceEllipseEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, currentEvent) {
+        SurfaceEllipseEditorFragment.prototype.getShapeCenter = function (shape) {
+            return shape.center;
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfaceEllipseEditorFragment.prototype.initializeControlElements = function (shape, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
+            var controlPoint;
+
+            controlPoint = new Placemark(
+                Location.ZERO,
+                false,
+                sizeControlPointAttributes
+            );
+            controlPoint.userProperties.isControlPoint = true;
+            controlPoint.userProperties.id = 0;
+            controlPoint.userProperties.purpose = ShapeEditorConstants.WIDTH;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            controlPoints.push(controlPoint);
+
+            controlPoint = new Placemark(
+                Location.ZERO,
+                false,
+                sizeControlPointAttributes
+            );
+            controlPoint.userProperties.isControlPoint = true;
+            controlPoint.userProperties.id = 1;
+            controlPoint.userProperties.purpose = ShapeEditorConstants.HEIGHT;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            controlPoints.push(controlPoint);
+
+            controlPoint = new Placemark(
+                Location.ZERO,
+                false,
+                angleControlPointAttributes
+            );
+            controlPoint.userProperties.isControlPoint = true;
+            controlPoint.userProperties.id = 2;
+            controlPoint.userProperties.purpose = ShapeEditorConstants.ROTATION;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            controlPoints.push(controlPoint);
+
+            this.makeAccessory(accessories, angleControlPointAttributes);
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfaceEllipseEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, alternateAction) {
             var terrainPoint = globe.computePointFromPosition(
                 terrainPosition.latitude,
                 terrainPosition.longitude,
@@ -100,7 +145,7 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfaceEllipseEditorFragment.prototype.updateControlPoints = function (shape, globe, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
+        SurfaceEllipseEditorFragment.prototype.updateControlElements = function (shape, globe, controlPoints, accessories) {
             var majorLocation = Location.greatCircleLocation(
                 shape.center,
                 90 + shape.heading,
@@ -120,50 +165,13 @@ define([
                 new Location(0, 0)
             );
 
-            if (controlPoints.length > 0) {
-                controlPoints[0].position = majorLocation;
-                controlPoints[1].position = minorLocation;
-                controlPoints[2].position = rotationLocation;
-            }
-            else {
-                var controlPoint;
-
-                controlPoint = new Placemark(
-                    majorLocation,
-                    false,
-                    sizeControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = 0;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.WIDTH;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-
-                controlPoint = new Placemark(
-                    minorLocation,
-                    false,
-                    sizeControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = 1;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.HEIGHT;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-
-                controlPoint = new Placemark(
-                    rotationLocation,
-                    false,
-                    angleControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = 2;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.ROTATION;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-            }
-
+            controlPoints[0].position = majorLocation;
             controlPoints[0].userProperties.size = shape.majorRadius;
+
+            controlPoints[1].position = minorLocation;
             controlPoints[1].userProperties.size = shape.minorRadius;
+
+            controlPoints[2].position = rotationLocation;
             controlPoints[2].userProperties.rotation = shape.heading;
 
             this.updateOrientationLine(shape.center, rotationLocation, accessories);

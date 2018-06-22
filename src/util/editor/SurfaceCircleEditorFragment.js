@@ -38,7 +38,7 @@ define([
         SurfaceCircleEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
 
         //Internal use only. Intentionally not documented.
-        SurfaceCircleEditorFragment.prototype.canEdit = function (shape) {
+        SurfaceCircleEditorFragment.prototype.canHandle = function (shape) {
             return shape instanceof SurfaceCircle;
         };
 
@@ -48,7 +48,29 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfaceCircleEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, currentEvent) {
+        SurfaceCircleEditorFragment.prototype.getShapeCenter = function (shape) {
+            return shape.center;
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfaceCircleEditorFragment.prototype.initializeControlElements = function (shape, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
+            var controlPoint = new Placemark(
+                Location.ZERO,
+                false,
+                sizeControlPointAttributes
+            );
+
+            controlPoint.userProperties.isControlPoint = true;
+            controlPoint.userProperties.size = shape.radius;
+            controlPoint.userProperties.id = 0;
+            controlPoint.userProperties.purpose = ShapeEditorConstants.OUTER_RADIUS;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+
+            controlPoints.push(controlPoint);
+        };
+
+        //Internal use only. Intentionally not documented.
+        SurfaceCircleEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, alternateAction) {
             var delta = this.computeControlPointDelta(globe, previousPosition, terrainPosition);
             var centerPoint = globe.computePointFromPosition(
                 shape.center.latitude,
@@ -72,29 +94,14 @@ define([
         };
 
         //Internal use only. Intentionally not documented.
-        SurfaceCircleEditorFragment.prototype.updateControlPoints = function (shape, globe, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
+        SurfaceCircleEditorFragment.prototype.updateControlElements = function (shape, globe, controlPoints, accessories) {
             var radiusLocation = Location.greatCircleLocation(
                 shape.center,
                 90,
                 shape.radius / globe.equatorialRadius,
                 new Location(0, 0));
 
-            if (controlPoints.length > 0) {
-                controlPoints[0].position = radiusLocation;
-            }
-            else {
-                var controlPoint = new Placemark(
-                    radiusLocation,
-                    false,
-                    sizeControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = 0;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.OUTER_RADIUS;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-            }
-
+            controlPoints[0].position = radiusLocation;
             controlPoints[0].userProperties.size = shape.radius;
         };
 
