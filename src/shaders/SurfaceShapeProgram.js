@@ -6,20 +6,20 @@ define([
         var vertexShaderSource =
             "attribute vec4 vertexPoint;\n" +
             "attribute vec4 vertexTexCoord;\n" +
-            "attribute vec4 offsetVector;\n" +
+            "attribute vec3 offsetVector;\n" +
             "uniform mat4 mvpMatrix;\n" +
             "uniform mat4 texCoordMatrix;\n" +
             "uniform float offsetWidth;\n" +
-            "uniform vec4 eyePoint;\n" +
+            "uniform vec3 eyePoint;\n" +
             "uniform float eyeAltitude;\n" +
             "uniform float pixelSizeFactor;\n" +
             "uniform float pixelSizeOffset;\n" +
             "varying vec2 texCoord;\n" +
             "void main() {\n" +
             // the following calculations determine the width of an outline in a best effort at constant size in screen space
-            "   float distance = max(0.01, min(length(eyePoint - vertexPoint), eyeAltitude));\n" +
+            "   float distance = max(0.01, min(length(eyePoint - vertexPoint.xyz), eyeAltitude));\n" +
             "   float pixelSize = offsetWidth * (pixelSizeFactor * distance + pixelSizeOffset);\n" +
-            "   gl_Position = mvpMatrix * (vertexPoint + offsetVector * pixelSize);\n" +
+            "   gl_Position = mvpMatrix * (vertexPoint + vec4(offsetVector * pixelSize, 1.0));\n" +
             "   texCoord = (texCoordMatrix * vertexTexCoord).st;\n" +
             "}",
 

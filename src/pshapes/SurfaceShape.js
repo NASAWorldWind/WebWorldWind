@@ -63,6 +63,8 @@ define([
 
         this.scratchPosition = new Position();
 
+        this.scratchPoint = new Vec3();
+
         this.orthoProjectionMatrix = new Matrix().setToOrthographicProjection(
             -1.5 * WorldWind.EARTH_RADIUS,
             1.5 * WorldWind.EARTH_RADIUS,
@@ -171,6 +173,8 @@ define([
 
         this.beginStenciling(dc);
 
+        this.loadTransforms(dc);
+
         if (this._activeAttributes.drawInterior) {
             this.drawInterior(dc);
         }
@@ -191,6 +195,14 @@ define([
     SurfaceShape.prototype.drawInterior = function (dc) {
         var gl = dc.currentGlContext, program = dc.currentProgram;
 
+        program.loadUniformFloat(gl, 0, program.offsetWidthLocation);
+        this.scratchPoint.copy(dc.eyePoint);
+        this.scratchPoint.subtract(this._centerPoint);
+        gl.uniform3f(program.eyePointLocation, this.scratchPoint[0], this.scratchPoint[1], this.scratchPoint[2]);
+        program.loadUniformFloat(gl, 0, program.eyeAltitudeLocation);
+        program.loadUniformFloat(gl, 0, program.pixelSizeFactorLocation);
+        program.loadUniformFloat(gl, 0, program.pixelSizeOffsetLocation);
+
         this.prepareStencil(dc);
         gl.drawElements(gl.TRIANGLES, this._interiorVolumeElements.count, gl.UNSIGNED_SHORT, this._interiorVolumeElements.offset);
 
@@ -201,7 +213,6 @@ define([
         } else {
             program.loadUniformColor(gl, this._activeAttributes.interiorColor, program.colorLocation);
         }
-
         gl.drawElements(gl.TRIANGLES, this._interiorVolumeElements.count, gl.UNSIGNED_SHORT, this._interiorVolumeElements.offset);
     };
 
@@ -209,8 +220,9 @@ define([
         var gl = dc.currentGlContext, program = dc.currentProgram;
 
         program.loadUniformFloat(gl, this._activeAttributes.outlineWidth, program.offsetWidthLocation);
-        gl.uniform3f(program.eyePointLocation, dc.eyePoint[0] - this._centerPoint[0],
-            dc.eyePoint[1] - this._centerPoint[1], dc.eyePoint[2] - this._centerPoint[2]);
+        this.scratchPoint.copy(dc.eyePoint);
+        this.scratchPoint.subtract(this._centerPoint);
+        gl.uniform3f(program.eyePointLocation, this.scratchPoint[0], this.scratchPoint[1], this.scratchPoint[2]);
         program.loadUniformFloat(gl, dc.eyePosition.altitude, program.eyeAltitudeLocation);
         program.loadUniformFloat(gl, dc.pixelSizeFactor, program.pixelSizeFactorLocation);
         program.loadUniformFloat(gl, dc.pixelSizeOffset, program.pixelSizeOffsetLocation);
@@ -223,6 +235,16 @@ define([
 
         this.applyStencilTest(dc);
         gl.drawElements(gl.TRIANGLES, this._outlineElements.count, gl.UNSIGNED_SHORT, this._outlineElements.offset);
+    };
+
+    SurfaceShape.prototype.loadTransforms = function (dc) {
+        var gl = dc.currentGlContext, program = dc.currentProgram;
+
+        this.scratchMatrix.copy(dc.modelviewProjection);
+        this.scratchMatrix.multiplyByTranslation(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2]);
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.mvpMatrixLocation);
+        this.scratchMatrix.setToIdentity();
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrix);
     };
 
     SurfaceShape.prototype.drawProjectedSurfaceImage = function (dc) {
@@ -264,8 +286,8 @@ define([
     SurfaceShape.prototype.endDrawing = function (dc) {
         var gl = dc.currentGlContext;
 
-        dc.bindBuffer(gl.ARRAY_BUFFER, null);
-        dc.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
         this._activeTexture = null;
         this._frameBuffer = null;
@@ -460,14 +482,14 @@ define([
 
     SurfaceShape.prototype.calculateVolumeVerticalLimits = function (dc) {
         // TODO more accurate volume limits that represent geographical extent and terrain
-        return {min: -5000, max: 80000};
+        return {min: -5000, max: 200000};
     };
 
     SurfaceShape.prototype.assembleVertexArray = function (dc) {
         this.calculateCenter(dc);
         this._vertexArray = new Float32Array(4 /*locations*/ * 2 /*interior and exterior points*/
-            * 6 /*components: x, y, z, ox, oy, oz (offsets)*/);
-        var i, limits = this.calculateVolumeVerticalLimits(dc), prevLocation, location, nextLocation;
+            * 2 /*top and bottom*/ * 6 /*components: x, y, z, ox, oy, oz (offsets)*/);
+        var i, limits = this.calculateVolumeVerticalLimits(dc), prevLocation, location, nextLocation, idx = 0;
 
         for (i = 0; i < 4; i++) {
             location = this._boundaries[i];
@@ -484,12 +506,12 @@ define([
                 nextLocation = this._boundaries[i + 1];
             }
 
-            this.generateVerticesWithOffsetVector(dc, prevLocation, location, nextLocation, limits);
+            idx = this.generateVerticesWithOffsetVector(dc, prevLocation, location, nextLocation, limits, idx);
         }
     };
 
-    SurfaceShape.prototype.generateVerticesWithOffsetVector = function (dc, prevLocation, location, nextLocation, altitudeLimits) {
-        var prevPoint = new Vec3(), point = new Vec3(), nextPoint = new Vec3(), idx = 0,
+    SurfaceShape.prototype.generateVerticesWithOffsetVector = function (dc, prevLocation, location, nextLocation, altitudeLimits, idx) {
+        var prevPoint = new Vec3(), point = new Vec3(), nextPoint = new Vec3(),
             altitude = [altitudeLimits.min, altitudeLimits.max];
 
         for (var i = 0; i < altitude.length; i++) {
@@ -526,6 +548,8 @@ define([
             this._vertexArray[idx++] = prevPoint[1];
             this._vertexArray[idx++] = prevPoint[2];
         }
+
+        return idx;
     };
 
     SurfaceShape.prototype.assembleElementArray = function (dc) {
@@ -567,7 +591,7 @@ define([
                 this._elementArray[idx++] = 1 + stride;
                 this._elementArray[idx++] = 1;
                 this._elementArray[idx++] = 1 + stride;
-                this._elementArray[idx++] = 7 + stride;
+                this._elementArray[idx++] = 3;
             } else {
                 this._elementArray[idx++] = 3 + stride;
                 this._elementArray[idx++] = 7 + stride;
@@ -593,60 +617,60 @@ define([
                 // inner
                 this._elementArray[idx++] = 1 + stride;
                 this._elementArray[idx++] = 1;
-                this._elementArray[idx++] = 3;
-                this._elementArray[idx++] = 3;
                 this._elementArray[idx++] = 3 + stride;
+                this._elementArray[idx++] = 3 + stride;
+                this._elementArray[idx++] = 3;
                 this._elementArray[idx++] = 1 + stride;
                 // top
                 this._elementArray[idx++] = 3 + stride;
                 this._elementArray[idx++] = 3;
                 this._elementArray[idx++] = 2;
-                this._elementArray[idx++] = 2;
                 this._elementArray[idx++] = 2 + stride;
+                this._elementArray[idx++] = 2;
                 this._elementArray[idx++] = 3 + stride;
                 // outer
                 this._elementArray[idx++] = 2 + stride;
                 this._elementArray[idx++] = 2;
-                this._elementArray[idx++] = 0;
+                this._elementArray[idx++] = stride;
                 this._elementArray[idx++] = 0;
                 this._elementArray[idx++] = stride;
-                this._elementArray[idx++] = 2 + stride;
+                this._elementArray[idx++] = 2;
                 // bottom
                 this._elementArray[idx++] = stride;
                 this._elementArray[idx++] = 0;
-                this._elementArray[idx++] = 1;
+                this._elementArray[idx++] = 1 + stride;
                 this._elementArray[idx++] = 1;
                 this._elementArray[idx++] = 1 + stride;
-                this._elementArray[idx++] = stride;
+                this._elementArray[idx++] = 0;
             } else {
                 // inner
                 this._elementArray[idx++] = 1 + stride;
-                this._elementArray[idx++] = 1;
-                this._elementArray[idx++] = 3;
-                this._elementArray[idx++] = 3;
+                this._elementArray[idx++] = 5 + stride;
                 this._elementArray[idx++] = 3 + stride;
+                this._elementArray[idx++] = 3 + stride;
+                this._elementArray[idx++] = 7 + stride;
                 this._elementArray[idx++] = 1 + stride;
                 // top
                 this._elementArray[idx++] = 3 + stride;
-                this._elementArray[idx++] = 3;
-                this._elementArray[idx++] = 2;
-                this._elementArray[idx++] = 2;
+                this._elementArray[idx++] = 7 + stride;
+                this._elementArray[idx++] = 6 + stride;
                 this._elementArray[idx++] = 2 + stride;
+                this._elementArray[idx++] = 6 + stride;
                 this._elementArray[idx++] = 3 + stride;
                 // outer
                 this._elementArray[idx++] = 2 + stride;
-                this._elementArray[idx++] = 2;
-                this._elementArray[idx++] = 0;
-                this._elementArray[idx++] = 0;
+                this._elementArray[idx++] = 6 + stride;
                 this._elementArray[idx++] = stride;
-                this._elementArray[idx++] = 2 + stride;
+                this._elementArray[idx++] = 4 + stride;
+                this._elementArray[idx++] = stride;
+                this._elementArray[idx++] = 6 + stride;
                 // bottom
                 this._elementArray[idx++] = stride;
-                this._elementArray[idx++] = 0;
-                this._elementArray[idx++] = 1;
-                this._elementArray[idx++] = 1;
+                this._elementArray[idx++] = 4 + stride;
                 this._elementArray[idx++] = 1 + stride;
-                this._elementArray[idx++] = stride;
+                this._elementArray[idx++] = 5 + stride;
+                this._elementArray[idx++] = 1 + stride;
+                this._elementArray[idx++] = 4 + stride;
             }
         }
     };

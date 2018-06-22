@@ -52,12 +52,14 @@ requirejs(['./WorldWindShim',
             new WorldWind.Location(30, -100),
             new WorldWind.Location(30, -90),
             new WorldWind.Location(20, -90),
-            new WorldWind.Location(20, -110)
+            new WorldWind.Location(20, -100)
         ];
         var shapeAttrs = new WorldWind.ShapeAttributes();
         shapeAttrs.drawInterior = true;
         shapeAttrs.interiorColor = new WorldWind.Color(0, 1, 0, 1);
-        shapeAttrs.drawOutline = false;
+        shapeAttrs.drawOutline = true;
+        shapeAttrs.outlineColor = new WorldWind.Color(0, 0, 0, 0.3);
+        shapeAttrs.outlineWidth = 20;
         var shape = new WorldWind.SurfacePolygon(boundaries, shapeAttrs);
         shape._textureCoordinates = [
             new WorldWind.Vec2(0, 1),
