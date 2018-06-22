@@ -212,7 +212,6 @@ define([
             var navigator = this.wwd.navigator;
             if (state === WorldWind.BEGAN) {
                 this.lastPoint.set(0, 0);
-                this.dragLastTimestamp = new Date();
             } else if (state === WorldWind.CHANGED) {
                 // Convert the translation from screen coordinates to arc degrees. Use this navigator's range as a
                 // metric for converting screen pixels to meters, and use the globe's radius for converting from meters
