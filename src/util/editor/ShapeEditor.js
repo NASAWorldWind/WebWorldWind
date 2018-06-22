@@ -33,10 +33,15 @@ define([
         '../../layer/RenderableLayer',
         '../../shapes/ShapeAttributes',
         '../../shapes/SurfaceEllipse',
+        './SurfaceEllipseEditorFragment',
         '../../shapes/SurfaceCircle',
+        './SurfaceCircleEditorFragment',
         '../../shapes/SurfacePolygon',
+        './SurfacePolygonEditorFragment',
         '../../shapes/SurfacePolyline',
+        './SurfacePolylineEditorFragment',
         '../../shapes/SurfaceRectangle',
+        './SurfaceRectangleEditorFragment',
         '../../shapes/SurfaceShape',
         '../../geom/Vec2',
         '../../geom/Vec3'
@@ -57,10 +62,15 @@ define([
               RenderableLayer,
               ShapeAttributes,
               SurfaceEllipse,
+              SurfaceEllipseEditorFragment,
               SurfaceCircle,
+              SurfaceCircleEditorFragment,
               SurfacePolygon,
+              SurfacePolygonEditorFragment,
               SurfacePolyline,
+              SurfacePolylineEditorFragment,
               SurfaceRectangle,
+              SurfaceRectangleEditorFragment,
               SurfaceShape,
               Vec2,
               Vec3) {
@@ -172,12 +182,6 @@ define([
             this.originalHighlightAttributes = new ShapeAttributes(null);
 
             /**
-             * For shapes without an inherent heading, the current heading established by the editor for the shape.
-             * @type {number}
-             */
-            this.currentHeading = 0;
-
-            /**
              * Attributes used to represent shape vertices.
              * @type {PlacemarkAttributes}
              */
@@ -216,6 +220,17 @@ define([
 
             //Internal use only. Intentionally not documented.
             this.currentEvent = null;
+
+            //Internal use only. Intentionally not documented.
+            this.activeEditorFragment = null;
+
+            this.editorFragments = [
+                new SurfaceCircleEditorFragment(),
+                new SurfaceEllipseEditorFragment(),
+                new SurfacePolygonEditorFragment(),
+                new SurfacePolylineEditorFragment(),
+                new SurfaceRectangleEditorFragment()
+            ];
 
             this.worldWindow.worldWindowController.addGestureListener(this);
         };
@@ -394,13 +409,11 @@ define([
                     this.handleMouseDown(event);
                 } else if (event.type === "pointermove" || event.type === "mousemove") {
                     this.handleMouseMove(event);
-                } else {
-                    Logger.logMessage(Logger.LEVEL_INFO, "ShapeEditor", "handleEvent",
-                        "Unrecognized event type: " + event.type);
                 }
-            } catch (event) {
+            } catch (error) {
+                console.log(error); // FIXME Remove this
                 Logger.logMessage(Logger.LEVEL_SEVERE, "ShapeEditor", "handleEvent",
-                    "Error handling event.\n" + event.toString());
+                    "Error handling event.\n" + error.toString());
             }
         };
 
@@ -416,37 +429,7 @@ define([
          * @returns {SurfaceShape} The new shadow shape created, or null if the shape type is not recognized.
          */
         ShapeEditor.prototype.doMakeShadowShape = function () {
-            if (this.shape && this.shape instanceof SurfacePolygon) {
-                return new SurfacePolygon(
-                    this.shape.boundaries,
-                    this.shape.attributes);
-            } else if (this.shape && this.shape instanceof SurfaceEllipse) {
-                return new SurfaceEllipse(
-                    this.shape.center,
-                    this.shape.majorRadius,
-                    this.shape.minorRadius,
-                    this.shape.heading,
-                    this.shape.attributes);
-            } else if (this.shape && this.shape instanceof SurfaceCircle) {
-                return new SurfaceCircle(
-                    this.shape.center,
-                    this.shape.radius,
-                    this.shape.attributes);
-            } else if (this.shape && this.shape instanceof SurfaceRectangle) {
-                return new SurfaceRectangle(
-                    this.shape.center,
-                    this.shape.width,
-                    this.shape.height,
-                    this.shape.heading,
-                    this.shape.attributes);
-            } else if (this.shape && this.shape instanceof SurfacePolyline) {
-                return new SurfacePolyline(
-                    this.shape.boundaries,
-                    this.shape.attributes
-                );
-            }
-
-            return null;
+            return this.activeEditorFragment.createShadowShape(this.shape);
         };
 
         /**
@@ -552,7 +535,14 @@ define([
          * @throws {ArgumentError} If the specified shape is null or not an instance of SurfaceShape.
          */
         ShapeEditor.prototype.edit = function (shape) {
-            if (shape != null && shape instanceof SurfaceShape) {
+            this.activeEditorFragment = null;
+            for (var i = 0; i < this.editorFragments.length; i++) {
+                if (this.editorFragments[i].canEdit(shape)) {
+                    this.activeEditorFragment = this.editorFragments[i];
+                }
+            }
+
+            if (this.activeEditorFragment != null) {
                 this.shape = shape;
                 this.enable();
                 this.armed = true;
@@ -609,8 +599,6 @@ define([
             this.worldWindow.removeLayer(this.annotationLayer);
 
             this.worldWindow.removeLayer(this.shadowLayer);
-
-            this.currentHeading = 0;
         };
 
         //Internal use only. Intentionally not documented.
@@ -637,22 +625,15 @@ define([
         };
 
         ShapeEditor.prototype.updateControlPoints = function () {
-            if (this.shape && this.shape instanceof SurfaceShape) {
-
-                if (this.shape instanceof SurfacePolygon ||
-                    this.shape instanceof SurfacePolyline) {
-                    this.updateSurfacePolygonControlPoints();
-                }
-                else if (this.shape instanceof SurfaceCircle) {
-                    this.updateSurfaceCircleControlPoints();
-                }
-                else if (this.shape instanceof SurfaceRectangle) {
-                    this.updateSurfaceRectangleControlPoints();
-                }
-                else if (this.shape instanceof SurfaceEllipse) {
-                    this.updateSurfaceEllipseControlPoints();
-                }
-            }
+            this.activeEditorFragment.updateControlPoints(
+                this.shape,
+                this.worldWindow.globe,
+                this.controlPointLayer.renderables,
+                this.accessoryLayer.renderables,
+                this.sizeControlPointAttributes,
+                this.angleControlPointAttributes,
+                this.locationControlPointAttributes
+            );
         };
 
         /**
@@ -745,67 +726,20 @@ define([
          * @param {Position} terrainPosition The terrain position under the cursor.
          */
         ShapeEditor.prototype.doReshapeShape = function (controlPoint, terrainPosition) {
-            if (this.shape && this.shape instanceof SurfaceShape) {
-                if (this.shape instanceof SurfacePolygon ||
-                    this.shape instanceof SurfacePolyline
-                ) {
-                    this.reshapeSurfacePolygon(controlPoint, terrainPosition);
-                }
-                else if (this.shape instanceof SurfaceCircle) {
-                    this.reshapeSurfaceCircle(controlPoint, terrainPosition);
-                }
-                else if (this.shape instanceof SurfaceRectangle) {
-                    this.reshapeSurfaceRectangle(controlPoint, terrainPosition);
-                }
-                else if (this.shape instanceof SurfaceEllipse) {
-                    this.reshapeSurfaceEllipse(controlPoint, terrainPosition);
-                }
-                this.currentSizingMarker.position = terrainPosition;
-                this.worldWindow.redraw();
+            if (!controlPoint) {
+                return;
             }
-        };
-
-        /**
-         * Computes the average location of a specified array of locations.
-         * @param {Location[]} locations The array of locations for the shape.
-         * @return {Position} the average of the locations specified in the array.
-         */
-        ShapeEditor.prototype.getCenter = function (locations) {
-            var count = 0;
-            var center = new Vec3(0, 0, 0);
-            var globe = this.worldWindow.globe;
-
-            if (locations.length > 0 && locations[0].length > 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    for (var j = 0; j < locations[i].length; j++) {
-                        center = center.add(globe.computePointFromPosition(
-                            locations[i][j].latitude,
-                            locations[i][j].longitude,
-                            0,
-                            new Vec3(0, 0, 0)));
-                        ++count;
-                    }
-                }
-            }
-            else if (locations.length >= 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    center = center.add(globe.computePointFromPosition(
-                        locations[i].latitude,
-                        locations[i].longitude,
-                        0,
-                        new Vec3(0, 0, 0)));
-                    ++count;
-                }
-            }
-
-            center = center.divide(count);
-
-            return globe.computePositionFromPoint(
-                center[0],
-                center[1],
-                center[2],
-                new Position(0, 0, 0)
+            this.activeEditorFragment.reshape(
+                this.shape,
+                this.worldWindow.globe,
+                controlPoint,
+                terrainPosition,
+                this.previousPosition,
+                this.currentEvent
             );
+            this.updateAnnotation(controlPoint);
+            this.currentSizingMarker.position = terrainPosition;
+            this.worldWindow.redraw();
         };
 
         /**
@@ -820,34 +754,6 @@ define([
             }
 
             return center;
-        };
-
-        /**
-         * Computes the average distance between a specified center point and a list of locations.
-         * @param {Globe} globe The globe to use for the computations.
-         * @param {Location} center The center point.
-         * @param {Array} locations The locations.
-         * @returns {Number} The average distance.
-         */
-        ShapeEditor.prototype.getAverageDistance = function (globe, center, locations) {
-            var count = locations.length;
-
-            var centerPoint = globe.computePointFromLocation(
-                center.latitude,
-                center.longitude,
-                new Vec3(0, 0, 0)
-            );
-
-            var totalDistance = 0;
-            for (var i = 0; i < locations.length; i++) {
-                var distance = globe.computePointFromLocation(
-                    locations[i].latitude,
-                    locations[i].longitude,
-                    new Vec3(0, 0, 0)).distanceTo(centerPoint);
-                totalDistance += distance / count;
-            }
-
-            return (count === 0) ? 0 : totalDistance / globe.equatorialRadius;
         };
 
         /**
@@ -883,62 +789,6 @@ define([
         };
 
         /**
-         * Updates the line designating the shape's central axis.
-         * @param {Position} centerPosition The shape's center location and altitude at which to place one of the line's
-         * end points.
-         * @param {Position} controlPointPosition  The shape orientation control point's position.
-         */
-        ShapeEditor.prototype.updateOrientationLine = function (centerPosition, controlPointPosition) {
-            if (this.accessoryLayer.renderables.length == 0) {
-                return;
-            }
-
-            var positions = [];
-            positions.push(centerPosition, controlPointPosition);
-            var rotationLine = this.accessoryLayer.renderables[0];
-            rotationLine.positions = positions;
-        };
-
-        /**
-         * Computes the Cartesian difference between two control points.
-         * @param {Position} previousPosition The position of the previous control point.
-         * @param {Position} currentPosition  The position of the current control point.
-         * @returns {Vec3} The Cartesian difference between the two control points.
-         */
-        ShapeEditor.prototype.computeControlPointDelta = function (previousPosition, currentPosition) {
-            var terrainPoint = this.worldWindow.globe.computePointFromPosition(
-                currentPosition.latitude,
-                currentPosition.longitude,
-                currentPosition.altitude,
-                new Vec3(0, 0, 0)
-            );
-            var previousPoint = this.worldWindow.globe.computePointFromPosition(
-                previousPosition.latitude,
-                previousPosition.longitude,
-                previousPosition.altitude,
-                new Vec3(0, 0, 0)
-            );
-
-            return terrainPoint.subtract(previousPoint);
-        };
-
-        /**
-         * Add a specified increment to an angle and normalize the result to be between 0 and 360 degrees.
-         * @param {Number} originalHeading The base angle.
-         * @param {Number} deltaHeading The increment to add prior to normalizing.
-         * @returns {Number} The normalized angle.
-         */
-        ShapeEditor.prototype.normalizedHeading = function (originalHeading, deltaHeading) {
-            var newHeading = originalHeading * Angle.DEGREES_TO_RADIANS + deltaHeading * Angle.DEGREES_TO_RADIANS;
-
-            if (Math.abs(newHeading) > Angle.TWO_PI) {
-                newHeading = newHeading % Angle.TWO_PI;
-            }
-
-            return Angle.RADIANS_TO_DEGREES * (newHeading >= 0 ? newHeading : newHeading + Angle.TWO_PI);
-        };
-
-        /**
          * Computes the point on a specified line segment that is nearest a specified point.
          *
          * @param {Vec3} p1 The line's first point.
@@ -961,7 +811,7 @@ define([
                 return p2;
             }
             else {
-                return Vec3.fromLine(p1, dot, dir);
+                return Vec3.fromLine(p1, dot, dir); // FIXME This is broken
             }
         };
 
@@ -1042,65 +892,6 @@ define([
             }
         };
 
-        /**
-         * Moves a control point location.
-         * @param {Placemark} controlPoint The control point being moved.
-         * @param {Position} terrainPosition The position selected by the user.
-         * @returns {Position} The position after move.
-         */
-        ShapeEditor.prototype.moveLocation = function (controlPoint, terrainPosition) {
-            var delta = this.computeControlPointDelta(this.previousPosition, terrainPosition);
-            var markerPoint = this.worldWindow.globe.computePointFromPosition(
-                controlPoint.position.latitude,
-                controlPoint.position.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-
-            markerPoint.add(delta);
-            var markerPosition = this.worldWindow.globe.computePositionFromPoint(
-                markerPoint[0],
-                markerPoint[1],
-                markerPoint[2],
-                new Position(0, 0, 0)
-            );
-
-            return markerPosition;
-        };
-
-        /**
-         * Rotates a shape's locations.
-         * @param {Position} terrainPosition The position selected by the user.
-         * @param {Location[]} locations The array of locations for the shape.
-         */
-        ShapeEditor.prototype.rotateLocations = function (terrainPosition, locations) {
-            var center = this.getCenter(locations);
-            var previousHeading = Location.greatCircleAzimuth(center, this.previousPosition);
-            var deltaHeading = Location.greatCircleAzimuth(center, terrainPosition) - previousHeading;
-            this.currentHeading = this.normalizedHeading(this.currentHeading, deltaHeading);
-
-            if (locations.length > 0 && locations[0].length > 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    for (var j = 0; j < locations[i].length; j++) {
-                        var heading = Location.greatCircleAzimuth(center, locations[i][j]);
-                        var distance = Location.greatCircleDistance(center, locations[i][j]);
-                        var newLocation = Location.greatCircleLocation(center, heading + deltaHeading, distance,
-                            new Location(0, 0));
-                        locations[i][j] = newLocation;
-                    }
-                }
-            }
-            else if (locations.length >= 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    var heading = Location.greatCircleAzimuth(center, locations[i]);
-                    var distance = Location.greatCircleDistance(center, locations[i]);
-                    var newLocation = Location.greatCircleLocation(center, heading + deltaHeading, distance,
-                        new Location(0, 0));
-                    locations[i] = newLocation;
-                }
-            }
-        };
-
         ShapeEditor.prototype.setPreviousPosition = function (event) {
             var mousePoint = this.worldWindow.canvasCoordinates(event.clientX,
                 event.clientY);
@@ -1115,494 +906,6 @@ define([
                 }
             }
         };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.reshapeSurfacePolygon = function (controlPoint, terrainPosition) {
-            var boundaries = this.shape.boundaries;
-            var locations = [];
-
-            var k = 0;
-            var newPos;
-
-            if (boundaries.length > 0 && boundaries[0].length > 2) {
-                outer:
-                    for (var i = 0; i < boundaries.length; i++) {
-                        for (var j = 0; j < boundaries[i].length; j++) {
-                            if (controlPoint.userProperties.purpose == ShapeEditor.LOCATION) {
-                                if (controlPoint.userProperties.id == k) {
-                                    newPos = this.moveLocation(controlPoint, terrainPosition);
-                                    boundaries[i][j] = newPos;
-                                    this.shape.boundaries = boundaries;
-                                    controlPoint.position = newPos;
-                                    break outer;
-                                }
-                            }
-                            else if (controlPoint.userProperties.purpose == ShapeEditor.ROTATION) {
-                                this.rotateLocations(terrainPosition, boundaries);
-                                this.shape.boundaries = boundaries;
-                                break outer;
-                            }
-                            k++;
-                        }
-                    }
-            }
-            else if (boundaries.length >= 2) {
-                //poly without whole
-                for (var i = 0; i < boundaries.length; i++) {
-                    if (controlPoint.userProperties.purpose == ShapeEditor.LOCATION) {
-                        if (controlPoint.userProperties.id == k) {
-                            if (this.currentEvent.altKey) {
-                                //remove location
-                                var minSize = this.shape instanceof SurfacePolygon ? 3 : 2;
-                                if (boundaries.length > minSize) {
-                                    // Delete the control point.
-                                    boundaries.splice(i, 1);
-                                    this.shape.boundaries = boundaries;
-                                    this.removeControlPoints();
-                                }
-                            }
-                            else {
-                                newPos = this.moveLocation(controlPoint, terrainPosition);
-                                boundaries[i] = newPos;
-                                this.shape.boundaries = boundaries;
-                                controlPoint.position = newPos;
-                            }
-                            break;
-                        }
-                    } else if (controlPoint.userProperties.purpose == ShapeEditor.ROTATION) {
-                        this.rotateLocations(terrainPosition, boundaries);
-                        this.shape.boundaries = boundaries;
-                        break;
-                    }
-                    k++;
-                }
-            }
-
-            this.updateAnnotation(controlPoint);
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.updateSurfacePolygonControlPoints = function () {
-            var locations = [];
-
-            if (this.shape.boundaries.length > 0 && this.shape.boundaries[0].length > 2) {
-                for (var i = 0; i < this.shape.boundaries.length; i++) {
-                    for (var j = 0; j < this.shape.boundaries[i].length; j++) {
-                        locations.push(this.shape.boundaries[i][j]);
-                    }
-                }
-            }
-            else if (this.shape.boundaries.length >= 2) {
-                for (var i = 0; i < this.shape.boundaries.length; i++) {
-                    locations.push(this.shape.boundaries[i]);
-                }
-            }
-
-            if (locations.length < 2)
-                return;
-
-            var globe = this.worldWindow.globe;
-            var polygonCenter = this.getCenter(locations);
-            var shapeRadius = this.getAverageDistance(globe, polygonCenter, locations);
-            shapeRadius = shapeRadius * 1.2;
-            var heading = this.currentHeading;
-            var rotationControlLocation = Location.greatCircleLocation(
-                polygonCenter,
-                heading,
-                shapeRadius,
-                new Location(0, 0));
-
-            var rotationPosition = new Position(
-                rotationControlLocation.latitude,
-                rotationControlLocation.longitude,
-                0);
-
-            var markers = this.controlPointLayer.renderables;
-
-            if (markers.length > 0) {
-                for (var i = 0; i < locations.length; i++) {
-                    markers[i].position = locations[i];
-                }
-                markers[locations.length].position = rotationPosition;
-                markers[locations.length].userProperties.rotation = heading;
-            }
-            else {
-                var controlPointMarker;
-                for (var i = 0; i < locations.length; i++) {
-                    controlPointMarker = new Placemark(
-                        locations[i],
-                        false,
-                        this.locationControlPointAttributes);
-                    controlPointMarker.userProperties.isControlPoint = true;
-                    controlPointMarker.userProperties.id = i;
-                    controlPointMarker.userProperties.purpose = ShapeEditor.LOCATION;
-
-                    controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                    this.controlPointLayer.addRenderable(controlPointMarker);
-                }
-
-                controlPointMarker = new Placemark(
-                    rotationPosition,
-                    false,
-                    this.angleControlPointAttributes
-                );
-
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = locations.length;
-                controlPointMarker.userProperties.purpose = ShapeEditor.ROTATION;
-                controlPointMarker.userProperties.rotation = heading;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-
-                this.controlPointLayer.addRenderable(controlPointMarker);
-            }
-
-            this.updateOrientationLine(polygonCenter, rotationPosition);
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.reshapeSurfaceCircle = function (controlPoint, terrainPosition) {
-            if (!controlPoint) {
-                return;
-            }
-
-            var circle = this.shape;
-
-            var delta = this.computeControlPointDelta(this.previousPosition, terrainPosition);
-            var centerPoint = this.worldWindow.globe.computePointFromPosition(
-                circle.center.latitude,
-                circle.center.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var markerPoint = this.worldWindow.globe.computePointFromPosition(
-                controlPoint.position.latitude,
-                controlPoint.position.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-
-            var vMarker = markerPoint.subtract(centerPoint).normalize();
-
-            var radius = circle.radius + delta.dot(vMarker);
-            if (radius > 0) {
-                circle.radius = radius;
-            }
-
-            this.updateAnnotation(controlPoint);
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.updateSurfaceCircleControlPoints = function () {
-            var circle = this.shape;
-
-            var radiusLocation = Location.greatCircleLocation(
-                circle.center,
-                90,
-                circle.radius / this.worldWindow.globe.equatorialRadius,
-                new Location(0, 0));
-
-            var markers = this.controlPointLayer.renderables;
-
-            if (markers.length > 0) {
-                markers[0].position = radiusLocation;
-            }
-            else {
-                var controlPointMarker = new Placemark(
-                    radiusLocation,
-                    false,
-                    this.sizeControlPointAttributes
-                );
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = 0;
-                controlPointMarker.userProperties.purpose = ShapeEditor.OUTER_RADIUS;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                this.controlPointLayer.addRenderable(controlPointMarker);
-            }
-
-            markers[0].userProperties.size = circle.radius;
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.reshapeSurfaceRectangle = function (controlPoint, terrainPosition) {
-            if (!controlPoint) {
-                return;
-            }
-
-            var rectangle = this.shape;
-
-            var terrainPoint = this.worldWindow.globe.computePointFromPosition(
-                terrainPosition.latitude,
-                terrainPosition.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var previousPoint = this.worldWindow.globe.computePointFromPosition(
-                this.previousPosition.latitude,
-                this.previousPosition.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var delta = terrainPoint.subtract(previousPoint);
-
-            var centerPoint = this.worldWindow.globe.computePointFromPosition(
-                this.shape.center.latitude,
-                this.shape.center.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var markerPoint = this.worldWindow.globe.computePointFromPosition(
-                controlPoint.position.latitude,
-                controlPoint.position.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var vMarker = markerPoint.subtract(centerPoint).normalize();
-
-            if (controlPoint.userProperties.purpose == ShapeEditor.WIDTH || controlPoint.userProperties.purpose == ShapeEditor.HEIGHT) {
-                var width = rectangle.width + (controlPoint.userProperties.id == 0 ? delta.dot(vMarker) * 2 : 0);
-                var height = rectangle.height + (controlPoint.userProperties.id == 1 ? delta.dot(vMarker) * 2 : 0);
-
-                if (width > 0 && height > 0) {
-                    rectangle.width = width;
-                    rectangle.height = height;
-                }
-            }
-            else {
-                var oldHeading = Location.greatCircleAzimuth(rectangle.center, this.previousPosition);
-                var deltaHeading = Location.greatCircleAzimuth(rectangle.center, terrainPosition) - oldHeading;
-                rectangle.heading = this.normalizedHeading(rectangle.heading, deltaHeading);
-            }
-
-            this.updateAnnotation(controlPoint);
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.updateSurfaceRectangleControlPoints = function () {
-            var rectangle = this.shape;
-
-            var widthLocation = Location.greatCircleLocation(
-                rectangle.center,
-                90 + rectangle.heading,
-                0.5 * rectangle.width / this.worldWindow.globe.equatorialRadius,
-                new Location(0, 0));
-
-            var heightLocation = Location.greatCircleLocation(
-                rectangle.center,
-                rectangle.heading,
-                0.5 * rectangle.height / this.worldWindow.globe.equatorialRadius,
-                new Location(0, 0));
-
-            var rotationLocation = Location.greatCircleLocation(
-                rectangle.center,
-                rectangle.heading,
-                0.7 * rectangle.height / this.worldWindow.globe.equatorialRadius,
-                new Location(0, 0));
-
-            var markers;
-
-            markers = this.controlPointLayer.renderables;
-
-            if (markers.length > 0) {
-                markers[0].position = widthLocation;
-                markers[1].position = heightLocation;
-                markers[2].position = rotationLocation;
-            }
-            else {
-                var controlPointMarker = new Placemark(
-                    widthLocation,
-                    false,
-                    this.sizeControlPointAttributes
-                );
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = 0;
-                controlPointMarker.userProperties.purpose = ShapeEditor.WIDTH;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                this.controlPointLayer.addRenderable(controlPointMarker);
-
-                controlPointMarker = new Placemark(
-                    heightLocation,
-                    false,
-                    this.sizeControlPointAttributes
-                );
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = 1;
-                controlPointMarker.userProperties.purpose = ShapeEditor.HEIGHT;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                this.controlPointLayer.addRenderable(controlPointMarker);
-
-                controlPointMarker = new Placemark(
-                    rotationLocation,
-                    false,
-                    this.angleControlPointAttributes
-                );
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = 1;
-                controlPointMarker.userProperties.purpose = ShapeEditor.ROTATION;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                this.controlPointLayer.addRenderable(controlPointMarker);
-            }
-
-            markers[0].userProperties.size = rectangle.width;
-            markers[1].userProperties.size = rectangle.height;
-            markers[2].userProperties.rotation = rectangle.heading;
-
-            this.updateOrientationLine(rectangle.center, rotationLocation);
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.reshapeSurfaceEllipse = function (controlPoint, terrainPosition) {
-            if (!controlPoint) {
-                return;
-            }
-
-            var ellipse = this.shape;
-
-            var terrainPoint = this.worldWindow.globe.computePointFromPosition(
-                terrainPosition.latitude,
-                terrainPosition.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var previousPoint = this.worldWindow.globe.computePointFromPosition(
-                this.previousPosition.latitude,
-                this.previousPosition.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var delta = terrainPoint.subtract(previousPoint);
-
-            var centerPoint = this.worldWindow.globe.computePointFromPosition(
-                ellipse.center.latitude,
-                ellipse.center.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var markerPoint = this.worldWindow.globe.computePointFromPosition(
-                controlPoint.position.latitude,
-                controlPoint.position.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-            var vMarker = markerPoint.subtract(centerPoint).normalize();
-
-            if (controlPoint.userProperties.purpose == ShapeEditor.WIDTH ||
-                controlPoint.userProperties.purpose == ShapeEditor.HEIGHT) {
-                var majorRadius = ellipse.majorRadius + (controlPoint.userProperties.id == 0 ? delta.dot(vMarker) : 0);
-                var minorRadius = ellipse.minorRadius + (controlPoint.userProperties.id == 1 ? delta.dot(vMarker) : 0);
-
-                if (majorRadius > 0 && minorRadius > 0) {
-                    ellipse.majorRadius = majorRadius;
-                    ellipse.minorRadius = minorRadius;
-                }
-            } else {
-                var oldHeading = Location.greatCircleAzimuth(ellipse.center, this.previousPosition);
-                var deltaHeading = Location.greatCircleAzimuth(ellipse.center, terrainPosition) - oldHeading;
-                ellipse.heading = this.normalizedHeading(ellipse.heading, deltaHeading);
-            }
-
-            this.updateAnnotation(controlPoint);
-        };
-
-        //Internal use only. Intentionally not documented.
-        ShapeEditor.prototype.updateSurfaceEllipseControlPoints = function () {
-            var ellipse = this.shape;
-
-            var majorLocation = Location.greatCircleLocation(
-                ellipse.center,
-                90 + ellipse.heading,
-                ellipse.majorRadius / this.worldWindow.globe.equatorialRadius,
-                new Location(0, 0));
-
-            var minorLocation = Location.greatCircleLocation(
-                ellipse.center,
-                ellipse.heading,
-                ellipse.minorRadius / this.worldWindow.globe.equatorialRadius,
-                new Location(0, 0));
-
-            var rotationLocation = Location.greatCircleLocation(
-                ellipse.center,
-                ellipse.heading,
-                1.15 * ellipse.minorRadius / this.worldWindow.globe.equatorialRadius,
-                new Location(0, 0)
-            );
-
-            var markers = this.controlPointLayer.renderables;
-
-            if (markers.length > 0) {
-                markers[0].position = majorLocation;
-                markers[1].position = minorLocation;
-                markers[2].position = rotationLocation;
-            }
-            else {
-                var controlPointMarker = new Placemark(
-                    majorLocation,
-                    false,
-                    this.sizeControlPointAttributes
-                );
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = 0;
-                controlPointMarker.userProperties.purpose = ShapeEditor.WIDTH;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                this.controlPointLayer.addRenderable(controlPointMarker);
-
-                controlPointMarker = new Placemark(
-                    minorLocation,
-                    false,
-                    this.sizeControlPointAttributes
-                );
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = 1;
-                controlPointMarker.userProperties.purpose = ShapeEditor.HEIGHT;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                this.controlPointLayer.addRenderable(controlPointMarker);
-
-                controlPointMarker = new Placemark(
-                    rotationLocation,
-                    false,
-                    this.angleControlPointAttributes
-                );
-                controlPointMarker.userProperties.isControlPoint = true;
-                controlPointMarker.userProperties.id = 2;
-                controlPointMarker.userProperties.purpose = ShapeEditor.ROTATION;
-
-                controlPointMarker.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                this.controlPointLayer.addRenderable(controlPointMarker);
-            }
-
-            markers[0].userProperties.size = ellipse.majorRadius;
-            markers[1].userProperties.size = ellipse.minorRadius;
-            markers[2].userProperties.rotation = ellipse.heading;
-
-            this.updateOrientationLine(ellipse.center, rotationLocation);
-        };
-
-        // Indicates that a control point is associated with annotation.
-        ShapeEditor.ANNOTATION = "annotation";
-
-        // Indicates a control point is associated with a location.
-        ShapeEditor.LOCATION = "location";
-
-        // Indicates that a control point is associated with whole-shape rotation.
-        ShapeEditor.ROTATION = "rotation";
-
-        // Indicates that a control point is associated with width change.
-        ShapeEditor.WIDTH = "width";
-
-        // Indicates that a control point is associated with height change.
-        ShapeEditor.HEIGHT = "height";
-
-        // Indicates that a control point is associated with the right width of a shape.
-        ShapeEditor.RIGHT_WIDTH = "rightWidth";
-
-        // Indicates that a control point is associated with the outer radius of a shape.
-        ShapeEditor.OUTER_RADIUS = "outerRadius";
 
         return ShapeEditor;
     }
