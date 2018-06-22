@@ -23,18 +23,18 @@ define([
 	 * @augments KmlObject
 	 * @param options
 	 * @constructor
-	 * @alias Delete
+	 * @alias KmlDelete
 	 */
-	var Delete = function(options) {
+	var KmlDelete = function(options) {
 		KmlObject.call(this, options);
 	};
 
-	Delete.prototype = Object.create(KmlObject.prototype);
+	KmlDelete.prototype = Object.create(KmlObject.prototype);
 
-	Object.defineProperties(Delete.prototype, {
+	Object.defineProperties(KmlDelete.prototype, {
 		/**
 		 * All shapes which should be deleted
-		 * @memberof Delete.prototype
+		 * @memberof KmlDelete.prototype
 		 * @readonly
 		 * @type {KmlObject[]}
 		 */
@@ -48,11 +48,11 @@ define([
 	/**
 	 * @inheritDoc
 	 */
-	Delete.prototype.getTagNames = function() {
-		return ['Delete'];
+	KmlDelete.prototype.getTagNames = function() {
+		return ['KmlDelete'];
 	};
 
-	KmlElements.addKey(Delete.prototype.getTagNames()[0], Delete);
+	KmlElements.addKey(KmlDelete.prototype.getTagNames()[0], KmlDelete);
 
-	return Delete;
+	return KmlDelete;
 });

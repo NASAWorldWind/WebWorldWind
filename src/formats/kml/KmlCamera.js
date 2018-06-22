@@ -17,7 +17,7 @@
 define([
     './KmlElements',
     './KmlAbstractView',
-    './util/NodeTransformers'
+    './util/KmlNodeTransformers'
 ], function (KmlElements,
              KmlAbstractView,
              NodeTransformers) {

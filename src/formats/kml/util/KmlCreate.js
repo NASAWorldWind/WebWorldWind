@@ -17,24 +17,25 @@
 define([
 	'../KmlElements',
 	'../KmlObject'
-], function(KmlElements,
+], function(KmlElements, 
 			KmlObject){
 	/**
-	 * @augment KmlObject
-	 * @param options
+	 *
+	 * @param options {Object}
+	 * @augments KmlObject
 	 * @constructor
-	 * @alias Change
+	 * @alias KmlCreate
 	 */
-	var Change = function(options) {
+	var KmlCreate = function(options) {
 		KmlObject.call(this, options);
 	};
 
-	Change.prototype = Object.create(KmlObject.prototype);
-
-	Object.defineProperties(Change.prototype, {
+	KmlCreate.prototype = Object.create(KmlObject.prototype);
+	
+	Object.defineProperties(KmlCreate.prototype, {
 		/**
-		 * All shapes which should be changed with the location where they should be changed.
-		 * @memberof Change.prototype
+		 * All shapes which should be created with the location where they should be created.
+		 * @memberof KmlCreate.prototype
 		 * @readonly
 		 * @type {KmlObject[]}
 		 */
@@ -48,11 +49,11 @@ define([
 	/**
 	 * @inheritDoc
 	 */
-	Change.prototype.getTagNames = function() {
-		return ['Change'];
+	KmlCreate.prototype.getTagNames = function() {
+		return ['KmlCreate'];
 	};
+	
+	KmlElements.addKey(KmlCreate.prototype.getTagNames()[0], KmlCreate);
 
-	KmlElements.addKey(Change.prototype.getTagNames()[0], Change);
-
-	return Change;
+	return KmlCreate;
 });

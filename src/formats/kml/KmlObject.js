@@ -19,7 +19,7 @@
  */
 define([
     '../../error/ArgumentError',
-    './util/Attribute',
+    './util/KmlAttribute',
     './KmlElements',
     './util/KmlElementsFactoryCached',
     '../../util/Logger',

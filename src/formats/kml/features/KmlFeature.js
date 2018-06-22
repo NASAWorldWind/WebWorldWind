@@ -22,7 +22,7 @@ define([
     '../styles/KmlStyleSelector',
     '../KmlRegion',
     '../KmlTimePrimitive',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../util/Promise'
 ], function (KmlObject,
              KmlAbstractView,
