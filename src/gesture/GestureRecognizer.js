@@ -71,6 +71,9 @@ define([
                 // Intentionally not documented.
                 this._nextState = null;
 
+                // Intentionally not documented.
+                this._lastEventTime = -1;
+
                 // Documented with its property accessor below.
                 this._clientX = 0;
 
@@ -88,6 +91,12 @@ define([
 
                 // Documented with its property accessor below.
                 this._translationY = 0;
+
+                // Documented with its property accessor below.
+                this._translationVelocityX = 0;
+
+                // Documented with its property accessor below.
+                this._translationVelocityY = 0;
 
                 // Intentionally not documented.
                 this._translationWeight = 0.4;
@@ -205,6 +214,34 @@ define([
                     this._translationY = value;
                     this._clientStartY = this._clientY;
                     this._touchCentroidShiftY = 0;
+                }
+            },
+
+            /**
+             * Indicates this gesture's current translation velocity along the X axis in pixels per second.
+             * @type {Number}
+             * @memberof GestureRecognizer.prototype
+             */
+            translationVelocityX: {
+                get: function () {
+                    return this._translationVelocityX;
+                },
+                set: function (value) {
+                    this._translationVelocityX = value;
+                }
+            },
+
+            /**
+             * Indicates this gesture's current translation velocity long the Y axis in pixels per second.
+             * @type {Number}
+             * @memberof GestureRecognizer.prototype
+             */
+            translationVelocityY: {
+                get: function () {
+                    return this._translationVelocityY;
+                },
+                set: function (value) {
+                    this._translationVelocityY = value;
                 }
             },
 
@@ -336,12 +373,15 @@ define([
         GestureRecognizer.prototype.reset = function () {
             this._state = WorldWind.POSSIBLE;
             this._nextState = null;
+            this._lastEventTime = -1;
             this._clientX = 0;
             this._clientY = 0;
             this._clientStartX = 0;
             this._clientStartY = 0;
             this._translationX = 0;
             this._translationY = 0;
+            this._translationVelocityX = 0;
+            this._translationVelocityY = 0;
             this._mouseButtonMask = 0;
             this._touches = [];
             this._touchCentroidShiftX = 0;
@@ -610,6 +650,8 @@ define([
                     Logger.logMessage(Logger.LEVEL_INFO, "GestureRecognizer", "handleEvent",
                         "Unrecognized event type: " + event.type);
                 }
+
+                this._lastEventTime = new Date();
             } catch (e) {
                 Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "handleEvent",
                     "Error handling event.\n" + e.toString());
@@ -657,6 +699,11 @@ define([
             this._clientY = event.clientY;
             this._translationX = this._translationX * (1 - w) + dx * w;
             this._translationY = this._translationY * (1 - w) + dy * w;
+
+            var elapsedTime = (new Date() - this._lastEventTime) / 1000;
+            this.endVelocityX = dx / elapsedTime;
+            this.endVelocityY = dy / elapsedTime;
+
             this.mouseMove(event);
         };
 
@@ -719,6 +766,10 @@ define([
             this._clientY = centroid.clientY;
             this._translationX = this._translationX * (1 - w) + dx * w;
             this._translationY = this._translationY * (1 - w) + dy * w;
+
+            var elapsedTime = (new Date() - this._lastEventTime) / 1000;
+            this.endVelocityX = dx / elapsedTime;
+            this.endVelocityY = dy / elapsedTime;
 
             this.touchMove(touch);
         };

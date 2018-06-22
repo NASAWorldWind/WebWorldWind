@@ -122,9 +122,7 @@ define([
             this.beginRange = 0;
             this.lastRotation = 0;
             this.dragDelta = new Vec2(0, 0);
-            this.dragVelocity = new Vec2(0, 0);
             this.dragLastLocation = new Location(0, 0);
-            this.dragLastTimestamp = new Date();
             this.flingAnimationId = -1;
         };
 
@@ -239,14 +237,6 @@ define([
                 this.wwd.redraw();
 
                 // Track state for possible fling behaviour
-                var now = new Date();
-                var elapsedTime = now - this.dragLastTimestamp;
-                this.dragVelocity.set(
-                    (tx - this.lastPoint[0]) / (elapsedTime / 1000),
-                    (ty - this.lastPoint[1]) / (elapsedTime / 1000)
-                );
-                this.dragLastTimestamp = now;
-
                 this.dragDelta.set(
                     this.dragLastLocation.latitude - navigator.lookAtLocation.latitude,
                     this.dragLastLocation.longitude - navigator.lookAtLocation.longitude
@@ -259,7 +249,8 @@ define([
                 var minVelocity = 100; // pixels per second
                 var animationDuration = 1500; // ms
 
-                if (Math.abs(this.dragVelocity[0]) > minVelocity || Math.abs(this.dragVelocity[1]) > minVelocity) {
+                if (Math.abs(recognizer.translationVelocityX) > minVelocity
+                    || Math.abs(recognizer.translationVelocityY) > minVelocity) {
 
                     // Initial delta at the beginning of this animation
                     var initialDelta = new Vec2();
