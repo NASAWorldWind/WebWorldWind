@@ -98,7 +98,7 @@ define([
      * @inheritDoc
      */
     KmlImagePyramid.prototype.getTagNames = function () {
-        return ['KmlImagePyramid'];
+        return ['ImagePyramid'];
     };
 
     KmlElements.addKey(KmlImagePyramid.prototype.getTagNames()[0], KmlImagePyramid);

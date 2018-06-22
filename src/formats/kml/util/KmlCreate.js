@@ -50,7 +50,7 @@ define([
 	 * @inheritDoc
 	 */
 	KmlCreate.prototype.getTagNames = function() {
-		return ['KmlCreate'];
+		return ['Create'];
 	};
 	
 	KmlElements.addKey(KmlCreate.prototype.getTagNames()[0], KmlCreate);

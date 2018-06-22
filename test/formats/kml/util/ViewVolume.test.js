@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-    'src/formats/kml/util/ViewVolume',
+    'src/formats/kml/util/KmlViewVolume',
     'src/util/XmlDocument'
 ], function (
     ViewVolume,

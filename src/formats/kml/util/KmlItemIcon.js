@@ -74,7 +74,7 @@ define([
      * @inheritDoc
      */
     KmlItemIcon.prototype.getTagNames = function () {
-        return ['KmlItemIcon'];
+        return ['ItemIcon'];
     };
 
     KmlElements.addKey(KmlItemIcon.prototype.getTagNames()[0], KmlItemIcon);

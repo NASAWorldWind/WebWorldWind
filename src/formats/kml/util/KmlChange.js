@@ -49,7 +49,7 @@ define([
 	 * @inheritDoc
 	 */
 	KmlChange.prototype.getTagNames = function() {
-		return ['KmlChange'];
+		return ['Change'];
 	};
 
 	KmlElements.addKey(KmlChange.prototype.getTagNames()[0], KmlChange);

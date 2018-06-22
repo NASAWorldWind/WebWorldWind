@@ -109,7 +109,7 @@ define([
      * @inheritDoc
      */
     KmlViewVolume.prototype.getTagNames = function () {
-        return ['KmlViewVolume'];
+        return ['ViewVolume'];
     };
 
     KmlElements.addKey(KmlViewVolume.prototype.getTagNames()[0], KmlViewVolume);

@@ -182,7 +182,7 @@ define([
 	 * @inheritDoc
 	 */
 	KmlNetworkLinkControl.prototype.getTagNames = function() {
-		return ['KmlNetworkLinkControl'];
+		return ['NetworkLinkControl'];
 	};
 
 	KmlElements.addKey(KmlNetworkLinkControl.prototype.getTagNames()[0], KmlNetworkLinkControl);

@@ -89,7 +89,7 @@ define([
      * @inheritDoc
      */
     KmlPair.prototype.getTagNames = function () {
-        return ['KmlPair'];
+        return ['Pair'];
     };
 
     /**

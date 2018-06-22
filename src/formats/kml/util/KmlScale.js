@@ -85,7 +85,7 @@ define([
      * @inheritDoc
      */
     KmlScale.prototype.getTagNames = function () {
-        return ['KmlScale'];
+        return ['Scale'];
     };
 
     KmlElements.addKey(KmlScale.prototype.getTagNames()[0], KmlScale);

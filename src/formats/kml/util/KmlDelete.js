@@ -49,7 +49,7 @@ define([
 	 * @inheritDoc
 	 */
 	KmlDelete.prototype.getTagNames = function() {
-		return ['KmlDelete'];
+		return ['Delete'];
 	};
 
 	KmlElements.addKey(KmlDelete.prototype.getTagNames()[0], KmlDelete);

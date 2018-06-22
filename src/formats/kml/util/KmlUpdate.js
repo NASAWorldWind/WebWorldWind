@@ -97,7 +97,7 @@ define([
 	 * @inheritDoc
 	 */
 	KmlUpdate.prototype.getTagNames = function() {
-		return ['KmlUpdate'];
+		return ['Update'];
 	};
 
 	KmlElements.addKey(KmlUpdate.prototype.getTagNames()[0], KmlUpdate);

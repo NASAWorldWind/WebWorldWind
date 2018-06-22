@@ -42,7 +42,7 @@ define([
      * @inheritDoc
      */
     KmlSchema.prototype.getTagNames = function () {
-        return ['KmlSchema'];
+        return ['Schema'];
     };
 
     KmlElements.addKey(KmlSchema.prototype.getTagNames()[0], KmlSchema);
