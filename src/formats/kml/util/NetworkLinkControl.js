@@ -185,7 +185,7 @@ define([
 		return ['NetworkLinkControl'];
 	};
 
-	KmlElements.addKey(ItemIcon.prototype.getTagNames()[0], NetworkLinkControl);
+	KmlElements.addKey(NetworkLinkControl.prototype.getTagNames()[0], NetworkLinkControl);
 
 	return NetworkLinkControl;
 });

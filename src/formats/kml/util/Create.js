@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-	'KmlElements',
+	'../KmlElements',
 	'../KmlObject'
 ], function(KmlElements, 
 			KmlObject){
