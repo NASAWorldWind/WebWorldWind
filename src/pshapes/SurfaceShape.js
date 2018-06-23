@@ -242,6 +242,13 @@ define([
         program.loadUniformFloat(gl, dc.pixelSizeFactor, program.pixelSizeFactorLocation);
         program.loadUniformFloat(gl, dc.pixelSizeOffset, program.pixelSizeOffsetLocation);
         program.loadUniformColor(gl, this._activeAttributes.outlineColor, program.colorLocation);
+        program.loadUniformBoolean(gl, false, program.isVertexLookupLocation);
+
+        this.scratchMatrix.copy(dc.modelviewProjection);
+        this.scratchMatrix.multiplyByTranslation(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2]);
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.mvpMatrixLocation);
+        this.scratchMatrix.setToIdentity();
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrixLocation);
 
         this.bindTexture(dc, true);
 
