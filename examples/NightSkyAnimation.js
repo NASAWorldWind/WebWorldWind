@@ -53,8 +53,6 @@ requirejs([
         starFieldLayer.time = now;
         atmosphereLayer.time = now;
 
-        // Animate the starry sky as well as the globe's day/night cycle.
-
         // In this example, each full day/night cycle lasts 8 seconds in real time.
         var simulatedMillisPerDay = 8000;
 
@@ -79,6 +77,7 @@ requirejs([
             requestAnimationFrame(runSimulation);
         }
 
+        // Animate the starry sky as well as the globe's day/night cycle.
         requestAnimationFrame(runSimulation);
 
         // Create a layer manager for controlling layer visibility.
