@@ -140,6 +140,8 @@ define([
          * @returns {Boolean} true if this framebuffer's texture was bound successfully, otherwise false.
          */
         FramebufferTexture.prototype.bind = function (dc) {
+            var gl = dc.currentGlContext;
+
             if (this.texture) {
                 dc.currentGlContext.bindTexture(gl.TEXTURE_2D, this.texture);
             }

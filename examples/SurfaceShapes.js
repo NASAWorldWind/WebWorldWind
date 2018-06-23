@@ -49,18 +49,19 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(shapesLayer);
 
         var boundaries = [
-            new WorldWind.Location(30, -100),
+            new WorldWind.Location(45, -100),
+            new WorldWind.Location(40, -90),
             new WorldWind.Location(30, -90),
-            new WorldWind.Location(20, -90),
-            new WorldWind.Location(20, -100)
+            new WorldWind.Location(30, -100)
         ];
         var shapeAttrs = new WorldWind.ShapeAttributes();
         shapeAttrs.drawInterior = true;
-        shapeAttrs.interiorColor = new WorldWind.Color(0, 1, 0, 1);
+        shapeAttrs.interiorColor = new WorldWind.Color(1, 1, 1, 1);
+        shapeAttrs.imageSource = "./data/400x230-splash-nww.png";
         shapeAttrs.drawOutline = true;
-        shapeAttrs.outlineColor = new WorldWind.Color(0, 0, 0, 0.3);
-        shapeAttrs.outlineWidth = 20;
-        var shape = new WorldWind.SurfacePolygon(boundaries, shapeAttrs);
+        shapeAttrs.outlineColor = new WorldWind.Color(1, 1, 1, 0.3);
+        shapeAttrs.outlineWidth = 5;
+        var shape = new WorldWind.SurfaceShape(boundaries, shapeAttrs);
         shape._textureCoordinates = [
             new WorldWind.Vec2(0, 1),
             new WorldWind.Vec2(1, 1),

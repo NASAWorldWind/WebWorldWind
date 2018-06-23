@@ -1,5 +1,6 @@
 define([
         '../geom/BoundingBox',
+        '../util/Color',
         '../render/FramebufferTexture',
         '../geom/Matrix',
         '../geom/Position',
@@ -10,9 +11,9 @@ define([
         '../render/Texture',
         '../geom/Vec3'
 ],
-    function(BoundingBox, FramebufferTexture, Matrix, Position, Renderable, Sector, ShapeAttributes, SurfaceShapeProgram, Texture, Vec3) {
+    function(BoundingBox, Color, FramebufferTexture, Matrix, Position, Renderable, Sector, ShapeAttributes, SurfaceShapeProgram, Texture, Vec3) {
 
-    var SurfaceShape = function (attributes) {
+    var SurfaceShape = function (boundaries, attributes) {
         Renderable.call(this);
 
         this._enabled = true;
@@ -29,7 +30,7 @@ define([
 
         this._boundingBox = null;
 
-        this._boundaries = null;
+        this._boundaries = boundaries;
 
         this._textureCoordinates = null;
 
@@ -42,8 +43,6 @@ define([
         this._vertexCacheKey = null;
 
         this._elementCacheKey = null;
-
-        this._whiteTextureCacheKey = null;
 
         this._interiorVolumeElements = {};
 
@@ -65,63 +64,25 @@ define([
 
         this.scratchPoint = new Vec3();
 
-        this.orthoProjectionMatrix = new Matrix().setToOrthographicProjection(
-            -1.5 * WorldWind.EARTH_RADIUS,
-            1.5 * WorldWind.EARTH_RADIUS,
-            -1.5 * WorldWind.EARTH_RADIUS,
-            1.5 * WorldWind.EARTH_RADIUS,
-            1.5 * WorldWind.EARTH_RADIUS,
-            -1.5 * WorldWind.EARTH_RADIUS
-        );
+        this.orthoMvpMatrix = new Matrix();
     };
+
+    SurfaceShape.prototype = Object.create(Renderable.prototype);
 
     SurfaceShape.CACHE_ID = 0;
 
     SurfaceShape.FRAMEBUFFER_CACHE_KEY = "SurfaceShapeFrameBuffer";
 
-    Object.defineProperties(SurfaceShape.prototype, {
-        boundaries: {
-            get: function () {
-                return this._boundaries;
-            },
-            set: function (boundaries) {
-                this._boundaries = boundaries;
-                this._sector.setToBoundingSector(boundaries);
-                this._boundingBox = null;
-                this._centerPoint = null;
-                this._vertexArray = null;
-                this._elementArray = null;
-                this._vertexCacheKey = null;
-                this._elementCacheKey = null;
-            }
-        },
-        textureCoordinates: {
-            get: function () {
-                return this._textureCoordinates;
-            },
-            set: function (textureCoordinates) {
-                this._textureCoordinates = textureCoordinates;
-                this._textureArray = null;
-                this._textureCacheKey = null;
-            }
-        }
-    });
-
-    SurfaceShape.prototype = Object.create(Renderable.prototype);
-
-    SurfaceShape.prototype.computeBoundaries = function () {
-
-    };
+    SurfaceShape.WHITE_TEXTURE_KEY = "SurfaceShapeWhiteTexture";
 
     SurfaceShape.prototype.render = function (dc) {
         var elevLimits;
 
-        this.computeBoundaries();
-        this._sector.setToBoundingSector(this._boundaries);
-
         if (!this._boundaries) {
             return;
         }
+
+        this._sector.setToBoundingSector(this._boundaries);
 
         if (!this._boundingBox) {
             this._boundingBox = new BoundingBox();
@@ -158,22 +119,21 @@ define([
 
         program = dc.findAndBindProgram(SurfaceShapeProgram);
 
-        this.bindShapeBuffer(dc);
-        this.configureShapeAttributes(dc);
-
-        this.bindElementBuffer(dc);
-
-        if (!this.bindTexture(dc)) {
+        // always bind a texture, if its not an image, the small 2x2 white canvas will be used
+        if (!this.bindTexture(dc, this._activeAttributes.imageSource)) {
             return;
         }
 
-        if (this._activeAttributes.imageSource && this._activeTexture && this._activeAttributes.drawInterior) {
+        this.bindShapeBuffer(dc);
+
+        this.bindElementBuffer(dc);
+
+        // check if the interior should be drawn, if an image is provided for the center, and if the texture is ready
+        if (this._activeAttributes.drawInterior && this._activeAttributes.imageSource && this._activeTexture) {
             this.drawProjectedSurfaceImage(dc);
         }
 
         this.beginStenciling(dc);
-
-        this.loadTransforms(dc);
 
         if (this._activeAttributes.drawInterior) {
             this.drawInterior(dc);
@@ -184,36 +144,91 @@ define([
         }
 
         this.endStenciling(dc);
-
-        if (this.debug) {
-            this.bindTexture(dc, true);
-            gl.drawElements(gl.LINE_STRIP, this._interiorVolumeElements.count, gl.UNSIGNED_SHORT, this._interiorVolumeElements.offset);
-            gl.drawElements(gl.LINE_STRIP, this._outlineElements.count, gl.UNSIGNED_SHORT, this._outlineElements.offset);
-        }
     };
 
     SurfaceShape.prototype.drawInterior = function (dc) {
-        var gl = dc.currentGlContext, program = dc.currentProgram;
+        var gl = dc.currentGlContext, terrain = dc.terrain, program = dc.currentProgram, terrainTiles = dc.terrain.surfaceGeometry,
+            terrainTile, i, len, center;
 
-        program.loadUniformFloat(gl, 0, program.offsetWidthLocation);
-        this.scratchPoint.copy(dc.eyePoint);
-        this.scratchPoint.subtract(this._centerPoint);
-        gl.uniform3f(program.eyePointLocation, this.scratchPoint[0], this.scratchPoint[1], this.scratchPoint[2]);
-        program.loadUniformFloat(gl, 0, program.eyeAltitudeLocation);
-        program.loadUniformFloat(gl, 0, program.pixelSizeFactorLocation);
-        program.loadUniformFloat(gl, 0, program.pixelSizeOffsetLocation);
+        // the interior vertices are not offset, set the parameters which influence offsetting to zero
+        gl.disableVertexAttribArray(program.offsetVectorLocation);
+        this.loadZeroOffsetValues(dc);
+
+        this.scratchMatrix.copy(dc.modelviewProjection);
+        this.scratchMatrix.multiplyByTranslation(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2]);
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.mvpMatrixLocation);
+        this.scratchMatrix.setToScale(0.5, 0.5, 1);
+        this.scratchMatrix.multiplyByTranslation(1, 1, 0);
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrixLocation);
+
+        // the color doesn't matter while we are populating the stencil
+        gl.disableVertexAttribArray(program.vertexTexCoordLocation);
+        gl.vertexAttrib4f(program.vertexTexCoordLocation, 0.25, 0.25, 0, 1);
+        program.loadUniformColor(gl, Color.WHITE, program.colorLocation);
 
         this.prepareStencil(dc);
         gl.drawElements(gl.TRIANGLES, this._interiorVolumeElements.count, gl.UNSIGNED_SHORT, this._interiorVolumeElements.offset);
 
         this.applyStencilTest(dc);
-        if (this._activeAttributes.imageSource && this._activeTexture) {
-            this._activeTexture.bind(dc);
-            program.loadUniformColor(gl, Color.WHITE, program.colorLocation);
+
+        program.loadUniformColor(gl, this._activeAttributes.interiorColor, program.colorLocation);
+
+        if (this._activeAttributes.imageSource) {
+            // // for debugging purposes:
+            // var canvas = document.createElement("canvas");
+            // canvas.setAttribute("width", "512");
+            // canvas.setAttribute("height", "512");
+            // var ctx = canvas.getContext("2d");
+            // ctx.fillStyle = "rgb(255, 0, 0)";
+            // ctx.fillRect(0, 0, 256, 256);
+            // ctx.fillStyle = "rgb(0, 255, 0)";
+            // ctx.fillRect(256, 0, 256, 256);
+            // ctx.fillStyle = "rgb(0, 0, 255)";
+            // ctx.fillRect(0, 256, 256, 256);
+            // ctx.fillStyle = "rgb(255, 255, 255)";
+            // ctx.fillRect(256, 256, 256, 256);
+            // var texture = new Texture(gl, canvas);
+            // texture.bind(dc);
+
+            // the vertices should be transformed using the standard mvp, but, the texture coordinates should also
+            // be vertex coordinates, and transformed using the orthographic projection and sample the active texture
+            // provided by the framebuffer (should already be bound)
+            program.loadUniformBoolean(gl, true, program.isVertexLookupLocation);
+
+            len = terrainTiles.length;
+
+            terrain.beginRendering(dc);
+
+            for (i = 0; i < len; i++) {
+                terrainTile = terrainTiles[i];
+
+                if (!terrainTile || !terrainTile.transformationMatrix) {
+                    continue;
+                }
+
+                this.scratchMatrix.copy(this.orthoMvpMatrix);
+                this.scratchMatrix.multiplyMatrix(terrainTile.transformationMatrix);
+                program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrixLocation);
+
+                terrain.beginRenderingTile(dc, terrainTile);
+                terrain.renderTile(dc, terrainTile);
+                terrain.endRenderingTile(dc, terrainTile);
+            }
+
+            terrain.endRendering(dc);
+
+            // terrain rendering buffered other arrays, so we need rebind the shadow volume data for potential use by
+            // the outline
+            if (this._activeAttributes.drawOutline) {
+                this.bindTexture(dc);
+                this.bindShapeBuffer(dc);
+                this.bindElementBuffer(dc);
+            }
+
         } else {
-            program.loadUniformColor(gl, this._activeAttributes.interiorColor, program.colorLocation);
+            gl.drawElements(gl.TRIANGLES, this._interiorVolumeElements.count, gl.UNSIGNED_SHORT, this._interiorVolumeElements.offset);
         }
-        gl.drawElements(gl.TRIANGLES, this._interiorVolumeElements.count, gl.UNSIGNED_SHORT, this._interiorVolumeElements.offset);
+        gl.enableVertexAttribArray(program.offsetVectorLocation);
     };
 
     SurfaceShape.prototype.drawOutline = function (dc) {
@@ -237,18 +252,39 @@ define([
         gl.drawElements(gl.TRIANGLES, this._outlineElements.count, gl.UNSIGNED_SHORT, this._outlineElements.offset);
     };
 
-    SurfaceShape.prototype.loadTransforms = function (dc) {
+    SurfaceShape.prototype.loadSceneTransforms = function (dc) {
         var gl = dc.currentGlContext, program = dc.currentProgram;
 
         this.scratchMatrix.copy(dc.modelviewProjection);
         this.scratchMatrix.multiplyByTranslation(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2]);
         program.loadUniformMatrix(gl, this.scratchMatrix, program.mvpMatrixLocation);
         this.scratchMatrix.setToIdentity();
-        program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrix);
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrixLocation);
     };
 
     SurfaceShape.prototype.drawProjectedSurfaceImage = function (dc) {
         var gl = dc.currentGlContext, program = dc.currentProgram, center;
+
+        // at this point, all of the geometry, texture, and texture coordinates should be bound and ready
+
+        this.calculateOrthographicTransform(dc);
+
+        // the vertex transformation to the orthographic projection becomes its texture coordinate in the offscreen
+        // framebuffer
+        this.scratchMatrix.copy(this.orthoMvpMatrix);
+        this.scratchMatrix.multiplyByTranslation(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2]);
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.mvpMatrixLocation);
+        // the vertex texture coordinate to be used in sampling should pass through unchanged
+        this.scratchMatrix.setToIdentity();
+        program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrixLocation);
+
+        // the SurfaceShapeProgram provides for a dynamic vertex offset, to avoid this, we'll disable the offsetVector
+        // vertex attribute array and load zeros for other key uniforms
+        gl.disableVertexAttribArray(program.offsetVectorLocation);
+        this.loadZeroOffsetValues(dc);
+
+        // keeps the textures colors as the shader modulates all lookups
+        program.loadUniformColor(gl, Color.WHITE, program.colorLocation);
 
         if (!this._frameBufferCacheKey) {
             this._frameBufferCacheKey = "SurfaceShapeFrameBuffer" + SurfaceShape.CACHE_ID++;
@@ -262,21 +298,15 @@ define([
         dc.bindFramebuffer(this._frameBuffer);
 
         gl.viewport(0, 0, 1024, 1024);
-
-        // load all of the uniforms
-        center = dc.globe.computePositionFromPoint(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2], this.scratchPosition);
-        this.scratchMatrix.copy(this.orthoProjectionMatrix);
-        this.scratchMatrix.multiplyByLookAtModelview(center, 0, 0, 0, 0, dc);
-        this.scratchMatrix.multiplyByTranslation(this._centerPoint[0], this._centerPoint[1], this._centerPoint[2]);
-        program.loadUniformMatrix(gl, this.scratchMatrix, program.mvpMatrixLocation);
-        this.scratchMatrix.setToIdentity();
-        program.loadTextureMatrix(gl, this.scratchMatrix, program.texCoordMatrixLocation);
-        program.loadUniformColor(gl, Color.WHITE, program.colorLocation);
-
         gl.drawElements(gl.TRIANGLES, this._interiorPlaneElements.count, gl.UNSIGNED_SHORT, this._interiorPlaneElements.offset);
-
         dc.bindFramebuffer(null);
         gl.viewport(0, 0, dc.viewport.width, dc.viewport.height);
+
+        gl.enableVertexAttribArray(program.offsetVectorLocation);
+
+        // switch the active texture to the orthographic projected framebuffer texture
+        this._frameBuffer.bind(dc);
+        this._activeTexture = this._frameBuffer.texture;
     };
 
     SurfaceShape.prototype.beginDrawing = function (dc) {
@@ -299,6 +329,16 @@ define([
         gl.enable(gl.CULL_FACE);
     };
 
+    SurfaceShape.prototype.loadZeroOffsetValues = function (dc) {
+        var gl = dc.currentGlContext, program = dc.currentProgram;
+
+        program.loadUniformFloat(gl, 0, program.offsetWidthLocation);
+        gl.uniform3f(program.eyePointLocation, 0, 0, 0);
+        program.loadUniformFloat(gl, 0, program.eyeAltitudeLocation);
+        program.loadUniformFloat(gl, 0, program.pixelSizeFactorLocation);
+        program.loadUniformFloat(gl, 0, program.pixelSizeOffsetLocation);
+    };
+
     SurfaceShape.prototype.bindElementBuffer = function (dc) {
         var gl = dc.currentGlContext, ebo;
 
@@ -318,7 +358,7 @@ define([
     };
 
     SurfaceShape.prototype.bindShapeBuffer = function (dc) {
-        var gl = dc.currentGlContext, vbo;
+        var gl = dc.currentGlContext, program = dc.currentProgram, vbo;
 
         if (!this._vertexCacheKey) {
             this._vertexCacheKey = "SurfaceShapeVertexArray " + SurfaceShape.CACHE_ID++;
@@ -333,10 +373,6 @@ define([
         } else {
             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         }
-    };
-
-    SurfaceShape.prototype.configureShapeAttributes = function (dc) {
-        var gl = dc.currentGlContext, program = dc.currentProgram;
 
         gl.enableVertexAttribArray(program.vertexPointLocation);
         gl.enableVertexAttribArray(program.offsetVectorLocation);
@@ -345,8 +381,30 @@ define([
         gl.vertexAttribPointer(program.offsetVectorLocation, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
     };
 
-    SurfaceShape.prototype.bindTextureBuffer = function (dc) {
-        var gl = dc.currentGlContext, tbo;
+    SurfaceShape.prototype.bindTexture = function (dc, textureKey) {
+        var gl = dc.currentGlContext, program = dc.currentProgram;
+
+        if (textureKey) {
+            this._activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
+            if (!this._activeTexture) {
+                dc.gpuResourceCache.retrieveTexture(gl, this._activeAttributes.imageSource);
+                return false; // wait until the requested texture is ready (this will stop rendering of this shape)
+            }
+
+            this.bindTextureCoordinateBuffer(dc);
+        } else {
+            this._activeTexture = SurfaceShape.getWhiteTexture(dc);
+
+            gl.vertexAttrib4f(program.vertexTexCoordLocation, 0.25, 0.25, 0, 1);
+        }
+
+        program.loadUniformTextureUnit(gl, gl.TEXTURE0, program.textureUnitLocation);
+
+        return this._activeTexture.bind(dc);
+    };
+
+    SurfaceShape.prototype.bindTextureCoordinateBuffer = function (dc) {
+        var gl = dc.currentGlContext, program = dc.currentProgram, tbo;
 
         if (!this._textureCacheKey) {
             this._textureCacheKey = "SurfaceShapeTextureArray " + SurfaceShape.CACHE_ID++;
@@ -361,44 +419,9 @@ define([
         } else {
             gl.bindBuffer(gl.ARRAY_BUFFER, tbo);
         }
-    };
-
-    SurfaceShape.prototype.configureTextureAttributes = function (dc) {
-        var gl = dc.currentGlContext, program = dc.currentProgram;
 
         gl.enableVertexAttribArray(program.vertexTexCoordLocation);
-
         gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
-    };
-
-    SurfaceShape.prototype.bindTexture = function (dc, forceWhite) {
-        var gl = dc.currentGlContext, program = dc.currentProgram;
-
-        if (this._activeAttributes.imageSource && !forceWhite) {
-            this._activeTexture = dc.gpuResourceCache.resourceForKey(this._activeAttributes.imageSource);
-            if (!this._activeTexture) {
-                dc.gpuResourceCache.retrieveTexture(gl, this._activeAttributes.imageSource);
-                return false;
-            }
-
-            this.bindTextureBuffer(dc);
-            this.configureTextureAttributes(dc);
-        } else {
-            if (!this._whiteTextureCacheKey) {
-                this._whiteTextureCacheKey = "SurfaceShapeWhiteTextureKey" + SurfaceShape.CACHE_ID++;
-            }
-
-            this._activeTexture = dc.gpuResourceCache.resourceForKey(this._whiteTextureCacheKey);
-            if (!this._activeTexture) {
-                this._activeTexture = new Texture(gl, this.generateWhiteTexture(dc));
-                dc.gpuResourceCache.putResource(this._whiteTextureCacheKey, this._activeTexture, 4 * 4 * 3);
-            }
-
-            gl.vertexAttrib4f(program.vertexTexCoordLocation, 0.25, 0.25, 0, 1);
-        }
-        program.loadUniformTextureUnit(gl, gl.TEXTURE0, program.textureUnitLocation);
-
-        return this._activeTexture.bind(dc);
     };
 
     SurfaceShape.prototype.beginStenciling = function (dc) {
@@ -480,13 +503,49 @@ define([
         );
     };
 
+    SurfaceShape.prototype.calculateOrthographicTransform = function (dc) {
+        var offset = WorldWind.EARTH_RADIUS;
+
+        this.orthoMvpMatrix.setToOrthographicProjection(
+            -offset,
+            offset,
+            -offset,
+            offset,
+            -offset,
+            offset
+        );
+        dc.globe.computePositionFromPoint(
+            this._centerPoint[0], this._centerPoint[1], this._centerPoint[2], this.scratchPosition);
+        this.orthoMvpMatrix.multiplyByLookAtModelview(this.scratchPosition, 0, 0, 0, 0, dc.globe);
+    };
+
+    SurfaceShape.getWhiteTexture = function (dc) {
+        var texture, canvas, ctx;
+
+        texture = dc.gpuResourceCache.resourceForKey(SurfaceShape.WHITE_TEXTURE_KEY);
+        if (!texture) {
+            canvas = document.createElement("canvas");
+            canvas.setAttribute("width", "2");
+            canvas.setAttribute("height", "2");
+            ctx = canvas.getContext("2d");
+            ctx.fillStyle = "rgba(255, 255, 255, 1.0)";
+            ctx.fillRect(0, 0, 2, 2);
+
+            texture = new Texture(dc.currentGlContext, canvas);
+            dc.gpuResourceCache.putResource(SurfaceShape.WHITE_TEXTURE_KEY, texture, texture.size);
+        }
+
+        return texture;
+    };
+
+    // The operations below would be the responsibility of the specific shapes in order to maximize the shapes geometry
+
     SurfaceShape.prototype.calculateVolumeVerticalLimits = function (dc) {
         // TODO more accurate volume limits that represent geographical extent and terrain
         return {min: -5000, max: 200000};
     };
 
     SurfaceShape.prototype.assembleVertexArray = function (dc) {
-        this.calculateCenter(dc);
         this._vertexArray = new Float32Array(4 /*locations*/ * 2 /*interior and exterior points*/
             * 2 /*top and bottom*/ * 6 /*components: x, y, z, ox, oy, oz (offsets)*/);
         var i, limits = this.calculateVolumeVerticalLimits(dc), prevLocation, location, nextLocation, idx = 0;
@@ -676,26 +735,30 @@ define([
     };
 
     SurfaceShape.prototype.assembleTextureArray = function (dc) {
-        var len = this._textureCoordinates.length, i, pair, idx = 0;
+        var verts = this._boundaries.length * 4, idx, coords;
 
-        this._textureArray = new Float32Array(len * 2);
+        this._textureArray = new Float32Array(verts * 2);
 
-        for (i = 0; i < len; i++) {
-            pair = this._textureCoordinates[i];
-            this._textureArray[idx++] = pair[0];
-            this._textureArray[idx++] = pair[1];
-        }
-    };
+        // 1, 5, 9, 13
+        idx = 1 * 2;
+        coords = this._textureCoordinates[0];
+        this._textureArray[idx++] = coords[0];
+        this._textureArray[idx++] = coords[1];
 
-    SurfaceShape.prototype.generateWhiteTexture = function (dc) {
-        var canvas = document.createElement("canvas"), ctx;
-        canvas.setAttribute("width", "2");
-        canvas.setAttribute("height", "2");
-        ctx = canvas.getContext("2d");
-        ctx.fillStyle = "rgba(255, 255, 255, 1.0)";
-        ctx.fillRect(0, 0, 2, 2);
+        idx = 5 * 2;
+        coords = this._textureCoordinates[1];
+        this._textureArray[idx++] = coords[0];
+        this._textureArray[idx++] = coords[1];
 
-        return canvas;
+        idx = 9 * 2;
+        coords = this._textureCoordinates[2];
+        this._textureArray[idx++] = coords[0];
+        this._textureArray[idx++] = coords[1];
+
+        idx = 13 * 2;
+        coords = this._textureCoordinates[3];
+        this._textureArray[idx++] = coords[0];
+        this._textureArray[idx++] = coords[1];
     };
 
     return SurfaceShape;

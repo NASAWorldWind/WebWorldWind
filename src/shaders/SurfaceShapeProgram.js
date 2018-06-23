@@ -14,13 +14,18 @@ define([
             "uniform float eyeAltitude;\n" +
             "uniform float pixelSizeFactor;\n" +
             "uniform float pixelSizeOffset;\n" +
+            "uniform bool isVertexLookup;\n" +
             "varying vec2 texCoord;\n" +
             "void main() {\n" +
             // the following calculations determine the width of an outline in a best effort at constant size in screen space
             "   float distance = max(0.01, min(length(eyePoint - vertexPoint.xyz), eyeAltitude));\n" +
             "   float pixelSize = offsetWidth * (pixelSizeFactor * distance + pixelSizeOffset);\n" +
             "   gl_Position = mvpMatrix * (vertexPoint + vec4(offsetVector * pixelSize, 1.0));\n" +
-            "   texCoord = (texCoordMatrix * vertexTexCoord).st;\n" +
+            "   if (isVertexLookup) {\n" +
+            "       texCoord = (texCoordMatrix * vertexPoint).st;\n" +
+            "   } else {\n" +
+            "       texCoord = (texCoordMatrix * vertexTexCoord).st;\n" +
+            "   }\n" +
             "}",
 
         fragmentShaderSource =
@@ -29,7 +34,11 @@ define([
             "uniform sampler2D textureSampler;\n" +
             "varying vec2 texCoord;\n" +
             "void main() {\n" +
-            "   gl_FragColor = color * texture2D(textureSampler, texCoord);\n" +
+            // "   if (texCoord.s >= 0.0 && texCoord.s <= 1.0 && texCoord.t >= 0.0 && texCoord.t <= 1.0) {\n" +
+            "       gl_FragColor = color * texture2D(textureSampler, texCoord);\n" +
+            // "   } else {\n" +
+            // "       gl_FragColor = color;\n" +
+            // "   }" +
             "}";
 
         var bindings = ["vertexPoint", "vertexTexCoord", "offsetVector"];
@@ -90,6 +99,8 @@ define([
         this.pixelSizeFactorLocation = this.uniformLocation(gl, "pixelSizeFactor");
 
         this.pixelSizeOffsetLocation = this.uniformLocation(gl, "pixelSizeOffset");
+
+        this.isVertexLookupLocation = this.uniformLocation(gl, "isVertexLookup");
     };
 
     SurfaceShapeProgram.prototype = Object.create(GpuProgram.prototype);
@@ -102,6 +113,14 @@ define([
 
     SurfaceShapeProgram.prototype.loadUniformTextureUnit = function (gl, unit) {
         gl.uniform1i(this.textureUnitLocation, unit - gl.TEXTURE0);
+    };
+
+    SurfaceShapeProgram.prototype.loadModelviewProjection = function (gl, matrix) {
+        this.loadUniformMatrix(gl, matrix, this.mvpMatrixLocation);
+    };
+
+    SurfaceShapeProgram.prototype.loadUniformBoolean = function (gl, enable, location) {
+        gl.uniform1i(location, enable ? 1 : 0);
     };
 
     return SurfaceShapeProgram;
