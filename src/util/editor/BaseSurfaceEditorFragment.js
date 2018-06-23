@@ -137,6 +137,93 @@ define([
             accessories.push(rotationLine);
         };
 
+        BaseSurfaceEditorFragment.prototype.addNewControlPoint = function (globe, terrainPosition, altitude, locations) {
+            // Find the nearest edge to the picked point and insert a new position on that edge.
+            var pointPicked = globe.computePointFromPosition(
+                terrainPosition.latitude,
+                terrainPosition.longitude,
+                altitude,
+                new Vec3(0, 0, 0)
+            );
+
+            var nearestPoint = null;
+            var nearestSegmentIndex = 0;
+            var nearestDistance = Number.MAX_VALUE;
+            for (var i = 1; i <= locations.length; i++) // <= is intentional, to handle the closing segment
+            {
+                // Skip the closing segment if the shape is not a polygon.
+                if (!(this._shape instanceof SurfacePolygon ) && i == locations.length) {
+                    continue;
+                }
+
+                var locationA = locations[i - 1];
+                var locationB = locations[i == locations.length ? 0 : i];
+
+                var pointA = globe.computePointFromPosition(
+                    locationA.latitude,
+                    locationA.longitude,
+                    altitude,
+                    new Vec3(0, 0, 0)
+                );
+
+                var pointB = this._worldWindow.globe.computePointFromPosition(
+                    locationB.latitude,
+                    locationB.longitude,
+                    altitude,
+                    new Vec3(0, 0, 0)
+                );
+
+                var pointOnEdge = this.nearestPointOnSegment(pointA, pointB, new Vec3(pointPicked[0], pointPicked[1], pointPicked[2]));
+
+                var distance = pointOnEdge.distanceTo(pointPicked);
+                if (distance < nearestDistance) {
+                    nearestPoint = pointOnEdge;
+                    nearestSegmentIndex = i;
+                    nearestDistance = distance;
+                }
+            }
+
+            if (nearestPoint) {
+                // Compute the location of the nearest point and add it to the shape.
+                var nearestLocation = globe.computePositionFromPoint(
+                    nearestPoint[0],
+                    nearestPoint[1],
+                    nearestPoint[2],
+                    new Position(0, 0, 0)
+                );
+
+                if (nearestSegmentIndex == locations.length)
+                    locations.push(nearestLocation);
+                else
+                    locations.splice(nearestSegmentIndex, 0, nearestLocation);
+
+                this.removeControlPoints();
+                this._shape.boundaries = locations;
+                this.updateControlElements();
+            }
+        };
+
+
+
+        BaseSurfaceEditorFragment.prototype.nearestPointOnSegment = function (p1, p2, point) {
+            var segment = p2.subtract(p1);
+
+            var segmentCopy = new Vec3(0, 0, 0);
+            segmentCopy.copy(segment);
+            var dir = segmentCopy.normalize();
+
+            var dot = point.subtract(p1).dot(dir);
+            if (dot < 0.0) {
+                return p1;
+            }
+            else if (dot > segment.magnitude()) {
+                return p2;
+            }
+            else {
+                return Vec3.fromLine(p1, dot, dir); // FIXME This is broken
+            }
+        };
+
         return BaseSurfaceEditorFragment;
     }
 );
