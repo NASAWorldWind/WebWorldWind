@@ -17,7 +17,6 @@
  * @exports ShapeEditor
  */
 define([
-        '../../geom/Angle',
         '../../shapes/Annotation',
         '../../shapes/AnnotationAttributes',
         '../../error/ArgumentError',
@@ -26,29 +25,22 @@ define([
         '../Insets',
         '../../geom/Location',
         '../Logger',
-        '../../shapes/Path',
         '../../shapes/Placemark',
         '../../shapes/PlacemarkAttributes',
         '../../geom/Position',
         '../../layer/RenderableLayer',
         '../../shapes/ShapeAttributes',
         './ShapeEditorConstants',
-        '../../shapes/SurfaceEllipse',
         './SurfaceEllipseEditorFragment',
-        '../../shapes/SurfaceCircle',
         './SurfaceCircleEditorFragment',
         '../../shapes/SurfacePolygon',
         './SurfacePolygonEditorFragment',
-        '../../shapes/SurfacePolyline',
         './SurfacePolylineEditorFragment',
-        '../../shapes/SurfaceRectangle',
         './SurfaceRectangleEditorFragment',
-        '../../shapes/SurfaceShape',
         '../../geom/Vec2',
         '../../geom/Vec3'
     ],
-    function (Angle,
-              Annotation,
+    function (Annotation,
               AnnotationAttributes,
               ArgumentError,
               Color,
@@ -56,43 +48,46 @@ define([
               Insets,
               Location,
               Logger,
-              Path,
               Placemark,
               PlacemarkAttributes,
               Position,
               RenderableLayer,
               ShapeAttributes,
               ShapeEditorConstants,
-              SurfaceEllipse,
               SurfaceEllipseEditorFragment,
-              SurfaceCircle,
               SurfaceCircleEditorFragment,
               SurfacePolygon,
               SurfacePolygonEditorFragment,
-              SurfacePolyline,
               SurfacePolylineEditorFragment,
-              SurfaceRectangle,
               SurfaceRectangleEditorFragment,
               SurfaceShape,
               Vec2,
-              Vec3) { // FIXME Remove unnecessary items from this list
+              Vec3) {
         "use strict";
 
         /**
+         * Constructs a new shape editor attached to the specified World Window.
          * @alias ShapeEditor
-         * @constructor
-         * @classdesc Provides a user interface for editing a shape and performs editing. Depending on the shape type,
-         * the shape is shown with control points for vertex locations and size. All shapes are shown with a handle that
-         * provides rotation.
-         * <p/>
-         * Drag on the shape's body moves the whole shape. Drag on a control point performs the action
-         * associated with that control point. The editor provides vertex insertion and removal for SurfacePolygon and
-         * SurfacePolyline. Shift-click when the cursor is over the shape inserts a control
-         * point at the cursor's position. Alt-click when the cursor is over a control point removes that control point.
-         * <p/>
-         * This editor supports all surface shapes except SurfaceImage.
+         * @classdesc Provides a controller for editing shapes. Depending on the type of shape, the following actions
+         * are available:
+         * <ul>
+         *     <li>Edit the location and size of its vertexes using control points;</li>
+         *     <li>Rotate the shape using a handle;</li>
+         *     <li>Drag the shape on the surface of the globe.</li>
+         * </ul>
+         * <p>
+         * To start editing a shape, pass it to the {@link ShapeEditor#edit} method. To end the edition, call the
+         * {@link ShapeEditor#stop} method.
+         * <p>
+         * Dragging the body of the shape moves the whole shape. Dragging a control point performs the action associated
+         * with that control point. The editor provides vertex insertion and removal for SurfacePolygon and
+         * SurfacePolyline. Shift-clicking when the cursor is over the shape inserts a control point near the position
+         * of the cursor. Alt-clicking when the cursor is over a control point removes that particular control point.
+         * <p>
+         * This editor currently supports all surface shapes except SurfaceImage.
          * @param {WorldWindow} worldWindow The World Window to associate this shape editor controller with.
-         * @throws {ArgumentError} If the specified world window is null or undefined.
+         * @throws {ArgumentError} If the specified World Window is <code>null</code> or <code>undefined</code>.
+         * @constructor
          */
         var ShapeEditor = function (worldWindow) {
             if (!worldWindow) {
@@ -215,7 +210,7 @@ define([
             },
 
             /**
-             * Attribuets used for the control points that move the boundaries of the shape.
+             * Attributes used for the control points that move the boundaries of the shape.
              * @memberof ShapeEditor.prototype
              * @type {PlacemarkAttributes}
              */
@@ -257,7 +252,7 @@ define([
             },
 
             /**
-             * Attributes used for the annotation.
+             * Attributes used for the annotation that displays hints during the actions.
              * @memberof ShapeEditor.prototype
              * @type {AnnotationAttributes}
              */
@@ -563,7 +558,7 @@ define([
                 var p = new Position(0, 0, 0);
                 this._worldWindow.globe.computePositionFromPoint(intersection[0], intersection[1],
                     intersection[2], p);
-                this._shape.moveTo(this._worldWindow.globe, new WorldWind.Location(p.latitude, p.longitude));
+                this._shape.moveTo(this._worldWindow.globe, new Location(p.latitude, p.longitude));
             }
 
             this.updateControlElements();
@@ -663,15 +658,6 @@ define([
 
 
 
-        /**
-         * Inserts the location nearest to a specified position on an edge of a specified list of locations into the
-         * appropriate place in that list.
-         * @param {Position} terrainPosition The position to find a nearest point for.
-         * @param {Number} altitude The altitude to use when determining the nearest point. Can be approximate and is
-         * not necessarily the altitude of the terrain position.
-         * @param {Location[]} locations The list of locations. This list is modified by this method to contain the new
-         * location on an edge nearest the specified terrain position.
-         */
         ShapeEditor.prototype.addNewControlPoint = function (terrainPosition, altitude, locations) {
             var globe = this._worldWindow.globe;
 
@@ -742,14 +728,6 @@ define([
 
 
 
-        /**
-         * Computes the point on a specified line segment that is nearest a specified point.
-         *
-         * @param {Vec3} p1 The line's first point.
-         * @param {Vec3} p2 The line's second point.
-         * @param {Vec3} point The point for which to determine a nearest point on the line segment.
-         * @returns {Vec3} The nearest point on the line segment.
-         */
         ShapeEditor.prototype.nearestPointOnSegment = function (p1, p2, point) {
             var segment = p2.subtract(p1);
 
