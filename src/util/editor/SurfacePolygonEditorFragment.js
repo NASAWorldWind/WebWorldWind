@@ -72,7 +72,7 @@ define([
                                 }
                             }
                             else if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                                this.rotateLocations(terrainPosition, boundaries);
+                                this.rotateLocations(globe, terrainPosition, previousPosition, boundaries);
                                 shape.boundaries = boundaries;
                                 break outer;
                             }
