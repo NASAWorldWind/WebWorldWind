@@ -18,9 +18,13 @@
  */
 define([
         '../../geom/Angle',
+        '../../geom/Location',
+        '../../geom/Position',
         '../../geom/Vec3'
     ],
     function (Angle,
+              Location,
+              Position,
               Vec3) {
         "use strict";
 
@@ -85,6 +89,48 @@ define([
         };
 
         /**
+         * Computes the average location of a specified array of locations.
+         * @param {Location[]} locations The array of locations for the shape.
+         * @return {Position} the average of the locations specified in the array.
+         */
+        BaseSurfaceEditorFragment.prototype.getCenter = function (globe, locations) {
+            var count = 0;
+            var center = new Vec3(0, 0, 0);
+
+            if (locations.length > 0 && locations[0].length > 2) {
+                for (var i = 0; i < locations.length; i++) {
+                    for (var j = 0; j < locations[i].length; j++) {
+                        center = center.add(globe.computePointFromPosition(
+                            locations[i][j].latitude,
+                            locations[i][j].longitude,
+                            0,
+                            new Vec3(0, 0, 0)));
+                        ++count;
+                    }
+                }
+            }
+            else if (locations.length >= 2) {
+                for (var i = 0; i < locations.length; i++) {
+                    center = center.add(globe.computePointFromPosition(
+                        locations[i].latitude,
+                        locations[i].longitude,
+                        0,
+                        new Vec3(0, 0, 0)));
+                    ++count;
+                }
+            }
+
+            center = center.divide(count);
+
+            return globe.computePositionFromPoint(
+                center[0],
+                center[1],
+                center[2],
+                new Position(0, 0, 0)
+            );
+        };
+
+        /**
          * Computes the average distance between a specified center point and a list of locations.
          * @param {Globe} globe The globe to use for the computations.
          * @param {Location} center The center point.
@@ -110,6 +156,63 @@ define([
             }
 
             return (count === 0) ? 0 : totalDistance / globe.equatorialRadius;
+        };
+
+        /**
+         * Moves a control point location.
+         * @param {Placemark} controlPoint The control point being moved.
+         * @param {Position} terrainPosition The position selected by the user.
+         * @returns {Position} The position after move.
+         */
+        BaseSurfaceEditorFragment.prototype.moveLocation = function (globe, controlPoint, terrainPosition, previousPosition) {
+            var delta = this.computeControlPointDelta(globe, previousPosition, terrainPosition);
+            var markerPoint = globe.computePointFromPosition(
+                controlPoint.position.latitude,
+                controlPoint.position.longitude,
+                0,
+                new Vec3(0, 0, 0)
+            );
+
+            markerPoint.add(delta);
+            return globe.computePositionFromPoint(
+                markerPoint[0],
+                markerPoint[1],
+                markerPoint[2],
+                new Position(0, 0, 0)
+            );
+        };
+
+        /**
+         * Rotates a shape's locations.
+         * @param {Position} terrainPosition The position selected by the user.
+         * @param {Location[]} locations The array of locations for the shape.
+         */
+        BaseSurfaceEditorFragment.prototype.rotateLocations = function (globe, terrainPosition, previousPosition, locations) {
+            var center = this.getCenter(globe, locations);
+            var previousHeading = Location.greatCircleAzimuth(center, previousPosition);
+            var deltaHeading = Location.greatCircleAzimuth(center, terrainPosition) - previousHeading;
+            this.currentHeading = this.normalizedHeading(this.currentHeading, deltaHeading);
+
+            if (locations.length > 0 && locations[0].length > 2) {
+                for (var i = 0; i < locations.length; i++) {
+                    for (var j = 0; j < locations[i].length; j++) {
+                        var heading = Location.greatCircleAzimuth(center, locations[i][j]);
+                        var distance = Location.greatCircleDistance(center, locations[i][j]);
+                        var newLocation = Location.greatCircleLocation(center, heading + deltaHeading, distance,
+                            new Location(0, 0));
+                        locations[i][j] = newLocation;
+                    }
+                }
+            }
+            else if (locations.length >= 2) {
+                for (var i = 0; i < locations.length; i++) {
+                    var heading = Location.greatCircleAzimuth(center, locations[i]);
+                    var distance = Location.greatCircleDistance(center, locations[i]);
+                    var newLocation = Location.greatCircleLocation(center, heading + deltaHeading, distance,
+                        new Location(0, 0));
+                    locations[i] = newLocation;
+                }
+            }
         };
 
         return BaseSurfaceEditorFragment;
