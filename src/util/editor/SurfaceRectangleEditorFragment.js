@@ -94,7 +94,7 @@ define([
                 }
             }
             else {
-                var oldHeading = Location.greatCircleAzimuth(shape.center, this.previousPosition);
+                var oldHeading = Location.greatCircleAzimuth(shape.center, previousPosition);
                 var deltaHeading = Location.greatCircleAzimuth(shape.center, terrainPosition) - oldHeading;
                 shape.heading = this.normalizedHeading(shape.heading, deltaHeading);
             }
