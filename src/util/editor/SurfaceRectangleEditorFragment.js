@@ -61,9 +61,9 @@ define([
                                                                                        sizeControlPointAttributes,
                                                                                        angleControlPointAttributes) {
 
-            this.createControlPoint(sizeControlPointAttributes, ShapeEditorConstants.WIDTH, controlPoints);
-            this.createControlPoint(sizeControlPointAttributes, ShapeEditorConstants.HEIGHT, controlPoints);
-            this.createControlPoint(angleControlPointAttributes, ShapeEditorConstants.ROTATION, controlPoints);
+            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.WIDTH);
+            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.HEIGHT);
+            this.createControlPoint(controlPoints, angleControlPointAttributes, ShapeEditorConstants.ROTATION);
 
             this.initializeRotationAccessory(accessories, angleControlPointAttributes);
         };

@@ -54,7 +54,7 @@ define([
                                                                                     accessories,
                                                                                     sizeControlPointAttributes) {
 
-            this.createControlPoint(sizeControlPointAttributes, ShapeEditorConstants.OUTER_RADIUS, controlPoints);
+            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.OUTER_RADIUS);
         };
 
         // Internal use only.

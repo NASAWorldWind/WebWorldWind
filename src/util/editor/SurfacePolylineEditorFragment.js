@@ -19,19 +19,15 @@
 define([
         './BaseSurfaceEditorFragment',
         '../../geom/Location',
-        '../../shapes/Placemark',
         '../../geom/Position',
         './ShapeEditorConstants',
         '../../shapes/SurfacePolyline',
-        '../../geom/Vec3'
     ],
     function (BaseSurfaceEditorFragment,
               Location,
-              Placemark,
               Position,
               ShapeEditorConstants,
-              SurfacePolyline,
-              Vec3) {
+              SurfacePolyline) {
         "use strict";
 
         //Internal use only. Intentionally not documented.
@@ -46,147 +42,106 @@ define([
 
         //Internal use only. Intentionally not documented.
         SurfacePolylineEditorFragment.prototype.createShadowShape = function (shape) {
-            return new SurfacePolyline(shape.boundaries, shape.attributes);
+            return new SurfacePolyline(this.deepCopyLocations(shape.boundaries), shape.attributes);
         };
 
         //Internal use only. Intentionally not documented.
-        SurfacePolylineEditorFragment.prototype.getShapeCenter = function (shape) {
-            return null;
+        SurfacePolylineEditorFragment.prototype.getShapeCenter = function (shape, globe) {
+            return this.getCenter(globe, shape.boundaries);
         };
 
-        //Internal use only. Intentionally not documented.
-        SurfacePolylineEditorFragment.prototype.reshape = function (shape, globe, controlPoint, terrainPosition, previousPosition, alternateAction) {
-            var boundaries = shape.boundaries;
+        // Internal use only.
+        SurfacePolylineEditorFragment.prototype.initializeControlElements = function (shape,
+                                                                                     controlPoints,
+                                                                                     accessories,
+                                                                                     sizeControlPointAttributes,
+                                                                                     angleControlPointAttributes,
+                                                                                     locationControlPointAttributes) {
+            this.currentHeading = 0;
+            this.locationControlPointAttributes = locationControlPointAttributes;
 
-            var k = 0;
-            var newPos;
+            var locations = shape.boundaries;
 
-            if (boundaries.length > 0 && boundaries[0].length > 2) {
-                outer:
-                    for (var i = 0; i < boundaries.length; i++) {
-                        for (var j = 0; j < boundaries[i].length; j++) {
-                            if (controlPoint.userProperties.purpose === ShapeEditorConstants.LOCATION) {
-                                if (controlPoint.userProperties.id === k) {
-                                    newPos = this.moveLocation(globe, controlPoint, terrainPosition, previousPosition);
-                                    boundaries[i][j] = newPos;
-                                    shape.boundaries = boundaries;
-                                    controlPoint.position = newPos;
-                                    break outer;
-                                }
-                            }
-                            else if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                                this.rotateLocations(globe, terrainPosition, previousPosition, boundaries);
-                                shape.boundaries = boundaries;
-                                break outer;
-                            }
-                            k++;
-                        }
-                    }
+            for (var i = 0, len = locations.length; i < len; i++) {
+                this.createControlPoint(
+                    controlPoints,
+                    locationControlPointAttributes,
+                    ShapeEditorConstants.LOCATION,
+                    i
+                );
             }
-            else if (boundaries.length >= 2) {
-                //poly without whole
-                for (var i = 0; i < boundaries.length; i++) {
-                    if (controlPoint.userProperties.purpose === ShapeEditorConstants.LOCATION) {
-                        if (controlPoint.userProperties.id === k) {
-                            if (alternateAction) {
-                                //remove location
-                                var minSize = shape instanceof SurfacePolygon ? 3 : 2;
-                                if (boundaries.length > minSize) {
-                                    // Delete the control point.
-                                    boundaries.splice(i, 1);
-                                    shape.boundaries = boundaries;
-                                    this.removeControlPoints();
-                                }
-                            }
-                            else {
-                                newPos = this.moveLocation(globe, controlPoint, terrainPosition, previousPosition);
-                                boundaries[i] = newPos;
-                                shape.boundaries = boundaries;
-                                controlPoint.position = newPos;
-                            }
-                            break;
-                        }
-                    } else if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                        this.rotateLocations(globe, terrainPosition, previousPosition, boundaries);
-                        shape.boundaries = boundaries;
-                        break;
-                    }
-                    k++;
-                }
-            }
+
+            this.createControlPoint(controlPoints, angleControlPointAttributes, ShapeEditorConstants.ROTATION);
+
+            this.initializeRotationAccessory(accessories, angleControlPointAttributes);
         };
 
-        //Internal use only. Intentionally not documented.
-        SurfacePolylineEditorFragment.prototype.updateControlPoints = function (shape, globe, controlPoints, accessories, sizeControlPointAttributes, angleControlPointAttributes, locationControlPointAttributes) {
-            var locations = [];
+        // Internal use only.
+        SurfacePolylineEditorFragment.prototype.updateControlElements = function (shape,
+                                                                                 globe,
+                                                                                 controlPoints,
+                                                                                 accessories) {
+            var locations = shape.boundaries;
 
-            if (shape.boundaries.length > 0 && shape.boundaries[0].length > 2) {
-                for (var i = 0; i < shape.boundaries.length; i++) {
-                    for (var j = 0; j < shape.boundaries[i].length; j++) {
-                        locations.push(shape.boundaries[i][j]);
-                    }
-                }
-            }
-            else if (shape.boundaries.length >= 2) {
-                for (var i = 0; i < shape.boundaries.length; i++) {
-                    locations.push(shape.boundaries[i]);
-                }
-            }
+            var rotationControlPoint = controlPoints.pop();
 
-            if (locations.length < 2)
-                return;
+            var lenControlPoints = controlPoints.length;
+
+            for (var i = 0, len = locations.length; i < len; i++) {
+                if (i >= lenControlPoints) {
+                    this.createControlPoint(
+                        controlPoints,
+                        this.locationControlPointAttributes,
+                        ShapeEditorConstants.LOCATION,
+                        i
+                    );
+                }
+                controlPoints[i].position = locations[i];
+            }
 
             var polygonCenter = this.getCenter(globe, locations);
-            var shapeRadius = this.getAverageDistance(globe, polygonCenter, locations);
-            shapeRadius = shapeRadius * 1.2;
-            var heading = this.currentHeading;
-            var rotationControlLocation = Location.greatCircleLocation(
+            var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
+
+            Location.greatCircleLocation(
                 polygonCenter,
-                heading,
-                shapeRadius,
-                new Location(0, 0));
+                this.currentHeading,
+                polygonRadius,
+                rotationControlPoint.position
+            );
 
-            var rotationPosition = new Position(
-                rotationControlLocation.latitude,
-                rotationControlLocation.longitude,
-                0);
+            rotationControlPoint.userProperties.rotation = this.currentHeading;
 
-            if (controlPoints.length > 0) {
-                for (var i = 0; i < locations.length; i++) {
-                    controlPoints[i].position = locations[i];
+            controlPoints.push(rotationControlPoint);
+
+            this.updateRotationAccessory(polygonCenter, rotationControlPoint.position, accessories);
+        };
+
+        // Internal use only.
+        SurfacePolylineEditorFragment.prototype.reshape = function (shape,
+                                                                   globe,
+                                                                   controlPoint,
+                                                                   newPosition,
+                                                                   previousPosition,
+                                                                   alternateAction) {
+            var locations = shape.boundaries;
+
+            if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
+                this.rotateLocations(globe, newPosition, previousPosition, locations);
+                shape.resetBoundaries();
+                shape._stateId = SurfacePolyline.stateId++;
+                shape.stateKeyInvalid = true;
+
+            } else if (controlPoint.userProperties.purpose === ShapeEditorConstants.LOCATION) {
+                var index = controlPoint.userProperties.index;
+                if (alternateAction) {
+                    // TODO Implement removal of the control point
+                } else {
+                    this.moveLocation(globe, controlPoint, previousPosition, newPosition, locations[index]);
                 }
-                controlPoints[locations.length].position = rotationPosition;
-                controlPoints[locations.length].userProperties.rotation = heading;
+                shape.resetBoundaries();
+                shape._stateId = SurfacePolyline.stateId++;
+                shape.stateKeyInvalid = true;
             }
-            else {
-                var controlPoint;
-
-                for (var i = 0; i < locations.length; i++) {
-                    controlPoint = new Placemark(
-                        locations[i],
-                        false,
-                        locationControlPointAttributes);
-                    controlPoint.userProperties.isControlPoint = true;
-                    controlPoint.userProperties.id = i;
-                    controlPoint.userProperties.purpose = ShapeEditorConstants.LOCATION;
-                    controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                    controlPoints.push(controlPoint);
-                }
-
-                controlPoint = new Placemark(
-                    rotationPosition,
-                    false,
-                    angleControlPointAttributes
-                );
-                controlPoint.userProperties.isControlPoint = true;
-                controlPoint.userProperties.id = locations.length;
-                controlPoint.userProperties.purpose = ShapeEditorConstants.ROTATION;
-                controlPoint.userProperties.rotation = heading;
-                controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                controlPoints.push(controlPoint);
-            }
-
-            this.updateOrientationLine(polygonCenter, rotationPosition, accessories);
         };
 
         return SurfacePolylineEditorFragment;

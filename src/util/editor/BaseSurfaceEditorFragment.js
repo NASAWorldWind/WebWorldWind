@@ -163,13 +163,16 @@ define([
             return (count === 0) ? 0 : totalDistance / globe.equatorialRadius;
         };
 
-        BaseSurfaceEditorFragment.prototype.createControlPoint = function(attributes, purpose, controlPoints) {
+        BaseSurfaceEditorFragment.prototype.createControlPoint = function(controlPoints, attributes, purpose, index) {
             var controlPoint = new Placemark(
                 new Location(0, 0),
                 false,
                 attributes
             );
             controlPoint.userProperties.purpose = purpose;
+            if (typeof index !== "undefined") {
+                controlPoint.userProperties.index = index;
+            }
             controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
             controlPoints.push(controlPoint);
         };
@@ -260,7 +263,23 @@ define([
             }
         };
 
+        BaseSurfaceEditorFragment.prototype.deepCopyLocations = function(locations) {
+            var newLocations = [];
 
+            if (locations.length > 0 && locations[0].length > 2) {
+                for (var i = 0, ilen = locations.length; i < ilen; i++) {
+                    for (var j = 0, jlen = locations[i].length; j < jlen; j++) {
+                        newLocations.push(new Location(locations[i][j].latitude, locations[i][j].longitude));
+                    }
+                }
+            } else {
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    newLocations.push(new Location(locations[i].latitude, locations[i].longitude));
+                }
+            }
+
+            return newLocations;
+        }
 
         BaseSurfaceEditorFragment.prototype.nearestPointOnSegment = function (p1, p2, point) {
             var segment = p2.subtract(p1);
@@ -287,7 +306,7 @@ define([
          * @param {Position} terrainPosition The position selected by the user.
          * @returns {Position} The position after move.
          */
-        BaseSurfaceEditorFragment.prototype.moveLocation = function (globe, controlPoint, terrainPosition, previousPosition) {
+        BaseSurfaceEditorFragment.prototype.moveLocation = function (globe, controlPoint, terrainPosition, previousPosition, result) {
             var delta = this.computeControlPointDelta(globe, previousPosition, terrainPosition);
             var markerPoint = globe.computePointFromPosition(
                 controlPoint.position.latitude,
@@ -301,7 +320,7 @@ define([
                 markerPoint[0],
                 markerPoint[1],
                 markerPoint[2],
-                new Position(0, 0, 0)
+                result
             );
         };
 
