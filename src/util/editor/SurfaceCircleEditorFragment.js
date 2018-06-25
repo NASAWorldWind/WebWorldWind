@@ -54,7 +54,7 @@ define([
                                                                                     accessories,
                                                                                     sizeControlPointAttributes) {
 
-            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.OUTER_RADIUS);
+            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.RADIUS);
         };
 
         // Internal use only.
@@ -76,12 +76,14 @@ define([
                                                                   currentPosition,
                                                                   previousPosition) {
 
-            var delta = this.computeControlPointDelta(globe, currentPosition, previousPosition);
-            var vector = this.computeControlPointDelta(globe, controlPoint.position, shape.center).normalize();
+            if (controlPoint.userProperties.purpose === ShapeEditorConstants.RADIUS) {
+                var delta = this.computeControlPointDelta(globe, currentPosition, previousPosition);
+                var vector = this.computeControlPointDelta(globe, controlPoint.position, shape.center).normalize();
 
-            var radius = shape.radius + delta.dot(vector);
-            if (radius > 0) {
-                shape.radius = radius;
+                var radius = shape.radius + delta.dot(vector);
+                if (radius > 0) {
+                    shape.radius = radius;
+                }
             }
         };
 

@@ -23,24 +23,22 @@ define([],
          */
         var ShapeEditorConstants = {
 
-            // Indicates a control point is associated with a location.
+            // Indicates a control point controlling a location.
             LOCATION: "location",
 
-            // Indicates that a control point is associated with whole-shape rotation.
+            // Indicates a control point controlling the rotation of shape.
             ROTATION: "rotation",
 
-            // Indicates that a control point is associated with width change.
+            // Indicates a control point controlling the width of a shape.
             WIDTH: "width",
 
-            // Indicates that a control point is associated with height change.
+            // Indicates a control point controlling the height of a shape.
             HEIGHT: "height",
 
-            // Indicates that a control point is associated with the right width of a shape.
-            RIGHT_WIDTH: "rightWidth",
+            // Indicates a control point controlling the radius of a shape.
+            RADIUS: "radius",
 
-            // Indicates that a control point is associated with the outer radius of a shape.
-            OUTER_RADIUS: "outerRadius",
-
+            // Indicates that an entire shape is being dragged.
             DRAG: "drag"
         };
 

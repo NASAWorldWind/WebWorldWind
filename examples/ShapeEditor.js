@@ -71,10 +71,33 @@ requirejs(['./WorldWindShim',
         var polygonBoundaries = [];
         polygonBoundaries.push(new WorldWind.Location(40, -100));
         polygonBoundaries.push(new WorldWind.Location(42, -105));
-        polygonBoundaries.push(new WorldWind.Location(40, -110));
+        polygonBoundaries.push(new WorldWind.Location(42, -110));
+        polygonBoundaries.push(new WorldWind.Location(40, -112));
         var polygonShape = new WorldWind.SurfacePolygon(polygonBoundaries, attributes);
         polygonShape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polygonShape);
+
+        var multiPolygonOuterBoundaries = [];
+        multiPolygonOuterBoundaries.push(new WorldWind.Location(40, -80));
+        multiPolygonOuterBoundaries.push(new WorldWind.Location(42, -85));
+        multiPolygonOuterBoundaries.push(new WorldWind.Location(42, -90));
+        multiPolygonOuterBoundaries.push(new WorldWind.Location(40, -92));
+        var multiPolygonInner1Boundaries = [];
+        multiPolygonInner1Boundaries.push(new WorldWind.Location(40.5, -86));
+        multiPolygonInner1Boundaries.push(new WorldWind.Location(41.5, -86));
+        multiPolygonInner1Boundaries.push(new WorldWind.Location(41.5, -85));
+        multiPolygonInner1Boundaries.push(new WorldWind.Location(40.5, -83));
+        var multiPolygonInner2Boundaries = [];
+        multiPolygonInner2Boundaries.push(new WorldWind.Location(41.5, -87));
+        multiPolygonInner2Boundaries.push(new WorldWind.Location(40.5, -91));
+        multiPolygonInner2Boundaries.push(new WorldWind.Location(41.5, -90));
+        var multiPolygonBoundaries = [];
+        multiPolygonBoundaries.push(multiPolygonOuterBoundaries);
+        multiPolygonBoundaries.push(multiPolygonInner1Boundaries);
+        multiPolygonBoundaries.push(multiPolygonInner2Boundaries);
+        var multiPolygonShape = new WorldWind.SurfacePolygon(multiPolygonBoundaries, attributes);
+        multiPolygonShape.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(multiPolygonShape);
 
         var polylineBoundaries = [];
         polylineBoundaries.push(new WorldWind.Location(45, -118));
@@ -118,6 +141,13 @@ requirejs(['./WorldWindShim',
             var shape = shapeEditor.stop();
             if (shape !== polygonShape) {
                 shapeEditor.edit(polygonShape);
+            }
+        });
+
+        document.getElementById("editMultiPolygonBtn").addEventListener("click", function(){
+            var shape = shapeEditor.stop();
+            if (shape !== multiPolygonShape) {
+                shapeEditor.edit(multiPolygonShape);
             }
         });
 

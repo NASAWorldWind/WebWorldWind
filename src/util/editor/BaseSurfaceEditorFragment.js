@@ -268,9 +268,11 @@ define([
 
             if (locations.length > 0 && locations[0].length > 2) {
                 for (var i = 0, ilen = locations.length; i < ilen; i++) {
+                    var ring = [];
                     for (var j = 0, jlen = locations[i].length; j < jlen; j++) {
-                        newLocations.push(new Location(locations[i][j].latitude, locations[i][j].longitude));
+                        ring.push(new Location(locations[i][j].latitude, locations[i][j].longitude));
                     }
+                    newLocations.push(ring);
                 }
             } else {
                 for (var i = 0, len = locations.length; i < len; i++) {
@@ -333,16 +335,14 @@ define([
             var center = this.getCenter(globe, locations);
             var previousHeading = Location.greatCircleAzimuth(center, previousPosition);
             var deltaHeading = Location.greatCircleAzimuth(center, terrainPosition) - previousHeading;
-            this.currentHeading = this.normalizedHeading(this.currentHeading, deltaHeading);
 
             if (locations.length > 0 && locations[0].length > 2) {
                 for (var i = 0; i < locations.length; i++) {
                     for (var j = 0; j < locations[i].length; j++) {
                         var heading = Location.greatCircleAzimuth(center, locations[i][j]);
                         var distance = Location.greatCircleDistance(center, locations[i][j]);
-                        var newLocation = Location.greatCircleLocation(center, heading + deltaHeading, distance,
-                            new Location(0, 0));
-                        locations[i][j] = newLocation;
+                        Location.greatCircleLocation(center, heading + deltaHeading, distance,
+                            locations[i][j]);
                     }
                 }
             }
@@ -350,11 +350,12 @@ define([
                 for (var i = 0; i < locations.length; i++) {
                     var heading = Location.greatCircleAzimuth(center, locations[i]);
                     var distance = Location.greatCircleDistance(center, locations[i]);
-                    var newLocation = Location.greatCircleLocation(center, heading + deltaHeading, distance,
-                        new Location(0, 0));
-                    locations[i] = newLocation;
+                    Location.greatCircleLocation(center, heading + deltaHeading, distance,
+                        locations[i]);
                 }
             }
+
+            return deltaHeading;
         };
 
         return BaseSurfaceEditorFragment;

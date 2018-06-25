@@ -89,8 +89,9 @@ define([
             var rotationControlPoint = controlPoints.pop();
 
             var lenControlPoints = controlPoints.length;
+            var lenLocations = locations.length;
 
-            for (var i = 0, len = locations.length; i < len; i++) {
+            for (var i = 0; i < lenLocations; i++) {
                 if (i >= lenControlPoints) {
                     this.createControlPoint(
                         controlPoints,
@@ -100,6 +101,10 @@ define([
                     );
                 }
                 controlPoints[i].position = locations[i];
+            }
+
+            if (lenControlPoints > lenLocations) {
+                controlPoints.splice(lenLocations, lenControlPoints - lenLocations)
             }
 
             var polygonCenter = this.getCenter(globe, locations);
@@ -129,15 +134,51 @@ define([
             var locations = this.getLocations(shape);
 
             if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                this.rotateLocations(globe, newPosition, previousPosition, locations);
+                var deltaHeading = this.rotateLocations(globe, newPosition, previousPosition, locations);
+                this.currentHeading = this.normalizedHeading(this.currentHeading, deltaHeading);
                 shape.resetBoundaries();
                 shape._stateId = SurfacePolygon.stateId++;
                 shape.stateKeyInvalid = true;
 
             } else if (controlPoint.userProperties.purpose === ShapeEditorConstants.LOCATION) {
                 var index = controlPoint.userProperties.index;
+
                 if (alternateAction) {
-                    // TODO Implement removal of the control point
+                    var boundaries = shape.boundaries;
+                    var lenBoundaries = boundaries.length;
+
+                    if (lenBoundaries > 0 && Array.isArray(boundaries[0])) {
+                        var ringIndex = -1;
+                        var locationOffset = 0;
+                        var locationIndex = -1;
+
+                        for (var i = 0; i < lenBoundaries && ringIndex == -1; i++) {
+                            var len = boundaries[i].length;
+                            if (locationOffset + len > index) {
+                                ringIndex = i;
+                                locationIndex = index - locationOffset;
+                            }
+                            locationOffset += len;
+                        }
+
+                        console.log(ringIndex);
+                        console.log(locationIndex);
+
+                        if (ringIndex !== -1) {
+                            var ring = boundaries[ringIndex];
+                            if (ring.length > 3) {
+                                ring.splice(locationIndex, 1);
+                            } else if (lenBoundaries > 2) {
+                                boundaries.splice(ringIndex, 1);
+                            }
+                        }
+
+                    } else {
+                        if (boundaries.length > 3) {
+                            boundaries.splice(index, 1);
+                        }
+                    }
+
                 } else {
                     this.moveLocation(globe, controlPoint, previousPosition, newPosition, locations[index]);
                 }
