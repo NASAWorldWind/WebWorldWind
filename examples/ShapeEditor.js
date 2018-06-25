@@ -88,6 +88,7 @@ requirejs(['./WorldWindShim',
         document.getElementById("editPolyBtn").addEventListener("click", function(){
             if(document.getElementById("editPolyBtn").innerHTML === "Start edit polygon"){
                 shapeEditor.edit(polyShape);
+                shapeEditor.shape.highlighted = true;
 
                 document.getElementById("editPolyBtn").innerHTML = "Stop edit polygon";
                 document.getElementById("editCircleBtn").disabled = true;
