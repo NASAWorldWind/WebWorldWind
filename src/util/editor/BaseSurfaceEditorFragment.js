@@ -234,79 +234,158 @@ define([
             return Angle.RADIANS_TO_DEGREES * (newHeading >= 0 ? newHeading : newHeading + Angle.TWO_PI);
         };
 
+        // Creates and returns a deep copy of a set of locations, which can include multiple rings.
+        BaseSurfaceEditorFragment.prototype.deepCopyLocations = function(locations) {
+            var newLocations = [];
 
-
-
-
-        /**
-         * Computes the average location of a specified array of locations.
-         * @param {Location[]} locations The array of locations for the shape.
-         * @return {Position} the average of the locations specified in the array.
-         */
-        BaseSurfaceEditorFragment.prototype.getCenter = function (globe, locations) {
-            var count = 0;
-            var center = new Vec3(0, 0, 0);
-
-            if (locations.length > 0 && locations[0].length > 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    for (var j = 0; j < locations[i].length; j++) {
-                        center = center.add(globe.computePointFromPosition(
-                            locations[i][j].latitude,
-                            locations[i][j].longitude,
-                            0,
-                            new Vec3(0, 0, 0)));
-                        ++count;
+            if (locations.length > 0 && Array.isArray(locations[0])) {
+                for (var i = 0, ilen = locations.length; i < ilen; i++) {
+                    var ring = [];
+                    for (var j = 0, jlen = locations[i].length; j < jlen; j++) {
+                        ring.push(new Location(locations[i][j].latitude, locations[i][j].longitude));
                     }
+                    newLocations.push(ring);
                 }
-            }
-            else if (locations.length >= 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    center = center.add(globe.computePointFromPosition(
-                        locations[i].latitude,
-                        locations[i].longitude,
-                        0,
-                        new Vec3(0, 0, 0)));
-                    ++count;
+            } else {
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    newLocations.push(new Location(locations[i].latitude, locations[i].longitude));
                 }
             }
 
-            center = center.divide(count);
-
-            return globe.computePositionFromPoint(
-                center[0],
-                center[1],
-                center[2],
-                new Position(0, 0, 0)
-            );
+            return newLocations;
         };
 
-        /**
-         * Computes the average distance between a specified center point and a list of locations.
-         * @param {Globe} globe The globe to use for the computations.
-         * @param {Location} center The center point.
-         * @param {Array} locations The locations.
-         * @returns {Number} The average distance.
-         */
-        BaseSurfaceEditorFragment.prototype.getAverageDistance = function (globe, center, locations) {
-            var count = locations.length;
+        // Returns the center of a set of locations, which can include multiple rings.
+        BaseSurfaceEditorFragment.prototype.getCenterFromLocations = function (globe, locations) {
+            var count = 0;
+            var center = new Vec3(0, 0, 0);
+            var tmpVector = new Vec3(0, 0, 0);
 
+            if (locations.length > 0 && Array.isArray(locations[0])) {
+                for (var i = 0, ilen = locations.length; i < ilen; i++) {
+                    for (var j = 0, jlen = locations[i].length; j < jlen; j++) {
+                        center.add(
+                            globe.computePointFromPosition(
+                                locations[i][j].latitude,
+                                locations[i][j].longitude,
+                                0,
+                                tmpVector
+                            )
+                        );
+                        count++;
+                    }
+                }
+            } else {
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    center.add(
+                        globe.computePointFromPosition(
+                            locations[i].latitude,
+                            locations[i].longitude,
+                            0,
+                            tmpVector
+                        )
+                    );
+                    count++;
+                }
+            }
+
+            center.divide(count);
+
+            return globe.computePositionFromPoint(center[0], center[1], center[2], new Position(0, 0, 0));
+        };
+
+        // Computes the average distance between the specified center point and the locations in the specified list.
+        BaseSurfaceEditorFragment.prototype.getAverageDistance = function (globe, center, locations) {
             var centerPoint = globe.computePointFromLocation(
                 center.latitude,
                 center.longitude,
                 new Vec3(0, 0, 0)
             );
 
+            var count = locations.length;
             var totalDistance = 0;
-            for (var i = 0; i < locations.length; i++) {
+            var tmpVector = new Vec3(0, 0, 0);
+            for (var i = 0; i < count; i++) {
                 var distance = globe.computePointFromLocation(
                     locations[i].latitude,
                     locations[i].longitude,
-                    new Vec3(0, 0, 0)).distanceTo(centerPoint);
+                    tmpVector
+                ).distanceTo(centerPoint);
                 totalDistance += distance / count;
             }
 
-            return (count === 0) ? 0 : totalDistance / globe.equatorialRadius;
+            return totalDistance / globe.equatorialRadius;
         };
+
+        // Moves the location of a control point.
+        BaseSurfaceEditorFragment.prototype.moveLocation = function (globe,
+                                                                     controlPoint,
+                                                                     currentPosition,
+                                                                     previousPosition,
+                                                                     result) {
+            // FIXME Is this needed?
+
+            var delta = this.computeControlPointDelta(globe, previousPosition, currentPosition);
+
+            var controlPointPoint = globe.computePointFromPosition(
+                controlPoint.position.latitude,
+                controlPoint.position.longitude,
+                0,
+                new Vec3(0, 0, 0)
+            );
+
+            controlPointPoint.add(delta);
+
+            return globe.computePositionFromPoint(
+                controlPointPoint[0],
+                controlPointPoint[1],
+                controlPointPoint[2],
+                result
+            );
+        };
+
+        // Rotates a set of locations, which can include multiple rings, around their center and returns the delta in
+        // heading that was applied.
+        BaseSurfaceEditorFragment.prototype.rotateLocations = function (globe, newPosition, previousPosition, locations) {
+            var center = this.getCenterFromLocations(globe, locations);
+            var previousHeading = Location.greatCircleAzimuth(center, previousPosition);
+            var deltaHeading = Location.greatCircleAzimuth(center, newPosition) - previousHeading;
+
+            if (locations.length > 0 && Array.isArray(locations[0])) {
+                for (var i = 0, ilen = locations.length; i < ilen; i++) {
+                    for (var j = 0, jlen = locations[i].length; j < jlen; j++) {
+                        var heading = Location.greatCircleAzimuth(center, locations[i][j]);
+                        var distance = Location.greatCircleDistance(center, locations[i][j]);
+                        Location.greatCircleLocation(
+                            center,
+                            heading + deltaHeading,
+                            distance,
+                            locations[i][j]
+                        );
+                    }
+                }
+            } else {
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    var heading = Location.greatCircleAzimuth(center, locations[i]);
+                    var distance = Location.greatCircleDistance(center, locations[i]);
+                    Location.greatCircleLocation(
+                        center,
+                        heading + deltaHeading,
+                        distance,
+                        locations[i]
+                    );
+                }
+            }
+
+            return deltaHeading;
+        };
+
+
+
+
+
+
+
 
         BaseSurfaceEditorFragment.prototype.addNewControlPoint = function (globe, terrainPosition, altitude, locations) {
             // Find the nearest edge to the picked point and insert a new position on that edge.
@@ -374,26 +453,6 @@ define([
             }
         };
 
-        BaseSurfaceEditorFragment.prototype.deepCopyLocations = function(locations) {
-            var newLocations = [];
-
-            if (locations.length > 0 && locations[0].length > 2) {
-                for (var i = 0, ilen = locations.length; i < ilen; i++) {
-                    var ring = [];
-                    for (var j = 0, jlen = locations[i].length; j < jlen; j++) {
-                        ring.push(new Location(locations[i][j].latitude, locations[i][j].longitude));
-                    }
-                    newLocations.push(ring);
-                }
-            } else {
-                for (var i = 0, len = locations.length; i < len; i++) {
-                    newLocations.push(new Location(locations[i].latitude, locations[i].longitude));
-                }
-            }
-
-            return newLocations;
-        }
-
         BaseSurfaceEditorFragment.prototype.nearestPointOnSegment = function (p1, p2, point) {
             var segment = p2.subtract(p1);
 
@@ -411,62 +470,6 @@ define([
             else {
                 return Vec3.fromLine(p1, dot, dir); // FIXME This is broken
             }
-        };
-
-        /**
-         * Moves a control point location.
-         * @param {Placemark} controlPoint The control point being moved.
-         * @param {Position} terrainPosition The position selected by the user.
-         * @returns {Position} The position after move.
-         */
-        BaseSurfaceEditorFragment.prototype.moveLocation = function (globe, controlPoint, terrainPosition, previousPosition, result) {
-            var delta = this.computeControlPointDelta(globe, previousPosition, terrainPosition);
-            var markerPoint = globe.computePointFromPosition(
-                controlPoint.position.latitude,
-                controlPoint.position.longitude,
-                0,
-                new Vec3(0, 0, 0)
-            );
-
-            markerPoint.add(delta);
-            return globe.computePositionFromPoint(
-                markerPoint[0],
-                markerPoint[1],
-                markerPoint[2],
-                result
-            );
-        };
-
-        /**
-         * Rotates a shape's locations.
-         * @param {Position} terrainPosition The position selected by the user.
-         * @param {Location[]} locations The array of locations for the shape.
-         */
-        BaseSurfaceEditorFragment.prototype.rotateLocations = function (globe, terrainPosition, previousPosition, locations) {
-            var center = this.getCenter(globe, locations);
-            var previousHeading = Location.greatCircleAzimuth(center, previousPosition);
-            var deltaHeading = Location.greatCircleAzimuth(center, terrainPosition) - previousHeading;
-
-            if (locations.length > 0 && locations[0].length > 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    for (var j = 0; j < locations[i].length; j++) {
-                        var heading = Location.greatCircleAzimuth(center, locations[i][j]);
-                        var distance = Location.greatCircleDistance(center, locations[i][j]);
-                        Location.greatCircleLocation(center, heading + deltaHeading, distance,
-                            locations[i][j]);
-                    }
-                }
-            }
-            else if (locations.length >= 2) {
-                for (var i = 0; i < locations.length; i++) {
-                    var heading = Location.greatCircleAzimuth(center, locations[i]);
-                    var distance = Location.greatCircleDistance(center, locations[i]);
-                    Location.greatCircleLocation(center, heading + deltaHeading, distance,
-                        locations[i]);
-                }
-            }
-
-            return deltaHeading;
         };
 
         return BaseSurfaceEditorFragment;

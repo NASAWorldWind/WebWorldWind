@@ -565,6 +565,7 @@ define([
 
         // Internal use only.
         ShapeEditor.prototype.drag = function (clientX, clientY) {
+            // TODO Understand and review
             var refPos = this._shape.getReferencePosition();
 
             var refPoint = this._worldWindow.globe.computePointFromPosition(

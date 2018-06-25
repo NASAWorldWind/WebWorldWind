@@ -50,7 +50,7 @@ define([
 
         // Internal use only.
         SurfacePolygonEditorFragment.prototype.getShapeCenter = function (shape, globe) {
-            return this.getCenter(globe, shape.boundaries);
+            return this.getCenterFromLocations(globe, shape.boundaries);
         };
 
         // Internal use only.
@@ -107,7 +107,7 @@ define([
                 controlPoints.splice(lenLocations, lenControlPoints - lenLocations)
             }
 
-            var polygonCenter = this.getCenter(globe, locations);
+            var polygonCenter = this.getCenterFromLocations(globe, locations);
             var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
 
             Location.greatCircleLocation(
@@ -192,14 +192,14 @@ define([
         SurfacePolygonEditorFragment.prototype.getLocations = function (shape) {
             var locations = [];
 
-            if (shape.boundaries.length > 0 && shape.boundaries[0].length > 2) {
-                for (var i = 0; i < shape.boundaries.length; i++) {
-                    for (var j = 0; j < shape.boundaries[i].length; j++) {
+            if (shape.boundaries.length > 0 && Array.isArray(shape.boundaries[0])) {
+                for (var i = 0, ilen = shape.boundaries.length; i < ilen; i++) {
+                    for (var j = 0, jlen = shape.boundaries[i].length; j < jlen; j++) {
                         locations.push(shape.boundaries[i][j]);
                     }
                 }
-            } else if (shape.boundaries.length >= 2) {
-                for (var i = 0; i < shape.boundaries.length; i++) {
+            } else {
+                for (var i = 0, len = shape.boundaries.length; i < len; i++) {
                     locations.push(shape.boundaries[i]);
                 }
             }

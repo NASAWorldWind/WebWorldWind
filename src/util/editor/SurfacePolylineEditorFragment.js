@@ -50,7 +50,7 @@ define([
 
         //Internal use only. Intentionally not documented.
         SurfacePolylineEditorFragment.prototype.getShapeCenter = function (shape, globe) {
-            return this.getCenter(globe, shape.boundaries);
+            return this.getCenterFromLocations(globe, shape.boundaries);
         };
 
         // Internal use only.
@@ -107,7 +107,7 @@ define([
                 controlPoints.splice(lenLocations, lenControlPoints - lenLocations)
             }
 
-            var polygonCenter = this.getCenter(globe, locations);
+            var polygonCenter = this.getCenterFromLocations(globe, locations);
             var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
 
             Location.greatCircleLocation(
