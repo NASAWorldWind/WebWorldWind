@@ -52,9 +52,9 @@ define([
         SurfaceCircleEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                     controlPoints,
                                                                                     accessories,
-                                                                                    sizeControlPointAttributes) {
+                                                                                    resizeControlPointAttributes) {
 
-            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.RADIUS);
+            this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.RADIUS);
         };
 
         // Internal use only.

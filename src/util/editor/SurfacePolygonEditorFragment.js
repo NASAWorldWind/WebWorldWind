@@ -33,7 +33,7 @@ define([
         // Internal use only.
         var SurfacePolygonEditorFragment = function () {
             this.currentHeading = 0;
-            this.locationControlPointAttributes = null;
+            this.moveControlPointAttributes = null;
         };
 
         SurfacePolygonEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
@@ -55,28 +55,28 @@ define([
 
         // Internal use only.
         SurfacePolygonEditorFragment.prototype.initializeControlElements = function (shape,
-                                                                                       controlPoints,
-                                                                                       accessories,
-                                                                                       sizeControlPointAttributes,
-                                                                                       angleControlPointAttributes,
-                                                                                       locationControlPointAttributes) {
+                                                                                     controlPoints,
+                                                                                     accessories,
+                                                                                     resizeControlPointAttributes,
+                                                                                     rotateControlPointAttributes,
+                                                                                     moveControlPointAttributes) {
             this.currentHeading = 0;
-            this.locationControlPointAttributes = locationControlPointAttributes;
+            this.moveControlPointAttributes = moveControlPointAttributes;
 
             var locations = this.getLocations(shape);
 
             for (var i = 0, len = locations.length; i < len; i++) {
                 this.createControlPoint(
                     controlPoints,
-                    locationControlPointAttributes,
+                    moveControlPointAttributes,
                     ShapeEditorConstants.LOCATION,
                     i
                 );
             }
 
-            this.createControlPoint(controlPoints, angleControlPointAttributes, ShapeEditorConstants.ROTATION);
+            this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
 
-            this.initializeRotationAccessory(accessories, angleControlPointAttributes);
+            this.createRotationAccessory(accessories, rotateControlPointAttributes);
         };
 
         // Internal use only.
@@ -95,7 +95,7 @@ define([
                 if (i >= lenControlPoints) {
                     this.createControlPoint(
                         controlPoints,
-                        this.locationControlPointAttributes,
+                        this.moveControlPointAttributes,
                         ShapeEditorConstants.LOCATION,
                         i
                     );
@@ -128,13 +128,13 @@ define([
         SurfacePolygonEditorFragment.prototype.reshape = function (shape,
                                                                    globe,
                                                                    controlPoint,
-                                                                   newPosition,
+                                                                   currentPosition,
                                                                    previousPosition,
-                                                                   alternateAction) {
+                                                                   secondaryBehavior) {
             var locations = this.getLocations(shape);
 
             if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                var deltaHeading = this.rotateLocations(globe, newPosition, previousPosition, locations);
+                var deltaHeading = this.rotateLocations(globe, currentPosition, previousPosition, locations);
                 this.currentHeading = this.normalizedHeading(this.currentHeading, deltaHeading);
                 shape.resetBoundaries();
                 shape._stateId = SurfacePolygon.stateId++;
@@ -143,7 +143,7 @@ define([
             } else if (controlPoint.userProperties.purpose === ShapeEditorConstants.LOCATION) {
                 var index = controlPoint.userProperties.index;
 
-                if (alternateAction) {
+                if (secondaryBehavior) {
                     var boundaries = shape.boundaries;
                     var lenBoundaries = boundaries.length;
 
@@ -180,7 +180,7 @@ define([
                     }
 
                 } else {
-                    this.moveLocation(globe, controlPoint, previousPosition, newPosition, locations[index]);
+                    this.moveLocation(globe, controlPoint, previousPosition, currentPosition, locations[index]);
                 }
                 shape.resetBoundaries();
                 shape._stateId = SurfacePolygon.stateId++;

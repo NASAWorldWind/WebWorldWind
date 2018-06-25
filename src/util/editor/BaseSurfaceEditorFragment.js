@@ -19,46 +19,170 @@
 define([
         '../../geom/Angle',
         '../../geom/Location',
+        '../Logger',
         '../../shapes/Path',
         '../../shapes/Placemark',
         '../../geom/Position',
         '../../shapes/ShapeAttributes',
+        '../../error/UnsupportedOperationError',
         '../../geom/Vec3'
     ],
     function (Angle,
               Location,
+              Logger,
               Path,
               Placemark,
               Position,
               ShapeAttributes,
+              UnsupportedOperationError,
               Vec3) {
         "use strict";
 
-        //Internal use only. Intentionally not documented.
+        // Internal use only.
         var BaseSurfaceEditorFragment = function () {};
 
         /**
-         * Add a specified increment to an angle and normalize the result to be between 0 and 360 degrees.
-         * @param {Number} originalHeading The base angle.
-         * @param {Number} deltaHeading The increment to add prior to normalizing.
-         * @returns {Number} The normalized angle.
+         * Returns a value indicating whether this fragment can handle the specified shape.
+         *
+         * @param {SurfaceShape} shape The shape to test.
+         * @return {Boolean} <code>true</code> if this fragment can handle the specified shape; otherwise
+         * <code>false</code>.
          */
-        BaseSurfaceEditorFragment.prototype.normalizedHeading = function (originalHeading, deltaHeading) {
-            var newHeading = originalHeading * Angle.DEGREES_TO_RADIANS + deltaHeading * Angle.DEGREES_TO_RADIANS;
-
-            if (Math.abs(newHeading) > Angle.TWO_PI) {
-                newHeading = newHeading % Angle.TWO_PI;
-            }
-
-            return Angle.RADIANS_TO_DEGREES * (newHeading >= 0 ? newHeading : newHeading + Angle.TWO_PI);
+        BaseSurfaceEditorFragment.prototype.canHandle = function (shape) {
+            throw new UnsupportedOperationError(Logger.logMessage(
+                Logger.LEVEL_SEVERE,
+                "BaseSurfaceEditorFragment",
+                "canHandle",
+                "abstractInvocation")
+            );
         };
 
         /**
-         * Computes the Cartesian difference between two control points.
-         * @param {Position} previousPosition The position of the previous control point.
-         * @param {Position} currentPosition  The position of the current control point.
-         * @returns {Vec3} The Cartesian difference between the two control points.
+         * Creates and return a shadow shape from the specified shape.
+         *
+         * The shadow shape must be a deep copy, i.e. acting on the properties of the specified shape afterwards must
+         * not alter the appearance of the shadow shape.
+         *
+         * @param {SurfaceShape} shape The base shape to create a shadow from.
+         * @return {SurfaceShape} The shadow shape created from the specified base shape.
          */
+        BaseSurfaceEditorFragment.prototype.createShadowShape = function (shape) {
+            throw new UnsupportedOperationError(Logger.logMessage(
+                Logger.LEVEL_SEVERE,
+                "BaseSurfaceEditorFragment",
+                "createShadowShape",
+                "abstractInvocation")
+            );
+        };
+
+        /**
+         * Returns the location at the center of the specified shape.
+         *
+         * @param {SurfaceShape} shape The shape to get the center from.
+         * @param {Globe} globe The globe on which the shape is edited.
+         * @return {Location} The location at the center of the specified shape.
+         */
+        BaseSurfaceEditorFragment.prototype.getShapeCenter = function (shape, globe) {
+            throw new UnsupportedOperationError(Logger.logMessage(
+                Logger.LEVEL_SEVERE,
+                "BaseSurfaceEditorFragment",
+                "getShapeCenter",
+                "abstractInvocation")
+            );
+        };
+
+        /**
+         * Initializes the control elements required to edit the specified shape.
+         *
+         * This method must create the elements, but not position them. Their positioning is handled by
+         * {@link BaseSurfaceEditorFragment#updateControlElements}.
+         *
+         * @param {SurfaceShape} shape The shape being edited.
+         * @param {Renderable[]} controlPoints The array to store control points in.
+         * @param {Renderable[]} accessories The array to store additional accessories in.
+         * @param {PlacemarkAttributes} resizeControlPointAttributes The attributes to use for control points that
+         * resize the shape.
+         * @param {PlacemarkAttributes} rotateControlPointAttributes The attributes to use for control points that
+         * rotate the shape.
+         * @param {PlacemarkAttributes} moveControlPointAttributes The attributes to use for control points that move
+         * the boundaries of the shape.
+         */
+        BaseSurfaceEditorFragment.prototype.initializeControlElements = function (shape,
+                                                                                  controlPoints,
+                                                                                  accessories,
+                                                                                  resizeControlPointAttributes,
+                                                                                  rotateControlPointAttributes,
+                                                                                  moveControlPointAttributes) {
+            throw new UnsupportedOperationError(Logger.logMessage(
+                Logger.LEVEL_SEVERE,
+                "BaseSurfaceEditorFragment",
+                "initializeControlElements",
+                "abstractInvocation")
+            );
+        };
+
+        /**
+         * Updates the control elements required to edit the specified shape.
+         *
+         * @param {SurfaceShape} shape The shape being edited.
+         * @param {Globe} globe The globe on which the shape is edited.
+         * @param {Renderable[]} controlPoints The array that stores the control points.
+         * @param {Renderable[]} accessories The array that stores the additional accessories.
+         */
+        BaseSurfaceEditorFragment.prototype.updateControlElements = function (shape,
+                                                                              globe,
+                                                                              controlPoints,
+                                                                              accessories) {
+            throw new UnsupportedOperationError(Logger.logMessage(
+                Logger.LEVEL_SEVERE,
+                "BaseSurfaceEditorFragment",
+                "updateControlElements",
+                "abstractInvocation")
+            );
+        };
+
+        /**
+         * Reshapes the specified shape by applying the appropriate effect when the given control point is moved from
+         * the previous location to the current location.
+         *
+         * @param {SurfaceShape} shape The shape being edited.
+         * @param {Globe} globe The globe on which the shape is edited.
+         * @param {Renderable} controlPoint The control point being acted on.
+         * @param {Position} currentPosition The current position for this action.
+         * @param {Position} previousPosition The previous position for this action.
+         * @param {Boolean} secondaryBehavior A value indicating whether the secondary behavior of this action should be
+         * performed or not.
+         */
+        BaseSurfaceEditorFragment.prototype.reshape = function (shape,
+                                                                globe,
+                                                                controlPoint,
+                                                                currentPosition,
+                                                                previousPosition,
+                                                                secondaryBehavior) {
+            throw new UnsupportedOperationError(Logger.logMessage(
+                Logger.LEVEL_SEVERE,
+                "BaseSurfaceEditorFragment",
+                "reshape",
+                "abstractInvocation")
+            );
+        };
+
+        // Creates a control point and adds it to the array of control points.
+        BaseSurfaceEditorFragment.prototype.createControlPoint = function(controlPoints, attributes, purpose, index) {
+            var controlPoint = new Placemark(new Location(0, 0), false, attributes);
+
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND
+
+            controlPoint.userProperties.purpose = purpose;
+
+            if (typeof index !== "undefined") {
+                controlPoint.userProperties.index = index;
+            }
+
+            controlPoints.push(controlPoint);
+        };
+
+        // Computes the cartesian difference between two positions such as control points.
         BaseSurfaceEditorFragment.prototype.computeControlPointDelta = function (globe, positionA, positionB) {
             var pointA = globe.computePointFromPosition(
                 positionA.latitude,
@@ -77,21 +201,42 @@ define([
             return pointA.subtract(pointB);
         };
 
-        /**
-         * Updates the line designating the shape's central axis.
-         * @param {Position} centerPosition The shape's center location and altitude at which to place one of the line's
-         * end points.
-         * @param {Position} controlPointPosition  The shape orientation control point's position.
-         */
+        // Creates an accessory showing the rotation of a shape and adds it to the array of accessories.
+        BaseSurfaceEditorFragment.prototype.createRotationAccessory = function (accessories, attributes) {
+            var positions = [];
+            positions.push(new Position(0, 0, 0));
+            positions.push(new Position(0, 0, 0));
+
+            var shapeAttributes = new ShapeAttributes(null);
+            shapeAttributes.outlineColor = attributes.imageColor;
+            shapeAttributes.outlineWidth = 2;
+
+            var rotationLine = new Path(positions, shapeAttributes);
+            rotationLine.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            rotationLine.followTerrain = true;
+
+            accessories.push(rotationLine);
+        };
+
+        // Updates the heading of the accessory showing the rotation of the shape.
         BaseSurfaceEditorFragment.prototype.updateRotationAccessory = function (centerPosition, controlPointPosition, accessories) {
-            if (accessories.length == 0) {
-                return;
+            accessories[0].positions = [centerPosition, controlPointPosition];
+        };
+
+        // Applies a delta to a heading and normalizes it.
+        BaseSurfaceEditorFragment.prototype.normalizedHeading = function (currentHeading, deltaHeading) {
+            var newHeading = currentHeading * Angle.DEGREES_TO_RADIANS + deltaHeading * Angle.DEGREES_TO_RADIANS;
+
+            if (Math.abs(newHeading) > Angle.TWO_PI) {
+                newHeading = newHeading % Angle.TWO_PI;
             }
 
-            var positions = [];
-            positions.push(centerPosition, controlPointPosition);
-            accessories[0].positions = positions;
+            return Angle.RADIANS_TO_DEGREES * (newHeading >= 0 ? newHeading : newHeading + Angle.TWO_PI);
         };
+
+
+
+
 
         /**
          * Computes the average location of a specified array of locations.
@@ -161,40 +306,6 @@ define([
             }
 
             return (count === 0) ? 0 : totalDistance / globe.equatorialRadius;
-        };
-
-        BaseSurfaceEditorFragment.prototype.createControlPoint = function(controlPoints, attributes, purpose, index) {
-            var controlPoint = new Placemark(
-                new Location(0, 0),
-                false,
-                attributes
-            );
-            controlPoint.userProperties.purpose = purpose;
-            if (typeof index !== "undefined") {
-                controlPoint.userProperties.index = index;
-            }
-            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-            controlPoints.push(controlPoint);
-        };
-
-        /**
-         * Set up the Path for the rotation line.
-         */
-        BaseSurfaceEditorFragment.prototype.initializeRotationAccessory = function (accessories, attributes) {
-            var pathPositions = [];
-            pathPositions.push(new Position(0, 0, 0));
-            pathPositions.push(new Position(0, 0, 0));
-            var rotationLine = new Path(pathPositions, null);
-            rotationLine.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-            rotationLine.followTerrain = true;
-
-            var pathAttributes = new ShapeAttributes(null);
-            pathAttributes.outlineColor = attributes.imageColor;
-            pathAttributes.outlineWidth = 2;
-
-            rotationLine.attributes = pathAttributes;
-
-            accessories.push(rotationLine);
         };
 
         BaseSurfaceEditorFragment.prototype.addNewControlPoint = function (globe, terrainPosition, altitude, locations) {

@@ -58,14 +58,14 @@ define([
         SurfaceEllipseEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                      controlPoints,
                                                                                      accessories,
-                                                                                     sizeControlPointAttributes,
-                                                                                     angleControlPointAttributes) {
+                                                                                     resizeControlPointAttributes,
+                                                                                     rotateControlPointAttributes) {
 
-            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.WIDTH);
-            this.createControlPoint(controlPoints, sizeControlPointAttributes, ShapeEditorConstants.HEIGHT);
-            this.createControlPoint(controlPoints, angleControlPointAttributes, ShapeEditorConstants.ROTATION);
+            this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.WIDTH);
+            this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.HEIGHT);
+            this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
 
-            this.initializeRotationAccessory(accessories, angleControlPointAttributes);
+            this.createRotationAccessory(accessories, rotateControlPointAttributes);
         };
 
         // Internal use only.

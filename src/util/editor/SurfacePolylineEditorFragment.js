@@ -33,7 +33,7 @@ define([
         //Internal use only. Intentionally not documented.
         var SurfacePolylineEditorFragment = function () {
             this.currentHeading = 0;
-            this.locationControlPointAttributes = null;
+            this.moveControlPointAttributes = null;
         };
 
         SurfacePolylineEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
@@ -57,26 +57,26 @@ define([
         SurfacePolylineEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                       controlPoints,
                                                                                       accessories,
-                                                                                      sizeControlPointAttributes,
-                                                                                      angleControlPointAttributes,
-                                                                                      locationControlPointAttributes) {
+                                                                                      resizeControlPointAttributes,
+                                                                                      rotateControlPointAttributes,
+                                                                                      moveControlPointAttributes) {
             this.currentHeading = 0;
-            this.locationControlPointAttributes = locationControlPointAttributes;
+            this.moveControlPointAttributes = moveControlPointAttributes;
 
             var locations = shape.boundaries;
 
             for (var i = 0, len = locations.length; i < len; i++) {
                 this.createControlPoint(
                     controlPoints,
-                    locationControlPointAttributes,
+                    moveControlPointAttributes,
                     ShapeEditorConstants.LOCATION,
                     i
                 );
             }
 
-            this.createControlPoint(controlPoints, angleControlPointAttributes, ShapeEditorConstants.ROTATION);
+            this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
 
-            this.initializeRotationAccessory(accessories, angleControlPointAttributes);
+            this.createRotationAccessory(accessories, rotateControlPointAttributes);
         };
 
         // Internal use only.
@@ -95,7 +95,7 @@ define([
                 if (i >= lenControlPoints) {
                     this.createControlPoint(
                         controlPoints,
-                        this.locationControlPointAttributes,
+                        this.moveControlPointAttributes,
                         ShapeEditorConstants.LOCATION,
                         i
                     );
@@ -128,13 +128,13 @@ define([
         SurfacePolylineEditorFragment.prototype.reshape = function (shape,
                                                                     globe,
                                                                     controlPoint,
-                                                                    newPosition,
+                                                                    currentPosition,
                                                                     previousPosition,
-                                                                    alternateAction) {
+                                                                    secondaryBehavior) {
             var locations = shape.boundaries;
 
             if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                var deltaHeading = this.rotateLocations(globe, newPosition, previousPosition, locations);
+                var deltaHeading = this.rotateLocations(globe, currentPosition, previousPosition, locations);
                 this.currentHeading = this.normalizedHeading(this.currentHeading, deltaHeading);
                 shape.resetBoundaries();
                 shape._stateId = SurfacePolyline.stateId++;
@@ -142,12 +142,12 @@ define([
 
             } else if (controlPoint.userProperties.purpose === ShapeEditorConstants.LOCATION) {
                 var index = controlPoint.userProperties.index;
-                if (alternateAction) {
+                if (secondaryBehavior) {
                     if (locations.length > 2) {
                         locations.splice(index, 1);
                     }
                 } else {
-                    this.moveLocation(globe, controlPoint, previousPosition, newPosition, locations[index]);
+                    this.moveLocation(globe, controlPoint, previousPosition, currentPosition, locations[index]);
                 }
                 shape.resetBoundaries();
                 shape._stateId = SurfacePolyline.stateId++;
