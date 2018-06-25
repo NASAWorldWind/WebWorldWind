@@ -496,6 +496,7 @@ define([
             }
         };
 
+        // Internal use only.
         ShapeEditor.prototype.beginAction = function (initialPosition, alternateAction, controlPoint) {
             // Define the active transformation
             if (controlPoint) {
@@ -522,6 +523,7 @@ define([
             this._worldWindow.redraw();
         };
 
+        // Internal use only.
         ShapeEditor.prototype.endAction = function () {
             this.shadowShapeLayer.removeAllRenderables();
 
@@ -536,6 +538,7 @@ define([
             this._worldWindow.redraw();
         };
 
+        // Internal use only.
         ShapeEditor.prototype.reshape = function (newPosition) {
             this.activeEditorFragment.reshape(
                 this._shape,
@@ -554,6 +557,7 @@ define([
             this._worldWindow.redraw();
         };
 
+        // Internal use only.
         ShapeEditor.prototype.drag = function (clientX, clientY) {
             // FIXME To be reviewed
             var refPos = this._shape.getReferencePosition();
@@ -594,6 +598,7 @@ define([
             this._worldWindow.redraw();
         };
 
+        // Internal use only.
         ShapeEditor.prototype.updateAnnotation = function (controlPoint) {
             this.annotationLayer.enabled = true;
 
@@ -618,10 +623,12 @@ define([
             this.annotation.text = annotationText;
         };
 
+        // Internal use only.
         ShapeEditor.prototype.hideAnnotation = function (controlPoint) {
             this.annotationLayer.enabled = false;
         };
 
+        // Internal use only.
         ShapeEditor.prototype.updateShapeAnnotation = function () {
             var center = this.activeEditorFragment.getShapeCenter(this._shape);
 
@@ -640,21 +647,25 @@ define([
             }
         };
 
+        // Internal use only.
         ShapeEditor.prototype.formatLatitude = function (number) {
             var suffix = number < 0 ? "\u00b0S" : "\u00b0N";
             return Math.abs(number).toFixed(4) + suffix;
         };
 
+        // Internal use only.
         ShapeEditor.prototype.formatLongitude = function (number) {
             var suffix = number < 0 ? "\u00b0W" : "\u00b0E";
             return Math.abs(number).toFixed(4) + suffix;
         };
 
+        // Internal use only.
         ShapeEditor.prototype.formatLength = function (number) {
             var suffix = " km";
             return Math.abs(number / 1000.0).toFixed(3) + suffix;
         };
 
+        // Internal use only.
         ShapeEditor.prototype.formatRotation = function (rotation) {
             return rotation.toFixed(4) + "°";
         };

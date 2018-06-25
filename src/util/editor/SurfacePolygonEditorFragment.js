@@ -67,7 +67,7 @@ define([
                 outer:
                     for (var i = 0; i < boundaries.length; i++) {
                         for (var j = 0; j < boundaries[i].length; j++) {
-                            if (controlPoint.userProperties.purpose === ShapeEditor.LOCATION) {
+                            if (controlPoint.userProperties.purpose === ShapeEditorConstants.LOCATION) {
                                 if (controlPoint.userProperties.id === k) {
                                     newPos = this.moveLocation(globe, controlPoint, terrainPosition, previousPosition);
                                     boundaries[i][j] = newPos;
@@ -76,8 +76,8 @@ define([
                                     break outer;
                                 }
                             }
-                            else if (controlPoint.userProperties.purpose === ShapeEditor.ROTATION) {
-                                this.rotateLocations(terrainPosition, boundaries);
+                            else if (controlPoint.userProperties.purpose === ShapeEditorConstants.ROTATION) {
+                                this.rotateLocations(globe, terrainPosition, previousPosition, boundaries);
                                 shape.boundaries = boundaries;
                                 break outer;
                             }
