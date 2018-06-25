@@ -121,11 +121,11 @@ define([
             this._annotationAttributes.altitudeMode = WorldWind.CLAMP_TO_GROUND;
             this._annotationAttributes.cornerRadius = 5;
             this._annotationAttributes.backgroundColor = new Color(0.67, 0.67, 0.67, 0.8);
-            this._annotationAttributes._leaderGapHeight = 0;
+            this._annotationAttributes.leaderGapHeight = 0;
             this._annotationAttributes.drawLeader = false;
             this._annotationAttributes.scale = 1;
-            this._annotationAttributes._textAttributes.color = Color.BLACK;
-            this._annotationAttributes._textAttributes.font = new Font(10);
+            this._annotationAttributes.textAttributes.color = Color.BLACK;
+            this._annotationAttributes.textAttributes.font = new Font(10);
             this._annotationAttributes.insets = new Insets(5, 5, 5, 5);
 
             // Internal use only.
@@ -308,6 +308,7 @@ define([
             // If we have a fragment for this shape, accept the shape and start the edition
             if (this.activeEditorFragment != null) {
                 this._shape = shape;
+                this._shape.highlighted = true;
                 this.initializeControlElements();
                 return true;
             }
@@ -326,6 +327,11 @@ define([
 
             var currentShape = this._shape;
             this._shape = null;
+
+            if (currentShape !== null) {
+                currentShape.highlighted = false;
+            }
+
             return currentShape;
         };
 
@@ -417,20 +423,20 @@ define([
 
             var mousePoint = this._worldWindow.canvasCoordinates(x, y);
             var pickList = this._worldWindow.pick(mousePoint);
+            var terrainObject = pickList.terrainObject();
 
             for (var p = 0, len = pickList.objects.length; p < len; p++) {
                 var object = pickList.objects[p];
 
                 if (!object.isTerrain) {
                     var userObject = object.userObject;
-                    var terrainObject = pickList.terrainObject();
 
                     if (userObject === this._shape) {
                         this.beginAction(terrainObject.position, event.altKey);
                         event.preventDefault();
                         break;
 
-                    } else if (this.controlPointsLayer.renderables.indexOf(userObject) ) {
+                    } else if (this.controlPointsLayer.renderables.indexOf(userObject) !== -1) {
                         this.beginAction(terrainObject.position, event.altKey, userObject);
                         event.preventDefault();
                         break;
@@ -559,7 +565,6 @@ define([
 
         // Internal use only.
         ShapeEditor.prototype.drag = function (clientX, clientY) {
-            // FIXME To be reviewed
             var refPos = this._shape.getReferencePosition();
 
             var refPoint = this._worldWindow.globe.computePointFromPosition(
@@ -587,8 +592,7 @@ define([
             var intersection = new Vec3(0, 0, 0);
             if (this._worldWindow.globe.intersectsLine(ray, intersection)) {
                 var p = new Position(0, 0, 0);
-                this._worldWindow.globe.computePositionFromPoint(intersection[0], intersection[1],
-                    intersection[2], p);
+                this._worldWindow.globe.computePositionFromPoint(intersection[0], intersection[1], intersection[2], p);
                 this._shape.moveTo(this._worldWindow.globe, new Location(p.latitude, p.longitude));
             }
 
@@ -611,11 +615,9 @@ define([
             var annotationText;
             if (controlPoint.userProperties.size !== undefined) {
                 annotationText = this.formatLength(controlPoint.userProperties.size);
-            }
-            else if (controlPoint.userProperties.rotation !== undefined) {
+            } else if (controlPoint.userProperties.rotation !== undefined) {
                 annotationText = this.formatRotation(controlPoint.userProperties.rotation);
-            }
-            else {
+            } else {
                 annotationText = this.formatLatitude(controlPoint.position.latitude)
                     + " "
                     + this.formatLongitude(controlPoint.position.longitude);
@@ -633,14 +635,11 @@ define([
             var center = this.activeEditorFragment.getShapeCenter(this._shape);
 
             if (center !== null) {
-                var dummyMarker = new Placemark(
+                var temporaryMarker = new Placemark(
                     new Position(center.latitude, center.longitude, 0),
                     null
                 );
-                dummyMarker.userProperties.isControlPoint = true;
-                dummyMarker.userProperties.id = 0;
-                dummyMarker.userProperties.purpose = ShapeEditor.ANNOTATION;
-                this.updateAnnotation(dummyMarker);
+                this.updateAnnotation(temporaryMarker);
 
             } else {
                 this.hideAnnotation();

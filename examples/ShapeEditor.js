@@ -50,12 +50,6 @@ requirejs(['./WorldWindShim',
         var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
         wwd.addLayer(shapesLayer);
 
-        // Create a simple surface polygon, a triangle.
-        var boundary = [];
-        boundary.push(new WorldWind.Location(40, -100));
-        boundary.push(new WorldWind.Location(42, -105));
-        boundary.push(new WorldWind.Location(40, -110));
-
         // Create and set attributes for it. The shapes below except the surface polyline use this same attributes
         // object. Real apps typically create new attributes objects for each shape unless they know the attributes
         // can be shared among shapes.
@@ -66,10 +60,6 @@ requirejs(['./WorldWindShim',
         var highlightAttributes = new WorldWind.ShapeAttributes(attributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
 
-        var polyShape = new WorldWind.SurfacePolygon(boundary, attributes);
-        polyShape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(polyShape);
-
         var circleShape = new WorldWind.SurfaceCircle(new WorldWind.Location(35, -110), 200e3, attributes);
         circleShape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(circleShape);
@@ -78,67 +68,77 @@ requirejs(['./WorldWindShim',
         ellipseShape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(ellipseShape);
 
+        var polygonBoundaries = [];
+        polygonBoundaries.push(new WorldWind.Location(40, -100));
+        polygonBoundaries.push(new WorldWind.Location(42, -105));
+        polygonBoundaries.push(new WorldWind.Location(40, -110));
+        var polygonShape = new WorldWind.SurfacePolygon(polygonBoundaries, attributes);
+        polygonShape.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(polygonShape);
+
+        var polylineBoundaries = [];
+        polylineBoundaries.push(new WorldWind.Location(45, -118));
+        polylineBoundaries.push(new WorldWind.Location(40, -115));
+        polylineBoundaries.push(new WorldWind.Location(43, -110));
+        polylineBoundaries.push(new WorldWind.Location(50, -120));
+        var polylineShape = new WorldWind.SurfacePolyline(polylineBoundaries, attributes);
+        polylineShape.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(polylineShape);
+
+        var rectangleShape = new WorldWind.SurfaceRectangle(new WorldWind.Location(33, -105), 300e3, 200e3, 70, attributes);
+        rectangleShape.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(rectangleShape);
+
+        var sectorShape = new WorldWind.SurfaceSector(new WorldWind.Sector(45, 47, -100, -110), attributes);
+        sectorShape.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(sectorShape);
+
         wwd.goTo(new WorldWind.Position(40.42, -104.60, 2417000));
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
+        new LayerManager(wwd);
 
         var shapeEditor = new WorldWind.ShapeEditor(wwd);
 
-        document.getElementById("editPolyBtn").addEventListener("click", function(){
-            if(document.getElementById("editPolyBtn").innerHTML === "Start edit polygon"){
-                shapeEditor.edit(polyShape);
-                shapeEditor.shape.highlighted = true;
-
-                document.getElementById("editPolyBtn").innerHTML = "Stop edit polygon";
-                document.getElementById("editCircleBtn").disabled = true;
-                document.getElementById("editEllipseBtn").disabled = true;
-            }
-            else{
-                shapeEditor.shape.highlighted = false;
-                shapeEditor.stop();
-
-                document.getElementById("editPolyBtn").innerHTML = "Start edit polygon";
-                document.getElementById("editCircleBtn").disabled = false;
-                document.getElementById("editEllipseBtn").disabled = false;
-            }
-        });
-
         document.getElementById("editCircleBtn").addEventListener("click", function(){
-            if(document.getElementById("editCircleBtn").innerHTML === "Start edit circle"){
+            var shape = shapeEditor.stop();
+            if (shape !== circleShape) {
                 shapeEditor.edit(circleShape);
-                shapeEditor.shape.highlighted = true;
-
-                document.getElementById("editCircleBtn").innerHTML = "Stop edit circle";
-                document.getElementById("editPolyBtn").disabled = true;
-                document.getElementById("editEllipseBtn").disabled = true;
-            }
-            else{
-                shapeEditor.shape.highlighted = false;
-                shapeEditor.stop();
-
-                document.getElementById("editCircleBtn").innerHTML = "Start edit circle";
-                document.getElementById("editPolyBtn").disabled = false;
-                document.getElementById("editEllipseBtn").disabled = false;
             }
         });
 
         document.getElementById("editEllipseBtn").addEventListener("click", function(){
-            if(document.getElementById("editEllipseBtn").innerHTML === "Start edit ellipse"){
+            var shape = shapeEditor.stop();
+            if (shape !== ellipseShape) {
                 shapeEditor.edit(ellipseShape);
-                shapeEditor.shape.highlighted = true;
-
-                document.getElementById("editEllipseBtn").innerHTML = "Stop edit ellipse";
-                document.getElementById("editCircleBtn").disabled = true;
-                document.getElementById("editPolyBtn").disabled = true;
             }
-            else{
-                shapeEditor.shape.highlighted = false;
-                shapeEditor.stop();
+        });
 
-                document.getElementById("editEllipseBtn").innerHTML = "Start edit ellipse";
-                document.getElementById("editCircleBtn").disabled = false;
-                document.getElementById("editPolyBtn").disabled = false;
+        document.getElementById("editPolygonBtn").addEventListener("click", function(){
+            var shape = shapeEditor.stop();
+            if (shape !== polygonShape) {
+                shapeEditor.edit(polygonShape);
+            }
+        });
+
+        document.getElementById("editPolylineBtn").addEventListener("click", function(){
+            var shape = shapeEditor.stop();
+            if (shape !== polylineShape) {
+                shapeEditor.edit(polylineShape);
+            }
+        });
+
+        document.getElementById("editRectangleBtn").addEventListener("click", function(){
+            var shape = shapeEditor.stop();
+            if (shape !== rectangleShape) {
+                shapeEditor.edit(rectangleShape);
+            }
+        });
+
+        document.getElementById("editSectorBtn").addEventListener("click", function(){
+            var shape = shapeEditor.stop();
+            if (shape !== sectorShape) {
+                shapeEditor.edit(sectorShape);
             }
         });
     }
