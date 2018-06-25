@@ -157,6 +157,12 @@ requirejs(['./WorldWindShim',
 
         // Feature collection test
 
+        // Feature test
+        var feature4326Layer = new WorldWind.RenderableLayer("Feature - EPSG 4326");
+        var feature4326GeoJSON = new WorldWind.GeoJSONParser("./data/epsg4326.geojson");
+        feature4326GeoJSON.load(null, shapeConfigurationCallback, feature4326Layer);
+        wwd.addLayer(feature4326Layer);
+
         // Feature collection - Spain and Portugal
         var spainLayer = new WorldWind.RenderableLayer("Feature Collection - Spain & Portugal");
         var spainGeoJSON = new WorldWind.GeoJSONParser(resourcesUrl + "FeatureCollectionTest_Spain_Portugal.geojson");
