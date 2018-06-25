@@ -20,6 +20,7 @@ define([
         '../../geom/Angle',
         '../../geom/Location',
         '../../shapes/Path',
+        '../../shapes/Placemark',
         '../../geom/Position',
         '../../shapes/ShapeAttributes',
         '../../geom/Vec3'
@@ -27,6 +28,7 @@ define([
     function (Angle,
               Location,
               Path,
+              Placemark,
               Position,
               ShapeAttributes,
               Vec3) {
@@ -57,22 +59,22 @@ define([
          * @param {Position} currentPosition  The position of the current control point.
          * @returns {Vec3} The Cartesian difference between the two control points.
          */
-        BaseSurfaceEditorFragment.prototype.computeControlPointDelta = function (globe, previousPosition, currentPosition) {
-            var terrainPoint = globe.computePointFromPosition(
-                currentPosition.latitude,
-                currentPosition.longitude,
-                currentPosition.altitude,
+        BaseSurfaceEditorFragment.prototype.computeControlPointDelta = function (globe, positionA, positionB) {
+            var pointA = globe.computePointFromPosition(
+                positionA.latitude,
+                positionA.longitude,
+                0,
                 new Vec3(0, 0, 0)
             );
 
-            var previousPoint = globe.computePointFromPosition(
-                previousPosition.latitude,
-                previousPosition.longitude,
-                previousPosition.altitude,
+            var pointB = globe.computePointFromPosition(
+                positionB.latitude,
+                positionB.longitude,
+                0,
                 new Vec3(0, 0, 0)
             );
 
-            return terrainPoint.subtract(previousPoint);
+            return pointA.subtract(pointB);
         };
 
         /**
@@ -81,7 +83,7 @@ define([
          * end points.
          * @param {Position} controlPointPosition  The shape orientation control point's position.
          */
-        BaseSurfaceEditorFragment.prototype.updateOrientationLine = function (centerPosition, controlPointPosition, accessories) {
+        BaseSurfaceEditorFragment.prototype.updateRotationAccessory = function (centerPosition, controlPointPosition, accessories) {
             if (accessories.length == 0) {
                 return;
             }
@@ -161,10 +163,21 @@ define([
             return (count === 0) ? 0 : totalDistance / globe.equatorialRadius;
         };
 
+        BaseSurfaceEditorFragment.prototype.createControlPoint = function(attributes, purpose, controlPoints) {
+            var controlPoint = new Placemark(
+                new Location(0, 0),
+                false,
+                attributes
+            );
+            controlPoint.userProperties.purpose = purpose;
+            controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+            controlPoints.push(controlPoint);
+        };
+
         /**
          * Set up the Path for the rotation line.
          */
-        BaseSurfaceEditorFragment.prototype.makeAccessory = function (accessories, attributes) {
+        BaseSurfaceEditorFragment.prototype.initializeRotationAccessory = function (accessories, attributes) {
             var pathPositions = [];
             pathPositions.push(new Position(0, 0, 0));
             pathPositions.push(new Position(0, 0, 0));
@@ -267,7 +280,7 @@ define([
                 return Vec3.fromLine(p1, dot, dir); // FIXME This is broken
             }
         };
-        
+
         /**
          * Moves a control point location.
          * @param {Placemark} controlPoint The control point being moved.

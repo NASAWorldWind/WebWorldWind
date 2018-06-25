@@ -23,9 +23,6 @@ define([],
          */
         var ShapeEditorConstants = {
 
-            // Indicates that a control point is associated with annotation.
-            ANNOTATION: "annotation",
-
             // Indicates a control point is associated with a location.
             LOCATION: "location",
 

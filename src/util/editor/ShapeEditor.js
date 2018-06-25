@@ -37,6 +37,7 @@ define([
         './SurfacePolygonEditorFragment',
         './SurfacePolylineEditorFragment',
         './SurfaceRectangleEditorFragment',
+        './SurfaceSectorEditorFragment',
         '../../geom/Vec2',
         '../../geom/Vec3'
     ],
@@ -60,7 +61,7 @@ define([
               SurfacePolygonEditorFragment,
               SurfacePolylineEditorFragment,
               SurfaceRectangleEditorFragment,
-              SurfaceShape,
+              SurfaceSectorEditorFragment,
               Vec2,
               Vec3) {
         "use strict";
@@ -138,7 +139,8 @@ define([
                 new SurfaceEllipseEditorFragment(),
                 new SurfacePolygonEditorFragment(),
                 new SurfacePolylineEditorFragment(),
-                new SurfaceRectangleEditorFragment()
+                new SurfaceRectangleEditorFragment(),
+                new SurfaceSectorEditorFragment()
             ];
 
             // Internal use only.
@@ -632,7 +634,7 @@ define([
 
         // Internal use only.
         ShapeEditor.prototype.updateShapeAnnotation = function () {
-            var center = this.activeEditorFragment.getShapeCenter(this._shape);
+            var center = this.activeEditorFragment.getShapeCenter(this._shape, this._worldWindow.globe);
 
             if (center !== null) {
                 var temporaryMarker = new Placemark(
