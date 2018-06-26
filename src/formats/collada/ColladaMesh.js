@@ -166,6 +166,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var indicesArray = [];
         var pos = 0;
         var indexedRendering = false;
+        var isUint32 = false;
 
         for (var i = 0; i < count; i++) {
 
@@ -215,11 +216,20 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                         firstIndex = currentIndex;
                     }
                     if (k > 2 * maxOffset) {
+                        if (firstIndex > 65535) {
+                            isUint32 = true;
+                        }
+                        if (prevIndex > 65535) {
+                            isUint32 = true;
+                        }
                         indicesArray.push(firstIndex);
                         indicesArray.push(prevIndex);
                     }
                 }
 
+                if (currentIndex > 65535) {
+                    isUint32 = true;
+                }
                 indicesArray.push(currentIndex);
                 pos += maxOffset;
 
@@ -229,10 +239,16 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var mesh = {
             vertices: new Float32Array(inputs[0][1]),
             indexedRendering: indexedRendering,
+            is32BitIndices: false,
             material: material
         };
 
-        this.transformMeshInfo(mesh, inputs, indicesArray);
+        if (mesh.indexedRendering) {
+            mesh.indices = isUint32 ? new Uint32Array(indicesArray) : new Uint16Array(indicesArray);
+            mesh.is32BitIndices = isUint32;
+        }
+
+        this.transformMeshInfo(mesh, inputs);
 
         return mesh;
 
@@ -294,9 +310,8 @@ define(['./ColladaUtils'], function (ColladaUtils) {
      * Internal. Applications should not call this function.
      * @param {Object} mesh The mesh that will be returned.
      * @param {Array} inputs The array containing the inputs of the mesh.
-     * @param {Number[]} indicesArray An array containing the indices.
      */
-    ColladaMesh.prototype.transformMeshInfo = function (mesh, inputs, indicesArray) {
+    ColladaMesh.prototype.transformMeshInfo = function (mesh, inputs) {
         var translator = {
             "normal": "normals",
             "texcoord": "uvs"
@@ -324,10 +339,6 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             if (name === 'uvs') {
                 mesh.isClamp = ColladaUtils.getTextureType(data);
             }
-        }
-
-        if (mesh.indexedRendering) {
-            mesh.indices = new Uint16Array(indicesArray);
         }
 
         return mesh;
