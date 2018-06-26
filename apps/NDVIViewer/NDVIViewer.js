@@ -116,11 +116,10 @@ requirejs(['../../src/WorldWind',
             };
 
             xhr.send(null);
-        };
-
+        }
         function addLoadingStatusParagraph(paragraphId, regionName, loadingStatus, totalNoOfScenes) {
             var newParagraph = document.createElement('p');
-            newParagraph.setAttribute("id", paragraphId)
+            newParagraph.setAttribute("id", paragraphId);
             newParagraph.textContent = "Loading " + regionName + ": " + loadingStatus + "/" + totalNoOfScenes;
             document.getElementById("surfacesStatus").appendChild(newParagraph);
         }
@@ -145,10 +144,10 @@ requirejs(['../../src/WorldWind',
                         var dataArray = xhr.response.split('\n');
 
                         if (analyticalSurfaceObjectArray.filter(
-                                function (e) {
-                                    return e.regionName === regionName
-                                }
-                            ).length === 0) {
+                            function (e) {
+                                return e.regionName === regionName
+                            }
+                        ).length === 0) {
                             // Parse ESRI Grid file
                             var ncols = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
                             var nrows = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
@@ -241,8 +240,7 @@ requirejs(['../../src/WorldWind',
             };
 
             xhr.send(null);
-        };
-
+        }
         function compareFilename(a, b) {
             if (a.filename < b.filename)
                 return -1;
