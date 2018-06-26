@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Illustrates how to display SurfaceShapes.
  */
@@ -50,78 +52,74 @@ requirejs(['./WorldWindShim',
         var shapesLayer = new WorldWind.RenderableLayer("Surface Shapes");
         wwd.addLayer(shapesLayer);
 
-        // Create a simple surface polygon, a triangle.
-        var boundary = [];
-        boundary.push(new WorldWind.Location(40, -100));
-        boundary.push(new WorldWind.Location(45, -110));
-        boundary.push(new WorldWind.Location(40, -120));
-
-        // Create and set attributes for it. The shapes below except the surface polyline use this same attributes
-        // object. Real apps typically create new attributes objects for each shape unless they know the attributes
-        // can be shared among shapes.
+        // Create and set common attributes for the surface shapes.
+        // Real apps typically create new attributes objects for each shape unless they know the attributes
+        // can be shared among all shapes.
         var attributes = new WorldWind.ShapeAttributes(null);
         attributes.outlineColor = WorldWind.Color.BLUE;
         attributes.interiorColor = new WorldWind.Color(0, 1, 1, 0.5);
 
+        // Create common highlight attributes. These are displayed whenever the user hovers over the shapes.
         var highlightAttributes = new WorldWind.ShapeAttributes(attributes);
         highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
 
-        var shape = new WorldWind.SurfacePolygon(boundary, attributes);
-        shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        // Create a triangle surface polygon.
+        var boundary = [];
+        boundary.push(new WorldWind.Location(40, -100));
+        boundary.push(new WorldWind.Location(45, -110));
+        boundary.push(new WorldWind.Location(40, -120));
+        var triangle = new WorldWind.SurfacePolygon(boundary, attributes);
+        triangle.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(triangle);
 
-        // Create a polygon with a hole in it.
+        // Create a triangle surface polygon with a hole in it.
         var boundaries = [];
         boundaries[0] = []; // outer boundary
         boundaries[0].push(new WorldWind.Location(40, -70));
         boundaries[0].push(new WorldWind.Location(45, -80));
         boundaries[0].push(new WorldWind.Location(40, -90));
         boundaries[1] = []; // inner boundary
-        boundaries[1].push(new WorldWind.Location(41, -73));
-        boundaries[1].push(new WorldWind.Location(44, -80));
         boundaries[1].push(new WorldWind.Location(41, -87));
-
-        shape = new WorldWind.SurfacePolygon(boundaries, attributes);
-        shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        boundaries[1].push(new WorldWind.Location(44, -80));
+        boundaries[1].push(new WorldWind.Location(41, -73));
+        var hollowTriangle = new WorldWind.SurfacePolygon(boundaries, attributes);
+        hollowTriangle.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(hollowTriangle);
 
         // Create a surface circle with a radius of 200 km.
-        shape = new WorldWind.SurfaceCircle(new WorldWind.Location(35, -120), 200e3, attributes);
-        shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        var circle = new WorldWind.SurfaceCircle(new WorldWind.Location(35, -120), 200e3, attributes);
+        circle.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(circle);
 
         // Create a surface ellipse with a minor radius of 200 km, a major radius of 300 km and a heading of 45 degrees.
-        shape = new WorldWind.SurfaceEllipse(new WorldWind.Location(35, -110), 300e3, 200e3, 45, attributes);
-        shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        var ellipse = new WorldWind.SurfaceEllipse(new WorldWind.Location(35, -110), 300e3, 200e3, 45, attributes);
+        ellipse.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(ellipse);
 
         // Create a surface rectangle with a width of 200 km, a height of 300 km and a heading of -45 degrees.
-        shape = new WorldWind.SurfaceRectangle(new WorldWind.Location(35, -100), 200e3, 300e3, -45, attributes);
-        shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        var rectangle = new WorldWind.SurfaceRectangle(new WorldWind.Location(35, -100), 200e3, 300e3, -45, attributes);
+        rectangle.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(rectangle);
 
         // Create a surface sector.
-        shape = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
-        shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
+        var sector = new WorldWind.SurfaceSector(new WorldWind.Sector(33, 37, -95, -90), attributes);
+        sector.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(sector);
 
-        // Create a surface polyline. Use different attributes then for the filled shapes.
+        // Create a surface polyline. Use different attributes from the filled shapes.
         boundary = [];
         boundary.push(new WorldWind.Location(33, -75));
         boundary.push(new WorldWind.Location(37, -80));
         boundary.push(new WorldWind.Location(33, -85));
-
         attributes = new WorldWind.ShapeAttributes(null);
         attributes.outlineColor = new WorldWind.Color(0, 1, 1, 0.5);
-
         highlightAttributes = new WorldWind.ShapeAttributes(attributes);
         highlightAttributes.outlineColor = new WorldWind.Color(1, 1, 1, 1);
+        var polyline = new WorldWind.SurfacePolyline(boundary, attributes);
+        polyline.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(polyline);
 
-        shape = new WorldWind.SurfacePolyline(boundary, attributes);
-        shape.highlightAttributes = highlightAttributes;
-        shapesLayer.addRenderable(shape);
-
-        // Now set up to handle highlighting.
+        // Set up a highlight controller to handle highlighting when the user hovers the shapes.
         var highlightController = new WorldWind.HighlightController(wwd);
 
         // Create a layer manager for controlling layer visibility.
