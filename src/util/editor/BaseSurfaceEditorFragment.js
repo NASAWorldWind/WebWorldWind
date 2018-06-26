@@ -178,7 +178,9 @@ define([
          * @param {Globe} globe The globe on which the shape is edited.
          * @param {Position} position The position for this action.
          */
-        BaseSurfaceEditorFragment.prototype.addNewVertex = function (shape, globe, position) {};
+        BaseSurfaceEditorFragment.prototype.addNewVertex = function (shape, globe, position) {
+            // Not supported by default.
+        };
 
         // Creates a control point and adds it to the array of control points.
         BaseSurfaceEditorFragment.prototype.createControlPoint = function(controlPoints, attributes, purpose, index) {
@@ -216,15 +218,11 @@ define([
 
         // Creates an accessory showing the rotation of a shape and adds it to the array of accessories.
         BaseSurfaceEditorFragment.prototype.createRotationAccessory = function (accessories, attributes) {
-            var positions = [];
-            positions.push(new Position(0, 0, 0));
-            positions.push(new Position(0, 0, 0));
-
             var shapeAttributes = new ShapeAttributes(null);
             shapeAttributes.outlineColor = attributes.imageColor;
             shapeAttributes.outlineWidth = 2;
 
-            var rotationLine = new Path(positions, shapeAttributes);
+            var rotationLine = new Path([], shapeAttributes);
             rotationLine.altitudeMode = WorldWind.CLAMP_TO_GROUND;
             rotationLine.followTerrain = true;
 
@@ -336,7 +334,7 @@ define([
                                                                      currentPosition,
                                                                      previousPosition,
                                                                      result) {
-            // FIXME Is this needed?
+            // FIXME Is this complexity needed?
 
             var delta = this.computeControlPointDelta(globe, previousPosition, currentPosition);
 

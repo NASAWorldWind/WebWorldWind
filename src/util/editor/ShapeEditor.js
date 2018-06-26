@@ -474,17 +474,17 @@ define([
             if (this.actionType) {
                 if (this.actionControlPoint
                     && terrainObject
-                    && event.altKey) { // FIXME What is this for?
+                    && event.altKey) {
+                        // FIXME What is this for?
                         this.reshape(terrainObject.position);
                 }
 
                 this.endAction();
-
             }
 
             if (terrainObject
-                && this.actionStartX === this.actionCurrentX // FIXME Is this check needed?
-                && this.actionStartY === this.actionCurrentY // FIXME Is this check needed?
+                && this.actionStartX === this.actionCurrentX
+                && this.actionStartY === this.actionCurrentY
                 && event.shiftKey) {
 
                 this.activeEditorFragment.addNewVertex(
@@ -562,7 +562,8 @@ define([
 
         // Internal use only.
         ShapeEditor.prototype.drag = function (clientX, clientY) {
-            // TODO Understand and review
+            // FIXME Is this complexity needed?
+
             var refPos = this._shape.getReferencePosition();
 
             var refPoint = this._worldWindow.globe.computePointFromPosition(

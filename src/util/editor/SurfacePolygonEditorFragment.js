@@ -189,6 +189,9 @@ define([
 
         // Internal use only.
         SurfacePolygonEditorFragment.prototype.addNewVertex = function (shape, globe, position) {
+
+            // TODO Add support for polygons with multiple rings
+
             var pointA = new Vec3(0, 0, 0);
             var pointB = new Vec3(0, 0, 0);
             var pointOnEdge = new Vec3(0, 0, 0);
