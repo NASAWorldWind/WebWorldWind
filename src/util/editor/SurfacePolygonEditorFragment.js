@@ -21,13 +21,15 @@ define([
         '../../geom/Location',
         '../../geom/Position',
         './ShapeEditorConstants',
-        '../../shapes/SurfacePolygon'
+        '../../shapes/SurfacePolygon',
+        '../../geom/Vec3'
     ],
     function (BaseSurfaceEditorFragment,
               Location,
               Position,
               ShapeEditorConstants,
-              SurfacePolygon) {
+              SurfacePolygon,
+              Vec3) {
         "use strict";
 
         // Internal use only.
@@ -161,9 +163,6 @@ define([
                             locationOffset += len;
                         }
 
-                        console.log(ringIndex);
-                        console.log(locationIndex);
-
                         if (ringIndex !== -1) {
                             var ring = boundaries[ringIndex];
                             if (ring.length > 3) {
@@ -182,6 +181,66 @@ define([
                 } else {
                     this.moveLocation(globe, controlPoint, previousPosition, currentPosition, locations[index]);
                 }
+                shape.resetBoundaries();
+                shape._stateId = SurfacePolygon.stateId++;
+                shape.stateKeyInvalid = true;
+            }
+        };
+
+        // Internal use only.
+        SurfacePolygonEditorFragment.prototype.addNewVertex = function (shape, globe, position) {
+            var pointA = new Vec3(0, 0, 0);
+            var pointB = new Vec3(0, 0, 0);
+            var pointOnEdge = new Vec3(0, 0, 0);
+
+            var locations = shape.boundaries;
+
+            var pointPicked = globe.computePointFromPosition(
+                position.latitude,
+                position.longitude,
+                0,
+                new Vec3(0, 0, 0)
+            );
+
+            var nearestPoint = new Vec3(0, 0 , 0);
+            var nearestSegmentIndex = -1;
+            var nearestDistance = Number.MAX_VALUE;
+            for (var i = 1, len = locations.length; i <= len; i++) {
+                var locationA = locations[i - 1];
+                var locationB = locations[i == len ? 0 : i];
+
+                globe.computePointFromPosition(locationA.latitude, locationA.longitude, 0, pointA);
+                globe.computePointFromPosition(locationB.latitude, locationB.longitude, 0, pointB);
+
+                pointOnEdge.copy(pointPicked);
+                pointOnEdge = this.closestPointOnSegment(
+                    pointA,
+                    pointB,
+                    pointPicked
+                );
+
+                var distance = pointOnEdge.distanceTo(pointPicked);
+                if (distance < nearestDistance) {
+                    nearestPoint.copy(pointOnEdge);
+                    nearestSegmentIndex = i;
+                    nearestDistance = distance;
+                }
+            }
+
+            if (nearestDistance < 20000) {
+                var nearestLocation = globe.computePositionFromPoint(
+                    nearestPoint[0],
+                    nearestPoint[1],
+                    nearestPoint[2],
+                    new Position(0, 0, 0)
+                );
+
+                if (nearestSegmentIndex == locations.length) {
+                    locations.push(nearestLocation);
+                } else {
+                    locations.splice(nearestSegmentIndex, 0, nearestLocation);
+                }
+
                 shape.resetBoundaries();
                 shape._stateId = SurfacePolygon.stateId++;
                 shape.stateKeyInvalid = true;

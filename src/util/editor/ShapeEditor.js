@@ -480,24 +480,21 @@ define([
 
                 this.endAction();
 
-            } else if (terrainObject
-                       && this.actionStartX === this.actionCurrentX // FIXME Is this check needed?
-                       && this.actionStartY === this.actionCurrentY // FIXME Is this check needed?
-                       && event.shiftKey) {
+            }
 
-                var pickList = this._worldWindow.pick(mousePoint);
-                for (var p = 0, len = pickList.objects.length; p < len; p++) {
+            if (terrainObject
+                && this.actionStartX === this.actionCurrentX // FIXME Is this check needed?
+                && this.actionStartY === this.actionCurrentY // FIXME Is this check needed?
+                && event.shiftKey) {
 
-                    if (!pickList.objects[p].isTerrain) { // FIXME Shouldn't it check that we are on the shape instead of any object?
-                        this.activeEditorFragment.addNewControlPoint(
-                            this._worldWindow.globe,
-                            terrainObject.position,
-                            0,
-                            this._shape.boundaries
-                        );
-                        break;
-                    }
-                }
+                this.activeEditorFragment.addNewVertex(
+                    this._shape,
+                    this._worldWindow.globe,
+                    terrainObject.position
+                );
+
+                this.updateControlElements();
+                this._worldWindow.redraw();
             }
         };
 
