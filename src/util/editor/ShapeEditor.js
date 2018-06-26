@@ -515,6 +515,7 @@ define([
 
             var editingAttributes = new ShapeAttributes(this.originalHighlightAttributes);
             editingAttributes.interiorColor.alpha = editingAttributes.interiorColor.alpha * 0.7;
+            editingAttributes.outlineColor.alpha = editingAttributes.outlineColor.alpha * 0.7;
             this._shape.highlightAttributes = editingAttributes;
 
             var shadowShape = this.activeEditorFragment.createShadowShape(this._shape);
