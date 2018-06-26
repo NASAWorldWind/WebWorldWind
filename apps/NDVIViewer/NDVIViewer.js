@@ -16,9 +16,8 @@
 /**
  * Exemplifies how to display and analyze NDVI data.
  */
-requirejs([
-        './WorldWindShim',
-        './LayerManager'],
+requirejs(['../../src/WorldWind',
+        '../util/LayerManager'],
     function (WorldWind,
               LayerManager) {
 
@@ -50,7 +49,7 @@ requirejs([
         layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
         isFirstSceneDraw = true;
 
-        var dataJsonUrl = './data/analyticalSurfaces.json';
+        var dataJsonUrl = './NDVIViewer/analyticalSurfaces.json';
         var colorPaletteArray = [
             0.0, 25.5, 0.701, 0.921, 1.0, 1.0,
             25.5, 51.0, 1.0000, 1.0000, 0.9412, 1.0,
@@ -286,7 +285,7 @@ requirejs([
         }
 
         function getImage(dataArray, regionName, filename, context2d, imageData, noDataValue) {
-            var worker = new Worker('CanvasWorker.js');
+            var worker = new Worker('./NDVIViewer/CanvasWorker.js');
 
             worker.onmessage = function (e) {
 
