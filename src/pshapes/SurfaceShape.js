@@ -312,8 +312,10 @@ define([
         gl.enableVertexAttribArray(program.offsetVectorLocation);
 
         // switch the active texture to the orthographic projected framebuffer texture
+        gl.activeTexture(gl.TEXTURE0);
         this._frameBuffer.bind(dc);
         this._activeTexture = this._frameBuffer.texture;
+        program.loadUniformTextureUnit(gl, gl.TEXTURE0);
     };
 
     SurfaceShape.prototype.beginDrawing = function (dc) {
@@ -390,6 +392,8 @@ define([
 
     SurfaceShape.prototype.bindTexture = function (dc, textureKey) {
         var gl = dc.currentGlContext, program = dc.currentProgram;
+
+        gl.activeTexture(gl.TEXTURE0);
 
         if (textureKey) {
             this._activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
