@@ -17,9 +17,8 @@
 /**
  * Exemplifies how to display and analyze NDVI data.
  */
-requirejs([
-        './WorldWindShim',
-        './LayerManager'],
+requirejs(['../../src/WorldWind',
+        '../util/LayerManager'],
     function (WorldWind,
               LayerManager) {
 
@@ -51,7 +50,7 @@ requirejs([
         layerManager.goToAnimator.goTo(new WorldWind.Position(41.77, 12.77, 40000));
         isFirstSceneDraw = true;
 
-        var dataJsonUrl = './data/analyticalSurfaces.json';
+        var dataJsonUrl = './NDVIViewer/analyticalSurfaces.json';
         var colorPaletteArray = [
             0.0, 25.5, 0.701, 0.921, 1.0, 1.0,
             25.5, 51.0, 1.0000, 1.0000, 0.9412, 1.0,
@@ -118,11 +117,10 @@ requirejs([
             };
 
             xhr.send(null);
-        };
-
+        }
         function addLoadingStatusParagraph(paragraphId, regionName, loadingStatus, totalNoOfScenes) {
             var newParagraph = document.createElement('p');
-            newParagraph.setAttribute("id", paragraphId)
+            newParagraph.setAttribute("id", paragraphId);
             newParagraph.textContent = "Loading " + regionName + ": " + loadingStatus + "/" + totalNoOfScenes;
             document.getElementById("surfacesStatus").appendChild(newParagraph);
         }
@@ -147,10 +145,10 @@ requirejs([
                         var dataArray = xhr.response.split('\n');
 
                         if (analyticalSurfaceObjectArray.filter(
-                                function (e) {
-                                    return e.regionName === regionName
-                                }
-                            ).length === 0) {
+                            function (e) {
+                                return e.regionName === regionName
+                            }
+                        ).length === 0) {
                             // Parse ESRI Grid file
                             var ncols = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
                             var nrows = Number(dataArray.shift().replace(/  +/g, ' ').split(' ')[1]);
@@ -243,8 +241,7 @@ requirejs([
             };
 
             xhr.send(null);
-        };
-
+        }
         function compareFilename(a, b) {
             if (a.filename < b.filename)
                 return -1;
@@ -287,7 +284,7 @@ requirejs([
         }
 
         function getImage(dataArray, regionName, filename, context2d, imageData, noDataValue) {
-            var worker = new Worker('CanvasWorker.js');
+            var worker = new Worker('./NDVIViewer/CanvasWorker.js');
 
             worker.onmessage = function (e) {
 
