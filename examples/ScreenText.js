@@ -52,7 +52,7 @@ requirejs(['./WorldWindShim',
         // Create a Renderable Layer to hold the ScreenTexts.
         var textLayer = new WorldWind.RenderableLayer("Screen Text");
 
-        //Create left ScreenText
+        // Create left ScreenText
         screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         screenText = new WorldWind.ScreenText(screenOffset, "Left");
         // Use the attributes offset to position the left side of the text string at the shape's screen location.
