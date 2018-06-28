@@ -433,8 +433,8 @@ define([
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
             verts[idx++] = scratchPoint[2];
-            verts[idx++] = 0.25;
-            verts[idx++] = 0.25;
+            verts[idx++] = 0;
+            verts[idx++] = 0;
             dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
@@ -468,17 +468,19 @@ define([
             var right = document.getElementById("right-plane").value * o;
             var top = document.getElementById("top-plane").value * o;
             var bottom = document.getElementById("bottom-plane").value * o;
-            var near = document.getElementById("near-plane").value * o;
-            var far = document.getElementById("far-plane").value * o;
+            var near = document.getElementById("near-plane").value * (o * 0.1);
+            var far = document.getElementById("far-plane").value * (o * 0.1);
+            var distance = document.getElementById("distance").value;
             document.getElementById("left-plane-label").innerText = left;
             document.getElementById("right-plane-label").innerText = right;
             document.getElementById("bottom-plane-label").innerText = bottom;
             document.getElementById("top-plane-label").innerText = top;
             document.getElementById("near-plane-label").innerText = near;
             document.getElementById("far-plane-label").innerText = far;
+            document.getElementById("distance-label").innerText = distance;
 
             this.orthoMatrix.setToOrthographicProjection(left, right, bottom, top, near, far);
-            this.orthoMatrix.multiplyByLookAtModelview(scratchPosition, 1e3, 0, 0, 0, dc.globe);
+            this.orthoMatrix.multiplyByLookAtModelview(scratchPosition, distance, 0, 0, 0, dc.globe);
 
             program.loadModelviewProjection(gl, this.orthoMatrix);
             scratchMatrix.setToIdentity();
@@ -488,27 +490,33 @@ define([
             program.loadOpacity(gl, 1);
             program.loadTextureUnit(gl, gl.TEXTURE0);
 
+            var texture = dc.gpuResourceCache.resourceForKey("./data/400x230-splash-nww.png");
+            if (!texture) {
+                dc.gpuResourceCache.retrieveTexture(gl, "./data/400x230-splash-nww.png");
+                return;
+            }
+
             // short term test texture
-            var canvas = document.createElement("canvas");
-            canvas.setAttribute("width", "512");
-            canvas.setAttribute("height", "512");
-            canvas.setAttribute("id", "ortho-image");
-            var ctx = canvas.getContext("2d");
-            ctx.fillStyle = "rgb(255, 0, 0)";
-            ctx.fillRect(0, 0, 256, 256);
-            ctx.fillStyle = "rgb(0, 255, 0)";
-            ctx.fillRect(256, 0, 256, 256);
-            ctx.fillStyle = "rgb(0, 0, 255)";
-            ctx.fillRect(0, 256, 256, 256);
-            ctx.fillStyle = "rgb(255, 255, 255)";
-            ctx.fillRect(256, 256, 256, 256);
-            var texture = new WorldWind.Texture(gl, canvas);
+            // var canvas = document.createElement("canvas");
+            // canvas.setAttribute("width", "512");
+            // canvas.setAttribute("height", "512");
+            // canvas.setAttribute("id", "ortho-image");
+            // var ctx = canvas.getContext("2d");
+            // ctx.fillStyle = "rgb(255, 0, 0)";
+            // ctx.fillRect(0, 0, 256, 256);
+            // ctx.fillStyle = "rgb(0, 255, 0)";
+            // ctx.fillRect(256, 0, 256, 256);
+            // ctx.fillStyle = "rgb(0, 0, 255)";
+            // ctx.fillRect(0, 256, 256, 256);
+            // ctx.fillStyle = "rgb(255, 255, 255)";
+            // ctx.fillRect(256, 256, 256, 256);
+            // var texture = new WorldWind.Texture(gl, canvas);
 
             // add it to the page just for diagnostics
-            var pic = document.getElementById("ortho-image");
-            if (!pic) {
-                document.body.appendChild(canvas);
-            }
+            // var pic = document.getElementById("ortho-image");
+            // if (!pic) {
+            //     document.body.appendChild(canvas);
+            // }
 
             gl.activeTexture(gl.TEXTURE0);
             texture.bind(dc);
@@ -532,6 +540,10 @@ define([
         ScreenImage.prototype.drawToTerrain = function (dc) {
             var gl = dc.currentGlContext, terrain = dc.terrain, program, terrainTiles = dc.terrain.surfaceGeometry,
                 terrainTile, i, len, texture, scratchMatrix = new Matrix();
+
+            if (!terrainTiles) {
+                return;
+            }
 
             program = dc.findAndBindProgram(OrthoProgram);
 
