@@ -52,49 +52,34 @@ requirejs(['./WorldWindShim',
         // Create a Renderable Layer to hold the ScreenTexts.
         var textLayer = new WorldWind.RenderableLayer("Screen Text");
 
-        // Create a common TextAttributes object that will be modified and assigned to each ScreenText.
-        // All ScreenTexts will share the same Font.
-        var textAttributes = new WorldWind.TextAttributes(null);
-        textAttributes.font = new WorldWind.Font(20);
-
         //Create left ScreenText
         screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         screenText = new WorldWind.ScreenText(screenOffset, "Left");
-        textAttributes.color = WorldWind.Color.RED;
-        // Use textAttributes.offset to position the left side of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = new WorldWind.TextAttributes(textAttributes);
+        // Use the attributes offset to position the left side of the text string at the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
         // Create right ScreenText
         screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
         screenText = new WorldWind.ScreenText(screenOffset, "Right");
-        textAttributes.color = WorldWind.Color.YELLOW;
-        // Use textAttributes.offset to position the right side of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = new WorldWind.TextAttributes(textAttributes);
+        // Use the attributes offset to position the right side of the text string at the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
         // The same screen offset value will be commonly used between the center-positioned ScreenTexts.
         // Their TextAttributes offsets will be used to adjust their text alignment.
-
-        // Common center screen position.
         screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
 
         // Center ScreenText, right-aligned
         screenText = new WorldWind.ScreenText(screenOffset, "Center, right-aligned.");
-        textAttributes.color = WorldWind.Color.LIGHT_GRAY;
-        // Use textAttributes.offset to right-align the text to the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = new WorldWind.TextAttributes(textAttributes);
+        // Use the attributes offset to right-align the text to the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
         // Center ScreenText, left-aligned
         screenText = new WorldWind.ScreenText(screenOffset, "Center, left-aligned.");
-        textAttributes.color = WorldWind.Color.WHITE;
-        // Use textAttributes.offset to left-align the text to the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = new WorldWind.TextAttributes(textAttributes);
+        // Use the attributes offset to left-align the text to the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
         // Add the text layer to the WorldWindow's layer list.
