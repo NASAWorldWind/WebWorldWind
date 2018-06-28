@@ -50,6 +50,21 @@ requirejs(['./WorldWindShim',
         var screenImage1 = new WorldWind.ScreenImage(screenOffset, "data/400x230-splash-nww.png");
         screenImage1.imageOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
         screenImage1.imageScale = 0.3;
+        screenImage1.debug = true;
+
+        var boundaries = [
+            new WorldWind.Location(20, -105),
+            new WorldWind.Location(25, -95),
+            new WorldWind.Location(35, -95),
+            new WorldWind.Location(35, -105)
+        ];
+        var attrs = new WorldWind.ShapeAttributes();
+        attrs.drawInterior = true;
+        attrs.interiorColor = new WorldWind.Color(0, 1, 0, 0.5);
+        attrs.drawOutline = true;
+        attrs.outlineColor = new WorldWind.Color(0, 0, 0, 1);
+        attrs.outlineWidth = 5;
+        var pgon = new WorldWind.SurfacePolygon(boundaries, attrs);
 
         // Create a screen image that uses a dynamically created image.
 
@@ -79,6 +94,7 @@ requirejs(['./WorldWindShim',
         screenImageLayer.displayName = "Screen Images";
         screenImageLayer.addRenderable(screenImage1);
         screenImageLayer.addRenderable(screenImage2);
+        // screenImageLayer.addRenderable(pgon);
         wwd.addLayer(screenImageLayer);
 
         // Create a layer manager for controlling layer visibility.

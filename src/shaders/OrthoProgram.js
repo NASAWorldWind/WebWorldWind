@@ -37,20 +37,20 @@ define([
                     'void main() {\n' +
                     '   gl_Position = mvpMatrix * vertexPoint;\n' +
                     '   texCoord = (texCoordMatrix * vertexPoint).st;\n' +
-                    '   texCoord.s = texCoord.s + 0.5;\n' +
-                    '   texCoord.t = 1.0 - (texCoord.t + 0.5);\n' +
+                '   texCoord.s = (texCoord.s + 1.0) * 0.5;\n' +
+                '   texCoord.t = (texCoord.t + 1.0) * 0.5;\n' +
                     '}',
                 fragmentShaderSource =
                     'precision mediump float;\n' +
                     'uniform sampler2D textureSampler;\n' +
                     'varying vec2 texCoord;\n' +
                     'void main() {\n' +
-                    '   gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n' +
-                    '   if (texCoord.s < 1.0 && texCoord.s > 0.0 && texCoord.t < 1.0 && texCoord.t > 0.0) {\n' +
+                    // '   gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n' +
+                    // '   if (texCoord.s < 1.0 && texCoord.s > 0.0 && texCoord.t < 1.0 && texCoord.t > 0.0) {\n' +
                     '       gl_FragColor = texture2D(textureSampler, texCoord);\n' +
-                    '   } else {\n' +
-                    '       discard;\n' +
-                    '   }\n' +
+                    // '   } else {\n' +
+                    // '       discard;\n' +
+                    // '   }\n' +
                     '}';
 
             // Specify bindings to avoid the WebGL performance warning that's generated when normalVector gets

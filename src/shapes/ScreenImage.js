@@ -18,24 +18,30 @@
  */
 define([
         '../error/ArgumentError',
+        '../shaders/BasicProgram',
         '../shaders/BasicTextureProgram',
         '../util/Color',
+        '../render/FramebufferTexture',
         '../util/ImageSource',
         '../util/Logger',
         '../geom/Matrix',
         '../util/Offset',
+        '../shaders/OrthoProgram',
         '../pick/PickedObject',
         '../render/Renderable',
         '../geom/Vec3',
         '../util/WWMath'
     ],
     function (ArgumentError,
+              BasicProgram,
               BasicTextureProgram,
               Color,
+              FramebufferTexture,
               ImageSource,
               Logger,
               Matrix,
               Offset,
+              OrthoProgram,
               PickedObject,
               Renderable,
               Vec3,
@@ -154,6 +160,10 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.layer = null;
+
+            this.debug = false;
+            this.framebuffer = null;
+            this.orthoMatrix = new Matrix();
         };
 
         // Internal use only. Intentionally not documented.
@@ -275,7 +285,286 @@ define([
         };
 
         ScreenImage.prototype.getActiveTexture = function (dc) {
-            return dc.gpuResourceCache.resourceForKey(this._imageSource);
+            if (this.debug) {
+                var textureSize = 1024, gl = dc.currentGlContext, program, verts, idx = 0, vbo;
+                var texture = {
+                    textureId: null,
+                    originalImageWidth: textureSize,
+                    originalImageHeight: textureSize,
+                    imageWidth: textureSize,
+                    imageHeight: textureSize,
+                    bind: function (dc) {
+                        var gl = dc.currentGlContext;
+
+                        gl.bindTexture(gl.TEXTURE_2D, this.textureId);
+
+                        return true;
+                    }
+                };
+
+                if (!this.framebuffer) {
+                    this.framebuffer = new FramebufferTexture(gl, textureSize, textureSize, false);
+                }
+                dc.bindFramebuffer(this.framebuffer);
+                gl.viewport(0, 0, textureSize, textureSize);
+                gl.clearColor(0, 0, 0, 0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                // program = dc.findAndBindProgram(BasicProgram);
+                //
+                // verts = new Float32Array(9);
+                //
+                // verts[idx++] = -0.5;
+                // verts[idx++] = -0.5;
+                // verts[idx++] = 0;
+                //
+                // verts[idx++] = 0.5;
+                // verts[idx++] = -0.5;
+                // verts[idx++] = 0;
+                //
+                // verts[idx++] = 0;
+                // verts[idx++] = 0.5;
+                // verts[idx++] = 0;
+                //
+                // vbo = gl.createBuffer();
+                // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                // gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+                // gl.enableVertexAttribArray(program.vertexPointLocation);
+                // gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+                //
+                // program.loadColor(gl, Color.RED);
+                // program.loadModelviewProjection(gl, Matrix.fromIdentity());
+                //
+                // gl.drawArrays(gl.TRIANGLES, 0, 3);
+                //
+                // gl.deleteBuffer(vbo);
+
+                // var temporarily replace the draw context's model view projection matrix with an othro projection
+                // var mvp = new Matrix();
+                // mvp.copy(dc.modelviewProjection);
+                // var orthoMvp = new Matrix();
+                // var o = WorldWind.EARTH_RADIUS;
+                // orthoMvp.setToOrthographicProjection(-o, o, -o, o, -o * 5, o * 5);
+                // // orthoMvp.multiplyMatrix(dc.modelview);
+                // orthoMvp.multiplyByLookAtModelview(new WorldWind.Position(0, 0, 0), 1e6, 0, 0, 0, dc.globe);
+                // dc.modelviewProjection.copy(orthoMvp);
+                //
+                // this.drawTerrainWireframe(dc);
+
+                this.drawSquareWithImage(dc);
+
+                texture.textureId = this.framebuffer.texture;
+                dc.bindFramebuffer(null);
+                gl.viewport(0, 0, dc.viewport.width, dc.viewport.height);
+                gl.clearColor(0, 0, 0, 1);
+                // dc.modelviewProjection.copy(mvp);
+
+                return texture;
+            } else {
+                return dc.gpuResourceCache.resourceForKey(this._imageSource);
+            }
+        };
+
+        ScreenImage.prototype.drawTerrainWireframe = function (dc) {
+            if (!dc.terrain || !dc.terrain.tessellator)
+                return;
+
+            var gl = dc.currentGlContext,
+                terrain = dc.terrain,
+                tessellator = terrain.tessellator,
+                surfaceGeometry = terrain.surfaceGeometry,
+                program,
+                terrainTile;
+
+            gl.depthMask(false);
+            try {
+                program = dc.findAndBindProgram(BasicProgram);
+                tessellator.beginRendering(dc);
+
+                for (var i = 0, len = surfaceGeometry.length; i < len; i++) {
+                    terrainTile = surfaceGeometry[i];
+                    tessellator.beginRenderingTile(dc, terrainTile);
+                    program.loadColorComponents(gl, 1, 1, 1, 0.3);
+                    tessellator.renderWireframeTile(dc, terrainTile);
+                    program.loadColorComponents(gl, 1, 0, 0, 0.6);
+                    tessellator.renderTileOutline(dc, terrainTile);
+                    tessellator.endRenderingTile(dc, terrainTile);
+                }
+
+            } finally {
+                tessellator.endRendering(dc);
+                gl.depthMask(true);
+            }
+        };
+
+        ScreenImage.prototype.drawSquareWithImage = function (dc) {
+            var gl = dc.currentGlContext, program, verts, idx = 0, scratchPosition = new WorldWind.Position(),
+                scratchPoint = new Vec3(), scratchMatrix = new Matrix(), viewMatrix = new Matrix(), vbo;
+
+            // just need to draw a simple square, and then we'll add texture coordinates
+            program = dc.findAndBindProgram(BasicTextureProgram);
+
+            verts = new Float32Array(5 * 6);
+            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            verts[idx++] = 0;
+            verts[idx++] = 1;
+            dc.globe.computePointFromPosition(30 - 5, -100 + 5, 0, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            verts[idx++] = 1;
+            verts[idx++] = 1;
+            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            verts[idx++] = 1;
+            verts[idx++] = 0;
+            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            verts[idx++] = 1;
+            verts[idx++] = 0;
+            dc.globe.computePointFromPosition(30 + 5, -100 - 5, 0, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            verts[idx++] = 0.25;
+            verts[idx++] = 0.25;
+            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            verts[idx++] = 0;
+            verts[idx++] = 1;
+
+            scratchPosition.latitude = 30;
+            scratchPosition.longitude = -100;
+            scratchPosition.altitude = 0;
+
+            //var o = WorldWind.EARTH_RADIUS;
+            // find the largest distance from one point to another for scaling the orthographic projection matrix
+            var x = -Number.MAX_VALUE, y = -Number.MAX_VALUE, z = -Number.MAX_VALUE, vx, vy, vz, wx, wy, wz;
+            for (var i = 0; i < 6; i++) {
+                vx = verts[i * 5];
+                vy = verts[i * 5 + 1];
+                vz = verts[i * 5 + 2];
+                for (var j = 0; j < 6; j++) {
+                    wx = verts[j * 5];
+                    wy = verts[j * 5 + 1];
+                    wz = verts[j * 5 + 2];
+
+                    x = Math.max(x, Math.abs(vx - wx));
+                    y = Math.max(y, Math.abs(vy - wy));
+                    z = Math.max(z, Math.abs(vz - wz));
+                }
+            }
+            var o = Math.sqrt(x * x + y * y + z * z) * Math.sqrt(2) / 2;
+            var left = document.getElementById("left-plane").value * o;
+            var right = document.getElementById("right-plane").value * o;
+            var top = document.getElementById("top-plane").value * o;
+            var bottom = document.getElementById("bottom-plane").value * o;
+            var near = document.getElementById("near-plane").value * o;
+            var far = document.getElementById("far-plane").value * o;
+            document.getElementById("left-plane-label").innerText = left;
+            document.getElementById("right-plane-label").innerText = right;
+            document.getElementById("bottom-plane-label").innerText = bottom;
+            document.getElementById("top-plane-label").innerText = top;
+            document.getElementById("near-plane-label").innerText = near;
+            document.getElementById("far-plane-label").innerText = far;
+
+            this.orthoMatrix.setToOrthographicProjection(left, right, bottom, top, near, far);
+            this.orthoMatrix.multiplyByLookAtModelview(scratchPosition, 1e3, 0, 0, 0, dc.globe);
+
+            program.loadModelviewProjection(gl, this.orthoMatrix);
+            scratchMatrix.setToIdentity();
+            program.loadTextureMatrix(gl, scratchMatrix);
+            program.loadTextureEnabled(gl, true);
+            program.loadColor(gl, Color.WHITE);
+            program.loadOpacity(gl, 1);
+            program.loadTextureUnit(gl, gl.TEXTURE0);
+
+            // short term test texture
+            var canvas = document.createElement("canvas");
+            canvas.setAttribute("width", "512");
+            canvas.setAttribute("height", "512");
+            canvas.setAttribute("id", "ortho-image");
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = "rgb(255, 0, 0)";
+            ctx.fillRect(0, 0, 256, 256);
+            ctx.fillStyle = "rgb(0, 255, 0)";
+            ctx.fillRect(256, 0, 256, 256);
+            ctx.fillStyle = "rgb(0, 0, 255)";
+            ctx.fillRect(0, 256, 256, 256);
+            ctx.fillStyle = "rgb(255, 255, 255)";
+            ctx.fillRect(256, 256, 256, 256);
+            var texture = new WorldWind.Texture(gl, canvas);
+
+            // add it to the page just for diagnostics
+            var pic = document.getElementById("ortho-image");
+            if (!pic) {
+                document.body.appendChild(canvas);
+            }
+
+            gl.activeTexture(gl.TEXTURE0);
+            texture.bind(dc);
+
+            vbo = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+            gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+            gl.enableVertexAttribArray(program.vertexPointLocation);
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 5 * 4, 0);
+            gl.enableVertexAttribArray(program.vertexTexCoordLocation);
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 5 * 4, 3 * 4);
+
+            gl.disable(gl.CULL_FACE);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            gl.enable(gl.CULL_FACE);
+
+            gl.disableVertexAttribArray(program.vertexTexCoordLocation);
+            gl.deleteBuffer(vbo);
+        };
+
+        ScreenImage.prototype.drawToTerrain = function (dc) {
+            var gl = dc.currentGlContext, terrain = dc.terrain, program, terrainTiles = dc.terrain.surfaceGeometry,
+                terrainTile, i, len, texture, scratchMatrix = new Matrix();
+
+            program = dc.findAndBindProgram(OrthoProgram);
+
+            // draw the terrain with texture coordinates which map to the framebuffer texture
+            //texture = this.framebuffer.texture;
+            gl.activeTexture(gl.TEXTURE0);
+            this.framebuffer.bind(dc);
+            program.loadTextureUnit(gl, gl.TEXTURE0);
+
+            len = terrainTiles.length;
+
+            terrain.beginRendering(dc);
+
+            for (i = 0; i < len; i++) {
+                terrainTile = terrainTiles[i];
+
+                if (!terrainTile || !terrainTile.transformationMatrix) {
+                    continue;
+                }
+
+                scratchMatrix.copy(this.orthoMatrix);
+                scratchMatrix.setToMultiply(this.orthoMatrix, terrainTile.transformationMatrix);
+                // scratchMatrix.multiplyByScale(0.5, 0.5, 1);
+                // scratchMatrix.multiplyByTranslation(1, 1, 0);
+                program.loadTextureMatrix(gl, scratchMatrix);
+
+                terrain.beginRenderingTile(dc, terrainTile);
+                terrain.renderTile(dc, terrainTile);
+                terrain.endRenderingTile(dc, terrainTile);
+
+            }
+
+            terrain.endRendering(dc);
         };
 
         // Internal. Intentionally not documented.
@@ -375,11 +664,20 @@ define([
 
             this.texCoordMatrix.setToIdentity();
             this.texCoordMatrix.multiplyByTextureTransform(this.activeTexture);
+            if (this.debug) {
+                var sy = this.activeTexture.originalImageHeight / this.activeTexture.imageHeight;
+                this.texCoordMatrix[5] = sy;
+                this.texCoordMatrix[7] = 0;
+            }
             program.loadTextureMatrix(gl, this.texCoordMatrix);
 
             if (this.activeTexture.bind(dc)) { // returns false if active texture cannot be bound
                 // Draw the placemark's image quad.
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            }
+
+            if (this.debug) {
+                this.drawToTerrain(dc);
             }
         };
 

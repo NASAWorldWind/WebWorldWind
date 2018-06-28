@@ -174,21 +174,23 @@ define([
         program.loadUniformColor(gl, this._activeAttributes.interiorColor, program.colorLocation);
 
         if (this._activeAttributes.imageSource) {
-            // // for debugging purposes:
-            // var canvas = document.createElement("canvas");
-            // canvas.setAttribute("width", "512");
-            // canvas.setAttribute("height", "512");
-            // var ctx = canvas.getContext("2d");
-            // ctx.fillStyle = "rgb(255, 0, 0)";
-            // ctx.fillRect(0, 0, 256, 256);
-            // ctx.fillStyle = "rgb(0, 255, 0)";
-            // ctx.fillRect(256, 0, 256, 256);
-            // ctx.fillStyle = "rgb(0, 0, 255)";
-            // ctx.fillRect(0, 256, 256, 256);
-            // ctx.fillStyle = "rgb(255, 255, 255)";
-            // ctx.fillRect(256, 256, 256, 256);
-            // var texture = new Texture(gl, canvas);
-            // texture.bind(dc);
+            // for debugging purposes:
+            var canvas = document.createElement("canvas");
+            canvas.setAttribute("width", "512");
+            canvas.setAttribute("height", "512");
+            var ctx = canvas.getContext("2d");
+            ctx.fillStyle = "rgb(255, 0, 0)";
+            ctx.fillRect(0, 0, 256, 256);
+            ctx.fillStyle = "rgb(0, 255, 0)";
+            ctx.fillRect(256, 0, 256, 256);
+            ctx.fillStyle = "rgb(0, 0, 255)";
+            ctx.fillRect(0, 256, 256, 256);
+            ctx.fillStyle = "rgb(255, 255, 255)";
+            ctx.fillRect(256, 256, 256, 256);
+            var texture = new Texture(gl, canvas);
+            gl.activeTexture(gl.TEXTURE0);
+            texture.bind(dc);
+            program.loadUniformTextureUnit(gl, gl.TEXTURE0);
 
             // the vertices should be transformed using the standard mvp, but, the texture coordinates should also
             // be vertex coordinates, and transformed using the orthographic projection and sample the active texture
@@ -208,6 +210,9 @@ define([
 
                 this.scratchMatrix.copy(this.orthoMvpMatrix);
                 this.scratchMatrix.multiplyMatrix(terrainTile.transformationMatrix);
+                // transform ndc to texture coordinates
+                this.scratchMatrix.multiplyByScale(0.5, 0.5, 1);
+                this.scratchMatrix.multiplyByTranslation(1, 1, 0);
                 program.loadUniformMatrix(gl, this.scratchMatrix, program.texCoordMatrixLocation);
 
                 terrain.beginRenderingTile(dc, terrainTile);
