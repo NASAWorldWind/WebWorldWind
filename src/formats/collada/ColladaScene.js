@@ -899,27 +899,22 @@ define([
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.initializeUintExtension = function (dc) {
-            if (!this._uintExtCacheKey) {
-                this._uintExtCacheKey = dc.gpuResourceCache.generateCacheKey();
+            var ext = dc.gpuResourceCache.resourceForKey(ColladaScene._uintExtCacheKey);
+
+            if (ext) {
+                this._hasUintExt = true;
             }
-
-            var ext = dc.gpuResourceCache.resourceForKey(this._uintExtCacheKey);
-            var extensionInCache = !!ext;
-
-            if (extensionInCache === this._hasUintExt) {
-                return;
-            }
-
-            this._hasUintExt = false;
-
-            if (!ext) {
+            else {
+                this._hasUintExt = false;
                 ext = dc.currentGlContext.getExtension('OES_element_index_uint');
                 if (ext) {
-                    dc.gpuResourceCache.putResource(this._uintExtCacheKey, ext, 1);
+                    dc.gpuResourceCache.putResource(ColladaScene._uintExtCacheKey, ext, 1);
                     this._hasUintExt = true;
                 }
             }
         };
+
+        ColladaScene._uintExtCacheKey = 'uintExtCacheKey';
 
         return ColladaScene;
 
