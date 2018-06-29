@@ -22,6 +22,7 @@ define([
         './error/ArgumentError',
         './gesture/ClickRecognizer',
         './gesture/DragRecognizer',
+        './gesture/FlingRecognizer',
         './gesture/GestureRecognizer',
         './geom/Location',
         './util/Logger',
@@ -41,6 +42,7 @@ define([
               ArgumentError,
               ClickRecognizer,
               DragRecognizer,
+              FlingRecognizer,
               GestureRecognizer,
               Location,
               Logger,
@@ -115,6 +117,11 @@ define([
             // this.clickRecognizer.addListener(this);
 
             // Intentionally not documented.
+            this.flingRecognizer = new FlingRecognizer(this.wwd, null);
+            this.flingRecognizer.addListener(this);
+            this.flingRecognizer.recognizeSimultaneouslyWith(this.primaryDragRecognizer);
+
+            // Intentionally not documented.
             this.beginPoint = new Vec2(0, 0);
             this.lastPoint = new Vec2(0, 0);
             this.beginHeading = 0;
@@ -174,6 +181,9 @@ define([
             // else if (recognizer === this.clickRecognizer || recognizer === this.tapRecognizer) {
             //     this.handleClickOrTap(recognizer);
             // }
+            else if (recognizer === this.flingRecognizer) {
+                this.handleFling(recognizer);
+            }
         };
 
         // Intentionally not documented.
@@ -243,67 +253,6 @@ define([
                 this.dragLastLocation.copy(navigator.lookAtLocation);
 
                 this.lastPoint.set(tx, ty);
-
-            } else if (state === WorldWind.ENDED) {
-                var minVelocity = 100; // pixels per second
-                var animationDuration = 1500; // ms
-
-                if (Math.abs(recognizer.translationVelocityX) > minVelocity
-                    || Math.abs(recognizer.translationVelocityY) > minVelocity) {
-
-                    // Initial delta at the beginning of this animation
-                    var initialDelta = new Vec2();
-                    initialDelta.copy(this.dragDelta);
-
-                    // Last location set by this animation
-                    var lastLocation = new Location();
-                    lastLocation.copy(this.dragLastLocation);
-
-                    // Start time of this animation
-                    var startTime = new Date();
-
-                    // Animation Loop
-                    var controller = this;
-                    var animate = function() {
-                        controller.flingAnimationId = -1;
-
-                        if (!lastLocation.equals(navigator.lookAtLocation)) {
-                            // The navigator was changed externally. Aborting the animation.
-                            return;
-                        }
-
-                        // Compute the delta to apply using a sinusoidal out easing
-                        var elapsed = (new Date() - startTime) / animationDuration;
-                        elapsed = elapsed > 1 ? 1 : elapsed;
-                        var value = Math.sin(elapsed * Math.PI / 2);
-
-                        var deltaLatitude = initialDelta[0] - initialDelta[0] * value;
-                        var deltaLongitude = initialDelta[1] - initialDelta[1] * value;
-
-                        // Apply the delta to the current lookAt location
-                        navigator.lookAtLocation.latitude -= deltaLatitude;
-                        navigator.lookAtLocation.longitude -= deltaLongitude;
-                        controller.applyLimits();
-                        controller.wwd.redraw();
-
-                        // Save the new current lookAt location
-                        lastLocation.copy(navigator.lookAtLocation);
-
-                        // If we haven't reached the animation duration, request a new frame
-                        if (elapsed < 1) {
-                            controller.flingAnimationId = requestAnimationFrame(animate);
-                        }
-                    };
-                    this.flingAnimationId = requestAnimationFrame(animate);
-                }
-            }
-        };
-
-        // Intentionally not documented.
-        BasicWorldWindowController.prototype.cancelFlingAnimation = function () {
-            if (this.flingAnimationId !== -1) {
-                cancelAnimationFrame(this.flingAnimationId);
-                this.flingAnimationId = -1;
             }
         };
 
@@ -364,6 +313,78 @@ define([
                 navigator.roll = params.roll;
                 this.applyLimits();
                 this.wwd.redraw();
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.handleFling = function (recognizer) {
+            if (this.wwd.globe.is2D()) {
+                // Not supported yet.
+            } else {
+                this.handleFling3D(recognizer);
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.handleFling3D = function (recognizer) {
+            if (recognizer.state === WorldWind.RECOGNIZED) {
+                var navigator = this.wwd.navigator;
+
+                var animationDuration = 1500; // ms
+
+                // Initial delta at the beginning of this animation
+                var initialDelta = new Vec2();
+                initialDelta.copy(this.dragDelta);
+
+                // Last location set by this animation
+                var lastLocation = new Location();
+                lastLocation.copy(this.dragLastLocation);
+
+                // Start time of this animation
+                var startTime = new Date();
+
+                // Animation Loop
+                var controller = this;
+                var animate = function() {
+                    controller.flingAnimationId = -1;
+
+                    if (!lastLocation.equals(navigator.lookAtLocation)) {
+                        // The navigator was changed externally. Aborting the animation.
+                        return;
+                    }
+
+                    // Compute the delta to apply using a sinusoidal out easing
+                    var elapsed = (new Date() - startTime) / animationDuration;
+                    elapsed = elapsed > 1 ? 1 : elapsed;
+                    var value = Math.sin(elapsed * Math.PI / 2);
+
+                    var deltaLatitude = initialDelta[0] - initialDelta[0] * value;
+                    var deltaLongitude = initialDelta[1] - initialDelta[1] * value;
+
+                    // Apply the delta to the current lookAt location
+                    navigator.lookAtLocation.latitude -= deltaLatitude;
+                    navigator.lookAtLocation.longitude -= deltaLongitude;
+                    controller.applyLimits();
+                    controller.wwd.redraw();
+
+                    // Save the new current lookAt location
+                    lastLocation.copy(navigator.lookAtLocation);
+
+                    // If we haven't reached the animation duration, request a new frame
+                    if (elapsed < 1) {
+                        controller.flingAnimationId = requestAnimationFrame(animate);
+                    }
+                };
+
+                this.flingAnimationId = requestAnimationFrame(animate);
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.cancelFlingAnimation = function () {
+            if (this.flingAnimationId !== -1) {
+                cancelAnimationFrame(this.flingAnimationId);
+                this.flingAnimationId = -1;
             }
         };
 

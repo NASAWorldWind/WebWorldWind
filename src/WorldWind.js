@@ -54,6 +54,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './globe/EarthRestElevationCoverage',
         './globe/ElevationCoverage',
         './globe/ElevationModel',
+        './gesture/FlingRecognizer',
         './util/Font',
         './util/FrameStatistics',
         './layer/FrameStatisticsLayer',
@@ -310,6 +311,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               EarthRestElevationCoverage,
               ElevationCoverage,
               ElevationModel,
+              FlingRecognizer,
               Font,
               FrameStatistics,
               FrameStatisticsLayer,
@@ -803,6 +805,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['EarthRestElevationCoverage'] = EarthRestElevationCoverage;
         WorldWind['ElevationCoverage'] = ElevationCoverage;
         WorldWind['ElevationModel'] = ElevationModel;
+        WorldWind['FlingRecognizer'] = FlingRecognizer,
         WorldWind['Font'] = Font;
         WorldWind['FrameStatistics'] = FrameStatistics;
         WorldWind['FrameStatisticsLayer'] = FrameStatisticsLayer;
