@@ -17,7 +17,7 @@
 define([
     './KmlAbstractView',
     './KmlElements',
-    './util/NodeTransformers',
+    './util/KmlNodeTransformers',
     '../../geom/Position'
 ], function (KmlAbstractView,
              KmlElements,

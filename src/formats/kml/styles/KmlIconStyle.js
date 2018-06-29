@@ -18,7 +18,7 @@ define([
     './KmlColorStyle',
     './../KmlElements',
     '../KmlIcon',
-    '../util/NodeTransformers'
+    '../util/KmlNodeTransformers'
 ], function (KmlColorStyle,
              KmlElements,
              KmlIcon,

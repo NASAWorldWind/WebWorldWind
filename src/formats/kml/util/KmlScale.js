@@ -17,7 +17,7 @@
 define([
     './../KmlElements',
     '../KmlObject',
-    './NodeTransformers'
+    './KmlNodeTransformers'
 ], function (
     KmlElements,
     KmlObject,
@@ -26,27 +26,27 @@ define([
     "use strict";
 
     /**
-     * Constructs a Scale. Application usually don't call this constructor. It is called by {@link KmlFile} as
+     * Constructs a KmlScale. Application usually don't call this constructor. It is called by {@link KmlFile} as
      * Objects from KmlFile are read. It is concrete implementation.
-     * @alias Scale
+     * @alias KmlScale
      * @constructor
-     * @classdesc Contains the data associated with Kml Scale
+     * @classdesc Contains the data associated with Kml KmlScale
      * @param options {Object}
-     * @param options.objectNode {Node} Node representing the Kml Scale
+     * @param options.objectNode {Node} Node representing the Kml KmlScale
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#scale
      * @augments KmlObject
      */
-    var Scale = function (options) {
+    var KmlScale = function (options) {
         KmlObject.call(this, options);
     };
 
-    Scale.prototype = Object.create(KmlObject.prototype);
+    KmlScale.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(Scale.prototype, {
+    Object.defineProperties(KmlScale.prototype, {
         /**
          * Scales model along x axis
-         * @memberof Scale.prototype
+         * @memberof KmlScale.prototype
          * @readonly
          * @type {Number}
          */
@@ -58,7 +58,7 @@ define([
 
         /**
          * Scales model along y axis
-         * @memberof Scale.prototype
+         * @memberof KmlScale.prototype
          * @readonly
          * @type {Number}
          */
@@ -70,7 +70,7 @@ define([
 
         /**
          * Scales model along z axis
-         * @memberof Scale.prototype
+         * @memberof KmlScale.prototype
          * @readonly
          * @type {Number}
          */
@@ -84,11 +84,11 @@ define([
     /**
      * @inheritDoc
      */
-    Scale.prototype.getTagNames = function () {
+    KmlScale.prototype.getTagNames = function () {
         return ['Scale'];
     };
 
-    KmlElements.addKey(Scale.prototype.getTagNames()[0], Scale);
+    KmlElements.addKey(KmlScale.prototype.getTagNames()[0], KmlScale);
 
-    return Scale;
+    return KmlScale;
 });

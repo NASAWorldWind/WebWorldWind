@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-	'src/formats/kml/util/TreeKeyValueCache'
+	'src/formats/kml/util/KmlTreeKeyValueCache'
 ], function (TreeKeyValueCache) {
 	"use strict";
 	describe("TreKeyValueCacheTest", function () {

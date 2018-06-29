@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 define([
-    './HrefResolver',
+    './KmlHrefResolver',
     './../KmlElements',
     '../KmlObject',
-    './NodeTransformers'
+    './KmlNodeTransformers'
 ], function (HrefResolver,
              KmlElements,
              KmlObject,
@@ -26,9 +26,9 @@ define([
     "use strict";
 
     /**
-     * Constructs an ItemIcon. Application usually don't call this constructor. It is called by {@link KmlFile} as
+     * Constructs an KmlItemIcon. Application usually don't call this constructor. It is called by {@link KmlFile} as
      * Objects from KmlFile are read. It is concrete implementation.
-     * @alias ItemIcon
+     * @alias KmlItemIcon
      * @constructor
      * @classdesc Contains the data associated with Kml Item Icon
      * @param options {Object}
@@ -37,18 +37,18 @@ define([
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
      * @augments KmlObject
      */
-    var ItemIcon = function (options) {
+    var KmlItemIcon = function (options) {
         KmlObject.call(this, options);
     };
 
-    ItemIcon.prototype = Object.create(KmlObject.prototype);
+    KmlItemIcon.prototype = Object.create(KmlObject.prototype);
 
-    Object.defineProperties(ItemIcon.prototype, {
+    Object.defineProperties(KmlItemIcon.prototype, {
         /**
          * Specifies the current state of the NetworkLink or Folder. Possible values are open, closed, error,
          * fetching0, fetching1, and fetching2. These values can be combined by inserting a space between two values
          * (no comma).
-         * @memberof ItemIcon.prototype
+         * @memberof KmlItemIcon.prototype
          * @readonly
          * @type {String}
          */
@@ -64,7 +64,7 @@ define([
      * @param fileCache {KmlFileCache} Cache needed to retrieve data urls from remote locations.
      * @returns {String} URL to use.
      */
-    ItemIcon.prototype.kmlHref = function(fileCache) {
+    KmlItemIcon.prototype.kmlHref = function(fileCache) {
         return new HrefResolver(
             this._factory.specific(this, {name: 'href', transformer: NodeTransformers.string}), fileCache
         ).url();
@@ -73,11 +73,11 @@ define([
     /**
      * @inheritDoc
      */
-    ItemIcon.prototype.getTagNames = function () {
+    KmlItemIcon.prototype.getTagNames = function () {
         return ['ItemIcon'];
     };
 
-    KmlElements.addKey(ItemIcon.prototype.getTagNames()[0], ItemIcon);
+    KmlElements.addKey(KmlItemIcon.prototype.getTagNames()[0], KmlItemIcon);
 
-    return ItemIcon;
+    return KmlItemIcon;
 });

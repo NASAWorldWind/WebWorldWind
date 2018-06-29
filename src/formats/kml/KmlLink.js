@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 define([
-    './util/HrefResolver',
+    './util/KmlHrefResolver',
     './KmlElements',
     './KmlObject',
-    './util/NodeTransformers'
+    './util/KmlNodeTransformers'
 ], function (HrefResolver,
              KmlElements,
              KmlObject,
