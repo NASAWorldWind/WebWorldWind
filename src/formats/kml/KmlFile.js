@@ -30,9 +30,9 @@ define([
     './KmzFile',
     '../../util/Logger',
     '../../util/Promise',
-    './util/RefreshListener',
-    './util/RemoteFile',
-    './util/StyleResolver',
+    './util/KmlRefreshListener',
+    './util/KmlRemoteFile',
+    './util/KmlStyleResolver',
     '../../util/XmlDocument',
     '../../util/WWUtil'
 ], function (ArgumentError,

@@ -27,9 +27,9 @@ define([
 
     /**
      * Provide functions for handling styles.
-     * @exports StyleResolver
+     * @exports KmlStyleResolver
      */
-    var StyleResolver = function (fileCache) {
+    var KmlStyleResolver = function (fileCache) {
         this._fileCache = fileCache;
     };
 
@@ -39,13 +39,13 @@ define([
      * @param styleSelector {KmlStyleSelector} Style to be applied. Optional.
      * @return {Promise} Promise of the style.
      */
-    StyleResolver.prototype.handleRemoteStyle = function (styleUrl, styleSelector) {
+    KmlStyleResolver.prototype.handleRemoteStyle = function (styleUrl, styleSelector) {
         if (styleUrl) {
             return this.handleStyleUrl(styleUrl);
         } else if (styleSelector) {
             return this.handleStyleSelector(styleSelector);
         } else {
-            Logger.logMessage(Logger.LEVEL_INFO, "StyleResolver", "handleRemoteStyle", "Style was null.");
+            Logger.logMessage(Logger.LEVEL_INFO, "KmlStyleResolver", "handleRemoteStyle", "Style was null.");
             return Promise.resolve(KmlStyle.default());
         }
     };
@@ -56,7 +56,7 @@ define([
      * @return {Promise} Promise of the style.
      * @private
      */
-    StyleResolver.prototype.handleStyleUrl = function (styleUrl) {
+    KmlStyleResolver.prototype.handleStyleUrl = function (styleUrl) {
         var self = this;
         return this.handlePromiseOfFile(styleUrl).then(function (kmlFile) {
             return kmlFile.resolveStyle(styleUrl);
@@ -75,7 +75,7 @@ define([
      * @returns {Promise} Promise of the resolved KmlFile
      * @private
      */
-    StyleResolver.prototype.handlePromiseOfFile = function (styleUrl) {
+    KmlStyleResolver.prototype.handlePromiseOfFile = function (styleUrl) {
         var file = this._fileCache.retrieve(styleUrl);
         if (!file) {
             // This is an issue of circular dependency again.
@@ -95,7 +95,7 @@ define([
      * @returns {Promise|*}
      * @private
      */
-    StyleResolver.prototype.handleStyleSelector = function (styleSelector) {
+    KmlStyleResolver.prototype.handleStyleSelector = function (styleSelector) {
         if (styleSelector.isMap) {
             return styleSelector.resolve(this);
         } else {
@@ -108,5 +108,5 @@ define([
         }
     };
 
-    return StyleResolver;
+    return KmlStyleResolver;
 });

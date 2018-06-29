@@ -18,14 +18,14 @@ define([], function () {
     "use strict";
 
     /**
-     * This class represents abstraction for Attribute. It is possible to test its existence, retrieve value and set
+     * This class represents abstraction for KmlAttribute. It is possible to test its existence, retrieve value and set
      * value.
-     * @alias Attribute
+     * @alias KmlAttribute
      * @param node {Node} Node on which the attribute exists
      * @param name {String} Name of the attribute
      * @constructor
      */
-    var Attribute = function(node, name) {
+    var KmlAttribute = function(node, name) {
         this.node = node;
         this.name = name;
     };
@@ -34,7 +34,7 @@ define([], function () {
      * It returns value of the attribute. If the attribute doesn't exists it returns null.
      * @returns {String|null}
      */
-    Attribute.prototype.value = function(){
+    KmlAttribute.prototype.value = function(){
         return (this.node.attributes && this.node.attributes.getNamedItem(this.name)&&
             this.node.attributes.getNamedItem(this.name).value) || null;
     };
@@ -43,7 +43,7 @@ define([], function () {
      * It returns true if there exists attribute with given name.
      * @returns {boolean}
      */
-    Attribute.prototype.exists = function() {
+    KmlAttribute.prototype.exists = function() {
         return this.value() != null;
     };
 
@@ -51,9 +51,9 @@ define([], function () {
      * Value which should be set to the attribute. 
      * @param value {String}
      */
-    Attribute.prototype.save = function(value) {
+    KmlAttribute.prototype.save = function(value) {
         this.node.setAttribute(this.name, value);
     };
 
-    return Attribute;
+    return KmlAttribute;
 });

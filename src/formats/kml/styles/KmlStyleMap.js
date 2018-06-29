@@ -17,7 +17,7 @@
 define([
     '../KmlElements',
     './KmlSubStyle',
-    '../util/Pair',
+    '../util/KmlPair',
     '../../../util/Promise'
 ], function (KmlElements,
              KmlSubStyle,

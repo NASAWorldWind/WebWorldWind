@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-    './NodeTransformers'
+    './KmlNodeTransformers'
 ], function (NodeTransformers) {
     "use strict";
 

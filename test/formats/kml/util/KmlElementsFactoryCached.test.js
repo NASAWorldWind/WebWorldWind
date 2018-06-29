@@ -20,7 +20,7 @@ define([
 	'src/formats/kml/geom/KmlLineString',
 	'src/formats/kml/geom/KmlMultiGeometry',
 	'src/formats/kml/geom/KmlPoint',
-	'src/formats/kml/util/NodeTransformers',
+	'src/formats/kml/util/KmlNodeTransformers',
 	'src/util/XmlDocument'
 ], function (KmlElementsFactoryCached,
 			 KmlGeometry,

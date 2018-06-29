@@ -17,7 +17,7 @@
 define([
 	'src/formats/kml/geom/KmlLinearRing',
 	'src/formats/kml/geom/KmlLineString',
-	'src/formats/kml/util/NodeTransformers',
+	'src/formats/kml/util/KmlNodeTransformers',
 	'src/util/XmlDocument'
 ], function (KmlLinearRing,
 			 KmlLineString,

@@ -17,7 +17,7 @@
 define([
     'src/util/XmlDocument',
     'src/formats/kml/styles/KmlListStyle',
-    'src/formats/kml/util/ItemIcon'
+    'src/formats/kml/util/KmlItemIcon'
 ], function (
     XmlDocument,
     KmlListStyle,
@@ -42,6 +42,7 @@ define([
             it ("should have the ListItemType, BgColor and ItemIcon properties",function(){
                 expect(listStyle.kmlListItemType).toEqual('check');
                 expect(listStyle.kmlBgColor).toEqual('ffffffff');
+                console.log(listStyle.kmlItemIcon);
                 expect(listStyle.kmlItemIcon instanceof ItemIcon).toBeTruthy();
 
             });
