@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-    'src/formats/kml/util/ItemIcon',
+    'src/formats/kml/util/KmlItemIcon',
     'src/formats/kml/KmlFileCache',
     'src/util/XmlDocument'
 ], function (

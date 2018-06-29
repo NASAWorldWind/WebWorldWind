@@ -20,7 +20,7 @@
 define([
     './KmlElements',
     './KmlTimePrimitive',
-    './util/NodeTransformers'
+    './util/KmlNodeTransformers'
 ], function(
     KmlElements,
     KmlTimePrimitive,

@@ -21,7 +21,7 @@ define([
     './KmlLinearRing',
     '../styles/KmlStyle',
     '../../../geom/Location',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon'

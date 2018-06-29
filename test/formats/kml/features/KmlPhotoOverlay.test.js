@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 define( [
-    'src/formats/kml/util/ImagePyramid',
-    'src/formats/kml/util/ViewVolume',
+    'src/formats/kml/util/KmlImagePyramid',
+    'src/formats/kml/util/KmlViewVolume',
     'src/formats/kml/geom/KmlPoint',
     'src/formats/kml/features/KmlPhotoOverlay',
     'src/util/XmlDocument'
@@ -47,7 +47,9 @@ define( [
                 expect(photoOverlay.kmlRotation).toEqual('0');
                 expect(photoOverlay.kmlShape).toEqual('rectangle');
 
+                console.log(photoOverlay.kmlViewVolume);
                 expect(photoOverlay.kmlViewVolume instanceof ViewVolume).toBeTruthy();
+                console.log(photoOverlay.kmlImagePyramid);
                 expect(photoOverlay.kmlImagePyramid instanceof ImagePyramid).toBeTruthy();
                 expect(photoOverlay.kmlPoint instanceof KmlPoint).toBeTruthy();
 

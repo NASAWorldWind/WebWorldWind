@@ -18,7 +18,7 @@ define([
     './KmlContainer',
     '../KmlElements',
     './KmlFeature',
-    '../util/Schema'
+    '../util/KmlSchema'
 ], function (
     KmlContainer,
     KmlElements,

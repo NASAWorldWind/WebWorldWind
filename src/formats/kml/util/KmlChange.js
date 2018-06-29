@@ -15,27 +15,26 @@
  * limitations under the License.
  */
 define([
-	'KmlElements',
+	'../KmlElements',
 	'../KmlObject'
-], function(KmlElements, 
+], function(KmlElements,
 			KmlObject){
 	/**
-	 *
-	 * @param options {Object}
-	 * @augments KmlObject
+	 * @augment KmlObject
+	 * @param options
 	 * @constructor
-	 * @alias Create
+	 * @alias KmlChange
 	 */
-	var Create = function(options) {
+	var KmlChange = function(options) {
 		KmlObject.call(this, options);
 	};
 
-	Create.prototype = Object.create(KmlObject.prototype);
-	
-	Object.defineProperties(Create.prototype, {
+	KmlChange.prototype = Object.create(KmlObject.prototype);
+
+	Object.defineProperties(KmlChange.prototype, {
 		/**
-		 * All shapes which should be created with the location where they should be created.
-		 * @memberof Create.prototype
+		 * All shapes which should be changed with the location where they should be changed.
+		 * @memberof KmlChange.prototype
 		 * @readonly
 		 * @type {KmlObject[]}
 		 */
@@ -49,11 +48,11 @@ define([
 	/**
 	 * @inheritDoc
 	 */
-	Create.prototype.getTagNames = function() {
-		return ['Create'];
+	KmlChange.prototype.getTagNames = function() {
+		return ['Change'];
 	};
-	
-	KmlElements.addKey(Create.prototype.getTagNames()[0], Create);
 
-	return Create;
+	KmlElements.addKey(KmlChange.prototype.getTagNames()[0], KmlChange);
+
+	return KmlChange;
 });
