@@ -19,8 +19,8 @@ define([
     './KmlFeature',
     '../KmlFile',
     '../KmlLink',
-    '../util/NodeTransformers',
-    '../util/RefreshListener'
+    '../util/KmlNodeTransformers',
+    '../util/KmlRefreshListener'
 ], function (KmlElements,
              KmlFeature,
              KmlFile,

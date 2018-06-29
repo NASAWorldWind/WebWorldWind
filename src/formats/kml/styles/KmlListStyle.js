@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 define([
-    '../util/ItemIcon',
+    '../util/KmlItemIcon',
     '../KmlElements',
     './KmlSubStyle',
-    '../util/NodeTransformers'
+    '../util/KmlNodeTransformers'
 ], function (ItemIcon,
              KmlElements,
              KmlSubStyle, 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-    'src/formats/kml/util/ImagePyramid',
+    'src/formats/kml/util/KmlImagePyramid',
     'src/util/XmlDocument'
 ], function (
     ImagePyramid,

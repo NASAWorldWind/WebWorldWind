@@ -17,7 +17,7 @@
 define([
     '../KmlElements',
     './KmlSubStyle',
-    '../util/NodeTransformers'
+    '../util/KmlNodeTransformers'
 ], function (
     KmlElements,
     KmlSubStyle,

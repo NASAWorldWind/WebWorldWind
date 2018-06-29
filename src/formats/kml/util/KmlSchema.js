@@ -21,31 +21,31 @@ define([
              KmlObject) {
     "use strict";
     /**
-     * Constructs an Schema. Application usually don't call this constructor. It is called by {@link KmlFile} as
+     * Constructs an KmlSchema. Application usually don't call this constructor. It is called by {@link KmlFile} as
      * Objects from KmlFile are read. It is concrete implementation.
-     * @alias Schema
+     * @alias KmlSchema
      * @constructor
-     * @classdesc Contains the data associated with Kml Schema
+     * @classdesc Contains the data associated with Kml KmlSchema
      * @param options {Object}
-     * @param options.objectNode {Node} Node representing the Kml Schema.
+     * @param options.objectNode {Node} Node representing the Kml KmlSchema.
      * @throws {ArgumentError} If either the node is null or undefined.
      * @see https://developers.google.com/kml/documentation/kmlreference#itemicon
      * @augments KmlObject
      */
-    var Schema = function (options) {
+    var KmlSchema = function (options) {
         KmlObject.call(this, options);
     };
 
-    Schema.prototype = Object.create(KmlObject.prototype);
+    KmlSchema.prototype = Object.create(KmlObject.prototype);
 
     /**
      * @inheritDoc
      */
-    Schema.prototype.getTagNames = function () {
+    KmlSchema.prototype.getTagNames = function () {
         return ['Schema'];
     };
 
-    KmlElements.addKey(Schema.prototype.getTagNames()[0], Schema);
+    KmlElements.addKey(KmlSchema.prototype.getTagNames()[0], KmlSchema);
 
-    return Schema;
+    return KmlSchema;
 });
