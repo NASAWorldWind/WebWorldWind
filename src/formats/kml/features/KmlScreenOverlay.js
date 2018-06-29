@@ -18,7 +18,7 @@ define([
     './../KmlElements',
     './KmlFeature',
     './KmlOverlay',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../util/Offset',
     '../../../shapes/ScreenImage'
 ], function (KmlElements,

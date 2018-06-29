@@ -17,7 +17,7 @@
 define([
     './KmlElements',
     './KmlObject',
-    './util/NodeTransformers'
+    './util/KmlNodeTransformers'
 ], function (KmlElements,
              KmlObject,
              NodeTransformers) {

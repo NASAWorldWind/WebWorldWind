@@ -25,9 +25,9 @@ define([
      * @param url {String} Representation of the url of the resource.
      * @param fileCache {KmlFileCache} Cache representing potential links loaded by current KML file.
      * @constructor
-     * @alias HrefResolver
+     * @alias KmlHrefResolver
      */
-    var HrefResolver = function (url, fileCache) {
+    var KmlHrefResolver = function (url, fileCache) {
         /**
          * The url to be resolved. The result will be an URL again. It is possible to load any binary data into
          * readable URL.
@@ -46,7 +46,7 @@ define([
      * @private
      * @return {String} Either external URL or internal URL representing the information.
      */
-    HrefResolver.prototype.url = function () {
+    KmlHrefResolver.prototype.url = function () {
         if (WWUtil.startsWith(this._url, 'http://') || WWUtil.startsWith(this._url, 'https://')) {
             return this._url;
         } else {
@@ -65,5 +65,5 @@ define([
         }
     };
 
-    return HrefResolver;
+    return KmlHrefResolver;
 });

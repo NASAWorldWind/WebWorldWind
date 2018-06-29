@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-	'src/formats/kml/util/Attribute',
+	'src/formats/kml/util/KmlAttribute',
 	'src/util/XmlDocument'
 ], function (Attribute,
 			 XmlDocument) {

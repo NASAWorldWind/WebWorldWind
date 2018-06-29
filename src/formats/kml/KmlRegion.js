@@ -22,7 +22,7 @@ define([
     './KmlLod',
     './KmlObject',
     './styles/KmlStyle',
-    './util/NodeTransformers',
+    './util/KmlNodeTransformers',
     '../../geom/Sector'
 ], function (BoundingBox,
              Color,

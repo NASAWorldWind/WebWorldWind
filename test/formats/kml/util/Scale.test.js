@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-    'src/formats/kml/util/Scale',
+    'src/formats/kml/util/KmlScale',
     'src/util/XmlDocument'
 ], function (
     Scale,

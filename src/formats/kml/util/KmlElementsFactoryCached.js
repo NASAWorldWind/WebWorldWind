@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 define([
-    './Attribute',
+    './KmlAttribute',
     './KmlElementsFactory',
-    './TreeKeyValueCache',
+    './KmlTreeKeyValueCache',
     '../../../util/WWUtil'
 ], function (
     Attribute,

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to display text at screen positions. Uses offsets to align the text relative to its position.
+ * Illustrates how to display text overlays. Uses offsets to align the text relative to its position.
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],
@@ -33,7 +33,6 @@ requirejs(['./WorldWindShim',
         var layers = [
             // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             // Add atmosphere layer on top of all base layers.
             {layer: new WorldWind.AtmosphereLayer(), enabled: true},
@@ -48,52 +47,39 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        var screenText,
-            textAttributes = new WorldWind.TextAttributes(null),
-            textLayer = new WorldWind.RenderableLayer("Screen Text");
+        var screenText, screenOffset;
 
-        // Set up the common text attributes.
-        textAttributes.color = WorldWind.Color.WHITE;
-        textAttributes.font = new WorldWind.Font(20);
+        // Create a Renderable Layer to hold the ScreenTexts.
+        var textLayer = new WorldWind.RenderableLayer("Screen Text");
 
-        // Create ScreenText shapes and their attributes.
-        // Indicate the shape's placement on the screen by using an offset as an argument to construct a new ScreenText.
-        // Use ScreenText.attributes.offset to position the text relative to the specified screen offset.
-
-        // We will exemplify ScreenText creation in two ways.
-        // In the first two ScreenTexts, we define the desired screen position and alignment by directly setting the
-        // offset values at ScreenText creation. With the "Center" ScreenText, the offset values are edited
-        // after ScreenText creation, overwriting the screenOffset and screenText attributes offset values.
-
-        // Left
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5), "Left");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = textAttributes;
+        // Create left ScreenText
+        screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
+        screenText = new WorldWind.ScreenText(screenOffset, "Left");
+        // Use the attributes offset to position the left side of the text string at the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
-        // Right
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5), "Right");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = textAttributes;
+        // Create right ScreenText
+        screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+        screenText = new WorldWind.ScreenText(screenOffset, "Right");
+        // Use the attributes offset to position the right side of the text string at the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
-        // Center
-        // Create an offset to feed it to the ScreenText constructor. Its offset values are irrelevant
-        // and will be overwritten after the ScreenText's creation.
-        var offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
-        screenText = new WorldWind.ScreenText(offset, "Center");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Edit the screen offset values to position the ScreenText at the center of the screen.
-        screenText.screenOffset.x = 0.5;
-        screenText.screenOffset.y = 0.5;
-        screenText.attributes = textAttributes;
-        // Align the ScreenText to its center point with its attributes offset.
-        screenText.attributes.offset.x = 0.5;
-        screenText.attributes.offset.y = 0.5;
+        // The same screen offset value will be commonly used between the center-positioned ScreenTexts.
+        // Their TextAttributes offsets will be used to adjust their text alignment.
+        screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
+
+        // Center ScreenText, right-aligned
+        screenText = new WorldWind.ScreenText(screenOffset, "Center, right-aligned.");
+        // Use the attributes offset to right-align the text to the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+        textLayer.addRenderable(screenText);
+
+        // Center ScreenText, left-aligned
+        screenText = new WorldWind.ScreenText(screenOffset, "Center, left-aligned.");
+        // Use the attributes offset to left-align the text to the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
         // Add the text layer to the WorldWindow's layer list.

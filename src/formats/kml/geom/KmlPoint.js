@@ -22,7 +22,7 @@ define([
     '../KmlElements',
     './KmlGeometry',
     '../../../geom/Location',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../shapes/Polygon',
     '../../../geom/Position'
 ], function(

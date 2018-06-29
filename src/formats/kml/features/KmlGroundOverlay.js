@@ -20,7 +20,7 @@ define([
     '../KmlLatLonBox',
     '../KmlLatLonQuad',
     './KmlOverlay',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../geom/Sector',
     '../../../shapes/SurfaceImage'
 ], function (

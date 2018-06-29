@@ -20,7 +20,7 @@ define([
     './KmlGeometry',
     '../styles/KmlStyle',
     '../../../geom/Location',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../shapes/Path',
     '../../../geom/Position',
     '../../../shapes/ShapeAttributes',

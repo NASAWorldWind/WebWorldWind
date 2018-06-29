@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 define([
-    '../util/ImagePyramid',
+    '../util/KmlImagePyramid',
     './../KmlElements',
     './KmlOverlay',
     '../geom/KmlPoint',
-    '../util/NodeTransformers',
-    '../util/ViewVolume'
+    '../util/KmlNodeTransformers',
+    '../util/KmlViewVolume'
 ], function (ImagePyramid,
              KmlElements,
              KmlOverlay,

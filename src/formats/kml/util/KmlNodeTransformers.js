@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-    './Attribute',
+    './KmlAttribute',
     '../KmlElements',
     '../../../geom/Position',
     '../../../util/WWUtil'
@@ -25,9 +25,9 @@ define([
             WWUtil){
     /**
      * Provides ways for transforming xml nodes to KML objects.
-     * @exports NodeTransformers
+     * @exports KmlNodeTransformers
      */
-    var NodeTransformers = function(){};
+    var KmlNodeTransformers = function(){};
 
     // Primitives
     /**
@@ -35,7 +35,7 @@ define([
      * @param node {Node} Node to transform
      * @returns {String} Text representation of node value.
      */
-    NodeTransformers.string = function (node) {
+    KmlNodeTransformers.string = function (node) {
         return String(getTextOfNode(node));
     };
 
@@ -44,7 +44,7 @@ define([
      * @param node {Node} Node to transform
      * @returns {Number} Numeric representation of node value.
      */
-    NodeTransformers.number = function (node) {
+    KmlNodeTransformers.number = function (node) {
         return Number(getTextOfNode(node));
     };
 
@@ -53,7 +53,7 @@ define([
      * @param node {Node} Node to transform
      * @returns {Boolean} Boolean representation of node value.
      */
-    NodeTransformers.boolean = function (node) {
+    KmlNodeTransformers.boolean = function (node) {
         return WWUtil.transformToBoolean(getTextOfNode(node));
     };
 
@@ -62,7 +62,7 @@ define([
      * @param node {Node} Node to transform
      * @returns {Date} Date representing current node.
      */
-    NodeTransformers.date = function(node) {
+    KmlNodeTransformers.date = function(node) {
         return WWUtil.date(getTextOfNode(node));
     };
 
@@ -90,7 +90,7 @@ define([
      * @param controls {Array} Array of controls.
      * @returns {KmlObject|null} KmlObject representation for the node.
      */
-    NodeTransformers.kmlObject = function (node, parent, controls) {
+    KmlNodeTransformers.kmlObject = function (node, parent, controls) {
         var nameOfElement = node.nodeName;
         var constructor = KmlElements.getKey(nameOfElement);
         if (!constructor) {
@@ -107,7 +107,7 @@ define([
      * @param controls {Array} Array of controls.
      * @returns {KmlLinearRing} Transformed Linear Ring.
      */
-    NodeTransformers.linearRing = function(node, parent, controls) {
+    KmlNodeTransformers.linearRing = function(node, parent, controls) {
         var constructor = KmlElements.getKey("LinearRing");
         if (!constructor) {
             return null;
@@ -126,7 +126,7 @@ define([
      * @param node {Node} Node to transform
      * @returns {Position[]} All included positions. Positions are separated by space.
      */
-    NodeTransformers.positions = function(node) {
+    KmlNodeTransformers.positions = function(node) {
         var positions = [];
         var coordinates = getTextOfNode(node).trim().replace(/\s+/g, ' ').split(' ');
         coordinates.forEach(function (pCoordinates) {
@@ -141,11 +141,11 @@ define([
      * @param name {String} Name of the attribute to retrieve.
      * @returns {Function} Transformer function.
      */
-    NodeTransformers.attribute = function(name) {
+    KmlNodeTransformers.attribute = function(name) {
         return function(node) {
             return new Attribute(node, name).value();
         };
     };
     
-    return NodeTransformers;
+    return KmlNodeTransformers;
 });
