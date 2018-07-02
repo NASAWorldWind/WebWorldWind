@@ -16,10 +16,10 @@
  */
 define([
     '../../error/ArgumentError',
-    './ColoredTile',
+    './HeatMapColoredTile',
     './HeatMapTile',
     '../../util/ImageSource',
-    './IntervalType',
+    './HeatMapIntervalType',
     '../../geom/Location',
     '../../util/Logger',
     '../../geom/MeasuredLocation',
