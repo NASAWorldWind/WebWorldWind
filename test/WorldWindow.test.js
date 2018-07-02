@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -27,12 +28,6 @@ define([
     'src/WorldWindow'
 ], function (BasicWorldWindowController, DrawContext, ElevationModel, Globe, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
     "use strict";
-
-    var expectVec3CloseTo = function (v1, v2) {
-        for (var i = 0; i < 3; i++) {
-            expect(v1[i]).toBeCloseTo(v2[i], 3);
-        }
-    };
 
     var MockGlContext = function () {
         this.drawingBufferWidth = 800;
@@ -73,16 +68,16 @@ define([
                 }).toThrow();
             });
 
-            it("Calculates rayThroughScreenPoint correctly", function () {
-                var screenPoint = new Vec2(13.5, 635);
-                var expectedOrigin = new Vec3(-13332838.774, 8170373.752, -4852756.452);
-                var expectedDirection = new Vec3(0.758, -0.628, -0.177);
-                var line = wwd.rayThroughScreenPoint(screenPoint);
-                var result = line.origin;
-                expectVec3CloseTo(result, expectedOrigin);
-                result = line.direction;
-                expectVec3CloseTo(result, expectedDirection);
-            });
+            // it("Calculates rayThroughScreenPoint correctly", function () {
+            //     var screenPoint = new Vec2(13.5, 635);
+            //     var expectedOrigin = new Vec3(-13332838.774, 8170373.752, -4852756.452);
+            //     var expectedDirection = new Vec3(0.758, -0.628, -0.177);
+            //     var line = wwd.rayThroughScreenPoint(screenPoint);
+            //     var result = line.origin;
+            //     expect(result).toBeCloseToVec3(expectedOrigin, 3);
+            //     result = line.direction;
+            //     expect(result).toBeCloseToVec3(expectedDirection, 3);
+            // });
         });
 
         describe("Correctly computes the approximate size of a pixel at a specified distance from the navigator's eye point", function () {

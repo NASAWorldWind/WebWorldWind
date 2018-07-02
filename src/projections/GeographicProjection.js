@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -205,6 +206,30 @@ define([
             result[0] = 0;
             result[1] = 1;
             result[2] = 0;
+
+            return result;
+        };
+
+        /**
+         * Computes the Cartesian surface normal vector at a specified geographic location.
+         *
+         * @param {Globe} globe The globe this projection is applied to.
+         * @param {number} latitude The latitude of the location, in degrees.
+         * @param {number} longitude The longitude of the location, in degrees.
+         * @param {Vec3} result A variable in which to return the computed vector.
+         *
+         * @returns{Vec3} The specified result argument containing the computed vector.
+         * @throws {ArgumentError} If either the specified globe or result argument is null or undefined.
+         */
+        GeographicProjection.prototype.surfaceNormalAtLocation = function (globe, latitude, longitude, result) {
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "GeographicProjection", "surfaceNormalAtLocation",
+                    "missingResult"));
+            }
+
+            result[0] = 0;
+            result[1] = 0;
+            result[2] = 1;
 
             return result;
         };

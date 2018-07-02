@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,8 +15,8 @@
  * limitations under the License.
  */
 define( [
-    'src/formats/kml/util/ImagePyramid',
-    'src/formats/kml/util/ViewVolume',
+    'src/formats/kml/util/KmlImagePyramid',
+    'src/formats/kml/util/KmlViewVolume',
     'src/formats/kml/geom/KmlPoint',
     'src/formats/kml/features/KmlPhotoOverlay',
     'src/util/XmlDocument'
@@ -46,7 +47,9 @@ define( [
                 expect(photoOverlay.kmlRotation).toEqual('0');
                 expect(photoOverlay.kmlShape).toEqual('rectangle');
 
+                console.log(photoOverlay.kmlViewVolume);
                 expect(photoOverlay.kmlViewVolume instanceof ViewVolume).toBeTruthy();
+                console.log(photoOverlay.kmlImagePyramid);
                 expect(photoOverlay.kmlImagePyramid instanceof ImagePyramid).toBeTruthy();
                 expect(photoOverlay.kmlPoint instanceof KmlPoint).toBeTruthy();
 

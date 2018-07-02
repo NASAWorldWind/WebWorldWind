@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,6 +15,9 @@
  * limitations under the License.
  */
 define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not directory name).
+        './formats/aaigrid/AAIGridConstants',
+        './formats/aaigrid/AAIGridMetadata',
+        './formats/aaigrid/AAIGridReader',
         './error/AbstractError',
         './geom/Angle',
         './shapes/Annotation',
@@ -86,26 +90,34 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/heatmap/HeatMapLayer',
         './layer/heatmap/HeatMapTile',
         './util/HighlightController',
-        './formats/kml/util/ImagePyramid',
         './util/ImageSource',
         './render/ImageTile',
         './util/Insets',
-        './formats/kml/util/ItemIcon',
         './formats/kml/KmlAbstractView',
+        './formats/kml/util/KmlAttribute',
         './formats/kml/styles/KmlBalloonStyle',
         './formats/kml/KmlCamera',
+        './formats/kml/util/KmlChange',
         './formats/kml/styles/KmlColorStyle',
         './formats/kml/features/KmlContainer',
         './formats/kml/controls/KmlControls',
+        './formats/kml/util/KmlCreate',
+        './formats/kml/util/KmlDelete',
         './formats/kml/features/KmlDocument',
         './formats/kml/KmlElements',
+        './formats/kml/util/KmlElementsFactory',
+        './formats/kml/util/KmlElementsFactoryCached',
         './formats/kml/features/KmlFeature',
         './formats/kml/KmlFile',
+        './formats/kml/KmlFileCache',
         './formats/kml/features/KmlFolder',
         './formats/kml/geom/KmlGeometry',
         './formats/kml/features/KmlGroundOverlay',
+        './formats/kml/util/KmlHrefResolver',
         './formats/kml/KmlIcon',
         './formats/kml/styles/KmlIconStyle',
+        './formats/kml/util/KmlImagePyramid',
+        './formats/kml/util/KmlItemIcon',
         './formats/kml/styles/KmlLabelStyle',
         './formats/kml/KmlLatLonAltBox',
         './formats/kml/KmlLatLonBox',
@@ -119,19 +131,28 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlLod',
         './formats/kml/KmlLookAt',
         './formats/kml/geom/KmlMultiGeometry',
+        './formats/kml/geom/KmlMultiTrack',
         './formats/kml/features/KmlNetworkLink',
+        './formats/kml/util/KmlNetworkLinkControl',
+        './formats/kml/util/KmlNodeTransformers',
         './formats/kml/KmlObject',
         './formats/kml/KmlOrientation',
         './formats/kml/features/KmlOverlay',
+        './formats/kml/util/KmlPair',
         './formats/kml/features/KmlPhotoOverlay',
         './formats/kml/features/KmlPlacemark',
         './formats/kml/geom/KmlPoint',
         './formats/kml/geom/KmlPolygon',
         './formats/kml/styles/KmlPolyStyle',
+        './formats/kml/util/KmlRefreshListener',
         './formats/kml/KmlRegion',
+        './formats/kml/util/KmlRemoteFile',
+        './formats/kml/util/KmlScale',
+        './formats/kml/util/KmlSchema',
         './formats/kml/features/KmlScreenOverlay',
         './formats/kml/styles/KmlStyle',
         './formats/kml/styles/KmlStyleMap',
+        './formats/kml/util/KmlStyleResolver',
         './formats/kml/styles/KmlStyleSelector',
         './formats/kml/styles/KmlSubStyle',
         './formats/kml/KmlTimePrimitive',
@@ -139,7 +160,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './formats/kml/KmlTimeStamp',
         './formats/kml/features/KmlTour',
         './formats/kml/geom/KmlTrack',
+        './formats/kml/util/KmlTreeKeyValueCache',
         './formats/kml/controls/KmlTreeVisibility',
+        './formats/kml/util/KmlUpdate',
+        './formats/kml/util/KmlViewVolume',
+        './formats/kml/KmzFile',
         './layer/LandsatRestLayer',
         './layer/Layer',
         './util/measure/LengthMeasurer',
@@ -161,7 +186,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './error/NotYetImplementedError',
         './util/Offset',
         './layer/OpenStreetMapImageLayer',
-        './formats/kml/util/Pair',
         './gesture/PanRecognizer',
         './shapes/Path',
         './util/PeriodicTimeSequence',
@@ -185,8 +209,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './layer/RenderableLayer',
         './layer/RestTiledImageLayer',
         './gesture/RotationRecognizer',
-        './formats/kml/util/Scale',
-        './formats/kml/util/Schema',
         './shapes/ScreenImage',
         './shapes/ScreenText',
         './geom/Sector',
@@ -236,7 +258,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec2',
         './geom/Vec3',
         './layer/ViewControlsLayer',
-        './formats/kml/util/ViewVolume',
         './ogc/wcs/WcsCapabilities',
         './ogc/wcs/WcsCoverage',
         './ogc/wcs/WcsCoverageDescriptions',
@@ -272,7 +293,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/WWMessage',
         './util/WWUtil',
         './util/XmlDocument'],
-    function (AbstractError,
+    function (AAIGridConstants,
+              AAIGridMetadata,
+              AAIGridReader,
+              AbstractError,
               Angle,
               Annotation,
               AnnotationAttributes,
@@ -344,26 +368,34 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               HeatMapLayer,
               HeatMapTile,
               HighlightController,
-              ImagePyramid,
               ImageSource,
               ImageTile,
               Insets,
-              ItemIcon,
               KmlAbstractView,
+              KmlAttribute,
               KmlBalloonStyle,
               KmlCamera,
+              KmlChange,
               KmlColorStyle,
               KmlContainer,
               KmlControls,
+              KmlCreate,
+              KmlDelete,
               KmlDocument,
               KmlElements,
+              KmlElementsFactory,
+              KmlElementsFactoryCached,
               KmlFeature,
               KmlFile,
+              KmlFileCache,
               KmlFolder,
               KmlGeometry,
               KmlGroundOverlay,
+              KmlHrefResolver,
               KmlIcon,
               KmlIconStyle,
+              KmlImagePyramid,
+              KmlItemIcon,
               KmlLabelStyle,
               KmlLatLonAltBox,
               KmlLatLonBox,
@@ -377,19 +409,28 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlLod,
               KmlLookAt,
               KmlMultiGeometry,
+              KmlMultiTrack,
               KmlNetworkLink,
+              KmlNetworkLinkControl,
+              KmlNodeTransformers,
               KmlObject,
               KmlOrientation,
               KmlOverlay,
+              KmlPair,
               KmlPhotoOverlay,
               KmlPlacemark,
               KmlPoint,
               KmlPolygon,
               KmlPolyStyle,
+              KmlRefreshListener,
               KmlRegion,
+              KmlRemoteFile,
+              KmlScale,
+              KmlSchema,
               KmlScreenOverlay,
               KmlStyle,
               KmlStyleMap,
+              KmlStyleResolver,
               KmlStyleSelector,
               KmlSubStyle,
               KmlTimePrimitive,
@@ -397,7 +438,11 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               KmlTimeStamp,
               KmlTour,
               KmlTrack,
+              KmlTreeKeyValueCache,
               KmlTreeVisibility,
+              KmlUpdate,
+              KmlViewVolume,
+              KmzFile,
               LandsatRestLayer,
               Layer,
               LengthMeasurer,
@@ -419,7 +464,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               NotYetImplementedError,
               Offset,
               OpenStreetMapImageLayer,
-              Pair,
               PanRecognizer,
               Path,
               PeriodicTimeSequence,
@@ -443,8 +487,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               RenderableLayer,
               RestTiledImageLayer,
               RotationRecognizer,
-              Scale,
-              Schema,
               ScreenImage,
               ScreenText,
               Sector,
@@ -494,7 +536,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec2,
               Vec3,
               ViewControlsLayer,
-              ViewVolume,
               WcsCapabilities,
               WcsCoverage,
               WcsCoverageDescriptions,
@@ -594,6 +635,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             /**
              * The radius of Earth.
              * @constant
+             * @deprecated Use WGS84_SEMI_MAJOR_AXIS instead.
              */
             EARTH_RADIUS: 6371e3,
 
@@ -749,9 +791,26 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
              * Indicates the cardinal direction west.
              * @constant
              */
-            WEST: "west"
+            WEST: "west",
+
+            /**
+             * WGS 84 reference value for Earth's semi-major axis: 6378137.0. Taken from NGA.STND.0036_1.0.0_WGS84,
+             * section 3.4.1.
+             * @constant
+             */
+            WGS84_SEMI_MAJOR_AXIS: 6378137.0,
+
+            /**
+             * WGS 84 reference value for Earth's inverse flattening: 298.257223563. Taken from
+             * NGA.STND.0036_1.0.0_WGS84, section 3.4.2.
+             * @constant
+             */
+            WGS84_INVERSE_FLATTENING: 298.257223563
         };
 
+        WorldWind['AAIGridConstants'] = AAIGridConstants;
+        WorldWind['AAIGridMetadata'] = AAIGridMetadata;
+        WorldWind['AAIGridReader'] = AAIGridReader;
         WorldWind['AbstractError'] = AbstractError;
         WorldWind['Angle'] = Angle;
         WorldWind['Annotation'] = Annotation;
@@ -827,9 +886,78 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
+        WorldWind['KmlAbstractView'] = KmlAbstractView;
+        WorldWind['KmlAttribute'] = KmlAttribute;
+        WorldWind['KmlBalloonStyle'] = KmlBalloonStyle;
+        WorldWind['KmlCamera'] = KmlCamera;
+        WorldWind['KmlChange'] = KmlChange;
+        WorldWind['KmlColorStyle'] = KmlColorStyle;
+        WorldWind['KmlContainer'] = KmlContainer;
         WorldWind['KmlControls'] = KmlControls;
+        WorldWind['KmlCreate'] = KmlCreate;
+        WorldWind['KmlDelete'] = KmlDelete;
+        WorldWind['KmlDocument'] = KmlDocument;
+        WorldWind['KmlElements'] = KmlElements;
+        WorldWind['KmlElementsFactory'] = KmlElementsFactory;
+        WorldWind['KmlElementsFactoryCached'] = KmlElementsFactoryCached;
+        WorldWind['KmlFeature'] = KmlFeature;
         WorldWind['KmlFile'] = KmlFile;
+        WorldWind['KmlFileCache'] = KmlFileCache;
+        WorldWind['KmlFolder'] = KmlFolder;
+        WorldWind['KmlGeometry'] = KmlGeometry;
+        WorldWind['KmlGroundOverlay'] = KmlGroundOverlay;
+        WorldWind['KmlHrefResolver'] = KmlHrefResolver;
+        WorldWind['KmlIcon'] = KmlIcon;
+        WorldWind['KmlIconStyle'] = KmlIconStyle;
+        WorldWind['KmlImagePyramid'] = KmlImagePyramid;
+        WorldWind['KmlItemIcon'] = KmlItemIcon;
+        WorldWind['KmlLabelStyle'] = KmlLabelStyle;
+        WorldWind['KmlLatLonAltBox'] = KmlLatLonAltBox;
+        WorldWind['KmlLatLonBox'] = KmlLatLonBox;
+        WorldWind['KmlLatLonQuad'] = KmlLatLonQuad;
+        WorldWind['KmlLinearRing'] = KmlLinearRing;
+        WorldWind['KmlLineString'] = KmlLineString;
+        WorldWind['KmlLineStyle'] = KmlLineStyle;
+        WorldWind['KmlListStyle'] = KmlListStyle;
+        WorldWind['KmlLink'] = KmlLink;
+        WorldWind['KmlLocation'] = KmlLocation;
+        WorldWind['KmlLod'] = KmlLod;
+        WorldWind['KmlLookAt'] = KmlLookAt;
+        WorldWind['KmlMultiGeometry'] = KmlMultiGeometry;
+        WorldWind['KmlMultiTrack'] = KmlMultiTrack;
+        WorldWind['KmlNetworkLink'] = KmlNetworkLink;
+        WorldWind['KmlNetworkLinkControl'] = KmlNetworkLinkControl;
+        WorldWind['KmlNodeTransformers'] = KmlNodeTransformers;
+        WorldWind['KmlObject'] = KmlObject;
+        WorldWind['KmlOrientation'] = KmlOrientation;
+        WorldWind['KmlOverlay'] = KmlOverlay;
+        WorldWind['KmlPair'] = KmlPair;
+        WorldWind['KmlPhotoOverlay'] = KmlPhotoOverlay;
+        WorldWind['KmlPlacemark'] = KmlPlacemark;
+        WorldWind['KmlPoint'] = KmlPoint;
+        WorldWind['KmlPolygon'] = KmlPolygon;
+        WorldWind['KmlPolyStyle'] = KmlPolyStyle;
+        WorldWind['KmlRefreshListener'] = KmlRefreshListener;
+        WorldWind['KmlRegion'] = KmlRegion;
+        WorldWind['KmlRemoteFile'] = KmlRemoteFile;
+        WorldWind['KmlScale'] = KmlScale;
+        WorldWind['KmlSchema'] = KmlSchema;
+        WorldWind['KmlScreenOverlay'] = KmlScreenOverlay;
+        WorldWind['KmlStyle'] = KmlStyle;
+        WorldWind['KmlStyleMap'] = KmlStyleMap;
+        WorldWind['KmlStyleResolver'] = KmlStyleResolver;
+        WorldWind['KmlStyleSelector'] = KmlStyleSelector;
+        WorldWind['KmlSubStyle'] = KmlSubStyle;
+        WorldWind['KmlTimePrimitive'] = KmlTimePrimitive;
+        WorldWind['KmlTimeSpan'] = KmlTimeSpan;
+        WorldWind['KmlTimeStamp'] = KmlTimeStamp;
+        WorldWind['KmlTour'] = KmlTour;
+        WorldWind['KmlTrack'] = KmlTrack;
+        WorldWind['KmlTreeKeyValueCache'] = KmlTreeKeyValueCache;
         WorldWind['KmlTreeVisibility'] = KmlTreeVisibility;
+        WorldWind['KmlUpdate'] = KmlUpdate;
+        WorldWind['KmlViewVolume'] = KmlViewVolume;
+        WorldWind['KmzFile'] = KmzFile;
         WorldWind['LandsatRestLayer'] = LandsatRestLayer;
         WorldWind['Layer'] = Layer;
         WorldWind['LengthMeasurer'] = LengthMeasurer;
