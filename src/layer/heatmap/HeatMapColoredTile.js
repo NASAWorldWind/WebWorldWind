@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -17,26 +18,26 @@ define([
     './HeatMapTile'
 ], function (HeatMapTile) {
     /**
-     * It provides us with a HeatMapTile available to ColoredTile.
+     * It provides us with a HeatMapTile available to HeatMapColoredTile.
      * @constructor
      * @augments HeatMapTile
-     * @alias ColoredTile
+     * @alias HeatMapColoredTile
      * @inheritDoc
      * @param options.intensityGradient {Object} Keys represent the opacity between 0 and 1 and the values represent
      *  color strings.
      */
-    var ColoredTile = function(data, options) {
+    var HeatMapColoredTile = function(data, options) {
         HeatMapTile.call(this, data, options);
 
         this._gradient = this.gradient(options.intensityGradient);
     };
 
-    ColoredTile.prototype = Object.create(HeatMapTile.prototype);
+    HeatMapColoredTile.prototype = Object.create(HeatMapTile.prototype);
 
     /**
      * @inheritDoc
      */
-    ColoredTile.prototype.draw = function() {
+    HeatMapColoredTile.prototype.draw = function() {
         var canvas = HeatMapTile.prototype.draw.call(this);
 
         var ctx = canvas.getContext('2d');
@@ -53,7 +54,7 @@ define([
      * @param grad {Object}
      * @return {Uint8ClampedArray} Array of the gradient data
      */
-    ColoredTile.prototype.gradient = function (grad) {
+    HeatMapColoredTile.prototype.gradient = function (grad) {
         // create a 256x1 gradient that we'll use to turn a grayscale heatmap into a colored one
         var canvas = this.createCanvas(1, 256),
             ctx = canvas.getContext('2d'),
@@ -73,7 +74,7 @@ define([
      * this takes relatively long. Is it possible to improve?
      * @private
      */
-    ColoredTile.prototype.colorize = function (pixels, gradient) {
+    HeatMapColoredTile.prototype.colorize = function (pixels, gradient) {
         for (var i = 0, len = pixels.length, j; i < len; i += 4) {
             j = pixels[i + 3] * 4; // get gradient color from opacity value
 
@@ -86,5 +87,5 @@ define([
 
     };
 
-    return ColoredTile;
+    return HeatMapColoredTile;
 });

@@ -39,7 +39,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './gesture/ClickRecognizer',
         './formats/collada/ColladaLoader',
         './util/Color',
-        './layer/heatmap/ColoredTile',
         './shapes/Compass',
         './layer/CompassLayer',
         './layer/CoordinatesDisplayLayer',
@@ -82,6 +81,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GpuShader',
         './shaders/GroundProgram',
         './util/HashMap',
+        './layer/heatmap/HeatMapColoredTile',
+        './layer/heatmap/HeatMapIntervalType',
         './layer/heatmap/HeatMapLayer',
         './layer/heatmap/HeatMapTile',
         './util/HighlightController',
@@ -89,7 +90,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './util/ImageSource',
         './render/ImageTile',
         './util/Insets',
-        './layer/heatmap/IntervalType',
         './formats/kml/util/ItemIcon',
         './formats/kml/KmlAbstractView',
         './formats/kml/styles/KmlBalloonStyle',
@@ -297,7 +297,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ClickRecognizer,
               ColladaLoader,
               Color,
-              ColoredTile,
               Compass,
               CompassLayer,
               CoordinatesDisplayLayer,
@@ -340,6 +339,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuShader,
               GroundProgram,
               HashMap,
+              HeatMapColoredTile,
+              HeatMapIntervalType,
               HeatMapLayer,
               HeatMapTile,
               HighlightController,
@@ -347,7 +348,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ImageSource,
               ImageTile,
               Insets,
-              IntervalType,
               ItemIcon,
               KmlAbstractView,
               KmlBalloonStyle,
@@ -777,7 +777,6 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ClickRecognizer'] = ClickRecognizer;
         WorldWind['ColladaLoader'] = ColladaLoader;
         WorldWind['Color'] = Color;
-        WorldWind['ColoredTile'] = ColoredTile;
         WorldWind['Compass'] = Compass;
         WorldWind['CompassLayer'] = CompassLayer;
         WorldWind['CoordinatesDisplayLayer'] = CoordinatesDisplayLayer;
@@ -820,13 +819,14 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuShader'] = GpuShader;
         WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HashMap'] = HashMap;
+        WorldWind['HeatMapColoredTile'] = HeatMapColoredTile;
+        WorldWind['HeatMapIntervalType'] = HeatMapIntervalType;
         WorldWind['HeatMapLayer'] = HeatMapLayer;
         WorldWind['HeatMapTile'] = HeatMapTile;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
         WorldWind['Insets'] = Insets;
-        WorldWind['IntervalType'] = IntervalType;
         WorldWind['KmlControls'] = KmlControls;
         WorldWind['KmlFile'] = KmlFile;
         WorldWind['KmlTreeVisibility'] = KmlTreeVisibility;
