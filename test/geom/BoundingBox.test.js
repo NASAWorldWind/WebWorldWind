@@ -238,5 +238,117 @@ define([
             });
         });
 
+        describe("intersection calculation", function () {
+            it("should intersect an identical bounding box", function () {
+                var boundingBoxOne = new BoundingBox();
+                var boundingBoxTwo = new BoundingBox();
+
+                var intersects = boundingBoxOne.intersectsBox(boundingBoxTwo);
+
+                expect(intersects).toBe(true);
+
+                intersects = boundingBoxTwo.intersectsBox(boundingBoxOne);
+
+                expect(intersects).toBe(true);
+            });
+
+            it("should intersect a partially overlapping bounding box", function () {
+                var boundingBoxOne = new BoundingBox();
+                var boundingBoxTwo = new BoundingBox();
+                boundingBoxTwo.center[0] = 0.125;
+
+                var intersects = boundingBoxOne.intersectsBox(boundingBoxTwo);
+
+                expect(intersects).toBe(true);
+
+                intersects = boundingBoxTwo.intersectsBox(boundingBoxOne);
+
+                expect(intersects).toBe(true);
+            });
+
+            it("should not intersect bounding boxes which do not intersect", function () {
+                var boundingBoxOne = new BoundingBox();
+                var points = new Float32Array(4 * 3);
+                var idx = 0;
+                points[idx++] = -5;
+                points[idx++] = 1;
+                points[idx++] = -10;
+
+                points[idx++] = -6;
+                points[idx++] = 1;
+                points[idx++] = -10;
+
+                points[idx++] = -7;
+                points[idx++] = 1;
+                points[idx++] = 10;
+
+                points[idx++] = -6;
+                points[idx++] = 0;
+                points[idx++] = 0;
+                boundingBoxOne.setToPoints(points);
+                var boundingBoxTwo = new BoundingBox();
+
+                var intersects = boundingBoxOne.intersectsBox(boundingBoxTwo);
+
+                expect(intersects).toBe(false);
+
+                intersects = boundingBoxTwo.intersectsBox(boundingBoxOne);
+
+                expect(intersects).toBe(false);
+            });
+        });
+
+        describe("Plane creation", function () {
+            it("should create planes for each side of r axis bounding box", function () {
+                var boundingBox = new BoundingBox(); // unit bounding box
+                var axis = new Vec3();
+                var plane = new Plane();
+
+                // r
+                axis.copy(boundingBox.r);
+                boundingBox.createPlaneBasedOnAxis(axis, plane);
+                expect(plane.distance).toBeCloseTo(0.5, 6);
+                expect(plane.normal).toEqualVec3(new WorldWind.Vec3(1, 0, 0), 1e-6);
+
+                axis.negate();
+                boundingBox.createPlaneBasedOnAxis(axis, plane);
+                expect(plane.distance).toBeCloseTo(0.5, 6);
+                expect(plane.normal).toEqualVec3(new WorldWind.Vec3(-1, 0, 0), 1e-6);
+            });
+
+            it("should create planes for each side of s axis bounding box", function () {
+                var boundingBox = new BoundingBox(); // unit bounding box
+                var axis = new Vec3();
+                var plane = new Plane();
+
+                // s
+                axis.copy(boundingBox.s);
+                boundingBox.createPlaneBasedOnAxis(axis, plane);
+                expect(plane.distance).toBeCloseTo(0.5, 6);
+                expect(plane.normal).toEqualVec3(new WorldWind.Vec3(0, 1, 0), 1e-6);
+
+                axis.negate();
+                boundingBox.createPlaneBasedOnAxis(axis, plane);
+                expect(plane.distance).toBeCloseTo(0.5, 6);
+                expect(plane.normal).toEqualVec3(new WorldWind.Vec3(0, -1, 0), 1e-6);
+            });
+
+            it("should create planes for each side of t axis bounding box", function () {
+                var boundingBox = new BoundingBox(); // unit bounding box
+                var axis = new Vec3();
+                var plane = new Plane();
+
+                // t
+                axis.copy(boundingBox.t);
+                boundingBox.createPlaneBasedOnAxis(axis, plane);
+                expect(plane.distance).toBeCloseTo(0.5, 6);
+                expect(plane.normal).toEqualVec3(new WorldWind.Vec3(0, 0, 1), 1e-6);
+
+                axis.negate();
+                boundingBox.createPlaneBasedOnAxis(axis, plane);
+                expect(plane.distance).toBeCloseTo(0.5, 6);
+                expect(plane.normal).toEqualVec3(new WorldWind.Vec3(0, 0, -1), 1e-6);
+            });
+        });
     });
 });

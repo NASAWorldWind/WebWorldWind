@@ -109,6 +109,7 @@ define([
             // Internal use only. Intentionally not documented.
             this.scratchElevations = new Float64Array(9);
             this.scratchPoints = new Float64Array(3 * this.scratchElevations.length);
+            this.scratchPlane = new Plane();
         };
 
         // Internal use only. Intentionally not documented.
@@ -421,6 +422,95 @@ define([
             var n = plane.normal;
 
             return 0.5 * (WWMath.fabs(this.r.dot(n)) + WWMath.fabs(this.s.dot(n)) + WWMath.fabs(this.t.dot(n)));
+        };
+
+        /**
+         * Determines if this bounding box intersects the provided bounding box
+         * @param boundingBox the box to test intersection with this one
+         * @returns {boolean} true if the boxes intersect
+         */
+        BoundingBox.prototype.intersectsBox = function (boundingBox) {
+            if (!boundingBox) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "BoundingBox", "intersectsBox", "missingBoundingBox"));
+            }
+
+
+            // create a plane for each side of the bounding box and test against this bounding box
+            this.tmp3.copy(boundingBox.r);
+            var plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
+            this.tmp1.copy(this.bottomCenter);
+            this.tmp2.copy(this.topCenter);
+
+            if (this.intersectionPoint(plane) < 0) {
+                return false;
+            }
+
+            this.tmp3.negate();
+            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
+            this.tmp1.copy(this.bottomCenter);
+            this.tmp2.copy(this.topCenter);
+
+            if (this.intersectionPoint(plane) < 0) {
+                return false;
+            }
+
+            this.tmp3.copy(boundingBox.s);
+            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
+            this.tmp1.copy(this.bottomCenter);
+            this.tmp2.copy(this.topCenter);
+
+            if (this.intersectionPoint(plane) < 0) {
+                return false;
+            }
+
+            this.tmp3.negate();
+            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
+            this.tmp1.copy(this.bottomCenter);
+            this.tmp2.copy(this.topCenter);
+
+            if (this.intersectionPoint(plane) < 0) {
+                return false;
+            }
+
+            this.tmp3.copy(boundingBox.t);
+            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
+            this.tmp1.copy(this.bottomCenter);
+            this.tmp2.copy(this.topCenter);
+
+            if (this.intersectionPoint(plane) < 0) {
+                return false;
+            }
+
+            this.tmp3.negate();
+            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
+            this.tmp1.copy(this.bottomCenter);
+            this.tmp2.copy(this.topCenter);
+
+            if (this.intersectionPoint(plane) < 0) {
+                return false;
+            }
+
+            return true;
+        };
+
+        /**
+         * Populates a {Plane} based on the the provided axis and center definition of this bounding box.
+         * @param axis the axis which this plane is based on (r, s, or t)
+         * @param result the {Plane} object to populate with results
+         * @returns {Plane} representing the face of a bounding box for the provided axis
+         */
+        BoundingBox.prototype.createPlaneBasedOnAxis = function (axis, result) {
+            this.tmp1.copy(this.center);
+            this.tmp2.copy(axis).divide(2);
+
+            this.tmp1.add(this.tmp2);
+            this.tmp2.copy(axis).normalize();
+
+            result.distance = this.tmp1.dot(this.tmp2);
+            result.normal.copy(this.tmp2);
+
+            return result;
         };
 
         /**
