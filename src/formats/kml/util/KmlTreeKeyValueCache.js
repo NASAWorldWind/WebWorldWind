@@ -22,11 +22,11 @@ define([
     /**
      * Cache working on a basic principle of storing the data as a pair of key, value. Currently the values are
      * never invalidated.
-     * @alias TreeKeyValueCache
+     * @alias KmlTreeKeyValueCache
      * @constructor
      * @classdesc Represents internally used cache which stores data in a tree like structure.
      */
-    var TreeKeyValueCache = function() {
+    var KmlTreeKeyValueCache = function() {
         this.map = {};
     };
 
@@ -36,7 +36,7 @@ define([
      * @param key {Object} Anything that can be used as a key in JavaScript object
      * @param value {Object} The value to be stored in the cache on given level and value. Value must started with #
      */
-    TreeKeyValueCache.prototype.add = function(level, key, value){
+    KmlTreeKeyValueCache.prototype.add = function(level, key, value){
         if(!this.map[level]) {
             this.map[level] = {};
         }
@@ -49,7 +49,7 @@ define([
      * @param key {Object} Anything that can be used as a key in JavaScript object
      * @returns {Object|null}
      */
-    TreeKeyValueCache.prototype.value = function(level, key) {
+    KmlTreeKeyValueCache.prototype.value = function(level, key) {
         if(!this.map[level]){
             return null;
         }
@@ -73,7 +73,7 @@ define([
      * @param level {Object} Anything that can be used as a key in JavaScript object
      * @returns {Object|null}
      */
-    TreeKeyValueCache.prototype.level = function(level) {
+    KmlTreeKeyValueCache.prototype.level = function(level) {
         return this.map[level];
     };
 
@@ -82,14 +82,14 @@ define([
      * @param level {Object} Anything that can be used as a key in JavaScript object
      * @param key {Object} Anything that can be used as a key in JavaScript object
      */
-    TreeKeyValueCache.prototype.remove = function(level, key) {
+    KmlTreeKeyValueCache.prototype.remove = function(level, key) {
         delete this.map[level][key];
     };
 
-    var applicationLevelCache = new TreeKeyValueCache();
-    TreeKeyValueCache.applicationLevelCache = function() {
+    var applicationLevelCache = new KmlTreeKeyValueCache();
+    KmlTreeKeyValueCache.applicationLevelCache = function() {
         return applicationLevelCache;
     };
 
-    return TreeKeyValueCache;
+    return KmlTreeKeyValueCache;
 });

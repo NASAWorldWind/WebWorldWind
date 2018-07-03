@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 define([
-    'src/formats/kml/util/Pair',
+    'src/formats/kml/util/KmlPair',
     'src/formats/kml/styles/KmlStyle',
     'src/util/XmlDocument'
 ], function (

@@ -17,7 +17,7 @@
 define([
     './KmlLink',
     './KmlElements',
-    './util/NodeTransformers'
+    './util/KmlNodeTransformers'
 ], function (
     KmlLink,
     KmlElements,

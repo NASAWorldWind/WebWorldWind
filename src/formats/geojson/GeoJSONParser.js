@@ -1100,13 +1100,16 @@ define(['../../error/ArgumentError',
         GeoJSONParser.prototype.setProj4jsAliases = function () {
             Proj4.defs([
                 [
+                    "urn:ogc:def:crs:EPSG::4326",
+                    Proj4.defs('EPSG:4326')
+                ],
+                [
                     'urn:ogc:def:crs:OGC:1.3:CRS84',
                     Proj4.defs('EPSG:4326')
                 ],
                 [
                     'urn:ogc:def:crs:EPSG::3857',
                     Proj4.defs('EPSG:3857')
-
                 ]
             ]);
         };

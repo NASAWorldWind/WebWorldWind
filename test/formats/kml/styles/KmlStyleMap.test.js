@@ -16,7 +16,7 @@
  */
 define([
     'src/formats/kml/styles/KmlStyleMap',
-    'src/formats/kml/util/Pair',
+    'src/formats/kml/util/KmlPair',
     'src/util/XmlDocument'
 ], function (
     KmlStyleMap,
@@ -36,6 +36,7 @@ define([
             var styleMap = new KmlStyleMap({objectNode:
                 kmlRepresentation.getElementsByTagName("StyleMap")[0]});
         it("should have the prototype properties of Pair", function(){
+            console.log(styleMap.kmlPairs[0]);
             expect(styleMap.kmlPairs[0] instanceof Pair).toBeTruthy();
         });
 

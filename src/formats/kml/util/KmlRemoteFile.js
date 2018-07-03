@@ -25,15 +25,15 @@ define([
 ) {
     "use strict";
     /**
-     * Creates representation of RemoteFile. In order to load an object it is necessary to run get function on created object.
+     * Creates representation of KmlRemoteFile. In order to load an object it is necessary to run get function on created object.
      * @param options {Object}
      * @param options.ajax {Boolean} If we should use plain AJAX
      * @param options.zip {Boolean} If we are downloading kmz
      * @param options.responseType {String} Optional responseType applied in specific circumstances for the kmz
      * @constructor
-     * @alias RemoteFile
+     * @alias KmlRemoteFile
      */
-    var RemoteFile = function(options) {
+    var KmlRemoteFile = function(options) {
         if(!options.ajax && !options.zip) {
             throw new ArgumentError(
                 Logger.logMessage(Logger.LEVEL_SEVERE, "RemoteDocument", "constructor",
@@ -48,7 +48,7 @@ define([
      * It retrieves the current file. Usually it is used only once, but it can be used multiple times.
      * @returns {Promise}
      */
-    RemoteFile.prototype.get = function() {
+    KmlRemoteFile.prototype.get = function() {
         var options = this.options;
         if(options.ajax) {
             return this.ajax(options.url, options);
@@ -71,7 +71,7 @@ define([
      * @param options.responseType {String} If set, rewrites default responseType.
      * @returns {Promise} Promise of the data.
      */
-    RemoteFile.prototype.ajax = function(url, options) {
+    KmlRemoteFile.prototype.ajax = function(url, options) {
         // Return promise.
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
@@ -114,5 +114,5 @@ define([
         });
     };
 
-    return RemoteFile;
+    return KmlRemoteFile;
 });
