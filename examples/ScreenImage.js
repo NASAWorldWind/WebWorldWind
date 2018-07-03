@@ -96,7 +96,7 @@ requirejs(['./WorldWindShim',
         screenImageLayer.displayName = "Screen Images";
         screenImageLayer.addRenderable(screenImage1);
         screenImageLayer.addRenderable(screenImage2);
-        // screenImageLayer.addRenderable(pgon);
+        screenImageLayer.addRenderable(pgon);
         wwd.addLayer(screenImageLayer);
 
         // Create a layer manager for controlling layer visibility.

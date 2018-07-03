@@ -24,6 +24,7 @@ define([
         '../util/Color',
         '../render/FramebufferTexture',
         '../util/ImageSource',
+        '../geom/Location',
         '../util/Logger',
         '../geom/Matrix',
         '../util/Offset',
@@ -40,6 +41,7 @@ define([
               Color,
               FramebufferTexture,
               ImageSource,
+              Location,
               Logger,
               Matrix,
               Offset,
@@ -167,6 +169,12 @@ define([
             this.framebuffer = null;
             this.orthoMatrix = new Matrix();
             this.boundingBox = new BoundingBox();
+            this.boundaries = [
+                new Location(30 - 10, -100 - 5),
+                new Location(30 - 5, -100 + 5),
+                new Location(30 + 5, -100 + 5),
+                new Location(30 + 5, -100 - 5)
+            ];
         };
 
         // Internal use only. Intentionally not documented.
@@ -402,43 +410,49 @@ define([
 
         ScreenImage.prototype.drawSquareWithImage = function (dc) {
             var gl = dc.currentGlContext, program, verts, idx = 0, scratchPosition = new WorldWind.Position(),
-                scratchPoint = new Vec3(), scratchMatrix = new Matrix(), viewMatrix = new Matrix(), vbo;
+                scratchPoint = new Vec3(), scratchMatrix = new Matrix(), viewMatrix = new Matrix(), vbo, loc;
 
             // just need to draw a simple square, and then we'll add texture coordinates
             program = dc.findAndBindProgram(BasicTextureProgram);
 
             verts = new Float32Array(5 * 6);
-            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            loc = this.boundaries[0];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
             verts[idx++] = scratchPoint[2];
             verts[idx++] = 0;
             verts[idx++] = 1;
-            dc.globe.computePointFromPosition(30 - 5, -100 + 5, 0, scratchPoint);
+            loc = this.boundaries[1];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
             verts[idx++] = scratchPoint[2];
             verts[idx++] = 1;
             verts[idx++] = 1;
-            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            loc = this.boundaries[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
             verts[idx++] = scratchPoint[2];
             verts[idx++] = 1;
             verts[idx++] = 0;
-            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            loc = this.boundaries[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
             verts[idx++] = scratchPoint[2];
             verts[idx++] = 1;
             verts[idx++] = 0;
-            dc.globe.computePointFromPosition(30 + 5, -100 - 5, 0, scratchPoint);
+            loc = this.boundaries[3];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
             verts[idx++] = scratchPoint[2];
             verts[idx++] = 0;
             verts[idx++] = 0;
-            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            loc = this.boundaries[0];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             verts[idx++] = scratchPoint[0];
             verts[idx++] = scratchPoint[1];
             verts[idx++] = scratchPoint[2];
@@ -451,27 +465,33 @@ define([
 
             var bboxVerts = new Float32Array(6 * 3);
             idx = 0;
-            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            loc = this.boundaries[0];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             bboxVerts[idx++] = scratchPoint[0];
             bboxVerts[idx++] = scratchPoint[1];
             bboxVerts[idx++] = scratchPoint[2];
-            dc.globe.computePointFromPosition(30 - 5, -100 + 5, 0, scratchPoint);
+            loc = this.boundaries[1];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             bboxVerts[idx++] = scratchPoint[0];
             bboxVerts[idx++] = scratchPoint[1];
             bboxVerts[idx++] = scratchPoint[2];
-            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            loc = this.boundaries[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             bboxVerts[idx++] = scratchPoint[0];
             bboxVerts[idx++] = scratchPoint[1];
             bboxVerts[idx++] = scratchPoint[2];
-            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            loc = this.boundaries[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             bboxVerts[idx++] = scratchPoint[0];
             bboxVerts[idx++] = scratchPoint[1];
             bboxVerts[idx++] = scratchPoint[2];
-            dc.globe.computePointFromPosition(30 + 5, -100 - 5, 0, scratchPoint);
+            loc = this.boundaries[3];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             bboxVerts[idx++] = scratchPoint[0];
             bboxVerts[idx++] = scratchPoint[1];
             bboxVerts[idx++] = scratchPoint[2];
-            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            loc = this.boundaries[0];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 0, scratchPoint);
             bboxVerts[idx++] = scratchPoint[0];
             bboxVerts[idx++] = scratchPoint[1];
             bboxVerts[idx++] = scratchPoint[2];
@@ -582,6 +602,10 @@ define([
                 this.boundingBox.render(dc);
             }
 
+            this.beginStenciling(dc);
+            this.drawVolume(dc);
+            this.applyStencil(dc);
+
             program = dc.findAndBindProgram(OrthoProgram);
 
             // draw the terrain with texture coordinates which map to the framebuffer texture
@@ -619,6 +643,8 @@ define([
             }
 
             terrain.endRendering(dc);
+
+            this.endStenciling(dc);
         };
 
         // Internal. Intentionally not documented.
@@ -733,6 +759,157 @@ define([
             if (this.debug) {
                 this.drawToTerrain(dc);
             }
+        };
+
+        ScreenImage.prototype.drawVolume = function (dc) {
+            var gl = dc.currentGlContext, scratchPoint = new Vec3();
+
+            var verts = new Float32Array(3 * 8);
+            var idx = 0;
+            var loc = this.boundaries[0];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -10000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 100000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            loc = this.boundaries[1];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -10000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 100000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            loc = this.boundaries[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -10000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 100000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            loc = this.boundaries[3];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, -10000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(loc.latitude, loc.longitude, 100000, scratchPoint);
+            verts[idx++] = scratchPoint[0];
+            verts[idx++] = scratchPoint[1];
+            verts[idx++] = scratchPoint[2];
+
+            var elems = new Int16Array(3 * 6 * 2);
+            idx = 0;
+            // bottom
+            elems[idx++] = 0;
+            elems[idx++] = 4;
+            elems[idx++] = 2;
+            elems[idx++] = 4;
+            elems[idx++] = 0;
+            elems[idx++] = 6;
+            // south side
+            elems[idx++] = 0;
+            elems[idx++] = 3;
+            elems[idx++] = 1;
+            elems[idx++] = 3;
+            elems[idx++] = 0;
+            elems[idx++] = 2;
+            // east side
+            elems[idx++] = 2;
+            elems[idx++] = 5;
+            elems[idx++] = 3;
+            elems[idx++] = 5;
+            elems[idx++] = 2;
+            elems[idx++] = 4;
+            // north side
+            elems[idx++] = 4;
+            elems[idx++] = 6;
+            elems[idx++] = 5;
+            elems[idx++] = 7;
+            elems[idx++] = 5;
+            elems[idx++] = 6;
+            // west side
+            elems[idx++] = 6;
+            elems[idx++] = 1;
+            elems[idx++] = 7;
+            elems[idx++] = 1;
+            elems[idx++] = 6;
+            elems[idx++] = 0;
+            // top
+            elems[idx++] = 1;
+            elems[idx++] = 3;
+            elems[idx++] = 5;
+            elems[idx++] = 5;
+            elems[idx++] = 7;
+            elems[idx++] = 1;
+
+            var vbo = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+            gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+
+            var ebo = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, elems, gl.STATIC_DRAW);
+
+            var program = dc.findAndBindProgram(BasicProgram);
+
+            gl.enableVertexAttribArray(program.vertexPointLocation);
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+
+            program.loadModelviewProjection(gl, dc.modelviewProjection);
+            program.loadColor(gl, Color.RED);
+
+            this.prepareStencil(dc);
+            gl.drawElements(gl.TRIANGLES, elems.length, gl.UNSIGNED_SHORT, 0);
+
+            gl.deleteBuffer(vbo);
+            gl.deleteBuffer(ebo);
+        };
+
+        ScreenImage.prototype.beginStenciling = function (dc) {
+            var gl = dc.currentGlContext;
+
+            gl.depthMask(false);
+            gl.enable(gl.STENCIL_TEST);
+            gl.disable(gl.CULL_FACE);
+        };
+
+        ScreenImage.prototype.prepareStencil = function (dc) {
+            var gl = dc.currentGlContext;
+
+            gl.clear(gl.STENCIL_BUFFER_BIT);
+            gl.stencilFunc(gl.ALWAYS, 0, 255);
+            gl.enable(gl.DEPTH_TEST);
+            gl.colorMask(false, false, false, false);
+
+            // z-fail
+            gl.stencilOpSeparate(gl.FRONT, gl.KEEP, gl.DECR_WRAP, gl.KEEP);
+            gl.stencilOpSeparate(gl.BACK, gl.KEEP, gl.INCR_WRAP, gl.KEEP);
+        };
+
+        ScreenImage.prototype.applyStencil = function (dc) {
+            var gl = dc.currentGlContext;
+
+            // Enable the scene drawing
+            gl.colorMask(true, true, true, true);
+
+            // Apply the stencil test to drawing
+            gl.stencilFunc(gl.NOTEQUAL, 0, 255);
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.ZERO); // reset stencil to zero after successful fragment modification
+
+            gl.disable(gl.DEPTH_TEST);
+        };
+
+        ScreenImage.prototype.endStenciling = function (dc) {
+            var gl = dc.currentGlContext;
+
+            gl.disable(gl.STENCIL_TEST);
+            gl.depthMask(true);
         };
 
         return ScreenImage;
