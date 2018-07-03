@@ -434,59 +434,44 @@ define([
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "BoundingBox", "intersectsBox", "missingBoundingBox"));
             }
+            var plane = this.scratchPlane, axis = boundingBox.tmp3;
 
+            this.tmp1.copy(this.bottomCenter);
+            this.tmp2.copy(this.topCenter);
 
             // create a plane for each side of the bounding box and test against this bounding box
-            this.tmp3.copy(boundingBox.r);
-            var plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
-            this.tmp1.copy(this.bottomCenter);
-            this.tmp2.copy(this.topCenter);
-
+            axis.copy(boundingBox.r);
+            boundingBox.createPlaneBasedOnAxis(axis, plane);
             if (this.intersectionPoint(plane) < 0) {
                 return false;
             }
 
-            this.tmp3.negate();
-            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
-            this.tmp1.copy(this.bottomCenter);
-            this.tmp2.copy(this.topCenter);
-
+            axis.negate();
+            boundingBox.createPlaneBasedOnAxis(axis, plane);
             if (this.intersectionPoint(plane) < 0) {
                 return false;
             }
 
-            this.tmp3.copy(boundingBox.s);
-            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
-            this.tmp1.copy(this.bottomCenter);
-            this.tmp2.copy(this.topCenter);
-
+            axis.copy(boundingBox.s);
+            boundingBox.createPlaneBasedOnAxis(axis, plane);
             if (this.intersectionPoint(plane) < 0) {
                 return false;
             }
 
-            this.tmp3.negate();
-            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
-            this.tmp1.copy(this.bottomCenter);
-            this.tmp2.copy(this.topCenter);
-
+            axis.negate();
+            boundingBox.createPlaneBasedOnAxis(axis, plane);
             if (this.intersectionPoint(plane) < 0) {
                 return false;
             }
 
-            this.tmp3.copy(boundingBox.t);
-            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
-            this.tmp1.copy(this.bottomCenter);
-            this.tmp2.copy(this.topCenter);
-
+            axis.copy(boundingBox.t);
+            boundingBox.createPlaneBasedOnAxis(axis, plane);
             if (this.intersectionPoint(plane) < 0) {
                 return false;
             }
 
-            this.tmp3.negate();
-            plane = boundingBox.createPlaneBasedOnAxis(this.tmp3, this.scratchPlane);
-            this.tmp1.copy(this.bottomCenter);
-            this.tmp2.copy(this.topCenter);
-
+            axis.negate();
+            boundingBox.createPlaneBasedOnAxis(axis, plane);
             if (this.intersectionPoint(plane) < 0) {
                 return false;
             }
@@ -495,7 +480,7 @@ define([
         };
 
         /**
-         * Populates a {Plane} based on the the provided axis and center definition of this bounding box.
+         * Populates the provided {Plane} based on the the provided axis and center definition of this bounding box.
          * @param axis the axis which this plane is based on (r, s, or t)
          * @param result the {Plane} object to populate with results
          * @returns {Plane} representing the face of a bounding box for the provided axis

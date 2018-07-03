@@ -31,13 +31,15 @@ requirejs(['./WorldWindShim',
         /**
          * Added imagery layers.
          */
+        var tl = new WorldWind.ShowTessellationLayer();
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
+            {layer: tl, enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
@@ -126,6 +128,12 @@ requirejs(['./WorldWindShim',
                 }
             }
         };
+
+        var terrainTileBoundingBox = document.getElementById("terrain-bounding-box");
+        terrainTileBoundingBox.addEventListener("change", function (ev) {
+            tl.enableTerrainExtent = ev.target.checked;
+            wwd.redraw();
+        });
 
         // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
         wwd.addEventListener("mousemove", handlePick);

@@ -238,7 +238,7 @@ define([
             });
         });
 
-        describe("intersection calculation", function () {
+        describe("boundingbox intersection calculation", function () {
             it("should intersect an identical bounding box", function () {
                 var boundingBoxOne = new BoundingBox();
                 var boundingBoxTwo = new BoundingBox();
@@ -295,6 +295,278 @@ define([
                 intersects = boundingBoxTwo.intersectsBox(boundingBoxOne);
 
                 expect(intersects).toBe(false);
+            });
+
+            it("should not intersect parallel aligned but disconnected bounding boxes", function () {
+                var pointsA = new Float32Array(6 * 3), pointsB = new Float32Array(6 * 3), idx = 0,
+                    bboxA = new BoundingBox(), bboxB = new BoundingBox(), intersect;
+
+                // the r axis should be on the z axis and the s axis should be on the y axis
+                // nose
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 10;
+                // tail
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -10;
+                // left wing
+                pointsA[idx++] = 4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // right wing
+                pointsA[idx++] = -4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // top
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 6;
+                pointsA[idx++] = 0;
+                // bottom
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -6;
+                pointsA[idx++] = 0;
+                bboxA.setToPoints(pointsA);
+
+                // the r axis should be on the z, but offset from the origin along the x axis
+                idx = 0;
+                // nose
+                pointsB[idx++] = 10;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 10;
+                // tail
+                pointsB[idx++] = 10;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = -10;
+                // left wing
+                pointsB[idx++] = 14;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // right wing
+                pointsB[idx++] = 10 - 4;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // top
+                pointsB[idx++] = 10;
+                pointsB[idx++] = 6;
+                pointsB[idx++] = 0;
+                // bottom
+                pointsB[idx++] = 10;
+                pointsB[idx++] = -6;
+                pointsB[idx++] = 0;
+                bboxB.setToPoints(pointsB);
+
+                intersect = bboxA.intersectsBox(bboxB);
+
+                expect(intersect).toBe(false);
+
+                intersect = bboxB.intersectsBox(bboxA);
+
+                expect(intersect).toBe(false);
+            });
+
+            it("should intersect", function () {
+                var pointsA = new Float32Array(6 * 3), pointsB = new Float32Array(6 * 3), idx = 0,
+                    bboxA = new BoundingBox(), bboxB = new BoundingBox(), intersect;
+
+                // the r axis should be on the z axis and the s axis should be on the y axis
+                // nose
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 10;
+                // tail
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -10;
+                // left wing
+                pointsA[idx++] = 4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // right wing
+                pointsA[idx++] = -4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // top
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 6;
+                pointsA[idx++] = 0;
+                // bottom
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -6;
+                pointsA[idx++] = 0;
+                bboxA.setToPoints(pointsA);
+
+                // the r axis should be on the z, but offset from the origin along the x axis
+                idx = 0;
+                // nose
+                pointsB[idx++] = 4;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 10;
+                // tail
+                pointsB[idx++] = 4;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = -10;
+                // left wing
+                pointsB[idx++] = 4 + 4;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // right wing
+                pointsB[idx++] = 4 - 4;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // top
+                pointsB[idx++] = 4;
+                pointsB[idx++] = 6;
+                pointsB[idx++] = 0;
+                // bottom
+                pointsB[idx++] = 4;
+                pointsB[idx++] = -6;
+                pointsB[idx++] = 0;
+                bboxB.setToPoints(pointsB);
+
+                intersect = bboxA.intersectsBox(bboxB);
+
+                expect(intersect).toBe(true);
+
+                intersect = bboxB.intersectsBox(bboxA);
+
+                expect(intersect).toBe(true);
+            });
+
+            it("should intersect a bounding box fully contained by the parent", function () {
+                var pointsA = new Float32Array(6 * 3), pointsB = new Float32Array(6 * 3), idx = 0,
+                    bboxA = new BoundingBox(), bboxB = new BoundingBox(), intersect;
+
+                // the r axis should be on the z axis and the s axis should be on the y axis
+                // nose
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 10;
+                // tail
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -10;
+                // left wing
+                pointsA[idx++] = 4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // right wing
+                pointsA[idx++] = -4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // top
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 6;
+                pointsA[idx++] = 0;
+                // bottom
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -6;
+                pointsA[idx++] = 0;
+                bboxA.setToPoints(pointsA);
+
+                // the r axis should be on the z, but offset from the origin along the x axis
+                idx = 0;
+                // nose
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 5;
+                // tail
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = -5;
+                // left wing
+                pointsB[idx++] = 2;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // right wing
+                pointsB[idx++] = -2;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // top
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 3;
+                pointsB[idx++] = 0;
+                // bottom
+                pointsB[idx++] = 0;
+                pointsB[idx++] = -3;
+                pointsB[idx++] = 0;
+                bboxB.setToPoints(pointsB);
+
+                intersect = bboxA.intersectsBox(bboxB);
+
+                expect(intersect).toBe(true);
+
+                intersect = bboxB.intersectsBox(bboxA);
+
+                expect(intersect).toBe(true);
+            });
+
+            it("should intersect a bounding box not aligned but intersecting", function () {
+                var pointsA = new Float32Array(6 * 3), pointsB = new Float32Array(6 * 3), idx = 0,
+                    bboxA = new BoundingBox(), bboxB = new BoundingBox(), intersect;
+
+                // the r axis should be on the z axis and the s axis should be on the y axis
+                // nose
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 10;
+                // tail
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -10;
+                // left wing
+                pointsA[idx++] = 4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // right wing
+                pointsA[idx++] = -4;
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 0;
+                // top
+                pointsA[idx++] = 0;
+                pointsA[idx++] = 6;
+                pointsA[idx++] = 0;
+                // bottom
+                pointsA[idx++] = 0;
+                pointsA[idx++] = -6;
+                pointsA[idx++] = 0;
+                bboxA.setToPoints(pointsA);
+
+                // the r axis should be on the z, but offset from the origin along the x axis
+                idx = 0;
+                // nose
+                pointsB[idx++] = 6;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 5;
+                // tail
+                pointsB[idx++] = 2;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = -5;
+                // left wing
+                pointsB[idx++] = 2 + 4;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // right wing
+                pointsB[idx++] = -2 + 4;
+                pointsB[idx++] = 0;
+                pointsB[idx++] = 0;
+                // top
+                pointsB[idx++] = 4;
+                pointsB[idx++] = 3;
+                pointsB[idx++] = 0;
+                // bottom
+                pointsB[idx++] = 4;
+                pointsB[idx++] = -3;
+                pointsB[idx++] = 0;
+                bboxB.setToPoints(pointsB);
+
+                intersect = bboxA.intersectsBox(bboxB);
+
+                expect(intersect).toBe(true);
+
+                intersect = bboxB.intersectsBox(bboxA);
+
+                expect(intersect).toBe(true);
             });
         });
 

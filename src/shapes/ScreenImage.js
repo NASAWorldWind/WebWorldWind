@@ -20,6 +20,7 @@ define([
         '../error/ArgumentError',
         '../shaders/BasicProgram',
         '../shaders/BasicTextureProgram',
+        '../geom/BoundingBox',
         '../util/Color',
         '../render/FramebufferTexture',
         '../util/ImageSource',
@@ -35,6 +36,7 @@ define([
     function (ArgumentError,
               BasicProgram,
               BasicTextureProgram,
+              BoundingBox,
               Color,
               FramebufferTexture,
               ImageSource,
@@ -164,6 +166,7 @@ define([
             this.debug = false;
             this.framebuffer = null;
             this.orthoMatrix = new Matrix();
+            this.boundingBox = new BoundingBox();
         };
 
         // Internal use only. Intentionally not documented.
@@ -446,6 +449,35 @@ define([
             scratchPosition.longitude = -100;
             scratchPosition.altitude = 0;
 
+            var bboxVerts = new Float32Array(6 * 3);
+            idx = 0;
+            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            bboxVerts[idx++] = scratchPoint[0];
+            bboxVerts[idx++] = scratchPoint[1];
+            bboxVerts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(30 - 5, -100 + 5, 0, scratchPoint);
+            bboxVerts[idx++] = scratchPoint[0];
+            bboxVerts[idx++] = scratchPoint[1];
+            bboxVerts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            bboxVerts[idx++] = scratchPoint[0];
+            bboxVerts[idx++] = scratchPoint[1];
+            bboxVerts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(30 + 5, -100 + 5, 0, scratchPoint);
+            bboxVerts[idx++] = scratchPoint[0];
+            bboxVerts[idx++] = scratchPoint[1];
+            bboxVerts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(30 + 5, -100 - 5, 0, scratchPoint);
+            bboxVerts[idx++] = scratchPoint[0];
+            bboxVerts[idx++] = scratchPoint[1];
+            bboxVerts[idx++] = scratchPoint[2];
+            dc.globe.computePointFromPosition(30 - 10, -100 - 5, 0, scratchPoint);
+            bboxVerts[idx++] = scratchPoint[0];
+            bboxVerts[idx++] = scratchPoint[1];
+            bboxVerts[idx++] = scratchPoint[2];
+
+            this.boundingBox.setToPoints(bboxVerts);
+
             //var o = WorldWind.EARTH_RADIUS;
             // find the largest distance from one point to another for scaling the orthographic projection matrix
             var x = -Number.MAX_VALUE, y = -Number.MAX_VALUE, z = -Number.MAX_VALUE, vx, vy, vz, wx, wy, wz;
@@ -545,6 +577,11 @@ define([
                 return;
             }
 
+            var drawBoundingBox = document.getElementById("shape-bounding-box");
+            if (drawBoundingBox && drawBoundingBox.checked) {
+                this.boundingBox.render(dc);
+            }
+
             program = dc.findAndBindProgram(OrthoProgram);
 
             // draw the terrain with texture coordinates which map to the framebuffer texture
@@ -562,6 +599,11 @@ define([
 
                 if (!terrainTile || !terrainTile.transformationMatrix) {
                     continue;
+                }
+
+                var checkCulling = document.getElementById("bounding-box-culling");
+                if (checkCulling && checkCulling.checked && !terrainTile.extent.intersectsBox(this.boundingBox)) {
+                    continue; // skip this terrain tile
                 }
 
                 scratchMatrix.copy(this.orthoMatrix);
