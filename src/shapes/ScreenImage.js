@@ -321,6 +321,7 @@ define([
                 gl.clearColor(0, 0, 0, 0);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
+                /*
                 // program = dc.findAndBindProgram(BasicProgram);
                 //
                 // verts = new Float32Array(9);
@@ -361,6 +362,7 @@ define([
                 // dc.modelviewProjection.copy(orthoMvp);
                 //
                 // this.drawTerrainWireframe(dc);
+                */
 
                 this.drawSquareWithImage(dc);
 
@@ -602,11 +604,18 @@ define([
                 this.boundingBox.render(dc);
             }
 
-            this.beginStenciling(dc);
-            this.drawVolume(dc);
-            this.applyStencil(dc);
+            var stencilEnabled = document.getElementById("stencil-clipping");
+            stencilEnabled = stencilEnabled && stencilEnabled.checked;
+            if (stencilEnabled) {
+                this.beginStenciling(dc);
+                this.drawVolume(dc);
+                this.applyStencil(dc);
+            }
 
             program = dc.findAndBindProgram(OrthoProgram);
+
+            // gl.enable(gl.CULL_FACE);
+            gl.enable(gl.DEPTH_TEST);
 
             // draw the terrain with texture coordinates which map to the framebuffer texture
             //texture = this.framebuffer.texture;
@@ -644,7 +653,9 @@ define([
 
             terrain.endRendering(dc);
 
-            this.endStenciling(dc);
+            if (stencilEnabled) {
+                this.endStenciling(dc);
+            }
         };
 
         // Internal. Intentionally not documented.
@@ -900,7 +911,7 @@ define([
 
             // Apply the stencil test to drawing
             gl.stencilFunc(gl.NOTEQUAL, 0, 255);
-            gl.stencilOp(gl.KEEP, gl.KEEP, gl.ZERO); // reset stencil to zero after successful fragment modification
+            gl.stencilOp(gl.KEEP, gl.KEEP, gl.KEEP); // reset stencil to zero after successful fragment modification
 
             gl.disable(gl.DEPTH_TEST);
         };
