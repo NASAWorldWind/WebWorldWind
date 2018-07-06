@@ -419,6 +419,13 @@ define([
 
             // Intentionally not documented.
             this.pixelSizeOffset = 0;
+
+            /**
+             * A place to store gl extensions for this drawContext.
+             * @type {Object}
+             * @private
+             */
+            this._glExtensionsCache = Object.create(null);
         };
 
         // Internal use. Intentionally not documented.
@@ -500,6 +507,7 @@ define([
             // Reset properties tracking the current WebGL state, which are now invalid.
             this.currentFramebuffer = null;
             this.currentProgram = null;
+            this._glExtensionsCache = Object.create(null);
         };
 
         /**
@@ -511,6 +519,7 @@ define([
             // asynchronous load operations that complete between context lost and context restored populate the cache
             // with invalid entries.
             this.gpuResourceCache.clear();
+            this._glExtensionsCache = Object.create(null);
         };
 
         /**
@@ -1571,6 +1580,35 @@ define([
                 " eo " + attributes.enableOutline +
                 " ow " + attributes.outlineWidth +
                 " oc " + attributes.outlineColor.toHexString(true);
+        };
+
+        /**
+         * A wrapper around gl.getExtension method, that also caches the extensions.
+         *
+         * @param {String} extensionName The name of the WebGL extension.
+         *
+         * @returns {Object|null} A WebGL extension object, or null if the extension is not available
+         *
+         * @throws {ArgumentError} if the name is missing or not a string
+         */
+        DrawContext.prototype.getExtension = function (extensionName) {
+            if (!extensionName) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "getExtension",
+                    "missing extensionName"));
+            }
+
+            if (typeof extensionName !== "string") {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "getExtension",
+                    "extensionName is not a string"));
+            }
+
+            if (extensionName in this._glExtensionsCache) {
+                return this._glExtensionsCache[extensionName];
+            }
+
+            this._glExtensionsCache[extensionName] = this.currentGlContext.getExtension(extensionName) || null;
+
+            return this._glExtensionsCache[extensionName];
         };
 
         return DrawContext;
