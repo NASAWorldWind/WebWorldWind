@@ -334,18 +334,13 @@ define([
                                                                      currentPosition,
                                                                      previousPosition,
                                                                      result) {
-            // FIXME Is this complexity needed?
-
-            var delta = this.computeControlPointDelta(globe, previousPosition, currentPosition);
 
             var controlPointPoint = globe.computePointFromPosition(
-                controlPoint.position.latitude,
-                controlPoint.position.longitude,
+                currentPosition.latitude,
+                currentPosition.longitude,
                 0,
                 new Vec3(0, 0, 0)
             );
-
-            controlPointPoint.add(delta);
 
             return globe.computePositionFromPoint(
                 controlPointPoint[0],
