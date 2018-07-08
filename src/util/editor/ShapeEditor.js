@@ -81,7 +81,7 @@ define([
          * Dragging the body of the shape moves the whole shape. Dragging a control point performs the action associated
          * with that control point. The editor provides vertex insertion and removal for SurfacePolygon and
          * SurfacePolyline. Shift-clicking when the cursor is over the shape inserts a control point near the position
-         * of the cursor. Alt-clicking when the cursor is over a control point removes that particular control point.
+         * of the cursor. Ctrl-clicking when the cursor is over a control point removes that particular control point.
          * <p>
          * This editor currently supports all surface shapes except SurfaceImage.
          * @param {WorldWindow} worldWindow The World Window to associate this shape editor controller with.
@@ -431,12 +431,12 @@ define([
                     var userObject = object.userObject;
 
                     if (userObject === this._shape) {
-                        this.beginAction(terrainObject.position, event.altKey);
+                        this.beginAction(terrainObject.position, event.ctrlKey);
                         event.preventDefault();
                         break;
 
                     } else if (this.controlPointsLayer.renderables.indexOf(userObject) !== -1) {
-                        this.beginAction(terrainObject.position, event.altKey, userObject);
+                        this.beginAction(terrainObject.position, event.ctrlKey, userObject);
                         event.preventDefault();
                         break;
                     }
@@ -471,11 +471,14 @@ define([
             var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
             var terrainObject = this._worldWindow.pickTerrain(mousePoint).terrainObject();
 
+
+            // The editor provides vertex insertion and removal for SurfacePolygon and
+            // SurfacePolyline. Shift-clicking when the cursor is over the shape inserts a control point near the position
+            // of the cursor. Ctrl-clicking when the cursor is over a control point removes that particular control point.
             if (this.actionType) {
                 if (this.actionControlPoint
                     && terrainObject
-                    && event.altKey) {
-                        // FIXME What is this for?
+                    && event.ctrlKey) {
                         this.reshape(terrainObject.position);
                 }
 
@@ -486,7 +489,6 @@ define([
                 && this.actionStartX === this.actionCurrentX
                 && this.actionStartY === this.actionCurrentY
                 && event.shiftKey) {
-
                 this.activeEditorFragment.addNewVertex(
                     this._shape,
                     this._worldWindow.globe,
