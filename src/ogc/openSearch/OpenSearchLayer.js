@@ -32,6 +32,7 @@ define([
      * @param document {OpenSearchDescriptionDocument} The document to display.
      * @param shapeConfigurationCallback {Function|null} The function which can adapt the way the renderables will look like.
      * @constructor
+     * @alias OpenSearchLayer
      */
     var OpenSearchLayer = function (document, shapeConfigurationCallback) {
         RenderableLayer.call(this);
