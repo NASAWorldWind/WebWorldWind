@@ -37,7 +37,7 @@ define([
         RenderableLayer.call(this);
 
         // There needs to be a mechanism to provide parsers for different types of responses.
-        let geoJSON = new GeoJSONParser(document);
+        var geoJSON = new GeoJSONParser(document);
         geoJSON.load(null, shapeConfigurationCallback, this);
     };
 

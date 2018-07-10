@@ -530,7 +530,7 @@ define([
                 });
 
                 it('contains total results', function(){
-                    expect(validProductsDocument.properties.totalResults).toBe(2492);
+                    expect(validProductsDocument.properties.totalResults).toBe(2496);
                 });
 
                 it('contains items per page', function(){
