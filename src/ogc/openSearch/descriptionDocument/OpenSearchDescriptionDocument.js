@@ -289,29 +289,34 @@ define([
         };
 
         /**
-         * Internal use. Applications should not call this method.
-         * Finds the first compatible URL for a search request based on the specified arguments.
+         * It returns the first URL from the Search document that matches the criteria.
          *
-         * @param {Array|null} searchParams The list of search parameters for the query.
-         * @param {OpenSearchRequest} requestOptions The request options.
-         * @param {Array} supportedFormats The list of formats (mime types) that the requesting service can parse.
+         * @public
+         * @param filter {Object}
+         * @param filter.supportedFormats {String[]|null} The list of search parameters for the query.
+         * @param filter.requestOptions {OpenSearchRequest} The request options.
+         * @param filter.searchParams {Array|null} The list of search parameters for the query.
          * @return {OpenSearchUrl|null} The first matching URL or null.
          */
-        OpenSearchDescriptionDocument.prototype.findCompatibleUrl = function (searchParams, requestOptions, supportedFormats) {
-            var compatibleUrls = this.findCompatibleUrls(searchParams, requestOptions, supportedFormats);
-            var atomUrls = compatibleUrls.filter(function (url) {
-                return url.type === 'application/atom+xml';
-            });
-            if (atomUrls.length) {
-                return atomUrls[0] || null;
-            }
-            return compatibleUrls[0] || null;
+        OpenSearchDescriptionDocument.prototype.findFirstSearchUrl = function(filter) {
+            return this.findCompatibleUrls(filter.searchParams, filter.requestOptions, filter.supportedFormats)[0] || null;
+        };
+
+        /**
+         * Indicates whether a particular extension is supported, e.g. geo, time and parameter
+         *
+         * @param extensionType {String} The extension type supported in this case.
+         * @return Boolean True if given extension is supported
+         */
+        OpenSearchDescriptionDocument.prototype.hasExtension = function(extensionType) {
+            // TODO: Figure out how do I find.
         };
 
         /**
          * Internal use. Applications should not call this method.
          * Finds a list of compatible URLs for a search request based on the specified arguments.
          *
+         * @private
          * @param {Array|null} searchParams The list of search parameters for the query.
          * @param {OpenSearchRequest} requestOptions The request options.
          * @param {Array} supportedFormats The list of formats (mime types) that the requesting service can parse.

@@ -56,6 +56,7 @@ define([
         var OpenSearchService = function () {
             this._url = '';
             this._descriptionDocument = null;
+            this._rawDescriptionDocument = null;
             this._parserRegistry = new OpenSearchParserRegistry();
 
             this.registerDefaultParsers();
@@ -81,6 +82,17 @@ define([
             descriptionDocument: {
                 get: function () {
                     return this._descriptionDocument;
+                }
+            },
+
+            /**
+             * The latest OpenSearch description document in the raw xml form.
+             * @memberof OpenSearchService.prototype
+             * @type {XmlDocument}
+             */
+            rawDescriptionDocument: {
+                get: function() {
+                    return this._rawDescriptionDocument;
                 }
             },
 
@@ -119,6 +131,7 @@ define([
             return OpenSearchUtils.fetch(requestOptions)
                 .then(function (responseText) {
                     var xmlRoot = OpenSearchUtils.parseXml(responseText);
+                    service._rawDescriptionDocument = xmlRoot;
                     service._descriptionDocument = new OpenSearchDescriptionDocument(xmlRoot);
                     return service;
                 });
@@ -139,13 +152,17 @@ define([
          */
         OpenSearchService.prototype.search = function (searchParams, options) {
             if (!this._descriptionDocument) {
-                return Promise.reject(new Error('OpenSearchService search - no descriptionDocument, run discover first'));
+                return Promise.reject(new Error('OpenSearchService search - no descriptionDocument, create the service via create first'));
             }
 
             var self = this;
             var requestOptions = new OpenSearchRequest(options);
             var supportedFormats = this.getSupportedFormats();
-            var openSearchUrl = this._descriptionDocument.findCompatibleUrl(searchParams, requestOptions, supportedFormats);
+            var openSearchUrl = this._descriptionDocument.findFirstSearchUrl({
+                searchParams: searchParams,
+                requestOptions: requestOptions,
+                supportedFormats: supportedFormats
+            });
 
             if (!openSearchUrl) {
                 return Promise.reject(new Error('OpenSearchService - no suitable Url found'));
@@ -177,16 +194,6 @@ define([
                     return responseParser.parse(response, requestOptions.relation);
                     // What are the possible results of this?
                 });
-        };
-
-        OpenSearchService.prototype.collections = function() {
-            // It doesn't have to contain the information.
-        };
-
-        OpenSearchService.prototype.products = function(){
-            // It must contain the geographical information that we can display.
-            // Each product must also contain the associated metadata.
-            // It should return the collection of the products.
         };
 
         /**
