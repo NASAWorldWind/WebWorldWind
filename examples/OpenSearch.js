@@ -26,25 +26,19 @@ requirejs([
 
         var wwd = new WorldWind.WorldWindow("canvasOne");
         var bmngLayer = new WorldWind.BMNGLayer();
-        var openSearchLayer = new WorldWind.OpenSearchLayer('Open Search');
         wwd.addLayer(bmngLayer);
-        wwd.addLayer(openSearchLayer);
 
         wwd.navigator.lookAtLocation.latitude = 46.50;
         wwd.navigator.lookAtLocation.longitude = 6.56;
         wwd.navigator.range = 2750 * 1e3;
-
-        openSearchLayer.shapeConfigurationCallback = shapeConfigurationCallback;
 
         // ************************************************************************************************************
         // This performs a 2-step search for Earth Observation products using the OpenSearch service and layer.
 
         var url = 'https://fedeo.esa.int/opensearch/description.xml';
 
-        var openSearchService = new WorldWind.OpenSearchService();
-
         // Use the service for getting and parsing the OpenSearch description document
-        openSearchService.discover({url : url})
+        WorldWind.OpenSearchService.create({url : url})
             .then(function (service) {
                 var searchParams = [
                     {name: 'query', value: 'LAI'},
@@ -62,21 +56,20 @@ requirejs([
 
                 var productSearchUrl = feature.links.search[0].href;
 
-                // Use the layer for the second step so that the results are display on the globe
-                return openSearchLayer.discover({url: productSearchUrl});
+                return WorldWind.OpenSearchService.create({url: productSearchUrl});
             })
-            .then(function (layer) {
+            .then(function (service) {
                 var searchParams = [
                     {name: 'startDate', value: new Date('2018-01-01T00:00:00Z')},
                     {name: 'endDate', value: new Date('2018-01-31T00:00:00Z')}
                 ];
 
                 // Search for products using the given parameters
-                return layer.search(searchParams);
+                return service.search(searchParams);
             })
-            .then(function (geoJSONCollection) {
+            .then(function (descriptionDocument) {
                 // Refresh the globe after the search has completed
-                wwd.redraw();
+                wwd.addLayer(new WorldWind.OpenSearchLayer(descriptionDocument, shapeConfigurationCallback));
             })
             .catch(function (err) {
                 // Handle errors

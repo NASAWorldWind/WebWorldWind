@@ -54,6 +54,7 @@ define([
 
             var ns = OpenSearchNamespaces.openSearch;
 
+            this._namespaces = OpenSearchUtils.getNodeAttributes(xmlRoot, {});
             this._shortName = OpenSearchUtils.getChildTextContent(xmlRoot, 'ShortName', ns);
             this._description = OpenSearchUtils.getChildTextContent(xmlRoot, 'Description', ns);
             this._urls = OpenSearchUtils.getXmlElements(xmlRoot, 'Url', ns).map(function (node) {
@@ -306,11 +307,18 @@ define([
         /**
          * Indicates whether a particular extension is supported, e.g. geo, time and parameter
          *
-         * @param extensionType {String} The extension type supported in this case.
+         * @param extensionType {String} The extension type supported in this case. E.g. http://a9.com/-/opensearch/extensions/geo/1.0/
          * @return Boolean True if given extension is supported
          */
         OpenSearchDescriptionDocument.prototype.hasExtension = function(extensionType) {
-            // TODO: Figure out how do I find.
+            var namespaces = this._namespaces;
+            var found = false;
+            Object.keys(namespaces).forEach(function(namespace){
+                if(namespaces[namespace] === extensionType) {
+                    found = true;
+                }
+            });
+            return found;
         };
 
         /**

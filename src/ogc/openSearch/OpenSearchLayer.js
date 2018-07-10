@@ -19,21 +19,26 @@
  */
 
 define([
+    '../../formats/geojson/GeoJSONParser',
     './OpenSearchConstants',
     '../../layer/RenderableLayer'
-], function (OpenSearchConstants,
+], function (GeoJSONParser,
+             OpenSearchConstants,
              RenderableLayer) {
     /**
+     * It represents layer, which takes the Description Document and based on the provided shape configuration displays
+     * the shapes on the globe. THe shapes are drawn as appropriate renderables.
      *
-     * @param document {OpenSearchDescriptionDocument}
+     * @param document {OpenSearchDescriptionDocument} The document to display.
+     * @param shapeConfigurationCallback {Function|null} The function which can adapt the way the renderables will look like.
      * @constructor
      */
-    var OpenSearchLayer = function (document) {
+    var OpenSearchLayer = function (document, shapeConfigurationCallback) {
         RenderableLayer.call(this);
 
         // There needs to be a mechanism to provide parsers for different types of responses.
         let geoJSON = new GeoJSONParser(document);
-        geoJSON.load(null, null, this);
+        geoJSON.load(null, shapeConfigurationCallback, this);
     };
 
     OpenSearchLayer.prototype = Object.create(RenderableLayer.prototype);
