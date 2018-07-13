@@ -27,6 +27,7 @@ requirejs(['./WorldWindShim',
 
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
+        wwd.globe.elevationModel.removeAllCoverages();
 
         /**
          * Added imagery layers.
@@ -94,10 +95,49 @@ requirejs(['./WorldWindShim',
         // Add the screen images to a layer and the layer to the WorldWindow's layer list.
         var screenImageLayer = new WorldWind.RenderableLayer();
         screenImageLayer.displayName = "Screen Images";
-        screenImageLayer.addRenderable(screenImage1);
+
         screenImageLayer.addRenderable(screenImage2);
-        screenImageLayer.addRenderable(pgon);
+        screenImageLayer.addRenderable(screenImage1);
+        // screenImageLayer.addRenderable(pgon);
+        var kmlLayer = new WorldWind.RenderableLayer("KML File");
+        kmlLayer.opacity = 0.5;
+        wwd.addLayer(kmlLayer);
+
+        new WorldWind.KmlFile('data/etna.kmz')
+            .then(function (kmlFile) {
+                kmlLayer.addRenderable(kmlFile);
+                wwd.redraw();
+            });
         wwd.addLayer(screenImageLayer);
+
+
+        var geoTiffLayer = new WorldWind.RenderableLayer("GeoTiff Layer");
+        geoTiffLayer.opacity = 0.5;
+        wwd.addLayer(geoTiffLayer);
+
+        // Define a parser completion callback
+        var parserCallback = function (geoTiffReader, xhrStatus) {
+            if (!geoTiffReader) {
+                // Error, provide the status text to the console
+                console.log(xhrStatus);
+                return;
+            }
+
+            var surfaceGeoTiff = new WorldWind.SurfaceImage(
+                geoTiffReader.metadata.bbox,
+                new WorldWind.ImageSource(geoTiffReader.getImage())
+            );
+
+            geoTiffLayer.addRenderable(surfaceGeoTiff);
+
+            geoTiffLayer.enabled = true;
+            geoTiffLayer.showSpinner = false;
+
+            wwd.redraw();
+        };
+
+        // Load the GeoTiff using the Reader's built in XHR retrieval function
+        WorldWind.GeoTiffReader.retrieveFromUrl("./data/sba_rgb_wgs84_512x512.tif", parserCallback);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
