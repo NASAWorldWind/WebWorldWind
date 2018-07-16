@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="VeryManyPolygons" type="JavascriptDebugType" factoryName="JavaScript Debug" uri="http://localhost:63342/WebWorldWind/performance/VeryManyPolygons.html">
-    <RunnerSettings RunnerId="JavascriptDebugRunner" />
-    <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
-    <method />
-  </configuration>
-</component>
-
