@@ -190,9 +190,6 @@ define([
 
         // Internal use only.
         SurfacePolygonEditorFragment.prototype.addNewVertex = function (shape, globe, position) {
-
-            // TODO Add support for polygons with multiple rings
-
             var pointA = new Vec3(0, 0, 0);
             var pointB = new Vec3(0, 0, 0);
             var pointOnEdge = new Vec3(0, 0, 0);
@@ -209,46 +206,96 @@ define([
             var nearestPoint = new Vec3(0, 0 , 0);
             var nearestSegmentIndex = -1;
             var nearestDistance = Number.MAX_VALUE;
-            for (var i = 1, len = locations.length; i <= len; i++) {
-                var locationA = locations[i - 1];
-                var locationB = locations[i == len ? 0 : i];
 
-                globe.computePointFromPosition(locationA.latitude, locationA.longitude, 0, pointA);
-                globe.computePointFromPosition(locationB.latitude, locationB.longitude, 0, pointB);
+            if(Array.isArray(shape.boundaries[0])){
+                var nearestPolyIndex = -1;
+                for (var i = 0, lenPoly = locations.length; i < lenPoly; i++) {
+                    for (var j = 1, lenVertices = locations[i].length; j <= lenVertices; j++){
+                        var locationA = locations[i][j - 1];
+                        var locationB = locations[i][j == lenVertices ? 0 : j];
 
-                pointOnEdge.copy(pointPicked);
-                pointOnEdge = this.closestPointOnSegment(
-                    pointA,
-                    pointB,
-                    pointPicked
-                );
+                        globe.computePointFromPosition(locationA.latitude, locationA.longitude, 0, pointA);
+                        globe.computePointFromPosition(locationB.latitude, locationB.longitude, 0, pointB);
 
-                var distance = pointOnEdge.distanceTo(pointPicked);
-                if (distance < nearestDistance) {
-                    nearestPoint.copy(pointOnEdge);
-                    nearestSegmentIndex = i;
-                    nearestDistance = distance;
+                        pointOnEdge.copy(pointPicked);
+                        pointOnEdge = this.closestPointOnSegment(
+                            pointA,
+                            pointB,
+                            pointPicked
+                        );
+
+                        var distance = pointOnEdge.distanceTo(pointPicked);
+                        if (distance < nearestDistance) {
+                            nearestPoint.copy(pointOnEdge);
+                            nearestPolyIndex = i;
+                            nearestSegmentIndex = j;
+                            nearestDistance = distance;
+                        }
+                    }
+                }
+
+                if (nearestDistance < 20000) {
+                    var nearestLocation = globe.computePositionFromPoint(
+                        nearestPoint[0],
+                        nearestPoint[1],
+                        nearestPoint[2],
+                        new Position(0, 0, 0)
+                    );
+
+                    if (nearestSegmentIndex == locations[nearestPolyIndex].length) {
+                        locations[nearestPolyIndex].push(nearestLocation);
+                    } else {
+                        locations[nearestPolyIndex].splice(nearestSegmentIndex, 0, nearestLocation);
+                    }
+
+                    shape.resetBoundaries();
+                    shape._stateId = SurfacePolygon.stateId++;
+                    shape.stateKeyInvalid = true;
+                }
+            }
+            else{
+                for (var i = 1, len = locations.length; i <= len; i++) {
+                    var locationA = locations[i - 1];
+                    var locationB = locations[i == len ? 0 : i];
+
+                    globe.computePointFromPosition(locationA.latitude, locationA.longitude, 0, pointA);
+                    globe.computePointFromPosition(locationB.latitude, locationB.longitude, 0, pointB);
+
+                    pointOnEdge.copy(pointPicked);
+                    pointOnEdge = this.closestPointOnSegment(
+                        pointA,
+                        pointB,
+                        pointPicked
+                    );
+
+                    var distance = pointOnEdge.distanceTo(pointPicked);
+                    if (distance < nearestDistance) {
+                        nearestPoint.copy(pointOnEdge);
+                        nearestSegmentIndex = i;
+                        nearestDistance = distance;
+                    }
+                }
+
+                if (nearestDistance < 20000) {
+                    var nearestLocation = globe.computePositionFromPoint(
+                        nearestPoint[0],
+                        nearestPoint[1],
+                        nearestPoint[2],
+                        new Position(0, 0, 0)
+                    );
+
+                    if (nearestSegmentIndex == locations.length) {
+                        locations.push(nearestLocation);
+                    } else {
+                        locations.splice(nearestSegmentIndex, 0, nearestLocation);
+                    }
+
+                    shape.resetBoundaries();
+                    shape._stateId = SurfacePolygon.stateId++;
+                    shape.stateKeyInvalid = true;
                 }
             }
 
-            if (nearestDistance < 20000) {
-                var nearestLocation = globe.computePositionFromPoint(
-                    nearestPoint[0],
-                    nearestPoint[1],
-                    nearestPoint[2],
-                    new Position(0, 0, 0)
-                );
-
-                if (nearestSegmentIndex == locations.length) {
-                    locations.push(nearestLocation);
-                } else {
-                    locations.splice(nearestSegmentIndex, 0, nearestLocation);
-                }
-
-                shape.resetBoundaries();
-                shape._stateId = SurfacePolygon.stateId++;
-                shape.stateKeyInvalid = true;
-            }
         };
 
         // Internal use only.
