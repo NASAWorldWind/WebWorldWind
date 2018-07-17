@@ -564,12 +564,28 @@ define([
             this._worldWindow.redraw();
         };
 
+        // TODO: To be discussed with Yann
+        // ShapeEditor.prototype.drag = function (clientX, clientY) {
+        //     var mousePoint = this._worldWindow.canvasCoordinates(clientX, clientY);
+        //     var pickList = this._worldWindow.pick(mousePoint);
+        //     var terrainObject = pickList.terrainObject();
+        //
+        //     if(terrainObject){
+        //         this._shape.moveTo(this._worldWindow.globe, new Location(terrainObject.position.latitude,
+        //             terrainObject.position.longitude));
+        //     }
+        //
+        //     this.updateControlElements();
+        //     this.updateShapeAnnotation();
+        //     this._worldWindow.redraw();
+        // };
+
         // Internal use only.
         ShapeEditor.prototype.drag = function (clientX, clientY) {
-            // FIXME Is this complexity needed?
-
+            // Get reference position for the shape that is dragged
             var refPos = this._shape.getReferencePosition();
 
+            // Get point for referenced position
             var refPoint = this._worldWindow.globe.computePointFromPosition(
                 refPos.latitude,
                 refPos.longitude,
@@ -580,9 +596,11 @@ define([
             var screenRefPoint = new Vec3(0, 0, 0);
             this._worldWindow.drawContext.project(refPoint, screenRefPoint);
 
+            // Check drag distance
             var dx = clientX - this.actionCurrentX;
             var dy = clientY - this.actionCurrentY;
 
+            // Get the latest position of mouse to calculate drag distance
             this.actionCurrentX = clientX;
             this.actionCurrentY = clientY;
 
@@ -592,6 +610,7 @@ define([
 
             var ray = this._worldWindow.rayThroughScreenPoint(new Vec2(x, y));
 
+            // Check if the mouse is over the globe and move shape
             var intersection = new Vec3(0, 0, 0);
             if (this._worldWindow.globe.intersectsLine(ray, intersection)) {
                 var p = new Position(0, 0, 0);
@@ -599,6 +618,7 @@ define([
                 this._shape.moveTo(this._worldWindow.globe, new Location(p.latitude, p.longitude));
             }
 
+            // Update control points and shape annotation
             this.updateControlElements();
             this.updateShapeAnnotation();
 
