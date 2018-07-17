@@ -40,7 +40,7 @@ define([
     "use strict";
 
     /**
-     * It represents a HeatMap Layer. The default implementation uses gradient circles as the way to display the
+     * Returns a HeatMap Layer. The default implementation uses gradient circles as the way to display the
      * point. The intensity of the point is taken in the account. The default implementation should look just fine,
      * though it is possible to change the way the HeatMap looks via options to quite some extent.
      * @constructor
@@ -135,8 +135,8 @@ define([
         },
 
         /**
-         * It is also possible to provide a function. Radius of the point to
-         * be representing the intensity location. Default value is 25. The size of the radius.
+         * Represents radius of the point drawn on the canvas. It is also possible to provide a function. Radius of the
+         * point to be representing the intensity location. Default value is 25. The size of the radius.
          * @memberof HeatMapLayer.prototype
          * @type {Function|Number}
          */
@@ -180,7 +180,7 @@ define([
     });
 
     /**
-     * It gets the relevant points for the visualisation for current sector. At the moment it uses QuadTree to retrieve
+     * Returns the relevant points for the visualisation for current sector. At the moment it uses QuadTree to retrieve
      * the information.
      * @private
      * @param data
@@ -269,7 +269,7 @@ define([
     };
 
     /**
-     * It sets gradient based on the Scale and IntervalType.
+     * Sets gradient based on the Scale and IntervalType.
      */
     HeatMapLayer.prototype.setGradient = function (data) {
         var intervalType = this.intervalType;
@@ -367,7 +367,7 @@ define([
     };
 
     /**
-     * It returns radius used to draw the points relevant to the HeatMap.
+     * Returns radius used to draw the points relevant to the HeatMap.
      * @protected
      * @param sector {Sector} Sector to be used for the calculation of the radius.
      * @return {Number} Pixels representing the radius.
@@ -383,7 +383,7 @@ define([
     };
 
     /**
-     * This method calculates the new sector for which the data will be filtered and which will be drawn on the tile.
+     * Calculates the new sector for which the data will be filtered and which will be drawn on the tile.
      * The standard version just applies extension factor to the difference between minimum and maximum.
      * @protected
      * @param sector {Sector} Sector to use as basis for the extension.

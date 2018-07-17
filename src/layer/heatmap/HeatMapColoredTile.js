@@ -18,7 +18,7 @@ define([
     './HeatMapTile'
 ], function (HeatMapTile) {
     /**
-     * It provides us with a HeatMapTile available to HeatMapColoredTile.
+     * Provides us with a HeatMapTile available to HeatMapColoredTile.
      * @constructor
      * @augments HeatMapTile
      * @alias HeatMapColoredTile

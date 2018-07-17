@@ -16,7 +16,7 @@
  */
 define([], function(){
     /**
-     * It represents one tile in the HeatMap information. It is basically an interface specifying the public methods
+     * Returns one tile for the HeatMap information. It is basically an interface specifying the public methods
      * properties and default configuration. The logic itself is handled in the subclasses.
      * @alias HeatMapTile
      * @constructor
@@ -43,7 +43,7 @@ define([], function(){
     };
 
     /**
-     * It returns the drawn HeatMapTile in the form of URL.
+     * Returns the drawn HeatMapTile in the form of URL.
      * @return {String} Data URL of the tile.
      */
     HeatMapTile.prototype.url = function() {
@@ -51,7 +51,7 @@ define([], function(){
     };
 
     /**
-     * It returns the whole Canvas. It is then possible to use for further uses. This one is actually used in the
+     * Returns the whole Canvas. It is then possible to use for further uses. This one is actually used in the
      * HeatMapLayer mechanism so if you want to provide some custom implementation of Canvas creation in your tile,
      * change this method.
      * @return {HTMLCanvasElement} Canvas Element representing the drawn tile.
@@ -61,7 +61,7 @@ define([], function(){
     };
 
     /**
-     * It draws the shapes on the canvas.
+     * Draws the shapes on the canvas.
      * @protected
      * @returns {HTMLCanvasElement}
      */
@@ -82,7 +82,7 @@ define([], function(){
     };
 
     /**
-     * It creates canvas element of given size.
+     * Creates canvas element of given size.
      * @protected
      * @param width {Number} Width of the canvas in pixels
      * @param height {Number} Height of the canvas in pixels
@@ -97,7 +97,7 @@ define([], function(){
     };
 
     /**
-     * It creates a canvas containing the circle of the right size. THe default shape is circle, but subclasses can
+     * Creates a canvas containing the circle of the right size. THe default shape is circle, but subclasses can
      * change this behavior.
      * @protected
      * @returns {HTMLCanvasElement} Canvas representing the circle.
@@ -125,7 +125,7 @@ define([], function(){
     };
 
     /**
-     * It calculates position in pixels of the point based on its latitude.
+     * Calculates position in pixels of the point based on its latitude.
      * @param location {Location} Location to transform
      * @param sector {Sector} Sector to which transform
      * @param height {Number} Height of the tile to draw to.
@@ -140,6 +140,7 @@ define([], function(){
     };
 
     /**
+     * Calculates position in pixels of the point based on its longitude.
      * @param location {Location} Location to transform
      * @param sector {Sector} Sector to which transform
      * @param width {Number} Height of the tile to draw to.
