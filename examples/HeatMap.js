@@ -36,7 +36,6 @@ requirejs(['./WorldWindShim',
             );
         }
 
-        //
         var heatMapLayer = new WorldWind.HeatMapLayer("HeatMap", locations);
 
         var layers = [
