@@ -420,12 +420,8 @@ define([
             // Intentionally not documented.
             this.pixelSizeOffset = 0;
 
-            /**
-             * A place to store gl extensions for this drawContext.
-             * @type {Object}
-             * @private
-             */
-            this._glExtensionsCache = Object.create(null);
+            // Intentionally not documented.
+            this.glExtensionsCache = Object.create(null);
         };
 
         // Internal use. Intentionally not documented.
@@ -507,7 +503,7 @@ define([
             // Reset properties tracking the current WebGL state, which are now invalid.
             this.currentFramebuffer = null;
             this.currentProgram = null;
-            this._glExtensionsCache = Object.create(null);
+            this.glExtensionsCache = Object.create(null);
         };
 
         /**
@@ -519,7 +515,7 @@ define([
             // asynchronous load operations that complete between context lost and context restored populate the cache
             // with invalid entries.
             this.gpuResourceCache.clear();
-            this._glExtensionsCache = Object.create(null);
+            this.glExtensionsCache = Object.create(null);
         };
 
         /**
@@ -1602,13 +1598,11 @@ define([
                     "extensionName is not a string"));
             }
 
-            if (extensionName in this._glExtensionsCache) {
-                return this._glExtensionsCache[extensionName];
+            if (!(extensionName in this.glExtensionsCache)) {
+                this.glExtensionsCache[extensionName] = this.currentGlContext.getExtension(extensionName) || null;
             }
 
-            this._glExtensionsCache[extensionName] = this.currentGlContext.getExtension(extensionName) || null;
-
-            return this._glExtensionsCache[extensionName];
+            return this.glExtensionsCache[extensionName];
         };
 
         return DrawContext;
