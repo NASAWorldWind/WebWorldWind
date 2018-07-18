@@ -84,8 +84,7 @@ define([
         var WorldWindow = function (canvasElem, elevationModel) {
             if (!(window.WebGLRenderingContext)) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor",
-                        "The specified canvas does not support WebGL."));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor", "webglNotSupported"));
             }
 
             // Get the actual canvas element either directly or by ID.
@@ -105,6 +104,10 @@ define([
 
             // Create the WebGL context associated with the HTML canvas.
             var gl = this.createContext(canvas);
+            if (!gl) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "constructor", "webglNotSupported"));
+            }
 
             // Internal. Intentionally not documented.
             this.drawContext = new DrawContext(gl);
@@ -123,6 +126,9 @@ define([
 
             // Internal. Intentionally not documented.
             this.scratchProjection = Matrix.fromIdentity();
+
+            // Internal. Intentionally not documented.
+            this.hasStencilBuffer = gl.getContextAttributes().stencil;
 
             /**
              * The HTML canvas associated with this WorldWindow.
@@ -563,9 +569,6 @@ define([
             if (!gl) {
                 gl = canvas.getContext("experimental-webgl", glAttrs);
             }
-
-            var actualAttributes = gl.getContextAttributes();
-            this.hasStencilBuffer = actualAttributes.stencil;
 
             // uncomment to debug WebGL
             //var gl = WebGLDebugUtils.makeDebugContext(this.canvas.getContext("webgl"),
