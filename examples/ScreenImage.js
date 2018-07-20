@@ -99,6 +99,23 @@ requirejs(['./WorldWindShim',
         screenImageLayer.addRenderable(screenImage2);
         screenImageLayer.addRenderable(screenImage1);
         // screenImageLayer.addRenderable(pgon);
+        var placemarkAttributes = new WorldWind.PlacemarkAttributes();
+        placemarkAttributes.imageScale = 1;
+        placemarkAttributes.imageOffset = new WorldWind.Offset(
+            WorldWind.OFFSET_FRACTION, 0.3,
+            WorldWind.OFFSET_FRACTION, 0.0);
+        placemarkAttributes.imageColor = WorldWind.Color.WHITE;
+        placemarkAttributes.labelAttributes.offset = new WorldWind.Offset(
+            WorldWind.OFFSET_FRACTION, 0.5,
+            WorldWind.OFFSET_FRACTION, 1.0);
+        placemarkAttributes.labelAttributes.color = WorldWind.Color.YELLOW;
+        placemarkAttributes.drawLeaderLine = true;
+        placemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.RED;
+        placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/pushpins/plain-black.png";
+        var placemark = new WorldWind.Placemark(new WorldWind.Position(30, -100, 0), true, placemarkAttributes);
+        placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
+        screenImageLayer.addRenderable(placemark);
+
         var kmlLayer = new WorldWind.RenderableLayer("KML File");
         kmlLayer.opacity = 0.5;
         wwd.addLayer(kmlLayer);

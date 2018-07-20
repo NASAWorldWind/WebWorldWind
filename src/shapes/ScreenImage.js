@@ -202,10 +202,10 @@ define([
             // ];
             // big star image
             this.boundaries = [
-                new Location(-20, -45),
-                new Location(-60, 45),
-                new Location(40, 45),
-                new Location(40, -45)
+                new Location(0, -130),
+                new Location(0, -70),
+                new Location(60, -70),
+                new Location(60, -130)
             ];
         };
 
@@ -655,7 +655,7 @@ define([
             scratchMatrix.setToIdentity();
             program.loadTextureMatrix(gl, scratchMatrix);
             program.loadTextureEnabled(gl, true);
-            program.loadColor(gl, new Color(1, 1, 1, 0.5));
+            program.loadColor(gl, new Color(1, 1, 1, 1));
             program.loadOpacity(gl, 1);
             program.loadTextureUnit(gl, gl.TEXTURE0);
 
@@ -878,7 +878,7 @@ define([
                     continue; // skip this terrain tile
                 }
 
-                scratchMatrix.copy(this.orthoMatrix);
+                // scratchMatrix.copy(this.orthoMatrix);
                 scratchMatrix.setToMultiply(this.orthoMatrix, terrainTile.transformationMatrix);
                 // scratchMatrix.multiplyByScale(0.5, 0.5, 1);
                 // scratchMatrix.multiplyByTranslation(1, 1, 0);
