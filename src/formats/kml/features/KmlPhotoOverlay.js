@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,12 +15,12 @@
  * limitations under the License.
  */
 define([
-    '../util/ImagePyramid',
+    '../util/KmlImagePyramid',
     './../KmlElements',
     './KmlOverlay',
     '../geom/KmlPoint',
-    '../util/NodeTransformers',
-    '../util/ViewVolume'
+    '../util/KmlNodeTransformers',
+    '../util/KmlViewVolume'
 ], function (ImagePyramid,
              KmlElements,
              KmlOverlay,

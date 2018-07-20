@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -136,9 +137,6 @@ requirejs(['./WorldWindShim',
         polarEllipse.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polarEllipse);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Create a highlight controller for highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
 
@@ -254,5 +252,6 @@ requirejs(['./WorldWindShim',
             return rotatingSectors[surfaceSector.sectorCounter];
         }
 
-    }
-);
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
+    });

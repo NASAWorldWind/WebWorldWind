@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -55,11 +56,12 @@ requirejs(['./WorldWindShim',
             WorldWind.OFFSET_FRACTION, 1.0);
         placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/white-dot.png";
 
+        // Callback function for configuring shapefile visualization.
         var shapeConfigurationCallback = function (attributes, record) {
             var configuration = {};
             configuration.name = attributes.values.name || attributes.values.Name || attributes.values.NAME;
 
-            if (record.isPointType()) {
+            if (record.isPointType()) { // Configure point-based features (cities, in this example)
                 configuration.name = attributes.values.name || attributes.values.Name || attributes.values.NAME;
 
                 configuration.attributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
@@ -68,7 +70,7 @@ requirejs(['./WorldWindShim',
                     var population = attributes.values.pop_max;
                     configuration.attributes.imageScale = 0.01 * Math.log(population);
                 }
-            } else if (record.isPolygonType()) {
+            } else if (record.isPolygonType()) { // Configure polygon-based features (countries, in this example).
                 configuration.attributes = new WorldWind.ShapeAttributes(null);
 
                 // Fill the polygon with a random pastel color.
@@ -103,6 +105,7 @@ requirejs(['./WorldWindShim',
         cityShapefile.load(null, shapeConfigurationCallback, cityLayer);
         wwd.addLayer(cityLayer);
 
+        // Create data for Fort Story (Over Virginia Beach, VA. It can be seen near Norfolk.)
         var fortStory = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
         var fortStoryLayer = new WorldWind.RenderableLayer("Fort Story");
         var fortStoryShapefile = new WorldWind.Shapefile(fortStory);

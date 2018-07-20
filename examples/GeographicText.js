@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -83,11 +84,10 @@ requirejs(['./WorldWindShim',
         // Add the text layer to the WorldWindow's layer list.
         wwd.addLayer(textLayer);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Point the camera and zoom to the State of Oregon.
         // Observe the decluttering feature according to camera altitude while zooming.
         wwd.goTo(new WorldWind.Position(44.00, -120.33, 800000));
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

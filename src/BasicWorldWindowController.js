@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -104,12 +105,12 @@ define([
             this.rotationRecognizer.requireRecognizerToFail(this.tiltRecognizer);
 
             // Intentionally not documented.
-            this.tapRecognizer = new TapRecognizer(this.wwd, null);
-            this.tapRecognizer.addListener(this);
+            // this.tapRecognizer = new TapRecognizer(this.wwd, null);
+            // this.tapRecognizer.addListener(this);
 
             // Intentionally not documented.
-            this.clickRecognizer = new ClickRecognizer(this.wwd, null);
-            this.clickRecognizer.addListener(this);
+            // this.clickRecognizer = new ClickRecognizer(this.wwd, null);
+            // this.clickRecognizer.addListener(this);
 
             // Intentionally not documented.
             this.beginPoint = new Vec2(0, 0);
@@ -161,28 +162,28 @@ define([
             else if (recognizer === this.tiltRecognizer) {
                 this.handleTilt(recognizer);
             }
-            else if (recognizer === this.clickRecognizer || recognizer === this.tapRecognizer) {
-                this.handleClickOrTap(recognizer);
-            }
+            // else if (recognizer === this.clickRecognizer || recognizer === this.tapRecognizer) {
+            //     this.handleClickOrTap(recognizer);
+            // }
         };
 
         // Intentionally not documented.
-        BasicWorldWindowController.prototype.handleClickOrTap = function (recognizer) {
-            if (recognizer.state === WorldWind.RECOGNIZED) {
-                var pickPoint = this.wwd.canvasCoordinates(recognizer.clientX, recognizer.clientY);
-
-                // Identify if the top picked object contains a URL for hyperlinking
-                var pickList = this.wwd.pick(pickPoint);
-                var topObject = pickList.topPickedObject();
-                // If the url object was appended, open the hyperlink
-                if (topObject &&
-                    topObject.userObject &&
-                    topObject.userObject.userProperties &&
-                    topObject.userObject.userProperties.url) {
-                    window.open(topObject.userObject.userProperties.url, "_blank");
-                }
-            }
-        };
+        // BasicWorldWindowController.prototype.handleClickOrTap = function (recognizer) {
+        //     if (recognizer.state === WorldWind.RECOGNIZED) {
+        //         var pickPoint = this.wwd.canvasCoordinates(recognizer.clientX, recognizer.clientY);
+        //
+        //         // Identify if the top picked object contains a URL for hyperlinking
+        //         var pickList = this.wwd.pick(pickPoint);
+        //         var topObject = pickList.topPickedObject();
+        //         // If the url object was appended, open the hyperlink
+        //         if (topObject &&
+        //             topObject.userObject &&
+        //             topObject.userObject.userProperties &&
+        //             topObject.userObject.userProperties.url) {
+        //             window.open(topObject.userObject.userProperties.url, "_blank");
+        //         }
+        //     }
+        // };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handlePanOrDrag = function (recognizer) {

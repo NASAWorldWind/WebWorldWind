@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -15,7 +16,7 @@
  */
 define([
     'src/formats/kml/styles/KmlStyleMap',
-    'src/formats/kml/util/Pair',
+    'src/formats/kml/util/KmlPair',
     'src/util/XmlDocument'
 ], function (
     KmlStyleMap,
@@ -35,6 +36,7 @@ define([
             var styleMap = new KmlStyleMap({objectNode:
                 kmlRepresentation.getElementsByTagName("StyleMap")[0]});
         it("should have the prototype properties of Pair", function(){
+            console.log(styleMap.kmlPairs[0]);
             expect(styleMap.kmlPairs[0] instanceof Pair).toBeTruthy();
         });
 
