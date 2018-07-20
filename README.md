@@ -1,11 +1,11 @@
 <img src="https://worldwind.arc.nasa.gov/img/nasa-logo.svg" height="100"/>
-<p>in partnership with the <a href="http://www.esa.int" target="_blank">European Space Agency</a></p>
 
 # Web WorldWind
 
 [![Build Status](https://travis-ci.org/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.org/NASAWorldWind/WebWorldWind)
 
-3D virtual globe API for JavaScript, developed by NASA in partnership with ESA. Provides a geographic context, complete with terrain, 
+Web WorldWind is a 3D virtual globe API for JavaScript, developed by NASA. The European Space Agency has provided valuable
+contributions to this project since 2015. Web WorldWind provides a geographic context, complete with terrain,
 for visualizing geographic or geo-located information in 3D and 2D. Web WorldWind provides high-resolution terrain and 
 imagery, retrieved from remote servers automatically as needed. Developers can provide custom terrain and imagery.
 Provides a collection of shapes for displaying and interacting with geographic data and representing a range of 
