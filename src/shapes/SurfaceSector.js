@@ -115,7 +115,7 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfaceSector.prototype.getReferencePosition = function () {
-            return new Location(this._sector.centroidLatitude(), this._sector.centroidLongitude());
+            return new Location(this.sector.centroidLatitude(), this.sector.centroidLongitude());
         };
 
         // Internal use only. Intentionally not documented.
