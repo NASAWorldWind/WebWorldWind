@@ -40,7 +40,13 @@ define([],
             RADIUS: "radius",
 
             // Indicates that an entire shape is being dragged.
-            DRAG: "drag"
+            DRAG: "drag",
+
+            // Indicates the corner with min latitude for a surface sector
+            MIN_CORNER: "min_corner",
+
+            // Indicates the corner with max latitude for a surface sector
+            MAX_CORNER: "max_corner"
         };
 
         return ShapeEditorConstants;
