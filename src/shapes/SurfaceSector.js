@@ -115,12 +115,7 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfaceSector.prototype.getReferencePosition = function () {
-            // Assign the first position as the reference position.
-            if (this._boundaries.length > 0){
-                return new Location(this.sector.centroidLatitude(), this.sector.centroidLongitude());
-            } else {
-                return null;
-            }
+            return new Location(this._sector.centroidLatitude(), this._sector.centroidLongitude());
         };
 
         // Internal use only. Intentionally not documented.
