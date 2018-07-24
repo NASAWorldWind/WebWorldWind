@@ -1585,17 +1585,12 @@ define([
          *
          * @returns {Object|null} A WebGL extension object, or null if the extension is not available
          *
-         * @throws {ArgumentError} if the name is missing or not a string
+         * @throws {ArgumentError} if the extensionName is missing
          */
         DrawContext.prototype.getExtension = function (extensionName) {
             if (!extensionName) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "getExtension",
                     "missing extensionName"));
-            }
-
-            if (typeof extensionName !== "string") {
-                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "getExtension",
-                    "extensionName is not a string"));
             }
 
             if (!(extensionName in this.glExtensionsCache)) {
