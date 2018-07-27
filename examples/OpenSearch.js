@@ -67,9 +67,13 @@ requirejs([
                 // Search for products using the given parameters
                 return service.search(searchParams);
             })
-            .then(function (descriptionDocument) {
-                // Refresh the globe after the search has completed
-                wwd.addLayer(new WorldWind.OpenSearchLayer(descriptionDocument, shapeConfigurationCallback));
+            .then(function (products) {
+                // Display the products on the globe
+                var layer = new WorldWind.RenderableLayer("OpenSearch Products");
+                new WorldWind.GeoJSONParser(products).load(null, shapeConfigurationCallback, layer);
+                wwd.addLayer(layer);
+
+                layerManager.synchronizeLayerList();
             })
             .catch(function (err) {
                 // Handle errors

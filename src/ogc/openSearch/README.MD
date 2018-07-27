@@ -1,4 +1,4 @@
-OpenSearch offers a collection of formats for the sharing of search results. The OpenSearch Geo extension provides a standard mechanism to query a resource based on geographic extents. With this extension, geospatial results are based on the GeoRSS standard and can be displayed automatically on a virtual globe. Other formats are also supported or will be such as KML and GeoJSON responses.
+OpenSearch offers a collection of formats for sharing search results. The OpenSearch Geo extension provides a standard mechanism to query a resource based on geographic extents. With this extension, geospatial results are based on the GeoRSS standard and can be displayed automatically on a virtual globe. Other formats are also supported or will be such as KML and GeoJSON responses.
 
 # Basic Workflow
 
@@ -12,7 +12,9 @@ OpenSearchService.create(productsSearchUrl).then(function (service) {
     
     });
 }).then(function (products) { 
-    wwd.addLayer(new OpenSearchLayer(products, function(){}));
+    var layer = new RenderableLayer("OpenSearch Products");
+    new GeoJSONParser(products).load(null, shapeConfigurationCallback, layer);
+    wwd.addLayer(layer);
 }).catch(function (error) {
     // Handle error
 });
@@ -35,7 +37,9 @@ OpenSearchService.create(colSearchUrl).then(function (step1service) {
     
     });
 }).then(function (products) { 
-    wwd.addLayer(new OpenSearchLayer(products, function shapeConfigurationCallback(){}));
+    var layer = new RenderableLayer("OpenSearch Products");
+    new GeoJSONParser(products).load(null, shapeConfigurationCallback, layer);
+    wwd.addLayer(layer);
 }).catch(function (error) {
     // Handle error
 });
@@ -75,16 +79,5 @@ class OpenSearchDescriptionDocument {
 class OpenSearchResponse {
   // Simple JavaScript object exposing the content of the response
   // See the current implementation
-}
-```
-
-## OpenSearchLayer API
-
-The layer for OpenSearch would take a complete or partial response, visit it for extracting all geospatial elements and generating renderables for them in the layer.
-
-```
-class OpenSearchLayer extends Renderablelayer {
-  // Constructs a new OpenSearchLayer
-  constructor(openSearchResponse){} 
 }
 ```

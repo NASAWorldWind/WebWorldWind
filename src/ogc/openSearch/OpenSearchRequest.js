@@ -35,13 +35,6 @@ define([
             options = options || defaultOptions;
 
             /**
-             * A flag to indicate if the current shapes in the layer should be replaced.
-             * Only used in the OpenSearchLayer.
-             * @type {Boolean}
-             */
-            this.replaceShapes = options.replaceShapes || defaultOptions.replaceShapes;
-
-            /**
              * Url for a resource such as a description document.
              * @type {String}
              */
@@ -145,7 +138,6 @@ define([
          * @static
          */
         OpenSearchRequest.defaultOptions = {
-            replaceShapes: true,
             url: '',
             method: '',
             encType: 'application/x-www-form-urlencoded',
