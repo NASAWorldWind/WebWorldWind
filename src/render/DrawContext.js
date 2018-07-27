@@ -419,6 +419,9 @@ define([
 
             // Intentionally not documented.
             this.pixelSizeOffset = 0;
+
+            // Intentionally not documented.
+            this.glExtensionsCache = {};
         };
 
         // Internal use. Intentionally not documented.
@@ -500,6 +503,7 @@ define([
             // Reset properties tracking the current WebGL state, which are now invalid.
             this.currentFramebuffer = null;
             this.currentProgram = null;
+            this.glExtensionsCache = {};
         };
 
         /**
@@ -511,6 +515,7 @@ define([
             // asynchronous load operations that complete between context lost and context restored populate the cache
             // with invalid entries.
             this.gpuResourceCache.clear();
+            this.glExtensionsCache = {};
         };
 
         /**
@@ -1571,6 +1576,26 @@ define([
                 " eo " + attributes.enableOutline +
                 " ow " + attributes.outlineWidth +
                 " oc " + attributes.outlineColor.toHexString(true);
+        };
+
+        /**
+         * Returns a WebGL extension and caches the result for subsequent calls.
+         *
+         * @param {String} extensionName The name of the WebGL extension.
+         * @returns {Object|null} A WebGL extension object, or null if the extension is not available.
+         * @throws {ArgumentError} If the argument is null or undefined.
+         */
+        DrawContext.prototype.getExtension = function (extensionName) {
+            if (!extensionName) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "DrawContext", "getExtension",
+                    "missingExtensionName"));
+            }
+
+            if (!(extensionName in this.glExtensionsCache)) {
+                this.glExtensionsCache[extensionName] = this.currentGlContext.getExtension(extensionName) || null;
+            }
+
+            return this.glExtensionsCache[extensionName];
         };
 
         return DrawContext;
