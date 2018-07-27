@@ -188,7 +188,7 @@ define([
                     this.reset();
 
                     this.meshIndices = null;
-                    this.outlineIndices = null;
+                    this.meshOutlineIndices = null;
                 }
             },
 
