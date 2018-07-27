@@ -40,8 +40,9 @@ define([
          * or undefined.
          */
         var BMNGLayer = function (layerName) {
+            // This LevelSet configuration captures the Blue Marble resolution of 4.166666667E-03 degrees/pixel
             TiledImageLayer.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 5, "image/jpeg", layerName || "BMNG256", 256, 256);
+                Sector.FULL_SPHERE, new Location(45, 45), 7, "image/jpeg", layerName || "BMNG256", 256, 256);
 
             this.displayName = "Blue Marble";
             this.pickEnabled = false;

@@ -161,7 +161,8 @@ define(function () {
             missingWebCoverageService: "The specified WebCoverageService is null or undefined.",
             missingWorldWindow: "The specified WorldWindow is null or undefined.",
             notYetImplemented: "This function is not yet implemented",
-            unsupportedVersion: "The specified version is not supported."
+            unsupportedVersion: "The specified version is not supported.",
+            webglNotSupported: "The browser does not support WebGL, or WebGL is disabled."
         }
     };
 

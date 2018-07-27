@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="WKT" type="JavascriptDebugType" factoryName="JavaScript Debug" uri="http://localhost:63342/WebWorldWind/examples/WKT.html">
-    <RunnerSettings RunnerId="JavascriptDebugRunner" />
-    <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
-    <method />
-  </configuration>
-</component>

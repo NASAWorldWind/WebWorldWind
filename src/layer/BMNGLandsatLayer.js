@@ -37,8 +37,9 @@ define([
          * @classdesc Displays a combined Blue Marble and Landsat image layer that spans the entire globe.
          */
         var BMNGLandsatLayer = function () {
+            // This LevelSet configuration captures the Landsat resolution of 1.38889E-04 degrees/pixel
             TiledImageLayer.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 10, "image/jpeg", "BMNGLandsat256", 256, 256);
+                Sector.FULL_SPHERE, new Location(45, 45), 12, "image/jpeg", "BMNGLandsat256", 256, 256);
 
             this.displayName = "Blue Marble & Landsat";
             this.pickEnabled = false;
