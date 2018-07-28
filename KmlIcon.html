@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Class: KmlIcon</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: KmlIcon</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>KmlIcon<span class="signature">(options)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Contains the data associated with Icon node.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="KmlIcon"><span class="type-signature"></span>new KmlIcon<span class="signature">(options)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Constructs an KmlIcon. Applications usually don't call this constructor. It is called by <a href="KmlFile.html">KmlFile</a> as
+objects from Kml file are read. This object is already concrete implementation.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>objectNode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Node</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Node representing icon in the document.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlIcon.js.html">formats/kml/KmlIcon.js</a>, <a href="formats_kml_KmlIcon.js.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="https://developers.google.com/kml/documentation/kmlreference#icon">https://developers.google.com/kml/documentation/kmlreference#icon</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the node is null or undefined.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="KmlLink.html">KmlLink</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="displayName"><span class="type-signature"></span>displayName<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    The display name of the renderable.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Renderable.html#displayName">Renderable#displayName</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>"Renderable"</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="render_Renderable.js.html">render/Renderable.js</a>, <a href="render_Renderable.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="enabled"><span class="type-signature"></span>enabled<span class="type-signature"> :Boolean</span></h4>
+
+
+
+
+<div class="description">
+    Indicates whether to display this renderable.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Renderable.html#enabled">Renderable#enabled</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="render_Renderable.js.html">render/Renderable.js</a>, <a href="render_Renderable.js.html#line49">line 49</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="id"><span class="type-signature">(readonly) </span>id<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Every object, which is part of the KML document has its identity. We will use it for changes in the
+document for binding.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlObject.html#id">KmlObject#id</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlObject.js.html">formats/kml/KmlObject.js</a>, <a href="formats_kml_KmlObject.js.html#line80">line 80</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlH"><span class="type-signature">(readonly) </span>kmlH<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The href can contain a pallet of icons. In this case this is height of the icon on the palette.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlIcon.js.html">formats/kml/KmlIcon.js</a>, <a href="formats_kml_KmlIcon.js.html#line88">line 88</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlHttpQuery"><span class="type-signature">(readonly) </span>kmlHttpQuery<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Appends information to the query string, based on the parameters specified. (Google Earth substitutes
+the
+appropriate current value at the time it creates the query string.) The following parameters are
+supported:
+[clientVersion]
+[kmlVersion]
+[clientName]
+[language]
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlHttpQuery">KmlLink#kmlHttpQuery</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line169">line 169</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlRefreshInterval"><span class="type-signature">(readonly) </span>kmlRefreshInterval<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    Indicates to refresh the file every n seconds.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlRefreshInterval">KmlLink#kmlRefreshInterval</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line74">line 74</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlRefreshMode"><span class="type-signature">(readonly) </span>kmlRefreshMode<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Specifies a time-based refresh mode, which can be one of the following:
+onChange - refresh when the file is loaded and whenever the Link parameters change (the default).
+onInterval - refresh every n seconds (specified in &lt;refreshInterval&gt;).
+onExpire - refresh the file when the expiration time is reached. If a fetched file has a
+ NetworkLinkControl, the &lt;expires&gt; time takes precedence over expiration times specified in HTTP
+headers. If no &lt;expires&gt; time is specified, the HTTP max-age header is used (if present). If max-age is
+not present, the Expires HTTP header is used (if present). (See Section RFC261b of the Hypertext
+Transfer Protocol - HTTP 1.1 for details on HTTP header fields.)
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlRefreshMode">KmlLink#kmlRefreshMode</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line62">line 62</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlViewBoundScale"><span class="type-signature">(readonly) </span>kmlViewBoundScale<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    Scales the BBOX parameters before sending them to the server. A value less than 1 specifies to use less
+than the full view (screen). A value greater than 1 specifies to fetch an area that extends beyond the
+edges of the current view.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlViewBoundScale">KmlLink#kmlViewBoundScale</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line119">line 119</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlViewFormat"><span class="type-signature">(readonly) </span>kmlViewFormat<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Specifies the format of the query string that is appended to the Link's &lt;href&gt; before the file is
+fetched.(If the &lt;href&gt; specifies a local file, this element is ignored.) If you specify a
+&lt;viewRefreshMode&gt; of onStop and do not include the &lt;viewFormat&gt; tag in the file, the following
+information is automatically appended to the query string:
+BBOX=[bboxWest],[bboxSouth],[bboxEast],[bboxNorth] This information matches the Web Map Service (WMS)
+bounding box specification. If you specify an empty &lt;viewFormat&gt; tag, no information is appended to the
+query string. You can also specify a custom set of viewing parameters to add to the query string. If you
+supply a format string, it is used instead of the BBOX information. If you also want the BBOX
+information, you need to add those parameters along with the custom parameters. You can use any of the
+following parameters in your format string (and Google Earth will substitute the appropriate current
+value at the time it creates the query string):
+[lookatLon], [lookatLat] - longitude and latitude of the point that &lt;LookAt&gt; is viewing
+[lookatRange], [lookatTilt], [lookatHeading] - values used by the &lt;LookAt&gt; element (see descriptions of
+ &lt;range&gt;, &lt;tilt&gt;, and &lt;heading&gt; in &lt;LookAt&gt;)
+[lookatTerrainLon], [lookatTerrainLat], [lookatTerrainAlt] - point on the terrain in degrees/meters that
+ &lt;LookAt&gt; is viewing
+[cameraLon], [cameraLat], [cameraAlt] - degrees/meters of the eyepoint for the camera
+[horizFov], [vertFov] - horizontal, vertical field of view for the camera
+[horizPixels], [vertPixels] - size in pixels of the 3D viewer
+[terrainEnabled] - indicates whether the 3D viewer is showing terrain
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlViewFormat">KmlLink#kmlViewFormat</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line150">line 150</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlViewRefreshMode"><span class="type-signature">(readonly) </span>kmlViewRefreshMode<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Specifies how the link is refreshed when the "camera" changes.
+Can be one of the following:
+never (default) - Ignore changes in the view. Also ignore &lt;viewFormat&gt; parameters, if any.
+onStop - Refresh the file n seconds after movement stops, where n is specified in &lt;viewRefreshTime&gt;.
+onRequest - Refresh the file only when the user explicitly requests it. (For example, in Google Earth,
+the user right-clicks and selects Refresh in the Context menu.)
+onRegion - Refresh the file when the Region becomes active. See &lt;Region&gt;.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlViewRefreshMode">KmlLink#kmlViewRefreshMode</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line92">line 92</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlViewRefreshTime"><span class="type-signature">(readonly) </span>kmlViewRefreshTime<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    After camera movement stops, specifies the number of seconds to wait before refreshing the view. (See
+&lt;viewRefreshMode&gt; and onStop above.)
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlViewRefreshTime">KmlLink#kmlViewRefreshTime</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlW"><span class="type-signature">(readonly) </span>kmlW<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The href can contain a pallet of icons. In this case this is width of the icon on the pallete.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlIcon.js.html">formats/kml/KmlIcon.js</a>, <a href="formats_kml_KmlIcon.js.html#line76">line 76</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlX"><span class="type-signature">(readonly) </span>kmlX<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The href can contain a pallet of icons. In this case this is offset from left border.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlIcon.js.html">formats/kml/KmlIcon.js</a>, <a href="formats_kml_KmlIcon.js.html#line52">line 52</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="kmlY"><span class="type-signature">(readonly) </span>kmlY<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The href can contain a pallet of icons. In this case this is offset from top border.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlIcon.js.html">formats/kml/KmlIcon.js</a>, <a href="formats_kml_KmlIcon.js.html#line64">line 64</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="node"><span class="type-signature">(readonly) </span>node<span class="type-signature"> :Node</span></h4>
+
+
+
+
+<div class="description">
+    Node of this object. It may be overridden by other users of some functions like parse.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Node</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlObject.html#node">KmlObject#node</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlObject.js.html">formats/kml/KmlObject.js</a>, <a href="formats_kml_KmlObject.js.html#line92">line 92</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="pickDelegate"><span class="type-signature"></span>pickDelegate<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    Indicates the object to return as the userObject of this shape when picked. If null,
+then this shape is returned as the userObject.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Renderable.html#pickDelegate">Renderable#pickDelegate</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>null</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="render_Renderable.js.html">render/Renderable.js</a>, <a href="render_Renderable.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="PickedObject.html#userObject">PickedObject.userObject</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="userProperties"><span class="type-signature"></span>userProperties<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    An application defined object associated with this renderable. A typical use case is to associate
+application defined data with a picked renderable.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Renderable.html#userProperties">Renderable#userProperties</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>An empty object</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="render_Renderable.js.html">render/Renderable.js</a>, <a href="render_Renderable.js.html#line66">line 66</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getTagNames"><span class="type-signature"></span>getTagNames<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;String>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns tag name of all descendants of abstract node or the tag name for current node.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="KmlLink.html#getTagNames">KmlLink#getTagNames</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlObject.js.html">formats/kml/KmlObject.js</a>, <a href="formats_kml_KmlObject.js.html#line122">line 122</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array.&lt;String></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="hook"><span class="type-signature"></span>hook<span class="signature">(controls, options)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    It calls all controls associated with current KmlFile with the link to this.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>controls</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="KmlControls.html">KmlControls</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Controls associated with current tree.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Options to pass into the controls.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlObject.html#hook">KmlObject#hook</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlObject.js.html">formats/kml/KmlObject.js</a>, <a href="formats_kml_KmlObject.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="kmlHref"><span class="type-signature"></span>kmlHref<span class="signature">(fileCache)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    It returns valid URL usable for remote resources.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fileCache</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">KmlFileCache</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Cache needed to retrieve data urls from remote locations.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="KmlLink.html#kmlHref">KmlLink#kmlHref</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="formats_kml_KmlLink.js.html">formats/kml/KmlLink.js</a>, <a href="formats_kml_KmlLink.js.html#line181">line 181</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    URL to use
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="render"><span class="type-signature"></span>render<span class="signature">(dc)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Render this renderable. Some shapes actually draw themselves during this call, others only add themselves
+to the draw context's ordered rendering list for subsequent drawing when their renderOrdered method is called.
+This method is intended to be called by layers such as <a href="RenderableLayer.html">RenderableLayer</a> and not by applications.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>dc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DrawContext.html">DrawContext</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current draw context.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Renderable.html#render">Renderable#render</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="render_Renderable.js.html">render/Renderable.js</a>, <a href="render_Renderable.js.html#line75">line 75</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:30:05 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,3918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Class: WorldWindow</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: WorldWindow</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>WorldWindow<span class="signature">(canvasElem, elevationModel)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Represents a WorldWind window for an HTML canvas.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="WorldWindow"><span class="type-signature"></span>new WorldWindow<span class="signature">(canvasElem, elevationModel)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Constructs a WorldWind window for an HTML canvas.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>canvasElem</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+|
+
+<span class="param-type">HTMLCanvasElement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The ID assigned to the HTML canvas in the document or the canvas
+element itself.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>elevationModel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ElevationModel.html">ElevationModel</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An optional argument indicating the elevation model to use for the World
+Window. If missing or null, a default elevation model is used.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line84">line 84</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If there is no HTML element with the specified ID in the document, or if the
+HTML canvas does not support WebGL.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="canvas"><span class="type-signature">(readonly) </span>canvas<span class="type-signature"> :HTMLElement</span></h4>
+
+
+
+
+<div class="description">
+    The HTML canvas associated with this WorldWindow.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">HTMLElement</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line138">line 138</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="deepPicking"><span class="type-signature"></span>deepPicking<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Indicates that picking will return all objects at the pick point, if any. The top-most object will have
+its isOnTop flag set to true.
+If deep picking is false, the default, only the top-most object is returned, plus
+the picked-terrain object if the pick point is over the terrain.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>false</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line198">line 198</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="depthBits"><span class="type-signature">(readonly) </span>depthBits<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    The number of bits in the depth buffer associated with this WorldWindow.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line145">line 145</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="frameStatistics"><span class="type-signature"></span>frameStatistics<span class="type-signature"> :<a href="FrameStatistics.html">FrameStatistics</a></span></h4>
+
+
+
+
+<div class="description">
+    Performance statistics for this WorldWindow.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="FrameStatistics.html">FrameStatistics</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line223">line 223</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="globe"><span class="type-signature"></span>globe<span class="type-signature"> :<a href="Globe.html">Globe</a></span></h4>
+
+
+
+
+<div class="description">
+    The globe displayed.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="Globe.html">Globe</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line158">line 158</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="goToAnimator"><span class="type-signature"></span>goToAnimator<span class="type-signature"> :<a href="GoToAnimator.html">GoToAnimator</a></span></h4>
+
+
+
+
+<div class="description">
+    The <a href="GoToAnimator.html">GoToAnimator</a> used by this WorldWindow to respond to its goTo method.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="GoToAnimator.html">GoToAnimator</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line229">line 229</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="layers"><span class="type-signature">(readonly) </span>layers<span class="type-signature"> :Array.&lt;<a href="Layer.html">Layer</a>></span></h4>
+
+
+
+
+<div class="description">
+    The layers to display in this WorldWindow.
+This property is read-only. Use <a href="WorldWindow.html#addLayer">addLayer</a> or
+<a href="WorldWindow.html#insertLayer">insertLayer</a> to add layers to this WorldWindow.
+Use <a href="WorldWindow.html#removeLayer">removeLayer</a> to remove layers from this WorldWindow.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;<a href="Layer.html">Layer</a>></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line168">line 168</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="navigator"><span class="type-signature"></span>navigator<span class="type-signature"> :<a href="LookAtNavigator.html">LookAtNavigator</a></span></h4>
+
+
+
+
+<div class="description">
+    The navigator used to manipulate the globe.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="LookAtNavigator.html">LookAtNavigator</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li><a href="LookAtNavigator.html">LookAtNavigator</a></li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line175">line 175</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="orderedRenderingFilters"><span class="type-signature">(readonly) </span>orderedRenderingFilters<span class="type-signature"> :Array.&lt;function()></span></h4>
+
+
+
+
+<div class="description">
+    An array of functions to call during ordered rendering prior to rendering the ordered renderables.
+Each function is passed one argument, the current draw context. The function may modify the
+ordered renderables in the draw context's ordered renderable list, which has been sorted from front
+to back when the filter function is called. Ordered rendering filters are typically used to apply
+decluttering. The default set of filter functions contains one function that declutters shapes with
+declutter group ID of 1 (<a href="GeographicText.html">GeographicText</a> by default) and one function that declutters shapes
+with declutter group ID 2 (<a href="Placemark.html">Placemark</a> by default). Applications can add functions to this
+array or remove them.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;function()></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li><a href="WorldWindow.html#declutter">WorldWindow.declutter</a> with a group ID of 1</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line332">line 332</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="redrawCallbacks"><span class="type-signature">(readonly) </span>redrawCallbacks<span class="type-signature"> :Array.&lt;function()></span></h4>
+
+
+
+
+<div class="description">
+    The list of callbacks to call immediately before and immediately after performing a redraw. The callbacks
+have two arguments: this WorldWindow and the redraw stage, e.g., <code style='white-space:nowrap'>redrawCallback(worldWindow, stage);</code>.
+The stage will be either WorldWind.BEFORE_REDRAW or WorldWind.AFTER_REDRAW indicating whether the
+callback has been called either immediately before or immediately after a redraw, respectively.
+Applications may add functions to this array or remove them.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;function()></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line347">line 347</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="subsurfaceMode"><span class="type-signature"></span>subsurfaceMode<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Indicates whether this WorldWindow should be configured for sub-surface rendering. If true, shapes
+below the terrain can be seen when the terrain is made transparent. If false, sub-surface shapes are
+not visible, however, performance is slightly increased.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>false</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line207">line 207</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="surfaceOpacity"><span class="type-signature"></span>surfaceOpacity<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The opacity to apply to terrain and surface shapes. This property is typically used when viewing
+the sub-surface. It modifies the opacity of the terrain and surface shapes as a whole. It should be
+a number between 0 and 1. It is compounded with the individual opacities of the image layers and
+surface shapes on the terrain.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>1</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line217">line 217</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="verticalExaggeration"><span class="type-signature"></span>verticalExaggeration<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The vertical exaggeration to apply to the terrain.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line188">line 188</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="viewport"><span class="type-signature">(readonly) </span>viewport<span class="type-signature"> :<a href="Rectangle.html">Rectangle</a></span></h4>
+
+
+
+
+<div class="description">
+    The current viewport of this WorldWindow.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="Rectangle.html">Rectangle</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line152">line 152</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="worldWindowController"><span class="type-signature"></span>worldWindowController<span class="type-signature"> :<a href="WorldWindowController.html">WorldWindowController</a></span></h4>
+
+
+
+
+<div class="description">
+    The controller used to manipulate the globe.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="WorldWindowController.html">WorldWindowController</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line182">line 182</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addEventListener"><span class="type-signature"></span>addEventListener<span class="signature">(type, listener)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Registers an event listener for the specified event type on this WorldWindow's canvas. This function
+delegates the processing of events to the WorldWindow's canvas. For details on this function and its
+arguments, see the W3C <a href="https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget">EventTarget</a>
+documentation.
+
+Registering event listeners using this function enables applications to prevent the WorldWindow's default
+navigation behavior. To prevent default navigation behavior, call the <a href="https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event">Event</a>'s
+preventDefault method from within an event listener for any events the navigator should not respond to.
+
+When an event occurs, this calls the registered event listeners in order of reverse registration. Since the
+WorldWindow registers its navigator event listeners first, application event listeners are called before
+navigator event listeners.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The event type to listen for.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The function to call when the event occurs.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line390">line 390</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If any argument is null or undefined.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addLayer"><span class="type-signature"></span>addLayer<span class="signature">(layer)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Adds a specified layer to the end of this WorldWindow.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Layer.html">Layer</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The layer to add. May be null or undefined, in which case this WorldWindow is not
+modified.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line1224">line 1224</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="canvasCoordinates"><span class="type-signature"></span>canvasCoordinates<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="Vec2.html">Vec2</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Converts window coordinates to coordinates relative to this WorldWindow's canvas.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The X coordinate to convert.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The Y coordinate to convert.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line360">line 360</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The converted coordinates.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Vec2.html">Vec2</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="declutter"><span class="type-signature"></span>declutter<span class="signature">(dc, groupId)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Declutters the current ordered renderables with a specified group ID. This function is not called by
+applications directly. It's meant to be invoked as an ordered rendering filter in this WorldWindow's
+<a href="WorldWindow.html#orderedRenderingFilters">orderedRenderingFilters</a> property.
+<p>
+The function operates by setting the target visibility of occluded shapes to 0 and unoccluded shapes to 1.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>dc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="DrawContext.html">DrawContext</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current draw context.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>groupId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The ID of the group to declutter. Must not be null, undefined or 0.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line1462">line 1462</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the specified group ID is null, undefined or 0.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="goTo"><span class="type-signature"></span>goTo<span class="signature">(position, completionCallback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Moves this WorldWindow's navigator to a specified location or position.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>position</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Location.html">Location</a></span>
+|
+
+<span class="param-type"><a href="Position.html">Position</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The location or position to move the navigator to. If this
+argument contains an "altitude" property, as <a href="Position.html">Position</a> does, the end point of the navigation is
+at the specified altitude. Otherwise the end point is at the current altitude of the navigator.
+
+This function uses this WorldWindow's <a href="GoToAnimator.html">GoToAnimator</a> property to perform the move. That object's
+properties can be specified by the application to modify its behavior during calls to this function.
+It's cancel method can also be used to cancel the move initiated by this function.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>completionCallback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">If not null or undefined, specifies a function to call when the
+animation completes. The completion callback is called with a single argument, this animator.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line1448">line 1448</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the specified location or position is null or undefined.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="indexOfLayer"><span class="type-signature"></span>indexOfLayer<span class="signature">(layer)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the index of a specified layer in this WorldWindow.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Layer.html">Layer</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The layer to search for.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line1261">line 1261</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The index of the specified layer or -1 if it doesn't exist in this WorldWindow.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="insertLayer"><span class="type-signature"></span>insertLayer<span class="signature">(index, layer)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Inserts a specified layer at a specified position in this WorldWindow.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>index</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The index at which to insert the layer. May be negative to specify the position
+from the end of the array.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Layer.html">Layer</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The layer to insert. May be null or undefined, in which case this WorldWindow is not
+modified.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line1250">line 1250</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="pick"><span class="type-signature"></span>pick<span class="signature">(pickPoint)</span><span class="type-signature"> &rarr; {<a href="PickedObjectList.html">PickedObjectList</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Requests the WorldWind objects displayed at a specified screen-coordinate point.
+
+If the point intersects the terrain, the returned list contains an object identifying the associated geographic
+position. This returns an empty list when nothing in the WorldWind scene intersects the specified point.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pickPoint</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The point to examine in this WorldWindow's screen coordinates.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line481">line 481</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the specified pick point is null or undefined.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A list of picked WorldWind objects at the specified pick point.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PickedObjectList.html">PickedObjectList</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="pickShapesInRegion"><span class="type-signature"></span>pickShapesInRegion<span class="signature">(rectangle)</span><span class="type-signature"> &rarr; {<a href="PickedObjectList.html">PickedObjectList</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Requests the WorldWind objects displayed within a specified screen-coordinate region. This returns all
+objects that intersect the specified region, regardless of whether or not an object is actually visible, and
+marks objects that are visible as on top.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>rectangle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Rectangle.html">Rectangle</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The screen coordinate rectangle identifying the region to search.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line541">line 541</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the specified rectangle is null or undefined.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A list of visible WorldWind objects within the specified region.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PickedObjectList.html">PickedObjectList</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="pickTerrain"><span class="type-signature"></span>pickTerrain<span class="signature">(pickPoint)</span><span class="type-signature"> &rarr; {<a href="PickedObjectList.html">PickedObjectList</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Requests the position of the WorldWind terrain at a specified screen-coordinate point. If the point
+intersects the terrain, the returned list contains a single object identifying the associated geographic
+position. Otherwise this returns an empty list.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>pickPoint</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The point to examine in this WorldWindow's screen coordinates.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line511">line 511</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the specified pick point is null or undefined.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A list containing the picked WorldWind terrain position at the specified point,
+or an empty list if the point does not intersect the terrain.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PickedObjectList.html">PickedObjectList</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="pixelSizeAtDistance"><span class="type-signature"></span>pixelSizeAtDistance<span class="signature">(distance)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Computes the approximate size of a pixel at a specified distance from the eye point.
+<p>
+This method assumes rectangular pixels, where pixel coordinates denote
+infinitely thin spaces between pixels. The units of the returned size are in model coordinates per pixel
+(usually meters per pixel). This returns 0 if the specified distance is zero. The returned size is undefined
+if the distance is less than zero.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>distance</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The distance from the eye point at which to determine pixel size, in model
+coordinates.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line782">line 782</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The approximate pixel size at the specified distance from the eye point, in model
+coordinates per pixel.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="rayThroughScreenPoint"><span class="type-signature"></span>rayThroughScreenPoint<span class="signature">(point)</span><span class="type-signature"> &rarr; {<a href="Line.html">Line</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Computes a ray originating at the eyePoint and extending through the specified point in window
+coordinates.
+<p>
+The specified point is understood to be in the window coordinate system of the WorldWindow, with the origin
+in the top-left corner and axes that extend down and to the right from the origin point.
+<p>
+The results of this method are undefined if the specified point is outside of the WorldWindow's
+bounds.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>point</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Vec2.html">Vec2</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The window coordinates point to compute a ray for.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line1510">line 1510</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A new Line initialized to the origin and direction of the computed ray, or null if the
+ray could not be computed.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="Line.html">Line</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="redraw"><span class="type-signature"></span>redraw<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Causes this WorldWindow to redraw itself at the next available opportunity. The redraw occurs on the main
+thread at a time of the browser's discretion. Applications should call redraw after changing the World
+Window's state, but should not expect that change to be reflected on screen immediately after this function
+returns. This is the preferred method for requesting a redraw of the WorldWindow.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line467">line 467</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeEventListener"><span class="type-signature"></span>removeEventListener<span class="signature">(type, listener)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Removes an event listener for the specified event type from this WorldWindow's canvas. The listener must be
+the same object passed to addEventListener. Calling removeEventListener with arguments that do not identify a
+currently registered listener has no effect.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Indicates the event type the listener registered for.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The listener to remove. Must be the same function object passed to addEventListener.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line435">line 435</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If any argument is null or undefined.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeLayer"><span class="type-signature"></span>removeLayer<span class="signature">(layer)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Removes the first instance of a specified layer from this WorldWindow.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>layer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Layer.html">Layer</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The layer to remove. May be null or undefined, in which case this WorldWindow is not
+modified. This WorldWindow is also not modified if the specified layer does not exist in this WorldWindow's
+layer list.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WorldWindow.js.html">WorldWindow.js</a>, <a href="WorldWindow.js.html#line1236">line 1236</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:30:18 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

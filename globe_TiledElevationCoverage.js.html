@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Source: globe/TiledElevationCoverage.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: globe/TiledElevationCoverage.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @exports TiledElevationCoverage
+ */
+define(['../util/AbsentResourceList',
+        '../geom/Angle',
+        '../error/ArgumentError',
+        '../globe/ElevationCoverage',
+        '../globe/ElevationImage',
+        '../formats/geotiff/GeoTiffReader',
+        '../util/LevelSet',
+        '../geom/Location',
+        '../util/Logger',
+        '../cache/MemoryCache',
+        '../geom/Sector',
+        '../util/Tile',
+        '../util/WWMath'],
+    function (AbsentResourceList,
+              Angle,
+              ArgumentError,
+              ElevationCoverage,
+              ElevationImage,
+              GeoTiffReader,
+              LevelSet,
+              Location,
+              Logger,
+              MemoryCache,
+              Sector,
+              Tile,
+              WWMath) {
+        "use strict";
+        /**
+         * Constructs a TiledElevationCoverage
+         * @alias TiledElevationCoverage
+         * @constructor
+         * @classdesc Represents the elevations for an area, often but not necessarily the whole globe.
+         * @param {{}} config Configuration properties for the coverage:
+         * &lt;ul>
+         *     &lt;li>coverageSector: {Sector} The sector this coverage spans.&lt;/li>
+         *     &lt;li>resolution: {Number} The resolution of the coverage, in degrees. (To compute degrees from meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)&lt;/li>
+         *     &lt;li>retrievalImageFormat: {String} The mime type of the elevation data retrieved by this coverage.&lt;/li>
+         *     &lt;li>minElevation (optional): {Number} The coverage's minimum elevation in meters.&lt;/li>
+         *     &lt;li>maxElevation (optional): {Number} Te coverage's maximum elevation in meters.&lt;/li>
+         *     &lt;li>urlBuilder (optional): {UrlBuilder} The factory to create URLs for elevation data requests.&lt;/li>
+         * &lt;ul>
+         * @throws {ArgumentError} If any required configuration parameter is null or undefined.
+         */
+        var TiledElevationCoverage = function (config) {
+            if (!config) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingConfig"));
+            }
+
+            if (!config.coverageSector) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingSector"));
+            }
+
+            if (!config.resolution) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingResolution"));
+            }
+
+            if (!config.retrievalImageFormat) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "constructor", "missingImageFormat"));
+            }
+
+            ElevationCoverage.call(this, config.resolution);
+
+            var firstLevelDelta = 45,
+                tileWidth = 256,
+                lastLevel = LevelSet.numLevelsForResolution(firstLevelDelta / tileWidth, config.resolution),
+                numLevels = Math.ceil(lastLevel); // match or exceed the specified resolution
+
+            /**
+             * The sector this coverage spans.
+             * @type {Sector}
+             * @readonly
+             */
+            this.coverageSector = config.coverageSector;
+
+            /**
+             * The mime type to use when retrieving elevations.
+             * @type {String}
+             * @readonly
+             */
+            this.retrievalImageFormat = config.retrievalImageFormat;
+
+            /**
+             * This coverage's minimum elevation in meters.
+             * @type {Number}
+             * @default 0
+             */
+            this.minElevation = config.minElevation || 0;
+
+            /**
+             * This coverage's maximum elevation in meters.
+             * @type {Number}
+             */
+            this.maxElevation = config.maxElevation || 0;
+
+            /**
+             * Indicates whether the data associated with this coverage is point data. A value of false
+             * indicates that the data is area data (pixel is area).
+             * @type {Boolean}
+             * @default true
+             */
+            this.pixelIsPoint = false;
+
+            /**
+             * The {@link LevelSet} dividing this coverage's geographic domain into a multi-resolution, hierarchical
+             * collection of tiles.
+             * @type {LevelSet}
+             * @readonly
+             */
+            this.levels = new LevelSet(this.coverageSector, new Location(firstLevelDelta, firstLevelDelta),
+                numLevels, tileWidth, tileWidth);
+
+            /**
+             * Internal use only
+             * The list of assembled tiles.
+             * @type {Array}
+             * @ignore
+             */
+            this.currentTiles = [];
+
+            /**
+             * Internal use only
+             * A scratch sector for use in computations.
+             * @type {Sector}
+             * @ignore
+             */
+            this.currentSector = new Sector(0, 0, 0, 0);
+
+            /**
+             * Internal use only
+             * A cache of elevation tiles.
+             * @type {MemoryCache}
+             * @ignore
+             */
+            this.tileCache = new MemoryCache(1000000, 800000);
+
+            /**
+             * Internal use only
+             * A cache of elevations.
+             * @type {MemoryCache}
+             * @ignore
+             */
+            this.imageCache = new MemoryCache(10000000, 8000000);
+
+            /**
+             * Controls how many concurrent tile requests are allowed for this coverage.
+             * @type {Number}
+             * @default WorldWind.configuration.coverageRetrievalQueueSize
+             */
+            this.retrievalQueueSize = WorldWind.configuration.coverageRetrievalQueueSize;
+
+            /**
+             * Internal use only
+             * The list of elevation retrievals in progress.
+             * @type {Array}
+             * @ignore
+             */
+            this.currentRetrievals = [];
+
+            /**
+             * Internal use only
+             * The list of resources pending acquisition.
+             * @type {Array}
+             * @ignore
+             */
+            this.absentResourceList = new AbsentResourceList(3, 5e3);
+
+            /**
+             * Internal use only
+             * The factory to create URLs for data requests. This property is typically set in the constructor of child
+             * classes. See {@link WcsUrlBuilder} for a concrete example.
+             * @type {UrlBuilder}
+             * @ignore
+             */
+            this.urlBuilder = config.urlBuilder || null;
+        };
+
+        TiledElevationCoverage.prototype = Object.create(ElevationCoverage.prototype);
+
+        // Documented in super class
+        TiledElevationCoverage.prototype.minAndMaxElevationsForSector = function (sector, result) {
+            if (!sector) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "minAndMaxElevationsForSector", "missingSector"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "minAndMaxElevationsForSector", "missingResult"));
+            }
+
+            var level = this.levels.levelForTexelSize(sector.deltaLatitude() * Angle.DEGREES_TO_RADIANS / 64);
+            this.assembleTiles(level, sector, false);
+
+            if (this.currentTiles.length === 0) {
+                return false; // Sector is outside the coverage's coverage area. Don't modify the result.
+            }
+
+            var hasCompleteCoverage = true;
+
+            for (var i = 0, len = this.currentTiles.length; i &lt; len; i++) {
+                var image = this.imageCache.entryForKey(this.currentTiles[i].tileKey);
+                if (image &amp;&amp; image.hasData) {
+                    var imageMin = image.minElevation;
+                    if (result[0] > imageMin) {
+                        result[0] = imageMin;
+                    }
+
+                    var imageMax = image.maxElevation;
+                    if (result[1] &lt; imageMax) {
+                        result[1] = imageMax;
+                    }
+                }
+
+                if (!image || !image.hasData || image.hasMissingData) {
+                    hasCompleteCoverage = false;
+                }
+            }
+
+            return hasCompleteCoverage;
+        };
+
+        // Documented in super class
+        TiledElevationCoverage.prototype.elevationAtLocation = function (latitude, longitude) {
+            if (!this.coverageSector.containsLocation(latitude, longitude)) {
+                return null; // location is outside the coverage's coverage
+            }
+
+            return this.pointElevationForLocation(latitude, longitude);
+        };
+
+        // Documented in super class
+        TiledElevationCoverage.prototype.elevationsForGrid = function (sector, numLat, numLon, result) {
+            if (!sector) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid", "missingSector"));
+            }
+
+            if (!numLat || !numLon || numLat &lt; 1 || numLon &lt; 1) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "TiledElevationCoverage", "elevationsForGrid",
+                        "The specified number of latitudinal or longitudinal positions is less than one."));
+            }
+
+            var gridResolution = sector.deltaLatitude() / (numLat - 1) * Angle.DEGREES_TO_RADIANS;
+            var level = this.levels.levelForTexelSize(gridResolution);
+            if (this.pixelIsPoint) {
+                return this.pointElevationsForGrid(sector, numLat, numLon, level, result);
+            } else {
+                return this.areaElevationsForGrid(sector, numLat, numLon, level, result);
+            }
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.pointElevationForLocation = function (latitude, longitude) {
+            var level = this.levels.lastLevel(),
+                deltaLat = level.tileDelta.latitude,
+                deltaLon = level.tileDelta.longitude,
+                r = Tile.computeRow(deltaLat, latitude),
+                c = Tile.computeColumn(deltaLon, longitude),
+                tileKey,
+                image = null;
+
+            for (var i = level.levelNumber; i >= 0; i--) {
+                tileKey = Tile.computeTileKey(i, r, c);
+                image = this.imageCache.entryForKey(tileKey);
+                if (image) {
+                    var elevation = image.elevationAtLocation(latitude, longitude);
+                    return isNaN(elevation) ? null : elevation;
+                }
+
+                r = Math.floor(r / 2);
+                c = Math.floor(c / 2);
+            }
+
+            return null; // did not find a tile with an image
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.pointElevationsForGrid = function (sector, numLat, numLon, level, result) {
+            this.assembleTiles(level, sector, true);
+            if (this.currentTiles.length === 0) {
+                return false; // Sector is outside the coverage's coverage area. Do not modify the results array.
+            }
+
+            // Sort from lowest resolution to highest so that higher resolutions override lower resolutions in the
+            // loop below.
+            this.currentTiles.sort(function (tileA, tileB) {
+                return tileA.level.levelNumber - tileB.level.levelNumber;
+            });
+
+            for (var i = 0, len = this.currentTiles.length; i &lt; len; i++) {
+                var image = this.imageCache.entryForKey(this.currentTiles[i].tileKey);
+                if (image) {
+                    image.elevationsForGrid(sector, numLat, numLon, result);
+                }
+            }
+
+            return !result.includes(NaN); // true if the result array is fully populated.
+        };
+
+        // Internal. Returns elevations for a grid assuming pixel-is-area.
+        TiledElevationCoverage.prototype.areaElevationsForGrid = function (sector, numLat, numLon, level, result) {
+            var minLat = sector.minLatitude,
+                maxLat = sector.maxLatitude,
+                minLon = sector.minLongitude,
+                maxLon = sector.maxLongitude,
+                deltaLat = sector.deltaLatitude() / (numLat > 1 ? numLat - 1 : 1),
+                deltaLon = sector.deltaLongitude() / (numLon > 1 ? numLon - 1 : 1),
+                lat, lon, s, t,
+                latIndex, lonIndex, resultIndex = 0;
+
+            for (latIndex = 0, lat = minLat; latIndex &lt; numLat; latIndex += 1, lat += deltaLat) {
+                if (latIndex === numLat - 1) {
+                    lat = maxLat; // explicitly set the last lat to the max latitude ensure alignment
+                }
+
+                for (lonIndex = 0, lon = minLon; lonIndex &lt; numLon; lonIndex += 1, lon += deltaLon) {
+                    if (lonIndex === numLon - 1) {
+                        lon = maxLon; // explicitly set the last lon to the max longitude ensure alignment
+                    }
+
+                    if (isNaN(result[resultIndex])) {
+                        if (this.coverageSector.containsLocation(lat, lon)) { // ignore locations outside of the model
+                            s = (lon + 180) / 360;
+                            t = (lat + 90) / 180;
+                            this.areaElevationForCoord(s, t, level.levelNumber, result, resultIndex);
+                        }
+                    }
+
+                    resultIndex++;
+                }
+            }
+
+            return !result.includes(NaN); // true if the result array is fully populated.
+        };
+
+        // Internal. Returns an elevation for a location assuming pixel-is-area.
+        TiledElevationCoverage.prototype.areaElevationForCoord = function (s, t, levelNumber, result, resultIndex) {
+            var level, levelWidth, levelHeight,
+                tMin, tMax,
+                vMin, vMax,
+                u, v,
+                x0, x1, y0, y1,
+                xf, yf,
+                retrieveTiles,
+                pixels = new Float64Array(4);
+
+            for (var i = levelNumber; i >= 0; i--) {
+                level = this.levels.level(i);
+                levelWidth = Math.round(level.tileWidth * 360 / level.tileDelta.longitude);
+                levelHeight = Math.round(level.tileHeight * 180 / level.tileDelta.latitude);
+                tMin = 1 / (2 * levelHeight);
+                tMax = 1 - tMin;
+                vMin = 0;
+                vMax = levelHeight - 1;
+                u = levelWidth * WWMath.fract(s); // wrap the horizontal coordinate
+                v = levelHeight * WWMath.clamp(t, tMin, tMax); // clamp the vertical coordinate to the level edge
+                x0 = WWMath.mod(Math.floor(u - 0.5), levelWidth);
+                x1 = WWMath.mod((x0 + 1), levelWidth);
+                y0 = WWMath.clamp(Math.floor(v - 0.5), vMin, vMax);
+                y1 = WWMath.clamp(y0 + 1, vMin, vMax);
+                xf = WWMath.fract(u - 0.5);
+                yf = WWMath.fract(v - 0.5);
+                retrieveTiles = (i == levelNumber) || (i == 0);
+
+                if (this.lookupPixels(x0, x1, y0, y1, level, retrieveTiles, pixels)) {
+                    if (ElevationImage.isNoData(pixels[0], pixels[1], pixels[2], pixels[3])) {
+                        return false;
+                    }
+                    else {
+                        result[resultIndex] = (1 - xf) * (1 - yf) * pixels[0] +
+                            xf * (1 - yf) * pixels[1] +
+                            (1 - xf) * yf * pixels[2] +
+                            xf * yf * pixels[3];
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        };
+
+        // Internal. Bilinearly interpolates tile-image elevations.
+        TiledElevationCoverage.prototype.lookupPixels = function (x0, x1, y0, y1, level, retrieveTiles, result) {
+            var levelNumber = level.levelNumber,
+                tileWidth = level.tileWidth,
+                tileHeight = level.tileHeight,
+                row0 = Math.floor(y0 / tileHeight),
+                row1 = Math.floor(y1 / tileHeight),
+                col0 = Math.floor(x0 / tileWidth),
+                col1 = Math.floor(x1 / tileWidth),
+                r0c0, r0c1, r1c0, r1c1;
+
+            if (row0 == row1 &amp;&amp; row0 == this.cachedRow &amp;&amp; col0 == col1 &amp;&amp; col0 == this.cachedCol) {
+                r0c0 = r0c1 = r1c0 = r1c1 = this.cachedImage; // use results from previous lookup
+            } else if (row0 == row1 &amp;&amp; col0 == col1) {
+                r0c0 = this.lookupImage(levelNumber, row0, col0, retrieveTiles); // only need to lookup one image
+                r0c1 = r1c0 = r1c1 = r0c0; // re-use the single image
+                this.cachedRow = row0;
+                this.cachedCol = col0;
+                this.cachedImage = r0c0; // note the results for subsequent lookups
+            } else {
+                r0c0 = this.lookupImage(levelNumber, row0, col0, retrieveTiles);
+                r0c1 = this.lookupImage(levelNumber, row0, col1, retrieveTiles);
+                r1c0 = this.lookupImage(levelNumber, row1, col0, retrieveTiles);
+                r1c1 = this.lookupImage(levelNumber, row1, col1, retrieveTiles);
+            }
+
+            if (r0c0 &amp;&amp; r0c1 &amp;&amp; r1c0 &amp;&amp; r1c1) {
+                result[0] = r0c0.pixel(x0 % tileWidth, y0 % tileHeight);
+                result[1] = r0c1.pixel(x1 % tileWidth, y0 % tileHeight);
+                result[2] = r1c0.pixel(x0 % tileWidth, y1 % tileHeight);
+                result[3] = r1c1.pixel(x1 % tileWidth, y1 % tileHeight);
+                return true;
+            }
+
+            return false;
+        };
+
+        // Internal. Intentionally not documented.
+        TiledElevationCoverage.prototype.lookupImage = function (levelNumber, row, column, retrieveTiles) {
+            var tileKey = Tile.computeTileKey(levelNumber, row, column),
+                image = this.imageCache.entryForKey(tileKey);
+
+            if (image == null &amp;&amp; retrieveTiles) {
+                var tile = this.tileForLevel(levelNumber, row, column);
+                this.retrieveTileImage(tile);
+            }
+
+            return image;
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.assembleTiles = function (level, sector, retrieveTiles) {
+            this.currentTiles = [];
+
+            // Intersect the requested sector with the coverage's coverage area. This avoids attempting to assemble tiles
+            // that are outside the coverage area.
+            this.currentSector.copy(sector);
+            this.currentSector.intersection(this.coverageSector);
+
+            if (this.currentSector.isEmpty())
+                return; // sector is outside the coverage's coverage area
+
+            var deltaLat = level.tileDelta.latitude,
+                deltaLon = level.tileDelta.longitude,
+                firstRow = Tile.computeRow(deltaLat, this.currentSector.minLatitude),
+                lastRow = Tile.computeLastRow(deltaLat, this.currentSector.maxLatitude),
+                firstCol = Tile.computeColumn(deltaLon, this.currentSector.minLongitude),
+                lastCol = Tile.computeLastColumn(deltaLon, this.currentSector.maxLongitude);
+
+            for (var row = firstRow; row &lt;= lastRow; row++) {
+                for (var col = firstCol; col &lt;= lastCol; col++) {
+                    this.addTileOrAncestor(level, row, col, retrieveTiles);
+                }
+            }
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.addTileOrAncestor = function (level, row, column, retrieveTiles) {
+            var tile = this.tileForLevel(level.levelNumber, row, column);
+
+            if (this.isTileImageInMemory(tile)) {
+                this.addToCurrentTiles(tile);
+            } else {
+                if (retrieveTiles) {
+                    this.retrieveTileImage(tile);
+                }
+
+                if (level.isFirstLevel()) {
+                    this.currentTiles.push(tile); // no ancestor tile to add
+                } else {
+                    this.addAncestor(level, row, column, retrieveTiles);
+                }
+            }
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.addAncestor = function (level, row, column, retrieveTiles) {
+            var tile = null,
+                r = Math.floor(row / 2),
+                c = Math.floor(column / 2);
+
+            for (var i = level.levelNumber - 1; i >= 0; i--) {
+                tile = this.tileForLevel(i, r, c);
+                if (this.isTileImageInMemory(tile)) {
+                    this.addToCurrentTiles(tile);
+                    return;
+                }
+
+                r = Math.floor(r / 2);
+                c = Math.floor(c / 2);
+            }
+
+            // No ancestor tiles have an in-memory image. Retrieve the ancestor tile corresponding for the first level, and
+            // add it. We add the necessary tiles to provide coverage over the requested sector in order to accurately return
+            // whether or not this coverage has data for the entire sector.
+            this.addToCurrentTiles(tile);
+
+            if (retrieveTiles) {
+                this.retrieveTileImage(tile);
+            }
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.addToCurrentTiles = function (tile) {
+            this.currentTiles.push(tile);
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.tileForLevel = function (levelNumber, row, column) {
+            var tileKey = Tile.computeTileKey(levelNumber, row, column),
+                tile = this.tileCache.entryForKey(tileKey);
+
+            if (tile) {
+                return tile;
+            }
+
+            var level = this.levels.level(levelNumber),
+                sector = Tile.computeSector(level, row, column);
+
+            tile = new Tile(sector, level, row, column);
+            this.tileCache.putEntry(tileKey, tile, tile.size());
+
+            return tile;
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.isTileImageInMemory = function (tile) {
+            return this.imageCache.containsKey(tile.tileKey);
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.resourceUrlForTile = function (tile) {
+            return this.urlBuilder.urlForTile(tile, this.retrievalImageFormat);
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.retrieveTileImage = function (tile) {
+            if (this.currentRetrievals.indexOf(tile.tileKey) &lt; 0) {
+
+                if (this.currentRetrievals.length > this.retrievalQueueSize) {
+                    return;
+                }
+
+                var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
+                    xhr = new XMLHttpRequest(),
+                    elevationCoverage = this;
+
+                if (!url)
+                    return;
+
+                xhr.open("GET", url, true);
+                xhr.responseType = 'arraybuffer';
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
+
+                        var contentType = xhr.getResponseHeader("content-type");
+
+                        if (xhr.status === 200) {
+                            if (contentType === elevationCoverage.retrievalImageFormat
+                                || contentType === "text/plain"
+                                || contentType === "application/octet-stream") {
+                                Logger.log(Logger.LEVEL_INFO, "Elevations retrieval succeeded: " + url);
+                                elevationCoverage.loadElevationImage(tile, xhr);
+                                elevationCoverage.absentResourceList.unmarkResourceAbsent(tile.tileKey);
+
+                                // Send an event to request a redraw.
+                                var e = document.createEvent('Event');
+                                e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                                window.dispatchEvent(e);
+                            } else if (contentType === "text/xml") {
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
+                                Logger.log(Logger.LEVEL_WARNING,
+                                    "Elevations retrieval failed (" + xhr.statusText + "): " + url + ".\n "
+                                    + String.fromCharCode.apply(null, new Uint8Array(xhr.response)));
+                            } else {
+                                elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
+                                Logger.log(Logger.LEVEL_WARNING,
+                                    "Elevations retrieval failed: " + url + ". " + "Unexpected content type "
+                                    + contentType);
+                            }
+                        } else {
+                            elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
+                            Logger.log(Logger.LEVEL_WARNING,
+                                "Elevations retrieval failed (" + xhr.statusText + "): " + url);
+                        }
+                    }
+                };
+
+                xhr.onerror = function () {
+                    elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
+                    Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval failed: " + url);
+                };
+
+                xhr.ontimeout = function () {
+                    elevationCoverage.removeFromCurrentRetrievals(tile.tileKey);
+                    elevationCoverage.absentResourceList.markResourceAbsent(tile.tileKey);
+                    Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval timed out: " + url);
+                };
+
+                xhr.send(null);
+
+                this.currentRetrievals.push(tile.tileKey);
+            }
+        };
+
+        // Intentionally not documented
+        TiledElevationCoverage.prototype.removeFromCurrentRetrievals = function (tileKey) {
+            var index = this.currentRetrievals.indexOf(tileKey);
+            if (index > -1) {
+                this.currentRetrievals.splice(index, 1);
+            }
+        };
+
+        // Intentionally not documented.
+        TiledElevationCoverage.prototype.loadElevationImage = function (tile, xhr) {
+            var elevationImage = new ElevationImage(tile.sector, tile.tileWidth, tile.tileHeight),
+                geoTiff;
+
+            if (this.retrievalImageFormat === "application/bil16") {
+                elevationImage.imageData = new Int16Array(xhr.response);
+                elevationImage.size = elevationImage.imageData.length * 2;
+            } else if (this.retrievalImageFormat === "application/bil32") {
+                elevationImage.imageData = new Float32Array(xhr.response);
+                elevationImage.size = elevationImage.imageData.length * 4;
+            } else if (this.retrievalImageFormat === "image/tiff") {
+                geoTiff = new GeoTiffReader(xhr.response);
+                elevationImage.imageData = geoTiff.getImageData();
+                elevationImage.size = elevationImage.imageData.length * geoTiff.metadata.bitsPerSample[0] / 8;
+            }
+
+            if (elevationImage.imageData) {
+                elevationImage.findMinAndMaxElevation();
+                this.imageCache.putEntry(tile.tileKey, elevationImage, elevationImage.size);
+                this.timestamp = Date.now();
+            }
+        };
+
+        return TiledElevationCoverage;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:29:59 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

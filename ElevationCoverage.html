@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Class: ElevationCoverage</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: ElevationCoverage</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>ElevationCoverage<span class="signature">(resolution)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">When used directly and not through a subclass, this class represents an elevation coverage
+whose elevations are zero at all locations.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="ElevationCoverage"><span class="type-signature"></span>new ElevationCoverage<span class="signature">(resolution)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Constructs an ElevationCoverage
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>resolution</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The resolution of the coverage, in degrees. (To compute degrees from
+meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the resolution argument is null, undefined, or zero.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="_enabled"><span class="type-signature"></span>_enabled<span class="type-signature"> :Boolean</span></h4>
+
+
+
+
+<div class="description">
+    Indicates whether or not to use this coverage.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>true</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="coverageSector"><span class="type-signature">(readonly) </span>coverageSector<span class="type-signature"> :<a href="Sector.html">Sector</a></span></h4>
+
+
+
+
+<div class="description">
+    The sector this coverage spans.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="Sector.html">Sector</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line78">line 78</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="displayName"><span class="type-signature"></span>displayName<span class="type-signature"> :String</span></h4>
+
+
+
+
+<div class="description">
+    Indicates this coverage's display name.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">String</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>"Coverage"</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="resolution"><span class="type-signature"></span>resolution<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The resolution of this coverage in degrees.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line71">line 71</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="timestamp"><span class="type-signature">(readonly) </span>timestamp<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    Indicates the last time this coverage changed, in milliseconds since midnight Jan 1, 1970.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-default">Default Value:</dt>
+    <dd class="tag-default"><ul class="dummy">
+            <li>Date.now() at construction</li>
+        </ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line51">line 51</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="elevationAtLocation"><span class="type-signature"></span>elevationAtLocation<span class="signature">(latitude, longitude)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the elevation at a specified location.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>latitude</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The location's latitude in degrees.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>longitude</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The location's longitude in degrees.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line134">line 134</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The elevation at the specified location, in meters. Returns null if the location is
+outside the coverage area of this coverage.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="elevationsForGrid"><span class="type-signature"></span>elevationsForGrid<span class="signature">(sector, numLat, numLon, result)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the elevations at locations within a specified sector.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sector</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Sector.html">Sector</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The sector for which to determine the elevations.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>numLat</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of latitudinal sample locations within the sector.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>numLon</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The number of longitudinal sample locations within the sector.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An array in which to return the requested elevations.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line148">line 148</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If the specified sector or result array is null or undefined, or if either of the
+specified numLat or numLon values is less than one.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if the result array was completely filled with elevation data, false otherwise.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="minAndMaxElevationsForSector"><span class="type-signature"></span>minAndMaxElevationsForSector<span class="signature">(sector, result)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Returns the minimum and maximum elevations within a specified sector.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>sector</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Sector.html">Sector</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The sector for which to determine extreme elevations.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>result</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Number></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An array in which to return the requested minimum and maximum elevations.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="globe_ElevationCoverage.js.html">globe/ElevationCoverage.js</a>, <a href="globe_ElevationCoverage.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        If any argument is null or undefined
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type"><a href="ArgumentError.html">ArgumentError</a></span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    true if the coverage completely fills the sector with data, false otherwise.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:30:02 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

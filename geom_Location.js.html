@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Source: geom/Location.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: geom/Location.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @exports Location
+ */
+define([
+        '../geom/Angle',
+        '../error/ArgumentError',
+        '../util/Logger',
+        '../geom/Plane',
+        '../geom/Vec3',
+        '../util/WWMath'
+    ],
+    function (Angle,
+              ArgumentError,
+              Logger,
+              Plane,
+              Vec3,
+              WWMath) {
+        "use strict";
+
+        /**
+         * Constructs a location from a specified latitude and longitude in degrees.
+         * @alias Location
+         * @constructor
+         * @classdesc Represents a latitude, longitude pair in degrees.
+         * @param {Number} latitude The latitude in degrees.
+         * @param {Number} longitude The longitude in degrees.
+         */
+        var Location = function (latitude, longitude) {
+            /**
+             * The latitude in degrees.
+             * @type {Number}
+             */
+            this.latitude = latitude;
+            /**
+             * The longitude in degrees.
+             * @type {Number}
+             */
+            this.longitude = longitude;
+        };
+
+        /**
+         * A location with latitude and longitude both 0.
+         * @constant
+         * @type {Location}
+         */
+        Location.ZERO = new Location(0, 0);
+
+        /**
+         * Creates a location from angles specified in radians.
+         * @param {Number} latitudeRadians The latitude in radians.
+         * @param {Number} longitudeRadians The longitude in radians.
+         * @returns {Location} The new location with latitude and longitude in degrees.
+         */
+        Location.fromRadians = function (latitudeRadians, longitudeRadians) {
+            return new Location(latitudeRadians * Angle.RADIANS_TO_DEGREES, longitudeRadians * Angle.RADIANS_TO_DEGREES);
+        };
+
+        /**
+         * Copies this location to the latitude and longitude of a specified location.
+         * @param {Location} location The location to copy.
+         * @returns {Location} This location, set to the values of the specified location.
+         * @throws {ArgumentError} If the specified location is null or undefined.
+         */
+        Location.prototype.copy = function (location) {
+            if (!location) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "copy", "missingLocation"));
+            }
+
+            this.latitude = location.latitude;
+            this.longitude = location.longitude;
+
+            return this;
+        };
+
+        /**
+         * Sets this location to the latitude and longitude.
+         * @param {Number} latitude The latitude to set.
+         * @param {Number} longitude The longitude to set.
+         * @returns {Location} This location, set to the values of the specified latitude and longitude.
+         */
+        Location.prototype.set = function (latitude, longitude) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+
+            return this;
+        };
+
+        /**
+         * Indicates whether this location is equal to a specified location.
+         * @param {Location} location The location to compare this one to.
+         * @returns {Boolean} &lt;code>true&lt;/code> if this location is equal to the specified location, otherwise
+         * &lt;code>false&lt;/code>.
+         */
+        Location.prototype.equals = function (location) {
+            return location
+                &amp;&amp; location.latitude === this.latitude &amp;&amp; location.longitude === this.longitude;
+        };
+
+        /**
+         * Compute a location along a path at a specified distance between two specified locations.
+         * @param {String} pathType The type of path to assume. Recognized values are
+         * [WorldWind.GREAT_CIRCLE]{@link WorldWind#GREAT_CIRCLE},
+         * [WorldWind.RHUMB_LINE]{@link WorldWind#RHUMB_LINE} and
+         * [WorldWind.LINEAR]{@link WorldWind#LINEAR}.
+         * If the path type is not recognized then WorldWind.LINEAR is used.
+         * @param {Number} amount The fraction of the path between the two locations at which to compute the new
+         * location. This number should be between 0 and 1. If not, it is clamped to the nearest of those values.
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @param {Location} result A Location in which to return the result.
+         * @returns {Location} The specified result location.
+         * @throws {ArgumentError} If either specified location or the result argument is null or undefined.
+         */
+        Location.interpolateAlongPath = function (pathType, amount, location1, location2, result) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateAlongPath", "missingLocation"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateAlongPath", "missingResult"));
+            }
+
+            if (pathType === WorldWind.GREAT_CIRCLE) {
+                return this.interpolateGreatCircle(amount, location1, location2, result);
+            } else if (pathType &amp;&amp; pathType === WorldWind.RHUMB_LINE) {
+                return this.interpolateRhumb(amount, location1, location2, result);
+            } else {
+                return this.interpolateLinear(amount, location1, location2, result);
+            }
+        };
+
+        /**
+         * Compute a location along a great circle path at a specified distance between two specified locations.
+         * @param {Number} amount The fraction of the path between the two locations at which to compute the new
+         * location. This number should be between 0 and 1. If not, it is clamped to the nearest of those values.
+         * This function uses a spherical model, not elliptical.
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @param {Location} result A Location in which to return the result.
+         * @returns {Location} The specified result location.
+         * @throws {ArgumentError} If either specified location or the result argument is null or undefined.
+         */
+        Location.interpolateGreatCircle = function (amount, location1, location2, result) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateGreatCircle", "missingLocation"));
+            }
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateGreatCircle", "missingResult"));
+            }
+
+            if (location1.equals(location2)) {
+                result.latitude = location1.latitude;
+                result.longitude = location1.longitude;
+                return result;
+            }
+
+            var t = WWMath.clamp(amount, 0, 1),
+                azimuthDegrees = this.greatCircleAzimuth(location1, location2),
+                distanceRadians = this.greatCircleDistance(location1, location2);
+
+            return this.greatCircleLocation(location1, azimuthDegrees, t * distanceRadians, result);
+        };
+
+        /**
+         * Computes the azimuth angle (clockwise from North) that points from the first location to the second location.
+         * This angle can be used as the starting azimuth for a great circle arc that begins at the first location, and
+         * passes through the second location.
+         * This function uses a spherical model, not elliptical.
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @returns {Number} The computed azimuth, in degrees.
+         * @throws {ArgumentError} If either specified location is null or undefined.
+         */
+        Location.greatCircleAzimuth = function (location1, location2) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleAzimuth", "missingLocation"));
+            }
+
+            var lat1 = location1.latitude * Angle.DEGREES_TO_RADIANS,
+                lat2 = location2.latitude * Angle.DEGREES_TO_RADIANS,
+                lon1 = location1.longitude * Angle.DEGREES_TO_RADIANS,
+                lon2 = location2.longitude * Angle.DEGREES_TO_RADIANS,
+                x,
+                y,
+                azimuthRadians;
+
+            if (lat1 == lat2 &amp;&amp; lon1 == lon2) {
+                return 0;
+            }
+
+            if (lon1 == lon2) {
+                return lat1 > lat2 ? 180 : 0;
+            }
+
+            // Taken from "Map Projections - A Working Manual", page 30, equation 5-4b.
+            // The atan2() function is used in place of the traditional atan(y/x) to simplify the case when x == 0.
+            y = Math.cos(lat2) * Math.sin(lon2 - lon1);
+            x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1);
+            azimuthRadians = Math.atan2(y, x);
+
+            return isNaN(azimuthRadians) ? 0 : azimuthRadians * Angle.RADIANS_TO_DEGREES;
+        };
+
+        /**
+         * Computes the great circle angular distance between two locations. The return value gives the distance as the
+         * angle between the two positions. In radians, this angle is the arc length of the segment between the two
+         * positions. To compute a distance in meters from this value, multiply the return value by the radius of the
+         * globe.
+         * This function uses a spherical model, not elliptical.
+         *
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @returns {Number} The computed distance, in radians.
+         * @throws {ArgumentError} If either specified location is null or undefined.
+         */
+        Location.greatCircleDistance = function (location1, location2) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleDistance", "missingLocation"));
+            }
+
+            var lat1Radians = location1.latitude * Angle.DEGREES_TO_RADIANS,
+                lat2Radians = location2.latitude * Angle.DEGREES_TO_RADIANS,
+                lon1Radians = location1.longitude * Angle.DEGREES_TO_RADIANS,
+                lon2Radians = location2.longitude * Angle.DEGREES_TO_RADIANS,
+                a,
+                b,
+                c,
+                distanceRadians;
+
+            if (lat1Radians == lat2Radians &amp;&amp; lon1Radians == lon2Radians) {
+                return 0;
+            }
+
+            // "Haversine formula," taken from https://en.wikipedia.org/wiki/Great-circle_distance#Formul.C3.A6
+            a = Math.sin((lat2Radians - lat1Radians) / 2.0);
+            b = Math.sin((lon2Radians - lon1Radians) / 2.0);
+            c = a * a + Math.cos(lat1Radians) * Math.cos(lat2Radians) * b * b;
+            distanceRadians = 2.0 * Math.asin(Math.sqrt(c));
+
+            return isNaN(distanceRadians) ? 0 : distanceRadians;
+        };
+
+        /**
+         * Computes the location on a great circle path corresponding to a given starting location, azimuth, and
+         * arc distance.
+         * This function uses a spherical model, not elliptical.
+         *
+         * @param {Location} location The starting location.
+         * @param {Number} greatCircleAzimuthDegrees The azimuth in degrees.
+         * @param {Number} pathLengthRadians The radian distance along the path at which to compute the end location.
+         * @param {Location} result A Location in which to return the result.
+         * @returns {Location} The specified result location.
+         * @throws {ArgumentError} If the specified location or the result argument is null or undefined.
+         */
+        Location.greatCircleLocation = function (location, greatCircleAzimuthDegrees, pathLengthRadians, result) {
+            if (!location) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleLocation", "missingLocation"));
+            }
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleLocation", "missingResult"));
+            }
+
+            if (pathLengthRadians == 0) {
+                result.latitude = location.latitude;
+                result.longitude = location.longitude;
+                return result;
+            }
+
+            var latRadians = location.latitude * Angle.DEGREES_TO_RADIANS,
+                lonRadians = location.longitude * Angle.DEGREES_TO_RADIANS,
+                azimuthRadians = greatCircleAzimuthDegrees * Angle.DEGREES_TO_RADIANS,
+                endLatRadians,
+                endLonRadians;
+
+            // Taken from "Map Projections - A Working Manual", page 31, equation 5-5 and 5-6.
+            endLatRadians = Math.asin(Math.sin(latRadians) * Math.cos(pathLengthRadians) +
+                Math.cos(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
+            endLonRadians = lonRadians + Math.atan2(
+                    Math.sin(pathLengthRadians) * Math.sin(azimuthRadians),
+                    Math.cos(latRadians) * Math.cos(pathLengthRadians) -
+                    Math.sin(latRadians) * Math.sin(pathLengthRadians) * Math.cos(azimuthRadians));
+
+            if (isNaN(endLatRadians) || isNaN(endLonRadians)) {
+                result.latitude = location.latitude;
+                result.longitude = location.longitude;
+            } else {
+                result.latitude = Angle.normalizedDegreesLatitude(endLatRadians * Angle.RADIANS_TO_DEGREES);
+                result.longitude = Angle.normalizedDegreesLongitude(endLonRadians * Angle.RADIANS_TO_DEGREES);
+            }
+
+            return result;
+        };
+
+        /**
+         * Compute a location along a rhumb path at a specified distance between two specified locations.
+         * This function uses a spherical model, not elliptical.
+         * @param {Number} amount The fraction of the path between the two locations at which to compute the new
+         * location. This number should be between 0 and 1. If not, it is clamped to the nearest of those values.
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @param {Location} result A Location in which to return the result.
+         * @returns {Location} The specified result location.
+         * @throws {ArgumentError} If either specified location or the result argument is null or undefined.
+         */
+        Location.interpolateRhumb = function (amount, location1, location2, result) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateRhumb", "missingLocation"));
+            }
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateRhumb", "missingResult"));
+            }
+
+            if (location1.equals(location2)) {
+                result.latitude = location1.latitude;
+                result.longitude = location1.longitude;
+                return result;
+            }
+
+            var t = WWMath.clamp(amount, 0, 1),
+                azimuthDegrees = this.rhumbAzimuth(location1, location2),
+                distanceRadians = this.rhumbDistance(location1, location2);
+
+            return this.rhumbLocation(location1, azimuthDegrees, t * distanceRadians, result);
+        };
+
+        /**
+         * Computes the azimuth angle (clockwise from North) that points from the first location to the second location.
+         * This angle can be used as the azimuth for a rhumb arc that begins at the first location, and
+         * passes through the second location.
+         * This function uses a spherical model, not elliptical.
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @returns {Number} The computed azimuth, in degrees.
+         * @throws {ArgumentError} If either specified location is null or undefined.
+         */
+        Location.rhumbAzimuth = function (location1, location2) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "rhumbAzimuth", "missingLocation"));
+            }
+
+            var lat1 = location1.latitude * Angle.DEGREES_TO_RADIANS,
+                lat2 = location2.latitude * Angle.DEGREES_TO_RADIANS,
+                lon1 = location1.longitude * Angle.DEGREES_TO_RADIANS,
+                lon2 = location2.longitude * Angle.DEGREES_TO_RADIANS,
+                dLon,
+                dPhi,
+                azimuthRadians;
+
+            if (lat1 == lat2 &amp;&amp; lon1 == lon2) {
+                return 0;
+            }
+
+            dLon = lon2 - lon1;
+            dPhi = Math.log(Math.tan(lat2 / 2.0 + Math.PI / 4) / Math.tan(lat1 / 2.0 + Math.PI / 4));
+
+            // If lonChange over 180 take shorter rhumb across 180 meridian.
+            if (WWMath.fabs(dLon) > Math.PI) {
+                dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
+            }
+
+            azimuthRadians = Math.atan2(dLon, dPhi);
+
+            return isNaN(azimuthRadians) ? 0 : azimuthRadians * Angle.RADIANS_TO_DEGREES;
+        };
+
+        /**
+         * Computes the rhumb angular distance between two locations. The return value gives the distance as the
+         * angle between the two positions in radians. This angle is the arc length of the segment between the two
+         * positions. To compute a distance in meters from this value, multiply the return value by the radius of the
+         * globe.
+         * This function uses a spherical model, not elliptical.
+         *
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @returns {Number} The computed distance, in radians.
+         * @throws {ArgumentError} If either specified location is null or undefined.
+         */
+        Location.rhumbDistance = function (location1, location2) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "rhumbDistance", "missingLocation"));
+            }
+
+            var lat1 = location1.latitude * Angle.DEGREES_TO_RADIANS,
+                lat2 = location2.latitude * Angle.DEGREES_TO_RADIANS,
+                lon1 = location1.longitude * Angle.DEGREES_TO_RADIANS,
+                lon2 = location2.longitude * Angle.DEGREES_TO_RADIANS,
+                dLat,
+                dLon,
+                dPhi,
+                q,
+                distanceRadians;
+
+            if (lat1 == lat2 &amp;&amp; lon1 == lon2) {
+                return 0;
+            }
+
+            dLat = lat2 - lat1;
+            dLon = lon2 - lon1;
+            dPhi = Math.log(Math.tan(lat2 / 2.0 + Math.PI / 4) / Math.tan(lat1 / 2.0 + Math.PI / 4));
+            q = dLat / dPhi;
+
+            if (isNaN(dPhi) || isNaN(q)) {
+                q = Math.cos(lat1);
+            }
+
+            // If lonChange over 180 take shorter rhumb across 180 meridian.
+            if (WWMath.fabs(dLon) > Math.PI) {
+                dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
+            }
+
+            distanceRadians = Math.sqrt(dLat * dLat + q * q * dLon * dLon);
+
+            return isNaN(distanceRadians) ? 0 : distanceRadians;
+        };
+
+        /**
+         * Computes the location on a rhumb arc with the given starting location, azimuth, and arc distance.
+         * This function uses a spherical model, not elliptical.
+         *
+         * @param {Location} location The starting location.
+         * @param {Number} azimuthDegrees The azimuth in degrees.
+         * @param {Number} pathLengthRadians The radian distance along the path at which to compute the location.
+         * @param {Location} result A Location in which to return the result.
+         * @returns {Location} The specified result location.
+         * @throws {ArgumentError} If the specified location or the result argument is null or undefined.
+         */
+        Location.rhumbLocation = function (location, azimuthDegrees, pathLengthRadians, result) {
+            if (!location) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "rhumbLocation", "missingLocation"));
+            }
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "rhumbLocation", "missingResult"));
+            }
+
+            if (pathLengthRadians == 0) {
+                result.latitude = location.latitude;
+                result.longitude = location.longitude;
+                return result;
+            }
+
+            var latRadians = location.latitude * Angle.DEGREES_TO_RADIANS,
+                lonRadians = location.longitude * Angle.DEGREES_TO_RADIANS,
+                azimuthRadians = azimuthDegrees * Angle.DEGREES_TO_RADIANS,
+                endLatRadians = latRadians + pathLengthRadians * Math.cos(azimuthRadians),
+                dPhi = Math.log(Math.tan(endLatRadians / 2 + Math.PI / 4) / Math.tan(latRadians / 2 + Math.PI / 4)),
+                q = (endLatRadians - latRadians) / dPhi,
+                dLon,
+                endLonRadians;
+
+            if (isNaN(dPhi) || isNaN(q) || !isFinite(q)) {
+                q = Math.cos(latRadians);
+            }
+
+            dLon = pathLengthRadians * Math.sin(azimuthRadians) / q;
+
+            // Handle latitude passing over either pole.
+            if (WWMath.fabs(endLatRadians) > Math.PI / 2) {
+                endLatRadians = endLatRadians > 0 ? Math.PI - endLatRadians : -Math.PI - endLatRadians;
+            }
+
+            endLonRadians = WWMath.fmod(lonRadians + dLon + Math.PI, 2 * Math.PI) - Math.PI;
+
+            if (isNaN(endLatRadians) || isNaN(endLonRadians)) {
+                result.latitude = location.latitude;
+                result.longitude = location.longitude;
+            } else {
+                result.latitude = Angle.normalizedDegreesLatitude(endLatRadians * Angle.RADIANS_TO_DEGREES);
+                result.longitude = Angle.normalizedDegreesLongitude(endLonRadians * Angle.RADIANS_TO_DEGREES);
+            }
+
+            return result;
+        };
+
+        /**
+         * Compute a location along a linear path at a specified distance between two specified locations.
+         * @param {Number} amount The fraction of the path between the two locations at which to compute the new
+         * location. This number should be between 0 and 1. If not, it is clamped to the nearest of those values.
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @param {Location} result A Location in which to return the result.
+         * @returns {Location} The specified result location.
+         * @throws {ArgumentError} If either specified location or the result argument is null or undefined.
+         */
+        Location.interpolateLinear = function (amount, location1, location2, result) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateLinear", "missingLocation"));
+            }
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "interpolateLinear", "missingResult"));
+            }
+
+            if (location1.equals(location2)) {
+                result.latitude = location1.latitude;
+                result.longitude = location1.longitude;
+                return result;
+            }
+
+            var t = WWMath.clamp(amount, 0, 1),
+                azimuthDegrees = this.linearAzimuth(location1, location2),
+                distanceRadians = this.linearDistance(location1, location2);
+
+            return this.linearLocation(location1, azimuthDegrees, t * distanceRadians, result);
+        };
+
+        /**
+         * Computes the azimuth angle (clockwise from North) that points from the first location to the second location.
+         * This angle can be used as the azimuth for a linear arc that begins at the first location, and
+         * passes through the second location.
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @returns {Number} The computed azimuth, in degrees.
+         * @throws {ArgumentError} If either specified location is null or undefined.
+         */
+        Location.linearAzimuth = function (location1, location2) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "linearAzimuth", "missingLocation"));
+            }
+
+            var lat1 = location1.latitude * Angle.DEGREES_TO_RADIANS,
+                lat2 = location2.latitude * Angle.DEGREES_TO_RADIANS,
+                lon1 = location1.longitude * Angle.DEGREES_TO_RADIANS,
+                lon2 = location2.longitude * Angle.DEGREES_TO_RADIANS,
+                dLon,
+                dPhi,
+                azimuthRadians;
+
+            if (lat1 == lat2 &amp;&amp; lon1 == lon2) {
+                return 0;
+            }
+
+            dLon = lon2 - lon1;
+            dPhi = lat2 - lat1;
+
+            // If longitude change is over 180 take shorter path across 180 meridian.
+            if (WWMath.fabs(dLon) > Math.PI) {
+                dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
+            }
+
+            azimuthRadians = Math.atan2(dLon, dPhi);
+
+            return isNaN(azimuthRadians) ? 0 : azimuthRadians * Angle.RADIANS_TO_DEGREES;
+        };
+
+        /**
+         * Computes the linear angular distance between two locations. The return value gives the distance as the
+         * angle between the two positions in radians. This angle is the arc length of the segment between the two
+         * positions. To compute a distance in meters from this value, multiply the return value by the radius of the
+         * globe.
+         *
+         * @param {Location} location1 The starting location.
+         * @param {Location} location2 The ending location.
+         * @returns {Number} The computed distance, in radians.
+         * @throws {ArgumentError} If either specified location is null or undefined.
+         */
+        Location.linearDistance = function (location1, location2) {
+            if (!location1 || !location2) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "linearDistance", "missingLocation"));
+            }
+
+            var lat1 = location1.latitude * Angle.DEGREES_TO_RADIANS,
+                lat2 = location2.latitude * Angle.DEGREES_TO_RADIANS,
+                lon1 = location1.longitude * Angle.DEGREES_TO_RADIANS,
+                lon2 = location2.longitude * Angle.DEGREES_TO_RADIANS,
+                dLat,
+                dLon,
+                distanceRadians;
+
+            if (lat1 == lat2 &amp;&amp; lon1 == lon2) {
+                return 0;
+            }
+
+            dLat = lat2 - lat1;
+            dLon = lon2 - lon1;
+
+            // If lonChange over 180 take shorter path across 180 meridian.
+            if (WWMath.fabs(dLon) > Math.PI) {
+                dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
+            }
+
+            distanceRadians = Math.sqrt(dLat * dLat + dLon * dLon);
+
+            return isNaN(distanceRadians) ? 0 : distanceRadians;
+        };
+
+        /**
+         * Computes the location on a linear path with the given starting location, azimuth, and arc distance.
+         *
+         * @param {Location} location The starting location.
+         * @param {Number} azimuthDegrees The azimuth in degrees.
+         * @param {Number} pathLengthRadians The radian distance along the path at which to compute the location.
+         * @param {Location} result A Location in which to return the result.
+         * @returns {Location} The specified result location.
+         * @throws {ArgumentError} If the specified location or the result argument is null or undefined.
+         */
+        Location.linearLocation = function (location, azimuthDegrees, pathLengthRadians, result) {
+            if (!location) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "linearLocation", "missingLocation"));
+            }
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "linearLocation", "missingResult"));
+            }
+
+            if (pathLengthRadians == 0) {
+                result.latitude = location.latitude;
+                result.longitude = location.longitude;
+                return result;
+            }
+
+            var latRadians = location.latitude * Angle.DEGREES_TO_RADIANS,
+                lonRadians = location.longitude * Angle.DEGREES_TO_RADIANS,
+                azimuthRadians = azimuthDegrees * Angle.DEGREES_TO_RADIANS,
+                endLatRadians = latRadians + pathLengthRadians * Math.cos(azimuthRadians),
+                endLonRadians;
+
+            // Handle latitude passing over either pole.
+            if (WWMath.fabs(endLatRadians) > Math.PI / 2) {
+                endLatRadians = endLatRadians > 0 ? Math.PI - endLatRadians : -Math.PI - endLatRadians;
+            }
+
+            endLonRadians =
+                WWMath.fmod(lonRadians + pathLengthRadians * Math.sin(azimuthRadians) + Math.PI, 2 * Math.PI) - Math.PI;
+
+            if (isNaN(endLatRadians) || isNaN(endLonRadians)) {
+                result.latitude = location.latitude;
+                result.longitude = location.longitude;
+            } else {
+                result.latitude = Angle.normalizedDegreesLatitude(endLatRadians * Angle.RADIANS_TO_DEGREES);
+                result.longitude = Angle.normalizedDegreesLongitude(endLonRadians * Angle.RADIANS_TO_DEGREES);
+            }
+
+            return result;
+        };
+
+        /**
+         * Determine whether a list of locations crosses the dateline.
+         * @param {Location[]} locations The locations to test.
+         * @returns {boolean} True if the dateline is crossed, else false.
+         * @throws {ArgumentError} If the locations list is null.
+         */
+        Location.locationsCrossDateLine = function (locations) {
+            if (!locations) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "locationsCrossDateline", "missingLocation"));
+            }
+
+            var pos = null;
+            for (var idx = 0, len = locations.length; idx &lt; len; idx += 1) {
+                var posNext = locations[idx];
+
+                if (pos != null) {
+                    // A segment cross the line if end pos have different longitude signs
+                    // and are more than 180 degrees longitude apart
+                    if (WWMath.signum(pos.longitude) != WWMath.signum(posNext.longitude)) {
+                        var delta = Math.abs(pos.longitude - posNext.longitude);
+                        if (delta > 180 &amp;&amp; delta &lt; 360)
+                            return true;
+                    }
+                }
+                pos = posNext;
+            }
+
+            return false;
+        };
+
+        /**
+         * Returns two locations with the most extreme latitudes on the sequence of great circle arcs defined by each pair
+         * of locations in the specified iterable.
+         *
+         * @param {Location[]} locations The pairs of locations defining a sequence of great circle arcs.
+         *
+         * @return {Location[]} Two locations with the most extreme latitudes on the great circle arcs.
+         *
+         * @throws IllegalArgumentException if locations is null.
+         */
+        Location.greatCircleArcExtremeLocations = function (locations) {
+            if (!locations) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeLocations", "missingLocation"));
+            }
+
+            var minLatLocation = null;
+            var maxLatLocation = null;
+
+            var lastLocation = null;
+
+            for (var idx = 0, len = locations.length; idx &lt; len; idx += 1) {
+                var location = locations[idx];
+
+                if (lastLocation != null) {
+                    var extremes = Location.greatCircleArcExtremeForTwoLocations(lastLocation, location);
+                    if (extremes == null) {
+                        continue;
+                    }
+
+                    if (minLatLocation == null || minLatLocation.latitude > extremes[0].latitude) {
+                        minLatLocation = extremes[0];
+                    }
+                    if (maxLatLocation == null || maxLatLocation.latitude &lt; extremes[1].latitude) {
+                        maxLatLocation = extremes[1];
+                    }
+                }
+
+                lastLocation = location;
+            }
+
+            return [minLatLocation, maxLatLocation];
+        };
+
+        /**
+         * Returns two locations with the most extreme latitudes on the great circle arc defined by, and limited to, the two
+         * locations.
+         *
+         * @param {Location} begin Beginning location on the great circle arc.
+         * @param {Location} end   Ending location on the great circle arc.
+         *
+         * @return {Location[]} Two locations with the most extreme latitudes on the great circle arc.
+         *
+         * @throws {ArgumentError} If either begin or end are null.
+         */
+        Location.greatCircleArcExtremeForTwoLocations = function (begin, end) {
+            if (!begin || !end) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeForTwoLocations", "missingLocation"));
+            }
+
+            var idx, len, location; // Iteration variables.
+            var minLatLocation = null;
+            var maxLatLocation = null;
+            var minLat = 90;
+            var maxLat = -90;
+
+            // Compute the min and max latitude and associated locations from the arc endpoints.
+            var locations = [begin, end];
+            for (idx = 0, len = locations.length; idx &lt; len; idx += 1) {
+                location = locations[idx];
+
+                if (minLat >= location.latitude) {
+                    minLat = location.latitude;
+                    minLatLocation = location;
+                }
+                if (maxLat &lt;= location.latitude) {
+                    maxLat = location.latitude;
+                    maxLatLocation = location;
+                }
+            }
+            // The above could be written for greater clarity, simplicity, and speed:
+            // minLat = Math.min(begin.latitude, end.latitude);
+            // maxLat = Math.max(begin.latitude, end.latitude);
+            // minLatLocation = minLat == begin.latitude ? begin : end;
+            // maxLatLocation = maxLat == begin.latitude ? begin : end;
+
+            // Compute parameters for the great circle arc defined by begin and end. Then compute the locations of extreme
+            // latitude on entire the great circle which that arc is part of.
+            var greatArcAzimuth = Location.greatCircleAzimuth(begin, end);
+            var greatArcDistance = Location.greatCircleDistance(begin, end);
+            var greatCircleExtremes = Location.greatCircleExtremeLocationsUsingAzimuth(begin, greatArcAzimuth);
+
+            // Determine whether either of the extreme locations are inside the arc defined by begin and end. If so,
+            // adjust the min and max latitude accordingly.
+            for (idx = 0, len = greatCircleExtremes.length; idx &lt; len; idx += 1) {
+                location = greatCircleExtremes[idx];
+
+                var az = Location.greatCircleAzimuth(begin, location);
+                var d = Location.greatCircleDistance(begin, location);
+
+                // The extreme location must be between the begin and end locations. Therefore its azimuth relative to
+                // the begin location should have the same signum, and its distance relative to the begin location should
+                // be between 0 and greatArcDistance, inclusive.
+                if (WWMath.signum(az) == WWMath.signum(greatArcAzimuth)) {
+                    if (d >= 0 &amp;&amp; d &lt;= greatArcDistance) {
+                        if (minLat >= location.latitude) {
+                            minLat = location.latitude;
+                            minLatLocation = location;
+                        }
+                        if (maxLat &lt;= location.latitude) {
+                            maxLat = location.latitude;
+                            maxLatLocation = location;
+                        }
+                    }
+                }
+            }
+
+            return [minLatLocation, maxLatLocation];
+        };
+
+        /**
+         * Returns two locations with the most extreme latitudes on the great circle with the given starting location and
+         * azimuth.
+         *
+         * @param {Location} location Location on the great circle.
+         * @param {number} azimuth  Great circle azimuth angle (clockwise from North).
+         *
+         * @return {Location[]} Two locations where the great circle has its extreme latitudes.
+         *
+         * @throws {ArgumentError} If location is null.
+         */
+        Location.greatCircleExtremeLocationsUsingAzimuth = function (location, azimuth) {
+            if (!location) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Location", "greatCircleArcExtremeLocationsUsingAzimuth", "missingLocation"));
+            }
+
+            var lat0 = location.latitude;
+            var az = azimuth * Angle.DEGREES_TO_RADIANS;
+
+            // Derived by solving the function for longitude on a great circle against the desired longitude. We start
+            // with the equation in "Map Projections - A Working Manual", page 31, equation 5-5:
+            //
+            //     lat = asin( sin(lat0) * cos(C) + cos(lat0) * sin(C) * cos(Az) )
+            //
+            // Where (lat0, lon) are the starting coordinates, c is the angular distance along the great circle from the
+            // starting coordinate, and Az is the azimuth. All values are in radians. Solving for angular distance gives
+            // distance to the equator:
+            //
+            //     tan(C) = -tan(lat0) / cos(Az)
+            //
+            // The great circle is by definition centered about the Globe's origin. Therefore intersections with the
+            // equator will be antipodal (exactly 180 degrees opposite each other), as will be the extreme latitudes.
+            // By observing the symmetry of a great circle, it is also apparent that the extreme latitudes will be 90
+            // degrees from either intersection with the equator.
+            //
+            // d1 = c + 90
+            // d2 = c - 90
+
+            var tanDistance = -Math.tan(lat0) / Math.cos(az);
+            var distance = Math.atan(tanDistance);
+
+            var extremeDistance1 = distance + (Math.PI / 2.0);
+            var extremeDistance2 = distance - (Math.PI / 2.0);
+
+            return [
+                Location.greatCircleLocation(location, azimuth, extremeDistance1, new Location(0, 0)),
+                Location.greatCircleLocation(location, azimuth, extremeDistance2, new Location(0, 0))
+            ];
+        };
+
+        /**
+         * Determine where a line between two positions crosses a given meridian. The intersection test is performed by
+         * intersecting a line in Cartesian space between the two positions with a plane through the meridian. Thus, it is
+         * most suitable for working with positions that are fairly close together as the calculation does not take into
+         * account great circle or rhumb paths.
+         *
+         * @param {Location} p1         First position.
+         * @param {Location} p2         Second position.
+         * @param {number} meridian     Longitude line to intersect with.
+         * @param {Globe} globe         Globe used to compute intersection.
+         *
+         * @return {number} latitude The intersection latitude along the meridian
+         *
+         * TODO: this code allocates 4 new Vec3 and 1 new Position; use scratch variables???
+         * TODO: Why not? Every location created would then allocated those variables as well, even if they aren't needed :(.
+         */
+        Location.intersectionWithMeridian = function (p1, p2, meridian, globe) {
+            // TODO: add support for 2D
+            //if (globe instanceof Globe2D)
+            //{
+            //    // y = mx + b case after normalizing negative angles.
+            //    double lon1 = p1.getLongitude().degrees &lt; 0 ? p1.getLongitude().degrees + 360 : p1.getLongitude().degrees;
+            //    double lon2 = p2.getLongitude().degrees &lt; 0 ? p2.getLongitude().degrees + 360 : p2.getLongitude().degrees;
+            //    if (lon1 == lon2)
+            //        return null;
+            //
+            //    double med = meridian.degrees &lt; 0 ? meridian.degrees + 360 : meridian.degrees;
+            //    double slope = (p2.latitude.degrees - p1.latitude.degrees) / (lon2 - lon1);
+            //    double lat = p1.latitude.degrees + slope * (med - lon1);
+            //
+            //    return LatLon.fromDegrees(lat, meridian.degrees);
+            //}
+
+            var pt1 = globe.computePointFromLocation(p1.latitude, p1.longitude, new Vec3(0, 0, 0));
+            var pt2 = globe.computePointFromLocation(p2.latitude, p2.longitude, new Vec3(0, 0, 0));
+
+            // Compute a plane through the origin, North Pole, and the desired meridian.
+            var northPole = globe.computePointFromLocation(90, meridian, new Vec3(0, 0, 0));
+            var pointOnEquator = globe.computePointFromLocation(0, meridian, new Vec3(0, 0, 0));
+
+            var plane = Plane.fromPoints(northPole, pointOnEquator, Vec3.ZERO);
+
+            var intersectionPoint = new Vec3(0, 0, 0);
+            if (!plane.intersectsSegmentAt(pt1, pt2, intersectionPoint)) {
+                return null;
+            }
+
+            // TODO: unable to simply create a new Position(0, 0, 0)
+            var pos = new WorldWind.Position(0, 0, 0);
+            globe.computePositionFromPoint(intersectionPoint[0], intersectionPoint[1], intersectionPoint[2], pos);
+
+            return pos.latitude;
+        };
+
+        /**
+         * Determine where a line between two positions crosses a given meridian. The intersection test is performed by
+         * intersecting a line in Cartesian space. Thus, it is most suitable for working with positions that are fairly
+         * close together as the calculation does not take into account great circle or rhumb paths.
+         *
+         * @param {Location | Position} p1 First position.
+         * @param {Location | Position} p2 Second position.
+         * @param {number} meridian Longitude line to intersect with.
+         *
+         * @return {number | null} latitude The intersection latitude along the meridian
+         * or null if the line is collinear with the meridian
+         */
+        Location.meridianIntersection = function(p1, p2, meridian){
+                // y = mx + b case after normalizing negative angles.
+                var lon1 = p1.longitude &lt; 0 ? p1.longitude + 360 : p1.longitude;
+                var lon2 = p2.longitude &lt; 0 ? p2.longitude + 360 : p2.longitude;
+                if (lon1 === lon2) {
+                    //infinite solutions, the line is collinear with the anti-meridian
+                    return null;
+                }
+
+                var med = meridian &lt; 0 ? meridian + 360 : meridian;
+                var slope = (p2.latitude - p1.latitude) / (lon2 - lon1);
+                var lat = p1.latitude + slope * (med - lon1);
+
+                return lat;
+        };
+
+        /**
+         * A bit mask indicating which if any pole is being referenced.
+         * This corresponds to Java WW's AVKey.NORTH and AVKey.SOUTH,
+         * although this encoding can capture both poles simultaneously, which was
+         * a 'to do' item in the Java implementation.
+         * @type {{NONE: number, NORTH: number, SOUTH: number}}
+         */
+        Location.poles = {
+            'NONE': 0,
+            'NORTH': 1,
+            'SOUTH': 2
+        };
+
+        return Location;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:29:59 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

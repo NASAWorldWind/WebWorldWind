@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Source: formats/shapefile/Shapefile.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: formats/shapefile/Shapefile.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @exports Shapefile
+ */
+define([
+        '../../geom/Angle',
+        '../../error/ArgumentError',
+        '../../util/ByteBuffer',
+        '../../util/Color',
+        '../../formats/shapefile/DBaseFile',
+        '../../geom/Location',
+        '../../util/Logger',
+        '../../error/NotYetImplementedError',
+        '../../shapes/Path',
+        '../../shapes/Placemark',
+        '../../shapes/PlacemarkAttributes',
+        '../../shapes/Polygon',
+        '../../geom/Position',
+        '../../formats/shapefile/PrjFile',
+        '../../layer/RenderableLayer',
+        '../../shapes/ShapeAttributes',
+        '../../formats/shapefile/ShapefileRecord',
+        '../../formats/shapefile/ShapefileRecordMultiPoint',
+        '../../formats/shapefile/ShapefileRecordNull',
+        '../../formats/shapefile/ShapefileRecordPoint',
+        '../../formats/shapefile/ShapefileRecordPolygon',
+        '../../formats/shapefile/ShapefileRecordPolyline',
+        '../../shapes/SurfacePolygon',
+        '../../shapes/SurfacePolyline'
+    ],
+    function (Angle,
+              ArgumentError,
+              ByteBuffer,
+              Color,
+              DBaseFile,
+              Location,
+              Logger,
+              NotYetImplementedError,
+              Path,
+              Placemark,
+              PlacemarkAttributes,
+              Polygon,
+              Position,
+              PrjFile,
+              RenderableLayer,
+              ShapeAttributes,
+              ShapefileRecord,
+              ShapefileRecordMultiPoint,
+              ShapefileRecordNull,
+              ShapefileRecordPoint,
+              ShapefileRecordPolygon,
+              ShapefileRecordPolyline,
+              SurfacePolygon,
+              SurfacePolyline) {
+        "use strict";
+
+        /**
+         * Constructs a shapefile object for a specified shapefile URL. Call [load]{@link Shapefile#load} to retrieve the
+         * shapefile and create shapes for it.
+         * @alias Shapefile
+         * @constructor
+         * @classdesc Parses a shapefile and creates shapes representing its contents. Points in the shapefile are
+         * represented by [Placemarks]{@link Placemark}, lines are represented by [Paths]{@link Path} or
+         * [SurfacePolylines]{@link SurfacePolyline}, and polygons
+         * are represented by [Polygons]{@link Polygon} or [SurfacePolygons]{@link SurfacePolygon}.
+         * A parser completion callback may be specified and is
+         * called when the shapefile is fully parsed but before shapes are created.
+         * &lt;p>
+         * An attribute callback may also be specified to examine each record and configure the shape created for it.
+         * This function enables the application to assign independent attributes to each
+         * shape. An argument to this function provides any attributes specified in an attribute file (.dbf)
+         * accompanying the shapefile. That attribute file is automatically detected, retrieved and parsed along
+         * with the shapefile.
+         * @param {String} url The location of the shapefile.
+         * @throws {ArgumentError} If the specified URL is null or undefined.
+         */
+        var Shapefile = function (url) {
+            if (!url) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Shapefile", "constructor", "missingUrl"));
+            }
+
+            // Documented in defineProperties below.
+            this._url = url;
+
+            // Documented in defineProperties below.
+            this._shapeType = null;
+
+            // Documented in defineProperties below.
+            this._layer = null;
+
+            // Documented in defineProperties below.
+            this._shapeConfigurationCallback = this.defaultShapeConfigurationCallback;
+
+            this._parserCompletionCallback = this.defaultParserCompletionCallback;
+
+            // Internal use only. Intentionally not documented.
+            this._buffer = null;
+
+            // Internal use only. Intentionally not documented.
+            this.attributeFile = new DBaseFile(url.replace(".shp", ".dbf"));
+
+            // Internal use only. Intentionally not documented.
+            this.projectionFile = new PrjFile(url.replace(".shp", ".prj"));
+
+            this.defaultPlacemarkAttributes = new PlacemarkAttributes(null);
+            this.defaultShapeAttributes = new ShapeAttributes(null);
+        };
+
+        Object.defineProperties(Shapefile.prototype, {
+            /**
+             * The shapefile URL as specified to this shapefile's constructor.
+             * @memberof Shapefile.prototype
+             * @type {String}
+             * @readonly
+             */
+            url: {
+                get: function () {
+                    return this._url;
+                }
+            },
+
+            /**
+             * The shape type of the shapefile. The type can be one of the following:
+             * &lt;ul>
+             *     &lt;li>WorldWind.POINT&lt;/li>
+             *     &lt;li>WorldWind.MULTI_POINT&lt;/li>
+             *     &lt;li>WorldWind.POLYLINE&lt;/li>
+             *     &lt;li>WorldWind.POLYGON&lt;/li>
+             * &lt;/ul>
+             * This value is defined during shapefile loading.
+             * @memberof Shapefile.prototype
+             * @type {String}
+             * @readonly
+             */
+            shapeType: {
+                get: function () {
+                    return this._shapeType;
+                }
+            },
+
+            /**
+             * The layer containing the shapes representing the records in this shapefile, as specified to this
+             * shapefile's constructor or created by the constructor if no layer was specified.
+             * @memberof Shapefile.prototype
+             * @type {RenderableLayer}
+             * @readonly
+             */
+            layer: {
+                get: function () {
+                    return this._layer;
+                }
+            },
+
+            /**
+             * The completion callback specified to [load]{@link Shapefile#load}. This function is called when
+             * shapefile parsing is done but before creating shapes for the shapefile. It's single argument is
+             * this shapefile.
+             * @memberof Shapefile.prototype
+             * @type {Function}
+             * @default [defaultParserCompletionCallback]{@link Shapefile#defaultParserCompletionCallback}
+             * @readonly
+             */
+            parserCompletionCallback: {
+                get: function () {
+                    return this._parserCompletionCallback;
+                }
+            },
+
+            /**
+             * The attribute callback specified to [load]{@link Shapefile#load}.
+             * See that method's description for details.
+             * @memberof Shapefile.prototype
+             * @type {Function}
+             * @default [defaultShapeConfigurationCallback]{@link Shapefile#defaultShapeConfigurationCallback}
+             * @readonly
+             */
+            shapeConfigurationCallback: {
+                get: function () {
+                    return this._shapeConfigurationCallback;
+                }
+            }
+        });
+
+        /**
+         * Retrieves the shapefile, parses it and creates shapes representing its contents. The result is a layer
+         * containing the created shapes. A function can be specified to be called when parsing is complete.
+         * A function can also be specified to be called for each shapefile record so that the attributes and
+         * other properties of the shape created for it can be assigned.
+         *
+         * @param {Function} parserCompletionCallback An optional function called when shapefile loading is complete but
+         * shape creation has not begun. If none is specified,
+         * [defaultParserCompletionCallback]{@link Shapefile#defaultParserCompletionCallback} is called. That function creates
+         * WorldWind shapes for the parsed shapefile records.
+         * The single argument to the callback function is this shapefile object. When the callback function is
+         * called, the layer containing the shapes is available via this shapefile's
+         * [layer]{@link Shapefile#layer} property.
+         *
+         * @param {Function} shapeConfigurationCallback An optional function called by the addRenderablesFor*
+         * methods just prior to creating a shape for the indicated shapefile record. This function
+         * can be used to assign attributes to newly created shapes. The callback function's first argument is an
+         * object containing the properties read from the corresponding shapefile attributes file, if any.
+         * This file, which has a .dbf suffix, is automatically detected, retrieved and parsed if it exists. The second
+         * argument to the callback function is the {@link ShapefileRecord} currently being operated on. The return
+         * value of the callback function must be either an object whose properties define attributes and other
+         * information for the shape, or null, in which case no shape is created for that record. See the following
+         * methods for descriptions of the configuration properties they recognize:
+         * &lt;ul>
+         *     &lt;li>[addRenderablesForPoint]{@link Shapefile#addRenderablesForPoints}&lt;/li>
+         *     &lt;li>[addRenderablesForMultiPoint]{@link Shapefile#addRenderablesForMultiPoints}&lt;/li>
+         *     &lt;li>[addRenderablesForPolylines]{@link Shapefile#addRenderablesForPolylines}&lt;/li>
+         *     &lt;li>[addRenderablesForPolygons]{@link Shapefile#addRenderablesForPolygons}&lt;/li>
+         * &lt;/ul>
+         *
+         * @param {RenderableLayer} layer A {@link RenderableLayer} to hold the shapes created for each shapefile
+         * record. If null, a new layer is created and assigned to this object's [layer]{@link Shapefile#layer}
+         * property.
+         */
+        Shapefile.prototype.load = function (parserCompletionCallback, shapeConfigurationCallback, layer) {
+            if (parserCompletionCallback) {
+                this._parserCompletionCallback = parserCompletionCallback;
+            }
+
+            if (shapeConfigurationCallback) {
+                this._shapeConfigurationCallback = shapeConfigurationCallback;
+            }
+
+            this._layer = layer || new RenderableLayer();
+
+            // Load primary and secondary files in the following order:
+            //      1) Projection file,
+            //      2) Attribute file, and
+            //      3) Shapefile.
+            // This is done because the projection and attribute files modify the interpretation of the shapefile.
+            var projectionFileCallback = (function () {
+                var attributeFileCallback = (function () {
+                    this.requestUrl(this.url);
+                }).bind(this);
+
+                this.attributeFile.load(attributeFileCallback);
+            }).bind(this);
+
+            this.projectionFile.load(projectionFileCallback);
+        };
+
+        /**
+         * The default parser completion callback, called if none was specified to the [load]{@link Shapefile#load} method.
+         * This default callback merely calls [addRenderablesForShapefile]{@link Shapefile#addRenderablesForShapefile}
+         * to create shapes for this shapefile's records.
+         * @param {Shapefile} shapefile This shapefile.
+         */
+        Shapefile.prototype.defaultParserCompletionCallback = function (shapefile) {
+            this.addRenderablesForShapefile(this.layer);
+        };
+
+        /**
+         * The default [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback} for this shapefile.
+         * It is called if none was specified to the [load]{@link Shapefile#load} method.
+         * This method assigns shared, default attributes to the shapes created for each record. Any changes to these
+         * attributes will have an effect in all shapes created by this shapefile.
+         * &lt;p>
+         * For polygon records, the record's attributes are checked for an attribute named "height", "Height",
+         * or "HEIGHT". If found, the returned shape configuration contains a height property holding the
+         * value associated with the record attribute. This causes the default shape creation function,
+         * [addRenderablesForPolygons]{@link Shapefile#addRenderablesForPolygons}, to create a
+         * {@link Polygon} with its extrude property set to true and position altitudes equal to the specified
+         * height value.
+         * &lt;p>
+         * For all records, the record's attributes are checked for an attribute named "name", "Name" or "NAME".
+         * If found, the returned shape configuration contains a name property holding the value associated with
+         * the record attribute. This value is specified as the label displayName property for all shapes created.
+         * For {@link Placemark} shapes it is also specified as the placemark label.
+         * It is specified as the displayName for all other shapes.
+         *
+         * @param {{}} attributes An object containing the attribute-value pairs found in the database file
+         * associated with this shapefile. See [load]{@link Shapefile#load} for more information.
+         * @param {ShapefileRecord} record The current shapefile record.
+         * @returns {{}} An object with properties as described above.
+         */
+        Shapefile.prototype.defaultShapeConfigurationCallback = function (attributes, record) {
+            var configuration = {};
+
+            var name = attributes.values.name || attributes.values.Name || attributes.values.NAME;
+            if (name) {
+                configuration.name = name;
+            }
+
+            if (record.isPointType()) {
+                configuration.attributes = this.defaultPlacemarkAttributes;
+            } else if (record.isMultiPointType()) {
+                configuration.attributes = this.defaultPlacemarkAttributes;
+            } else if (record.isPolylineType()) {
+                configuration.attributes = this.defaultShapeAttributes;
+            } else if (record.isPolygonType()) {
+                configuration.attributes = this.defaultShapeAttributes;
+                var height = attributes.values.height || attributes.values.Height || attributes.values.HEIGHT;
+                if (height) {
+                    configuration.height = height;
+                }
+            }
+
+            return configuration;
+        };
+
+        /**
+         * Iterates over this shapefile's records and creates shapes for them. See the following methods for the
+         * details of the shapes created and their use of the
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback}:
+         * &lt;ul>
+         *     &lt;li>[addRenderablesForPoints]{@link Shapefile#addRenderablesForPoints}&lt;/li>
+         *     &lt;li>[addRenderablesForMultiPoints]{@link Shapefile#addRenderablesForMultiPoints}&lt;/li>
+         *     &lt;li>[addRenderablesForPolylines]{@link Shapefile#addRenderablesForPolylines}&lt;/li>
+         *     &lt;li>[addRenderablesForPolygons]{@link Shapefile#addRenderablesForPolygons}&lt;/li>
+         * &lt;/ul>
+         * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
+         * @throws {ArgumentError} If the specified layer is null or undefined.
+         */
+        Shapefile.prototype.addRenderablesForShapefile = function (layer) {
+            if (!layer) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Shapefile", "addRenderablesForShapefile", "missingLayer"));
+            }
+
+            if (this.isPointType()) {
+                this.addRenderablesForPoints(layer);
+            } else if (this.isMultiPointType()) {
+                this.addRenderablesForMultiPoints(layer);
+            } else if (this.isPolylineType()) {
+                this.addRenderablesForPolylines(layer);
+            } else if (this.isPolygonType()) {
+                this.addRenderablesForPolygons(layer);
+            }
+        };
+
+        /**
+         * Iterates over this shapefile's records and creates {@link Placemark}s for the shapefile's point records.
+         * One placemark is created for each record.
+         * Applications typically do not call this method directly. It is called by
+         * [addRenderablesForShapefile]{@link Shapefile#addRenderablesForShapefile}.
+         * &lt;p>
+         * This method invokes this shapefile's
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback} once for each record.
+         * If that function returns null, the record is skipped. If it returns non-null, the returned value is
+         * assumed to be an object with any or all of the following optional properties:
+         * &lt;ul>
+         *     &lt;li>&lt;i>attributes:&lt;/i> A {@link PlacemarkAttributes} object to assign to the placemark created
+         *     for the record.&lt;/li>
+         *     &lt;li>&lt;i>highlightAttributes:&lt;/i> A {@link PlacemarkAttributes} object to assign to the
+         *     highlight attributes of the placemark
+         *     created for the record.&lt;/li>
+         *     &lt;li>&lt;i>altitudeMode:&lt;/i> The [altitude mode]{@link AbstractShape#altitudeMode} to apply to the
+         *     created placemark. If not specified,
+         *     [WorldWind.RELATIVE_TO_GROUND]{@link WorldWind#RELATIVE_TO_GROUND} is used.&lt;/li>
+         *     &lt;li>&lt;i>name:&lt;/i> A String to assign as the created placemark's label.&lt;/li>
+         *     &lt;li>&lt;i>altitude:&lt;/i> A Number indicating the altitude of the created placemark.
+         *     If not specified, the altitude of all created placemarks is 0.&lt;/li>
+         *     &lt;li>&lt;i>pickDelegate:&lt;/i> An object returned as the userObject when this feature is picked.&lt;/li>
+         *     &lt;li>&lt;i>userProperties:&lt;/i> An ad hoc object assigned to the renderable.&lt;/li>
+         * &lt;/ul>
+         * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
+         * @throws {ArgumentError} If the specified layer is null or undefined.
+         */
+        Shapefile.prototype.addRenderablesForPoints = function (layer) {
+            if (!layer) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Shapefile", "addRenderablesForPoints", "missingLayer"));
+            }
+
+            // Note: for points, there should be only ONE part, and only ONE point per record.
+            for (var record = this.next(); !!record; record = this.next()) {
+                var configuration = this.shapeConfigurationCallback(record.attributes, record),
+                    altitude = (configuration &amp;&amp; configuration.altitude) ? configuration.altitude : 0;
+
+                if (!configuration) {
+                    continue;
+                }
+
+                for (var part = 0, parts = record.numberOfParts; part &lt; parts; part += 1) {
+                    var points = record.pointBuffer(part);
+                    for (var idx = 0, len = points.length; idx &lt; len; idx += 2) {
+                        var longitude = points[idx],
+                            latitude = points[idx + 1],
+                            position = new Position(latitude, longitude, altitude),
+                            placemark = new Placemark(position, false, configuration.attributes);
+
+                        placemark.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                        if (configuration.highlightAttributes) {
+                            placemark.highlightAttributes = configuration.highlightAttributes;
+                        }
+                        if (configuration.name) {
+                            placemark.label = configuration.name;
+                        }
+                        if (configuration.pickDelegate) {
+                            placemark.pickDelegate = configuration.pickDelegate;
+                        }
+                        if (configuration.userProperties) {
+                            placemark.userProperties = configuration.userProperties;
+                        }
+                        layer.addRenderable(placemark);
+                    }
+                }
+            }
+        };
+
+        /**
+         * Iterates over this shapefile's records and creates {@link Placemark}s for each point in the shapefile's
+         * multi-point records.
+         * One placemark is created for each point.
+         * Applications typically do not call this method directly. It is called by
+         * [addRenderablesForShapefile]{@link Shapefile#addRenderablesForShapefile}.
+         * &lt;p>
+         * This method invokes this shapefile's
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback} once for each record.
+         * If that function returns null, the record is skipped. If it returns non-null, the returned value is
+         * assumed to be an object with any or all of the following optional properties:
+         * &lt;ul>
+         *     &lt;li>&lt;i>attributes:&lt;/i> A {@link PlacemarkAttributes} object to assign to the placemarks created
+         *     for the record.&lt;/li>
+         *     &lt;li>&lt;i>highlightAttributes:&lt;/i> A {@link PlacemarkAttributes} object to assign to the
+         *     highlight attributes of the placemarks created for the record.&lt;/li>
+         *     &lt;li>&lt;i>altitudeMode:&lt;/i> The [altitude mode]{@link AbstractShape#altitudeMode} to apply to the
+         *     created placemarks. If not specified,
+         *     [WorldWind.RELATIVE_TO_GROUND]{@link WorldWind#RELATIVE_TO_GROUND} is used.&lt;/li>
+         *     &lt;li>&lt;i>label:&lt;/i> A String to assign as the created placemarks' label.&lt;/li>
+         *     &lt;li>&lt;i>altitude:&lt;/i> A Number indicating the altitude of the created placemarks.
+         *     If not specified, the altitude of all created placemarks is 0.&lt;/li>
+         *     &lt;li>&lt;i>name:&lt;/i> A String to assign as the created placemarks' label.&lt;/li>
+         *     &lt;li>&lt;i>pickDelegate:&lt;/i> An object returned as the userObject when this feature is picked.&lt;/li>
+         *     &lt;li>&lt;i>userProperties:&lt;/i> An ad hoc object assigned to the renderable.&lt;/li>
+         * &lt;/ul>
+         * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
+         * @throws {ArgumentError} If the specified layer is null or undefined.
+         */
+        Shapefile.prototype.addRenderablesForMultiPoints = function (layer) {
+            if (!layer) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Shapefile", "addRenderablesForMultiPoints", "missingLayer"));
+            }
+
+            // Note: for multi-points, there should only be ONE part.
+            for (var record = this.next(); !!record; record = this.next()) {
+                var configuration = this.shapeConfigurationCallback(record.attributes, record),
+                    altitude = (configuration &amp;&amp; configuration.altitude) ? configuration.altitude : 0;
+
+                if (!configuration) {
+                    continue;
+                }
+
+                for (var part = 0, parts = record.numberOfParts; part &lt; parts; part += 1) {
+                    var points = record.pointBuffer(part);
+                    for (var idx = 0, len = points.length; idx &lt; len; idx += 2) {
+                        var longitude = points[idx],
+                            latitude = points[idx + 1],
+                            position = new Position(latitude, longitude, altitude),
+                            placemark = new Placemark(position, false, configuration.attributes);
+
+                        placemark.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                        if (configuration.highlightAttributes) {
+                            placemark.highlightAttributes = configuration.highlightAttributes;
+                        }
+                        if (configuration.name) {
+                            placemark.label = configuration.name;
+                        }
+                        if (configuration.pickDelegate) {
+                            placemark.pickDelegate = configuration.pickDelegate;
+                        }
+                        if (configuration.userProperties) {
+                            placemark.userProperties = configuration.userProperties;
+                        }
+                        layer.addRenderable(placemark);
+                    }
+                }
+            }
+        };
+
+        /**
+         * Iterates over this shapefile's records and creates {@link Path}s or {@link SurfacePolyline}s for the
+         * shapefile's polyline records, depending on the altitude optionally returned by the
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback}.
+         * One shape is created for each record.
+         * Applications typically do not call this method directly. It is called by
+         * [addRenderablesForShapefile]{@link Shapefile#addRenderablesForShapefile}.
+         * &lt;p>
+         * This method invokes this shapefile's
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback} once for each record.
+         * If that function returns null, the record is skipped. If it returns non-null, the returned value is
+         * assumed to be an object with any or all of the following optional properties:
+         * &lt;ul>
+         *     &lt;li>&lt;i>attributes:&lt;/i> A {@link ShapeAttributes} object to assign to the shape created
+         *     for the record.&lt;/li>
+         *     &lt;li>&lt;i>highlightAttributes:&lt;/i> A {@link ShapeAttributes} object to assign to the highlight
+         *     attributes of the shape created for the record.&lt;/li>
+         *     &lt;li>&lt;i>altitudeMode:&lt;/i> The [altitude mode]{@link AbstractShape#altitudeMode} to apply to the
+         *     created shape. If not specified,
+         *     [WorldWind.RELATIVE_TO_GROUND]{@link WorldWind#RELATIVE_TO_GROUND} is used.
+         *     &lt;li>&lt;i>altitude:&lt;/i> A Number indicating the altitude of the created shape.
+         *     If unspecified or 0, a {@link SurfacePolyline} is created for the record, otherwise a
+         *     {@link Path} is created.&lt;/li>
+         *     &lt;li>&lt;i>name:&lt;/i> A String to assign as the created shape's displayName property.&lt;/li>
+         *     &lt;li>&lt;i>pickDelegate:&lt;/i> An object returned as the userObject when this feature is picked.&lt;/li>
+         *     &lt;li>&lt;i>userProperties:&lt;/i> An ad hoc object assigned to the renderable.&lt;/li>
+         * &lt;/ul>
+         * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
+         * @throws {ArgumentError} If the specified layer is null or undefined.
+         */
+        Shapefile.prototype.addRenderablesForPolylines = function (layer) {
+            if (!layer) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Shapefile", "addRenderablesForPolylines", "missingLayer"));
+            }
+
+            for (var record = this.next(); !!record; record = this.next()) {
+                var configuration = this.shapeConfigurationCallback(record.attributes, record),
+                    altitude = (configuration &amp;&amp; configuration.altitude) ? configuration.altitude : 0;
+
+                if (!configuration) {
+                    continue;
+                }
+
+                for (var part = 0, parts = record.numberOfParts; part &lt; parts; part += 1) {
+                    var points = record.pointBuffer(part);
+
+                    var positions = [];
+
+                    for (var idx = 0, len = points.length; idx &lt; len; idx += 2) {
+                        var longitude = points[idx],
+                            latitude = points[idx + 1],
+                            position = !altitude ?
+                                new Location(latitude, longitude) : new Position(latitude, longitude, altitude);
+
+                        positions.push(position);
+                    }
+
+                    var shape;
+                    if (!altitude) {
+                        shape = new SurfacePolyline(positions, configuration.attributes);
+                    } else {
+                        shape = new Path(positions, configuration.attributes);
+                        shape.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                    }
+
+                    if (configuration.highlightAttributes) {
+                        shape.highlightAttributes = configuration.highlightAttributes;
+                    }
+                    if (configuration.name) {
+                        shape.displayName = configuration.name;
+                    }
+                    if (configuration.pickDelegate) {
+                        shape.pickDelegate = configuration.pickDelegate;
+                    }
+                    if (configuration.userProperties) {
+                        shape.userProperties = configuration.userProperties;
+                    }
+                    layer.addRenderable(shape);
+                }
+            }
+        };
+
+        /**
+         * Iterates over this shapefile's records and creates {@link Polygon}s or {@link SurfacePolygon}s for the
+         * shapefile's polygon records, depending on the altitude and height optionally returned by the
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback}.
+         * One shape is created for each record.
+         * Applications typically do not call this method directly. It is called by
+         * [addRenderablesForShapefile]{@link Shapefile#addRenderablesForShapefile}.
+         * &lt;p>
+         * This method invokes this shapefile's
+         * [shapeConfigurationCallback]{@link Shapefile#shapeConfigurationCallback} once for each record.
+         * If that function returns null, the record is skipped. If it returns non-null, the returned value is
+         * assumed to be an object with any or all of the following optional properties:
+         * &lt;ul>
+         *     &lt;li>&lt;i>attributes:&lt;/i> A {@link ShapeAttributes} object to assign to the shape created
+         *     for the record.&lt;/li>
+         *     &lt;li>&lt;i>highlightAttributes:&lt;/i> A {@link ShapeAttributes} object to assign to the highlight
+         *     attributes of the shape created for the record.&lt;/li>
+         *     &lt;li>&lt;i>altitudeMode:&lt;/i> The [altitude mode]{@link AbstractShape#altitudeMode} to apply to the
+         *     created shape. If not specified,
+         *     [WorldWind.RELATIVE_TO_GROUND]{@link WorldWind#RELATIVE_TO_GROUND} is used.
+         *     If the altitude is 0, this property is ignored.&lt;/li>
+         *     &lt;li>&lt;i>altitude:&lt;/i> A Number indicating the altitude of the created shape.
+         *     If unspecified or 0 and the &lt;i>height&lt;/i> property (see next line) is undefined or 0,
+         *     a {@link SurfacePolygon} is created for the record, otherwise a {@link Polygon} is created.&lt;/li>
+         *     &lt;li>&lt;i>height:&lt;/i> A Number indicating polygon height. If defined and non-zero, a
+         *     {@link Polygon} is created for this record with its position altitudes set to the specified height
+         *     relative to ground and its [extrude]{@link Polygon#extrude} property set to true to create an
+         *     extruded polygon. A height specified here overrides an altitude if both are specified.&lt;/li>
+         *     &lt;li>&lt;i>name:&lt;/i> A String to assign as the created shape's displayName property.&lt;/li>
+         *     &lt;li>&lt;i>pickDelegate:&lt;/i> An object returned as the userObject when this feature is picked.&lt;/li>
+         *     &lt;li>&lt;i>userProperties:&lt;/i> An ad hoc object assigned to the renderable.&lt;/li>
+         * &lt;/ul>
+         * @param {RenderableLayer} layer The layer in which to place the newly created shapes.
+         * @throws {ArgumentError} If the specified layer is null or undefined.
+         */
+        Shapefile.prototype.addRenderablesForPolygons = function (layer) {
+            if (!layer) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Shapefile", "addRenderablesForPolygons", "missingLayer"));
+            }
+
+            for (var record = this.next(); !!record; record = this.next()) {
+                var configuration = this.shapeConfigurationCallback(record.attributes, record);
+
+                var boundaries = [],
+                    position,
+                    height = configuration.height,
+                    altitude = configuration.altitude;
+
+                for (var part = 0, parts = record.numberOfParts; part &lt; parts; part += 1) {
+                    var points = record.pointBuffer(part),
+                        positions = [];
+
+                    // The shapefile duplicates the first and last point in each record, but WW shapes do not
+                    // require this. So skip the last point in each record.
+                    for (var idx = 0, len = points.length - 2; idx &lt; len; idx += 2) {
+                        var longitude = points[idx],
+                            latitude = points[idx + 1];
+
+                        if (height) {
+                            position = new Position(latitude, longitude, height);
+                        } else if (altitude) {
+                            position = new Position(latitude, longitude, altitude);
+                        } else {
+                            position = new Location(latitude, longitude);
+                        }
+
+                        positions.push(position);
+                    }
+
+                    boundaries.push(positions);
+                }
+
+                var shape;
+                if (height) {
+                    shape = new Polygon(boundaries, configuration.attributes);
+                    shape.extrude = true;
+                    shape.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                } else if (!altitude) {
+                    shape = new SurfacePolygon(boundaries, configuration.attributes);
+                } else {
+                    shape = new Polygon(boundaries, configuration.attributes);
+                    shape.altitudeMode = configuration.altitudeMode || WorldWind.RELATIVE_TO_GROUND;
+                }
+
+                if (configuration.highlightAttributes) {
+                    shape.highlightAttributes = configuration.highlightAttributes;
+                }
+                if (configuration.name) {
+                    shape.displayName = configuration.name;
+                }
+                if (configuration.pickDelegate) {
+                    shape.pickDelegate = configuration.pickDelegate;
+                }
+                if (configuration.userProperties) {
+                    shape.userProperties = configuration.userProperties;
+                }
+                layer.addRenderable(shape);
+            }
+        };
+
+        /**
+         * Returns the next {@link ShapefileRecord} in the shapefile, or null if no more records exist. This method
+         * can be used to iterate through the shapefile records. Only one such iteration is possible.
+         *
+         * @returns {ShapefileRecord} The next shapefile record in the shapefile, or null if no more records exist.
+         */
+        Shapefile.prototype.next = function () {
+            while (this._buffer.position &lt; this._buffer.limit()) {
+                var record = this.readRecord(this._buffer);
+                if (!(record instanceof ShapefileRecordNull)) {
+                    return record;
+                }
+            }
+
+            // If you get hear, the shapefile is out of records.
+            return null;
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.requestUrl = function (url) {
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("GET", url, true);
+            xhr.responseType = 'arraybuffer';
+            xhr.onreadystatechange = (function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        this._buffer = new ByteBuffer(xhr.response);
+
+                        this.parse();
+                    }
+                    else {
+                        Logger.log(Logger.LEVEL_WARNING,
+                            "Shapefile retrieval failed (" + xhr.statusText + "): " + url);
+                    }
+
+                    if (!!this._parserCompletionCallback) {
+                        this._parserCompletionCallback(this);
+                    }
+                }
+            }).bind(this);
+
+            xhr.onerror = function () {
+                Logger.log(Logger.LEVEL_WARNING, "Shapefile retrieval failed: " + url);
+
+                if (!!this._parserCompletionCallback) {
+                    this._parserCompletionCallback(this);
+                }
+            };
+
+            xhr.ontimeout = function () {
+                Logger.log(Logger.LEVEL_WARNING, "Shapefile retrieval timed out: " + url);
+
+                if (!!this._parserCompletionCallback) {
+                    this._parserCompletionCallback(this);
+                }
+            };
+
+            xhr.send(null);
+        };
+
+        // Internal use only. Intentionally not documented.
+        Shapefile.prototype.parse = function () {
+            try {
+                var header = this.readHeader(this._buffer);
+                this._shapeType = header.shapeType;
+            }
+            catch (e) {
+                console.log(e);
+            }
+            finally {
+            }
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.readHeader = function (buffer) {
+            buffer.order(ByteBuffer.BIG_ENDIAN);
+            var fileCode = buffer.getInt32();
+            if (fileCode != Shapefile.FILE_CODE) {
+                // Let the caller catch and log the message.
+                throw new Error(Logger.log(Logger.LEVEL_SEVERE, "Shapefile header is invalid"));
+            }
+
+            // Skip 5 unused ints.
+            buffer.skipInt32s(5);
+
+            // File length.
+            var lengthInWords = buffer.getInt32();
+
+            // Switch to little endian for the remaining part.
+            buffer.order(ByteBuffer.LITTLE_ENDIAN);
+
+            // Read remaining header data.
+            var version = buffer.getInt32();
+            var type = buffer.getInt32();
+
+            var rect = this.readBoundingRectangle(buffer);
+
+            // Check whether the shape type is supported.
+            var shapeType = this.getShapeType(type);
+            if (shapeType == null) {
+                // Let the caller catch and log the message.
+                // TODO: ??? figure out the correct type of error to throw
+                throw new Error(Logger.log(Logger.LEVEL_SEVERE, "Shapefile type is unsupported: " + type.toString()));
+            }
+
+            // Assemble header
+            var header = {
+                'fileLength': lengthInWords * 2, // One word = 2 bytes.
+                'version': version,
+                'shapeType': shapeType,
+                'boundingRectangle': rect.coords,
+                'normalizePoints': rect.isNormalized
+            };
+
+            // Skip over bounds for measures and Z.
+            buffer.skipDoubles(4);
+
+            return header;
+        };
+
+        //**************************************************************//
+        //********************  Bounding Rectangle  ********************//
+        //**************************************************************//
+
+        /*
+         * Stores a bounding rectangle's coordinates, and if the coordinates are normalized. If isNormalized is
+         * true, this indicates that the original coordinate values are out of range and required
+         * normalization. The shapefile and shapefile records use this to determine which records must have their point
+         * coordinates normalized. Normalization is rarely needed, and this enables the shapefile to normalize only point
+         * coordinates associated with records that require it.
+         *
+         * The Javascript implementation inherits from the following Java implementation:
+         * protected static class BoundingRectangle
+         * {
+         *    // Four-element array of the bounding rectangle's coordinates, ordered as follows: (minY, maxY, minX, maxX).
+         *    public double[] coords;
+         *    // True if the coordinates are normalized, and false otherwise.
+         *    public boolean isNormalized;
+         * }
+         *
+         *  In Javascript, this is represented as the object {'coords': coords, 'isNormalized': isNormalized}
+         */
+
+        // Intentionally not documented.
+        Shapefile.prototype.readBoundingRectangle = function (buffer) {
+            if (!this.projectionFile) {
+                return this.readUnspecifiedBoundingRectangle(buffer);
+            }
+            else if (this.projectionFile.isGeographicCoordinateSystem()) {
+                return this.readGeographicBoundingRectangle(buffer);
+            }
+            else if (this.projectionFile.isProjectedCoordinateSystem()) {
+                return this.readProjectedBoundingRectangle(buffer);
+            }
+            else {
+                return this.readUnspecifiedBoundingRectangle(buffer);
+            }
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.readUnspecifiedBoundingRectangle = function (buffer) {
+            // Read the bounding rectangle coordinates in the following order: minY, maxY, minX, maxX.
+            var coords = this.readBoundingRectangleCoordinates(buffer);
+            return {'coords': coords, 'isNormalized': false};
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.readGeographicBoundingRectangle = function (buffer) {
+            // Read the bounding rectangle coordinates in the following order: minLat, maxLat, minLon, maxLon.
+            var coords = this.readBoundingRectangleCoordinates(buffer),
+                isNormalized = false,
+                normalizedLat = 0;
+
+            // The bounding rectangle's min latitude exceeds -90. Set the min latitude to -90. Correct the max latitude if
+            // the normalized min latitude is greater than the max latitude.
+            if (coords[0] &lt; -90) {
+                normalizedLat = Angle.normalizedDegreesLatitude(coords[0]);
+
+                coords[0] = 90;
+                isNormalized = true;
+
+                if (coords[1] &lt; normalizedLat) {
+                    coords[1] = normalizedLat;
+                }
+            }
+
+            // The bounding rectangle's max latitude exceeds +90. Set the max latitude to +90. Correct the min latitude if
+            // the normalized max latitude is less than the min latitude.
+            if (coords[1] > 90) {
+                normalizedLat = Angle.normalizedDegreesLatitude(coords[1]);
+
+                coords[1] = 90;
+                isNormalized = true;
+
+                if (coords[0] > normalizedLat)
+                    coords[0] = normalizedLat;
+            }
+
+            // The bounding rectangle's longitudes exceed +-180, therefore the rectangle spans the international
+            // dateline. Set the longitude bound to (-180, 180) to contain the dateline spanning rectangle.
+            if (coords[2] &lt; -180 || coords[3] > 180) {
+                coords[2] = -180;
+                coords[3] = 180;
+                isNormalized = true;
+            }
+
+            return {'coords': coords, 'isNormalized': isNormalized};
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.readProjectedBoundingRectangle = function (buffer) {
+            throw new NotYetImplementedError(
+                Logger.log(Logger.LEVEL_SEVERE, "Shapefile.readProjectedBoundingRectangle() not yet implemented"));
+
+            // TODO: complete the implementation; the Java implementation is summarized below.
+            //Object o = this.getValue(AVKey.PROJECTION_NAME);
+            //
+            //if (AVKey.PROJECTION_UTM.equals(o)) {
+            //    // Read the bounding rectangle coordinates in the following order: minEast, minNorth, maxEast, maxNorth.
+            //    var coords = ShapefileUtils.readDoubleArray(buffer, 4);
+            //    // Convert the UTM bounding rectangle to a geographic bounding rectangle. The zone and hemisphere parameters
+            //    // have already been validated in validateBounds.
+            //    var zone = (Integer) this.getValue(AVKey.PROJECTION_ZONE);
+            //    var hemisphere = (String) this.getValue(AVKey.PROJECTION_HEMISPHERE);
+            //    Sector sector = Sector.fromUTMRectangle(zone, hemisphere, coords[0], coords[2], coords[1], coords[3]);
+            //    // Return an array with bounding rectangle coordinates in the following order: minLon, maxLon, minLat, maxLat.
+            //    BoundingRectangle rect = new BoundingRectangle();
+            //    rect.coords = sector.toArrayDegrees();
+            //    return rect;
+            //}
+            //else {
+            //    // The Shapefile's coordinate system projection is unsupported. This should never happen because the
+            //    // projection is validated during initialization, but we check anyway. Let the caller catch and log the
+            //    // message.
+            //    throw new Error(Logger.log(Logger.LEVEL_SEVERE, "Shapefile has an unsupported projection"));
+            //}
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.readBoundingRectangleCoordinates = function (buffer) {
+            // Read the bounding rectangle coordinates in the following order: minX, minY, maxX, maxY.
+            var minx = buffer.getDouble(),
+                miny = buffer.getDouble(),
+                maxx = buffer.getDouble(),
+                maxy = buffer.getDouble();
+
+            // Return an array with bounding rectangle coordinates in the following order: minY, maxY, minX, maxX.
+            return [miny, maxy, minx, maxx];
+        };
+
+        //**************************************************************//
+        //********************  Shape Records  *************************//
+        //**************************************************************//
+
+        // Intentionally not documented.
+        Shapefile.prototype.readRecord = function (buffer) {
+            // The buffer current position is assumed to be set at the start of the record and will be set to the
+            // start of the next record after this method has completed.
+            var record = this.createRecord(buffer);
+
+            if (record != null) {
+                // Read the record's attribute data.
+                if (this.attributeFile != null &amp;&amp; this.attributeFile.hasNext()) {
+                    var attributes = this.attributeFile.nextRecord();
+                    record.setAttributes(attributes);
+                }
+            }
+
+            return record;
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.createRecord = function (buffer) {
+            // Select proper record class
+            if (this.isNullType()) {
+                return this.createNull(buffer);
+            }
+            else if (this.isPointType()) {
+                return this.createPoint(buffer);
+            }
+            else if (this.isMultiPointType()) {
+                return this.createMultiPoint(buffer);
+            }
+            else if (this.isPolygonType()) {
+                return this.createPolygon(buffer);
+            }
+            else if (this.isPolylineType()) {
+                return this.createPolyline(buffer);
+            }
+
+            return null;
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.createNull = function (buffer) {
+            return new ShapefileRecordNull(this, buffer);
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.createPoint = function (buffer) {
+            return new ShapefileRecordPoint(this, buffer);
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.createMultiPoint = function (buffer) {
+            return new ShapefileRecordMultiPoint(this, buffer);
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.createPolyline = function (buffer) {
+            return new ShapefileRecordPolyline(this, buffer);
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.createPolygon = function (buffer) {
+            return new ShapefileRecordPolygon(this, buffer);
+        };
+
+        // Intentionally not documented.
+        Shapefile.prototype.getShapeType = function (shapeType) {
+            // Cases commented out indicate shape types not implemented
+            switch (shapeType) {
+                case 0:
+                    return Shapefile.NULL;
+                case 1:
+                    return Shapefile.POINT;
+                case 3:
+                    return Shapefile.POLYLINE;
+                case 5:
+                    return Shapefile.POLYGON;
+                case 8:
+                    return Shapefile.MULTI_POINT;
+
+                case 11:
+                    return Shapefile.POINT_Z;
+                case 13:
+                    return Shapefile.POLYLINE_Z;
+                case 15:
+                    return Shapefile.POLYGON_Z;
+                case 18:
+                    return Shapefile.MULTI_POINT_Z;
+
+                case 21:
+                    return Shapefile.POINT_M;
+                case 23:
+                    return Shapefile.POLYLINE_M;
+                case 25:
+                    return Shapefile.POLYGON_M;
+                case 28:
+                    return Shapefile.MULTI_POINT_M;
+
+//            case 31:
+//                return Shapefile.SHAPE_MULTI_PATCH;
+
+                default:
+                    return null; // unsupported shape type
+            }
+        };
+
+        //**************************************************************//
+        //********************  Utilities  *****************************//
+        //**************************************************************//
+
+        /**
+         * Indicates whether this shapefile contains optional measure values.
+         *
+         * @return {Boolean} True if this shapefile is one that contains measure values.
+         */
+        Shapefile.prototype.isMeasureType = function () {
+            return Shapefile.measureTypes.hasOwnProperty(this._shapeType);
+        };
+
+        /**
+         * Indicates whether this shapefile contains Z values.
+         *
+         * @return {Boolean} True if this shapefile contains Z values.
+         */
+        Shapefile.prototype.isZType = function () {
+            return Shapefile.zTypes.hasOwnProperty(this._shapeType);
+        };
+
+        /**
+         * Indicates whether this shapefile is [Shapefile.NULL]{@link Shapefile#NULL}.
+         *
+         * @return {Boolean} True if this shapefile is a null type.
+         */
+        Shapefile.prototype.isNullType = function () {
+            return this._shapeType === Shapefile.NULL;
+        };
+
+        /**
+         * Indicates whether this shapefile is either
+         * [Shapefile.POINT]{@link Shapefile#POINT},
+         * [Shapefile.POINT_M]{@link Shapefile#POINT_M}
+         * or [Shapefile.POINT_Z]{@link Shapefile#POINT_Z}.
+         *
+         * @return {Boolean} True if the shapefile is a point type.
+         */
+        Shapefile.prototype.isPointType = function () {
+            return Shapefile.pointTypes.hasOwnProperty(this._shapeType);
+        };
+
+        /**
+         * Indicates whether this shapefile is either
+         * [Shapefile.MULTI_POINT]{@link Shapefile#MULTI_POINT},
+         * [Shapefile.MULTI_POINT_M]{@link Shapefile#MULTI_POINT_M}
+         * or [Shapefile.MULTI_POINT_Z]{@link Shapefile#MULTI_POINT_Z}.
+         *
+         * @return {Boolean} True if this shapefile is a multi-point type.
+         */
+        Shapefile.prototype.isMultiPointType = function () {
+            return Shapefile.multiPointTypes.hasOwnProperty(this._shapeType);
+        };
+
+        /**
+         * Indicates whether this shapefile is either
+         * [Shapefile.POLYLINE]{@link Shapefile#POLYLINE},
+         * [Shapefile.POLYLINE_M]{@link Shapefile#POLYLINE_M}
+         * or [Shapefile.POLYLINE_Z]{@link Shapefile#POLYLINE_Z}.
+         *
+         * @return {Boolean} True if this shapefile is a polyline type.
+         */
+        Shapefile.prototype.isPolylineType = function () {
+            return Shapefile.polylineTypes.hasOwnProperty(this._shapeType);
+        };
+
+        /**
+         * Indicates whether this shapefile is either
+         * [Shapefile.POLYGON]{@link Shapefile#POLYGON},
+         * [Shapefile.POLYGON_M]{@link Shapefile#POLYGON_M}
+         * or [Shapefile.POLYGON_Z]{@link Shapefile#POLYGON_Z}.
+         *
+         * @return {Boolean} True if this shapefile is a polygon type.
+         */
+        Shapefile.prototype.isPolygonType = function () {
+            return Shapefile.polygonTypes.hasOwnProperty(this._shapeType);
+        };
+
+        Shapefile.NULL = "null";
+        Shapefile.POINT = "point";
+        Shapefile.MULTI_POINT = "multiPoint";
+        Shapefile.POLYLINE = "polyline";
+        Shapefile.POLYGON = "polygon";
+
+        Shapefile.POINT_M = Shapefile.POINT + "M";
+        Shapefile.MULTI_POINT_M = Shapefile.MULTI_POINT + "M";
+        Shapefile.POLYLINE_M = Shapefile.POLYLINE + "M";
+        Shapefile.POLYGON_M = Shapefile.POLYGON + "M";
+
+        Shapefile.POINT_Z = Shapefile.POINT + "Z";
+        Shapefile.MULTI_POINT_Z = Shapefile.MULTI_POINT + "Z";
+        Shapefile.POLYLINE_Z = Shapefile.POLYLINE + "Z";
+        Shapefile.POLYGON_Z = Shapefile.POLYGON + "Z";
+
+        Shapefile.SHAPE_MULTI_PATCH = "multiPatch";
+
+        // Internal use only. Intentionally not documented.
+        Shapefile.measureTypes = {
+            pointM: Shapefile.POINT_M,
+            pointZ: Shapefile.POINT_Z,
+            multiPointM: Shapefile.MULTI_POINT_M,
+            multiPointZ: Shapefile.MULTI_POINT_Z,
+            polylineM: Shapefile.POLYLINE_M,
+            polylineZ: Shapefile.POLYLINE_Z,
+            polygonM: Shapefile.POLYGON_M,
+            polygonZ: Shapefile.POLYGON_Z
+        };
+
+        // Internal use only. Intentionally not documented.
+        Shapefile.zTypes = {
+            pointZ: Shapefile.POINT_Z,
+            multiPointZ: Shapefile.MULTI_POINT_Z,
+            polylineZ: Shapefile.POLYLINE_Z,
+            polygonZ: Shapefile.POLYGON_Z
+        };
+
+        // Internal use only. Intentionally not documented.
+        Shapefile.pointTypes = {
+            point: Shapefile.POINT,
+            pointZ: Shapefile.POINT_Z,
+            pointM: Shapefile.POINT_M
+        };
+
+        // Internal use only. Intentionally not documented.
+        Shapefile.multiPointTypes = {
+            multiPoint: Shapefile.MULTI_POINT,
+            multiPointZ: Shapefile.MULTI_POINT_Z,
+            multiPointM: Shapefile.MULTI_POINT_M
+        };
+
+        // Internal use only. Intentionally not documented.
+        Shapefile.polylineTypes = {
+            polyline: Shapefile.POLYLINE,
+            polylineZ: Shapefile.POLYLINE_Z,
+            polylineM: Shapefile.POLYLINE_M
+        };
+
+        // Internal use only. Intentionally not documented.
+        Shapefile.polygonTypes = {
+            polygon: Shapefile.POLYGON,
+            polygonZ: Shapefile.POLYGON_Z,
+            polygonM: Shapefile.POLYGON_M
+        };
+
+        // Intentionally not documented.
+        Shapefile.FILE_CODE = 0x0000270A;
+
+        return Shapefile;
+    }
+);</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:29:59 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Source: shapes/Text.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: shapes/Text.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @exports Text
+ */
+define([
+        '../error/ArgumentError',
+        '../shaders/BasicTextureProgram',
+        '../util/Color',
+        '../util/Font',
+        '../util/Logger',
+        '../geom/Matrix',
+        '../pick/PickedObject',
+        '../render/Renderable',
+        '../shapes/TextAttributes',
+        '../error/UnsupportedOperationError',
+        '../geom/Vec2',
+        '../geom/Vec3',
+        '../util/WWMath'
+    ],
+    function (ArgumentError,
+              BasicTextureProgram,
+              Color,
+              Font,
+              Logger,
+              Matrix,
+              PickedObject,
+              Renderable,
+              TextAttributes,
+              UnsupportedOperationError,
+              Vec2,
+              Vec3,
+              WWMath) {
+        "use strict";
+
+        /**
+         * Constructs a text shape. This constructor is intended to be called only by subclasses.
+         * @alias Text
+         * @constructor
+         * @augments Renderable
+         * @classdesc Represents a string of text displayed at a specified geographic or screen position.
+         * This is an abstract class meant to be subclassed and not meant to be instantiated directly.
+         * See {@link GeographicText} and {@link ScreenText} for concrete classes.
+         *
+         * @param {String} text The text to display.
+         * @throws {ArgumentError} If the specified text is null or undefined.
+         */
+        var Text = function (text) {
+            if (!text) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Text", "constructor", "missingText"));
+            }
+
+            Renderable.call(this);
+
+            /**
+             * The text's attributes. If null and this text is not highlighted, this text is not drawn.
+             * @type {TextAttributes}
+             * @default see [TextAttributes]{@link TextAttributes}
+             */
+            this.attributes = new TextAttributes(null);
+
+            /**
+             * The attributes used when this text's highlighted flag is true. If null and the
+             * highlighted flag is true, this text's normal attributes are used. If they, too, are null, this
+             * text is not drawn.
+             * @type {TextAttributes}
+             * @default null
+             */
+            this.highlightAttributes = null;
+
+            /**
+             * Indicates whether this text uses its highlight attributes rather than its normal attributes.
+             * @type {boolean}
+             * @default false
+             */
+            this.highlighted = false;
+
+            /**
+             * Indicates whether this text is drawn.
+             * @type {boolean}
+             * @default true
+             */
+            this.enabled = true;
+
+            /**
+             * This shape's text. If null or empty, no text is drawn.
+             * @type {String}
+             * @default null
+             */
+            this.text = text;
+
+            /**
+             * This text's altitude mode. May be one of
+             * &lt;ul>
+             *  &lt;li>[WorldWind.ABSOLUTE]{@link WorldWind#ABSOLUTE}&lt;/li>
+             *  &lt;li>[WorldWind.RELATIVE_TO_GROUND]{@link WorldWind#RELATIVE_TO_GROUND}&lt;/li>
+             *  &lt;li>[WorldWind.CLAMP_TO_GROUND]{@link WorldWind#CLAMP_TO_GROUND}&lt;/li>
+             * &lt;/ul>
+             * @default WorldWind.ABSOLUTE
+             */
+            this.altitudeMode = WorldWind.ABSOLUTE;
+
+            /**
+             * Indicates the object to return as the userObject of this text when picked. If null,
+             * then this text object is returned as the userObject.
+             * @type {Object}
+             * @default null
+             * @see  [PickedObject.userObject]{@link PickedObject#userObject}
+             */
+            this.pickDelegate = null;
+
+            /**
+             * Indicates whether this text has visual priority over other shapes in the scene.
+             * @type {Boolean}
+             * @default false
+             */
+            this.alwaysOnTop = false;
+
+            /**
+             * This shape's target visibility, a value between 0 and 1. During ordered rendering this shape modifies its
+             * [current visibility]{@link Text#currentVisibility} towards its target visibility at the rate
+             * specified by the draw context's [fadeVelocity]{@link DrawContext#fadeVelocity} property. The target
+             * visibility and current visibility are used to control the fading in and out of this shape.
+             * @type {Number}
+             * @default 1
+             */
+            this.targetVisibility = 1;
+
+            /**
+             * This shape's current visibility, a value between 0 and 1. This property scales the shape's effective
+             * opacity. It is incremented or decremented each frame according to the draw context's
+             * [fade velocity]{@link DrawContext#fadeVelocity} property in order to achieve this shape's current
+             * [target visibility]{@link Text#targetVisibility}. This current visibility and target visibility are
+             * used to control the fading in and out of this shape.
+             * @type {Number}
+             * @default 1
+             * @readonly
+             */
+            this.currentVisibility = 1;
+
+            /**
+             * Indicates the group ID of the declutter group to include this Text shape. If non-zer0, this shape
+             * is decluttered relative to all other shapes within its group.
+             * @type {Number}
+             * @default 0
+             */
+            this.declutterGroup = 0;
+
+            /**
+             * The image to display when this text shape is eliminated from the scene due to decluttering.
+             * @type {String}
+             * @default A round dot drawn in this shape's text color.
+             */
+            this.markerImageSource = WorldWind.configuration.baseUrl + "images/white-dot.png";
+
+            /**
+             * The scale to apply to the [markerImageSource]{@link Text#markerImageSource}.
+             * @type {Number}
+             * @default 0.1
+             */
+            this.markerImageScale = 0.1;
+
+            // Internal use only. Intentionally not documented.
+            this.activeAttributes = null;
+
+            // Internal use only. Intentionally not documented.
+            this.activeTexture = null;
+
+            // Internal use only. Intentionally not documented.
+            this.imageTransform = Matrix.fromIdentity();
+
+            // Internal use only. Intentionally not documented.
+            this.imageBounds = null;
+
+            // Internal use only. Intentionally not documented.
+            this.layer = null;
+
+            // Internal use only. Intentionally not documented.
+            this.depthOffset = -0.003;
+
+            // Internal use only. Intentionally not documented.
+            this.screenPoint = new Vec3(0, 0, 0);
+        };
+
+        // Internal use only. Intentionally not documented.
+        Text.matrix = Matrix.fromIdentity(); // scratch variable
+        Text.glPickPoint = new Vec3(0, 0, 0); // scratch variable
+
+        Text.prototype = Object.create(Renderable.prototype);
+
+        /**
+         * Copies the contents of a specified text object to this text object.
+         * @param {Text} that The text object to copy.
+         */
+        Text.prototype.copy = function (that) {
+            this.text = that.text;
+            this.attributes = that.attributes;
+            this.highlightAttributes = that.highlightAttributes;
+            this.highlighted = that.highlighted;
+            this.enabled = that.enabled;
+            this.altitudeMode = that.altitudeMode;
+            this.pickDelegate = that.pickDelegate;
+            this.alwaysOnTop = that.alwaysOnTop;
+            this.depthOffset = that.depthOffset;
+            this.declutterGroup = that.declutterGroup;
+            this.targetVisibility = that.targetVisibility;
+            this.currentVisibility = that.currentVisibility;
+
+            return this;
+        };
+
+        Object.defineProperties(Text.prototype, {
+            /**
+             * Indicates the screen coordinate bounds of this shape during ordered rendering.
+             * @type {Rectangle}
+             * @readonly
+             * @memberof Text.prototype
+             */
+            screenBounds: {
+                get: function () {
+                    return this.imageBounds;
+                }
+            }
+        });
+
+        /**
+         * Renders this text. This method is typically not called by applications but is called by
+         * [RenderableLayer]{@link RenderableLayer} during rendering. For this shape this method creates and
+         * enques an ordered renderable with the draw context and does not actually draw the text.
+         * @param {DrawContext} dc The current draw context.
+         */
+        Text.prototype.render = function (dc) {
+            if (!this.enabled || (!this.text) || this.text.length === 0) {
+                return;
+            }
+
+            if (!dc.accumulateOrderedRenderables) {
+                return;
+            }
+
+            // Create an ordered renderable for this text. If one has already been created this frame then we're
+            // in 2D-continuous mode and another needs to be created for one of the alternate globe offsets.
+            var orderedText;
+            if (this.lastFrameTime !== dc.timestamp) {
+                orderedText = this.makeOrderedRenderable(dc);
+            } else {
+                var textCopy = this.clone();
+                orderedText = textCopy.makeOrderedRenderable(dc);
+            }
+
+            if (!orderedText) {
+                return;
+            }
+
+            if (!orderedText.isVisible(dc)) {
+                return;
+            }
+
+            orderedText.layer = dc.currentLayer;
+
+            this.lastFrameTime = dc.timestamp;
+            dc.addOrderedRenderable(orderedText);
+        };
+
+        /**
+         * Draws this shape as an ordered renderable. Applications do not call this function. It is called by
+         * {@link WorldWindow} during rendering. Implements the {@link OrderedRenderable} interface.
+         * @param {DrawContext} dc The current draw context.
+         */
+        Text.prototype.renderOrdered = function (dc) {
+            // Optimize away the case of achieved target visibility of 0 and no marker image to display in that case.
+            if (this.currentVisibility === 0 &amp;&amp; this.targetVisibility === 0 &amp;&amp; !this.markerImageSource) {
+                return;
+            }
+
+            this.drawOrderedText(dc);
+
+            if (dc.pickingMode) {
+                var po = new PickedObject(this.pickColor.clone(), this.pickDelegate ? this.pickDelegate : this,
+                    this.position, this.layer, false);
+
+                dc.resolvePick(po);
+            }
+        };
+
+        // Intentionally not documented.
+        Text.prototype.makeOrderedRenderable = function (dc) {
+            var w, h, s,
+                offset;
+
+            this.determineActiveAttributes(dc);
+            if (!this.activeAttributes) {
+                return null;
+            }
+
+            //// Compute the text's screen point and distance to the eye point.
+            if (!this.computeScreenPointAndEyeDistance(dc)) {
+                return null;
+            }
+
+            this.activeTexture = dc.createTextTexture(this.text, this.activeAttributes);
+
+            w = this.activeTexture.imageWidth;
+            h = this.activeTexture.imageHeight;
+            s = this.activeAttributes.scale;
+            offset = this.activeAttributes.offset.offsetForSize(w, h);
+
+            this.imageTransform.setTranslation(
+                this.screenPoint[0] - offset[0] * s,
+                this.screenPoint[1] - offset[1] * s,
+                this.screenPoint[2]);
+
+            this.imageTransform.setScale(w * s, h * s, 1);
+
+            this.imageBounds = WWMath.boundingRectForUnitQuad(this.imageTransform);
+
+            return this;
+        };
+
+        /**
+         * Computes this shape's screen point and eye distance. Subclasses must override this method.
+         * @param {DrawContext} dc The current draw context.
+         * @returns {Boolean} true if the screen point can be computed, otherwise false.
+         * @protected
+         */
+        Text.prototype.computeScreenPointAndEyeDistance = function (dc) {
+            throw new UnsupportedOperationError(
+                Logger.logMessage(Logger.LEVEL_SEVERE, "Renderable", "render", "abstractInvocation"));
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.determineActiveAttributes = function (dc) {
+            if (this.highlighted &amp;&amp; this.highlightAttributes) {
+                this.activeAttributes = this.highlightAttributes;
+            } else {
+                this.activeAttributes = this.attributes;
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.isVisible = function (dc) {
+            if (dc.pickingMode) {
+                return dc.pickRectangle &amp;&amp; this.imageBounds.intersects(dc.pickRectangle);
+            } else {
+                return this.imageBounds.intersects(dc.viewport);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.drawOrderedText = function (dc) {
+            this.beginDrawing(dc);
+
+            try {
+                this.doDrawOrderedText(dc);
+                if (!dc.pickingMode) {
+                    //this.drawBatchOrderedText(dc);
+                }
+            } finally {
+                this.endDrawing(dc);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.drawBatchOrderedText = function (dc) {
+            // Draw any subsequent text in the ordered renderable queue, removing each from the queue as it's
+            // processed. This avoids the overhead of setting up and tearing down OpenGL state for each text shape.
+
+            var or;
+
+            while ((or = dc.peekOrderedRenderable()) &amp;&amp; or instanceof Text) {
+                dc.popOrderedRenderable(); // remove it from the queue
+
+                try {
+                    or.doDrawOrderedText(dc)
+                } catch (e) {
+                    Logger.logMessage(Logger.LEVEL_WARNING, 'Text', 'drawBatchOrderedText',
+                        "Error occurred while rendering text using batching: " + e.message);
+                }
+                // Keep going. Render the rest of the ordered renderables.
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.beginDrawing = function (dc) {
+            var gl = dc.currentGlContext,
+                program;
+
+            dc.findAndBindProgram(BasicTextureProgram);
+
+            // Configure GL to use the draw context's unit quad VBOs for both model coordinates and texture coordinates.
+            // Most browsers can share the same buffer for vertex and texture coordinates, but Internet Explorer requires
+            // that they be in separate buffers, so the code below uses the 3D buffer for vertex coords and the 2D
+            // buffer for texture coords.
+            program = dc.currentProgram;
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer3());
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer());
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(program.vertexPointLocation);
+            gl.enableVertexAttribArray(program.vertexTexCoordLocation);
+
+            // Tell the program which texture unit to use.
+            program.loadTextureUnit(gl, gl.TEXTURE0);
+
+            // Turn off color modulation since we want to pick against the text box and not just the text.
+            program.loadModulateColor(gl, false);
+
+            // Suppress depth-buffer writes.
+            gl.depthMask(false);
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.endDrawing = function (dc) {
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram;
+
+            // Restore the default GL vertex attribute state.
+            gl.disableVertexAttribArray(program.vertexPointLocation);
+            gl.disableVertexAttribArray(program.vertexTexCoordLocation);
+
+            // Restore the default GL buffer and texture bindings.
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindTexture(gl.TEXTURE_2D, null);
+
+            // Restore the default GL depth mask state.
+            gl.depthMask(true);
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.doDrawOrderedText = function (dc) {
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram;
+
+            // Compute the text's current visibility, potentially requesting additional frames.
+            if (!dc.pickingMode &amp;&amp; this.currentVisibility !== this.targetVisibility) {
+                var visibilityDelta = (dc.timestamp - dc.previousRedrawTimestamp) / dc.fadeTime;
+                if (this.currentVisibility &lt; this.targetVisibility) {
+                    this.currentVisibility = Math.min(1, this.currentVisibility + visibilityDelta);
+                } else {
+                    this.currentVisibility = Math.max(0, this.currentVisibility - visibilityDelta);
+                }
+                dc.redrawRequested = true;
+            }
+
+            // Turn off depth testing for the text unless it's been requested.
+            if (!this.activeAttributes.depthTest) {
+                gl.disable(gl.DEPTH_TEST);
+            }
+
+            // Use the text color and opacity. Modulation is done to white to avoid the program's shader from
+            // modifying the text color. When picking, use the pick color, 100% opacity and no texture.
+            if (!dc.pickingMode) {
+                program.loadColor(gl, Color.WHITE);
+                program.loadOpacity(gl, this.layer.opacity * this.currentVisibility);
+            } else {
+                this.pickColor = dc.uniquePickColor();
+                program.loadColor(gl, this.pickColor);
+                program.loadOpacity(gl, 1);
+                program.loadTextureEnabled(gl, false);
+            }
+
+            // When the text is visible, draw the text label.
+            if (this.currentVisibility > 0) {
+                this.drawLabel(dc);
+            }
+
+            // When the text is not visible, draw a marker to indicate that something is there.
+            if (this.currentVisibility &lt; 1 &amp;&amp; this.markerImageSource) {
+                this.drawMarker(dc);
+            }
+
+            // Restore the default GL depth test state.
+            if (!this.activeAttributes.depthTest) {
+                gl.enable(gl.DEPTH_TEST);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.drawLabel = function (dc) {
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram,
+                textureBound;
+
+            // Use the label texture when not picking.
+            if (!dc.pickingMode &amp;&amp; this.activeTexture) {
+                Text.matrix.setToIdentity();
+                Text.matrix.multiplyByTextureTransform(this.activeTexture);
+                textureBound = this.activeTexture.bind(dc); // returns false if texture is null or cannot be bound
+                program.loadTextureEnabled(gl, textureBound);
+                program.loadTextureMatrix(gl, Text.matrix);
+            }
+
+            // Compute and specify the text label's modelview-projection matrix.
+            Text.matrix.copy(dc.screenProjection);
+            Text.matrix.multiplyMatrix(this.imageTransform);
+            program.loadModelviewProjection(gl, Text.matrix);
+
+            // Draw the text as a two-triangle square.
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.drawMarker = function (dc) {
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram,
+                textureBound;
+
+            var markerTexture = dc.gpuResourceCache.resourceForKey(this.markerImageSource);
+            if (!markerTexture) {
+                dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.markerImageSource);
+                return;
+            }
+
+            // Use the marker opacity and texture when not picking.
+            if (!dc.pickingMode) {
+                Text.matrix.setToIdentity();
+                Text.matrix.multiplyByTextureTransform(markerTexture);
+                textureBound = markerTexture.bind(dc); // returns false if texture is null or cannot be bound
+                program.loadTextureEnabled(gl, textureBound);
+                program.loadTextureMatrix(gl, Text.matrix);
+                program.loadOpacity(gl, this.layer.opacity * (1 - this.currentVisibility));
+            }
+
+            // Compute and specify the marker's modelview-projection matrix.
+            var s = this.markerImageScale;
+            Text.matrix.copy(dc.screenProjection);
+            Text.matrix.multiplyByTranslation(
+                this.screenPoint[0] - s * markerTexture.imageWidth / 2,
+                this.screenPoint[1] - s * markerTexture.imageWidth / 2,
+                this.screenPoint[2]);
+            Text.matrix.multiplyByScale(markerTexture.imageWidth * s, markerTexture.imageHeight * s, 1);
+            program.loadModelviewProjection(gl, Text.matrix);
+
+            // Draw the marker as a two-triangle square.
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+
+        return Text;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:29:59 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

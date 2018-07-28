@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Source: ogc/wms/WmsLayerCapabilities.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: ogc/wms/WmsLayerCapabilities.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @exports WmsLayerCapabilities
+ */
+define([
+        '../../error/ArgumentError',
+        '../../util/Logger'
+    ],
+    function (ArgumentError,
+              Logger) {
+        "use strict";
+
+        /**
+         * Constructs an WMS Layer instance from an XML DOM.
+         * @alias WmsLayerCapabilities
+         * @constructor
+         * @classdesc Represents a WMS layer description from a WMS Capabilities document. This object holds all the
+         * fields specified in the associated WMS Capabilities document.
+         * @param {{}} layerElement A WMS Layer element describing the layer.
+         * @param {{}} parentNode An object indicating the new layer object's parent object.
+         * @throws {ArgumentError} If the specified layer element is null or undefined.
+         */
+        var WmsLayerCapabilities = function (layerElement, parentNode) {
+            if (!layerElement) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmsLayerCapabilities", "constructor",
+                        "Layer element is null or undefined."));
+            }
+
+            /**
+             * The parent object, as specified to the constructor of this object.
+             * @type {{}}
+             * @readonly
+             */
+            this.parent = parentNode;
+
+            /**
+             * The layers that are children of this layer.
+             * @type {WmsLayerCapabilities[]}
+             * @readonly
+             */
+            this.layers;
+
+            /**
+             * The name of this layer description.
+             * @type {String}
+             * @readonly
+             */
+            this.name;
+
+            /**
+             * The title of this layer.
+             * @type {String}
+             * @readonly
+             */
+            this.title;
+
+            /**
+             * The abstract of this layer.
+             * @type {String}
+             * @readonly
+             */
+            this.abstract;
+
+            /**
+             * The list of keywords associated with this layer description.
+             * @type {String[]}
+             * @readonly
+             */
+            this.keywordList;
+
+            /**
+             * The identifiers associated with this layer description. Each identifier has the following properties:
+             * authority, content.
+             * @type {Object[]}
+             */
+            this.identifiers;
+
+            /**
+             * The metadata URLs associated with this layer description. Each object in the returned array has the
+             * following properties: type, format, url.
+             * @type {Object[]}
+             * @readonly
+             */
+            this.metadataUrls;
+
+            /**
+             * The data URLs associated with this layer description. Each object in the returned array has the
+             * following properties: format, url.
+             * @type {Object[]}
+             * @readonly
+             */
+            this.dataUrls;
+
+            /**
+             * The feature list URLs associated with this layer description. Each object in the returned array has the
+             * following properties: format, url.
+             * @type {Object[]}
+             * @readonly
+             */
+            this.featureListUrls;
+
+            this.assembleLayer(layerElement);
+        };
+
+        Object.defineProperties(WmsLayerCapabilities.prototype, {
+            /**
+             * The WMS capability section containing this layer description.
+             * @type {{}}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            capability: {
+                get: function () {
+                    var o = this;
+
+                    while (o &amp;&amp; (o instanceof WmsLayerCapabilities)) {
+                        o = o.parent;
+                    }
+
+                    return o;
+                }
+            },
+
+            /**
+             * The WMS queryable attribute.
+             * @type {Boolean}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            queryable: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_queryable");
+                }
+            },
+
+            /**
+             * The WMS cascaded attribute.
+             * @type {Boolean}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            cascaded: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_cascaded");
+                }
+            },
+
+            /**
+             * The WMS opaque attribute.
+             * @type {Boolean}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            opaque: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_opaque");
+                }
+            },
+
+            /**
+             * The WMS noSubsets attribute.
+             * @type {Boolean}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            noSubsets: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_noSubsets");
+                }
+            },
+
+            /**
+             * The WMS fixedWidth attribute.
+             * @type {Number}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            fixedWidth: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_fixedWidth");
+                }
+            },
+
+            /**
+             * The WMS fixedHeight attribute.
+             * @type {Number}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            fixedHeight: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_fixedHeight");
+                }
+            },
+
+            /**
+             * The list of styles associated with this layer description, accumulated from this layer and its parent
+             * layers. Each object returned may have the following properties: name {String}, title {String},
+             * abstract {String}, legendUrls {Object[]}, styleSheetUrl, styleUrl. Legend urls may have the following
+             * properties: width, height, format, url. Style sheet urls and style urls have the following properties:
+             * format, url.
+             * @type {Object[]}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            styles: {
+                get: function () {
+                    return WmsLayerCapabilities.accumulate(this, "_styles", []);
+                }
+            },
+
+            /**
+             * The list of coordinate system descriptions associated with this layer, accumulated from this layer
+             * and its parent layers. WMS servers implementing WMS version 1.3.0 and above have this field.
+             * @type {String[]}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            crses: {
+                get: function () {
+                    return WmsLayerCapabilities.accumulate(this, "_crses", []);
+                }
+            },
+
+            /**
+             * The list of coordinate system descriptions associated with this layer, accumulated from this layer
+             * and its parent layers. WMS servers implementing WMS version 1.1.1 and below have this field.
+             * @type {String[]}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            srses: {
+                get: function () {
+                    return WmsLayerCapabilities.accumulate(this, "_srses", []);
+                }
+            },
+
+            /**
+             * This layer description's geographic bounding box. WMS servers implementing WMS 1.3.0 and above have
+             * this field. The returned object has properties for each of the WMS-specified fields. For example,
+             * "westBoundingLongitude".
+             * @type {{}}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            geographicBoundingBox: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_geographicBoundingBox");
+                }
+            },
+
+            /**
+             * This layer description's geographic bounding box. WMS servers implementing WMS 1.1.1 and below have
+             * this field. The returned object has properties for each of the WMS-specified fields. For example,
+             * "maxx".
+             * @type {{}}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            latLonBoundingBox: { // WMS 1.1.1
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_latLonBoundingBox");
+                }
+            },
+
+            /**
+             * The bounding boxes associated with this layer description. The returned object has properties for each
+             * of the defined attributes. For example, "minx".
+             * @type {{}}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            boundingBoxes: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_boundingBoxes");
+                }
+            },
+
+            /**
+             * The list of dimensions associated with this layer description, accumulated from this layer and its
+             * parent layers. WMS servers implementing WMS version 1.3.0 and above provide this field.
+             * @type {String[]}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            dimensions: {
+                get: function () {
+                    var accumulatedDimensions = [],
+                        layer = this;
+
+                    // Accumulate only dimensions with unique names with descendants overriding ancestors.
+                    while (layer &amp;&amp; (layer instanceof WmsLayerCapabilities)) {
+                        if (layer._dimensions &amp;&amp; layer._dimensions.length > 0) {
+                            layer._dimensions.forEach(function (ancestorDimension) {
+                                var name = ancestorDimension.name;
+                                var include = true;
+                                accumulatedDimensions.forEach(function (descendantDimension) {
+                                    if (descendantDimension.name === name) {
+                                        include = false;
+                                    }
+                                });
+                                if (include) {
+                                    accumulatedDimensions.push(ancestorDimension);
+                                }
+                            });
+                        }
+
+                        layer = layer.parent;
+                    }
+
+                    return accumulatedDimensions.length > 0 ? accumulatedDimensions : undefined;
+                }
+            },
+
+            /**
+             * The list of extents associated with this layer description, accumulated from this layer and its
+             * parent layers. WMS servers implementing WMS version 1.3.0 and above provide this field.
+             * @type {String[]}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            extents: {
+                get: function () {
+                    var accumulatedDimensions = [],
+                        layer = this;
+
+                    // Accumulate only extents with unique names with descendants overriding ancestors.
+                    while (layer &amp;&amp; (layer instanceof WmsLayerCapabilities)) {
+                        if (layer._extents &amp;&amp; layer._extents.length > 0) {
+                            layer._extents.forEach(function (ancestorDimension) {
+                                var name = ancestorDimension.name;
+                                var include = true;
+                                accumulatedDimensions.forEach(function (descendantDimension) {
+                                    if (descendantDimension.name === name) {
+                                        include = false;
+                                    }
+                                });
+                                if (include) {
+                                    accumulatedDimensions.push(ancestorDimension);
+                                }
+                            });
+                        }
+
+                        layer = layer.parent;
+                    }
+
+                    return accumulatedDimensions.length > 0 ? accumulatedDimensions : undefined;
+                }
+            },
+
+            /**
+             * The attribution element associated with this layer description. The returned object has the following
+             * properties: title {String}, url {String}, logoUrl {{format, url}}.
+             * @type {{}}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            attribution: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_attribution");
+                }
+            },
+
+            /**
+             * The authority URLs associated with this layer description, accumulated from this layer and its parent
+             * layers. The returned objects have the following properties: name {String}, url {String}.
+             * @type {Object[]}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            authorityUrls: {
+                get: function () {
+                    return WmsLayerCapabilities.accumulate(this, "_authorityUrls", []);
+                }
+            },
+
+            /**
+             * The minimum-scale-denominator associated with this layer description.
+             * WMS servers implementing WMS version 1.3.0 and above provide this field.
+             * @type {Number}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            minScaleDenominator: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_minScaleDenominator");
+                }
+            },
+
+            /**
+             * The maximum-scale-denominator associated with this layer description.
+             * WMS servers implementing WMS version 1.3.0 and above provide this field.
+             * @type {Number}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            maxScaleDenominator: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_maxScaleDenominator");
+                }
+            },
+
+            /**
+             * The scale hint associated with this layer description.
+             * WMS servers implementing WMS version 1.1.1 and below provide this field.
+             * @type {Number}
+             * @readonly
+             * @memberof WmsLayerCapabilities.prototype
+             */
+            scaleHint: {
+                get: function () {
+                    return WmsLayerCapabilities.replace(this, "_scaleHint");
+                }
+            }
+        });
+
+        WmsLayerCapabilities.prototype.style = function(name) {
+            if (!name) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WmsLayerCapabilities", "style",
+                        "Style name is null or undefined."));
+            }
+
+            var styles = this.styles;
+            if (!styles) {
+                return null;
+            }
+
+            for (var i = 0, len = styles.length, style; i &lt; len; i++) {
+                style = styles[i];
+                if (style.name === name) {
+                    return style;
+                }
+            }
+        }
+
+        WmsLayerCapabilities.accumulate = function (layer, propertyName, accumulation) {
+            // Accumulate all of the named properties in the specified layer and its ancestors.
+            while (layer &amp;&amp; (layer instanceof WmsLayerCapabilities)) {
+                var property = layer[propertyName];
+
+                if (property) {
+                    for (var i = 0; i &lt; property.length; i++) {
+                        accumulation.push(property[i]);
+                    }
+                }
+
+                layer = layer.parent;
+            }
+
+            return accumulation.length > 0 ? accumulation : null;
+        };
+
+        WmsLayerCapabilities.replace = function (layer, propertyName) {
+            // Find the first property instance encountered from the specified layer upwards through its ancestors.
+            while (layer &amp;&amp; (layer instanceof WmsLayerCapabilities)) {
+                var property = layer[propertyName];
+
+                if (property) {
+                    return property;
+                } else {
+                    layer = layer.parent;
+                }
+            }
+        };
+
+        WmsLayerCapabilities.prototype.assembleLayer = function (layerElement) {
+            var elements, attrValue, c, e;
+
+            attrValue = layerElement.getAttribute("queryable");
+            if (attrValue) {
+                this._queryable = attrValue === "1" || attrValue === "true"
+            }
+
+            attrValue = layerElement.getAttribute("opaque");
+            if (attrValue) {
+                this._opaque = attrValue === "1" || attrValue === "true"
+            }
+
+            attrValue = layerElement.getAttribute("noSubsets");
+            if (attrValue) {
+                this._noSubsets = attrValue === "1" || attrValue === "true"
+            }
+
+            attrValue = layerElement.getAttribute("cascaded");
+            if (attrValue) {
+                this._cascaded = parseInt("10");
+            }
+
+            attrValue = layerElement.getAttribute("fixedWidth");
+            if (attrValue) {
+                this._fixedWidth = parseInt("10");
+            }
+
+            attrValue = layerElement.getAttribute("fixedHeight");
+            if (attrValue) {
+                this._fixedHeight = parseInt("10");
+            }
+
+            var children = layerElement.children || layerElement.childNodes;
+            for (c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "Layer") {
+                    if (!this.layers) {
+                        this.layers = [];
+                    }
+                    this.layers.push(new WmsLayerCapabilities(childElement, this));
+
+                } else if (childElement.localName === "Name") {
+                    this.name = childElement.textContent;
+
+                } else if (childElement.localName === "Title") {
+                    this.title = childElement.textContent;
+
+                } else if (childElement.localName === "Abstract") {
+                    this.abstract = childElement.textContent;
+
+                } else if (childElement.localName === "KeywordList") {
+                    this.keywordList = this.keywordList || [];
+
+                    var children2 = childElement.children || childElement.childNodes;
+                    for (var c2 = 0; c2 &lt; children2.length; c2++) {
+                        var child2 = children2[c2];
+
+                        if (child2.localName === "Keyword") {
+                            this.keywordList.push(child2.textContent);
+                        }
+                    }
+                } else if (childElement.localName === "Style") {
+                    if (!this._styles) {
+                        this._styles = [];
+                    }
+                    this._styles.push(WmsLayerCapabilities.assembleStyle(childElement))
+
+                } else if (childElement.localName === "CRS") {
+                    if (!this._crses) {
+                        this._crses = [];
+                    }
+                    this._crses.push(childElement.textContent);
+
+                } else if (childElement.localName === "SRS") { // WMS 1.1.1
+                    if (!this._srses) {
+                        this._srses = [];
+                    }
+                    this._srses.push(childElement.textContent);
+
+                } else if (childElement.localName === "EX_GeographicBoundingBox") {
+                    this._geographicBoundingBox = WmsLayerCapabilities.assembleGeographicBoundingBox(childElement);
+
+                } else if (childElement.localName === "LatLonBoundingBox") { // WMS 1.1.1
+                    this._geographicBoundingBox = WmsLayerCapabilities.assembleLatLonBoundingBox(childElement);
+
+                } else if (childElement.localName === "BoundingBox") {
+                    if (!this._boundingBoxes) {
+                        this._boundingBoxes = [];
+                    }
+                    this._boundingBoxes.push(WmsLayerCapabilities.assembleBoundingBox(childElement));
+
+                } else if (childElement.localName === "Dimension") {
+                    if (!this._dimensions) {
+                        this._dimensions = [];
+                    }
+                    this._dimensions.push(WmsLayerCapabilities.assembleDimension(childElement));
+
+                } else if (childElement.localName === "Extent") { // WMS 1.1.1
+                    if (!this._extents) {
+                        this._extents = [];
+                    }
+                    this._extents.push(WmsLayerCapabilities.assembleDimension(childElement)); // same schema as 1.3.0 Dimension
+
+                } else if (childElement.localName === "Attribution") {
+                    this._attribution = WmsLayerCapabilities.assembleAttribution(childElement);
+
+                } else if (childElement.localName === "AuthorityURL") {
+                    if (!this._authorityUrls) {
+                        this._authorityUrls = [];
+                    }
+                    this._authorityUrls.push(WmsLayerCapabilities.assembleAuthorityUrl(childElement));
+
+                } else if (childElement.localName === "Identifier") {
+                    if (!this.identifiers) {
+                        this.identifiers = [];
+                    }
+                    this.identifiers.push(WmsLayerCapabilities.assembleIdentifier(childElement));
+
+                } else if (childElement.localName === "MetadataURL") {
+                    if (!this.metadataUrls) {
+                        this.metadataUrls = [];
+                    }
+                    this.metadataUrls.push(WmsLayerCapabilities.assembleMetadataUrl(childElement));
+
+                } else if (childElement.localName === "DataURL") {
+                    if (!this.dataUrls) {
+                        this.dataUrls = [];
+                    }
+                    this.dataUrls.push(WmsLayerCapabilities.assembleUrl(childElement));
+
+                } else if (childElement.localName === "FeatureListURL") {
+                    if (!this.featureListUrls) {
+                        this.featureListUrls = [];
+                    }
+                    this.featureListUrls.push(WmsLayerCapabilities.assembleUrl(childElement));
+
+                } else if (childElement.localName === "MinScaleDenominator") {
+                    this._minScaleDenominator = parseFloat(childElement.textContent);
+
+                } else if (childElement.localName === "MaxScaleDenominator") {
+                    this._maxScaleDenominator = parseFloat(childElement.textContent);
+
+                } else if (childElement.localName === "ScaleHint") { // WMS 1.1.1
+                    this._scaleHint = {};
+                    this._scaleHint.min = WmsLayerCapabilities.getFloatAttribute(childElement, "min");
+                    this._scaleHint.max = WmsLayerCapabilities.getFloatAttribute(childElement, "max");
+                }
+            }
+        };
+
+        WmsLayerCapabilities.assembleStyle = function (styleElement) {
+            var result = {};
+
+            var children = styleElement.children || styleElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "Name") {
+                    result.name = childElement.textContent;
+
+                } else if (childElement.localName === "Title") {
+                    result.title = childElement.textContent;
+
+                } else if (childElement.localName === "Abstract") {
+                    result.abstract = childElement.textContent;
+
+                } else if (childElement.localName === "LegendURL") {
+                    if (!result.legendUrls) {
+                        result.legendUrls = [];
+                    }
+                    result.legendUrls.push(WmsLayerCapabilities.assembleLegendUrl(childElement));
+
+                } else if (childElement.localName === "StyleSheetURL") {
+                    result.styleSheetUrl = WmsLayerCapabilities.assembleUrl(childElement);
+
+                } else if (childElement.localName === "StyleURL") {
+                    result.styleUrl = WmsLayerCapabilities.assembleUrl(childElement);
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleGeographicBoundingBox = function (bboxElement) {
+            var result = {};
+
+            var children = bboxElement.children || bboxElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "westBoundLongitude") {
+                    result.westBoundLongitude = parseFloat(childElement.textContent);
+
+                } else if (childElement.localName === "eastBoundLongitude") {
+                    result.eastBoundLongitude = parseFloat(childElement.textContent);
+
+                } else if (childElement.localName === "southBoundLatitude") {
+                    result.southBoundLatitude = parseFloat(childElement.textContent);
+
+                } else if (childElement.localName === "northBoundLatitude") {
+                    result.northBoundLatitude = parseFloat(childElement.textContent);
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleLatLonBoundingBox = function (bboxElement) { // WMS 1.1.1
+            var result = {};
+
+            result.minx = WmsLayerCapabilities.getFloatAttribute(bboxElement, "minx");
+            result.miny = WmsLayerCapabilities.getFloatAttribute(bboxElement, "miny");
+            result.maxx = WmsLayerCapabilities.getFloatAttribute(bboxElement, "maxx");
+            result.maxy = WmsLayerCapabilities.getFloatAttribute(bboxElement, "maxy");
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleBoundingBox = function (bboxElement) {
+            var result = {};
+
+            result.crs = bboxElement.getAttribute("CRS");
+            result.minx = WmsLayerCapabilities.getFloatAttribute(bboxElement, "minx");
+            result.miny = WmsLayerCapabilities.getFloatAttribute(bboxElement, "miny");
+            result.maxx = WmsLayerCapabilities.getFloatAttribute(bboxElement, "maxx");
+            result.maxy = WmsLayerCapabilities.getFloatAttribute(bboxElement, "maxy");
+            result.resx = WmsLayerCapabilities.getFloatAttribute(bboxElement, "resx");
+            result.resy = WmsLayerCapabilities.getFloatAttribute(bboxElement, "resy");
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleDimension = function (dimensionElement) {
+            var result = {};
+
+            result.name = dimensionElement.getAttribute("name");
+            result.units = dimensionElement.getAttribute("units");
+            result.unitSymbol = dimensionElement.getAttribute("unitSymbol");
+            result.default = dimensionElement.getAttribute("default");
+            result.multipleValues = dimensionElement.getAttribute("multipleValues");
+            if (result.multipleValues) {
+                result.multipleValues = result.multipleValues === "true" || result.multipleValues === "1";
+            }
+            result.nearestValue = dimensionElement.getAttribute("nearestValue");
+            if (result.nearestValue) {
+                result.nearestValue = result.nearestValue === "true" || result.nearestValue === "1";
+            }
+            result.current = dimensionElement.getAttribute("current");
+            if (result.current) {
+                result.current = result.current === "true" || result.current === "1";
+            }
+
+            result.content = dimensionElement.textContent;
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleAttribution = function (attributionElement) {
+            var result = {};
+
+            var children = attributionElement.children || attributionElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "Title") {
+                    result.title = childElement.textContent;
+
+                } else if (childElement.localName === "OnlineResource") {
+                    result.url = childElement.getAttribute("xlink:href");
+
+                } else if (childElement.localName === "LogoUrul") {
+                    result.logoUrl = WmsLayerCapabilities.assembleLogoUrl(childElement);
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleAuthorityUrl = function (urlElement) {
+            var result = {};
+
+            result.name = urlElement.getAttribute("name");
+
+            var children = urlElement.children || urlElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "OnlineResource") {
+                    result.url = childElement.getAttribute("xlink:href");
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleIdentifier = function (identifierElement) {
+            var result = {};
+
+            result.authority = identifierElement.getAttribute("authority");
+            result.content = identifierElement.textContent;
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleMetadataUrl = function (urlElement) {
+            var result = {};
+
+            result.type = urlElement.getAttribute("type");
+
+            var children = urlElement.children || urlElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "Format") {
+                    result.format = childElement.textContent;
+
+                } else if (childElement.localName === "OnlineResource") {
+                    result.url = childElement.getAttribute("xlink:href");
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleLegendUrl = function (urlElement) {
+            var result = {};
+
+            result.width = WmsLayerCapabilities.getIntegerAttribute(urlElement, "width");
+            result.height = WmsLayerCapabilities.getIntegerAttribute(urlElement, "height");
+
+            var children = urlElement.children || urlElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "Format") {
+                    result.format = childElement.textContent;
+
+                } else if (childElement.localName === "OnlineResource") {
+                    result.url = childElement.getAttribute("xlink:href");
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleLogoUrl = function (urlElement) {
+            var result = {};
+
+            result.width = WmsLayerCapabilities.getIntegerAttribute(urlElement, "width");
+            result.height = WmsLayerCapabilities.getIntegerAttribute(urlElement, "height");
+
+            var children = urlElement.children || urlElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "Format") {
+                    result.format = childElement.textContent;
+
+                } else if (childElement.localName === "OnlineResource") {
+                    result.url = childElement.getAttribute("xlink:href");
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.assembleUrl = function (urlElement) {
+            var result = {};
+
+            var children = urlElement.children || urlElement.childNodes;
+            for (var c = 0; c &lt; children.length; c++) {
+                var childElement = children[c];
+
+                if (childElement.localName === "Format") {
+                    result.format = childElement.textContent;
+
+                } else if (childElement.localName === "OnlineResource") {
+                    result.url = childElement.getAttribute("xlink:href");
+                }
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.getIntegerAttribute = function (element, attrName) {
+            var result = element.getAttribute(attrName);
+
+            if (result) {
+                result = parseInt(result);
+            } else {
+                result = undefined;
+            }
+
+            return result;
+        };
+
+        WmsLayerCapabilities.getFloatAttribute = function (element, attrName) {
+            var result = element.getAttribute(attrName);
+
+            if (result) {
+                result = parseFloat(result);
+            } else {
+                result = undefined;
+            }
+
+            return result;
+        };
+
+        return WmsLayerCapabilities;
+    }
+)
+;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:29:59 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

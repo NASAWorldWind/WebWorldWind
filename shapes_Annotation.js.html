@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>WorldWind: Source: shapes/Annotation.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: shapes/Annotation.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+define([
+        '../shapes/AnnotationAttributes',
+        '../error/ArgumentError',
+        '../shaders/BasicTextureProgram',
+        '../util/Color',
+        '../util/Font',
+        '../util/Insets',
+        '../util/Logger',
+        '../geom/Matrix',
+        '../util/Offset',
+        '../pick/PickedObject',
+        '../render/Renderable',
+        '../shapes/TextAttributes',
+        '../geom/Vec2',
+        '../geom/Vec3',
+        '../util/WWMath'
+    ],
+    function (AnnotationAttributes,
+              ArgumentError,
+              BasicTextureProgram,
+              Color,
+              Font,
+              Insets,
+              Logger,
+              Matrix,
+              Offset,
+              PickedObject,
+              Renderable,
+              TextAttributes,
+              Vec2,
+              Vec3,
+              WWMath) {
+        "use strict";
+
+        /**
+         * Constructs an annotation.
+         * @alias Annotation
+         * @constructor
+         * @augments Renderable
+         * @classdesc Represents an Annotation shape. An annotation displays a callout, a text and a leader pointing
+         * the annotation's geographic position to the ground.
+         * @param {Position} position The annotations's geographic position.
+         * @param {AnnotationAttributes} attributes The attributes to associate with this annotation.
+         * @throws {ArgumentError} If the specified position is null or undefined.
+         */
+        var Annotation = function (position, attributes) {
+
+            if (!position) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Annotation", "constructor", "missingPosition"));
+            }
+
+            Renderable.call(this);
+
+            /**
+             * This annotation's geographic position.
+             * @type {Position}
+             */
+            this.position = position;
+
+            /**
+             * The annotation's attributes.
+             * @type {AnnotationAttributes}
+             * @default see [AnnotationAttributes]{@link AnnotationAttributes}
+             */
+            this.attributes = attributes ? attributes : new AnnotationAttributes(null);
+
+            /**
+             * This annotation's altitude mode. May be one of
+             * &lt;ul>
+             *  &lt;li>[WorldWind.ABSOLUTE]{@link WorldWind#ABSOLUTE}&lt;/li>
+             *  &lt;li>[WorldWind.RELATIVE_TO_GROUND]{@link WorldWind#RELATIVE_TO_GROUND}&lt;/li>
+             *  &lt;li>[WorldWind.CLAMP_TO_GROUND]{@link WorldWind#CLAMP_TO_GROUND}&lt;/li>
+             * &lt;/ul>
+             * @default WorldWind.ABSOLUTE
+             */
+            this.altitudeMode = WorldWind.ABSOLUTE;
+
+            // Internal use only. Intentionally not documented.
+            this.layer = null;
+
+            // Internal use only. Intentionally not documented.
+            this.lastStateKey = null;
+
+            // Internal use only. Intentionally not documented.
+            this.calloutTransform = Matrix.fromIdentity();
+
+            // Internal use only. Intentionally not documented.
+            this.calloutOffset = new WorldWind.Offset(
+                WorldWind.OFFSET_FRACTION, 0.5,
+                WorldWind.OFFSET_FRACTION, 0);
+
+            // Internal use only. Intentionally not documented.
+            this.label = "";
+
+            // Internal use only. Intentionally not documented.
+            this.labelTexture = null;
+
+            // Internal use only. Intentionally not documented.
+            this.labelTransform = Matrix.fromIdentity();
+
+            // Internal use only. Intentionally not documented.
+            this.placePoint = new Vec3(0, 0, 0);
+
+            // Internal use only. Intentionally not documented.
+            this.depthOffset = -2.05;
+
+            // Internal use only. Intentionally not documented.
+            this.calloutPoints = null;
+        };
+
+        Annotation.matrix = Matrix.fromIdentity();
+        Annotation.screenPoint = new Vec3(0, 0, 0);
+        Annotation.scratchPoint = new Vec3(0, 0, 0);
+
+        Annotation.prototype = Object.create(Renderable.prototype);
+
+        Object.defineProperties(Annotation.prototype, {
+
+            /**
+             * The text for this annotation.
+             * @type {String}
+             * @memberof Annotation.prototype
+             */
+            text: {
+                get: function () {
+                    return this.label;
+                },
+                set: function (value) {
+                    this.label = value;
+                    this.lastStateKey = null;
+                }
+            }
+        });
+
+        /**
+         * Draws this shape as an ordered renderable. Applications do not call this function. It is called by
+         * [WorldWindow]{@link WorldWindow} during rendering.
+         * @param {DrawContext} dc The current draw context.
+         */
+        Annotation.prototype.renderOrdered = function (dc) {
+
+            this.drawOrderedAnnotation(dc);
+
+            if (dc.pickingMode) {
+
+                var po = new PickedObject(this.pickColor.clone(), this,
+                    this.position, this.layer, false);
+
+                if (dc.pickPoint) {
+                    if (this.labelBounds.containsPoint(
+                            dc.convertPointToViewport(dc.pickPoint, Annotation.scratchPoint))) {
+                        po.labelPicked = true;
+                    }
+                }
+
+                dc.resolvePick(po);
+            }
+        };
+
+        /**
+         * Creates a new annotation that is a copy of this annotation.
+         * @returns {Annotation} The new annotation.
+         */
+        Annotation.prototype.clone = function () {
+            var clone = new Annotation(this.position);
+
+            clone.copy(this);
+            clone.pickDelegate = this.pickDelegate ? this.pickDelegate : this;
+
+            return clone;
+        };
+
+        /**
+         * Copies the contents of a specified annotation to this annotation.
+         * @param {Annotation} that The Annotation to copy.
+         */
+        Annotation.prototype.copy = function (that) {
+            this.position = that.position;
+            this.enabled = that.enabled;
+            this.attributes = that.attributes;
+            this.label = that.label;
+            this.altitudeMode = that.altitudeMode;
+            this.pickDelegate = that.pickDelegate;
+            this.depthOffset = that.depthOffset;
+
+            return this;
+        };
+
+        /**
+         * Renders this annotation. This method is typically not called by applications but is called by
+         * {@link RenderableLayer} during rendering. For this shape this method creates and
+         * enques an ordered renderable with the draw context and does not actually draw the annotation.
+         * @param {DrawContext} dc The current draw context.
+         */
+        Annotation.prototype.render = function (dc) {
+
+            if (!this.enabled) {
+                return;
+            }
+
+            if (!dc.accumulateOrderedRenderables) {
+                return;
+            }
+
+            if (dc.globe.projectionLimits
+                &amp;&amp; !dc.globe.projectionLimits.containsLocation(this.position.latitude, this.position.longitude)) {
+                return;
+            }
+
+            var orderedAnnotation;
+            if (this.lastFrameTime !== dc.timestamp) {
+                orderedAnnotation = this.makeOrderedRenderable(dc);
+            } else {
+                var annotationCopy = this.clone();
+                orderedAnnotation = annotationCopy.makeOrderedRenderable(dc);
+            }
+
+            if (!orderedAnnotation) {
+                return;
+            }
+
+            orderedAnnotation.layer = dc.currentLayer;
+
+            this.lastFrameTime = dc.timestamp;
+            dc.addOrderedRenderable(orderedAnnotation);
+        };
+
+        // Internal. Intentionally not documented.
+        Annotation.prototype.drawOrderedAnnotation = function (dc) {
+            this.beginDrawing(dc);
+
+            try {
+                this.doDrawOrderedAnnotation(dc);
+            } finally {
+                this.endDrawing(dc);
+            }
+        };
+
+        /* Intentionally not documented
+         * Creates an ordered renderable for this shape.
+         * @protected
+         * @param {DrawContext} dc The current draw context.
+         * @returns {OrderedRenderable} The ordered renderable. May be null, in which case an ordered renderable
+         * cannot be created or should not be created at the time this method is called.
+         */
+        Annotation.prototype.makeOrderedRenderable = function (dc) {
+
+            var w, h, s, iLeft, iRight, iTop, iBottom,
+                offset, leaderGapHeight;
+
+            // Wraps the text based and the width and height that were set for the
+            // annotation
+            this.label = dc.textRenderer.wrap(
+                this.label,
+                this.attributes.width, this.attributes.height);
+
+            // Compute the annotation's model point.
+            dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
+                this.altitudeMode, this.placePoint);
+
+            this.eyeDistance = dc.eyePoint.distanceTo(this.placePoint);
+
+            // Compute the annotation's screen point in the OpenGL coordinate system of the WorldWindow
+            // by projecting its model coordinate point onto the viewport. Apply a depth offset in order
+            // to cause the annotation to appear above nearby terrain.
+            if (!dc.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
+                return null;
+            }
+
+            this.labelTexture = dc.createTextTexture(this.label, this.attributes.textAttributes);
+
+            w = this.labelTexture.imageWidth;
+            h = this.labelTexture.imageHeight;
+            s = this.attributes.scale;
+            iLeft = this.attributes.insets.left;
+            iRight = this.attributes.insets.right;
+            iTop = this.attributes.insets.top;
+            iBottom = this.attributes.insets.bottom;
+            leaderGapHeight = this.attributes.leaderGapHeight;
+
+            offset = this.calloutOffset.offsetForSize((w + iLeft + iRight) * s, (h + iTop + iBottom) * s);
+
+            this.calloutTransform.setTranslation(
+                Annotation.screenPoint[0] - offset[0],
+                Annotation.screenPoint[1] + leaderGapHeight,
+                Annotation.screenPoint[2]);
+
+            this.labelTransform.setTranslation(
+                Annotation.screenPoint[0] - offset[0] + iLeft * s,
+                Annotation.screenPoint[1] + leaderGapHeight + iBottom * s,
+                Annotation.screenPoint[2]);
+
+            this.labelTransform.setScale(w * s, h * s, 1);
+
+            this.labelBounds = WWMath.boundingRectForUnitQuad(this.labelTransform);
+
+            // Compute dimensions of the callout taking in consideration the insets
+            var width = (w + iLeft + iRight) * s;
+            var height = (h + iTop + iBottom) * s;
+
+            var leaderOffsetX = (width / 2);
+
+            var leaderOffsetY = -leaderGapHeight;
+
+            if (!this.attributes.drawLeader) {
+                leaderOffsetY = 0;
+            }
+
+            if (this.attributes.stateKey !== this.lastStateKey) {
+                this.calloutPoints = this.createCallout(
+                    width, height,
+                    leaderOffsetX, leaderOffsetY,
+                    this.attributes.leaderGapWidth, this.attributes.cornerRadius);
+            }
+
+            return this;
+        };
+
+        // Internal. Intentionally not documented.
+        Annotation.prototype.beginDrawing = function (dc) {
+            var gl = dc.currentGlContext,
+                program;
+
+            dc.findAndBindProgram(BasicTextureProgram);
+
+            program = dc.currentProgram;
+
+            gl.enableVertexAttribArray(program.vertexPointLocation);
+            gl.enableVertexAttribArray(program.vertexTexCoordLocation);
+
+            program.loadModulateColor(gl, dc.pickingMode);
+        };
+
+        // Internal. Intentionally not documented.
+        Annotation.prototype.endDrawing = function (dc) {
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram;
+
+            // Clear the vertex attribute state.
+            gl.disableVertexAttribArray(program.vertexPointLocation);
+            gl.disableVertexAttribArray(program.vertexTexCoordLocation);
+
+            // Clear GL bindings.
+            dc.bindProgram(null);
+        };
+
+        // Internal. Intentionally not documented.
+        Annotation.prototype.drawCorner = function (x0, y0, cornerRadius, start, end, steps, buffer, startIdx) {
+            if (cornerRadius &lt; 1) {
+                return startIdx;
+            }
+
+            var step = (end - start) / (steps - 1);
+            for (var i = 1; i &lt; steps - 1; i++) {
+                var a = start + step * i;
+                var x = x0 + Math.cos(a) * cornerRadius;
+                var y = y0 + Math.sin(a) * cornerRadius;
+                buffer[startIdx++] = x;
+                buffer[startIdx++] = y;
+            }
+
+            return startIdx;
+        };
+
+        // Internal. Intentionally not documented.
+        Annotation.prototype.createCallout = function (width, height, leaderOffsetX, leaderOffsetY, leaderGapWidth,
+                                                       cornerRadius) {
+
+            var cornerSteps = 16;
+
+            var numVertices = 2 * (12 + (cornerRadius &lt; 1 ? 0 : 4 * (cornerSteps - 2)));
+
+            var buffer = new Float32Array(numVertices);
+
+            var idx = 0;
+
+            //Bottom right
+            buffer[idx++] = width / 2 + leaderGapWidth / 2;
+            buffer[idx++] = 0;
+            buffer[idx++] = width - cornerRadius;
+            buffer[idx++] = 0;
+            idx = this.drawCorner(width - cornerRadius, cornerRadius, cornerRadius, -Math.PI / 2, 0,
+                cornerSteps, buffer, idx);
+
+            //Right
+            buffer[idx++] = width;
+            buffer[idx++] = cornerRadius;
+            buffer[idx++] = width;
+            buffer[idx++] = height - cornerRadius;
+            idx = this.drawCorner(width - cornerRadius, height - cornerRadius, cornerRadius, 0, Math.PI / 2,
+                cornerSteps, buffer, idx);
+
+            //Top
+            buffer[idx++] = width - cornerRadius;
+            buffer[idx++] = height;
+            buffer[idx++] = cornerRadius;
+            buffer[idx++] = height;
+            idx = this.drawCorner(cornerRadius, height - cornerRadius, cornerRadius, Math.PI / 2, Math.PI,
+                cornerSteps, buffer, idx);
+
+            //Left
+            buffer[idx++] = 0;
+            buffer[idx++] = height - cornerRadius;
+            buffer[idx++] = 0;
+            buffer[idx++] = cornerRadius;
+            idx = this.drawCorner(cornerRadius, cornerRadius, cornerRadius, Math.PI, Math.PI * 1.5,
+                cornerSteps, buffer, idx);
+
+            //Bottom left
+            buffer[idx++] = cornerRadius;
+            buffer[idx++] = 0;
+            buffer[idx++] = width / 2 - leaderGapWidth / 2;
+            buffer[idx++] = 0;
+
+            //Draw leader
+            buffer[idx++] = leaderOffsetX;
+            buffer[idx++] = leaderOffsetY;
+
+            buffer[idx++] = width / 2 + leaderGapWidth / 2;
+            buffer[idx] = 0;
+
+            return buffer;
+        };
+
+        // Internal. Intentionally not documented.
+        Annotation.prototype.doDrawOrderedAnnotation = function (dc) {
+
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram,
+                textureBound;
+
+            var refreshBuffers = false;
+
+            if (dc.pickingMode) {
+                this.pickColor = dc.uniquePickColor();
+            }
+
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.attributes.opacity * this.layer.opacity);
+
+            // Attributes have changed. We need to track this because the callout vbo data may
+            // have changed if scaled or text wrapping changes callout dimensions
+            var calloutAttributesChanged = (this.attributes.stateKey !== this.lastStateKey);
+
+            // Create new cache key if callout drawing points have changed
+            if (!this.calloutCacheKey || calloutAttributesChanged) {
+                this.calloutCacheKey = dc.gpuResourceCache.generateCacheKey();
+            }
+
+            var calloutVboId = dc.gpuResourceCache.resourceForKey(this.calloutCacheKey);
+
+            if (!calloutVboId) {
+                calloutVboId = gl.createBuffer();
+                dc.gpuResourceCache.putResource(this.calloutCacheKey, calloutVboId,
+                    this.calloutPoints.length * 4);
+
+                refreshBuffers = true;
+            }
+
+            // Remove the last generated vbo data if attributes changed
+            if (calloutAttributesChanged &amp;&amp; this.calloutCacheKey) {
+                dc.gpuResourceCache.removeResource(this.calloutCacheKey);
+            }
+
+            // Store current statekey because we are no longer using it
+            // in this iteration
+            this.lastStateKey = this.attributes.stateKey;
+
+            // Compute and specify the MVP matrix.
+            Annotation.matrix.copy(dc.screenProjection);
+            Annotation.matrix.multiplyMatrix(this.calloutTransform);
+            program.loadModelviewProjection(gl, Annotation.matrix);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, calloutVboId);
+
+            if (refreshBuffers) {
+                gl.bufferData(gl.ARRAY_BUFFER,
+                    this.calloutPoints, gl.STATIC_DRAW);
+
+                dc.frameStatistics.incrementVboLoadCount(1);
+            }
+
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.backgroundColor);
+            program.loadTextureEnabled(gl, false);
+
+            gl.vertexAttribPointer(program.vertexPointLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLE_FAN, 0, this.calloutPoints.length / 2);
+
+            // Draw text
+            Annotation.matrix.copy(dc.screenProjection);
+            Annotation.matrix.multiplyMatrix(this.labelTransform);
+            program.loadModelviewProjection(gl, Annotation.matrix);
+
+            Annotation.matrix.setToIdentity();
+            Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
+            program.loadTextureMatrix(gl, Annotation.matrix);
+
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : Color.WHITE);
+            textureBound = this.labelTexture.bind(dc);
+            program.loadTextureEnabled(gl, textureBound);
+
+            // Configure GL to use the draw context's unit quad VBOs for both model coordinates and texture coordinates.
+            // Most browsers can share the same buffer for vertex and texture coordinates, but Internet Explorer requires
+            // that they be in separate buffers, so the code below uses the 3D buffer for vertex coords and the 2D
+            // buffer for texture coords.
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer3());
+            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer());
+            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+
+        return Annotation;
+    });</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AAIGridConstants.html">AAIGridConstants</a></li><li><a href="module-Angle.html">Angle</a></li><li><a href="module-ColladaUtils.html">ColladaUtils</a></li><li><a href="module-GeoJSONExporter.html">GeoJSONExporter</a></li><li><a href="module-KmlElements.html">KmlElements</a></li><li><a href="module-KmlFileCache.html">KmlFileCache</a></li><li><a href="module-KmlNodeTransformers.html">KmlNodeTransformers</a></li><li><a href="module-KmlStyleResolver.html">KmlStyleResolver</a></li><li><a href="module-Logger.html">Logger</a></li><li><a href="module-MeasurerUtils.html">MeasurerUtils</a></li><li><a href="module-PolygonSplitter.html">PolygonSplitter</a></li><li><a href="module-SunPosition.html">SunPosition</a></li><li><a href="module-WktElements.html">WktElements</a></li><li><a href="module-WktExporter.html">WktExporter</a></li><li><a href="module-WorldWind.html">WorldWind</a></li><li><a href="module-WWMath.html">WWMath</a></li><li><a href="module-WWUtil.html">WWUtil</a></li></ul><h3>Classes</h3><ul><li><a href="AAIGridMetadata.html">AAIGridMetadata</a></li><li><a href="AAIGridReader.html">AAIGridReader</a></li><li><a href="AbsentResourceList.html">AbsentResourceList</a></li><li><a href="AbstractError.html">AbstractError</a></li><li><a href="AbstractMesh.html">AbstractMesh</a></li><li><a href="AbstractShape.html">AbstractShape</a></li><li><a href="Annotation.html">Annotation</a></li><li><a href="AnnotationAttributes.html">AnnotationAttributes</a></li><li><a href="AreaMeasurer.html">AreaMeasurer</a></li><li><a href="ArgumentError.html">ArgumentError</a></li><li><a href="AsterV2ElevationCoverage.html">AsterV2ElevationCoverage</a></li><li><a href="AtmosphereLayer.html">AtmosphereLayer</a></li><li><a href="AtmosphereProgram.html">AtmosphereProgram</a></li><li><a href="BasicProgram.html">BasicProgram</a></li><li><a href="BasicTextureProgram.html">BasicTextureProgram</a></li><li><a href="BasicTimeSequence.html">BasicTimeSequence</a></li><li><a href="BasicWorldWindowController.html">BasicWorldWindowController</a></li><li><a href="BingAerialLayer.html">BingAerialLayer</a></li><li><a href="BingAerialWithLabelsLayer.html">BingAerialWithLabelsLayer</a></li><li><a href="BingImageryUrlBuilder.html">BingImageryUrlBuilder</a></li><li><a href="BingRoadsLayer.html">BingRoadsLayer</a></li><li><a href="BingTiledImageLayer.html">BingTiledImageLayer</a></li><li><a href="BMNGLandsatLayer.html">BMNGLandsatLayer</a></li><li><a href="BMNGLayer.html">BMNGLayer</a></li><li><a href="BMNGOneImageLayer.html">BMNGOneImageLayer</a></li><li><a href="BMNGRestLayer.html">BMNGRestLayer</a></li><li><a href="BoundingBox.html">BoundingBox</a></li><li><a href="ByteBuffer.html">ByteBuffer</a></li><li><a href="ClickRecognizer.html">ClickRecognizer</a></li><li><a href="ColladaAsset.html">ColladaAsset</a></li><li><a href="ColladaImage.html">ColladaImage</a></li><li><a href="ColladaLoader.html">ColladaLoader</a></li><li><a href="ColladaMaterial.html">ColladaMaterial</a></li><li><a href="ColladaMesh.html">ColladaMesh</a></li><li><a href="ColladaNode.html">ColladaNode</a></li><li><a href="ColladaScene.html">ColladaScene</a></li><li><a href="Color.html">Color</a></li><li><a href="Compass.html">Compass</a></li><li><a href="CompassLayer.html">CompassLayer</a></li><li><a href="CoordinatesDisplayLayer.html">CoordinatesDisplayLayer</a></li><li><a href="DateWW.html">DateWW</a></li><li><a href="DBaseFile.html">DBaseFile</a></li><li><a href="DigitalGlobeTiledImageLayer.html">DigitalGlobeTiledImageLayer</a></li><li><a href="DragRecognizer.html">DragRecognizer</a></li><li><a href="DrawContext.html">DrawContext</a></li><li><a href="EarthElevationModel.html">EarthElevationModel</a></li><li><a href="EarthRestElevationCoverage.html">EarthRestElevationCoverage</a></li><li><a href="ElevationCoverage.html">ElevationCoverage</a></li><li><a href="ElevationImage.html">ElevationImage</a></li><li><a href="ElevationModel.html">ElevationModel</a></li><li><a href="Font.html">Font</a></li><li><a href="FramebufferTexture.html">FramebufferTexture</a></li><li><a href="FramebufferTile.html">FramebufferTile</a></li><li><a href="FramebufferTileController.html">FramebufferTileController</a></li><li><a href="FrameStatistics.html">FrameStatistics</a></li><li><a href="FrameStatisticsLayer.html">FrameStatisticsLayer</a></li><li><a href="Frustum.html">Frustum</a></li><li><a href="GebcoElevationCoverage.html">GebcoElevationCoverage</a></li><li><a href="GeographicMesh.html">GeographicMesh</a></li><li><a href="GeographicProjection.html">GeographicProjection</a></li><li><a href="GeographicText.html">GeographicText</a></li><li><a href="GeoJSONConstants.html">GeoJSONConstants</a></li><li><a href="GeoJSONCRS.html">GeoJSONCRS</a></li><li><a href="GeoJSONFeature.html">GeoJSONFeature</a></li><li><a href="GeoJSONFeatureCollection.html">GeoJSONFeatureCollection</a></li><li><a href="GeoJSONGeometry.html">GeoJSONGeometry</a></li><li><a href="GeoJSONGeometryCollection.html">GeoJSONGeometryCollection</a></li><li><a href="GeoJSONGeometryLineString.html">GeoJSONGeometryLineString</a></li><li><a href="GeoJSONGeometryMultiLineString.html">GeoJSONGeometryMultiLineString</a></li><li><a href="GeoJSONGeometryMultiPoint.html">GeoJSONGeometryMultiPoint</a></li><li><a href="GeoJSONGeometryMultiPolygon.html">GeoJSONGeometryMultiPolygon</a></li><li><a href="GeoJSONGeometryPoint.html">GeoJSONGeometryPoint</a></li><li><a href="GeoJSONGeometryPolygon.html">GeoJSONGeometryPolygon</a></li><li><a href="GeoJSONParser.html">GeoJSONParser</a></li><li><a href="GeoTiff.html">GeoTiff</a></li><li><a href="GeoTiffKeyEntry.html">GeoTiffKeyEntry</a></li><li><a href="GeoTiffMetadata.html">GeoTiffMetadata</a></li><li><a href="GeoTiffReader.html">GeoTiffReader</a></li><li><a href="GestureRecognizer.html">GestureRecognizer</a></li><li><a href="Globe.html">Globe</a></li><li><a href="Globe2D.html">Globe2D</a></li><li><a href="GoToAnimator.html">GoToAnimator</a></li><li><a href="GpuProgram.html">GpuProgram</a></li><li><a href="GpuResourceCache.html">GpuResourceCache</a></li><li><a href="GpuShader.html">GpuShader</a></li><li><a href="GroundProgram.html">GroundProgram</a></li><li><a href="HashMap.html">HashMap</a></li><li><a href="HighlightController.html">HighlightController</a></li><li><a href="ImageSource.html">ImageSource</a></li><li><a href="ImageTile.html">ImageTile</a></li><li><a href="Insets.html">Insets</a></li><li><a href="KmlAbstractView.html">KmlAbstractView</a></li><li><a href="KmlAttribute.html">KmlAttribute</a></li><li><a href="KmlBalloonStyle.html">KmlBalloonStyle</a></li><li><a href="KmlCamera.html">KmlCamera</a></li><li><a href="KmlChange.html">KmlChange</a></li><li><a href="KmlColorStyle.html">KmlColorStyle</a></li><li><a href="KmlContainer.html">KmlContainer</a></li><li><a href="KmlControls.html">KmlControls</a></li><li><a href="KmlCreate.html">KmlCreate</a></li><li><a href="KmlDelete.html">KmlDelete</a></li><li><a href="KmlDocument.html">KmlDocument</a></li><li><a href="KmlElementsFactory.html">KmlElementsFactory</a></li><li><a href="KmlElementsFactoryCached.html">KmlElementsFactoryCached</a></li><li><a href="KmlFeature.html">KmlFeature</a></li><li><a href="KmlFile.html">KmlFile</a></li><li><a href="KmlFolder.html">KmlFolder</a></li><li><a href="KmlGeometry.html">KmlGeometry</a></li><li><a href="KmlGroundOverlay.html">KmlGroundOverlay</a></li><li><a href="KmlHrefResolver.html">KmlHrefResolver</a></li><li><a href="KmlIcon.html">KmlIcon</a></li><li><a href="KmlIconStyle.html">KmlIconStyle</a></li><li><a href="KmlImagePyramid.html">KmlImagePyramid</a></li><li><a href="KmlItemIcon.html">KmlItemIcon</a></li><li><a href="KmlLabelStyle.html">KmlLabelStyle</a></li><li><a href="KmlLatLonAltBox.html">KmlLatLonAltBox</a></li><li><a href="KmlLatLonBox.html">KmlLatLonBox</a></li><li><a href="KmlLatLonQuad.html">KmlLatLonQuad</a></li><li><a href="KmlLinearRing.html">KmlLinearRing</a></li><li><a href="KmlLineString.html">KmlLineString</a></li><li><a href="KmlLineStyle.html">KmlLineStyle</a></li><li><a href="KmlLink.html">KmlLink</a></li><li><a href="KmlListStyle.html">KmlListStyle</a></li><li><a href="KmlLocation.html">KmlLocation</a></li><li><a href="KmlLod.html">KmlLod</a></li><li><a href="KmlLookAt.html">KmlLookAt</a></li><li><a href="KmlMultiGeometry.html">KmlMultiGeometry</a></li><li><a href="KmlMultiTrack.html">KmlMultiTrack</a></li><li><a href="KmlNetworkLink.html">KmlNetworkLink</a></li><li><a href="KmlNetworkLinkControl.html">KmlNetworkLinkControl</a></li><li><a href="KmlObject.html">KmlObject</a></li><li><a href="KmlOrientation.html">KmlOrientation</a></li><li><a href="KmlOverlay.html">KmlOverlay</a></li><li><a href="KmlPair.html">KmlPair</a></li><li><a href="KmlPhotoOverlay.html">KmlPhotoOverlay</a></li><li><a href="KmlPlacemark.html">KmlPlacemark</a></li><li><a href="KmlPoint.html">KmlPoint</a></li><li><a href="KmlPolygon.html">KmlPolygon</a></li><li><a href="KmlPolyStyle.html">KmlPolyStyle</a></li><li><a href="KmlRefreshListener.html">KmlRefreshListener</a></li><li><a href="KmlRefreshListener.Event.html">Event</a></li><li><a href="KmlRegion.html">KmlRegion</a></li><li><a href="KmlRemoteFile.html">KmlRemoteFile</a></li><li><a href="KmlScale.html">KmlScale</a></li><li><a href="KmlSchema.html">KmlSchema</a></li><li><a href="KmlScreenOverlay.html">KmlScreenOverlay</a></li><li><a href="KmlStyle.html">KmlStyle</a></li><li><a href="KmlStyleMap.html">KmlStyleMap</a></li><li><a href="KmlStyleSelector.html">KmlStyleSelector</a></li><li><a href="KmlSubStyle.html">KmlSubStyle</a></li><li><a href="KmlTimePrimitive.html">KmlTimePrimitive</a></li><li><a href="KmlTimeSpan.html">KmlTimeSpan</a></li><li><a href="KmlTimeStamp.html">KmlTimeStamp</a></li><li><a href="KmlTour.html">KmlTour</a></li><li><a href="KmlTrack.html">KmlTrack</a></li><li><a href="KmlTreeKeyValueCache.html">KmlTreeKeyValueCache</a></li><li><a href="KmlTreeVisibility.html">KmlTreeVisibility</a></li><li><a href="KmlViewVolume.html">KmlViewVolume</a></li><li><a href="KmzFile.html">KmzFile</a></li><li><a href="LandsatRestLayer.html">LandsatRestLayer</a></li><li><a href="Layer.html">Layer</a></li><li><a href="LengthMeasurer.html">LengthMeasurer</a></li><li><a href="Level.html">Level</a></li><li><a href="LevelRowColumnUrlBuilder.html">LevelRowColumnUrlBuilder</a></li><li><a href="libtess.ActiveRegion.html">ActiveRegion</a></li><li><a href="libtess.CachedVertex.html">CachedVertex</a></li><li><a href="libtess.Dict.html">Dict</a></li><li><a href="libtess.DictNode.html">DictNode</a></li><li><a href="libtess.GluFace.html">GluFace</a></li><li><a href="libtess.GluHalfEdge.html">GluHalfEdge</a></li><li><a href="libtess.GluMesh.html">GluMesh</a></li><li><a href="libtess.GluTesselator.html">GluTesselator</a></li><li><a href="libtess.GluVertex.html">GluVertex</a></li><li><a href="libtess.PQHandleElem.html">PQHandleElem</a></li><li><a href="libtess.PQNode.html">PQNode</a></li><li><a href="libtess.PriorityQ.html">PriorityQ</a></li><li><a href="libtess.PriorityQHeap.html">PriorityQHeap</a></li><li><a href="Line.html">Line</a></li><li><a href="Location.html">Location</a></li><li><a href="LookAtNavigator.html">LookAtNavigator</a></li><li><a href="Matrix.html">Matrix</a></li><li><a href="Matrix3.html">Matrix3</a></li><li><a href="MeasuredLocation.html">MeasuredLocation</a></li><li><a href="MemoryCache.html">MemoryCache</a></li><li><a href="MemoryCacheListener.html">MemoryCacheListener</a></li><li><a href="MercatorTiledImageLayer.html">MercatorTiledImageLayer</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="NominatimGeocoder.html">NominatimGeocoder</a></li><li><a href="NotYetImplementedError.html">NotYetImplementedError</a></li><li><a href="Offset.html">Offset</a></li><li><a href="OpenStreetMapImageLayer.html">OpenStreetMapImageLayer</a></li><li><a href="OrderedRenderable.html">OrderedRenderable</a></li><li><a href="OwsConstraint.html">OwsConstraint</a></li><li><a href="OwsDescription.html">OwsDescription</a></li><li><a href="OwsLanguageString.html">OwsLanguageString</a></li><li><a href="OwsOperationsMetadata.html">OwsOperationsMetadata</a></li><li><a href="OwsServiceIdentification.html">OwsServiceIdentification</a></li><li><a href="OwsServiceProvider.html">OwsServiceProvider</a></li><li><a href="PanRecognizer.html">PanRecognizer</a></li><li><a href="Path.html">Path</a></li><li><a href="PeriodicTimeSequence.html">PeriodicTimeSequence</a></li><li><a href="PickedObject.html">PickedObject</a></li><li><a href="PickedObjectList.html">PickedObjectList</a></li><li><a href="PinchRecognizer.html">PinchRecognizer</a></li><li><a href="Placemark.html">Placemark</a></li><li><a href="PlacemarkAttributes.html">PlacemarkAttributes</a></li><li><a href="Plane.html">Plane</a></li><li><a href="Polygon.html">Polygon</a></li><li><a href="Position.html">Position</a></li><li><a href="PrjFile.html">PrjFile</a></li><li><a href="ProjectionEquirectangular.html">ProjectionEquirectangular</a></li><li><a href="ProjectionGnomonic.html">ProjectionGnomonic</a></li><li><a href="ProjectionMercator.html">ProjectionMercator</a></li><li><a href="ProjectionPolarEquidistant.html">ProjectionPolarEquidistant</a></li><li><a href="ProjectionUPS.html">ProjectionUPS</a></li><li><a href="ProjectionWgs84.html">ProjectionWgs84</a></li><li><a href="Rectangle.html">Rectangle</a></li><li><a href="Renderable.html">Renderable</a></li><li><a href="RenderableLayer.html">RenderableLayer</a></li><li><a href="RestTiledImageLayer.html">RestTiledImageLayer</a></li><li><a href="RotationRecognizer.html">RotationRecognizer</a></li><li><a href="ScreenCreditController.html">ScreenCreditController</a></li><li><a href="ScreenImage.html">ScreenImage</a></li><li><a href="ScreenText.html">ScreenText</a></li><li><a href="Sector.html">Sector</a></li><li><a href="ShapeAttributes.html">ShapeAttributes</a></li><li><a href="Shapefile.html">Shapefile</a></li><li><a href="ShapefileRecord.html">ShapefileRecord</a></li><li><a href="ShapefileRecordMultiPoint.html">ShapefileRecordMultiPoint</a></li><li><a href="ShapefileRecordNull.html">ShapefileRecordNull</a></li><li><a href="ShapefileRecordPoint.html">ShapefileRecordPoint</a></li><li><a href="ShapefileRecordPolygon.html">ShapefileRecordPolygon</a></li><li><a href="ShapefileRecordPolyline.html">ShapefileRecordPolyline</a></li><li><a href="SkyProgram.html">SkyProgram</a></li><li><a href="StarFieldLayer.html">StarFieldLayer</a></li><li><a href="StarFieldProgram.html">StarFieldProgram</a></li><li><a href="SurfaceCircle.html">SurfaceCircle</a></li><li><a href="SurfaceEllipse.html">SurfaceEllipse</a></li><li><a href="SurfaceImage.html">SurfaceImage</a></li><li><a href="SurfacePolygon.html">SurfacePolygon</a></li><li><a href="SurfacePolyline.html">SurfacePolyline</a></li><li><a href="SurfaceRectangle.html">SurfaceRectangle</a></li><li><a href="SurfaceRenderable.html">SurfaceRenderable</a></li><li><a href="SurfaceSector.html">SurfaceSector</a></li><li><a href="SurfaceShape.html">SurfaceShape</a></li><li><a href="SurfaceShapeTile.html">SurfaceShapeTile</a></li><li><a href="SurfaceTile.html">SurfaceTile</a></li><li><a href="SurfaceTileRenderer.html">SurfaceTileRenderer</a></li><li><a href="SurfaceTileRendererProgram.html">SurfaceTileRendererProgram</a></li><li><a href="TapRecognizer.html">TapRecognizer</a></li><li><a href="TectonicPlatesLayer.html">TectonicPlatesLayer</a></li><li><a href="Terrain.html">Terrain</a></li><li><a href="TerrainTile.html">TerrainTile</a></li><li><a href="TerrainTileList.html">TerrainTileList</a></li><li><a href="Tessellator.html">Tessellator</a></li><li><a href="Text.html">Text</a></li><li><a href="TextAttributes.html">TextAttributes</a></li><li><a href="TextRenderer.html">TextRenderer</a></li><li><a href="Texture.html">Texture</a></li><li><a href="TextureTile.html">TextureTile</a></li><li><a href="TiffConstants.html">TiffConstants</a></li><li><a href="TiffIFDEntry.html">TiffIFDEntry</a></li><li><a href="Tile.html">Tile</a></li><li><a href="TiledElevationCoverage.html">TiledElevationCoverage</a></li><li><a href="TiledImageLayer.html">TiledImageLayer</a></li><li><a href="TileFactory.html">TileFactory</a></li><li><a href="TiltRecognizer.html">TiltRecognizer</a></li><li><a href="Touch.html">Touch</a></li><li><a href="TriangleMesh.html">TriangleMesh</a></li><li><a href="UnsupportedOperationError.html">UnsupportedOperationError</a></li><li><a href="UrlBuilder.html">UrlBuilder</a></li><li><a href="UsgsNedElevationCoverage.html">UsgsNedElevationCoverage</a></li><li><a href="UsgsNedHiElevationCoverage.html">UsgsNedHiElevationCoverage</a></li><li><a href="Vec2.html">Vec2</a></li><li><a href="Vec3.html">Vec3</a></li><li><a href="ViewControlsLayer.html">ViewControlsLayer</a></li><li><a href="WcsCapabilities.html">WcsCapabilities</a></li><li><a href="WcsCoverageDescriptions.html">WcsCoverageDescriptions</a></li><li><a href="WcsEarthElevationCoverage.html">WcsEarthElevationCoverage</a></li><li><a href="WcsTileUrlBuilder.html">WcsTileUrlBuilder</a></li><li><a href="WFSCapabilities.html">WFSCapabilities</a></li><li><a href="Wkt.html">Wkt</a></li><li><a href="WktGeometryCollection.html">WktGeometryCollection</a></li><li><a href="WktLineString.html">WktLineString</a></li><li><a href="WktMultiLineString.html">WktMultiLineString</a></li><li><a href="WktMultiPoint.html">WktMultiPoint</a></li><li><a href="WktMultiPolygon.html">WktMultiPolygon</a></li><li><a href="WktObject.html">WktObject</a></li><li><a href="WktPoint.html">WktPoint</a></li><li><a href="WktPolygon.html">WktPolygon</a></li><li><a href="WktTriangle.html">WktTriangle</a></li><li><a href="WktType.html">WktType</a></li><li><a href="WMSCapabilities.html">WMSCapabilities</a></li><li><a href="WmsLayer.html">WmsLayer</a></li><li><a href="WmsLayerCapabilities.html">WmsLayerCapabilities</a></li><li><a href="WmsTimeDimensionedLayer.html">WmsTimeDimensionedLayer</a></li><li><a href="WmsUrlBuilder.html">WmsUrlBuilder</a></li><li><a href="WmtsCapabilities.html">WmtsCapabilities</a></li><li><a href="WmtsLayer.html">WmtsLayer</a></li><li><a href="WmtsLayerCapabilities.html">WmtsLayerCapabilities</a></li><li><a href="WorldWindow.html">WorldWindow</a></li><li><a href="WorldWindowController.html">WorldWindowController</a></li></ul><h3>Global</h3><ul><li><a href="global.html#catch">catch</a></li><li><a href="global.html#crs">crs</a></li><li><a href="global.html#enabled">enabled</a></li><li><a href="global.html#maxElevation">maxElevation</a></li><li><a href="global.html#minElevation">minElevation</a></li><li><a href="global.html#style">style</a></li><li><a href="global.html#then">then</a></li><li><a href="global.html#timestamp">timestamp</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sat Jul 28 2018 07:29:59 GMT+0000 (UTC)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
