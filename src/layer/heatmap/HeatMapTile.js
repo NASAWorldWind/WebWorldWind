@@ -66,7 +66,8 @@ define([], function(){
      * @returns {HTMLCanvasElement}
      */
     HeatMapTile.prototype.draw = function() {
-        var shape = this.shape();
+        // Create shape based on the gradient.
+        //var shape = this.shape();
 
         var ctx = this._canvas.getContext('2d');
         ctx.clearRect(0,0, this._width, this._height);
@@ -75,7 +76,7 @@ define([], function(){
             var location = this._data[i];
             // Get the location in pixels and draw the image.
             ctx.globalAlpha = location.measure * this._incrementPerIntensity;
-            ctx.drawImage(shape, this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
+            ctx.drawImage(this.shape(location.measure * this._incrementPerIntensity), this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
         }
 
         return this._canvas;
@@ -102,7 +103,7 @@ define([], function(){
      * @protected
      * @returns {HTMLCanvasElement} Canvas representing the circle.
      */
-    HeatMapTile.prototype.shape = function() {
+    HeatMapTile.prototype.shape = function(measure) {
         var shape = this.createCanvas(this._width, this._height),
             ctx = shape.getContext('2d'),
             r2 = this._radius + this._radius;

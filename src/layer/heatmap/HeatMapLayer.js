@@ -80,7 +80,7 @@ define([
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
         this._radius = 25;
         this._blur = 10;
-        this._incrementPerIntensity = 0.025;
+        this._incrementPerIntensity = this.calculateIncrementPerIntensity(measuredLocations);
 
         this.setGradient(measuredLocations);
     };
@@ -337,7 +337,7 @@ define([
                 blur: this.blur,
 
                 intensityGradient: this.gradient,
-                incrementPerIntensity: this.incrementPerIntensity
+                incrementPerIntensity: this._incrementPerIntensity
             }).canvas();
 
             var result = document.createElement('canvas');
