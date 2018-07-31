@@ -67,12 +67,17 @@ define([
         }
 
         var latitude, longitude;
+        var max = Number.MIN_VALUE;
         measuredLocations.forEach(function (measured) {
             latitude = Math.floor(measured.latitude);
             longitude = Math.floor(measured.longitude);
             data[latitude][longitude].push(measured);
+            if(measured.measure > max) {
+                max = measured.measure;
+            }
         });
         this._data = data;
+        this._measuredLocations = measuredLocations;
         // Use other structure than filtering for the geographical data? Each of the tiles receive a value.
         // Object representing the lat and lon?
 
@@ -80,7 +85,7 @@ define([
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
         this._radius = 25;
         this._blur = 10;
-        this._incrementPerIntensity = this.calculateIncrementPerIntensity(measuredLocations);
+        this._incrementPerIntensity = 1 / max;
 
         this.setGradient(measuredLocations);
     };
@@ -271,7 +276,7 @@ define([
     /**
      * Sets gradient based on the Scale and IntervalType.
      */
-    HeatMapLayer.prototype.setGradient = function (data) {
+    HeatMapLayer.prototype.setGradient = function () {
         var intervalType = this.intervalType;
         var scale = this.scale;
 
@@ -281,6 +286,7 @@ define([
                 gradient[index / scale.length] = color;
             });
         } else if (intervalType === IntervalType.QUANTILES) {
+            var data = this._measuredLocations;
             // Equal amount of pieces in each group.
             data.sort(function (item1, item2) {
                 if (item1.measure < item2.measure) {
@@ -296,8 +302,12 @@ define([
                 scale.forEach(function (color, index) {
                     // What is the fraction of the colors
                     var fractionDecidingTheScale = index / scale.length; // Kolik je na nte pozice z maxima.
-                    var pointInScale = data[Math.floor(fractionDecidingTheScale * data.length)].intensity / max;
-                    gradient[pointInScale] = color;
+                    var pointInScale = data[Math.floor(fractionDecidingTheScale * data.length)].measure / max;
+                    if(index === 0) {
+                        gradient[0] = color;
+                    } else {
+                        gradient[pointInScale] = color;
+                    }
                 });
             } else {
                 scale.forEach(function (color, index) {

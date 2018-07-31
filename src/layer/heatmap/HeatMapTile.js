@@ -27,6 +27,8 @@ define([], function(){
      * @param options.height {Number} Height of the Canvas to be created in pixels.
      * @param options.radius {Number} Radius of the data point in pixels.
      * @param options.incrementPerIntensity {Number}
+     * @param options.intensityGradient {Object} Keys represent the opacity between 0 and 1 and the values represent
+     *  color strings.
      */
     var HeatMapTile = function(data, options) {
         this._data = data;
@@ -34,8 +36,10 @@ define([], function(){
         this._sector = options.sector;
 
         this._canvas = this.createCanvas(options.width, options.height);
+
         this._width = options.width;
         this._height = options.height;
+        this._intensityGradient = options.intensityGradient;
 
         this._radius = options.radius;
 
@@ -66,17 +70,33 @@ define([], function(){
      * @returns {HTMLCanvasElement}
      */
     HeatMapTile.prototype.draw = function() {
-        // Create shape based on the gradient.
-        //var shape = this.shape();
+        // Create shape based on the gradient. This means the intervals for the colors from the gradient, which needs to be created on the up.
+        // They are from 0 to 1. It already represents percentage.
+        var shapes = [];
+        for(var intensityKey in this._intensityGradient) {
+            if(this._intensityGradient.hasOwnProperty(intensityKey)) {
+                shapes.push({
+                    shape: this.shape(intensityKey),
+                    min: intensityKey
+                });
+            }
+        }
 
         var ctx = this._canvas.getContext('2d');
         ctx.clearRect(0,0, this._width, this._height);
 
+        var percentage, shapeToDraw = null;
         for(var i = 0; i < this._data.length; i++) {
             var location = this._data[i];
-            // Get the location in pixels and draw the image.
-            ctx.globalAlpha = location.measure * this._incrementPerIntensity;
-            ctx.drawImage(this.shape(location.measure * this._incrementPerIntensity), this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
+            percentage = location.measure * this._incrementPerIntensity;
+            ctx.globalAlpha = percentage;
+            // Find the shape based on the gradient. Get the location in pixels and draw the shape.
+            shapes.forEach(function(shape){
+                if(percentage > shape.min) {
+                    shapeToDraw = shape.shape;
+                }
+            });
+            ctx.drawImage(shapeToDraw, this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
         }
 
         return this._canvas;
@@ -104,9 +124,8 @@ define([], function(){
      * @returns {HTMLCanvasElement} Canvas representing the circle.
      */
     HeatMapTile.prototype.shape = function(measure) {
-        var shape = this.createCanvas(this._width, this._height),
-            ctx = shape.getContext('2d'),
-            r2 = this._radius + this._radius;
+        var shape = this.createCanvas(this._radius * this._radius, this._radius * this._radius),
+            ctx = shape.getContext('2d');
 
         shape.width = shape.height = r2;
 
