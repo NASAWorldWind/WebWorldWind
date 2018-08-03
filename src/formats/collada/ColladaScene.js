@@ -119,9 +119,6 @@ define([
             //Internal. Intentionally not documented.
             this._vboCacheKey = '';
             this._iboCacheKey = '';
-            this._uintExtCacheKey = '';
-
-            this._hasUintExt = null;
 
             this.setSceneData(sceneData);
         };
@@ -675,10 +672,11 @@ define([
 
             var indexSize = sizeOfUint16;
             var indexBufferSize = numIndices * indexSize;
+            var uIntExt;
             if (is32BitIndices) {
-                this.initializeUintExtension(dc);
+                uIntExt = dc.getExtension('OES_element_index_uint');
 
-                if (!this._hasUintExt) {
+                if (!uIntExt) {
                     Logger.log(Logger.LEVEL_SEVERE,
                         'The 3D model is too big and might not render properly. \n' +
                         'The browser does not support the "OES_element_index_uint" extension, ' +
@@ -701,7 +699,7 @@ define([
                     mesh = this._entities[i].mesh;
                     if (mesh.indexedRendering) {
                         data = mesh.indices;
-                        if (data instanceof Uint32Array && !this._hasUintExt) {
+                        if (data instanceof Uint32Array && !uIntExt) {
                             data = new Uint16Array(data);
                         }
                         this._entities[i].indexOffset = offset;
@@ -780,7 +778,7 @@ define([
 
             if (buffers.indexedRendering) {
                 var indexOffsetBytes = entity.indexOffset * entity.indexSize;
-                if (buffers.is32BitIndices && this._hasUintExt) {
+                if (buffers.is32BitIndices && dc.getExtension('OES_element_index_uint')) {
                     gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_INT, indexOffsetBytes);
                 }
                 else {
@@ -896,25 +894,6 @@ define([
             }
             return draw;
         };
-
-        // Internal. Intentionally not documented.
-        ColladaScene.prototype.initializeUintExtension = function (dc) {
-            var ext = dc.gpuResourceCache.resourceForKey(ColladaScene._uintExtCacheKey);
-
-            if (ext) {
-                this._hasUintExt = true;
-            }
-            else {
-                this._hasUintExt = false;
-                ext = dc.currentGlContext.getExtension('OES_element_index_uint');
-                if (ext) {
-                    dc.gpuResourceCache.putResource(ColladaScene._uintExtCacheKey, ext, 1);
-                    this._hasUintExt = true;
-                }
-            }
-        };
-
-        ColladaScene._uintExtCacheKey = 'uintExtCacheKey';
 
         return ColladaScene;
 
