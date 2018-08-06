@@ -166,21 +166,6 @@ define([
             set: function (blur) {
                 this._blur = blur;
             }
-        },
-
-        /**
-         * Increment per intensity. How strong is going to be the change in
-         * the intensity based on the intensity vector of the point
-         * @memberof HeatMapLayer.prototype
-         * @type {Number}
-         */
-        incrementPerIntensity: {
-            get: function () {
-                return this._incrementPerIntensity;
-            },
-            set: function (incrementPerIntensity) {
-                this._incrementPerIntensity = incrementPerIntensity;
-            }
         }
     });
 

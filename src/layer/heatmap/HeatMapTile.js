@@ -120,6 +120,7 @@ define([], function(){
     /**
      * Creates a canvas containing the circle of the right size. THe default shape is circle, but subclasses can
      * change this behavior.
+     * 
      * @protected
      * @returns {HTMLCanvasElement} Canvas representing the circle.
      */
@@ -127,10 +128,8 @@ define([], function(){
         var shape = this.createCanvas(this._radius * this._radius, this._radius * this._radius),
             ctx = shape.getContext('2d');
 
-        shape.width = shape.height = r2;
-
         var gradient = ctx.createRadialGradient(this._radius, this._radius, 0, this._radius, this._radius, this._radius);
-        gradient.addColorStop(0, "rgba(0,0,0,1)");
+        gradient.addColorStop(0, "rgba(0,0,0," + measure + ")");
         gradient.addColorStop(1, "rgba(0,0,0,0)");
 
         ctx.beginPath();
