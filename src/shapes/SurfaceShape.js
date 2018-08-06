@@ -84,7 +84,7 @@ define([
             this._pathType = WorldWind.GREAT_CIRCLE;
             this._maximumNumEdgeIntervals = SurfaceShape.DEFAULT_NUM_EDGE_INTERVALS;
             this._polarThrottle = SurfaceShape.DEFAULT_POLAR_THROTTLE;
-            this._sector = null;
+            this._boundingSector = null;
 
             /**
              * Indicates the object to return as the owner of this shape when picked.
@@ -386,9 +386,9 @@ define([
              * @memberof SurfaceShape.prototype
              * @type {Sector}
              */
-            sector: {
+            boundingSector: {
                 get: function () {
-                    return this._sector;
+                    return this._boundingSector;
                 }
             }
         });
@@ -422,10 +422,10 @@ define([
                 " ne " + shape.maximumNumEdgeIntervals +
                 " po " + shape.polarThrottle +
                 " se " + "[" +
-                shape.sector.minLatitude + "," +
-                shape.sector.maxLatitude + "," +
-                shape.sector.minLongitude + "," +
-                shape.sector.maxLongitude +
+                shape.boundingSector.minLatitude + "," +
+                shape.boundingSector.maxLatitude + "," +
+                shape.boundingSector.minLongitude + "," +
+                shape.boundingSector.maxLongitude +
                 "]";
         };
 
@@ -862,20 +862,20 @@ define([
             }
             var minLatitude = Math.min(eastSector.minLatitude, westSector.minLatitude);
             var maxLatitude = Math.max(eastSector.maxLatitude, eastSector.maxLatitude);
-            this._sector = new Sector(minLatitude, maxLatitude, -180, 180);
+            this._boundingSector = new Sector(minLatitude, maxLatitude, -180, 180);
             this._sectors = [eastSector, westSector];
         };
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.sectorsNotOverAntiMeridian = function () {
-            this._sector = new Sector(90, -90, 180, -180);
+            this._boundingSector = new Sector(90, -90, 180, -180);
             for (var i = 0, len = this.contours.length; i < len; i++) {
                 var sectors = this.contours[i].sectors;
                 for (var j = 0, lenS = sectors.length; j < lenS; j++) {
-                    this._sector.union(sectors[j]);
+                    this._boundingSector.union(sectors[j]);
                 }
             }
-            this._sectors = [this._sector];
+            this._sectors = [this._boundingSector];
         };
 
         // Internal use only. Intentionally not documented.
