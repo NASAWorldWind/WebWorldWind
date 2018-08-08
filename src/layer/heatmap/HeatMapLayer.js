@@ -53,7 +53,7 @@ define([
         this.tileWidth = 512;
         this.tileHeight = 512;
 
-        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 14, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
+        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
 
         this.displayName = displayName;
 
@@ -307,6 +307,7 @@ define([
      * @inheritDoc
      */
     HeatMapLayer.prototype.retrieveTileImage = function (dc, tile, suppressRedraw) {
+        var startTime = new Date().getTime();
         if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
             if (this.absentResourceList.isResourceAbsent(tile.imagePath)) {
                 return;
@@ -317,9 +318,9 @@ define([
                 layer = this,
                 radius = this.calculateRadius(tile.sector);
 
-            var extended = this.calculateExtendedSector(tile.sector);
-            var extendedWidth = Math.ceil(extended.extensionFactor * this.tileWidth);
-            var extendedHeight = Math.ceil(extended.extensionFactor * this.tileHeight);
+            var extended = this.calculateExtendedSector(tile.sector, 2 * (radius / this.tileWidth), 2 * (radius / this.tileHeight));
+            var extendedWidth = Math.ceil(extended.extensionFactorWidth * this.tileWidth);
+            var extendedHeight = Math.ceil(extended.extensionFactorHeight * this.tileHeight);
 
             var data = this.filterGeographically(this._data, extended.sector);
 
@@ -362,6 +363,8 @@ define([
                 }
             }
         }
+        var endTime = new Date().getTime();
+        console.log('Tile generation.', endTime - startTime);
     };
 
     /**
@@ -388,10 +391,9 @@ define([
      * @return {Object} .sector New extended sector.
      *                  .extensionFactor The factor by which the area is changed.
      */
-    HeatMapLayer.prototype.calculateExtendedSector = function (sector) {
-        var extensionFactor = 1;
-        var latitudeChange = (sector.maxLatitude - sector.minLatitude) * extensionFactor;
-        var longitudeChange = (sector.maxLongitude - sector.minLongitude) * extensionFactor;
+    HeatMapLayer.prototype.calculateExtendedSector = function (sector, extensionFactorWidth, extensionFactorHeight) {
+        var latitudeChange = (sector.maxLatitude - sector.minLatitude) * extensionFactorHeight;
+        var longitudeChange = (sector.maxLongitude - sector.minLongitude) * extensionFactorWidth;
         return {
             sector: new Sector(
                 sector.minLatitude - latitudeChange,
@@ -399,7 +401,8 @@ define([
                 sector.minLongitude - longitudeChange,
                 sector.maxLongitude + longitudeChange
             ),
-            extensionFactor: extensionFactor
+            extensionFactorHeight: extensionFactorHeight,
+            extensionFactorWidth: extensionFactorWidth
         };
     };
 
