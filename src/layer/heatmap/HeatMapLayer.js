@@ -307,7 +307,6 @@ define([
      * @inheritDoc
      */
     HeatMapLayer.prototype.retrieveTileImage = function (dc, tile, suppressRedraw) {
-        var startTime = new Date().getTime();
         if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
             if (this.absentResourceList.isResourceAbsent(tile.imagePath)) {
                 return;
@@ -363,8 +362,6 @@ define([
                 }
             }
         }
-        var endTime = new Date().getTime();
-        console.log('Tile generation.', endTime - startTime);
     };
 
     /**
