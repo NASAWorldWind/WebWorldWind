@@ -385,8 +385,11 @@ define([
      * The standard version just applies extension factor to the difference between minimum and maximum.
      * @protected
      * @param sector {Sector} Sector to use as basis for the extension.
+     * @param extensionFactorWidth {Number} The factor to be applied on the width to get sector representing the right geographical area.
+     * @param extensionFactorHeight {Number} The factor to be applied on the height to get sector representing the right geographical area.
      * @return {Object} .sector New extended sector.
-     *                  .extensionFactor The factor by which the area is changed.
+     *                  .extensionFactorHeight The factor by which the area is changed on the latitude.
+     *                  .extensionFactorWidth The factor by which the area is changed on the longitude.
      */
     HeatMapLayer.prototype.calculateExtendedSector = function (sector, extensionFactorWidth, extensionFactorHeight) {
         var latitudeChange = (sector.maxLatitude - sector.minLatitude) * extensionFactorHeight;
