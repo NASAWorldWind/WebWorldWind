@@ -83,13 +83,20 @@ define([
                                                                   controlPoint,
                                                                   currentPosition,
                                                                   previousPosition) {
-
             if (controlPoint.userProperties.purpose === ShapeEditorConstants.MIN_CORNER) {
-                shape.sector = new Sector(currentPosition.latitude, shape._boundaries[1].latitude,
-                    currentPosition.longitude, shape._boundaries[2].longitude);
+                shape.sector = new Sector(
+                    currentPosition.latitude,
+                    shape._sector.maxLatitude,
+                    currentPosition.longitude,
+                    shape._sector.maxLongitude
+                );
             } else if (controlPoint.userProperties.purpose === ShapeEditorConstants.MAX_CORNER) {
-                shape.sector = new Sector(shape._boundaries[0].latitude, currentPosition.latitude,
-                    shape._boundaries[0].longitude, currentPosition.longitude);
+                shape.sector = new Sector(
+                    shape._sector.minLatitude,
+                    currentPosition.latitude,
+                    shape._sector.minLongitude,
+                    currentPosition.longitude
+                );
             }
         };
 
