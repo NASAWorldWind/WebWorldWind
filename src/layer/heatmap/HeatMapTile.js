@@ -83,7 +83,6 @@ define([], function(){
         }
 
         var ctx = this._canvas.getContext('2d');
-        ctx.clearRect(0,0, this._width, this._height);
 
         var percentage, shapeToDraw = null;
         for(var i = 0; i < this._data.length; i++) {

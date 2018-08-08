@@ -332,7 +332,10 @@ define([
                 blur: this.blur,
 
                 intensityGradient: this.gradient,
-                incrementPerIntensity: this._incrementPerIntensity
+                incrementPerIntensity: this._incrementPerIntensity,
+
+                extendedWidth: extendedWidth,
+                extendedHeight: extendedHeight
             }).canvas();
 
             var result = document.createElement('canvas');

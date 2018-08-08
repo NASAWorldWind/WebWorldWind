@@ -25,10 +25,14 @@ define([
      * @inheritDoc
      * @param options.intensityGradient {Object} Keys represent the opacity between 0 and 1 and the values represent
      *  color strings.
+     *  @param options.extendedWidth {Number} Optional. Minimal width that needs to be retrieved for colorization.
+     *  @param options.extendedHeight {Number} Optional. Minimal height that needs to be retrieved for colorization.
      */
     var HeatMapColoredTile = function(data, options) {
         HeatMapTile.call(this, data, options);
 
+        this._extendedWidth = options.extendedWidth;
+        this._extendedHeight = options.extendedHeight;
         this._gradient = this.gradient(options.intensityGradient);
     };
 
@@ -41,9 +45,23 @@ define([
         var canvas = HeatMapTile.prototype.draw.call(this);
 
         var ctx = canvas.getContext('2d');
-        var colored = ctx.getImageData(0, 0, this._width, this._height);
+
+        var top = 0;
+        var left = 0;
+        var width = this._width;
+        var height = this._height;
+        if(this._extendedHeight) {
+            top = this._extendedHeight;
+            height = this._height - (2 * this._extendedHeight);
+        }
+        if(this._extendedWidth) {
+            left = this._extendedWidth;
+            width = this._width - (2 * this._extendedWidth);
+        }
+
+        var colored = ctx.getImageData(top, left, width, height);
         this.colorize(colored.data, this._gradient);
-        ctx.putImageData(colored, 0, 0);
+        ctx.putImageData(colored, top, left);
 
         return canvas;
     };
