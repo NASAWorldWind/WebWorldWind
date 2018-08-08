@@ -50,8 +50,8 @@ define([
      * @param measuredLocations {MeasuredLocation[]} Array of the points with the measured locations provided. .
      */
     var HeatMapLayer = function (displayName, measuredLocations) {
-        this.tileWidth = 512;
-        this.tileHeight = 512;
+        this.tileWidth = 256;
+        this.tileHeight = 256;
 
         TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
 
@@ -83,8 +83,8 @@ define([
 
         this._intervalType = IntervalType.CONTINUOUS;
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
-        this._radius = 25;
-        this._blur = 10;
+        this._radius = 12.5;
+        this._blur = 5;
         this._incrementPerIntensity = 1 / max;
 
         this.setGradient(measuredLocations);
