@@ -17,9 +17,9 @@
 define([
     '../../error/ArgumentError',
     './HeatMapColoredTile',
+    './HeatMapIntervalType',
     './HeatMapTile',
     '../../util/ImageSource',
-    './HeatMapIntervalType',
     '../../geom/Location',
     '../../util/Logger',
     '../../geom/MeasuredLocation',
@@ -27,10 +27,10 @@ define([
     '../../geom/Sector',
     '../../util/WWUtil'
 ], function (ArgumentError,
-             ColoredTile,
+             HeatMapColoredTile,
+             HeatMapIntervalType,
              HeatMapTile,
              ImageSource,
-             IntervalType,
              Location,
              Logger,
              MeasuredLocation,
@@ -40,14 +40,17 @@ define([
     "use strict";
 
     /**
-     * Returns a HeatMap Layer. The default implementation uses gradient circles as the way to display the
-     * point. The intensity of the point is taken in the account. The default implementation should look just fine,
-     * though it is possible to change the way the HeatMap looks via options to quite some extent.
+     * Constructs a HeatMap Layer.
+     *
+     * The default implementation uses gradient circles to display measured locations. The measure of the locations
+     * define the colors of the gradient.
+     *
+     * @alias HeatMapLayer
      * @constructor
      * @augments TiledImageLayer
-     * @alias HeatMapLayer
-     * @param displayName {String} The display name to associate with this layer.
-     * @param measuredLocations {MeasuredLocation[]} Array of the points with the measured locations provided. .
+     * @classdesc A HeatMap layer for visualising an array of measured locations.
+     * @param {String} displayName This layer's display name.
+     * @param {MeasuredLocation[]} measuredLocations An array of locations with measures to visualise.
      */
     var HeatMapLayer = function (displayName, measuredLocations) {
         this.tileWidth = 256;
@@ -58,10 +61,9 @@ define([
         this.displayName = displayName;
 
         var data = {};
-        var lat, lon;
-        for (lat = -90; lat <= 90; lat++) {
+        for (var lat = -90; lat <= 90; lat++) {
             data[lat] = {};
-            for (lon = -180; lon <= 180; lon++) {
+            for (var lon = -180; lon <= 180; lon++) {
                 data[lat][lon] = [];
             }
         }
@@ -76,12 +78,10 @@ define([
                 max = measured.measure;
             }
         });
+
         this._data = data;
         this._measuredLocations = measuredLocations;
-        // Use other structure than filtering for the geographical data? Each of the tiles receive a value.
-        // Object representing the lat and lon?
-
-        this._intervalType = IntervalType.CONTINUOUS;
+        this._intervalType = HeatMapIntervalType.CONTINUOUS;
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
         this._radius = 12.5;
         this._blur = 5;
@@ -94,10 +94,9 @@ define([
 
     Object.defineProperties(HeatMapLayer.prototype, {
         /**
-         * Different types of approaches to handling the interval between min
-         * and max values. Default value is Continuous.
+         * Type of interval to apply between the minimum and maximum values in the data. Default value is CONTINUOUS.
          * @memberof HeatMapLayer.prototype
-         * @type {IntervalType}
+         * @type {HeatMapIntervalType}
          */
         intervalType: {
             get: function () {
@@ -110,8 +109,8 @@ define([
         },
 
         /**
-         * Array of colors representing the scale which should be used when generating the
-         * layer. Default is ['blue', 'cyan', 'lime', 'yellow', 'red']
+         * Array of colors representing the scale used when generating the gradients.
+         * The default value is ['blue', 'cyan', 'lime', 'yellow', 'red'].
          * @memberof HeatMapLayer.prototype
          * @type {String[]}
          */
@@ -126,7 +125,7 @@ define([
         },
 
         /**
-         * Gradient to use for coloring of the HeatMap.
+         * Gradient of colours used to draw the points and derived from the scale and the data.
          * @memberOf HeatMapLayer.prototype
          * @type {String[]}
          */
@@ -136,14 +135,15 @@ define([
             },
             set: function (gradient) {
                 this._gradient = gradient;
+                // TODO The gradient depends on the scale. Should it be readonly? Should the scale be cleared when the
+                // gradient is manually set if it even makes sense?
             }
         },
 
         /**
-         * Represents radius of the point drawn on the canvas. It is also possible to provide a function. Radius of the
-         * point to be representing the intensity location. Default value is 25. The size of the radius.
+         * Radius of a point in pixels. The default value is 12.5.
          * @memberof HeatMapLayer.prototype
-         * @type {Function|Number}
+         * @type {Number}
          */
         radius: {
             get: function () {
@@ -155,7 +155,7 @@ define([
         },
 
         /**
-         * Amount of pixels used for blur.
+         * Blur distance around a point in pixels. The default value is 5.
          * @memberof HeatMapLayer.prototype
          * @type {Number}
          */
@@ -266,11 +266,11 @@ define([
         var scale = this.scale;
 
         var gradient = {};
-        if (intervalType === IntervalType.CONTINUOUS) {
+        if (intervalType === HeatMapIntervalType.CONTINUOUS) {
             scale.forEach(function (color, index) {
                 gradient[index / scale.length] = color;
             });
-        } else if (intervalType === IntervalType.QUANTILES) {
+        } else if (intervalType === HeatMapIntervalType.QUANTILES) {
             var data = this._measuredLocations;
             // Equal amount of pieces in each group.
             data.sort(function (item1, item2) {
@@ -315,7 +315,7 @@ define([
             var imagePath = tile.imagePath,
                 cache = dc.gpuResourceCache,
                 layer = this,
-                radius = this.calculateRadius(tile.sector);
+                radius = this.radius;
 
             var extended = this.calculateExtendedSector(tile.sector, 2 * (radius / this.tileWidth), 2 * (radius / this.tileHeight));
             var extendedWidth = Math.ceil(extended.extensionFactorWidth * this.tileWidth);
@@ -364,21 +364,6 @@ define([
         }
     };
 
-    /**
-     * Returns radius used to draw the points relevant to the HeatMap.
-     * @protected
-     * @param sector {Sector} Sector to be used for the calculation of the radius.
-     * @return {Number} Pixels representing the radius.
-     */
-    HeatMapLayer.prototype.calculateRadius = function (sector) {
-        var radius = this.radius;
-
-        if (typeof this.radius === 'function') {
-            radius = this.radius(sector, this.tileWidth, this.tileHeight);
-        }
-
-        return radius;
-    };
 
     /**
      * Calculates the new sector for which the data will be filtered and which will be drawn on the tile.
@@ -420,7 +405,7 @@ define([
      * @return {HeatMapTile} Implementation of the HeatMapTile used for this instance of the layer.
      */
     HeatMapLayer.prototype.createHeatMapTile = function (data, options) {
-        return new ColoredTile(data, options);
+        return new HeatMapColoredTile(data, options);
     };
 
     return HeatMapLayer;
