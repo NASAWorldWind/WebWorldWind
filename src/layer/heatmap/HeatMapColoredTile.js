@@ -18,11 +18,17 @@ define([
     './HeatMapTile'
 ], function (HeatMapTile) {
     /**
-     * Provides us with a HeatMapTile available to HeatMapColoredTile.
+     * Constructs a HeatMapColoredTile.
+     *
+     * The default implementation using the shades of gray to draw the information produced by the HeatMapTile is a source
+     * for coloring. This class colours the provided canvas based on the information contained in the intensityGradient.
+     *
+     *  @inheritDoc
+     *
+     * @alias HeatMapColoredTile
      * @constructor
      * @augments HeatMapTile
-     * @alias HeatMapColoredTile
-     * @inheritDoc
+     * @classdesc Tile for the HeatMap layer visualising data on a canvas using colour scale.
      * @param options.intensityGradient {Object} Keys represent the opacity between 0 and 1 and the values represent
      *  color strings.
      *  @param options.extendedWidth {Number} Optional. Minimal width that needs to be retrieved for colorization.
@@ -40,6 +46,8 @@ define([
 
     /**
      * @inheritDoc
+     *
+     * The coloured version colorizes only the cropped area relevant for the display. The rest is ignored.
      */
     HeatMapColoredTile.prototype.draw = function() {
         var canvas = HeatMapTile.prototype.draw.call(this);
@@ -67,19 +75,21 @@ define([
     };
 
     /**
-     * It creates one pixel height gradient based on the provided color scale. It is then used to color the HeatMap.
+     * Creates one pixel height gradient based on the provided intensity gradient. The gradient is drawn on the small
+     * canvas, from which the resulting data are retrieved.
      * @private
-     * @param grad {Object}
-     * @return {Uint8ClampedArray} Array of the gradient data
+     * @param intensityGradient {Object}  Gradient of colours used to draw the points. The keys represents percentage
+     *  for start of given color, which is value of the object.
+     * @returns {Uint8ClampedArray} Array of the gradient colours representing the full range relevant for this tile.
      */
-    HeatMapColoredTile.prototype.gradient = function (grad) {
+    HeatMapColoredTile.prototype.gradient = function (intensityGradient) {
         // create a 256x1 gradient that we'll use to turn a grayscale heatmap into a colored one
         var canvas = this.createCanvas(1, 256),
             ctx = canvas.getContext('2d'),
             gradient = ctx.createLinearGradient(0, 0, 0, 256);
 
-        for (var i in grad) {
-            gradient.addColorStop(+i, grad[i]);
+        for (var i in intensityGradient) {
+            gradient.addColorStop(+i, intensityGradient[i]);
         }
 
         ctx.fillStyle = gradient;
@@ -89,12 +99,16 @@ define([
     };
 
     /**
-     * this takes relatively long. Is it possible to improve?
+     * Colorizes all the relevant pixels based on the values from the linear gradient. The colour is applied directly
+     * to the pixels by changing them.
      * @private
+     * @param pixels {Uint8ClampedArray} The pixels to colorize in the format retrieved from canvas.
+     * @param gradient {Uint8ClampedArray} The pixels used as the source of the colors for the data pixels. The colors
+     *  are applied based on the opacity (blackness) of given pixel.
      */
     HeatMapColoredTile.prototype.colorize = function (pixels, gradient) {
         for (var i = 0, len = pixels.length, j; i < len; i += 4) {
-            j = pixels[i + 3] * 4; // get gradient color from opacity value
+            j = pixels[i + 3] * 4;
 
             if (j) {
                 pixels[i] = gradient[j];

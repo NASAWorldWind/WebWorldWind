@@ -18,12 +18,12 @@ define([], function(){
     "use strict";
 
     /**
-     * Enumeration of different approaches towards the interval and color scales in case of heatmap.
-     * Continuous - The distribution of the colors in the color scale is even based on the value. This is good for the
-     *   data sets with even distribution
+     * Enumeration of different approaches towards the interval and color scales in case of HeatMap layer.
+     * Continuous - The distribution of the colors in the color scale is even based on the measure. This is good for the
+     *   data sets with even distribution.
      * Quantiles - The distribution of the colors in the color scale is uneven based on the value. It is distributed evenly
-     *   based on the lowest 10%, 10% to 20% and so on. Basically it categorizes values based on to which quantile
-     *   the value belongs.
+     *   based on the measure for the lowest 10%, 10% to 20% and so on. Basically it categorizes measures based on to which
+     *   quantile the measure belongs. This is good for data sets with uneven distribution.
      * @exports HeatMapIntervalType
      * @type {{CONTINUOUS: number, QUANTILES: number}}
      */

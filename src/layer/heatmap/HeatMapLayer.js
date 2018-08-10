@@ -81,10 +81,10 @@ define([
 
         this._data = data;
         this._measuredLocations = measuredLocations;
+
         this._intervalType = HeatMapIntervalType.CONTINUOUS;
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
         this._radius = 12.5;
-        this._blur = 5;
         this._incrementPerIntensity = 1 / max;
 
         this.setGradient(measuredLocations);
@@ -95,6 +95,7 @@ define([
     Object.defineProperties(HeatMapLayer.prototype, {
         /**
          * Type of interval to apply between the minimum and maximum values in the data. Default value is CONTINUOUS.
+         * The supported values are CONTINUOUS and QUANTILES
          * @memberof HeatMapLayer.prototype
          * @type {HeatMapIntervalType}
          */
@@ -125,18 +126,22 @@ define([
         },
 
         /**
-         * Gradient of colours used to draw the points and derived from the scale and the data.
+         * Gradient of colours used to draw the points and derived from the scale, intervalType and the data. The colors
+         * are stored in an object, which has as keys the percentage from which the given color should be applied.
+         * The default object based on the default scale and intervalType (in case of CONTINUOUS the data are irrelevant):
+         * {
+         *     "0": "blue",
+         *     "0.2": "cyan",
+         *     "0.4": "lime",
+         *     "o.6": "yellow",
+         *     "0.8": "red"
+         * }
          * @memberOf HeatMapLayer.prototype
-         * @type {String[]}
+         * @type {Object}
          */
         gradient: {
             get: function () {
                 return this._gradient;
-            },
-            set: function (gradient) {
-                this._gradient = gradient;
-                // TODO The gradient depends on the scale. Should it be readonly? Should the scale be cleared when the
-                // gradient is manually set if it even makes sense?
             }
         },
 
@@ -152,30 +157,19 @@ define([
             set: function (radius) {
                 this._radius = radius;
             }
-        },
-
-        /**
-         * Blur distance around a point in pixels. The default value is 5.
-         * @memberof HeatMapLayer.prototype
-         * @type {Number}
-         */
-        blur: {
-            get: function () {
-                return this._blur;
-            },
-            set: function (blur) {
-                this._blur = blur;
-            }
         }
     });
 
     /**
-     * Returns the relevant points for the visualisation for current sector. At the moment it uses QuadTree to retrieve
-     * the information.
+     * Returns the relevant points for the visualisation for current sector. To retrieve the relevant points, the data
+     * are stored in the two dimensional array representation of the geographic locations. The first index represents
+     * latitude from -90 to 90. The second index represents longitude from -180 to 180.
+     * For the sector pieces outside of the bounds of valid latitude and longitude, the array behaves as if it was
+     * continuous in the longitudinal space of <-180,180> and clamped to the min, max value in case of latitudinal space.
      * @private
-     * @param data
-     * @param sector
-     * @returns {Object[]}
+     * @param data {MeasuredLocation[][]} Two dimensional array covering the whole globe in WGS84 coordinates.
+     * @param sector {Sector} Visible sector limiting the data to retrieve.
+     * @returns {MeasuredLocation[]} Array of the Measured Locations relevant for given sector.
      */
     HeatMapLayer.prototype.filterGeographically = function (data, sector) {
         var minLatitude = Math.floor(sector.minLatitude);
@@ -185,6 +179,7 @@ define([
 
         var extraLongitudeBefore = 0, extraLongitudeAfter = 0;
 
+        // Clamp the latitude to <-90,90>
         if (minLatitude <= -90) {
             minLatitude = -90;
         }
@@ -192,6 +187,7 @@ define([
             maxLatitude = 90;
         }
 
+        // Handle continuousness of the longitudinal space.
         if (minLongitude <= -180) {
             extraLongitudeBefore = Math.abs(minLongitude - (-180));
             minLongitude = -180;
@@ -202,48 +198,35 @@ define([
         }
 
         var result = [];
-        var lat, lon;
         this.gatherGeographical(data, result, sector, minLatitude, maxLatitude, minLongitude, maxLongitude);
 
         if (extraLongitudeBefore !== 0) {
             var beforeSector = new Sector(minLatitude, maxLatitude, 180 - extraLongitudeBefore, 180);
-            for (lat = minLatitude; lat <= maxLatitude; lat++) {
-                for (lon = 180 - extraLongitudeBefore; lon <= 180; lon++) {
-                    data[lat][lon].forEach(function (element) {
-                        if (beforeSector.containsLocation(element.latitude, element.longitude)) {
-                            result.push(new MeasuredLocation(element.latitude, -360 + element.longitude, element.measure));
-                        }
-                    });
-                }
-            }
+            this.gatherGeographical(data, result, beforeSector, minLatitude, maxLatitude, 180 - extraLongitudeBefore, 180);
         }
+
         if (extraLongitudeAfter !== 0) {
             var afterSector = new Sector(minLatitude, maxLatitude, -180, -180 + extraLongitudeAfter);
-
-            for (lat = minLatitude; lat <= maxLatitude; lat++) {
-                for (lon = -180; lon <= -180 + extraLongitudeAfter; lon++) {
-                    data[lat][lon].forEach(function (element) {
-                        if (afterSector.containsLocation(element.latitude, element.longitude)) {
-                            result.push(new MeasuredLocation(element.latitude, 360 + element.longitude, element.measure));
-                        }
-                    });
-                }
-            }
+            this.gatherGeographical(data, result, afterSector, minLatitude, maxLatitude, -180, -180 + extraLongitudeAfter);
         }
 
         return result;
     };
 
     /**
-     * Internal method to gather the geographical data for given sector and boundingBox.
+     * Internal method to gather the geographical data for given sector and bounding box. The data are in the two dimensional
+     * array structure. Therefore the method goes through the slice of the array limited by the bounding box. The
+     * elements in given 1 * 1 degree space are then filtered based on their exact location and the exact limitation of
+     * the sector.
      * @private
-     * @param data
-     * @param result
-     * @param sector
-     * @param minLatitude
-     * @param maxLatitude
-     * @param minLongitude
-     * @param maxLongitude
+     * @param data {MeasuredLocation[][]} Two dimensional array covering the whole globe in WGS84 coordinates. The globe
+     *  is split into the grid of 1 * 1 degrees.
+     * @param result {MeasuredLocation[]} Array of the Locations that are valid within given area.
+     * @param sector {Sector} The sector representing the detailed area relevant for given
+     * @param minLatitude {Number} The integer bound of the sector relevant for the filtering.
+     * @param maxLatitude {Number} The integer bound of the sector relevant for the filtering.
+     * @param minLongitude {Number} The integer bound of the sector relevant for the filtering.
+     * @param maxLongitude {Number} The integer bound of the sector relevant for the filtering.
      */
     HeatMapLayer.prototype.gatherGeographical = function (data, result, sector, minLatitude, maxLatitude, minLongitude, maxLongitude) {
         var lat, lon;
@@ -259,7 +242,14 @@ define([
     };
 
     /**
-     * Sets gradient based on the Scale and IntervalType.
+     * Sets gradient based on the Scale and IntervalType. It supports CONTINUOUS and QUANTILES types of the interval.
+     * The CONTINUOUS simply distribute the colors equally among the percentage.
+     * The QUNATILES distribution takes into account the underlying data. The data are sorted based on the measures.
+     * The amount of colors in the scale decides how many of the intervals will be in the resulting gradient. The value
+     * used as the key for the resulting gradient is taken from element on the position represented by the percentage
+     * counted via following formula:
+     *  gradientIndex = (data[Math.floor((1 / scale.length) * data.length)].measure) / max;
+     * @private
      */
     HeatMapLayer.prototype.setGradient = function () {
         var intervalType = this.intervalType;
@@ -285,13 +275,12 @@ define([
             var max = data[data.length - 1].measure;
             if (data.length >= scale.length) {
                 scale.forEach(function (color, index) {
-                    // What is the fraction of the colors
-                    var fractionDecidingTheScale = index / scale.length; // Kolik je na nte pozice z maxima.
-                    var pointInScale = data[Math.floor(fractionDecidingTheScale * data.length)].measure / max;
                     if(index === 0) {
                         gradient[0] = color;
                     } else {
-                        gradient[pointInScale] = color;
+                        gradient[
+                            data[Math.floor(index / scale.length * data.length)].measure / max
+                            ] = color;
                     }
                 });
             } else {
@@ -304,6 +293,7 @@ define([
     };
 
     /**
+     * The Image for given Tile is generated and drawn on internal Canvas.
      * @inheritDoc
      */
     HeatMapLayer.prototype.retrieveTileImage = function (dc, tile, suppressRedraw) {
@@ -329,7 +319,6 @@ define([
                 width: this.tileWidth + 2 * extendedWidth,
                 height: this.tileHeight + 2 * extendedHeight,
                 radius: radius,
-                blur: this.blur,
 
                 intensityGradient: this.gradient,
                 incrementPerIntensity: this._incrementPerIntensity,
@@ -367,7 +356,8 @@ define([
 
     /**
      * Calculates the new sector for which the data will be filtered and which will be drawn on the tile.
-     * The standard version just applies extension factor to the difference between minimum and maximum.
+     * The standard version just applies extension factor to the difference between minimum and maximum. The extension
+     * factor may differ between latitude and longitude.
      * @protected
      * @param sector {Sector} Sector to use as basis for the extension.
      * @param extensionFactorWidth {Number} The factor to be applied on the width to get sector representing the right geographical area.
@@ -392,7 +382,8 @@ define([
     };
 
     /**
-     * Overwrite this method if you want to use a custom implementation of tile used for displaying the data.
+     * Overwrite this method if you want to use a custom implementation of tile used for displaying the data. In the
+     * default version the tile draws points as blurring circles coloured based on the gradient.
      * @protected
      * @param data {Object[]} Array of information constituting points in the map.
      * @param options {Object}
@@ -400,9 +391,13 @@ define([
      * @param options.width {Number} Width of the Canvas to be created in pixels.
      * @param options.height {Number} Height of the Canvas to be created in pixels.
      * @param options.radius {Number} Radius of the data point in pixels.
-     * @param options.blur {Number} Blur of the HeatMap element in the pixels.
-     * @param options.incrementPerIntensity {Number}
-     * @return {HeatMapTile} Implementation of the HeatMapTile used for this instance of the layer.
+     * @param options.incrementPerIntensity {Number} The ratio representing the 1 / measure for the maximum measure.
+     * @param options.intensityGradient {Object} Gradient of colours used to draw the points and derived from the scale,
+     *  intervalType and the data.
+     * @param options.extendedWidth {Number} Minimal width that needs to be valid in the resulting object.
+     * @param options.extendedHeight {Number} Minimal height that needs to be valid in the resulting object.
+     *
+     * @return {HeatMapTile} Instance of the implementation of the HeatMapTile used for this instance of the layer.
      */
     HeatMapLayer.prototype.createHeatMapTile = function (data, options) {
         return new HeatMapColoredTile(data, options);

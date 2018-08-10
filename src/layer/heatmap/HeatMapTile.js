@@ -16,17 +16,24 @@
  */
 define([], function(){
     /**
+     * Constructs a HeatMapTile.
+     *
      * Returns one tile for the HeatMap information. It is basically an interface specifying the public methods
      * properties and default configuration. The logic itself is handled in the subclasses.
+     *
      * @alias HeatMapTile
      * @constructor
+     * @classdesc Tile for the HeatMap layer visualising data on a canvas using shades of gray scale.
+     *
      * @param data {Object[]} Array of information constituting points in the map.
      * @param options {Object}
-     * @param options.sector {Sector} Sector with the geographical information for tile representation.
+     * @param options.sector {Sector} Sector representing the geographical area for this tile. It is used to correctly
+     *  interpret the location of the MeasuredLocation on the resulting canvas.
      * @param options.width {Number} Width of the Canvas to be created in pixels.
      * @param options.height {Number} Height of the Canvas to be created in pixels.
-     * @param options.radius {Number} Radius of the data point in pixels.
-     * @param options.incrementPerIntensity {Number}
+     * @param options.radius {Number} Radius of the data point in pixels. The radius represents the blur applied to the
+     *  drawn shape
+     * @param options.incrementPerIntensity {Number} The ratio representing the 1 / measure for the maximum measure.
      * @param options.intensityGradient {Object} Keys represent the opacity between 0 and 1 and the values represent
      *  color strings.
      */
@@ -55,7 +62,7 @@ define([], function(){
     };
 
     /**
-     * Returns the whole Canvas. It is then possible to use for further uses. This one is actually used in the
+     * Returns the whole Canvas. It is then possible to use further. This one is actually used in the
      * HeatMapLayer mechanism so if you want to provide some custom implementation of Canvas creation in your tile,
      * change this method.
      * @return {HTMLCanvasElement} Canvas Element representing the drawn tile.
@@ -65,13 +72,12 @@ define([], function(){
     };
 
     /**
-     * Draws the shapes on the canvas.
+     * Draws the shapes on the canvas. Create shapes based on the gradient. Each of the gradient colors has associated
+     * shape, which defines how strong will be the center point.
      * @protected
      * @returns {HTMLCanvasElement}
      */
     HeatMapTile.prototype.draw = function() {
-        // Create shape based on the gradient. This means the intervals for the colors from the gradient, which needs to be created on the up.
-        // They are from 0 to 1. It already represents percentage.
         var shapes = [];
         for(var intensityKey in this._intensityGradient) {
             if(this._intensityGradient.hasOwnProperty(intensityKey)) {
@@ -89,7 +95,6 @@ define([], function(){
             var location = this._data[i];
             percentage = location.measure * this._incrementPerIntensity;
             ctx.globalAlpha = percentage;
-            // Find the shape based on the gradient. Get the location in pixels and draw the shape.
             shapes.forEach(function(shape){
                 if(percentage > shape.min) {
                     shapeToDraw = shape.shape;
