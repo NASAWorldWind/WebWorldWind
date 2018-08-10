@@ -153,10 +153,9 @@ define([], function(){
      * @param sector {Sector} Sector to which transform
      * @param height {Number} Height of the tile to draw to.
      * @private
-     * @returns {number} Position on the height in pixels. THe result needs to start with 0
+     * @returns {Number} Position on the height in pixels. THe result starts with 0
      */
     HeatMapTile.prototype.latitudeInSector = function(location, sector, height) {
-        // Percentage of the available space.
         var sizeOfArea = sector.maxLatitude - sector.minLatitude;
         var locationInArea = location.latitude - sector.minLatitude;
         return Math.ceil((locationInArea / sizeOfArea) * (height - 1));
@@ -167,7 +166,8 @@ define([], function(){
      * @param location {Location} Location to transform
      * @param sector {Sector} Sector to which transform
      * @param width {Number} Height of the tile to draw to.
-     * @returns {number}
+     * @private
+     * @returns {Number} Position on the height in pixels. THe result starts with 0
      */
     HeatMapTile.prototype.longitudeInSector = function(location, sector, width) {
         var sizeOfArea = sector.maxLongitude - sector.minLongitude ;
