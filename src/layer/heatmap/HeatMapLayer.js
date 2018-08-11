@@ -202,12 +202,12 @@ define([
 
         if (extraLongitudeBefore !== 0) {
             var beforeSector = new Sector(minLatitude, maxLatitude, 180 - extraLongitudeBefore, 180);
-            this.gatherGeographical(data, result, beforeSector, minLatitude, maxLatitude, 180 - extraLongitudeBefore, 180);
+            this.gatherGeographical(data, result, beforeSector, minLatitude, maxLatitude, 180 - extraLongitudeBefore, 180, -360);
         }
 
         if (extraLongitudeAfter !== 0) {
             var afterSector = new Sector(minLatitude, maxLatitude, -180, -180 + extraLongitudeAfter);
-            this.gatherGeographical(data, result, afterSector, minLatitude, maxLatitude, -180, -180 + extraLongitudeAfter);
+            this.gatherGeographical(data, result, afterSector, minLatitude, maxLatitude, -180, -180 + extraLongitudeAfter, 360);
         }
 
         return result;
@@ -227,14 +227,21 @@ define([
      * @param maxLatitude {Number} The integer bound of the sector relevant for the filtering.
      * @param minLongitude {Number} The integer bound of the sector relevant for the filtering.
      * @param maxLongitude {Number} The integer bound of the sector relevant for the filtering.
+     * @param adaptLongitude {Number} Optional. If this is supplied, then the result contains new measured locations
+     *  with the longitude adapted by adding this number.
      */
-    HeatMapLayer.prototype.gatherGeographical = function (data, result, sector, minLatitude, maxLatitude, minLongitude, maxLongitude) {
+    HeatMapLayer.prototype.gatherGeographical = function (data, result, sector, minLatitude, maxLatitude, minLongitude,
+                                                          maxLongitude, adaptLongitude) {
         var lat, lon;
         for (lat = minLatitude; lat <= maxLatitude; lat++) {
             for (lon = minLongitude; lon <= maxLongitude; lon++) {
                 data[lat][lon].forEach(function (element) {
                     if (sector.containsLocation(element.latitude, element.longitude)) {
-                        result.push(element);
+                        if(!adaptLongitude) {
+                            result.push(element);
+                        } else {
+                            result.push(new MeasuredLocation(element.latitude, adaptLongitude + element.longitude, element.measure));
+                        }
                     }
                 });
             }
@@ -289,7 +296,7 @@ define([
                 });
             }
         }
-        this.gradient = gradient;
+        this._gradient = gradient;
     };
 
     /**
