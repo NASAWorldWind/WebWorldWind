@@ -113,7 +113,7 @@ requirejs(['./WorldWindShim',
         rectangleShape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(rectangleShape);
 
-        var sectorShape = new WorldWind.SurfaceSector(new WorldWind.Sector(45, 47, -100, -110), attributes);
+        var sectorShape = new WorldWind.SurfaceSector(new WorldWind.Sector(45, 47, -110, -100), attributes);
         sectorShape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(sectorShape);
 
