@@ -16,9 +16,9 @@ enabling developers to include their own custom terrain and imagery.
 
 ## Get Started
 
-The Web WorldWind [Developer's Guide](https://worldwind.arc.nasa.gov/web) has a complete description of Web
-WorldWind's functionality. You'll also find there links to many Web WorldWind resources, including a user guide. The
-latest Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
+The Web WorldWind [Developer's Guide](https://worldwind.arc.nasa.gov/web) has a complete description of Web WorldWind's
+functionality. You'll also find there links to many Web WorldWind resources, including a user guide. The latest
+Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
 
 ## Building
 
