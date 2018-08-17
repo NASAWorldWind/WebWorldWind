@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -274,7 +275,7 @@ define([
             result[1] = cosLat;
             result[2] = -sinLat * cosLon;
 
-            return result;
+            return result.normalize();
         };
 
         ProjectionWgs84.prototype.northTangentAtPoint = function (globe, x, y, z, offset, result) {
@@ -283,18 +284,31 @@ define([
             return this.northTangentAtLocation(globe, this.scratchPosition.latitude, this.scratchPosition.longitude, result);
         };
 
+        ProjectionWgs84.prototype.surfaceNormalAtLocation = function (globe, latitude, longitude, result) {
+            var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
+                cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
+                sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
+                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS);
+
+            result[0] = cosLat * sinLon;
+            result[1] = sinLat;
+            result[2] = cosLat * cosLon;
+
+            return result.normalize();
+        };
+
         ProjectionWgs84.prototype.surfaceNormalAtPoint = function (globe, x, y, z, result) {
             if (!globe) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ProjectionWgs84",
                     "surfaceNormalAtPoint", "missingGlobe"));
             }
 
-            var eSquared = globe.equatorialRadius * globe.equatorialRadius,
-                polSquared = globe.polarRadius * globe.polarRadius;
+            var a2 = globe.equatorialRadius * globe.equatorialRadius,
+                b2 = globe.polarRadius * globe.polarRadius;
 
-            result[0] = x / eSquared;
-            result[1] = y / polSquared;
-            result[2] = z / eSquared;
+            result[0] = x / a2;
+            result[1] = y / b2;
+            result[2] = z / a2;
 
             return result.normalize();
         };

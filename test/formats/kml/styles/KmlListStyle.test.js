@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,7 +17,7 @@
 define([
     'src/util/XmlDocument',
     'src/formats/kml/styles/KmlListStyle',
-    'src/formats/kml/util/ItemIcon'
+    'src/formats/kml/util/KmlItemIcon'
 ], function (
     XmlDocument,
     KmlListStyle,
@@ -41,6 +42,7 @@ define([
             it ("should have the ListItemType, BgColor and ItemIcon properties",function(){
                 expect(listStyle.kmlListItemType).toEqual('check');
                 expect(listStyle.kmlBgColor).toEqual('ffffffff');
+                console.log(listStyle.kmlItemIcon);
                 expect(listStyle.kmlItemIcon instanceof ItemIcon).toBeTruthy();
 
             });

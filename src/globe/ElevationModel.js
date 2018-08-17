@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -17,8 +18,12 @@
  * @exports ElevationModel
  */
 define(['../error/ArgumentError',
+        '../geom/Angle',
+        '../geom/Location',
         '../util/Logger'],
     function (ArgumentError,
+              Angle,
+              Location,
               Logger) {
         "use strict";
 
@@ -53,6 +58,8 @@ define(['../error/ArgumentError',
              * @type {Array}
              */
             this.coverages = [];
+
+            this.scratchLocation = new Location(0, 0);
 
             this.computeStateKey();
 
@@ -160,6 +167,7 @@ define(['../error/ArgumentError',
             if (this.coverages.length > 1) {
                 this.coverages.sort(this.coverageComparator);
             }
+
             this.computeStateKey();
         };
 
@@ -286,6 +294,67 @@ define(['../error/ArgumentError',
         };
 
         /**
+         * Internal use only
+         * Returns the index of the coverage most closely matching the supplied resolution and overlapping the supplied
+         * sector or point area of interest. At least one area of interest parameter must be non-null.
+         * @param {Sector} sector An optional sector area of interest. Setting this parameter to null will cause it to be ignored.
+         * @param {Location} location An optional point area of interest. Setting this parameter to null will cause it to be ignored.
+         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
+         * @returns {Number} The index of the coverage most closely matching the requested resolution.
+         * @ignore
+         */
+        ElevationModel.prototype.preferredCoverageIndex = function (sector, location, targetResolution) {
+
+            var i,
+                n = this.coverages.length,
+                minResDiff = Number.MAX_VALUE,
+                minDiffIdx = -1;
+
+            for (i = 0; i < n; i++) {
+                var coverage = this.coverages[i],
+                    validCoverage = coverage.enabled && ((sector !== null && coverage.coverageSector.intersects(sector)) ||
+                        (location !== null && coverage.coverageSector.containsLocation(location.latitude, location.longitude)));
+                if (validCoverage) {
+                    var resDiff = Math.abs(coverage.resolution - targetResolution);
+                    if (resDiff > minResDiff) {
+                        return minDiffIdx;
+                    }
+                    minResDiff = resDiff;
+                    minDiffIdx = i;
+                }
+            }
+
+            return minDiffIdx;
+        };
+
+        /**
+         * Returns the best coverage available for a particular resolution,
+         * @param {Number} latitude The location's latitude in degrees.
+         * @param {Number} longitude The location's longitude in degrees.
+         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
+         * @returns {ElevationCoverage} The coverage most closely matching the requested resolution. Returns null if no coverage is available at this
+         * location.
+         * @throws {ArgumentError} If the specified resolution is not positive.
+         */
+        ElevationModel.prototype.bestCoverageAtLocation = function (latitude, longitude, targetResolution) {
+
+            if (!targetResolution || targetResolution < 0) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationModel", "bestCoverageAtLocation", "invalidResolution"));
+            }
+
+            this.scratchLocation.set(latitude, longitude);
+            var preferredIndex = this.preferredCoverageIndex(null, this.scratchLocation, targetResolution);
+            if (preferredIndex >= 0) {
+                return this.coverages[preferredIndex];
+            }
+
+            return null;
+        };
+
+        /**
          * Returns the elevations at locations within a specified sector.
          * @param {Sector} sector The sector for which to determine the elevations.
          * @param {Number} numLat The number of latitudinal sample locations within the sector.
@@ -321,25 +390,31 @@ define(['../error/ArgumentError',
             }
 
             result.fill(NaN);
-            var resolution = Number.MAX_VALUE, i, n = this.coverages.length, resultFilled = false;
-            for (i = n - 1; !resultFilled && i >= 0; i--) {
-                var coverage = this.coverages[i];
-                if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
-                    resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
-                    if (resultFilled) {
-                        resolution = coverage.resolution;
+            var resolution = Number.MAX_VALUE,
+                resultFilled = false,
+                preferredIndex = this.preferredCoverageIndex(sector, null, targetResolution);
+
+            if (preferredIndex >= 0) {
+                for (var i = preferredIndex; !resultFilled && i >= 0; i--) {
+                    var coverage = this.coverages[i];
+                    if (coverage.enabled && coverage.coverageSector.intersects(sector)) {
+                        resultFilled = coverage.elevationsForGrid(sector, numLat, numLon, result);
+                        if (resultFilled) {
+                            resolution = coverage.resolution;
+                        }
                     }
                 }
             }
 
             if (!resultFilled) {
-                n = result.length;
+                var n = result.length;
                 for (i = 0; i < n; i++) {
                     if (isNaN(result[i])) {
                         result[i] = 0;
                     }
                 }
             }
+
             return resolution;
         };
 

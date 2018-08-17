@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * Illustrates how to display text at screen positions. Uses offsets to align the text relative to its position.
+ * Illustrates how to display text overlays. Uses offsets to align the text relative to its position.
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],
@@ -22,19 +23,20 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
-        // Tell WorldWind to log only warnings.
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        /**
-         * Added imagery layers.
-         */
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -45,52 +47,39 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        var screenText,
-            textAttributes = new WorldWind.TextAttributes(null),
-            textLayer = new WorldWind.RenderableLayer("Screen Text");
+        var screenText, screenOffset;
 
-        // Set up the common text attributes.
-        textAttributes.color = WorldWind.Color.RED;
+        // Create a Renderable Layer to hold the ScreenTexts.
+        var textLayer = new WorldWind.RenderableLayer("Screen Text");
 
-        // Create a screen text shape and its attributes.
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1), "Upper Left");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the upper left corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1);
-        screenText.attributes = textAttributes;
+        // Create left ScreenText
+        screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
+        screenText = new WorldWind.ScreenText(screenOffset, "Left");
+        // Use the attributes offset to position the left side of the text string at the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0), "Lower Left");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the lower left corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
-        screenText.attributes = textAttributes;
+        // Create right ScreenText
+        screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+        screenText = new WorldWind.ScreenText(screenOffset, "Right");
+        // Use the attributes offset to position the right side of the text string at the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 1), "Upper Right");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the upper right corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 1);
-        screenText.attributes = textAttributes;
+        // The same screen offset value will be commonly used between the center-positioned ScreenTexts.
+        // Their TextAttributes offsets will be used to adjust their text alignment.
+        screenOffset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
+
+        // Center ScreenText, right-aligned
+        screenText = new WorldWind.ScreenText(screenOffset, "Center, right-aligned.");
+        // Use the attributes offset to right-align the text to the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0), "Lower Right");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the lower right corner of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0);
-        screenText.attributes = textAttributes;
-        textLayer.addRenderable(screenText);
-
-        screenText = new WorldWind.ScreenText(
-            new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5), "Center");
-        textAttributes = new WorldWind.TextAttributes(textAttributes);
-        // Use offset to position the center of the text string at the shape's screen location.
-        textAttributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
-        screenText.attributes = textAttributes;
+        // Center ScreenText, left-aligned
+        screenText = new WorldWind.ScreenText(screenOffset, "Center, left-aligned.");
+        // Use the attributes offset to left-align the text to the shape's screen location.
+        screenText.attributes.offset = new WorldWind.Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0.5);
         textLayer.addRenderable(screenText);
 
         // Add the text layer to the WorldWindow's layer list.
@@ -98,27 +87,4 @@ requirejs(['./WorldWindShim',
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
-
-        // Set up to handle picking.
-        var handlePick = (function (o) {
-            var pickPoint = wwd.canvasCoordinates(o.clientX, o.clientY);
-
-            var pickList = wwd.pick(pickPoint);
-            if (pickList.objects.length > 0) {
-                for (var p = 0; p < pickList.objects.length; p++) {
-                    var pickedObject = pickList.objects[p];
-                    if (!pickedObject.isTerrain) {
-                        if (pickedObject.userObject instanceof WorldWind.ScreenText) {
-                            console.log(pickedObject.userObject.text);
-                        }
-                    }
-                }
-            }
-        }).bind(this);
-
-        // Listen for mouse moves and highlight text that the cursor rolls over.
-        wwd.addEventListener("mousemove", handlePick);
-
-        // Listen for taps on mobile devices and highlight text that the user taps.
-        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
     });

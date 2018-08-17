@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -23,61 +24,56 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Add WorldWind UI layers.
+        wwd.addLayer(new WorldWind.CompassLayer());
+        wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
+        wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
+
+        // Create a background layer.
         var backgroundLayer = new WorldWind.BMNGOneImageLayer();
         backgroundLayer.hide = true; // Don't show it in the layer manager.
         wwd.addLayer(backgroundLayer);
 
         // Create the Blue Marble time series layer using REST tiles hosted at worldwind32.arc.nasa.gov.
-        var blueMarbleTimeSeries = new WorldWind.BMNGRestLayer("https://worldwind32.arc.nasa.gov/standalonedata/Earth/BlueMarble256");
-        blueMarbleTimeSeries.enabled = false;
-        blueMarbleTimeSeries.showSpinner = true;
+        // Disable it until its images are cached, which is initiated below.
+        var timeSeriesLayer = new WorldWind.BMNGRestLayer(
+            "https://worldwind32.arc.nasa.gov/standalonedata/Earth/BlueMarble256");
+        timeSeriesLayer.enabled = false;
+        timeSeriesLayer.showSpinner = true;
+        wwd.addLayer(timeSeriesLayer);
 
-        // Add Blue Marble time series to the WorldWindow's layer list. Disable it until its images are preloaded,
-        // which is initiated below.
-        wwd.addLayer(blueMarbleTimeSeries);
+        // Add atmosphere layer on top of base imagery layer.
+        wwd.addLayer(new WorldWind.AtmosphereLayer());
 
-        // Create a compass and view controls.
-        wwd.addLayer(new WorldWind.CompassLayer());
-        wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
-        wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
+        var timeIndex = 0;
+        var animationStep = 200;
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
-        // Ensure that the background and other control layers are displayed while the blue marble layer is
-        // being pre-populated.
-        wwd.redraw();
-
-        // Wait for the layer to pre-populate all its sub-layers before enabling it.
-        var prePopulateInterval = window.setInterval(function () {
-            if (!this.prePopulate) {
-                // Pre-populate the layer's sub-layers so that we don't see flashing of their image tiles as they're
-                // loaded.
-                blueMarbleTimeSeries.prePopulate(wwd);
-                this.prePopulate = true;
+        function animateTimeSeries() {
+            // Pre-load all of the time series layer data before starting the animation, so that we don't see image
+            // tiles flashing as they're downloaded.
+            if (!timeSeriesLayer.isPrePopulated(wwd)) {
+                timeSeriesLayer.prePopulate(wwd);
                 return;
             }
 
-            // See if the layer is pre-populated now. If so, enable it.
-            if (blueMarbleTimeSeries.isPrePopulated(wwd)) {
-                blueMarbleTimeSeries.enabled = true;
-                blueMarbleTimeSeries.showSpinner = false;
-                window.clearInterval(prePopulateInterval);
-                layerManager.synchronizeLayerList();
+            // Increment the Blue Marble layer's time at a specified frequency.
+            timeIndex = ++timeIndex % WorldWind.BMNGRestLayer.availableTimes.length;
+            timeSeriesLayer.time = WorldWind.BMNGRestLayer.availableTimes[timeIndex];
+            timeSeriesLayer.enabled = true;
+            timeSeriesLayer.showSpinner = false;
+            layerManager.synchronizeLayerList();
+            wwd.redraw();
+        }
 
-                // Increment the Blue Marble layer's time at a specified frequency.
-                var currentIndex = 0;
-                window.setInterval(function () {
-                    if (blueMarbleTimeSeries.enabled) {
-                        currentIndex = ++currentIndex % WorldWind.BMNGRestLayer.availableTimes.length;
-                        blueMarbleTimeSeries.time = WorldWind.BMNGRestLayer.availableTimes[currentIndex];
-                        wwd.redraw();
-                    }
-                }, 200);
-            }
-        }, 200);
+        // Run the animation at the desired frequency.
+        window.setInterval(animateTimeSeries, animationStep);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

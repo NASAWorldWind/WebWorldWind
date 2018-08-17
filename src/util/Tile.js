@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -115,7 +116,7 @@ define([
              * @type {String}
              * @readonly
              */
-            this.tileKey = level.levelNumber.toString() + "." + row.toString() + "." + column.toString();
+            this.tileKey = Tile.computeTileKey(level.levelNumber, row, column);
 
             /**
              * The Cartesian bounding box of this tile.
@@ -401,6 +402,18 @@ define([
 
             globe.computePointFromPosition(this.sector.centroidLatitude(), this.sector.centroidLongitude(), 0,
                 this.referencePoint);
+        };
+
+        /**
+         * Computes a key that uniquely identifies a tile within its level set.
+         *
+         * @param {Number} levelNumber The tile's level number in a tile pyramid.
+         * @param {Number} row The tile's row in the specified level in a tile pyramid.
+         * @param {Number} column The tile's column in the specified level in a tile pyramid.
+         * @returns {String} A string key uniquely identifying a tile with the specified level, row, and column.
+         */
+        Tile.computeTileKey = function (levelNumber, row, column) {
+            return levelNumber + "." + row + "." + column;
         };
 
         /**

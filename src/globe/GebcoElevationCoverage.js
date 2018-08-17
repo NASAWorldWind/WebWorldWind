@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -36,15 +37,16 @@ define([
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
         var GebcoElevationCoverage = function () {
-            TiledElevationCoverage.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 6, "application/bil16",
-                "GebcoElevations256", 256, 256, 0.008333333333333);
+            TiledElevationCoverage.call(this, {
+                coverageSector: Sector.FULL_SPHERE,
+                resolution: 0.008333333333333,
+                retrievalImageFormat: "application/bil16",
+                minElevation: -11000,
+                maxElevation: 8850,
+                urlBuilder: new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "GEBCO", "", "1.3.0")
+            });
 
             this.displayName = "GEBCO Earth Elevation Coverage";
-            this.minElevation = -11000;
-            this.maxElevation = 8850;
-            this.pixelIsPoint = false;
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev", "GEBCO", "", "1.3.0");
         };
 
         GebcoElevationCoverage.prototype = Object.create(TiledElevationCoverage.prototype);

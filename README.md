@@ -1,15 +1,14 @@
 <img src="https://worldwind.arc.nasa.gov/img/nasa-logo.svg" height="100"/>
-<p>in partnership with the <a href="http://www.esa.int" target="_blank">European Space Agency</a></p>
 
 # Web WorldWind
 
 [![Build Status](https://travis-ci.org/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.org/NASAWorldWind/WebWorldWind)
 
-3D virtual globe API for JavaScript, developed by NASA in partnership with ESA. Provides a geographic context, complete with terrain, 
-for visualizing geographic or geo-located information in 3D and 2D. Web WorldWind provides high-resolution terrain and 
-imagery, retrieved from remote servers automatically as needed. Developers can provide custom terrain and imagery.
-Provides a collection of shapes for displaying and interacting with geographic data and representing a range of 
-geometric objects.   
+3D virtual globe API for JavaScript, developed by NASA. The European Space Agency has provided valuable contributions
+to this platform since 2015. Provides a geographic context, complete with terrain, for visualizing geographic or
+geo-located information in 3D and 2D. Web WorldWind provides high-resolution terrain and imagery, retrieved from remote
+servers automatically as needed. Developers can provide custom terrain and imagery. Provides a collection of shapes for
+displaying and interacting with geographic data and representing a range of geometric objects.
 
 - [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has setup instructions, developers guides, API documentation and more
 - [Forum](https://forum.worldwindcentral.com) provides help from the WorldWind community
@@ -37,4 +36,15 @@ latest Web WorldWind release provides many simple examples showing how to use al
 
 ## License
 
-Licensed under the [Apache License, Version 2.0](https://apache.org/licenses/LICENSE-2.0).
+Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+National Aeronautics and Space Administration. All rights reserved.
+
+The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+    
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

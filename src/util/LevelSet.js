@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -126,11 +127,45 @@ define([
         };
 
         /**
+         * Returns the number of levels that match the specified resolution. firstLevelResolution indicates the
+         * resolution of the first level's tiles, in degrees per pixel. This depends only on the LevelSet configuration,
+         * and is derived by evaluating {@code levelZeroDelta.latitude / tileHeight}. lastLevelResolution indicates the
+         * resolution of the data represented by the LevelSet.
+         *
+         * The returned level count is a fractional value. The dataset resolution is rarely an even multiple of the
+         * first level resolution, so the ideal last level is typically somewhere in between two levels. An integer
+         * level count can be computed depending on the desired behavior. If the last level should
+         * <i>match or exceed</i> the data resolution, take the ceiling of the returned value. Otherwise, if the last
+         * level should be <i>no more than<i/> the data resolution, take the floor of the returned value.
+         *
+         * @param {Number} firstLevelResolution the known resolution of the first level in degrees per pixel
+         * @param {Number} lastLevelResolution the desired resolution of the last level in degrees per pixel
+         *
+         * @return {Number} the number of levels as a fractional level count
+         *
+         * @throws {ArgumentError} If either resolution is null, undefined, or zero
+         */
+        LevelSet.numLevelsForResolution = function (firstLevelResolution, lastLevelResolution) {
+            if (!firstLevelResolution || !lastLevelResolution) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "LevelSet", "numLevelsForResolution", "missingResolution"));
+            }
+
+            var lastLevel = Math.log(firstLevelResolution / lastLevelResolution) / Math.log(2); // fractional level address
+
+            if (lastLevel < 0) {
+                lastLevel = 0; // ensure at least one level is used, resolution can be less than the first level resolution
+            }
+
+            return lastLevel + 1; // convert level number to level count
+        };
+
+        /**
          * Returns the {@link Level} for a specified level number.
          * @param {Number} levelNumber The number of the desired level.
          * @returns {Level} The requested level, or null if the level does not exist.
          */
-        LevelSet.prototype.level = function(levelNumber) {
+        LevelSet.prototype.level = function (levelNumber) {
             if (levelNumber < 0 || levelNumber >= this.levels.length) {
                 return null;
             } else {
@@ -144,7 +179,7 @@ define([
          * size, and returns the last level if the delta is less than the last level's texel size.
          * @param {Number} texelSize The size of pixels or elevation cells in the level, in radians per pixel or cell.
          */
-        LevelSet.prototype.levelForTexelSize = function(texelSize) {
+        LevelSet.prototype.levelForTexelSize = function (texelSize) {
             // TODO: Replace this loop with a computation.
             var lastLevel = this.lastLevel();
 
@@ -166,7 +201,7 @@ define([
          * Returns the first (lowest resolution) level of this level set.
          * @returns {Level} The first level of this level set.
          */
-        LevelSet.prototype.firstLevel = function() {
+        LevelSet.prototype.firstLevel = function () {
             return this.levels[0];
         };
 
@@ -174,7 +209,7 @@ define([
          * Returns the last (highest resolution) level of this level set.
          * @returns {Level} The last level of this level set.
          */
-        LevelSet.prototype.lastLevel = function() {
+        LevelSet.prototype.lastLevel = function () {
             return this.levels[this.levels.length - 1];
         };
 

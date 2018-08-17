@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -28,12 +29,14 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        /**
-         * Add imagery layers.
-         */
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -58,6 +61,8 @@ requirejs(['./WorldWindShim',
 
             meshPositions.push(row);
         }
+
+        // Create a mesh with a texture image.
 
         // Create the mesh.
         var mesh = new WorldWind.GeographicMesh(meshPositions, null);
@@ -85,6 +90,7 @@ requirejs(['./WorldWindShim',
 
         // Create a mesh that displays a custom image.
 
+        // Create custom image with a 2D canvas.
         var canvas = document.createElement("canvas"),
             ctx2d = canvas.getContext("2d"),
             size = 64, c = size / 2 - 0.5, innerRadius = 5, outerRadius = 20;
@@ -124,16 +130,16 @@ requirejs(['./WorldWindShim',
         mesh.attributes = meshAttributes;
 
         // Create and assign the mesh's highlight attributes.
-        var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
+        highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
         highlightAttributes.outlineColor = WorldWind.Color.WHITE;
         mesh.highlightAttributes = highlightAttributes;
 
         // Add the shape to the layer.
         meshLayer.addRenderable(mesh);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Now set up to handle highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

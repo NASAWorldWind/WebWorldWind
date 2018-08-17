@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -18,12 +19,18 @@
  */
 define([
         '../geom/Angle',
+        '../util/Color',
         '../geom/Location',
+        '../util/Offset',
+        '../shapes/ScreenImage',
         '../geom/Sector',
         '../layer/MercatorTiledImageLayer'
     ],
     function (Angle,
+              Color,
               Location,
+              Offset,
+              ScreenImage,
               Sector,
               MercatorTiledImageLayer) {
         "use strict";
@@ -52,16 +59,21 @@ define([
             this.pickEnabled = true;
 
             this.detectBlankImages = true;
-
-            this.creditImage = WorldWind.configuration.baseUrl + "images/powered-by-bing.png";
         };
+
+        // Internal use only. Intentionally not documented.
+        BingTiledImageLayer.logoImage = null;
+
+        // Internal use only. Intentionally not documented.
+        BingTiledImageLayer.logoLastFrameTime = 0;
 
         BingTiledImageLayer.prototype = Object.create(MercatorTiledImageLayer.prototype);
 
         BingTiledImageLayer.prototype.doRender = function (dc) {
             MercatorTiledImageLayer.prototype.doRender.call(this, dc);
+
             if (this.inCurrentFrame) {
-                dc.screenCreditController.addImageCredit(this.creditImage);
+                this.renderLogo(dc);
             }
         };
 
@@ -75,12 +87,25 @@ define([
             this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 1, 1));
         };
 
+        BingTiledImageLayer.prototype.renderLogo = function (dc) {
+            if (!BingTiledImageLayer.logoImage) {
+                BingTiledImageLayer.logoImage = new ScreenImage(WorldWind.configuration.bingLogoPlacement,
+                    WorldWind.configuration.baseUrl + "images/powered-by-bing.png");
+                BingTiledImageLayer.logoImage.imageColor = new Color(1, 1, 1, 0.5); // Make Bing logo semi transparent.
+            }
+
+            if (BingTiledImageLayer.logoLastFrameTime !== dc.timestamp) {
+                BingTiledImageLayer.logoImage.screenOffset = WorldWind.configuration.bingLogoPlacement;
+                BingTiledImageLayer.logoImage.imageOffset = WorldWind.configuration.bingLogoAlignment;
+                BingTiledImageLayer.logoImage.render(dc);
+                BingTiledImageLayer.logoLastFrameTime = dc.timestamp;
+            }
+        };
+
         // Determines the Bing map size for a specified level number.
         BingTiledImageLayer.prototype.mapSizeForLevel = function (levelNumber) {
             return 256 << (levelNumber + 1);
         };
 
         return BingTiledImageLayer;
-    }
-)
-;
+    });

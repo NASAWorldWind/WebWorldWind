@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -32,7 +33,7 @@ define([
 
                 it("Correctly finds min/max elevations respecting NO_DATA values", function () {
                     var w = 5, h = 5;
-                    var image = new ElevationImage("/test", new Sector(-1, 1, -1, 1), w, h);
+                    var image = new ElevationImage(new Sector(-1, 1, -1, 1), w, h);
                     image.imageData = [];
                     for (var i = 0; i < w * h; i++) {
                         image.imageData.push(ElevationImage.NO_DATA);

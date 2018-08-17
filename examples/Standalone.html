@@ -22,8 +22,8 @@ imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
 -->
 <html>
 <head lang="en">
-    <meta charset="UTF-8">
-    <title>WorldWind Example</title>
+    <meta charset="utf-8">
+    <title>WorldWind Standalone Example</title>
     <!-- Include the Web WorldWind library. -->
     <script src="../worldwind.min.js" type="text/javascript"></script>
 </head>
@@ -40,12 +40,17 @@ imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
 
     // Define the event listener to initialize Web WorldWind.
     function eventWindowLoaded() {
+
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create a WorldWindow for the canvas. Use a REST elevation model rather than the default.
-        var elevationModel = new WorldWind.ElevationModel();
-        elevationModel.addCoverage(new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0", "DTED 0", 0.008333333333333));
-        var wwd = new WorldWind.WorldWindow("canvasOne", elevationModel);
+        // Create a WorldWindow for the canvas.
+        var wwd = new WorldWind.WorldWindow("canvasOne");
+
+        // Use a REST elevation coverage rather than the defaults.
+        var dted0 = new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0");
+        wwd.globe.elevationModel.removeAllCoverages();
+        wwd.globe.elevationModel.addCoverage(dted0);
 
         // Add the REST Blue Marble layer that retrieves imagery from local standalone data.
         var blueMarble = new WorldWind.BMNGRestLayer(null, "../standalonedata/Earth/BlueMarble256/");

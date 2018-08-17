@@ -1,7 +1,8 @@
 /*
- * Copyright 2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -59,6 +60,19 @@ define([
             this.xmlDom = xmlDom;
 
             this.assembleDocument();
+        };
+
+        /**
+         * Returns the GetCoverage base url as detailed in the capabilities document
+         */
+        WcsCapabilities.prototype.getCoverageBaseUrl = function () {
+            if (this.version === "1.0.0") {
+                return this.capability.request.getCoverage.get;
+            } else if (this.version === "2.0.1" || this.version === "2.0.0") {
+                return this.operationsMetadata.getOperationMetadataByName("GetCoverage").dcp[0].getMethods[0].url;
+            }
+
+            return null;
         };
 
         // Internal. Intentionally not documented.
@@ -247,30 +261,59 @@ define([
             return request;
         };
 
-        // Internal use only. This flattens the DCPType structure to provide a simplified object model.
+        // Internal. Intentionally not documented.
         WcsCapabilities.prototype.assembleDCPType100 = function (element) {
-            var children = element.children || element.childNodes, dcptype = {}, httpChild, method, onlineResource, url;
+            var children = element.children || element.childNodes, dcpType = {};
             for (var c = 0; c < children.length; c++) {
                 var child = children[c];
 
                 if (child.localName === "DCPType") {
-                    // Traverse the DCPType element to determine the GET/POST urls
-                    httpChild = child.children || child.childNodes;
-                    httpChild = httpChild[0];
-                    method = httpChild.children || httpChild.childNodes;
-                    method = method[0];
-                    onlineResource = method.children || method.childNodes;
-                    onlineResource = onlineResource[0];
-                    url = onlineResource.getAttribute("xlink:href");
-                    if (method.localName === "Get") {
-                        dcptype.get = url;
-                    } else if (method.localName === "Post") {
-                        dcptype.post = url;
-                    }
+                    this.assembleHttp100(child, dcpType);
                 }
             }
 
-            return dcptype;
+            return dcpType;
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCapabilities.prototype.assembleHttp100 = function (element, dcpType) {
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "HTTP") {
+                    return this.assembleMethod100(child, dcpType);
+                }
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCapabilities.prototype.assembleMethod100 = function (element, dcpType) {
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "Get") {
+                    dcpType["get"] = this.assembleOnlineResource100(child);
+                } else if (child.localName === "Post") {
+                    dcpType["post"] = this.assembleOnlineResource100(child);
+                }
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        WcsCapabilities.prototype.assembleOnlineResource100 = function (element) {
+            var children = element.children || element.childNodes;
+
+            for (var c = 0; c < children.length; c++) {
+                var child = children[c];
+
+                if (child.localName === "OnlineResource") {
+                    return child.getAttribute("xlink:href");
+                }
+            }
         };
 
         // Internal. Intentionally not documented.

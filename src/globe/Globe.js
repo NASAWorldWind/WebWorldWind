@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -77,25 +78,27 @@ define([
             this.elevationModel = elevationModel;
 
             /**
-             * This globe's equatorial radius.
+             * This globe's equatorial radius in meters.
+             *
              * @type {Number}
-             * @default 6378137.0 meters
+             * @default WGS 84 semi-major axis (6378137.0 meters)
              */
-            this.equatorialRadius = 6378137.0;
+            this.equatorialRadius = WorldWind.WGS84_SEMI_MAJOR_AXIS;
+            var f = 1 / WorldWind.WGS84_INVERSE_FLATTENING;
 
             /**
-             * This globe's polar radius.
+             * This globe's polar radius in meters.
              * @type {Number}
-             * @default 6356752.3 meters
+             * @default WGS 84 semi-minor axis (6356752.3142 meters). Taken from NGA.STND.0036_1.0.0_WGS84, section 3.2.
              */
-            this.polarRadius = 6356752.3;
+            this.polarRadius = this.equatorialRadius * (1 - f);
 
             /**
              * This globe's eccentricity squared.
              * @type {Number}
-             * @default 0.00669437999013
+             * @default WGS 84 first eccentricity squared (6.694379990141e-3). Taken from NGA.STND.0036_1.0.0_WGS84, section 3.3.
              */
-            this.eccentricitySquared = 0.00669437999013;
+            this.eccentricitySquared = (2 * f) - (f * f);
 
             /**
              * The tessellator used to create this globe's terrain.
@@ -360,6 +363,12 @@ define([
                     "missingResult"));
             }
 
+            // For backwards compatibility, check whether the projection defines a surfaceNormalAtLocation function
+            // before calling it. If it's not available, use the old code to compute the normal.
+            if (this.projection.surfaceNormalAtLocation) {
+                return this.projection.surfaceNormalAtLocation(this, latitude, longitude, result);
+            }
+
             if (this.is2D()) {
                 result[0] = 0;
                 result[1] = 0;
@@ -371,13 +380,11 @@ define([
             var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
                 cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
                 sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
-                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS),
-                eqSquared = this.equatorialRadius * this.equatorialRadius,
-                polSquared = this.polarRadius * this.polarRadius;
+                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS);
 
-            result[0] = cosLat * sinLon / eqSquared;
-            result[1] = (1 - this.eccentricitySquared) * sinLat / polSquared;
-            result[2] = cosLat * cosLon / eqSquared;
+            result[0] = cosLat * sinLon;
+            result[1] = sinLat;
+            result[2] = cosLat * cosLon;
 
             return result.normalize();
         };

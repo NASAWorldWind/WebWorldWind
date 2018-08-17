@@ -1,7 +1,8 @@
 /*
- * Copyright 2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -22,14 +23,14 @@ define([
     '../../util/Promise',
     '../../ogc/wcs/WcsCapabilities',
     '../../ogc/wcs/WcsCoverage',
-    '../../ogc/wcs/WcsDescribeCoverage'
+    '../../ogc/wcs/WcsCoverageDescriptions'
     ],
     function (ArgumentError,
               Logger,
               Promise,
               WcsCapabilities,
               WcsCoverage,
-              WcsDescribeCoverage) {
+              WcsCoverageDescriptions) {
         "use strict";
 
         /**
@@ -46,7 +47,7 @@ define([
             this.serviceAddress = null;
 
             /**
-             * A collection of the coverages available from this service. Not populated until service is initialized by
+             * A collection of WcsCoverages available from this service. Not populated until service is initialized by
              * the connect method.
              * @type {Array}
              */
@@ -60,7 +61,7 @@ define([
 
             /**
              * A map of the coverages to their corresponding DescribeCoverage documents.
-             * @type {WcsDescribeCoverage}
+             * @type {WcsCoverageDescriptions}
              */
             this.coverageDescriptions = null;
         };
@@ -96,7 +97,7 @@ define([
             return service.retrieveCapabilities()
                 .then(function (wcsCapabilities) {
                     service.capabilities = wcsCapabilities;
-                    return service.describeCoverages(wcsCapabilities);
+                    return service.retrieveCoverageDescriptions(wcsCapabilities);
                 })
                 .then(function (coverages) {
                     service.parseCoverages(coverages);
@@ -135,17 +136,21 @@ define([
         };
 
         // Internal use only
-        WebCoverageService.prototype.describeCoverages = function () {
+        WebCoverageService.prototype.retrieveCoverageDescriptions = function () {
             return this.retrieveXml(this.buildDescribeCoverageXmlRequest());
         };
 
         // Internal use only
         WebCoverageService.prototype.parseCoverages = function (xmlDom) {
-            this.coverageDescriptions = new WcsDescribeCoverage(xmlDom);
+            this.coverageDescriptions = new WcsCoverageDescriptions(xmlDom);
             var coverageCount = this.coverageDescriptions.coverages.length;
+            var coverageId, coverage;
 
             for (var i = 0; i < coverageCount; i++) {
-                this.coverages.push(this.coverageDescriptions.coverages[i]);
+                coverageId = this.coverageDescriptions.coverages[i].coverageId
+                    || this.coverageDescriptions.coverages[i].name;
+                coverage = new WcsCoverage(coverageId, this);
+                this.coverages.push(coverage);
             }
         };
 

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,20 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Illustrates how to perform picking in a region around the pointing cursor.
+ */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -36,6 +47,14 @@ requirejs(['./WorldWindShim',
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
+
+        // Create a placemark layer to hold all the placemarks.
+        var placemarkLayer = new WorldWind.RenderableLayer();
+        placemarkLayer.displayName = "Placemarks";
+        wwd.addLayer(placemarkLayer);
+
+        // Create and add a grid of placemarks over the US.
+        // See PlacemarksAndPicking example for more information on placemark creation and attributes.
 
         var images = [
             "plain-black.png",
@@ -65,7 +84,6 @@ requirejs(['./WorldWindShim',
             placemark,
             placemarkAttributes = new WorldWind.PlacemarkAttributes(null),
             highlightAttributes,
-            placemarkLayer = new WorldWind.RenderableLayer(),
             latitude = 47, longitude = -122,
             latDelta = 2, lonDelta = 2;
 
@@ -75,6 +93,7 @@ requirejs(['./WorldWindShim',
             WorldWind.OFFSET_FRACTION, 0.0);
         placemarkAttributes.imageColor = WorldWind.Color.WHITE;
 
+        // Add every placemark to form a grid.
         for (var j = 0; j < 10; j++) {
             latitude -= j > 0 ? latDelta : 0;
             for (var i = 0, len = images.length; i < len; i++) {
@@ -90,13 +109,7 @@ requirejs(['./WorldWindShim',
             }
         }
 
-        placemarkLayer.displayName = "Placemarks";
-        wwd.addLayer(placemarkLayer);
-
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
-        // Now set up to handle picking.
+        // Set the picking event handling.
 
         var highlightedItems = [];
 
@@ -147,4 +160,7 @@ requirejs(['./WorldWindShim',
 
         // Listen for taps on mobile devices and highlight the placemarks that the user taps.
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

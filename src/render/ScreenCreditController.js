@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -23,7 +24,6 @@ define([
         '../layer/Layer',
         '../util/Logger',
         '../util/Offset',
-        '../shapes/ScreenImage',
         '../shapes/ScreenText'
     ],
     function (ArgumentError,
@@ -32,7 +32,6 @@ define([
               Layer,
               Logger,
               Offset,
-              ScreenImage,
               ScreenText) {
         "use strict";
 
@@ -46,21 +45,25 @@ define([
         var ScreenCreditController = function () {
             Layer.call(this, "ScreenCreditController");
 
-            // Internal. Intentionally not documented.
-            this.imageCredits = [];
+            /**
+             * An {@link Offset} indicating where to place the attributions on the screen.
+             * @type {Offset}
+             * @default The lower left corner of the window with an 11px left margin and a 2px bottom margin.
+             */
+            this.creditPlacement = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
 
-            // Internal. Intentionally not documented.
-            this.textCredits = [];
+            /**
+             * The amount of horizontal spacing between adjacent attributions.
+             * @type {number}
+             * @default An 11px margin between attributions.
+             */
+            this.creditMargin = 11;
 
-            // Internal. Intentionally not documented.
-            this.margin = 5;
-
-            // Internal. Intentionally not documented.
-            this.creditSpacing = 21;
-
-            // Internal. Intentionally not documented.
+            // Apply 50% opacity to all shapes rendered by this layer.
             this.opacity = 0.5;
 
+            // Internal. Intentionally not documented.
+            this.credits = [];
         };
 
         ScreenCreditController.prototype = Object.create(Layer.prototype);
@@ -69,73 +72,39 @@ define([
          * Clears all credits from this controller.
          */
         ScreenCreditController.prototype.clear = function () {
-            this.imageCredits = [];
-            this.textCredits = [];
+            this.credits = [];
         };
 
         /**
-         * Adds an image credit to this controller.
-         * @param {String} imageUrl The URL of the image to display in the credits area.
-         * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
-         * @throws {ArgumentError} If the specified URL is null or undefined.
-         */
-        ScreenCreditController.prototype.addImageCredit = function (imageUrl, hyperlinkUrl) {
-            if (!imageUrl) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
-            }
-
-            // Verify if image credit is not already in controller, if it is, don't add it.
-            for (var i = 0, len = this.imageCredits.length; i < len; i++) {
-                if (this.imageCredits[i].imageSource === imageUrl) {
-                    return;
-                }
-            }
-
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
-            var credit = new ScreenImage(screenOffset, imageUrl);
-            credit.imageOffset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
-
-            // Append new user property to store URL for hyperlinking.
-            // (See BasicWorldWindowController.handleClickOrTap).
-            if (hyperlinkUrl) {
-                credit.userProperties.url = hyperlinkUrl;
-            }
-
-            this.imageCredits.push(credit);
-        };
-
-        /**
-         * Adds a string credit to this controller.
-         * @param {String} stringCredit The string to display in the credits area.
+         * Adds a credit to this controller.
+         * @param {String} creditString The text to display in the credits area.
          * @param {Color} color The color with which to draw the string.
          * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
-        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color, hyperlinkUrl) {
-            if (!stringCredit) {
+        ScreenCreditController.prototype.addCredit = function (creditString, color, hyperlinkUrl) {
+            if (!creditString) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addCredit", "missingText"));
             }
 
             if (!color) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addCredit", "missingColor"));
             }
 
             // Verify if text credit is not already in controller, if it is, don't add it.
-            for (var i = 0, len = this.textCredits.length; i < len; i++) {
-                if (this.textCredits[i].text === stringCredit) {
+            for (var i = 0, len = this.credits.length; i < len; i++) {
+                if (this.credits[i].text === creditString) {
                     return;
                 }
             }
 
-            var screenOffset = new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0);
-
-            var credit = new ScreenText(screenOffset, stringCredit);
+            var credit = new ScreenText(new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0), creditString);
+            credit.attributes.font = new Font(10);
             credit.attributes.color = color;
             credit.attributes.enableOutline = false;
-            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0.5);
+            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
 
             // Append new user property to store URL for hyperlinking.
             // (See BasicWorldWindowController.handleClickOrTap).
@@ -143,27 +112,25 @@ define([
                 credit.userProperties.url = hyperlinkUrl;
             }
 
-            this.textCredits.push(credit);
+            this.credits.push(credit);
         };
 
         // Internal use only. Intentionally not documented.
         ScreenCreditController.prototype.doRender = function (dc) {
-            var creditOrdinal = 1,
-                i,
-                len;
+            var point = this.creditPlacement.offsetForSize(dc.viewport.width, dc.viewport.height);
 
-            for (i = 0, len = this.imageCredits.length; i < len; i++) {
-                this.imageCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.imageCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
-                this.imageCredits[i].render(dc);
-                creditOrdinal++;
-            }
+            for (var i = 0, len = this.credits.length; i < len; i++) {
+                // Place the credit text on screen and render it.
+                this.credits[i].screenOffset.x = point[0];
+                this.credits[i].screenOffset.y = point[1];
+                this.credits[i].render(dc);
 
-            for (i = 0, len = this.textCredits.length; i < len; i++) {
-                this.textCredits[i].screenOffset.x = dc.viewport.width - (this.margin);
-                this.textCredits[i].screenOffset.y = creditOrdinal * this.creditSpacing;
-                this.textCredits[i].render(dc);
-                creditOrdinal++;
+                // Advance the screen position for the next credit.
+                dc.textRenderer.typeFace = this.credits[i].attributes.font;
+                dc.textRenderer.outlineWidth = this.credits[i].attributes.outlineWidth;
+                dc.textRenderer.enableOutline = this.credits[i].attributes.enableOutline;
+                point[0] += dc.textRenderer.textSize(this.credits[i].text)[0];
+                point[0] += this.creditMargin;
             }
         };
 
