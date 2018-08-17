@@ -100,7 +100,12 @@ define([], function(){
                     shapeToDraw = shape.shape;
                 }
             });
-            ctx.drawImage(shapeToDraw, this.longitudeInSector(location, this._sector, this._width), this._height - this.latitudeInSector(location, this._sector, this._height));
+            ctx.drawImage(shapeToDraw,
+                          this.longitudeInSector(location, this._sector, this._width)
+                              - (shapeToDraw.width / 2),
+                          this._height
+                              - this.latitudeInSector(location, this._sector, this._height)
+                              - (shapeToDraw.height / 2));
         }
 
         return this._canvas;
@@ -117,7 +122,6 @@ define([], function(){
         var canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
-
         return canvas;
     };
 
@@ -129,7 +133,7 @@ define([], function(){
      * @returns {HTMLCanvasElement} Canvas representing the circle.
      */
     HeatMapTile.prototype.shape = function(measure) {
-        var shape = this.createCanvas(this._radius * this._radius, this._radius * this._radius),
+        var shape = this.createCanvas(this._radius * 2, this._radius * 2),
             ctx = shape.getContext('2d');
 
         var gradient = ctx.createRadialGradient(this._radius, this._radius, 0, this._radius, this._radius, this._radius);
@@ -137,6 +141,7 @@ define([], function(){
         gradient.addColorStop(1, "rgba(0,0,0,0)");
 
         ctx.beginPath();
+
         ctx.arc(this._radius, this._radius, this._radius, 0, Math.PI * 2, true);
 
         ctx.fillStyle = gradient;
@@ -153,26 +158,26 @@ define([], function(){
      * @param sector {Sector} Sector to which transform
      * @param height {Number} Height of the tile to draw to.
      * @private
-     * @returns {Number} Position on the height in pixels. THe result starts with 0
+     * @returns {Number} Position on the height in pixels.
      */
     HeatMapTile.prototype.latitudeInSector = function(location, sector, height) {
         var sizeOfArea = sector.maxLatitude - sector.minLatitude;
         var locationInArea = location.latitude - sector.minLatitude;
-        return Math.ceil((locationInArea / sizeOfArea) * (height - 1));
+        return Math.ceil((locationInArea / sizeOfArea) * height);
     };
 
     /**
      * Calculates position in pixels of the point based on its longitude.
      * @param location {Location} Location to transform
      * @param sector {Sector} Sector to which transform
-     * @param width {Number} Height of the tile to draw to.
+     * @param width {Number} Width of the tile to draw to.
      * @private
-     * @returns {Number} Position on the height in pixels. THe result starts with 0
+     * @returns {Number} Position on the width in pixels.
      */
     HeatMapTile.prototype.longitudeInSector = function(location, sector, width) {
         var sizeOfArea = sector.maxLongitude - sector.minLongitude ;
         var locationInArea = location.longitude - sector.minLongitude;
-        return Math.ceil((locationInArea / sizeOfArea) * (width - 1));
+        return Math.ceil((locationInArea / sizeOfArea) * width);
     };
 
     return HeatMapTile;

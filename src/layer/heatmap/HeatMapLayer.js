@@ -337,8 +337,9 @@ define([
             var result = document.createElement('canvas');
             result.height = this.tileHeight;
             result.width = this.tileWidth;
-            result.getContext('2d').putImageData(canvas.getContext('2d').getImageData(
-                extendedWidth, extendedHeight, this.tileWidth, this.tileHeight), 0, 0
+            result.getContext('2d').putImageData(
+                canvas.getContext('2d').getImageData(extendedWidth, extendedHeight, this.tileWidth, this.tileHeight),
+                0, 0
             );
 
             var texture = layer.createTexture(dc, tile, result);
