@@ -50,6 +50,8 @@ requirejs(['./WorldWindShim',
 
         // Create GeoTiff layer and add it to the WorldWindow's layer list. Disabled until its image is loaded.
         var geoTiffLayer = new WorldWind.RenderableLayer("GeoTiff");
+        geoTiffLayer.enabled = false;
+        geoTiffLayer.showSpinner = true;
         wwd.addLayer(geoTiffLayer);
 
         var resourceUrl = "https://worldwind.arc.nasa.gov/web/examples/data/black_sea_rgb.tif";
@@ -70,6 +72,9 @@ requirejs(['./WorldWindShim',
 
             // Add the SurfaceImage to the GeoTiff layer and update the layer manager.
             geoTiffLayer.addRenderable(surfaceGeoTiff);
+            geoTiffLayer.enabled = true;
+            geoTiffLayer.showSpinner = false;
+            layerManager.synchronizeLayerList();
 
             // Redraw the WorldWindow and point the camera towards the imagery location.
             wwd.redraw();
