@@ -113,8 +113,8 @@ define([
             this._activeTexture = null;
 
             //Internal. Intentionally not documented.
-            this._scratchVector = new Vec3(0, 0, 0);
-            this._scratchColor = new Color(1, 1, 1, 1);
+            this._tmpVector = new Vec3(0, 0, 0);
+            this._tmpColor = new Color(1, 1, 1, 1);
 
             //Internal. Intentionally not documented.
             this._vboCacheKey = '';
@@ -627,7 +627,7 @@ define([
                 var mesh = this._entities[i].mesh;
                 if (mesh.indexedRendering) {
                     numIndices += mesh.indices.length;
-                    if (mesh.indices instanceof Uint32Array) {
+                    if (mesh.indices.name === "Uint32Array") {
                         is32BitIndices = true;
                     }
                 }
@@ -679,7 +679,7 @@ define([
                 if (!uIntExt) {
                     Logger.log(Logger.LEVEL_SEVERE,
                         'The 3D model is too big and might not render properly. \n' +
-                        'The browser does not support the "OES_element_index_uint" extension, ' +
+                        'Your browser does not support the "OES_element_index_uint" extension, ' +
                         'required to render large models.'
                     );
                 }
@@ -699,7 +699,7 @@ define([
                     mesh = this._entities[i].mesh;
                     if (mesh.indexedRendering) {
                         data = mesh.indices;
-                        if (data instanceof Uint32Array && !uIntExt) {
+                        if (data.name === "Uint32Array" && !uIntExt) {
                             data = new Uint16Array(data);
                         }
                         this._entities[i].indexOffset = offset;
@@ -778,7 +778,7 @@ define([
 
             if (buffers.indexedRendering) {
                 var indexOffsetBytes = entity.indexOffset * entity.indexSize;
-                if (buffers.is32BitIndices && dc.getExtension('OES_element_index_uint')) {
+                if (buffers.indices.name === "Uint32Array" && dc.getExtension('OES_element_index_uint')) {
                     gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_INT, indexOffsetBytes);
                 }
                 else {
@@ -814,10 +814,10 @@ define([
                 a = diffuse[3] != null ? diffuse[3] : 1;
             }
 
-            this._scratchColor.set(r, g, b, a);
+            this._tmpColor.set(r, g, b, a);
             opacity = a * this.layer.opacity;
             gl.depthMask(opacity >= 1 || dc.pickingMode);
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : this._scratchColor);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : this._tmpColor);
             program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
         };
 
@@ -878,11 +878,11 @@ define([
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.computeNormalMatrix = function () {
-            this._transformationMatrix.extractRotationAngles(this._scratchVector);
+            this._transformationMatrix.extractRotationAngles(this._tmpVector);
             this._normalTransformMatrix.setToIdentity();
-            this._normalTransformMatrix.multiplyByRotation(-1, 0, 0, this._scratchVector[0]);
-            this._normalTransformMatrix.multiplyByRotation(0, -1, 0, this._scratchVector[1]);
-            this._normalTransformMatrix.multiplyByRotation(0, 0, -1, this._scratchVector[2]);
+            this._normalTransformMatrix.multiplyByRotation(-1, 0, 0, this._tmpVector[0]);
+            this._normalTransformMatrix.multiplyByRotation(0, -1, 0, this._tmpVector[1]);
+            this._normalTransformMatrix.multiplyByRotation(0, 0, -1, this._tmpVector[2]);
         };
 
         // Internal. Intentionally not documented.

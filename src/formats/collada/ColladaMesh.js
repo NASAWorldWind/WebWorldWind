@@ -166,7 +166,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var indicesArray = [];
         var pos = 0;
         var indexedRendering = false;
-        var isUint32 = false;
+        var is32BitIndices = false;
 
         for (var i = 0; i < count; i++) {
 
@@ -216,11 +216,8 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                         firstIndex = currentIndex;
                     }
                     if (k > 2 * maxOffset) {
-                        if (firstIndex > 65535) {
-                            isUint32 = true;
-                        }
-                        if (prevIndex > 65535) {
-                            isUint32 = true;
+                        if (firstIndex > 65535 || prevIndex > 65535) {
+                            is32BitIndices = true;
                         }
                         indicesArray.push(firstIndex);
                         indicesArray.push(prevIndex);
@@ -228,7 +225,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                 }
 
                 if (currentIndex > 65535) {
-                    isUint32 = true;
+                    is32BitIndices = true;
                 }
                 indicesArray.push(currentIndex);
                 pos += maxOffset;
@@ -239,13 +236,11 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var mesh = {
             vertices: new Float32Array(inputs[0][1]),
             indexedRendering: indexedRendering,
-            is32BitIndices: false,
             material: material
         };
 
         if (mesh.indexedRendering) {
-            mesh.indices = isUint32 ? new Uint32Array(indicesArray) : new Uint16Array(indicesArray);
-            mesh.is32BitIndices = isUint32;
+            mesh.indices = is32BitIndices ? new Uint32Array(indicesArray) : new Uint16Array(indicesArray);
         }
 
         this.transformMeshInfo(mesh, inputs);
