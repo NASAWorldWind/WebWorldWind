@@ -33,8 +33,7 @@ define([
         '../geom/Sector',
         '../shapes/ShapeAttributes',
         '../error/UnsupportedOperationError',
-        '../geom/Vec3',
-        '../util/WWMath'
+        '../geom/Vec3'
     ],
     function (AbstractError,
               Angle,
@@ -51,8 +50,7 @@ define([
               Sector,
               ShapeAttributes,
               UnsupportedOperationError,
-              Vec3,
-              WWMath) {
+              Vec3) {
         "use strict";
 
         /**

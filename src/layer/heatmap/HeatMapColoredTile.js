@@ -45,8 +45,6 @@ define([
     HeatMapColoredTile.prototype = Object.create(HeatMapTile.prototype);
 
     /**
-     * @inheritDoc
-     *
      * The coloured version colorizes only the cropped area relevant for the display. The rest is ignored.
      */
     HeatMapColoredTile.prototype.draw = function() {
