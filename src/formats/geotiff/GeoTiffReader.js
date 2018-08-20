@@ -894,7 +894,7 @@ define([
                         this.metadata.modelTiepoint = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
                     case GeoTiffConstants.Tag.GDAL_METADATA:
-                        this.metadata.noData = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        this.metadata.metaData = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
                     case GeoTiffConstants.Tag.GDAL_NODATA:
                         this.metadata.noData = this.imageFileDirectories[0][i].getIFDEntryValue();
