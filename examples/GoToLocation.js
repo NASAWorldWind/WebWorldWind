@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -47,9 +48,6 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
-
         // Now set up to handle clicks and taps.
 
         // The common gesture-handling function.
@@ -63,7 +61,7 @@ requirejs(['./WorldWindShim',
             var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
 
             // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
-            if (pickList.objects.length == 1 && pickList.objects[0].isTerrain) {
+            if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
                 var position = pickList.objects[0].position;
                 wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
             }
@@ -74,4 +72,7 @@ requirejs(['./WorldWindShim',
 
         // Listen for taps on mobile devices.
         var tapRecognizer = new WorldWind.TapRecognizer(wwd, handleClick);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

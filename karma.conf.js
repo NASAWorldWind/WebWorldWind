@@ -21,7 +21,8 @@ module.exports = function(config) {
       {pattern: 'examples/data/KML_Samples.kml', included: false},
       {pattern: 'test/formats/geotiff/*.tif', included: false},
       {pattern: 'test/ogc/wcs/*.xml', included: false},
-      {pattern: 'test/ogc/openSearch/*.xml', included: false}
+      {pattern: 'test/ogc/openSearch/*.xml', included: false},
+      {pattern: 'test/formats/aaigrid/*.asc', included: false}
     ],
 
 

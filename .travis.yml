@@ -15,18 +15,18 @@ script:
 # Deploy build artifacts. Travis does not invoke this step for pull request builds
 deploy:
   # Publish develop branch distributions to the Artifactory apps repository
-  - provider: script
-    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/apps/web
-    skip_cleanup: true
-    on:
-      branch: develop
+  #- provider: script
+  #  script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/apps/web
+  #  skip_cleanup: true
+  #  on:
+  #    branch: develop
   # Publish API documentation to GitHub Pages
-  - provider: pages
-    github_token: $GITHUB_API_KEY
-    local_dir: build/dist/api-doc
-    skip_cleanup: true
-    on:
-      branch: develop
+  #- provider: pages
+  #  github_token: $GITHUB_API_KEY
+  #  local_dir: build/dist/api-doc
+  #  skip_cleanup: true
+  #  on:
+  #    branch: develop
   # Publish release artifacts to the npm repository
   - provider: npm
     email: $NPM_EMAIL

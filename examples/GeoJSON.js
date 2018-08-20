@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2018 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -40,9 +41,6 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
         ];
-
-        // Create a layer manager for controlling layer visibility.
-        var layerManager = new LayerManager(wwd);
 
         for (var l = 0; l < layers.length; l++) {
             layers[l].layer.enabled = layers[l].enabled;
@@ -173,7 +171,8 @@ requirejs(['./WorldWindShim',
         ch3857GeoJSON.load(null, shapeConfigurationCallback, ch3857Layer);
         wwd.addLayer(ch3857Layer);
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
         layerManager.synchronizeLayerList();
-
         layerManager.goToAnimator.goTo(new WorldWind.Location(38.72, 14.91))
     });

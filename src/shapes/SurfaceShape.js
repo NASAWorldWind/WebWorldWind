@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -32,8 +33,7 @@ define([
         '../geom/Sector',
         '../shapes/ShapeAttributes',
         '../error/UnsupportedOperationError',
-        '../geom/Vec3',
-        '../util/WWMath'
+        '../geom/Vec3'
     ],
     function (AbstractError,
               Angle,
@@ -50,8 +50,7 @@ define([
               Sector,
               ShapeAttributes,
               UnsupportedOperationError,
-              Vec3,
-              WWMath) {
+              Vec3) {
         "use strict";
 
         /**
@@ -83,7 +82,7 @@ define([
             this._pathType = WorldWind.GREAT_CIRCLE;
             this._maximumNumEdgeIntervals = SurfaceShape.DEFAULT_NUM_EDGE_INTERVALS;
             this._polarThrottle = SurfaceShape.DEFAULT_POLAR_THROTTLE;
-            this._sector = null;
+            this._boundingSector = null;
 
             /**
              * Indicates the object to return as the owner of this shape when picked.
@@ -97,7 +96,7 @@ define([
              * @type {Sector[]}
              * @protected
              */
-            this._sectors = [];
+            this._boundingSectors = [];
 
             /*
              * The raw collection of locations defining this shape and are explicitly specified by the client of this class.
@@ -385,9 +384,9 @@ define([
              * @memberof SurfaceShape.prototype
              * @type {Sector}
              */
-            sector: {
+            boundingSector: {
                 get: function () {
-                    return this._sector;
+                    return this._boundingSector;
                 }
             }
         });
@@ -421,10 +420,10 @@ define([
                 " ne " + shape.maximumNumEdgeIntervals +
                 " po " + shape.polarThrottle +
                 " se " + "[" +
-                shape.sector.minLatitude + "," +
-                shape.sector.maxLatitude + "," +
-                shape.sector.minLongitude + "," +
-                shape.sector.maxLongitude +
+                shape.boundingSector.minLatitude + "," +
+                shape.boundingSector.maxLatitude + "," +
+                shape.boundingSector.minLongitude + "," +
+                shape.boundingSector.maxLongitude +
                 "]";
         };
 
@@ -716,13 +715,13 @@ define([
          */
         SurfaceShape.prototype.computeSectors = function (dc) {
             // Return a previously computed value if it already exists.
-            if (this._sectors && this._sectors.length > 0) {
-                return this._sectors;
+            if (this._boundingSectors && this._boundingSectors.length > 0) {
+                return this._boundingSectors;
             }
 
             this.prepareBoundaries(dc);
 
-            return this._sectors;
+            return this._boundingSectors;
         };
 
         /**
@@ -734,7 +733,7 @@ define([
          */
         SurfaceShape.prototype.computeExtent = function (dc) {
 
-            if (!this._sectors || this._sectors.length === 0) {
+            if (!this._boundingSectors || this._boundingSectors.length === 0) {
                 return null;
             }
 
@@ -750,8 +749,8 @@ define([
             var boxPoints;
             // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
             // Return the box which contains that sector.
-            if (this._sectors.length === 1) {
-                boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+            if (this._boundingSectors.length === 1) {
+                boxPoints = this._boundingSectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
                 this.currentData.extent.setToVec3Points(boxPoints);
             }
             // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
@@ -759,8 +758,8 @@ define([
             else {
                 var boxCorners = [];
 
-                for (var i = 0; i < this._sectors.length; i++) {
-                    boxPoints = this._sectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                for (var i = 0; i < this._boundingSectors.length; i++) {
+                    boxPoints = this._boundingSectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
                     var box = new BoundingBox();
                     box.setToVec3Points(boxPoints);
                     var corners = box.getCorners();
@@ -861,20 +860,20 @@ define([
             }
             var minLatitude = Math.min(eastSector.minLatitude, westSector.minLatitude);
             var maxLatitude = Math.max(eastSector.maxLatitude, eastSector.maxLatitude);
-            this._sector = new Sector(minLatitude, maxLatitude, -180, 180);
-            this._sectors = [eastSector, westSector];
+            this._boundingSector = new Sector(minLatitude, maxLatitude, -180, 180);
+            this._boundingSectors = [eastSector, westSector];
         };
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.sectorsNotOverAntiMeridian = function () {
-            this._sector = new Sector(90, -90, 180, -180);
+            this._boundingSector = new Sector(90, -90, 180, -180);
             for (var i = 0, len = this.contours.length; i < len; i++) {
                 var sectors = this.contours[i].sectors;
                 for (var j = 0, lenS = sectors.length; j < lenS; j++) {
-                    this._sector.union(sectors[j]);
+                    this._boundingSector.union(sectors[j]);
                 }
             }
-            this._sectors = [this._sector];
+            this._boundingSectors = [this._boundingSector];
         };
 
         // Internal use only. Intentionally not documented.

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -80,9 +81,9 @@ requirejs(['./WorldWindShim',
         var highlightAttributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
         highlightAttributes.imageScale = 1.2;
 
-        // Create the placemark with the attributes attributes defined above.
-        var latitude = 47.684444, longitude = -121.129722, altitude = 1e2;
-        var placemark = new WorldWind.Placemark(new WorldWind.Position(latitude, longitude, altitude), false, placemarkAttributes);
+        // Create the placemark with the attributes defined above.
+        var placemarkPosition = new WorldWind.Position(47.684444, -121.129722, 1e2);
+        var placemark = new WorldWind.Placemark(placemarkPosition, false, placemarkAttributes);
         // Draw placemark at altitude defined above, relative to the terrain.
         placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
         // Assign highlight attributes for the placemark.
@@ -102,5 +103,4 @@ requirejs(['./WorldWindShim',
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
-
     });

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -49,18 +50,20 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(layers[l].layer);
     }
 
+        // Create renderable layer to hold the Collada model.
     var modelLayer = new WorldWind.RenderableLayer("Duck");
     wwd.addLayer(modelLayer);
 
+        // Define a position for locating the model.
     var position = new WorldWind.Position(45, -100, 1000e3);
+        // Create a Collada loader and direct it to the desired directory and .dae file.
     var colladaLoader = new WorldWind.ColladaLoader(position);
     colladaLoader.init({dirPath: './collada_models/duck/'});
     colladaLoader.load('duck.dae', function (scene) {
         scene.scale = 5000;
-        modelLayer.addRenderable(scene);
+        modelLayer.addRenderable(scene); // Add the Collada model to the renderable layer within a callback.
     });
 
     // Create a layer manager for controlling layer visibility.
     var layerManager = new LayerManager(wwd);
-
 });

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -93,9 +94,9 @@ define([
      */
     WktObject.prototype.addCoordinates = function (coordinates) {
         if (this._is3d) {
-            this.coordinates.push(new Position(coordinates[0], coordinates[1], coordinates[2] || 0));
+            this.coordinates.push(new Position(coordinates[1], coordinates[0], coordinates[2] || 0));
         } else {
-            this.coordinates.push(new Location(coordinates[0], coordinates[1]));
+            this.coordinates.push(new Location(coordinates[1], coordinates[0]));
         }
     };
 
