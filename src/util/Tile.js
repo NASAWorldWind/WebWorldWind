@@ -326,7 +326,7 @@ define([
                 distance = this.distanceTo(dc.eyePoint),
                 pixelSize = dc.pixelSizeAtDistance(distance);
 
-            return cellSize > Math.max(detailFactor * pixelSize, 0.5);
+            return cellSize > detailFactor * pixelSize;
         };
 
         /**
