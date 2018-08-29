@@ -628,7 +628,7 @@ define([
                 var mesh = this._entities[i].mesh;
                 if (mesh.indexedRendering) {
                     numIndices += mesh.indices.length;
-                    if (mesh.indices.name === "Uint32Array") {
+                    if (mesh.indices instanceof Uint32Array) {
                         is32BitIndices = true;
                     }
                 }
@@ -700,7 +700,7 @@ define([
                     mesh = this._entities[i].mesh;
                     if (mesh.indexedRendering) {
                         data = mesh.indices;
-                        if (data.name === "Uint32Array" && !uIntExt) {
+                        if (data instanceof Uint32Array && !uIntExt) {
                             data = new Uint16Array(data);
                         }
                         this._entities[i].indexOffset = offset;
@@ -779,7 +779,7 @@ define([
 
             if (buffers.indexedRendering) {
                 var indexOffsetBytes = entity.indexOffset * entity.indexSize;
-                if (buffers.indices.name === "Uint32Array" && dc.getExtension('OES_element_index_uint')) {
+                if (buffers.indices instanceof Uint32Array && dc.getExtension('OES_element_index_uint')) {
                     gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_INT, indexOffsetBytes);
                 }
                 else {
