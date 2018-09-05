@@ -120,6 +120,8 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfaceSector.prototype.moveTo = function (globe, position) {
+            var sector = this._sector;
+
             var locations = new Array(3);
 
             locations[0] = new Location(sector.minLatitude, sector.minLongitude);
