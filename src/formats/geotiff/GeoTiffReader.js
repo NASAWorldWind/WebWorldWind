@@ -813,6 +813,9 @@ define([
                     case TiffConstants.Tag.EXTRA_SAMPLES:
                         this.metadata.extraSamples = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
+                    case TiffConstants.Tag.IMAGE_DESCRIPTION:
+                        this.metadata.imageDescription = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
+                        break;
                     case TiffConstants.Tag.IMAGE_LENGTH:
                         this.metadata.imageLength = this.imageFileDirectories[0][i].getIFDEntryValue()[0];
                         break;
@@ -889,6 +892,9 @@ define([
                         break;
                     case GeoTiffConstants.Tag.MODEL_TIEPOINT:
                         this.metadata.modelTiepoint = this.imageFileDirectories[0][i].getIFDEntryValue();
+                        break;
+                    case GeoTiffConstants.Tag.GDAL_METADATA:
+                        this.metadata.metaData = this.imageFileDirectories[0][i].getIFDEntryValue();
                         break;
                     case GeoTiffConstants.Tag.GDAL_NODATA:
                         this.metadata.noData = this.imageFileDirectories[0][i].getIFDEntryValue();
