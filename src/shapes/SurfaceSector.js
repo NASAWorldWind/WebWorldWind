@@ -113,5 +113,30 @@ define([
             this._boundaries[3] = new Location(sector.minLatitude, sector.maxLongitude);
         };
 
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.getReferencePosition = function () {
+            return new Location(this.sector.centroidLatitude(), this.sector.centroidLongitude());
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.moveTo = function (globe, position) {
+            var sector = this._sector;
+
+            var locations = new Array(3);
+
+            locations[0] = new Location(sector.minLatitude, sector.minLongitude);
+            locations[1] = new Location(sector.maxLatitude, sector.minLongitude);
+            locations[2] = new Location(sector.maxLatitude, sector.maxLongitude);
+
+            locations = this.computeShiftedLocations(globe, this.getReferencePosition(), position, locations);
+
+            this.sector = new WorldWind.Sector(
+                locations[0].latitude,
+                locations[1].latitude,
+                locations[1].longitude,
+                locations[2].longitude
+            );
+        };
+
         return SurfaceSector;
     });
