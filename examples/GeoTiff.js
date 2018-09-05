@@ -78,7 +78,7 @@ requirejs(['./WorldWindShim',
 
             // Redraw the WorldWindow and point the camera towards the imagery location.
             wwd.redraw();
-            wwd.goTo(new WorldWind.Position(43.69, 28.54, 55000));
+            wwd.goTo(new WorldWind.Position(43.80, 28.57, 30000));
         });
 
         // Create a layer manager for controlling layer visibility.
