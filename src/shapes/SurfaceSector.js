@@ -120,16 +120,20 @@ define([
 
         // Internal use only. Intentionally not documented.
         SurfaceSector.prototype.moveTo = function (globe, position) {
-            if (this._boundaries.length > 0) {
-                this._boundaries = this.computeShiftedLocations(globe, this.getReferencePosition(), position,
-                    this._boundaries);
-                this.sector = new WorldWind.Sector(
-                    this._boundaries[0].latitude,
-                    this._boundaries[1].latitude,
-                    this._boundaries[1].longitude,
-                    this._boundaries[2].longitude
-                );
-            }
+            var locations = new Array(3);
+
+            locations[0] = new Location(sector.minLatitude, sector.minLongitude);
+            locations[1] = new Location(sector.maxLatitude, sector.minLongitude);
+            locations[2] = new Location(sector.maxLatitude, sector.maxLongitude);
+
+            locations = this.computeShiftedLocations(globe, this.getReferencePosition(), position, locations);
+
+            this.sector = new WorldWind.Sector(
+                locations[0].latitude,
+                locations[1].latitude,
+                locations[1].longitude,
+                locations[2].longitude
+            );
         };
 
         return SurfaceSector;
