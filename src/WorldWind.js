@@ -85,6 +85,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shaders/GpuShader',
         './shaders/GroundProgram',
         './util/HashMap',
+        './layer/heatmap/HeatMapColoredTile',
+        './layer/heatmap/HeatMapIntervalType',
+        './layer/heatmap/HeatMapLayer',
+        './layer/heatmap/HeatMapTile',
         './util/HighlightController',
         './util/ImageSource',
         './render/ImageTile',
@@ -251,6 +255,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './error/UnsupportedOperationError',
         './globe/UsgsNedElevationCoverage',
         './globe/UsgsNedHiElevationCoverage',
+        './util/UrlBuilder',
         './geom/Vec2',
         './geom/Vec3',
         './layer/ViewControlsLayer',
@@ -359,6 +364,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               GpuShader,
               GroundProgram,
               HashMap,
+              HeatMapColoredTile,
+              HeatMapIntervalType,
+              HeatMapLayer,
+              HeatMapTile,
               HighlightController,
               ImageSource,
               ImageTile,
@@ -525,6 +534,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               UsgsNedElevationCoverage,
               UsgsNedHiElevationCoverage,
               UnsupportedOperationError,
+              UrlBuilder,
               Vec2,
               Vec3,
               ViewControlsLayer,
@@ -870,6 +880,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['GpuShader'] = GpuShader;
         WorldWind['GroundProgram'] = GroundProgram;
         WorldWind['HashMap'] = HashMap;
+        WorldWind['HeatMapColoredTile'] = HeatMapColoredTile;
+        WorldWind['HeatMapIntervalType'] = HeatMapIntervalType;
+        WorldWind['HeatMapLayer'] = HeatMapLayer;
+        WorldWind['HeatMapTile'] = HeatMapTile;
         WorldWind['HighlightController'] = HighlightController;
         WorldWind['ImageSource'] = ImageSource;
         WorldWind['ImageTile'] = ImageTile;
@@ -1036,6 +1050,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['UsgsNedElevationCoverage'] = UsgsNedElevationCoverage;
         WorldWind['UsgsNedHiElevationCoverage'] = UsgsNedHiElevationCoverage;
         WorldWind['UnsupportedOperationError'] = UnsupportedOperationError;
+        WorldWind['UrlBuilder'] = UrlBuilder;
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
