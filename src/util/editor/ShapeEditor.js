@@ -38,6 +38,7 @@ define([
         './SurfacePolygonEditorFragment',
         './SurfacePolylineEditorFragment',
         './SurfaceRectangleEditorFragment',
+        './SurfaceSectorEditorFragment',
         '../../geom/Vec2',
         '../../geom/Vec3'
     ],
@@ -61,6 +62,7 @@ define([
               SurfacePolygonEditorFragment,
               SurfacePolylineEditorFragment,
               SurfaceRectangleEditorFragment,
+              SurfaceSectorEditorFragment,
               Vec2,
               Vec3) {
         "use strict";
@@ -138,7 +140,8 @@ define([
                 new SurfaceEllipseEditorFragment(),
                 new SurfacePolygonEditorFragment(),
                 new SurfacePolylineEditorFragment(),
-                new SurfaceRectangleEditorFragment()
+                new SurfaceRectangleEditorFragment(),
+                new SurfaceSectorEditorFragment()
             ];
 
             // Internal use only.
@@ -456,7 +459,6 @@ define([
                 if (terrainObject) {
                     if (this.actionType === ShapeEditorConstants.DRAG) {
                         this.drag(event.clientX, event.clientY);
-
                     } else {
                         this.reshape(terrainObject.position);
                     }
@@ -535,7 +537,7 @@ define([
             this.shadowShapeLayer.removeAllRenderables();
 
             this._shape.highlightAttributes = this.originalHighlightAttributes;
-            
+
             this.hideAnnotation();
 
             this.actionControlPoint = null;
@@ -564,25 +566,9 @@ define([
             this._worldWindow.redraw();
         };
 
-        // TODO: To be discussed with Yann
-        // ShapeEditor.prototype.drag = function (clientX, clientY) {
-        //     var mousePoint = this._worldWindow.canvasCoordinates(clientX, clientY);
-        //     var pickList = this._worldWindow.pick(mousePoint);
-        //     var terrainObject = pickList.terrainObject();
-        //
-        //     if(terrainObject){
-        //         this._shape.moveTo(this._worldWindow.globe, new Location(terrainObject.position.latitude,
-        //             terrainObject.position.longitude));
-        //     }
-        //
-        //     this.updateControlElements();
-        //     this.updateShapeAnnotation();
-        //     this._worldWindow.redraw();
-        // };
-
         // Internal use only.
         ShapeEditor.prototype.drag = function (clientX, clientY) {
-            // Get reference position for the shape that is dragged
+            // Get refecence position for the shape that is dragged
             var refPos = this._shape.getReferencePosition();
 
             // Get point for referenced position

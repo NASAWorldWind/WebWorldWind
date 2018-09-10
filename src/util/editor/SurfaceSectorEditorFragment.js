@@ -72,9 +72,8 @@ define([
         SurfaceSectorEditorFragment.prototype.updateControlElements = function (shape,
                                                                                 globe,
                                                                                 controlPoints) {
-
-            controlPoints[0].position = shape._boundaries[0];
-            controlPoints[1].position = shape._boundaries[2];
+            controlPoints[0].position = new Location(shape._sector.minLatitude, shape._sector.minLongitude);
+            controlPoints[1].position = new Location(shape._sector.maxLatitude, shape._sector.maxLongitude);
         };
 
         // Internal use only.
