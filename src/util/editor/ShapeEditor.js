@@ -568,7 +568,7 @@ define([
 
         // Internal use only.
         ShapeEditor.prototype.drag = function (clientX, clientY) {
-            // Get refecence position for the shape that is dragged
+            // Get reference position for the shape that is dragged
             var refPos = this._shape.getReferencePosition();
 
             // Get point for referenced position
