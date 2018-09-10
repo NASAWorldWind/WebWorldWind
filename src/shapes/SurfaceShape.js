@@ -793,17 +793,64 @@ define([
                 new Vec3(0, 0, 0));
             var newPoint = globe.computePointFromLocation(newLocation.latitude, newLocation.longitude,
                 new Vec3(0, 0, 0));
-            var delta = newPoint.subtract(oldPoint);
 
-            for (var i = 0, len = locations.length; i < len; i++) {
-                globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
-                result.add(delta);
-                globe.computePositionFromPoint(result[0], result[1], result[2], newPos);
-                newLocations.push(new Location(newPos.latitude, newPos.longitude));
+            if(globe.is2D()){
+                var delta = newPoint.subtract(oldPoint);
+
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
+                    result.add(delta);
+                    globe.computePositionFromPoint(result[0], result[1], result[2], newPos);
+                    newLocations.push(new Location(newPos.latitude, newPos.longitude));
+                }
+            } else {
+                var delta_lat = newLocation.latitude - oldLocation.latitude;
+                var delta_long = newLocation.longitude - oldLocation.longitude;
+                var max = -90;
+                var min = 90;
+
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    var new_lat = locations[i].latitude + delta_lat;
+                    var new_long = locations[i].longitude + delta_long;
+
+
+                    if (new_lat > 90) {
+                        new_lat = 180 - new_lat;
+                        new_long += 180;
+                    } else if (new_lat < -90) {
+                        new_lat = -180 - new_lat;
+                        new_long += 180;
+                    }
+
+                    if (new_long < -180) {
+                        new_long += 360;
+                    } else if (new_long > 180) {
+                        new_long -= 360;
+                    }
+
+
+                    if (new_lat > max) {
+                        max = new_lat;
+                    }
+
+                    if (new_lat < min) {
+                        min = new_lat;
+                    }
+
+                    newLocations.push(new Location(new_lat, new_long));
+                }
+
+                if (max > 87) {
+                    var delta = max - 87;
+                    for (var i = 0, len = newLocations.length; i < len; i++) {
+                        newLocations[i].latitude -= delta;
+                    }
+                }
             }
 
             return newLocations;
         };
+
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.prepareSectors = function () {
