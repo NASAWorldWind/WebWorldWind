@@ -124,6 +124,21 @@ requirejs(['./WorldWindShim',
 
         var shapeEditor = new WorldWind.ShapeEditor(wwd);
 
+        document.getElementById("createCircleBtn").addEventListener("click", function(){
+            shapeEditor.create(WorldWind.SurfaceCircle, attributes).then(
+                function (shape) {
+                    shapesLayer.addRenderable(shape);
+                },
+                function (error) {
+                    if (error) {
+                        console.log("Error in shape creation: " + error);
+                    } else {
+                        console.log("No shape created.");
+                    }
+                }
+            );
+        });
+
         document.getElementById("editCircleBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== circleShape) {
