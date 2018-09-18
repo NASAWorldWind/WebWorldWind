@@ -249,7 +249,9 @@ define([
                 // Track state for possible fling behaviour
                 this.dragDelta.set(
                     this.dragLastLocation.latitude - navigator.lookAtLocation.latitude,
-                    this.dragLastLocation.longitude - navigator.lookAtLocation.longitude
+                    Angle.normalizedDegreesLongitude(
+                        this.dragLastLocation.longitude - navigator.lookAtLocation.longitude
+                    )
                 );
                 this.dragLastLocation.copy(navigator.lookAtLocation);
 
