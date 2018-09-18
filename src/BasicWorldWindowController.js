@@ -120,6 +120,7 @@ define([
             this.flingRecognizer = new FlingRecognizer(this.wwd, null);
             this.flingRecognizer.addListener(this);
             this.flingRecognizer.recognizeSimultaneouslyWith(this.primaryDragRecognizer);
+            this.flingRecognizer.recognizeSimultaneouslyWith(this.panRecognizer);
 
             // Intentionally not documented.
             this.beginPoint = new Vec2(0, 0);
