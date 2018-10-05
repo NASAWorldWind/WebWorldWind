@@ -117,6 +117,23 @@ requirejs(['./WorldWindShim',
         sectorShape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(sectorShape);
 
+        // Create a placemark.
+        var placemark = new WorldWind.Placemark(new WorldWind.Position(41, -95, 0), false, null);
+        placemark.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+
+        var placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
+        placemarkAttributes.imageColor = WorldWind.Color.WHITE;
+        placemarkAttributes.imageScale = 20;
+
+        var highlightPlacemarkAttributes = new WorldWind.PlacemarkAttributes(null);
+        highlightPlacemarkAttributes.imageColor = WorldWind.Color.RED;
+        highlightPlacemarkAttributes.imageScale = 20;
+
+        placemark.attributes = placemarkAttributes;
+        placemark.highlightAttributes = highlightPlacemarkAttributes;
+
+        shapesLayer.addRenderable(placemark);
+
         wwd.goTo(new WorldWind.Position(40.42, -104.60, 2417000));
 
         // Create a layer manager for controlling layer visibility.
@@ -135,6 +152,13 @@ requirejs(['./WorldWindShim',
             var shape = shapeEditor.stop();
             if (shape !== ellipseShape) {
                 shapeEditor.edit(ellipseShape);
+            }
+        });
+
+        document.getElementById("editPlacemarkBtn").addEventListener("click", function(){
+            var shape = shapeEditor.stop();
+            if (shape !== placemark) {
+                shapeEditor.edit(placemark);
             }
         });
 
