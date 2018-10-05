@@ -28,6 +28,7 @@ define([
         '../Logger',
         '../../shapes/Placemark',
         '../../shapes/PlacemarkAttributes',
+        './PlacemarkEditorFragment',
         '../../geom/Position',
         '../../layer/RenderableLayer',
         '../../shapes/ShapeAttributes',
@@ -52,6 +53,7 @@ define([
               Logger,
               Placemark,
               PlacemarkAttributes,
+              PlacemarkEditorFragment,
               Position,
               RenderableLayer,
               ShapeAttributes,
@@ -136,6 +138,7 @@ define([
 
             //Internal use only. Intentionally not documented.
             this.editorFragments = [
+                new PlacemarkEditorFragment(),
                 new SurfaceCircleEditorFragment(),
                 new SurfaceEllipseEditorFragment(),
                 new SurfacePolygonEditorFragment(),
@@ -204,6 +207,7 @@ define([
             // Internal use only.
             // The original highlight attributes of the shape in order to restore them after the action.
             this.originalHighlightAttributes = new ShapeAttributes(null);
+            this.originalPlacemarkHighlightAttributes = new PlacemarkAttributes(null);
 
             this._worldWindow.worldWindowController.addGestureListener(this);
         };
@@ -515,16 +519,37 @@ define([
             this.actionControlPosition = initialPosition;
             this.actionSecondaryBehavior = alternateAction;
 
-            // Place a shadow shape at the original location of the shape
-            this.originalHighlightAttributes = this._shape.highlightAttributes;
 
-            var editingAttributes = new ShapeAttributes(this.originalHighlightAttributes);
-            editingAttributes.interiorColor.alpha = editingAttributes.interiorColor.alpha * 0.7;
-            editingAttributes.outlineColor.alpha = editingAttributes.outlineColor.alpha * 0.7;
+
+            var editingAttributes = null;
+
+            // Place a shadow shape at the original location of the shape
+            if (this.activeEditorFragment instanceof PlacemarkEditorFragment) {
+                this.originalHighlightAttributes = null;
+                this.originalPlacemarkHighlightAttributes = this._shape.highlightAttributes;
+
+                editingAttributes = new PlacemarkAttributes(this.originalPlacemarkHighlightAttributes);
+                editingAttributes.imageColor.alpha = editingAttributes.imageColor.alpha * 0.7;
+            } else {
+                this.originalHighlightAttributes = this._shape.highlightAttributes;
+                this.originalPlacemarkHighlightAttributes = null;
+
+                editingAttributes = new ShapeAttributes(this.originalHighlightAttributes);
+                editingAttributes.interiorColor.alpha = editingAttributes.interiorColor.alpha * 0.7;
+                editingAttributes.outlineColor.alpha = editingAttributes.outlineColor.alpha * 0.7;
+            }
+
             this._shape.highlightAttributes = editingAttributes;
 
             var shadowShape = this.activeEditorFragment.createShadowShape(this._shape);
-            shadowShape.highlightAttributes = new ShapeAttributes(this.originalHighlightAttributes);
+
+            if (this.activeEditorFragment instanceof PlacemarkEditorFragment) {
+                shadowShape.altitudeMode = WorldWind.CLAMP_TO_GROUND;
+                shadowShape.highlightAttributes = new PlacemarkAttributes(this.originalHighlightAttributes);
+            } else {
+                shadowShape.highlightAttributes = new ShapeAttributes(this.originalHighlightAttributes);
+            }
+
             shadowShape.highlighted = true;
 
             this.shadowShapeLayer.addRenderable(shadowShape);
@@ -536,7 +561,11 @@ define([
         ShapeEditor.prototype.endAction = function () {
             this.shadowShapeLayer.removeAllRenderables();
 
-            this._shape.highlightAttributes = this.originalHighlightAttributes;
+            if (this.activeEditorFragment instanceof PlacemarkEditorFragment) {
+                this._shape.highlightAttributes = this.originalPlacemarkHighlightAttributes;
+            } else {
+                this._shape.highlightAttributes = this.originalHighlightAttributes;
+            }
 
             this.hideAnnotation();
 
