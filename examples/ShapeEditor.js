@@ -144,56 +144,56 @@ requirejs(['./WorldWindShim',
         document.getElementById("editCircleBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== circleShape) {
-                shapeEditor.edit(circleShape);
+                shapeEditor.edit(circleShape, true, true, true, true);
             }
         });
 
         document.getElementById("editEllipseBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== ellipseShape) {
-                shapeEditor.edit(ellipseShape);
+                shapeEditor.edit(ellipseShape, false, true, false, true);
             }
         });
 
         document.getElementById("editPlacemarkBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== placemark) {
-                shapeEditor.edit(placemark);
+                shapeEditor.edit(placemark, true, true, true, true);
             }
         });
 
         document.getElementById("editPolygonBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== polygonShape) {
-                shapeEditor.edit(polygonShape);
+                shapeEditor.edit(polygonShape, true, false, true, true);
             }
         });
 
         document.getElementById("editMultiPolygonBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== multiPolygonShape) {
-                shapeEditor.edit(multiPolygonShape);
+                shapeEditor.edit(multiPolygonShape, true, true, true, true);
             }
         });
 
         document.getElementById("editPolylineBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== polylineShape) {
-                shapeEditor.edit(polylineShape);
+                shapeEditor.edit(polylineShape, true, true, true, true);
             }
         });
 
         document.getElementById("editRectangleBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== rectangleShape) {
-                shapeEditor.edit(rectangleShape);
+                shapeEditor.edit(rectangleShape, true, false, false, true);
             }
         });
 
         document.getElementById("editSectorBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== sectorShape) {
-                shapeEditor.edit(sectorShape);
+                shapeEditor.edit(sectorShape, true, true, true, true);
             }
         });
     }

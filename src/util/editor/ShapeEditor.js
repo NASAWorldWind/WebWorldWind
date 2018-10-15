@@ -105,6 +105,13 @@ define([
             // Documented in defineProperties below.
             this._shape = null;
 
+            // Internal use only.
+            // Flags indicating whether the specific action is allowed or not.
+            this._allowMove = false;
+            this._allowReshape = false;
+            this._allowRotate = false;
+            this._allowManageControlPoint = false;
+
             // Documented in defineProperties below.
             this._moveControlPointAttributes = new PlacemarkAttributes(null);
             this._moveControlPointAttributes.imageColor = WorldWind.Color.BLUE;
@@ -298,11 +305,21 @@ define([
         /**
          * Edits the specified shape. Currently, only surface shapes are supported.
          * @param {SurfaceShape} shape The shape to edit.
+         * @param {Boolean} move true to enable move action on shape, false to disable move action on shape.
+         * @param {Boolean} reshape true to enable reshape action on shape, false to disable reshape action on shape.
+         * @param {Boolean} rotate true to enable rotate action on shape, false to disable rotate action on shape.
+         * @param {Boolean} manageControlPoint true to enable the action to manage the control points of the shape,
+         * false to disable it.
          * @return {Boolean} <code>true</code> if the editor could start the edition of the specified shape; otherwise
          * <code>false</code>.
          */
-        ShapeEditor.prototype.edit = function (shape) {
+        ShapeEditor.prototype.edit = function (shape, move, reshape, rotate, manageControlPoint) {
             this.stop();
+
+            this._allowMove = move;
+            this._allowReshape = reshape;
+            this._allowRotate = rotate;
+            this._allowManageControlPoint = manageControlPoint;
 
             // Look for a fragment that can handle the specified shape
             for (var i = 0, len = this.editorFragments.length; i < len; i++) {
@@ -331,6 +348,11 @@ define([
             this.removeControlElements();
 
             this.activeEditorFragment = null;
+
+            this._allowMove = false;
+            this._allowReshape = false;
+            this._allowRotate = false;
+            this._allowManageControlPoint = false;
 
             var currentShape = this._shape;
             this._shape = null;
@@ -462,9 +484,19 @@ define([
 
                 if (terrainObject) {
                     if (this.actionType === ShapeEditorConstants.DRAG) {
-                        this.drag(event.clientX, event.clientY);
+                        if (this._allowMove) {
+                            this.drag(event.clientX, event.clientY);
+                        } else {
+                            Logger.logMessage(Logger.LEVEL_INFO, "ShapeEditor", "handleMouseMove",
+                                "Disabled action for selected shape.");
+                        }
                     } else {
-                        this.reshape(terrainObject.position);
+                        if (this._allowReshape || this._allowRotate) {
+                            this.reshape(terrainObject.position);
+                        } else {
+                            Logger.logMessage(Logger.LEVEL_INFO, "ShapeEditor", "handleMouseMove",
+                                "Disabled action for selected shape.");
+                        }
                     }
 
                     event.preventDefault();
@@ -515,11 +547,10 @@ define([
             } else {
                 this.actionType = ShapeEditorConstants.DRAG;
             }
+
             this.actionControlPoint = controlPoint;
             this.actionControlPosition = initialPosition;
             this.actionSecondaryBehavior = alternateAction;
-
-
 
             var editingAttributes = null;
 
@@ -578,21 +609,26 @@ define([
 
         // Internal use only.
         ShapeEditor.prototype.reshape = function (newPosition) {
-            this.activeEditorFragment.reshape(
-                this._shape,
-                this._worldWindow.globe,
-                this.actionControlPoint,
-                newPosition,
-                this.actionControlPosition,
-                this.actionSecondaryBehavior
-            );
+            var purpose = this.actionControlPoint.userProperties.purpose;
 
-            this.actionControlPosition = newPosition;
+            if ((purpose === ShapeEditorConstants.ROTATION && this._allowRotate) ||
+                (purpose !== ShapeEditorConstants.ROTATION) && this._allowReshape) {
+                this.activeEditorFragment.reshape(
+                    this._shape,
+                    this._worldWindow.globe,
+                    this.actionControlPoint,
+                    newPosition,
+                    this.actionControlPosition,
+                    this.actionSecondaryBehavior
+                );
 
-            this.updateControlElements();
-            this.updateAnnotation(this.actionControlPoint);
+                this.actionControlPosition = newPosition;
 
-            this._worldWindow.redraw();
+                this.updateControlElements();
+                this.updateAnnotation(this.actionControlPoint);
+
+                this._worldWindow.redraw();
+            }
         };
 
         // Internal use only.
