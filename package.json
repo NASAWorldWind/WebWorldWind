@@ -32,11 +32,11 @@
   "devDependencies": {
     "grunt": "^1.0.3",
     "grunt-contrib-clean": "^2.0.0",
-    "grunt-contrib-compress": "^1.4.3",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-requirejs": "^1.0.0",
     "grunt-jsdoc": "^2.3.0",
     "grunt-karma": "^3.0.0",
+    "grunt-zip": "^0.18.1",
     "jasmine-core": "^3.2.1",
     "karma": "^3.0.0",
     "karma-chrome-launcher": "^2.2.0",
