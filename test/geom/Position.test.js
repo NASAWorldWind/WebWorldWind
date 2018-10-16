@@ -50,7 +50,7 @@ define([
         describe("Copies this position to the latitude and longitude of a specified position", function () {
 
             it("Copies the position successfully", function () {
-                var position = Position.ZERO;
+                var position = new Position(0, 0, 0);
                 var positionTarget = new Position(37.52, 15.08, 150);
 
                 position.copy(positionTarget);
@@ -61,7 +61,7 @@ define([
 
             it("Should throw an exception on missing position input", function () {
                 expect(function () {
-                    var position = Position.ZERO;
+                    var position = new Position(0, 0, 0);
                     position.copy(null);
                 }).toThrow();
             });
@@ -92,7 +92,7 @@ define([
                     0.5,
                     positionA,
                     positionB,
-                    Position.ZERO);
+                    new Position());
                 expect(resultPosition.latitude).toBeCloseTo(41.537);
                 expect(resultPosition.longitude).toBeCloseTo(12.227);
                 expect(resultPosition.altitude).toBeCloseTo(135);
@@ -103,7 +103,7 @@ define([
                     0.5,
                     positionA,
                     positionA,
-                    Position.ZERO);
+                    new Position());
                 expect(resultPosition).toEqual(positionA);
             });
 
@@ -115,7 +115,7 @@ define([
                             0.5,
                             null,
                             positionB,
-                            Position.ZERO);
+                            new Position());
                     }).toThrow();
                 });
 
@@ -125,7 +125,7 @@ define([
                             0.5,
                             positionA,
                             null,
-                            Position.ZERO);
+                            new Position());
                     }).toThrow();
                 });
 
@@ -151,7 +151,7 @@ define([
                     0.5,
                     positionA,
                     positionB,
-                    Position.ZERO);
+                    new Position());
                 expect(resultPosition.latitude).toBeCloseTo(41.5);
                 expect(resultPosition.longitude).toBeCloseTo(12.135);
                 expect(resultPosition.altitude).toBeCloseTo(135);
@@ -162,7 +162,7 @@ define([
                     0.5,
                     positionA,
                     positionA,
-                    Position.ZERO);
+                    new Position());
                 expect(resultPosition).toEqual(positionA);
             });
 
@@ -174,7 +174,7 @@ define([
                             0.5,
                             null,
                             positionB,
-                            Position.ZERO);
+                            new Position());
                     }).toThrow();
                 });
 
@@ -184,7 +184,7 @@ define([
                             0.5,
                             positionA,
                             null,
-                            Position.ZERO);
+                            new Position());
                     }).toThrow();
                 });
 
@@ -210,7 +210,7 @@ define([
                     0.5,
                     positionA,
                     positionB,
-                    Position.ZERO);
+                    new Position());
                 expect(resultPosition.latitude).toBeCloseTo(41.5);
                 expect(resultPosition.longitude).toBeCloseTo(12.044);
                 expect(resultPosition.altitude).toBeCloseTo(135);
@@ -221,7 +221,7 @@ define([
                     0.5,
                     positionA,
                     positionA,
-                    Position.ZERO);
+                    new Position());
                 expect(resultPosition).toEqual(positionA);
             });
 
@@ -233,7 +233,7 @@ define([
                             0.5,
                             null,
                             positionB,
-                            Position.ZERO);
+                            new Position());
                     }).toThrow();
                 });
 
@@ -243,7 +243,7 @@ define([
                             0.5,
                             positionA,
                             null,
-                            Position.ZERO);
+                            new Position());
                     }).toThrow();
                 });
 

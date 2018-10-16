@@ -57,7 +57,7 @@ define([
         describe("Copies this sector to the latitude and longitude of a specified sector", function () {
 
             it("Copies the sector successfully", function () {
-                var sector = Sector.ZERO;
+                var sector = new Sector(0, 0, 0, 0);
                 var sectorTarget = new Sector(37, 39, 13, 18);
 
                 sector.copy(sectorTarget);
@@ -69,7 +69,7 @@ define([
 
             it("Should throw an exception on missing sector input", function () {
                 expect(function () {
-                    var sector = Sector.ZERO;
+                    var sector = new Sector(0, 0, 0, 0);
                     sector.copy(null);
                 }).toThrow();
             });
@@ -325,7 +325,7 @@ define([
 
             it("Should throw an exception on missing sector input", function () {
                 expect(function () {
-                    var sector = Sector.ZERO;
+                    var sector = new Sector(0, 0, 0, 0);
                     sector.intersection(null);
                 }).toThrow();
             });
@@ -506,7 +506,7 @@ define([
 
             it("Should throw an exception on missing sector input", function () {
                 expect(function () {
-                    var sector = Sector.ZERO;
+                    var sector = new Sector(0, 0, 0, 0);
                     sector.union(null);
                 }).toThrow();
             });
