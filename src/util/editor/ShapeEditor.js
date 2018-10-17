@@ -216,6 +216,17 @@ define([
             this.originalHighlightAttributes = new ShapeAttributes(null);
             this.originalPlacemarkHighlightAttributes = new PlacemarkAttributes(null);
 
+            // Internal use only.
+            // counters used to detect double click
+            this._clicked0X = null;
+            this._clicked0Y = null;
+            this._clicked1X = null;
+            this._clicked1Y = null;
+            this._click0Time = 0;
+            this._click1Time = 0;
+            this._dbclickTimeout = 0;
+            this._clickDelay = 500;
+
             this._worldWindow.worldWindowController.addGestureListener(this);
         };
 
@@ -454,6 +465,22 @@ define([
             var pickList = this._worldWindow.pick(mousePoint);
             var terrainObject = pickList.terrainObject();
 
+            if (this._click0Time && !this._click1Time) {
+                this._clicked1X = x;
+                this._clicked1Y = y;
+                this._click1Time = Date.now() - this._click0Time;
+            } else {
+                this._clicked0X = x;
+                this._clicked0Y = y;
+                this._click0Time = Date.now();
+                this._click1Time = 0;
+                clearTimeout(this._dbclickTimeout);
+                this._dbclickTimeout = setTimeout(function () {
+                        this._click0Time = 0;
+                    }, this._clickDelay
+                );
+            }
+
             for (var p = 0, len = pickList.objects.length; p < len; p++) {
                 var object = pickList.objects[p];
 
@@ -461,12 +488,12 @@ define([
                     var userObject = object.userObject;
 
                     if (userObject === this._shape) {
-                        this.beginAction(terrainObject.position, event.ctrlKey);
+                        this.beginAction(terrainObject.position, this._allowManageControlPoint);
                         event.preventDefault();
                         break;
 
                     } else if (this.controlPointsLayer.renderables.indexOf(userObject) !== -1) {
-                        this.beginAction(terrainObject.position, event.ctrlKey, userObject);
+                        this.beginAction(terrainObject.position, this._allowManageControlPoint, userObject);
                         event.preventDefault();
                         break;
                     }
@@ -477,6 +504,19 @@ define([
         // Internal use only.
         // Updates the current action if any.
         ShapeEditor.prototype.handleMouseMove = function (event) {
+
+            if (this._click0Time && !this._click1Time) {
+                this._clicked1X = event.clientX;
+                this._clicked1Y = event.clientY;
+            }
+
+            if (!(this._clicked0X === this._clicked1X
+                    && this._clicked0Y === this._clicked1Y)) {
+                clearTimeout(this._dbclickTimeout);
+                this._click0Time = 0;
+                this._click1Time = 0;
+            }
+
             if (this.actionType) {
 
                 var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
@@ -492,6 +532,7 @@ define([
                         }
                     } else {
                         if (this._allowReshape || this._allowRotate) {
+                            this.actionSecondaryBehavior = false;
                             this.reshape(terrainObject.position);
                         } else {
                             Logger.logMessage(Logger.LEVEL_INFO, "ShapeEditor", "handleMouseMove",
@@ -510,15 +551,22 @@ define([
             var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
             var terrainObject = this._worldWindow.pickTerrain(mousePoint).terrainObject();
 
-
-            // The editor provides vertex insertion and removal for SurfacePolygon and
-            // SurfacePolyline. Shift-clicking when the cursor is over the shape inserts a control point near the position
-            // of the cursor. Ctrl-clicking when the cursor is over a control point removes that particular control point.
+            // The editor provides vertex insertion and removal for SurfacePolygon and SurfacePolyline.
+            // Shift-clicking when the cursor is over the shape inserts a control point near the position
+            // of the cursor.
             if (this.actionType) {
-                if (this.actionControlPoint
-                    && terrainObject
-                    && event.ctrlKey) {
-                        this.reshape(terrainObject.position);
+                if (this._click0Time && this._click1Time) {
+                    if (this._click1Time <= this._clickDelay) {
+                        if (this.actionControlPoint
+                            && terrainObject
+                            && this._allowManageControlPoint) {
+                            this.actionSecondaryBehavior = true;
+                            this.reshape(terrainObject.position);
+                        }
+                    }
+                    clearTimeout(this._dbclickTimeout);
+                    this._click0Time = 0;
+                    this._click1Time = 0;
                 }
 
                 this.endAction();
@@ -527,7 +575,8 @@ define([
             if (terrainObject
                 && this.actionStartX === this.actionCurrentX
                 && this.actionStartY === this.actionCurrentY
-                && event.shiftKey) {
+                && event.shiftKey
+                && this._allowManageControlPoint) {
                 this.activeEditorFragment.addNewVertex(
                     this._shape,
                     this._worldWindow.globe,
@@ -612,7 +661,8 @@ define([
             var purpose = this.actionControlPoint.userProperties.purpose;
 
             if ((purpose === ShapeEditorConstants.ROTATION && this._allowRotate) ||
-                (purpose !== ShapeEditorConstants.ROTATION) && this._allowReshape) {
+                (purpose !== ShapeEditorConstants.ROTATION && this._allowReshape) ||
+                (purpose === ShapeEditorConstants.LOCATION && this._allowManageControlPoint && this.actionSecondaryBehavior)) {
                 this.activeEditorFragment.reshape(
                     this._shape,
                     this._worldWindow.globe,
