@@ -217,7 +217,7 @@ define([
             this.originalPlacemarkHighlightAttributes = new PlacemarkAttributes(null);
 
             // Internal use only.
-            // counters used to detect double click
+            // counters used to detect double click (time measured in ms)
             this._clicked0X = null;
             this._clicked0Y = null;
             this._clicked1X = null;
@@ -226,6 +226,12 @@ define([
             this._click1Time = 0;
             this._dbclickTimeout = 0;
             this._clickDelay = 500;
+
+            // Internal use only.
+            // counters used to detect long press event (time measured in ms)
+            this._longPressTimeout = 0;
+            this._longPressDelay = 1500;
+
 
             this._worldWindow.worldWindowController.addGestureListener(this);
         };
@@ -481,6 +487,34 @@ define([
                 );
             }
 
+            var allowVertex = terrainObject
+                && this.actionStartX === this.actionCurrentX
+                && this.actionStartY === this.actionCurrentY
+                && this._allowManageControlPoint;
+
+            // counter for long-press detection
+            clearTimeout(this._longPressTimeout);
+
+            var context = this;
+
+
+            // The editor provides vertex insertion and removal for SurfacePolygon and SurfacePolyline.
+            // Long press when the cursor is over the shape inserts a control point near the position
+            // of the cursor.
+            this._longPressTimeout = setTimeout(function () {
+                    if (allowVertex) {
+                        context.activeEditorFragment.addNewVertex(
+                            context._shape,
+                            context._worldWindow.globe,
+                            terrainObject.position
+                        );
+
+                        context.updateControlElements();
+                        context._worldWindow.redraw();
+                    }
+                }, this._longPressDelay
+            );
+
             for (var p = 0, len = pickList.objects.length; p < len; p++) {
                 var object = pickList.objects[p];
 
@@ -517,6 +551,8 @@ define([
                 this._click1Time = 0;
             }
 
+            clearTimeout(this._longPressTimeout);
+
             if (this.actionType) {
 
                 var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
@@ -552,8 +588,7 @@ define([
             var terrainObject = this._worldWindow.pickTerrain(mousePoint).terrainObject();
 
             // The editor provides vertex insertion and removal for SurfacePolygon and SurfacePolyline.
-            // Shift-clicking when the cursor is over the shape inserts a control point near the position
-            // of the cursor.
+            // Double clicking when the cursor is over a control point will remove it.
             if (this.actionType) {
                 if (this._click0Time && this._click1Time) {
                     if (this._click1Time <= this._clickDelay) {
@@ -572,20 +607,7 @@ define([
                 this.endAction();
             }
 
-            if (terrainObject
-                && this.actionStartX === this.actionCurrentX
-                && this.actionStartY === this.actionCurrentY
-                && event.shiftKey
-                && this._allowManageControlPoint) {
-                this.activeEditorFragment.addNewVertex(
-                    this._shape,
-                    this._worldWindow.globe,
-                    terrainObject.position
-                );
-
-                this.updateControlElements();
-                this._worldWindow.redraw();
-            }
+            clearTimeout(this._longPressTimeout);
         };
 
         // Internal use only.
