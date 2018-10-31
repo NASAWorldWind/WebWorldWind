@@ -130,12 +130,18 @@ requirejs(['./WorldWindShim',
         placemark.altitudeMode = WorldWind.CLAMP_TO_GROUND;
 
         var placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
+        placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/pushpins/plain-red.png";
+        placemarkAttributes.imageScale = 1;
+        placemarkAttributes.imageOffset = new WorldWind.Offset(
+            WorldWind.OFFSET_FRACTION, 0.3,
+            WorldWind.OFFSET_FRACTION, 0.0);
         placemarkAttributes.imageColor = WorldWind.Color.WHITE;
-        placemarkAttributes.imageScale = 20;
+        placemarkAttributes.drawLeaderLine = true;
+        placemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.RED;
 
         var highlightPlacemarkAttributes = new WorldWind.PlacemarkAttributes(null);
         highlightPlacemarkAttributes.imageColor = WorldWind.Color.RED;
-        highlightPlacemarkAttributes.imageScale = 20;
+        highlightPlacemarkAttributes.imageScale = 1.2;
 
         placemark.attributes = placemarkAttributes;
         placemark.highlightAttributes = highlightPlacemarkAttributes;
