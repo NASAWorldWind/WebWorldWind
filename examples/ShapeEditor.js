@@ -186,7 +186,7 @@ requirejs(['./WorldWindShim',
         document.getElementById("editMultiPolygonBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== multiPolygonShape) {
-                shapeEditor.edit(multiPolygonShape, true, true, true, true);
+                shapeEditor.edit(multiPolygonShape, false, true, true, true);
             }
         });
 

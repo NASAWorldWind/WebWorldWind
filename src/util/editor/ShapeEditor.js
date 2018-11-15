@@ -107,10 +107,10 @@ define([
 
             // Internal use only.
             // Flags indicating whether the specific action is allowed or not.
-            this._allowMove = false;
-            this._allowReshape = false;
-            this._allowRotate = false;
-            this._allowManageControlPoint = false;
+            this._allowMove = true;
+            this._allowReshape = true;
+            this._allowRotate = true;
+            this._allowManageControlPoint = true;
 
             // Documented in defineProperties below.
             this._moveControlPointAttributes = new PlacemarkAttributes(null);
@@ -366,10 +366,10 @@ define([
 
             this.activeEditorFragment = null;
 
-            this._allowMove = false;
-            this._allowReshape = false;
-            this._allowRotate = false;
-            this._allowManageControlPoint = false;
+            this._allowMove = true;
+            this._allowReshape = true;
+            this._allowRotate = true;
+            this._allowManageControlPoint = true;
 
             var currentShape = this._shape;
             this._shape = null;
