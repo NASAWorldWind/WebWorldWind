@@ -56,14 +56,14 @@ requirejs(['./WorldWindShim',
         // can be shared among shapes.
         var attributes = new WorldWind.ShapeAttributes(null);
         attributes.outlineColor = WorldWind.Color.BLACK;
-        attributes.interiorColor = new WorldWind.Color(1, 1, 1, 1.0);
+        attributes.interiorColor = new WorldWind.Color(0.8, 0.9, 0.9, 1.0);
 
         var highlightAttributes = new WorldWind.ShapeAttributes(attributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
 
         var polylineAttributes = new WorldWind.ShapeAttributes(null);
         polylineAttributes.outlineColor = WorldWind.Color.BLACK;
-        polylineAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1.0);
+        polylineAttributes.interiorColor = new WorldWind.Color(0.8, 0.9, 0.9, 1.0);
         polylineAttributes.outlineWidth = 5;
 
         var polylineHighlightAttributes = new WorldWind.ShapeAttributes(polylineAttributes);
