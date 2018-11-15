@@ -272,59 +272,121 @@ define([
                 this.beginPoint.set(x, y);
                 this.lastPoint.set(x, y);
             } else if (state === WorldWind.CHANGED) {
-                var x1 = this.lastPoint[0],
-                    y1 = this.lastPoint[1],
-                    x2 = this.beginPoint[0] + tx,
-                    y2 = this.beginPoint[1] + ty;
-
-                this.lastPoint.set(x2, y2);
-
-                var globe = this.wwd.globe,
-                    ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
-                    point1 = new Vec3(0, 0, 0),
-                    point2 = new Vec3(0, 0, 0),
-                    origin = new Vec3(0, 0, 0);
-
-                if (!globe.intersectsLine(ray, point1)) {
-                    return;
-                }
-
-                ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x2, y2));
-                if (!globe.intersectsLine(ray, point2)) {
-                    return;
-                }
-
-                // Transform the original navigator state's modelview matrix to account for the gesture's change.
-                var modelview = Matrix.fromIdentity();
-                this.wwd.computeViewingTransform(null, modelview);
-                modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
-
-                // Compute the globe point at the screen center from the perspective of the transformed navigator state.
-                modelview.extractEyePoint(ray.origin);
-                modelview.extractForwardVector(ray.direction);
-                if (!globe.intersectsLine(ray, origin)) {
-                    return;
-                }
-
-                // Convert the transformed modelview matrix to a set of navigator properties, then apply those
-                // properties to this navigator.
-                var params = modelview.extractViewingParameters(origin, navigator.roll, globe, {});
-                navigator.lookAtLocation.copy(params.origin);
-                navigator.range = params.range;
-                navigator.heading = params.heading;
-                navigator.tilt = params.tilt;
-                navigator.roll = params.roll;
-                this.applyLimits();
-                this.wwd.redraw();
+                this.move2D(tx, ty);
             }
+        };
+
+        BasicWorldWindowController.prototype.move2D = function (tx, ty) {
+            var navigator = this.wwd.navigator;
+            var x1 = this.lastPoint[0],
+                y1 = this.lastPoint[1],
+                x2 = this.beginPoint[0] + tx,
+                y2 = this.beginPoint[1] + ty;
+
+            this.lastPoint.set(x2, y2);
+
+            var globe = this.wwd.globe,
+                ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x1, y1)),
+                point1 = new Vec3(0, 0, 0),
+                point2 = new Vec3(0, 0, 0),
+                origin = new Vec3(0, 0, 0);
+
+            if (!globe.intersectsLine(ray, point1)) {
+                return;
+            }
+
+            ray = this.wwd.rayThroughScreenPoint(this.wwd.canvasCoordinates(x2, y2));
+            if (!globe.intersectsLine(ray, point2)) {
+                return;
+            }
+
+            // Transform the original navigator state's modelview matrix to account for the gesture's change.
+            var modelview = Matrix.fromIdentity();
+            this.wwd.computeViewingTransform(null, modelview);
+            modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
+
+            // Compute the globe point at the screen center from the perspective of the transformed navigator state.
+            modelview.extractEyePoint(ray.origin);
+            modelview.extractForwardVector(ray.direction);
+            if (!globe.intersectsLine(ray, origin)) {
+                return;
+            }
+
+            // Convert the transformed modelview matrix to a set of navigator properties, then apply those
+            // properties to this navigator.
+            var params = modelview.extractViewingParameters(origin, navigator.roll, globe, {});
+            navigator.lookAtLocation.copy(params.origin);
+            navigator.range = params.range;
+            navigator.heading = params.heading;
+            navigator.tilt = params.tilt;
+            navigator.roll = params.roll;
+            this.applyLimits();
+            this.wwd.redraw();
+
+            this.dragDelta.set(x1 - x2, y1 - y2);
+            this.dragLastLocation.copy(navigator.lookAtLocation);
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleFling = function (recognizer) {
             if (this.wwd.globe.is2D()) {
-                // Not supported yet.
+                this.handleFling2D(recognizer);
             } else {
                 this.handleFling3D(recognizer);
+            }
+        };
+
+        BasicWorldWindowController.prototype.handleFling2D = function (recognizer) {
+            if (recognizer.state === WorldWind.RECOGNIZED) {
+                var wwd = this.wwd;
+                var navigator = wwd.navigator;
+
+                var animationDuration = 1500; // ms
+
+                this.beginPoint.copy(this.lastPoint);
+
+                // Last location set by this animation
+                var lastLocation = new Location();
+                lastLocation.copy(this.dragLastLocation);
+
+                // Start time of this animation
+                var startTime = new Date();
+
+                var beginTx = this.dragDelta[0];
+                var beginTy = this.dragDelta[1];
+                var tx = beginTx;
+                var ty = beginTy;
+
+                // Animation Loop
+                var controller = this;
+                var animate = function () {
+                    controller.flingAnimationId = -1;
+
+                    if (!lastLocation.equals(navigator.lookAtLocation)) {
+                        // The navigator was changed externally. Aborting the animation.
+                        return;
+                    }
+
+                    // Compute the delta to apply using a sinusoidal out easing
+                    var elapsed = (new Date() - startTime) / animationDuration;
+                    elapsed = elapsed > 1 ? 1 : elapsed;
+                    var value = Math.sin(elapsed * Math.PI / 2);
+
+                    tx -= beginTx - beginTx * value;
+                    ty -= beginTy - beginTy * value;
+
+                    controller.move2D(tx, ty);
+
+                    // Save the new current lookAt location
+                    lastLocation.copy(navigator.lookAtLocation);
+
+                    // If we haven't reached the animation duration, request a new frame
+                    if (elapsed < 1) {
+                        controller.flingAnimationId = requestAnimationFrame(animate);
+                    }
+                };
+
+                this.flingAnimationId = requestAnimationFrame(animate);
             }
         };
 
@@ -348,7 +410,7 @@ define([
 
                 // Animation Loop
                 var controller = this;
-                var animate = function() {
+                var animate = function () {
                     controller.flingAnimationId = -1;
 
                     if (!lastLocation.equals(navigator.lookAtLocation)) {
