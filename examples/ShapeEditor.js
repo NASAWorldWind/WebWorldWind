@@ -134,7 +134,9 @@ requirejs(['./WorldWindShim',
 
         var highlightPlacemarkAttributes = new WorldWind.PlacemarkAttributes(null);
         highlightPlacemarkAttributes.imageColor = WorldWind.Color.RED;
-        highlightPlacemarkAttributes.imageScale = 1.2;
+        highlightPlacemarkAttributes.imageOffset = new WorldWind.Offset(
+            WorldWind.OFFSET_FRACTION, 0.3,
+            WorldWind.OFFSET_FRACTION, 0.0);
 
         placemark.attributes = placemarkAttributes;
         placemark.highlightAttributes = highlightPlacemarkAttributes;
