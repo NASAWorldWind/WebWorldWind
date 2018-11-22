@@ -114,18 +114,19 @@ define([
 
             // Documented in defineProperties below.
             this._moveControlPointAttributes = new PlacemarkAttributes(null);
-            this._moveControlPointAttributes.imageColor = WorldWind.Color.BLUE;
-            this._moveControlPointAttributes.imageScale = 6;
+            this._moveControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/blue-dot.png";
+            this._moveControlPointAttributes.imageScale = 0.15;
 
             // Documented in defineProperties below.
             this._resizeControlPointAttributes = new PlacemarkAttributes(null);
-            this._resizeControlPointAttributes.imageColor = WorldWind.Color.CYAN;
-            this._resizeControlPointAttributes.imageScale = 6;
+            this._resizeControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/yellow-dot.png";
+            this._resizeControlPointAttributes.imageScale = 0.15;
 
             // Documented in defineProperties below.
             this._rotateControlPointAttributes = new PlacemarkAttributes(null);
             this._rotateControlPointAttributes.imageColor = WorldWind.Color.GREEN;
-            this._rotateControlPointAttributes.imageScale = 6;
+            this._rotateControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/green-dot.png";
+            this._rotateControlPointAttributes.imageScale = 0.15;
 
             // Documented in defineProperties below.
             this._annotationAttributes = new AnnotationAttributes(null);
