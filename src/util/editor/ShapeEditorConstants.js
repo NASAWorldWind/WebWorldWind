@@ -46,7 +46,10 @@ define([],
             MIN_CORNER: "min_corner",
 
             // Indicates the corner with max latitude for a surface sector
-            MAX_CORNER: "max_corner"
+            MAX_CORNER: "max_corner",
+
+            // Indicates a control point that marks the middle of a segment.
+            SHADOW: "shadow"
         };
 
         return ShapeEditorConstants;

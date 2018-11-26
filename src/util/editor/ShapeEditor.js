@@ -118,6 +118,11 @@ define([
             this._moveControlPointAttributes.imageScale = 0.15;
 
             // Documented in defineProperties below.
+            this._shadowControlPointAttributes = new PlacemarkAttributes(null);
+            this._shadowControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/gray-dot.png";
+            this._shadowControlPointAttributes.imageScale = 0.15;
+
+            // Documented in defineProperties below.
             this._resizeControlPointAttributes = new PlacemarkAttributes(null);
             this._resizeControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/yellow-dot.png";
             this._resizeControlPointAttributes.imageScale = 0.15;
@@ -277,6 +282,20 @@ define([
             },
 
             /**
+             * Attributes used for the shadow control points used to mask the middle of a segment.
+             * @memberof ShapeEditor.prototype
+             * @type {PlacemarkAttributes}
+             */
+            shadowControlPointAttributes: {
+                get: function () {
+                    return this._shadowControlPointAttributes;
+                },
+                set: function (value) {
+                    this._shadowControlPointAttributes = value;
+                }
+            },
+
+            /**
              * Attributes used for the control points that resize the shape.
              * @memberof ShapeEditor.prototype
              * @type {PlacemarkAttributes}
@@ -407,7 +426,8 @@ define([
                 this.accessoriesLayer.renderables,
                 this._resizeControlPointAttributes,
                 this._rotateControlPointAttributes,
-                this._moveControlPointAttributes
+                this._moveControlPointAttributes,
+                this._shadowControlPointAttributes
             );
 
             this.updateControlElements();

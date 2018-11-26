@@ -37,6 +37,7 @@ define([
         var SurfacePolygonEditorFragment = function () {
             this.currentHeading = 0;
             this.moveControlPointAttributes = null;
+            this.shadowControlPointAttributes = null;
         };
 
         SurfacePolygonEditorFragment.prototype = Object.create(BaseSurfaceEditorFragment.prototype);
@@ -62,9 +63,11 @@ define([
                                                                                      accessories,
                                                                                      resizeControlPointAttributes,
                                                                                      rotateControlPointAttributes,
-                                                                                     moveControlPointAttributes) {
+                                                                                     moveControlPointAttributes,
+                                                                                     shadowControlPointAttributes) {
             this.currentHeading = 0;
             this.moveControlPointAttributes = moveControlPointAttributes;
+            this.shadowControlPointAttributes = shadowControlPointAttributes;
 
             var locations = this.getLocations(shape);
 
@@ -108,6 +111,34 @@ define([
 
             if (lenControlPoints > lenLocations) {
                 controlPoints.splice(lenLocations, lenControlPoints - lenLocations)
+            }
+
+            for (var i = 0; i < lenLocations - 1; i++) {
+                this.createControlPoint(
+                    controlPoints,
+                    this.shadowControlPointAttributes,
+                    ShapeEditorConstants.SHADOW,
+                    lenLocations + i
+                );
+
+                controlPoints[lenLocations + i].position = new Location(
+                    (locations[i].latitude + locations[i+1].latitude)/2,
+                    (locations[i].longitude + locations[i+1].longitude)/2
+                );
+
+                if (i == lenLocations - 2) {
+                    this.createControlPoint(
+                        controlPoints,
+                        this.shadowControlPointAttributes,
+                        ShapeEditorConstants.SHADOW,
+                        lenLocations + i + 1
+                    );
+
+                    controlPoints[lenLocations + i + 1].position = new Location(
+                        (locations[i+1].latitude + locations[0].latitude)/2,
+                        (locations[i+1].longitude + locations[0].longitude)/2
+                    );
+                }
             }
 
             var polygonCenter = this.getCenterFromLocations(globe, locations);

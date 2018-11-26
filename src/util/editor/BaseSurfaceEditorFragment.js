@@ -109,13 +109,16 @@ define([
          * rotate the shape.
          * @param {PlacemarkAttributes} moveControlPointAttributes The attributes to use for control points that move
          * the boundaries of the shape.
+         * @param {PlacemarkAttributes} shadowControlPointAttributes The attributes to use for control points that will
+         * mark the middle of one segment.
          */
         BaseSurfaceEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                   controlPoints,
                                                                                   accessories,
                                                                                   resizeControlPointAttributes,
                                                                                   rotateControlPointAttributes,
-                                                                                  moveControlPointAttributes) {
+                                                                                  moveControlPointAttributes,
+                                                                                  shadowControlPointAttributes) {
             throw new UnsupportedOperationError(Logger.logMessage(
                 Logger.LEVEL_SEVERE,
                 "BaseSurfaceEditorFragment",
