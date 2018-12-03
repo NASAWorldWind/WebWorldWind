@@ -671,7 +671,7 @@ define([
 
             if (this.activeEditorFragment instanceof PlacemarkEditorFragment) {
                 shadowShape.altitudeMode = WorldWind.CLAMP_TO_GROUND;
-                shadowShape.highlightAttributes = new PlacemarkAttributes(this.originalHighlightAttributes);
+                shadowShape.highlightAttributes = new PlacemarkAttributes(this.originalPlacemarkHighlightAttributes);
             } else {
                 shadowShape.highlightAttributes = new ShapeAttributes(this.originalHighlightAttributes);
             }

@@ -133,10 +133,12 @@ requirejs(['./WorldWindShim',
         placemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.RED;
 
         var highlightPlacemarkAttributes = new WorldWind.PlacemarkAttributes(null);
-        highlightPlacemarkAttributes.imageColor = WorldWind.Color.RED;
+        highlightPlacemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/pushpins/plain-red.png";
+        highlightPlacemarkAttributes.imageScale = 1;
         highlightPlacemarkAttributes.imageOffset = new WorldWind.Offset(
             WorldWind.OFFSET_FRACTION, 0.3,
             WorldWind.OFFSET_FRACTION, 0.0);
+        highlightPlacemarkAttributes.imageColor = WorldWind.Color.RED;
 
         placemark.attributes = placemarkAttributes;
         placemark.highlightAttributes = highlightPlacemarkAttributes;
