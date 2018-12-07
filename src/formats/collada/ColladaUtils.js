@@ -196,7 +196,7 @@ define(['../../util/Logger'], function (Logger) {
             var request = new XMLHttpRequest();
 
             request.onload = function () {
-                if (this.status >= 200 && this.status < 400) {
+                if ((this.status >= 200 && this.status < 400) || this.status == 0) {
                     cb(this.response);
                 }
                 else {
