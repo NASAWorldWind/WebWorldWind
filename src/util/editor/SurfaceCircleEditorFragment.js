@@ -54,20 +54,23 @@ define([
                                                                                     controlPoints,
                                                                                     accessories,
                                                                                     resizeControlPointAttributes) {
-
-            this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.RADIUS);
+            if (resizeControlPointAttributes) {
+                this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.RADIUS);
+            }
         };
 
         // Internal use only.
         SurfaceCircleEditorFragment.prototype.updateControlElements = function (shape, globe, controlPoints) {
-            Location.greatCircleLocation(
-                shape.center,
-                90,
-                shape.radius / globe.equatorialRadius,
-                controlPoints[0].position
-            );
+            if (controlPoints.length > 0) {
+                Location.greatCircleLocation(
+                    shape.center,
+                    90,
+                    shape.radius / globe.equatorialRadius,
+                    controlPoints[0].position
+                );
 
-            controlPoints[0].userProperties.size = shape.radius;
+                controlPoints[0].userProperties.size = shape.radius;
+            }
         };
 
         // Internal use only.

@@ -404,6 +404,22 @@ define([
         // Internal use only.
         // Called by {@link ShapeEditor#edit} to initialize the control elements used for editing.
         ShapeEditor.prototype.initializeControlElements = function () {
+            var moveControlAttributes = this._moveControlPointAttributes;
+            var resizeControlAttributes = this._resizeControlPointAttributes;
+            var rotateControlAttributes = this._rotateControlPointAttributes;
+
+            if (!this._allowMove) {
+                moveControlAttributes = null;
+            }
+
+            if (!this._allowReshape) {
+                resizeControlAttributes = null;
+            }
+
+            if (!this._allowRotate) {
+                rotateControlAttributes = null;
+            }
+
             if (this._worldWindow.indexOfLayer(this.shadowShapeLayer) == -1) {
                 this._worldWindow.insertLayer(0, this.shadowShapeLayer);
             }
@@ -424,9 +440,9 @@ define([
                 this._shape,
                 this.controlPointsLayer.renderables,
                 this.accessoriesLayer.renderables,
-                this._resizeControlPointAttributes,
-                this._rotateControlPointAttributes,
-                this._moveControlPointAttributes,
+                resizeControlAttributes,
+                rotateControlAttributes,
+                moveControlAttributes,
                 this._shadowControlPointAttributes
             );
 

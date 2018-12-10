@@ -66,23 +66,28 @@ define([
                                                                                       moveControlPointAttributes,
                                                                                       shadowControlPointAttributes) {
             this.currentHeading = 0;
-            this.moveControlPointAttributes = moveControlPointAttributes;
-            this.shadowControlPointAttributes = shadowControlPointAttributes;
 
-            var locations = shape.boundaries;
+            if (moveControlPointAttributes) {
+                this.moveControlPointAttributes = moveControlPointAttributes;
+                this.shadowControlPointAttributes = shadowControlPointAttributes;
 
-            for (var i = 0, len = locations.length; i < len; i++) {
-                this.createControlPoint(
-                    controlPoints,
-                    moveControlPointAttributes,
-                    ShapeEditorConstants.LOCATION,
-                    i
-                );
+                var locations = shape.boundaries;
+
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    this.createControlPoint(
+                        controlPoints,
+                        moveControlPointAttributes,
+                        ShapeEditorConstants.LOCATION,
+                        i
+                    );
+                }
             }
 
-            this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
+            if (rotateControlPointAttributes) {
+                this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
 
-            this.createRotationAccessory(accessories, rotateControlPointAttributes);
+                this.createRotationAccessory(accessories, rotateControlPointAttributes);
+            }
         };
 
         // Internal use only.
@@ -91,57 +96,75 @@ define([
                                                                                   controlPoints,
                                                                                   accessories) {
             var locations = shape.boundaries;
-
-            var rotationControlPoint = controlPoints.pop();
-
-            var lenControlPoints = controlPoints.length;
             var lenLocations = locations.length;
+            var lenControlPoints = controlPoints.length;
+            var locationControlPoints = [];
+            var rotationControlPoint = null;
 
-            for (var i = 0; i < lenLocations; i++) {
-                if (i >= lenControlPoints) {
+            console.dir(shape.pathType);
+
+            if (lenControlPoints > 0) {
+                for (var i = lenControlPoints - 1; i > -1; i--) {
+                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.ROTATION) {
+                        rotationControlPoint = controlPoints[i];
+
+                        var polygonCenter = this.getCenterFromLocations(globe, locations);
+                        var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
+
+                        Location.greatCircleLocation(
+                            polygonCenter,
+                            this.currentHeading,
+                            polygonRadius,
+                            rotationControlPoint.position
+                        );
+
+                        rotationControlPoint.userProperties.rotation = this.currentHeading;
+
+                        this.updateRotationAccessory(polygonCenter, rotationControlPoint.position, accessories);
+                    }
+
+                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.LOCATION) {
+                        locationControlPoints.push(controlPoints[i]);
+                    }
+                    controlPoints.pop();
+                }
+
+                locationControlPoints.reverse();
+                var lenLocationControlPoints = locationControlPoints.length;
+
+                for (var i = 0; i < lenLocations; i++) {
+                    if (i >= lenLocationControlPoints) {
+                        this.createControlPoint(
+                            locationControlPoints,
+                            this.moveControlPointAttributes,
+                            ShapeEditorConstants.LOCATION,
+                            i
+                        );
+                    }
+                    locationControlPoints[i].position = locations[i];
+                }
+
+                if (locationControlPoints.length > lenLocations) {
+                    locationControlPoints.splice(lenLocations, locationControlPoints.length - lenLocations);
+                }
+
+                for (var i = 0; i < locationControlPoints.length; i++) {
+                    controlPoints.push(locationControlPoints[i]);
+                }
+
+                for (var i = 0; i < lenLocations - 1; i++) {
                     this.createControlPoint(
                         controlPoints,
-                        this.moveControlPointAttributes,
-                        ShapeEditorConstants.LOCATION,
-                        i
+                        this.shadowControlPointAttributes,
+                        ShapeEditorConstants.SHADOW,
+                        lenLocations + i
                     );
+
+                    this.computeShadowPointLocations(shape, controlPoints[lenLocations + i], locations[i], locations[i + 1]);
                 }
-                controlPoints[i].position = locations[i];
+
+                controlPoints.push(rotationControlPoint);
             }
-
-            if (lenControlPoints > lenLocations) {
-                controlPoints.splice(lenLocations, lenControlPoints - lenLocations);
-            }
-
-            for (var i = 0; i < lenLocations - 1; i++) {
-                this.createControlPoint(
-                    controlPoints,
-                    this.shadowControlPointAttributes,
-                    ShapeEditorConstants.SHADOW,
-                    lenLocations + i
-                );
-
-                controlPoints[lenLocations + i].position = new Location(
-                    (locations[i].latitude + locations[i+1].latitude)/2,
-                    (locations[i].longitude + locations[i+1].longitude)/2
-                );
-            }
-
-            var polygonCenter = this.getCenterFromLocations(globe, locations);
-            var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
-
-            Location.greatCircleLocation(
-                polygonCenter,
-                this.currentHeading,
-                polygonRadius,
-                rotationControlPoint.position
-            );
-
-            rotationControlPoint.userProperties.rotation = this.currentHeading;
-
-            controlPoints.push(rotationControlPoint);
-
-            this.updateRotationAccessory(polygonCenter, rotationControlPoint.position, accessories);
         };
 
         // Internal use only.

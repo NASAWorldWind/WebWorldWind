@@ -62,11 +62,16 @@ define([
                                                                                      resizeControlPointAttributes,
                                                                                      rotateControlPointAttributes) {
 
-            this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.WIDTH);
-            this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.HEIGHT);
-            this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
+            if (resizeControlPointAttributes) {
+                this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.WIDTH);
+                this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.HEIGHT);
+            }
 
-            this.createRotationAccessory(accessories, rotateControlPointAttributes);
+            if (rotateControlPointAttributes) {
+                this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
+
+                this.createRotationAccessory(accessories, rotateControlPointAttributes);
+            }
         };
 
         // Internal use only.
@@ -74,32 +79,44 @@ define([
                                                                                  globe,
                                                                                  controlPoints,
                                                                                  accessories) {
-            Location.greatCircleLocation(
-                shape.center,
-                90 + shape.heading,
-                shape.majorRadius / globe.equatorialRadius,
-                controlPoints[0].position
-            );
+            var length = controlPoints.length;
 
-            Location.greatCircleLocation(
-                shape.center,
-                shape.heading,
-                shape.minorRadius / globe.equatorialRadius,
-                controlPoints[1].position
-            );
+            if (length > 0) {
+                for (var i = 0; i < length; i++) {
+                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.WIDTH) {
+                        Location.greatCircleLocation(
+                            shape.center,
+                            90 + shape.heading,
+                            shape.majorRadius / globe.equatorialRadius,
+                            controlPoints[i].position
+                        );
+                        controlPoints[i].userProperties.size = shape.majorRadius;
+                    }
 
-            Location.greatCircleLocation(
-                shape.center,
-                shape.heading,
-                1.6 * shape.minorRadius / globe.equatorialRadius,
-                controlPoints[2].position
-            );
+                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.HEIGHT) {
+                        Location.greatCircleLocation(
+                            shape.center,
+                            shape.heading,
+                            shape.minorRadius / globe.equatorialRadius,
+                            controlPoints[i].position
+                        );
+                        controlPoints[i].userProperties.size = shape.minorRadius;
+                    }
 
-            controlPoints[0].userProperties.size = shape.majorRadius;
-            controlPoints[1].userProperties.size = shape.minorRadius;
-            controlPoints[2].userProperties.rotation = shape.heading;
+                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.ROTATION) {
+                        Location.greatCircleLocation(
+                            shape.center,
+                            shape.heading,
+                            1.6 * shape.minorRadius / globe.equatorialRadius,
+                            controlPoints[i].position
+                        );
 
-            this.updateRotationAccessory(shape.center, controlPoints[2].position, accessories);
+                        controlPoints[i].userProperties.rotation = shape.heading;
+
+                        this.updateRotationAccessory(shape.center, controlPoints[i].position, accessories);
+                    }
+                }
+            }
         };
 
         // Internal use only.

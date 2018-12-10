@@ -411,6 +411,39 @@ define([
             }
         };
 
+        // Computes the location for a shadow control point for two given locations.
+        BaseSurfaceEditorFragment.prototype.computeShadowPointLocations = function (shape,
+                                                                                   shadowControlPoint,
+                                                                                   startLocation,
+                                                                                   endLocation) {
+            var segmentAzimuth = null;
+            var segmentDistance = null;
+
+            if (shape.pathType === WorldWind.LINEAR) {
+                shadowControlPoint.position = new Location(
+                    (startLocation.latitude + endLocation.latitude)/2,
+                    (startLocation.longitude + endLocation.longitude)/2
+                );
+            } else if (shape.pathType === WorldWind.RHUMB_LINE) {
+                if (segmentAzimuth == null) {
+                    segmentAzimuth = Location.rhumbAzimuth(startLocation, endLocation);
+                    segmentDistance = Location.rhumbDistance(startLocation, endLocation);
+                }
+                shadowControlPoint.position = Location.rhumbLocation(startLocation, segmentAzimuth, 0.5 * segmentDistance,
+                    shadowControlPoint.position);
+            } else {
+                // Great Circle
+                if (segmentAzimuth == null) {
+                    segmentAzimuth = Location.greatCircleAzimuth(startLocation, endLocation); //degrees
+                    segmentDistance = Location.greatCircleDistance(startLocation, endLocation); //radians
+                }
+                //Location, degrees, radians, Location
+                shadowControlPoint.position = Location.greatCircleLocation(startLocation, segmentAzimuth, 0.5 * segmentDistance,
+                    shadowControlPoint.position);
+            }
+
+        }
+
         return BaseSurfaceEditorFragment;
     }
 );
