@@ -1,0 +1,173 @@
+{
+  "type" : "FeatureCollection",
+  "id" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&startRecord=1&maximumRecords=10&recordSchema=server-choice&platform=spot&instrument=HRVIR1",
+  "totalResults" : 1,
+  "startIndex" : 1,
+  "itemsPerPage" : 10,
+  "queries" : {
+    "request" : [ {
+      "dc:type" : "collection",
+      "eo:instrument" : "HRVIR1",
+      "eo:platform" : "spot",
+      "count" : 10,
+      "startIndex" : 1,
+      "sru:recordSchema" : "server-choice"
+    } ]
+  },
+  "properties" : {
+    "title" : "FEDEO Clearinghouse - Search Response",
+    "creator" : "FEDEO Clearinghouse",
+    "authors" : [ {
+      "type" : "Agent",
+      "name" : "FEDEO Clearinghouse",
+      "email" : "eohelp@eo.esa.int"
+    } ],
+    "updated" : "2018-12-19T07:51:58Z",
+    "lang" : "en",
+    "rights" : "Copyright 2016-2018, European Space Agency",
+    "links" : {
+      "profiles" : [ {
+        "href" : "http://www.opengis.net/spec/owc-geojson/1.0/req/core"
+      } ],
+      "first" : [ {
+        "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&maximumRecords=10&recordSchema=server-choice&platform=spot&instrument=HRVIR1&startRecord=1&status=1,0",
+        "type" : "application/geo+json",
+        "title" : "first results"
+      } ],
+      "last" : [ {
+        "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&maximumRecords=10&recordSchema=server-choice&platform=spot&instrument=HRVIR1&startRecord=1&status=1,0",
+        "type" : "application/geo+json",
+        "title" : "last results"
+      } ],
+      "search" : [ {
+        "href" : "http://fedeo.esa.int/opensearch/description.xml",
+        "type" : "application/opensearchdescription+xml",
+        "title" : "search"
+      } ]
+    }
+  },
+  "features" : [ {
+    "type" : "Feature",
+    "id" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/geo%2Bjson&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage",
+    "geometry" : {
+      "type" : "Polygon",
+      "coordinates" : [ [ [ -180, -90 ], [ 180, -90 ], [ 180, 90 ], [ -180, 90 ], [ -180, -90 ] ] ]
+    },
+    "properties" : {
+      "title" : "SpotWorldHeritage (Theia)",
+      "identifier" : "EOP:CNES:THEIA:SpotWorldHeritage",
+      "abstract" : "Multispectral decametric images from the Spot 1-5 archive of more than 5 years old, acquired in the framework of the Spot World Heritage programme, based on a partnership between CNES and Airbus Defence and Space. The images are available on a free and open basis for any user, provided usage is non-commercial",
+      "updated" : "2018-12-19T07:51:59Z",
+      "categories" : [ {
+        "term" : "http://www.eionet.europa.eu/gemet/concept/3650",
+        "label" : "Geology"
+      }, {
+        "term" : "http://www.eionet.europa.eu/gemet/concept/4612",
+        "label" : "Land cover"
+      }, {
+        "term" : "FedEO",
+        "label" : "FedEO"
+      }, {
+        "term" : "THEIA",
+        "label" : "THEIA"
+      }, {
+        "term" : "spotworldheritage",
+        "label" : "spotworldheritage"
+      }, {
+        "term" : "level2A",
+        "label" : "level2A"
+      }, {
+        "term" : "reflectance",
+        "label" : "reflectance"
+      }, {
+        "term" : "spot",
+        "label" : "spot"
+      }, {
+        "term" : "CNES",
+        "label" : "CNES"
+      }, {
+        "term" : "SPOT1",
+        "label" : "SPOT1"
+      }, {
+        "term" : "SPOT2",
+        "label" : "SPOT2"
+      }, {
+        "term" : "SPOT4",
+        "label" : "SPOT4"
+      }, {
+        "term" : "SPOT5",
+        "label" : "SPOT5"
+      }, {
+        "term" : "HRV2",
+        "label" : "HRV2"
+      }, {
+        "term" : "HRV1",
+        "label" : "HRV1"
+      }, {
+        "term" : "HRVIR1",
+        "label" : "HRVIR1"
+      }, {
+        "term" : "HRVIR2",
+        "label" : "HRVIR2"
+      }, {
+        "term" : "HRG1",
+        "label" : "HRG1"
+      }, {
+        "term" : "HRG2",
+        "label" : "HRG2"
+      } ],
+      "links" : {
+        "alternates" : [ {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage&recordSchema=server-choice",
+          "type" : "application/atom+xml",
+          "title" : "Atom format"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage&recordSchema=iso",
+          "type" : "application/vnd.iso.19139+xml",
+          "title" : "ISO 19139 metadata"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage&recordSchema=iso19139-2",
+          "type" : "application/vnd.iso.19139-2+xml",
+          "title" : "ISO 19139-2 metadata"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage&recordSchema=iso19115",
+          "type" : "application/iso19115+xml",
+          "title" : "ISO MENDS metadata"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage&recordSchema=iso19115-3",
+          "type" : "application/vnd.iso.19115-3+xml",
+          "title" : "ISO 19115-3 metadata"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage&recordSchema=dif10",
+          "type" : "application/dif10+xml",
+          "title" : "DIF-10 metadata"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage&recordSchema=dc",
+          "type" : "application/xml",
+          "title" : "Dublin Core metadata"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&uid=EOP:CNES:THEIA:SpotWorldHeritage&recordSchema=iso",
+          "type" : "application/rdf+xml",
+          "title" : "RDF/XML format"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&uid=EOP:CNES:THEIA:SpotWorldHeritage&recordSchema=iso",
+          "type" : "application/ld+json",
+          "title" : "JSON-LD format"
+        }, {
+          "href" : "http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&uid=EOP:CNES:THEIA:SpotWorldHeritage&recordSchema=iso",
+          "type" : "text/turtle",
+          "title" : "Turtle format"
+        } ],
+        "search" : [ {
+          "href" : "http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:CNES:THEIA:SpotWorldHeritage&sensorType=OPTICAL&subject=SpotWorldHeritage",
+          "type" : "application/opensearchdescription+xml"
+        } ],
+        "previews" : [ {
+          "href" : "http://131.176.197.12/opensearch/images/cnes.png",
+          "type" : "image/png",
+          "title" : "Quicklook"
+        } ]
+      }
+    }
+  } ]
+}

@@ -11,13 +11,9 @@
     <Description>Provides interoperable access, following ISO/OGC interface guidelines, to Earth Observation metadata.
     </Description>
     <Tags>FEDEO, ESA, Earth Observation, Digital Repository, HMA, HMA-S, HMA-SE, CEOS-OS-BP-V1.1/L1.</Tags>
-    <Url rel="self" template="http://fedeo.esa.int/opensearch/description.xml"
-         type="application/opensearchdescription+xml"/>
-    <Url rel="search" template="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier={eo:parentIdentifier}"
-         type="application/opensearchdescription+xml"/>
     <Url indexOffset="1" pageOffset="1" rel="results"
-         template="../base/test/ogc/openSearch/osCollectionResult.xml?httpAccept=application/atom%2Bxml&amp;parentIdentifier={eo:parentIdentifier}&amp;query={searchTerms?}&amp;startRecord={startIndex?}&amp;startPage={startPage?}&amp;maximumRecords={count?}&amp;startDate={time:start?}&amp;endDate={time:end?}&amp;bbox={geo:box?}&amp;name={geo:name?}&amp;lat={geo:lat?}&amp;lon={geo:lon?}&amp;radius={geo:radius?}&amp;uid={geo:uid?}&amp;recordSchema={sru:recordSchema?}"
-         type="application/atom+xml">
+         template="../base/test/ogc/openSearch/osProductResult.json?httpAccept=application%2Fgeo%2Bjson&amp;parentIdentifier={eo:parentIdentifier}&amp;query={searchTerms?}&amp;startRecord={startIndex?}&amp;startPage={startPage?}&amp;maximumRecords={count?}&amp;startDate={time:start?}&amp;endDate={time:end?}&amp;bbox={geo:box?}&amp;name={geo:name?}&amp;lat={geo:lat?}&amp;lon={geo:lon?}&amp;radius={geo:radius?}&amp;uid={geo:uid?}"
+         type="application/geo+json">
         <param:Parameter maxInclusive="50" minInclusive="0" name="maximumRecords" pattern="[0-9]+" value="{count}"/>
         <param:Parameter minInclusive="1" name="startRecord" pattern="[0-9]+" value="{startIndex}"/>
         <param:Parameter minInclusive="1" name="startPage" pattern="[0-9]+" value="{startPage}"/>
@@ -301,8 +297,8 @@
                          value="{searchTerms}"/>
     </Url>
     <Url indexOffset="1" pageOffset="1" rel="collection"
-         template="../base/test/ogc/openSearch/osCollectionResult.xml?httpAccept=application/atom%2Bxml&amp;parentIdentifier={eo:parentIdentifier?}&amp;subject={dc:subject?}&amp;query={searchTerms?}&amp;startRecord={startIndex?}&amp;startPage={startPage?}&amp;maximumRecords={count?}&amp;startDate={time:start?}&amp;endDate={time:end?}&amp;type={dc:type?}&amp;title={dc:title?}&amp;publisher={dc:publisher?}&amp;bbox={geo:box?}&amp;name={geo:name?}&amp;lat={geo:lat?}&amp;lon={geo:lon?}&amp;radius={geo:radius?}&amp;uid={geo:uid?}&amp;organisationName={eo:organisationName?}&amp;productType={eo:productType?}&amp;platform={eo:platform?}&amp;instrument={eo:instrument?}&amp;classifiedAs={semantic:classifiedAs?}&amp;recordSchema={sru:recordSchema?}"
-         type="application/atom+xml">
+         template="../base/test/ogc/openSearch/osCollectionResult.json?httpAccept=application%2Fgeo%2Bjson&amp;parentIdentifier={eo:parentIdentifier?}&amp;subject={dc:subject?}&amp;query={searchTerms?}&amp;startRecord={startIndex?}&amp;startPage={startPage?}&amp;maximumRecords={count?}&amp;startDate={time:start?}&amp;endDate={time:end?}&amp;type={dc:type?}&amp;title={dc:title?}&amp;publisher={dc:publisher?}&amp;bbox={geo:box?}&amp;name={geo:name?}&amp;lat={geo:lat?}&amp;lon={geo:lon?}&amp;radius={geo:radius?}&amp;uid={geo:uid?}&amp;organisationName={eo:organisationName?}&amp;productType={eo:productType?}&amp;platform={eo:platform?}&amp;instrument={eo:instrument?}&amp;classifiedAs={semantic:classifiedAs?}"
+         type="application/geo+json">
 
         <param:Parameter name="type" value="{dc:type}">
             <param:Option label="dataset series" value="collection"/>
@@ -616,6 +612,7 @@
                          title="Textual search in the title, abstract or keyword section of the collection. Surround with double quotes for exact match."
                          value="{searchTerms}"/>
     </Url>
+
     <Query eo:parentIdentifier="TropForest" role="example" time:end="2009-04-10T00:00:00Z"
            time:start="2009-04-01T00:00:00Z"/>
     <Query eo:parentIdentifier="EOP:JAXA:CATS-I" role="example"/>

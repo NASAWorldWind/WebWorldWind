@@ -1,4 +1,4 @@
-OpenSearch offers a collection of formats for sharing search results. The OpenSearch Geo extension provides a standard mechanism to query a resource based on geographic extents. With this extension, geospatial results are based on the GeoRSS standard and can be displayed automatically on a virtual globe. Other formats are also supported or will be such as KML and GeoJSON responses.
+OpenSearch (http://docs.opengeospatial.org/is/13-026r8/13-026r8.html) offers a collection of formats for sharing search results. The OpenSearch Geo extension provides a standard mechanism to query a resource based on geographic extents. With this extension, geospatial results are based on the GeoRSS standard and can be displayed automatically on a virtual globe. Other formats are also supported or will be such as KML and GeoJSON responses.
 
 # Basic Workflow
 

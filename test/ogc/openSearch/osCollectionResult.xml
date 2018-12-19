@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2"
+      xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:fn="http://www.w3.org/2005/xpath-functions"
+      xmlns:geo="http://a9.com/-/opensearch/extensions/geo/1.0/" xmlns:georss="http://www.georss.org/georss"
+      xmlns:gml="http://www.opengis.net/gml" xmlns:os="http://a9.com/-/spec/opensearch/1.1/"
+      xmlns:rim="urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0"
+      xmlns:semantic="http://a9.com/-/opensearch/extensions/semantic/1.0/"
+      xmlns:sru="http://a9.com/-/opensearch/extensions/sru/2.0/"
+      xmlns:time="http://a9.com/-/opensearch/extensions/time/1.0/" xmlns:wrs="http://www.opengis.net/cat/wrs/1.0"
+      xmlns:xlink="http://www.w3.org/1999/xlink">
+    <author>
+        <name>FEDEO Clearinghouse</name>
+        <email>eohelp@eo.esa.int</email>
+    </author>
+    <generator>FEDEO Clearinghouse</generator>
+    <id>http://fedeo.esa.int/opensearch/request</id>
+    <rights>Copyright 2016-2018, European Space Agency</rights>
+    <title>FEDEO Clearinghouse - Search Response</title>
+    <updated>2018-12-19T07:13:07Z</updated>
+    <link href="http://fedeo.esa.int/opensearch/request?startRecord=1&amp;maximumRecords=10&amp;platform=sentinel&amp;httpAccept=application/atom%2Bxml&amp;status=38,0"
+          hreflang="en" rel="self" type="application/atom+xml"/>
+    <link href="http://fedeo.esa.int/opensearch/FedEO_OSGW_Service.xml" rel="describedby" type="application/xml"/>
+    <link href="http://fedeo.esa.int/opensearch/request?&amp;maximumRecords=10&amp;platform=sentinel&amp;httpAccept=application/atom%2Bxml&amp;startRecord=1&amp;status=38,0"
+          rel="first" type="application/atom+xml"/>
+
+    <link href="http://fedeo.esa.int/opensearch/request?&amp;maximumRecords=10&amp;platform=sentinel&amp;httpAccept=application/atom%2Bxml&amp;startRecord=11&amp;status=38,0"
+          rel="next" type="application/atom+xml"/>
+    <link href="http://fedeo.esa.int/opensearch/request?&amp;maximumRecords=10&amp;platform=sentinel&amp;httpAccept=application/atom%2Bxml&amp;startRecord=31&amp;status=38,0"
+          rel="last" type="application/atom+xml"/>
+    <link href="http://fedeo.esa.int/opensearch/description.xml" hreflang="en" rel="search"
+          type="application/opensearchdescription+xml"/>
+    <os:totalResults>38</os:totalResults>
+    <os:startIndex>1</os:startIndex>
+    <os:itemsPerPage>10</os:itemsPerPage>
+    <os:Query xmlns:eo="http://a9.com/-/opensearch/extensions/eo/1.0/" dc:type="collection" eo:platform="sentinel"
+              os:count="10" os:startIndex="1" role="request"/>
+    <entry>
+        <category label="Science Keywords &gt; Earth Science &gt; Spectral/Engineering &gt; Radar &gt; Radar Imagery"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/53f69037-ff05-4b09-a95d-e65ff42da595"/>
+        <category label="SENTINEL-1A"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/c7279e54-f7c1-4ee7-a957-719d6021a3f6"/>
+        <category label="SENTINEL-1B"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/9940dbad-1a9a-4858-a0e8-af35b21277e2"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="SSARA" term="SSARA"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:SSARA&amp;sensorType=RADAR&amp;platform=SENTINEL-1"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="http://www.unavco.org/projects/other-projects/ssara/ssara.html" rel="describedby" type="text/html"/>
+        <link href="http://131.176.197.12/opensearch/images/unavco.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:SSARA:SENTINEL-1&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:SSARA:SENTINEL-1&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:SSARA:SENTINEL-1&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>Seamless SAR Archive (SSARA) Provided Collections for SENTINEL-1 platform</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td> This collection represents the SENTINEL-1 collections provided by the SSARA - Seamless SAR Archive that are available through the FedEO Opensearch Gateway. SSARA will provide users with simple browser and web service API access tools to view and retrieve SAR data from multiple archives, to place their tasking requests, to order data, and to report results back to data providers; to make a larger pool of data available to scientific data users; and to encourage broader national and international use of SAR data. The new ACCESS-developed tools will help overcome current obstacles including heterogeneous archive access protocols and data/product formats, data provider access policy constraints, and an increasingly broad and diverse selection of SAR data that now includes SENTINEL-1 SAR data.(Information from http://www.unavco.org/projects/other-projects/ssara/ssara.html).	</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ASSARA%3ASENTINEL-1&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>Seamless SAR Archive (SSARA) Provided Collections for SENTINEL-1 platform</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:SSARA:SENTINEL-1</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>0</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>461.77</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="land cover" term="http://www.eionet.europa.eu/gemet/concept/4612"/>
+        <category label="chlorophyll" term="http://www.eionet.europa.eu/gemet/concept/1391"/>
+        <category label="natural disaster" term="http://www.eionet.europa.eu/gemet/concept/5496"/>
+        <category label="SENTINEL-2"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/2ce20983-98b2-40b9-bb0e-a08074fb93b3"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="THEIA" term="THEIA"/>
+        <category label="PEPS" term="PEPS"/>
+        <category label="CNES" term="CNES"/>
+        <category label="optical" term="optical"/>
+        <category label="sentinel2" term="sentinel2"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:CNES:PEPS:S2&amp;sensorType=OPTICAL&amp;platform=S2A"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="http://131.176.197.12/opensearch/images/cnes.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:CNES:PEPS:S2&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:CNES:PEPS:S2&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:CNES:PEPS:S2&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>Sentinel-2 (PEPS)</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>The SENTINEL-2 mission is a land monitoring constellation of two satellites each equipped with a MSI (Multispectral Imager) instrument covering 13 spectral bands providing high resolution optical imagery (i.e., 10m, 20m, 60 m) every 10 days with one satellite and 5 days with two satellites.</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS2&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>Sentinel-2 (PEPS)</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:CNES:PEPS:S2</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>0</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>207.31</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="land cover" term="http://www.eionet.europa.eu/gemet/concept/4612"/>
+        <category label="chlorophyll" term="http://www.eionet.europa.eu/gemet/concept/1391"/>
+        <category label="natural disaster" term="http://www.eionet.europa.eu/gemet/concept/5496"/>
+        <category label="SENTINEL-2"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/2ce20983-98b2-40b9-bb0e-a08074fb93b3"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="MSI" term="MSI"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:ESA:SCIHUB&amp;platform=SENTINEL-2&amp;sensorType=OPTICAL&amp;processingLevel=Level-1C&amp;sensorMode=INS-NOBS&amp;productType=S2MSI1C"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="https://sentinel.esa.int/web/sentinel/missions/sentinel-2" rel="describedby"
+              title="ESA Sentinel Online" type="text/html"/>
+        <link href="http://131.176.197.12/opensearch/images/esa.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:S2MSI1C&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:S2MSI1C&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:S2MSI1C&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>SENTINEL-2 Level-1C</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>The Sentinel-2 mission is a land monitoring constellation of two satellites that provide high resolution optical imagery and provide continuity for the current SPOT and Landsat missions. The mission provides a global coverage of the Earth's land surface every 10 days with one satellite and 5 days with 2 satellites, making the data of great use in on-going studies. The satellites are equipped with the state-of-the-art MSI (Multispectral Imager) instrument, that offers high-resolution optical imagery. For Level-1C Sentinel 2 products that provides top-of-atmosphere reflectances in cartographic geometry, the granules, also called tiles, are 100 km2 ortho-images in UTM/WGS84 projection. The UTM (Universal Transverse Mercator) system divides the Earth's surface into 60 zones. Each UTM zone has a vertical width of 6 degrees of longitude and horizontal width of 8 degrees of latitude. Tiles are approximately 500 MB in size. Tiles can be fully or partially covered by image data. Partially covered tiles correspond to those at the edge of the swath.               </td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS2MSI1C&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>SENTINEL-2 Level-1C</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:ESA:S2MSI1C</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>1</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>545.29</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="Science Keywords &gt; Earth Science &gt; Oceans &gt; Ocean Optics &gt; Absorption"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/e501d002-d11e-4569-8c0d-e40ae5b45f65"/>
+        <category label="Science Keywords &gt; Earth Science &gt; Atmosphere &gt; Atmospheric Radiation &gt; Albedo"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/48c16952-b6e0-40cd-b6dd-7cdbf5a443a1"/>
+        <category label="SENTINEL-1A"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/c7279e54-f7c1-4ee7-a957-719d6021a3f6"/>
+        <category label="SENTINEL-1B"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/9940dbad-1a9a-4858-a0e8-af35b21277e2"/>
+        <category label="SENTINEL-2"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/2ce20983-98b2-40b9-bb0e-a08074fb93b3"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="SENTINEL-1" term="SENTINEL-1"/>
+        <category label="MSI" term="MSI"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:ESA:SCIHUB" hreflang="en"
+              rel="search" type="application/opensearchdescription+xml"/>
+        <link href="https://sentinel.esa.int/web/sentinel/missions/sentinel-1" rel="describedby"
+              title="ESA Sentinel Online" type="text/html"/>
+        <link href="http://131.176.197.12/opensearch/images/esa.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>SENTINEL Products </td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>This collection represents all products generated from all Sentinel platforms.  </td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>SENTINEL Products</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:ESA:SENTINEL</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>1</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>545.29</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="ocean" term="http://www.eionet.europa.eu/gemet/concept/5789"/>
+        <category label="SENTINEL-3"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/8a19f309-46ee-424b-be9f-e7e57e5b8ca0"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="OLCI" term="OLCI"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:ESA:SCIHUB&amp;platform=SENTINEL-3&amp;sensorType=OPTICAL&amp;productType=OL_1_EFR___"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="https://sentinel.esa.int/web/sentinel/missions/sentinel-3" rel="describedby"
+              title="ESA Sentinel Online" type="text/html"/>
+        <link href="http://131.176.197.12/opensearch/images/esa.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:S3_OLCI&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:S3_OLCI&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:S3_OLCI&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>SENTINEL-3 OLCI Level 1B Full Resolution (OL_1_EFR)</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>				The main objective of the SENTINEL-3 mission is to measure sea surface topography, sea and land surface temperature, and ocean and land surface colour with high accuracy and reliability to support ocean forecasting systems, environmental monitoring and climate monitoring. This collection represents the Level-1 Full Resolution OLCI products. These products include Top-Of-Atmosphere (TOA) radiometric measurements, radiometrically corrected, calibrated and spectrally characterised. It is quality controlled, ortho-geolocated (latitude and longitude coordinates, altitude) and annotated with satellite position and pointing, landmarks and preliminary pixel classification (e.g. land/water/cloud masks). Products are generated in FR (300 m) for the whole globe with the same coverage.               </td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3AS3_OLCI&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>SENTINEL-3 OLCI Level 1B Full Resolution (OL_1_EFR)</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:ESA:S3_OLCI</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>1</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>545.29</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="land cover" term="http://www.eionet.europa.eu/gemet/concept/4612"/>
+        <category label="sea" term="http://www.eionet.europa.eu/gemet/concept/7495"/>
+        <category label="ice" term="http://www.eionet.europa.eu/gemet/concept/4131"/>
+        <category label="natural disaster" term="http://www.eionet.europa.eu/gemet/concept/5496"/>
+        <category label="Science Keywords &gt; Earth Science &gt; Oceans &gt; Ocean Optics &gt; Absorption"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/e501d002-d11e-4569-8c0d-e40ae5b45f65"/>
+        <category label="Science Keywords &gt; Earth Science &gt; Atmosphere &gt; Atmospheric Radiation &gt; Albedo"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/48c16952-b6e0-40cd-b6dd-7cdbf5a443a1"/>
+        <category label="SENTINEL-1A"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/c7279e54-f7c1-4ee7-a957-719d6021a3f6"/>
+        <category label="SENTINEL-1B"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/9940dbad-1a9a-4858-a0e8-af35b21277e2"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="SENTINEL-1" term="SENTINEL-1"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:ESA:SCIHUB&amp;platform=SENTINEL-1&amp;sensorType=RADAR&amp;processingLevel=L1"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="http://131.176.197.12/opensearch/images/esa.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>SENTINEL-1 Level 1</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>Sentinel-1 is a polar-orbiting, all-weather, day-and-night radar imaging mission for land and ocean services. 				The first Sentinel-1 satellite was launched on a Soyuz rocket from Europe's Spaceport in French Guiana on 3 April 2014.    											Level-1 data are the generally available products intended for most data users. Level-1 products are produced as Single Look Complex (SLC) and Ground Range Detected (GRD).Level-1 Single Look Complex (SLC) products consist of focused SAR data geo-referenced using orbit and attitude data from the satellite and provided in zero-Doppler slant-range geometry. The products include a single look in each dimension using the full TX signal bandwidth and consist of complex samples preserving the phase information.Level-1 Ground Range Detected (GRD) products consist of focused SAR data that has been detected, multi-looked and projected to ground range using an Earth ellipsoid model. Phase information is lost. The resulting product has approximately square resolution pixels and square pixel spacing with reduced speckle at the cost of reduced geometric resolution.				</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>SENTINEL-1 Level 1</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:ESA:SENTINEL_1_L1</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>1</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>545.29</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="land cover" term="http://www.eionet.europa.eu/gemet/concept/4612"/>
+        <category label="chlorophyll" term="http://www.eionet.europa.eu/gemet/concept/1391"/>
+        <category label="natural disaster" term="http://www.eionet.europa.eu/gemet/concept/5496"/>
+        <category label="SENTINEL-2"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/2ce20983-98b2-40b9-bb0e-a08074fb93b3"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="MSI" term="MSI"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:ESA:SCIHUB&amp;platform=SENTINEL-2&amp;sensorType=OPTICAL"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="https://sentinel.esa.int/web/sentinel/missions/sentinel-2" rel="describedby"
+              title="ESA Sentinel Online" type="text/html"/>
+        <link href="http://131.176.197.12/opensearch/images/esa.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_2&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_2&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_2&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>SENTINEL-2 Products </td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>The Sentinel-2 mission is a land monitoring constellation of two satellites that provide high resolution optical imagery and provide continuity for the current SPOT and Landsat missions. The mission provides a global coverage of the Earth's land surface every 10 days with one satellite and 5 days with 2 satellites, making the data of great use in on-going studies. The satellites are equipped with the state-of-the-art MSI (Multispectral Imager) instrument, that offers high-resolution optical imagery.               </td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_2&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>SENTINEL-2 Products</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:ESA:SENTINEL_2</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>1</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>545.29</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="land cover" term="http://www.eionet.europa.eu/gemet/concept/4612"/>
+        <category label="sea" term="http://www.eionet.europa.eu/gemet/concept/7495"/>
+        <category label="ice" term="http://www.eionet.europa.eu/gemet/concept/4131"/>
+        <category label="natural disaster" term="http://www.eionet.europa.eu/gemet/concept/5496"/>
+        <category label="Science Keywords &gt; Earth Science &gt; Oceans &gt; Ocean Optics &gt; Absorption"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/e501d002-d11e-4569-8c0d-e40ae5b45f65"/>
+        <category label="Science Keywords &gt; Earth Science &gt; Atmosphere &gt; Atmospheric Radiation &gt; Albedo"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/48c16952-b6e0-40cd-b6dd-7cdbf5a443a1"/>
+        <category label="SENTINEL-1A"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/c7279e54-f7c1-4ee7-a957-719d6021a3f6"/>
+        <category label="SENTINEL-1B"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/9940dbad-1a9a-4858-a0e8-af35b21277e2"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="SENTINEL-1" term="SENTINEL-1"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:ESA:SCIHUB&amp;platform=SENTINEL-1&amp;sensorType=RADAR&amp;processingLevel=L1&amp;productType=SLC"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="http://131.176.197.12/opensearch/images/esa.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1_SLC&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1_SLC&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1_SLC&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>SENTINEL-1 Level 1 Single Look Complex (SLC)</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>Sentinel-1 is a polar-orbiting, all-weather, day-and-night radar imaging mission for land and ocean services. 				The first Sentinel-1 satellite was launched on a Soyuz rocket from Europe's Spaceport in French Guiana on 3 April 2014.    												Level-1 Single Look Complex (SLC) products consist of focused SAR data geo-referenced using orbit and attitude data from the satellite and provided in zero-Doppler slant-range geometry. The products include a single look in each dimension using the full TX signal bandwidth and consist of complex samples preserving the phase information.</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_SLC&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>SENTINEL-1 Level 1 Single Look Complex (SLC)</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:ESA:SENTINEL_1_L1_SLC</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>1</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>545.29</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="land cover" term="http://www.eionet.europa.eu/gemet/concept/4612"/>
+        <category label="sea" term="http://www.eionet.europa.eu/gemet/concept/7495"/>
+        <category label="ice" term="http://www.eionet.europa.eu/gemet/concept/4131"/>
+        <category label="natural disaster" term="http://www.eionet.europa.eu/gemet/concept/5496"/>
+        <category label="SENTINEL-1A"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/c7279e54-f7c1-4ee7-a957-719d6021a3f6"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="THEIA" term="THEIA"/>
+        <category label="PEPS" term="PEPS"/>
+        <category label="CNES" term="CNES"/>
+        <category label="level1" term="level1"/>
+        <category label="radar" term="radar"/>
+        <category label="sentinel1" term="sentinel1"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:CNES:PEPS:S1&amp;sensorType=RADAR&amp;platform=S1A"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="http://131.176.197.12/opensearch/images/cnes.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:CNES:PEPS:S1&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:CNES:PEPS:S1&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:CNES:PEPS:S1&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>Sentinel-1 (PEPS)</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>The SENTINEL-1 mission comprises a constellation of two polar-orbiting satellites, operating day and night performing C-band Synthetic Aperture Radar (SAR) imaging, enabling them to acquire imagery regardless of the weather. Sentinel-1 is operated in four imaging modes with different resolutions (down to 10 m) and coverage (up to 400 km swath), offering reliable wide area monitoring every 12 days with one satellite and 6 days with two satellites.</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3ACNES%3APEPS%3AS1&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>Sentinel-1 (PEPS)</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:CNES:PEPS:S1</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>0</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>207.31</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+    <entry>
+        <category label="land" term="http://www.eionet.europa.eu/gemet/concept/4599"/>
+        <category label="land cover" term="http://www.eionet.europa.eu/gemet/concept/4612"/>
+        <category label="sea" term="http://www.eionet.europa.eu/gemet/concept/7495"/>
+        <category label="ice" term="http://www.eionet.europa.eu/gemet/concept/4131"/>
+        <category label="natural disaster" term="http://www.eionet.europa.eu/gemet/concept/5496"/>
+        <category label="Science Keywords &gt; Earth Science &gt; Oceans &gt; Ocean Optics &gt; Absorption"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/e501d002-d11e-4569-8c0d-e40ae5b45f65"/>
+        <category label="Science Keywords &gt; Earth Science &gt; Atmosphere &gt; Atmospheric Radiation &gt; Albedo"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/48c16952-b6e0-40cd-b6dd-7cdbf5a443a1"/>
+        <category label="SENTINEL-1A"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/c7279e54-f7c1-4ee7-a957-719d6021a3f6"/>
+        <category label="SENTINEL-1B"
+                  term="http://gcmdservices.gsfc.nasa.gov/kms/concept/9940dbad-1a9a-4858-a0e8-af35b21277e2"/>
+        <category label="FedEO" term="FedEO"/>
+        <category label="SENTINEL-1" term="SENTINEL-1"/>
+        <id>http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD</id>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD"
+              rel="alternate" title="Atom format" type="application/atom+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:ESA:SCIHUB&amp;sensorType=RADAR&amp;platform=SENTINEL-1&amp;processingLevel=L1&amp;productType=GRD"
+              hreflang="en" rel="search" type="application/opensearchdescription+xml"/>
+        <link href="http://131.176.197.12/opensearch/images/esa.png" rel="icon" type="image/png"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=iso"
+              rel="alternate" title="ISO 19139 metadata" type="application/vnd.iso.19139+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=iso19139-2"
+              rel="alternate" title="ISO 19139-2 metadata" type="application/vnd.iso.19139-2+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/iso19115%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=iso19115"
+              rel="alternate" title="ISO MENDS metadata" type="application/iso19115+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19115-3%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=iso19115-3"
+              rel="alternate" title="ISO 19115-3 metadata" type="application/vnd.iso.19115-3+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=dif10"
+              rel="alternate" title="DIF-10 metadata" type="application/dif10+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/xml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=dc"
+              rel="alternate" title="Dublin Core metadata" type="application/xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/rdf%2Bxml&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1_GRD&amp;recordSchema=iso"
+              rel="alternate" title="RDF/XML format" type="application/rdf+xml"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/ld%2Bjson&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1_GRD&amp;recordSchema=iso"
+              rel="alternate" title="JSON-LD format" type="application/ld+json"/>
+        <link href="http://fedeo.esa.int/opensearch/request/?httpAccept=text/turtle&amp;parentIdentifier=EOP:ESA:FEDEO:COLLECTIONS&amp;uid=EOP:ESA:SENTINEL_1_L1_GRD&amp;recordSchema=iso"
+              rel="alternate" title="Turtle format" type="text/turtle"/>
+        <summary type="html"><![CDATA[<table xmlns="">
+<tr valign="top">
+<td>
+<b>Title</b>
+</td>
+<td>SENTINEL-1 Level 1 Ground Range Detected (GRD)</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Description</b>
+</td>
+<td>Sentinel-1 is a polar-orbiting, all-weather, day-and-night radar imaging mission for land and ocean services. 				The first Sentinel-1 satellite was launched on a Soyuz rocket from Europe's Spaceport in French Guiana on 3 April 2014.    				From this collection, you may order  Level-1 Ground Range Detected (GRD) products. 				Level-1 Ground Range Detected (GRD) products consist of focused SAR data that has been detected, multi-looked and projected to ground range using an Earth ellipsoid model. Phase information is lost. The resulting product has approximately square resolution pixels and square pixel spacing with reduced speckle at the cost of reduced geometric resolution.GRD products can be in one of three resolutions: Full Resolution (FR), High Resolution (HR) ,Medium Resolution (MR). The resolution is dependent upon the amount of multi-looking performed. Level-1 GRD products are available in MR and HR for IW and EW modes, MR for WV mode and MR, HR and FR for SM mode.						</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Type</b>
+</td>
+<td>Collection</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Date</b>
+</td>
+<td/>
+</tr>
+<tr valign="top">
+<td>
+<b>Media Type</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD" title="ATOM format">ATOM</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/sru%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=server-choice" title="SRU format">SRU</a>
+</td>
+</tr>
+<tr valign="top">
+<td>
+<b>Metadata</b>
+</td>
+<td>
+<a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=iso" title="ISO format">ISO 19139</a>   |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/vnd.iso.19139-2%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=iso19139-2" title="ISO format">ISO 19139-2</a> |   <a href="http://fedeo.esa.int/opensearch/request/?httpAccept=application/dif10%2Bxml&amp;parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&amp;uid=EOP%3AESA%3ASENTINEL_1_L1_GRD&amp;recordSchema=dif10" title="ISO format">DIF-10</a>
+</td>
+</tr>
+</table>]]></summary>
+        <title>SENTINEL-1 Level 1 Ground Range Detected (GRD)</title>
+        <updated>2018-12-19T07:13:07Z</updated>
+        <dc:identifier>EOP:ESA:SENTINEL_1_L1_GRD</dc:identifier>
+        <georss:polygon>-90 -180 -90 180 90 180 90 -180 -90 -180</georss:polygon>
+        <dqv:hasQualityMeasure xmlns:dqv="http://www.w3.org/ns/dqv#">
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/state</dqv:hasMetric>
+                <dqv:value>1</dqv:value>
+            </dqv:QualityMeasure>
+            <dqv:QualityMeasure>
+                <dqv:hasMetric>http://www.icinga.org/last_state_change</dqv:hasMetric>
+                <dqv:value>545.29</dqv:value>
+            </dqv:QualityMeasure>
+        </dqv:hasQualityMeasure>
+    </entry>
+</feed>

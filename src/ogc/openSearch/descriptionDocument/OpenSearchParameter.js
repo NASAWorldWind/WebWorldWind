@@ -137,13 +137,15 @@ define([
             }
 
             var minimum = node.getAttribute('minimum');
+            var required;
             if (!minimum) {
                 minimum = 1;
+                required= false;
             }
             else {
                 minimum = +minimum;
+                required = minimum > 0;
             }
-            var required = minimum > 0;
 
             var max = node.getAttribute('maximum');
             var maximum = 1;

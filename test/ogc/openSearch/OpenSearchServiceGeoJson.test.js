@@ -21,36 +21,31 @@ define([
     "use strict";
     var openSearchService;
 
-    describe("Open Search Support", function(){
+    describe("Open Search Support - GeoJSON collections, products", function(){
         var validDescriptionDocument,
             validCollectionsDocument,
             validProductsDocument;
 
         beforeAll(function(done){
             var service;
-            OpenSearchService.create({url: '../base/test/ogc/openSearch/osDescription.xml'}).then(function(result){
+            OpenSearchService.create({url: '../base/test/ogc/openSearch/osDescriptionGeoJson.xml'}).then(function(result){
                 service = result;
                 validDescriptionDocument = result.descriptionDocument;
                 return service.search([
-                    {name: 'query', value: 'LAI'},
-                    {name: 'startDate', value: '2017-05-28T14:51:34Z'},
-                    {name: 'endDate', value: '2018-05-28T14:51:34Z'},
-                    {name: 'organisationName', value:'VITO'},
-                    {name: 'platform', value: ''},
-                    {name: 'instrument', value: ''}
+                    {name: 'startRecord', value: '1'},
+                    {name: 'maximumRecords', value: '10'},
+                    {name: 'recordSchema', value: 'server-choice'},
+                    {name: 'platform', value: 'spot'},
+                    {name: 'instrument', value: 'HRVIR1'}
                 ], {relation: OpenSearchConstants.COLLECTION})
             }).then(function(result){
                 validCollectionsDocument = result;
                 return service.search([
-                    {name: 'startDate', value: '2017-05-28T14:51:34Z'},
-                    {name: 'endDate', value: '2018-05-28T14:51:34Z'},
-                    {name: 'parentIdentifier', value: 'EOP:VITO:PDF:urn:eop:VITO:CGS_S2_LAI'},
-                    {name: 'organisationName', value:'VITO'},
-                    {name: 'platform', value: ''},
-                    {name: 'instrument', value: ''}
+                    {name: 'parentIdentifier', value: 'TropForest'},
+                    {name: 'recordSchema', value: 'server-choice'},
+                    {name: 'platform', value: 'ALOS'}
                 ]);
             }).then(function(result){
-                console.log('ValidProductsDocument ', result);
                 validProductsDocument = result;
                 done();
             }).catch(function(err){
@@ -72,11 +67,11 @@ define([
                 var first;
 
                 beforeAll(function(){
-                    first = validDescriptionDocument.urls[9];
+                    first = validDescriptionDocument.urls[0];
                 });
 
-                it('contains 18 urls', function(){
-                    expect(validDescriptionDocument.urls.length).toBe(18);
+                it('contains 2 urls', function(){
+                    expect(validDescriptionDocument.urls.length).toBe(2);
                 });
 
                 describe('first', function(){
@@ -90,10 +85,6 @@ define([
 
                     it('contains encType', function(){
                         expect(first.encType).toBe('application/x-www-form-urlencoded');
-                    });
-
-                    it('contains template', function(){
-                        expect(first.template).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&parentIdentifier={eo:parentIdentifier}&query={searchTerms?}&startRecord={startIndex?}&startPage={startPage?}&maximumRecords={count?}&startDate={time:start?}&endDate={time:end?}&bbox={geo:box?}&name={geo:name?}&lat={geo:lat?}&lon={geo:lon?}&radius={geo:radius?}&uid={geo:uid?}');
                     });
 
                     describe('parameters', function () {
@@ -386,6 +377,18 @@ define([
         });
 
         describe("Search Collections", function(){
+            it('contains totalResults', function(){
+                expect(validCollectionsDocument.totalResults).toBe(1);
+            });
+
+            it('contains startIndex', function(){
+                expect(validCollectionsDocument.startIndex).toBe(1);
+            });
+
+            it('contains itemsPerPage', function(){
+                expect(validCollectionsDocument.itemsPerPage).toBe(10);
+            });
+
             describe('properties', function(){
                 it('contains creator', function(){
                     expect(validCollectionsDocument.properties.creator).toBe('FEDEO Clearinghouse');
@@ -399,37 +402,13 @@ define([
                     expect(validCollectionsDocument.properties.title).toBe('FEDEO Clearinghouse - Search Response');
                 });
 
-                it('contains totalResults', function(){
-                    expect(validCollectionsDocument.properties.totalResults).toBe(4);
-                });
-
-                it('contains startIndex', function(){
-                    expect(validCollectionsDocument.properties.startIndex).toBe(1);
-                });
-
-                it('contains itemsPerPage', function(){
-                    expect(validCollectionsDocument.properties.itemsPerPage).toBe(10);
-                });
-
-                it('contains query', function(){
-                    expect(validCollectionsDocument.properties.query).toBe('xmlns:eo="http://a9.com/-/opensearch/extensions/eo/1.0/" dc:type="collection" eo:organisationName="VITO" os:searchTerms="LAI" role="request" time:end="2018-05-28T14:51:34Z" time:start="2017-05-28T14:51:34Z"');
-                });
-
                 describe('links', function(){
-                    it('contains self', function(){
-                        expect(validCollectionsDocument.properties.links.self[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&query=LAI&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&organisationName=VITO&platform=&instrument=&status=4,0');
-                    });
-
-                    it('contains describedby', function(){
-                        expect(validCollectionsDocument.properties.links.describedby[0].href).toBe('http://fedeo.esa.int/opensearch/FedEO_OSGW_Service.xml');
-                    });
-
                     it('contains first', function(){
-                        expect(validCollectionsDocument.properties.links.first.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&query=LAI&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&organisationName=VITO&platform=&instrument=&startRecord=1&status=4,0');
+                        expect(validCollectionsDocument.properties.links.first[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&maximumRecords=10&recordSchema=server-choice&platform=spot&instrument=HRVIR1&startRecord=1&status=1,0');
                     });
 
                     it('contains last', function(){
-                        expect(validCollectionsDocument.properties.links.last.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&query=LAI&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&organisationName=VITO&platform=&instrument=&startRecord=1&status=4,0');
+                        expect(validCollectionsDocument.properties.links.last[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&maximumRecords=10&recordSchema=server-choice&platform=spot&instrument=HRVIR1&startRecord=1&status=1,0');
                     });
 
                     it('contains search', function(){
@@ -444,13 +423,13 @@ define([
                     first = validCollectionsDocument.features[0];
                 });
 
-                it('contains 4 features', function(){
-                    expect(validCollectionsDocument.features.length).toBe(4);
+                it('contains 1 feature', function(){
+                    expect(validCollectionsDocument.features.length).toBe(1);
                 });
 
                 describe('first', function(){
                     it('contains id', function(){
-                        expect(first.id).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&parentIdentifier=EOP%3AEUMETSAT&uid=EO%3AEUM%3ADAT%3APROBA-V%3ALAI-V2');
+                        expect(first.id).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/geo%2Bjson&parentIdentifier=EOP%3AESA%3AFEDEO%3ACOLLECTIONS&uid=EOP%3ACNES%3ATHEIA%3ASpotWorldHeritage');
                     });
 
                     it('contains type', function(){
@@ -459,16 +438,16 @@ define([
 
                     describe('properties', function(){
                         it('contains title', function(){
-                            expect(first.properties.title).toBe('Leaf Area Index V2 - PROBA-V - Africa');
+                            expect(first.properties.title).toBe('SpotWorldHeritage (Theia)');
                         });
 
                         it('contains identifier', function(){
-                            expect(first.properties.identifier).toBe('EO:EUM:DAT:PROBA-V:LAI-V2');
+                            expect(first.properties.identifier).toBe('EOP:CNES:THEIA:SpotWorldHeritage');
                         });
 
                         describe('categories', function(){
                             it('contains 13 categories', function(){
-                                expect(first.properties.categories.length).toBe(13);
+                                expect(first.properties.categories.length).toBe(19);
                             });
 
                             describe('first', function(){
@@ -478,11 +457,11 @@ define([
                                 });
 
                                 it('has label', function(){
-                                    expect(firstCategory.label).toBe('Atmospheric conditions');
+                                    expect(firstCategory.label).toBe('Geology');
                                 });
 
                                 it('has term', function(){
-                                    expect(firstCategory.term).toBe('Atmospheric conditions');
+                                    expect(firstCategory.term).toBe('http://www.eionet.europa.eu/gemet/concept/3650');
                                 });
                             });
                         });
@@ -491,19 +470,19 @@ define([
                     describe('links', function(){
                         describe('alternates', function(){
                             it('contains the 10 alternates', function(){
-                                expect(first.links.alternates.length).toBe(10);
+                                expect(first.properties.links.alternates.length).toBe(10);
                             });
                         });
 
                         describe('search', function(){
                             it('contains href', function(){
-                                expect(first.links.search[0].href).toBe('http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:EUMETSAT:EO:EUM:DAT:PROBA-V:LAI-V2');
+                                expect(first.properties.links.search[0].href).toBe('http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=EOP:CNES:THEIA:SpotWorldHeritage&sensorType=OPTICAL&subject=SpotWorldHeritage');
                             })
                         });
 
-                        describe('icon', function(){
+                        describe('previews', function(){
                             it('contains href', function(){
-                                expect(first.links.icon[0].href).toBe('http://131.176.197.12/opensearch/images/eumetsat.jpg');
+                                expect(first.properties.links.previews[0].href).toBe('http://131.176.197.12/opensearch/images/cnes.png');
                             })
                         });
                     });
@@ -514,6 +493,18 @@ define([
         describe("Search Products", function(){
             it('contains type', function(){
                 expect(validProductsDocument.type).toBe('FeatureCollection');
+            });
+
+            it('contains total results', function(){
+                expect(validProductsDocument.totalResults).toBe(1665);
+            });
+
+            it('contains items per page', function(){
+                expect(validProductsDocument.itemsPerPage).toBe(10);
+            });
+
+            it('contains start index', function(){
+                expect(validProductsDocument.startIndex).toBe(1);
             });
 
             describe('properties', function(){
@@ -529,67 +520,21 @@ define([
                     expect(validProductsDocument.properties.title).toBe('FEDEO Clearinghouse - Search Response');
                 });
 
-                it('contains total results', function(){
-                    expect(validProductsDocument.properties.totalResults).toBe(2496);
-                });
-
-                it('contains items per page', function(){
-                    expect(validProductsDocument.properties.itemsPerPage).toBe(10);
-                });
-
-                it('contains start index', function(){
-                    expect(validProductsDocument.properties.startIndex).toBe(1);
-                });
-
-                it('contains query', function(){
-                    expect(validProductsDocument.properties.query).toBe('eo:organisationName="VITO" eo:parentIdentifier="urn:eop:VITO:CGS_S2_LAI" role="request" time:end="2018-05-28T14:51:34Z" time:start="2017-05-28T14:51:34Z"');
-                });
-
                 describe('links', function(){
-                    beforeAll(function(){
-                        console.log(validProductsDocument.properties.links.alternates);
-                        console.log(validProductsDocument.properties.links.describedby);
-                    });
-
-                    it('contains self', function(){
-                        expect(validProductsDocument.properties.links.self[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=');
-                    });
-
-                    describe('alternates', function(){
-                        var first;
-                        beforeAll(function(){
-                            first = validProductsDocument.properties.links.alternates[0];
-                        });
-
-                        it('contains 2', function(){
-                            expect(validProductsDocument.properties.links.alternates.length).toBe(2);
-                        });
-
-                        describe('first', function(){
-                            it('has href', function(){
-                                expect(first.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/metalink%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=');
-                            })
-                        });
-                    });
-
-                    it('contains describedby', function(){
-                        expect(validProductsDocument.properties.links.describedby[0].href).toBe('http://SERVER_NAME/opensearch/FedEO_OSGW_Service.xml');
-                    });
-
                     it('contains first', function(){
-                        expect(validProductsDocument.properties.links.first.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=&startRecord=1');
+                        expect(validProductsDocument.properties.links.first[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&parentIdentifier=TropForest&recordSchema=server-choice&platform=ALOS&startRecord=1');
                     });
 
                     it('contains next', function(){
-                        expect(validProductsDocument.properties.links.next.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=&startRecord=11');
+                        expect(validProductsDocument.properties.links.next[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&parentIdentifier=TropForest&recordSchema=server-choice&platform=ALOS&startRecord=11');
                     });
 
                     it('contains last', function(){
-                        expect(validProductsDocument.properties.links.last.href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application/atom%2Bxml&startDate=2017-05-28T14%3A51%3A34Z&endDate=2018-05-28T14%3A51%3A34Z&parentIdentifier=EOP%3AVITO%3APDF%3Aurn%3Aeop%3AVITO%3ACGS_S2_LAI&organisationName=VITO&platform=&instrument=&startRecord=2491');
+                        expect(validProductsDocument.properties.links.last[0].href).toBe('http://fedeo.esa.int/opensearch/request/?httpAccept=application%2Fgeo%2Bjson&parentIdentifier=TropForest&recordSchema=server-choice&platform=ALOS&startRecord=1661');
                     });
 
                     it('contains search', function(){
-                        expect(validProductsDocument.properties.links.search[0].href).toBe('http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=urn%3Aeop%3AVITO%3ACGS_S2_LAI');
+                        expect(validProductsDocument.properties.links.search[0].href).toBe('http://fedeo.esa.int/opensearch/description.xml?parentIdentifier=TropForest');
                     })
                 })
             });
