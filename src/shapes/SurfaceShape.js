@@ -804,6 +804,56 @@ define([
                     newLocations.push(new Location(newPos.latitude, newPos.longitude));
                 }
             } else {
+                // Euler method
+
+                // var xVecOld = new Vec3(0, oldPoint[1], oldPoint[2]);
+                // var yVecOld =  new Vec3(oldPoint[0], 0, oldPoint[2]);
+                // var zVecOld =  new Vec3(oldPoint[0], oldPoint[1], 0);
+                // var xVecNew = new Vec3(0, newPoint[1], newPoint[2]);
+                // var yVecNew =  new Vec3(newPoint[0], 0, newPoint[2]);
+                // var zVecNew =  new Vec3(newPoint[0], newPoint[1], 0);
+                //
+                //
+                // var alpha = Math.acos(xVecOld.dot(xVecNew) / (xVecOld.magnitude() * xVecNew.magnitude()));
+                // var beta = Math.acos(yVecOld.dot(yVecNew) / (yVecOld.magnitude() * yVecNew.magnitude()));
+                // var gama = Math.acos(zVecOld.dot(zVecNew) / (zVecOld.magnitude() * zVecNew.magnitude()));
+                //
+                // var alpha = Math.atan2()
+                //
+                // var crossX = xVecOld.cross(xVecNew);
+                // var crossY = yVecOld.cross(yVecNew);
+                // var crossZ = zVecOld.cross(zVecNew);
+                //
+                // if(new Vec3(1, 0, 0).dot(crossX) < 0){
+                //      alpha = -alpha;
+                // }
+                //
+                // if(new Vec3(0, 1, 0).dot(crossY) < 0){
+                //     beta = -beta;
+                // }
+                //
+                // if(new Vec3(0, 0, 1).dot(crossZ) < 0){
+                //     gama = -gama;
+                // }
+                //
+                // for (var i = 0, len = locations.length; i < len; i++) {
+                //     globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
+                //     var newX = result[0] * Math.cos(beta) * Math.cos(gama) +
+                //                result[1] * (Math.cos(beta) * (-Math.sin(gama))) +
+                //                result[2] * Math.sin(beta);
+                //
+                //     var newY = result[0] * ((-Math.sin(alpha)) * (-Math.sin(beta)) * (Math.cos(gama)) + Math.cos(alpha) * Math.sin(gama)) +
+                //                result[1] * ( (-Math.sin(alpha)) * (-Math.sin(beta)) * (-Math.sin(gama)) + Math.cos(alpha) * Math.cos(gama) ) +
+                //                result[2] * Math.sin(alpha) * Math.cos(beta);
+                //
+                //     var newZ = result[0] * (Math.cos(alpha) * (-Math.sin(beta)) * Math.cos(gama) + Math.sin(alpha) * Math.sin(gama)) +
+                //                result[1] * (Math.cos(alpha) * (-Math.sin(beta)) * (-Math.sin(gama)) + Math.sin(alpha) * Math.cos(gama)) +
+                //                result[2] * Math.cos(alpha) * Math.cos(beta);
+                //
+                //     globe.computePositionFromPoint(newX, newY, newZ, newPos);
+                //     newLocations.push(new Location(newPos.latitude, newPos.longitude));
+                // }
+
                 var delta_lat = newLocation.latitude - oldLocation.latitude;
                 var delta_long = newLocation.longitude - oldLocation.longitude;
                 var max = -90;
@@ -840,8 +890,8 @@ define([
                     newLocations.push(new Location(new_lat, new_long));
                 }
 
-                if (max > 87) {
-                    var delta = max - 87;
+                if (max > 90) {
+                    var delta = max - 90;
                     for (var i = 0, len = newLocations.length; i < len; i++) {
                         newLocations[i].latitude -= delta;
                     }
