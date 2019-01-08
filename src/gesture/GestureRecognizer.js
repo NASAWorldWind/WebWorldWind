@@ -93,10 +93,10 @@ define([
                 this._translationY = 0;
 
                 // Documented with its property accessor below.
-                this._translationVelocityX = 0;
+                this._velocityX = 0;
 
                 // Documented with its property accessor below.
-                this._translationVelocityY = 0;
+                this._velocityY = 0;
 
                 // Intentionally not documented.
                 this._translationWeight = 0.4;
@@ -218,30 +218,30 @@ define([
             },
 
             /**
-             * Indicates this gesture's current translation velocity along the X axis in pixels per second.
+             * Indicates this gesture's current velocity along the X axis in pixels per second.
              * @type {Number}
              * @memberof GestureRecognizer.prototype
              */
-            translationVelocityX: {
+            velocityX: {
                 get: function () {
-                    return this._translationVelocityX;
+                    return this._velocityX;
                 },
                 set: function (value) {
-                    this._translationVelocityX = value;
+                    this._velocityX = value;
                 }
             },
 
             /**
-             * Indicates this gesture's current translation velocity long the Y axis in pixels per second.
+             * Indicates this gesture's current velocity long the Y axis in pixels per second.
              * @type {Number}
              * @memberof GestureRecognizer.prototype
              */
-            translationVelocityY: {
+            velocityY: {
                 get: function () {
-                    return this._translationVelocityY;
+                    return this._velocityY;
                 },
                 set: function (value) {
-                    this._translationVelocityY = value;
+                    this._velocityY = value;
                 }
             },
 
@@ -380,8 +380,8 @@ define([
             this._clientStartY = 0;
             this._translationX = 0;
             this._translationY = 0;
-            this._translationVelocityX = 0;
-            this._translationVelocityY = 0;
+            this._velocityX = 0;
+            this._velocityY = 0;
             this._mouseButtonMask = 0;
             this._touches = [];
             this._touchCentroidShiftX = 0;
@@ -595,10 +595,10 @@ define([
         };
 
         // Intentionally not documented.
-        GestureRecognizer.prototype.updateTranslationVelocity = function(newClientX, newClientY) {
+        GestureRecognizer.prototype.updateVelocity = function(newClientX, newClientY) {
             var elapsedTime = (new Date() - this._lastEventTime) / 1000;
-            this._translationVelocityX = (newClientX - this._clientX) / elapsedTime;
-            this._translationVelocityY = (newClientY - this._clientY) / elapsedTime;
+            this._velocityX = (newClientX - this._clientX) / elapsedTime;
+            this._velocityY = (newClientY - this._clientY) / elapsedTime;
         };
 
         // Intentionally not documented.
@@ -683,8 +683,8 @@ define([
                 this._clientStartY = event.clientY;
                 this._translationX = 0;
                 this._translationY = 0;
-                this._translationVelocityX = 0;
-                this._translationVelocityY = 0;
+                this._velocityX = 0;
+                this._velocityY = 0;
             }
 
             this._mouseButtonMask |= buttonBit;
@@ -701,7 +701,7 @@ define([
                 return; // ignore redundant mouse move events
             }
 
-            this.updateTranslationVelocity(event.clientX, event.clientY);
+            this.updateVelocity(event.clientX, event.clientY);
 
             var dx = event.clientX - this._clientStartX,
                 dy = event.clientY - this._clientStartY,
@@ -741,8 +741,8 @@ define([
                 this._clientStartY = event.clientY;
                 this._translationX = 0;
                 this._translationY = 0;
-                this._translationVelocityX = 0;
-                this._translationVelocityY = 0;
+                this._velocityX = 0;
+                this._velocityY = 0;
                 this._touchCentroidShiftX = 0;
                 this._touchCentroidShiftY = 0;
             } else {
@@ -769,7 +769,7 @@ define([
 
             var centroid = this.touchCentroid();
 
-            this.updateTranslationVelocity(centroid.clientX, centroid.clientY);
+            this.updateVelocity(centroid.clientX, centroid.clientY);
 
             var dx = centroid.clientX - this._clientStartX + this._touchCentroidShiftX,
                 dy = centroid.clientY - this._clientStartY + this._touchCentroidShiftY,

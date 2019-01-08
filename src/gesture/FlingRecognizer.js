@@ -60,8 +60,8 @@ define(['../gesture/GestureRecognizer'],
                 return;
             }
 
-            if (Math.abs(this.translationVelocityX) > this.minVelocity
-                || Math.abs(this.translationVelocityY) > this.minVelocity) {
+            if (Math.abs(this.velocityX) > this.minVelocity
+                || Math.abs(this.velocityY) > this.minVelocity) {
 
                 this.state = WorldWind.RECOGNIZED;
             }
