@@ -106,6 +106,7 @@ define([
         SurfacePolygonEditorFragment.prototype.updateControlElements = function (shape,
                                                                                  globe,
                                                                                  controlPoints,
+                                                                                 shadowControlPoints,
                                                                                  accessories) {
             var locations = this.getLocations(shape);
             var lenLocations = locations.length;
