@@ -114,6 +114,7 @@ define([
          */
         BaseSurfaceEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                   controlPoints,
+                                                                                  shadowControlPoints,
                                                                                   accessories,
                                                                                   resizeControlPointAttributes,
                                                                                   rotateControlPointAttributes,
@@ -138,6 +139,7 @@ define([
         BaseSurfaceEditorFragment.prototype.updateControlElements = function (shape,
                                                                               globe,
                                                                               controlPoints,
+                                                                              shadowControlPoints,
                                                                               accessories) {
             throw new UnsupportedOperationError(Logger.logMessage(
                 Logger.LEVEL_SEVERE,

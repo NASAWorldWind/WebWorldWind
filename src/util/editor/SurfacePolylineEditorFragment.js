@@ -60,6 +60,7 @@ define([
         // Internal use only.
         SurfacePolylineEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                       controlPoints,
+                                                                                      shadowControlPoints,
                                                                                       accessories,
                                                                                       resizeControlPointAttributes,
                                                                                       rotateControlPointAttributes,
@@ -88,12 +89,24 @@ define([
 
                 this.createRotationAccessory(accessories, rotateControlPointAttributes);
             }
+
+            // if (shadowControlPointAttributes) {
+            //     for (var i = 0, len = locations.length - 1; i < len; i++) {
+            //         this.createControlPoint(
+            //             shadowControlPoints,
+            //             shadowControlPointAttributes,
+            //             ShapeEditorConstants.SHADOW,
+            //             i
+            //         );
+            //     }
+            // }
         };
 
         // Internal use only.
         SurfacePolylineEditorFragment.prototype.updateControlElements = function (shape,
                                                                                   globe,
                                                                                   controlPoints,
+                                                                                  shadowControlPoints,
                                                                                   accessories) {
             var locations = shape.boundaries;
             var lenLocations = locations.length;
@@ -101,70 +114,67 @@ define([
             var locationControlPoints = [];
             var rotationControlPoint = null;
 
-            console.dir(shape.pathType);
 
-            if (lenControlPoints > 0) {
-                for (var i = lenControlPoints - 1; i > -1; i--) {
-                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                        rotationControlPoint = controlPoints[i];
+            for (var i = lenControlPoints - 1; i > -1; i--) {
+                if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.ROTATION) {
+                    rotationControlPoint = controlPoints[i];
 
-                        var polygonCenter = this.getCenterFromLocations(globe, locations);
-                        var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
+                    var polygonCenter = this.getCenterFromLocations(globe, locations);
+                    var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
 
-                        Location.greatCircleLocation(
-                            polygonCenter,
-                            this.currentHeading,
-                            polygonRadius,
-                            rotationControlPoint.position
-                        );
-
-                        rotationControlPoint.userProperties.rotation = this.currentHeading;
-
-                        this.updateRotationAccessory(polygonCenter, rotationControlPoint.position, accessories);
-                    }
-
-                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.LOCATION) {
-                        locationControlPoints.push(controlPoints[i]);
-                    }
-                    controlPoints.pop();
-                }
-
-                locationControlPoints.reverse();
-                var lenLocationControlPoints = locationControlPoints.length;
-
-                for (var i = 0; i < lenLocations; i++) {
-                    if (i >= lenLocationControlPoints) {
-                        this.createControlPoint(
-                            locationControlPoints,
-                            this.moveControlPointAttributes,
-                            ShapeEditorConstants.LOCATION,
-                            i
-                        );
-                    }
-                    locationControlPoints[i].position = locations[i];
-                }
-
-                if (locationControlPoints.length > lenLocations) {
-                    locationControlPoints.splice(lenLocations, locationControlPoints.length - lenLocations);
-                }
-
-                for (var i = 0; i < locationControlPoints.length; i++) {
-                    controlPoints.push(locationControlPoints[i]);
-                }
-
-                for (var i = 0; i < lenLocations - 1; i++) {
-                    this.createControlPoint(
-                        controlPoints,
-                        this.shadowControlPointAttributes,
-                        ShapeEditorConstants.SHADOW,
-                        lenLocations + i
+                    Location.greatCircleLocation(
+                        polygonCenter,
+                        this.currentHeading,
+                        polygonRadius,
+                        rotationControlPoint.position
                     );
 
-                    this.computeShadowPointLocations(shape, controlPoints[lenLocations + i], locations[i], locations[i + 1]);
+                    rotationControlPoint.userProperties.rotation = this.currentHeading;
+
+                    this.updateRotationAccessory(polygonCenter, rotationControlPoint.position, accessories);
                 }
 
-                controlPoints.push(rotationControlPoint);
+                if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.LOCATION) {
+                    locationControlPoints.push(controlPoints[i]);
+                }
+                controlPoints.pop();
             }
+
+            locationControlPoints.reverse();
+            var lenLocationControlPoints = locationControlPoints.length;
+
+            for (var i = 0; i < lenLocations; i++) {
+                if (i >= lenLocationControlPoints) {
+                    this.createControlPoint(
+                        locationControlPoints,
+                        this.moveControlPointAttributes,
+                        ShapeEditorConstants.LOCATION,
+                        i
+                    );
+                }
+                locationControlPoints[i].position = locations[i];
+            }
+
+            if (locationControlPoints.length > lenLocations) {
+                locationControlPoints.splice(lenLocations, locationControlPoints.length - lenLocations);
+            }
+
+            for (var i = 0; i < locationControlPoints.length; i++) {
+                controlPoints.push(locationControlPoints[i]);
+            }
+
+            for (var i = 0; i < lenLocations - 1; i++) {
+                this.createControlPoint(
+                    shadowControlPoints,
+                    this.shadowControlPointAttributes,
+                    ShapeEditorConstants.SHADOW,
+                    lenLocations + i
+                );
+
+                this.computeShadowPointLocations(shape, shadowControlPoints[i], locations[i], locations[i + 1]);
+            }
+
+            controlPoints.push(rotationControlPoint);
         };
 
         // Internal use only.

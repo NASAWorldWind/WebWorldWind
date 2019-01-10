@@ -61,6 +61,7 @@ define([
         // Internal use only.
         SurfaceSectorEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                     controlPoints,
+                                                                                    shadowControlPoints,
                                                                                     accessories,
                                                                                     resizeControlPointAttributes) {
 

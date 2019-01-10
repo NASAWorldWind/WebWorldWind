@@ -52,14 +52,17 @@ define([
         // Internal use only.
         PlacemarkEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                 controlPoints,
+                                                                                shadowControlPoints,
                                                                                 accessories,
                                                                                 resizeControlPointAttributes,
                                                                                 rotateControlPointAttributes,
                                                                                 moveControlPointAttributes) {
 
-            // we will use the same Placemark as control point
-            shape.userProperties.purpose = ShapeEditorConstants.DRAG;
-            controlPoints.push(shape);
+            if (moveControlPointAttributes) {
+                // we will use the same Placemark as control point
+                shape.userProperties.purpose = ShapeEditorConstants.DRAG;
+                controlPoints.push(shape);
+            }
         };
 
         // Internal use only.

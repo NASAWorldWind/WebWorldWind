@@ -165,6 +165,10 @@ define([
             this.controlPointsLayer = new RenderableLayer("Shape Editor Control Points");
 
             // Internal use only.
+            // The layer that holds the shadow control points created by the editor fragment.
+            this.shadowControlPointsLayer = new RenderableLayer("Shape Editor Shadow Control Points");
+
+            // Internal use only.
             // The layers that holds the additional accessories created by the editor fragment.
             this.accessoriesLayer = new RenderableLayer("Shape Editor Accessories");
             this.accessoriesLayer.pickEnabled = false;
@@ -407,6 +411,7 @@ define([
             var moveControlAttributes = this._moveControlPointAttributes;
             var resizeControlAttributes = this._resizeControlPointAttributes;
             var rotateControlAttributes = this._rotateControlPointAttributes;
+            var shadowControlAttributes = this._shadowControlPointAttributes;
 
             if (!this._allowMove) {
                 moveControlAttributes = null;
@@ -420,6 +425,10 @@ define([
                 rotateControlAttributes = null;
             }
 
+            if (!this._allowManageControlPoint) {
+                shadowControlAttributes = null;
+            }
+
             if (this._worldWindow.indexOfLayer(this.shadowShapeLayer) == -1) {
                 this._worldWindow.insertLayer(0, this.shadowShapeLayer);
             }
@@ -427,6 +436,11 @@ define([
             if (this._worldWindow.indexOfLayer(this.controlPointsLayer) == -1) {
                 this._worldWindow.addLayer(this.controlPointsLayer);
             }
+
+            if (this._worldWindow.indexOfLayer(this.shadowControlPointsLayer) == -1) {
+                this._worldWindow.addLayer(this.shadowControlPointsLayer);
+            }
+
 
             if (this._worldWindow.indexOfLayer(this.accessoriesLayer) == -1) {
                 this._worldWindow.addLayer(this.accessoriesLayer);
@@ -439,11 +453,12 @@ define([
             this.activeEditorFragment.initializeControlElements(
                 this._shape,
                 this.controlPointsLayer.renderables,
+                this.shadowControlPointsLayer.renderables,
                 this.accessoriesLayer.renderables,
                 resizeControlAttributes,
                 rotateControlAttributes,
                 moveControlAttributes,
-                this._shadowControlPointAttributes
+                shadowControlAttributes
             );
 
             this.updateControlElements();
@@ -454,6 +469,9 @@ define([
         ShapeEditor.prototype.removeControlElements = function () {
             this._worldWindow.removeLayer(this.controlPointsLayer);
             this.controlPointsLayer.removeAllRenderables();
+
+            this._worldWindow.removeLayer(this.shadowControlPointsLayer);
+            this.shadowControlPointsLayer.removeAllRenderables();
 
             this._worldWindow.removeLayer(this.accessoriesLayer);
             this.accessoriesLayer.removeAllRenderables();
@@ -471,6 +489,7 @@ define([
                 this._shape,
                 this._worldWindow.globe,
                 this.controlPointsLayer.renderables,
+                this.shadowControlPointsLayer.renderables,
                 this.accessoriesLayer.renderables
             );
         };
@@ -539,7 +558,7 @@ define([
 
 
             // The editor provides vertex insertion and removal for SurfacePolygon and SurfacePolyline.
-            // Long press when the cursor is over the shape inserts a control point near the position
+            // Single click when the cursor is over a shadow control point inserts a control point near the position
             // of the cursor.
             this._longPressTimeout = setTimeout(function () {
                     if (allowVertex) {
@@ -567,6 +586,10 @@ define([
                         break;
 
                     } else if (this.controlPointsLayer.renderables.indexOf(userObject) !== -1) {
+                        this.beginAction(terrainObject.position, this._allowManageControlPoint, userObject);
+                        event.preventDefault();
+                        break;
+                    } else if (this.shadowControlPointsLayer.renderables.indexOf(userObject) !== -1) {
                         this.beginAction(terrainObject.position, this._allowManageControlPoint, userObject);
                         event.preventDefault();
                         break;
@@ -628,11 +651,14 @@ define([
             var terrainObject = this._worldWindow.pickTerrain(mousePoint).terrainObject();
 
             // The editor provides vertex insertion and removal for SurfacePolygon and SurfacePolyline.
-            // Double clicking when the cursor is over a control point will remove it.
+            // Double click when the cursor is over a control point will remove it.
+            // Single click when the cursor is over a shadow control point will add it.
+            console.dir(this.actionType)
             if (this.actionType) {
                 if (this._click0Time && this._click1Time) {
                     if (this._click1Time <= this._clickDelay) {
                         if (this.actionControlPoint
+                            && this.actionType == 'location'
                             && terrainObject
                             && this._allowManageControlPoint) {
                             this.actionSecondaryBehavior = true;
@@ -642,6 +668,18 @@ define([
                     clearTimeout(this._dbclickTimeout);
                     this._click0Time = 0;
                     this._click1Time = 0;
+
+                } else {
+                    if (this.actionType == 'shadow' && this._allowManageControlPoint) {
+                        this.activeEditorFragment.addNewVertex(
+                            this._shape,
+                            this._worldWindow.globe,
+                            terrainObject.position
+                        );
+
+                        this.updateControlElements();
+                        this._worldWindow.redraw();
+                    }
                 }
 
                 this.endAction();
@@ -724,7 +762,8 @@ define([
 
             if ((purpose === ShapeEditorConstants.ROTATION && this._allowRotate) ||
                 (purpose !== ShapeEditorConstants.ROTATION && this._allowReshape) ||
-                (purpose === ShapeEditorConstants.LOCATION && this._allowManageControlPoint && this.actionSecondaryBehavior)) {
+                (purpose === ShapeEditorConstants.LOCATION && this._allowManageControlPoint && this.actionSecondaryBehavior) ||
+                (purpose === ShapeEditorConstants.SHADOW && this._allowManageControlPoint && this.actionSecondaryBehavior)) {
                 this.activeEditorFragment.reshape(
                     this._shape,
                     this._worldWindow.globe,

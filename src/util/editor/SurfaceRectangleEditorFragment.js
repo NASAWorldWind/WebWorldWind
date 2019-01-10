@@ -58,11 +58,10 @@ define([
         // Internal use only.
         SurfaceRectangleEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                        controlPoints,
+                                                                                       shadowControlPoints,
                                                                                        accessories,
                                                                                        resizeControlPointAttributes,
                                                                                        rotateControlPointAttributes) {
-
-            console.dir(resizeControlPointAttributes)
 
             if (resizeControlPointAttributes) {
                 this.createControlPoint(controlPoints, resizeControlPointAttributes, ShapeEditorConstants.WIDTH);
@@ -80,6 +79,7 @@ define([
         SurfaceRectangleEditorFragment.prototype.updateControlElements = function (shape,
                                                                                    globe,
                                                                                    controlPoints,
+                                                                                   shadowControlPoints,
                                                                                    accessories) {
             var length = controlPoints.length;
 

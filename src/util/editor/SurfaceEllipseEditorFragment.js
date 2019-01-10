@@ -58,6 +58,7 @@ define([
         // Internal use only.
         SurfaceEllipseEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                      controlPoints,
+                                                                                     shadowControlPoints,
                                                                                      accessories,
                                                                                      resizeControlPointAttributes,
                                                                                      rotateControlPointAttributes) {
@@ -78,6 +79,7 @@ define([
         SurfaceEllipseEditorFragment.prototype.updateControlElements = function (shape,
                                                                                  globe,
                                                                                  controlPoints,
+                                                                                 shadowControlPoints,
                                                                                  accessories) {
             var length = controlPoints.length;
 

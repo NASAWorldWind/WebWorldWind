@@ -52,6 +52,7 @@ define([
         // Internal use only.
         SurfaceCircleEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                     controlPoints,
+                                                                                    shadowControlPoints,
                                                                                     accessories,
                                                                                     resizeControlPointAttributes) {
             if (resizeControlPointAttributes) {

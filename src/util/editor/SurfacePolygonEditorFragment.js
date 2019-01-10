@@ -60,6 +60,7 @@ define([
         // Internal use only.
         SurfacePolygonEditorFragment.prototype.initializeControlElements = function (shape,
                                                                                      controlPoints,
+                                                                                     shadowControlPoints,
                                                                                      accessories,
                                                                                      resizeControlPointAttributes,
                                                                                      rotateControlPointAttributes,
@@ -87,6 +88,17 @@ define([
                 this.createControlPoint(controlPoints, rotateControlPointAttributes, ShapeEditorConstants.ROTATION);
 
                 this.createRotationAccessory(accessories, rotateControlPointAttributes);
+            }
+
+            if (shadowControlPointAttributes) {
+                for (var i = 0, len = locations.length - 1; i < len; i++) {
+                    this.createControlPoint(
+                        shadowControlPoints,
+                        shadowControlPointAttributes,
+                        ShapeEditorConstants.SHADOW,
+                        i
+                    );
+                }
             }
         };
 
