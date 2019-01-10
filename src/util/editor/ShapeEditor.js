@@ -206,14 +206,6 @@ define([
             this.actionSecondaryBehavior = false;
 
             // Internal use only.
-            // The client X position at the start of the action.
-            this.actionStartX = null;
-
-            //Internal use only.
-            // The client Y position at the start of the action.
-            this.actionStartY = null;
-
-            // Internal use only.
             // The current client X position for the action.
             this.actionCurrentX = null;
 
@@ -236,12 +228,6 @@ define([
             this._click1Time = 0;
             this._dbclickTimeout = 0;
             this._clickDelay = 500;
-
-            // Internal use only.
-            // counters used to detect long press event (time measured in ms)
-            this._longPressTimeout = 0;
-            this._longPressDelay = 1500;
-
 
             this._worldWindow.worldWindowController.addGestureListener(this);
         };
@@ -518,8 +504,6 @@ define([
             var x = event.clientX,
                 y = event.clientY;
 
-            this.actionStartX = x;
-            this.actionStartY = y;
             this.actionCurrentX = x;
             this.actionCurrentY = y;
 
@@ -545,34 +529,6 @@ define([
                     }, this._clickDelay
                 );
             }
-
-            var allowVertex = terrainObject
-                && this.actionStartX === this.actionCurrentX
-                && this.actionStartY === this.actionCurrentY
-                && this._allowManageControlPoint;
-
-            // counter for long-press detection
-            clearTimeout(this._longPressTimeout);
-
-            var context = this;
-
-
-            // The editor provides vertex insertion and removal for SurfacePolygon and SurfacePolyline.
-            // Single click when the cursor is over a shadow control point inserts a control point near the position
-            // of the cursor.
-            this._longPressTimeout = setTimeout(function () {
-                    if (allowVertex) {
-                        context.activeEditorFragment.addNewVertex(
-                            context._shape,
-                            context._worldWindow.globe,
-                            terrainObject.position
-                        );
-
-                        context.updateControlElements();
-                        context._worldWindow.redraw();
-                    }
-                }, this._longPressDelay
-            );
 
             for (var p = 0, len = pickList.objects.length; p < len; p++) {
                 var object = pickList.objects[p];
@@ -613,8 +569,6 @@ define([
                 this._click0Time = 0;
                 this._click1Time = 0;
             }
-
-            clearTimeout(this._longPressTimeout);
 
             if (this.actionType) {
 
@@ -684,8 +638,6 @@ define([
 
                 this.endAction();
             }
-
-            clearTimeout(this._longPressTimeout);
         };
 
         // Internal use only.
