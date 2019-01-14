@@ -114,32 +114,28 @@ define([
             var locationControlPoints = [];
             var rotationControlPoint = null;
 
-            if (lenControlPoints > 0) {
-                for (var i = lenControlPoints - 1; i > -1; i--) {
-                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.ROTATION) {
-                        rotationControlPoint = controlPoints[i];
+            for (var i = lenControlPoints - 1; i > -1; i--) {
+                if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.ROTATION) {
+                    rotationControlPoint = controlPoints[i];
 
-                        var polygonCenter = this.getCenterFromLocations(globe, locations);
-                        var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
+                    var polygonCenter = this.getCenterFromLocations(globe, locations);
+                    var polygonRadius = 1.2 * this.getAverageDistance(globe, polygonCenter, locations);
 
-                        Location.greatCircleLocation(
-                            polygonCenter,
-                            this.currentHeading,
-                            polygonRadius,
-                            rotationControlPoint.position
-                        );
+                    Location.greatCircleLocation(
+                        polygonCenter,
+                        this.currentHeading,
+                        polygonRadius,
+                        rotationControlPoint.position
+                    );
 
-                        rotationControlPoint.userProperties.rotation = this.currentHeading;
+                    rotationControlPoint.userProperties.rotation = this.currentHeading;
 
-                        this.updateRotationAccessory(polygonCenter, rotationControlPoint.position, accessories);
-                    }
-
-                    if (controlPoints[i].userProperties.purpose === ShapeEditorConstants.LOCATION) {
-                        locationControlPoints.push(controlPoints[i]);
-                    }
-
-                    controlPoints.pop();
+                    this.updateRotationAccessory(polygonCenter, rotationControlPoint.position, accessories);
+                } else {
+                    locationControlPoints.push(controlPoints[i]);
                 }
+
+                controlPoints.pop();
             }
 
             locationControlPoints.reverse();
@@ -165,25 +161,25 @@ define([
                 controlPoints.push(locationControlPoints[i]);
             }
 
-            for (var i = 0; i < lenLocations - 1; i++) {
+            for (var i = 0; i < controlPoints.length - 1; i++) {
                 this.createControlPoint(
-                    controlPoints,
+                    shadowControlPoints,
                     this.shadowControlPointAttributes,
                     ShapeEditorConstants.SHADOW,
-                    lenLocations + i
+                    i
                 );
 
-                this.computeShadowPointLocations(shape, controlPoints[lenLocations + i], locations[i], locations[i + 1]);
+                this.computeShadowPointLocations(shape, shadowControlPoints[i], locations[i], locations[i + 1]);
 
                 if (i == lenLocations - 2) {
                     this.createControlPoint(
-                        controlPoints,
+                        shadowControlPoints,
                         this.shadowControlPointAttributes,
                         ShapeEditorConstants.SHADOW,
-                        lenLocations + i + 1
+                        i + 1
                     );
 
-                    this.computeShadowPointLocations(shape, controlPoints[lenLocations + i + 1], locations[i + 1], locations[0]);
+                    this.computeShadowPointLocations(shape, shadowControlPoints[i + 1], locations[i + 1], locations[0]);
                 }
             }
 
