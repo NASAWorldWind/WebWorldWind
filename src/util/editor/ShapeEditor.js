@@ -607,7 +607,6 @@ define([
             // The editor provides vertex insertion and removal for SurfacePolygon and SurfacePolyline.
             // Double click when the cursor is over a control point will remove it.
             // Single click when the cursor is over a shadow control point will add it.
-            console.dir(this.actionType)
             if (this.actionType) {
                 if (this._click0Time && this._click1Time) {
                     if (this._click1Time <= this._clickDelay) {
