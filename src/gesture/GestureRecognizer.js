@@ -72,7 +72,7 @@ define([
                 this._nextState = null;
 
                 // Intentionally not documented.
-                this._lastEventTime = -1;
+                this._lastPositionEventTime = -1;
 
                 // Documented with its property accessor below.
                 this._clientX = 0;
@@ -373,7 +373,6 @@ define([
         GestureRecognizer.prototype.reset = function () {
             this._state = WorldWind.POSSIBLE;
             this._nextState = null;
-            this._lastEventTime = -1;
             this._clientX = 0;
             this._clientY = 0;
             this._clientStartX = 0;
@@ -382,6 +381,7 @@ define([
             this._translationY = 0;
             this._velocityX = 0;
             this._velocityY = 0;
+            this._lastPositionEventTime = -1;
             this._mouseButtonMask = 0;
             this._touches = [];
             this._touchCentroidShiftX = 0;
@@ -595,13 +595,6 @@ define([
         };
 
         // Intentionally not documented.
-        GestureRecognizer.prototype.updateVelocity = function(newClientX, newClientY) {
-            var elapsedTime = (new Date() - this._lastEventTime) / 1000;
-            this._velocityX = (newClientX - this._clientX) / elapsedTime;
-            this._velocityY = (newClientY - this._clientY) / elapsedTime;
-        };
-
-        // Intentionally not documented.
         GestureRecognizer.prototype.onGestureEvent = function (event) {
             if (!this.enabled) {
                 return;
@@ -657,8 +650,6 @@ define([
                     Logger.logMessage(Logger.LEVEL_INFO, "GestureRecognizer", "handleEvent",
                         "Unrecognized event type: " + event.type);
                 }
-
-                this._lastEventTime = new Date();
             } catch (e) {
                 Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "handleEvent",
                     "Error handling event.\n" + e.toString());
@@ -685,6 +676,7 @@ define([
                 this._translationY = 0;
                 this._velocityX = 0;
                 this._velocityY = 0;
+                this._lastPositionEventTime = new Date();
             }
 
             this._mouseButtonMask |= buttonBit;
@@ -701,7 +693,11 @@ define([
                 return; // ignore redundant mouse move events
             }
 
-            this.updateVelocity(event.clientX, event.clientY);
+            var now = new Date();
+            var elapsedTime = (now - this._lastPositionEventTime) / 1000;
+            this._velocityX = (event.clientX - this._clientX) / elapsedTime;
+            this._velocityY = (event.clientY - this._clientY) / elapsedTime;
+            this._lastPositionEventTime = now;
 
             var dx = event.clientX - this._clientStartX,
                 dy = event.clientY - this._clientStartY,
@@ -743,6 +739,7 @@ define([
                 this._translationY = 0;
                 this._velocityX = 0;
                 this._velocityY = 0;
+                this._lastPositionEventTime = new Date();
                 this._touchCentroidShiftX = 0;
                 this._touchCentroidShiftY = 0;
             } else {
@@ -769,7 +766,11 @@ define([
 
             var centroid = this.touchCentroid();
 
-            this.updateVelocity(centroid.clientX, centroid.clientY);
+            var now = new Date();
+            var elapsedTime = (now - this._lastPositionEventTime) / 1000;
+            this._velocityX = (centroid.clientX - this._clientX) / elapsedTime;
+            this._velocityY = (centroid.clientY - this._clientY) / elapsedTime;
+            this._lastPositionEventTime = now;
 
             var dx = centroid.clientX - this._clientStartX + this._touchCentroidShiftX,
                 dy = centroid.clientY - this._clientStartY + this._touchCentroidShiftY,

@@ -52,7 +52,10 @@ define(['../gesture/GestureRecognizer'],
 
         // Documented in superclass.
         FlingRecognizer.prototype.touchEnd = function (touch) {
-            this.checkForFling();
+            // Check for a fling only when the last touch ends
+            if (this.touchCount == 0) {
+                this.checkForFling();
+            }
         };
 
         FlingRecognizer.prototype.checkForFling = function() {
