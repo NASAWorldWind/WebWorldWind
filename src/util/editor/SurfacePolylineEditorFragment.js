@@ -150,12 +150,21 @@ define([
                         ShapeEditorConstants.LOCATION,
                         i
                     );
+
+                    this.createControlPoint(
+                        shadowControlPoints,
+                        this.shadowControlPointAttributes,
+                        ShapeEditorConstants.SHADOW,
+                        i - 1
+                    );
+
                 }
                 locationControlPoints[i].position = locations[i];
             }
 
             if (locationControlPoints.length > lenLocations) {
                 locationControlPoints.splice(lenLocations, locationControlPoints.length - lenLocations);
+                shadowControlPoints.splice(lenLocations-1, shadowControlPoints.length - lenLocations - 1);
             }
 
             for (var i = 0; i < locationControlPoints.length; i++) {
@@ -163,13 +172,6 @@ define([
             }
 
             for (var i = 0; i < controlPoints.length - 1; i++) {
-                this.createControlPoint(
-                    shadowControlPoints,
-                    this.shadowControlPointAttributes,
-                    ShapeEditorConstants.SHADOW,
-                    i
-                );
-
                 this.computeShadowPointLocations(shape, shadowControlPoints[i], locations[i], locations[i + 1]);
             }
 

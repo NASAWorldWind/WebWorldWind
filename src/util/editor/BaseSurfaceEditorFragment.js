@@ -431,7 +431,7 @@ define([
                     segmentAzimuth = Location.rhumbAzimuth(startLocation, endLocation);
                     segmentDistance = Location.rhumbDistance(startLocation, endLocation);
                 }
-                shadowControlPoint.position = Location.rhumbLocation(startLocation, segmentAzimuth, 0.5 * segmentDistance,
+                Location.rhumbLocation(startLocation, segmentAzimuth, 0.5 * segmentDistance,
                     shadowControlPoint.position);
             } else {
                 // Great Circle
@@ -440,7 +440,7 @@ define([
                     segmentDistance = Location.greatCircleDistance(startLocation, endLocation); //radians
                 }
                 //Location, degrees, radians, Location
-                shadowControlPoint.position = Location.greatCircleLocation(startLocation, segmentAzimuth, 0.5 * segmentDistance,
+                Location.greatCircleLocation(startLocation, segmentAzimuth, 0.5 * segmentDistance,
                     shadowControlPoint.position);
             }
 
