@@ -509,9 +509,9 @@ define([
 
             var mousePoint = this._worldWindow.canvasCoordinates(x, y);
             var tmpOutlineWidth = this._shape.highlightAttributes.outlineWidth;
-            // this._shape.highlightAttributes.outlineWidth = 5;
+            this._shape.highlightAttributes.outlineWidth = 5;
             var pickList = this._worldWindow.pick(mousePoint);
-            // this._shape.highlightAttributes.outlineWidth = tmpOutlineWidth;
+            this._shape.highlightAttributes.outlineWidth = tmpOutlineWidth;
             var terrainObject = pickList.terrainObject();
 
             if (this._click0Time && !this._click1Time) {
