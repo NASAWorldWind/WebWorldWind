@@ -169,14 +169,28 @@ define([
                 controlPoints.push(locationControlPoints[i]);
             }
 
-            for (var i = 0; i < controlPoints.length - 1 ; i++) {
-                this.computeShadowPointLocations(shape, shadowControlPoints[i], locations[i], locations[i + 1]);
+            if (shape.boundaries.length > 0 && Array.isArray(shape.boundaries[0])) {
+                var x = 0;
+                for (var i = 0, ilen = shape.boundaries.length; i < ilen; i++) {
+                    for (var j = 0, jlen = shape.boundaries[i].length - 1; j < jlen; j++) {
+                        this.computeShadowPointLocations(shape, shadowControlPoints[x], shape.boundaries[i][j], shape.boundaries[i][j + 1]);
 
-                if (i == controlPoints.length - 2) {
-                    this.computeShadowPointLocations(shape, shadowControlPoints[i + 1], locations[i + 1], locations[0]);
+                        if (j == jlen - 1) {
+                            this.computeShadowPointLocations(shape, shadowControlPoints[x + 1], shape.boundaries[i][j + 1], shape.boundaries[i][0]);
+                            x += 1;
+                        }
+                        x += 1;
+                    }
+                }
+            } else {
+                for (var i = 0; i < controlPoints.length - 1 ; i++) {
+                    this.computeShadowPointLocations(shape, shadowControlPoints[i], locations[i], locations[i + 1]);
+
+                    if (i == controlPoints.length - 2) {
+                        this.computeShadowPointLocations(shape, shadowControlPoints[i + 1], locations[i + 1], locations[0]);
+                    }
                 }
             }
-
 
             controlPoints.push(rotationControlPoint);
         };
