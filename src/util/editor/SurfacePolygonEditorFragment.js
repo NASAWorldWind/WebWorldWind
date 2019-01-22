@@ -91,7 +91,7 @@ define([
             }
 
             if (shadowControlPointAttributes) {
-                for (var i = 0, len = locations.length - 1; i < len; i++) {
+                for (var i = 0, len = locations.length; i < len; i++) {
                     this.createControlPoint(
                         shadowControlPoints,
                         shadowControlPointAttributes,
@@ -149,36 +149,30 @@ define([
                         ShapeEditorConstants.LOCATION,
                         i
                     );
+
+                    this.createControlPoint(
+                        shadowControlPoints,
+                        this.shadowControlPointAttributes,
+                        ShapeEditorConstants.SHADOW,
+                        i
+                    );
                 }
                 locationControlPoints[i].position = locations[i];
             }
 
             if (locationControlPoints.length > lenLocations) {
-                locationControlPoints.splice(lenLocations, locationControlPoints.length - lenLocations)
+                locationControlPoints.splice(lenLocations, locationControlPoints.length - lenLocations);
+                shadowControlPoints.splice(lenLocations, shadowControlPoints.length - lenLocations);
             }
 
             for (var i = 0; i < locationControlPoints.length; i++) {
                 controlPoints.push(locationControlPoints[i]);
             }
 
-            for (var i = 0; i < controlPoints.length - 1; i++) {
-                this.createControlPoint(
-                    shadowControlPoints,
-                    this.shadowControlPointAttributes,
-                    ShapeEditorConstants.SHADOW,
-                    i
-                );
-
+            for (var i = 0; i < controlPoints.length - 1 ; i++) {
                 this.computeShadowPointLocations(shape, shadowControlPoints[i], locations[i], locations[i + 1]);
 
-                if (i == lenLocations - 2) {
-                    this.createControlPoint(
-                        shadowControlPoints,
-                        this.shadowControlPointAttributes,
-                        ShapeEditorConstants.SHADOW,
-                        i + 1
-                    );
-
+                if (i == controlPoints.length - 2) {
                     this.computeShadowPointLocations(shape, shadowControlPoints[i + 1], locations[i + 1], locations[0]);
                 }
             }
