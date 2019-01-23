@@ -66,13 +66,12 @@ define([
                                                                                      rotateControlPointAttributes,
                                                                                      moveControlPointAttributes,
                                                                                      shadowControlPointAttributes) {
+            var locations = this.getLocations(shape);
             this.currentHeading = 0;
 
             if (moveControlPointAttributes) {
                 this.moveControlPointAttributes = moveControlPointAttributes;
                 this.shadowControlPointAttributes = shadowControlPointAttributes;
-
-                var locations = this.getLocations(shape);
 
                 for (var i = 0, len = locations.length; i < len; i++) {
                     this.createControlPoint(

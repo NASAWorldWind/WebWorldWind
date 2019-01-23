@@ -19,8 +19,8 @@
             <div class="alert alert-info">
                 Dragging the body of the shape moves the whole shape. Dragging a control point performs the action associated
                 with that control point. The editor provides vertex insertion and removal for SurfacePolygon and
-                SurfacePolyline. Long click when the cursor is over the shape inserts a control point near the position
-                of the cursor. Double when the cursor is over a control point removes that particular control point.
+                SurfacePolyline. Single click when the cursor is over a shadow control point of a shape inserts a control point at
+                that position. Double click when the cursor is over a control point removes that particular control point.
             </div>
         </div>
     </div>
@@ -61,6 +61,25 @@
             <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto">
                 Your browser does not support HTML5 Canvas.
             </canvas>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="alert alert-warning">
+                <p>You can also manage the actions available for a particular shape by calling the edit method of ShapeEditor with the desired options.
+                You can manage the move, reshape and rotate actions and you can also chose if you can add/remove control points on a shape (default values - all action are allowed).
+                In our example we used the edit method in various ways:</p>
+                <ul>
+                    <li><b>Circle</b> - you can do all the available actions (move, resize).</li>
+                    <li><b>Ellipse</b> - you can do resize (move and rotate are not allowed).</li>
+                    <li><b>Placemark</b> - you move it (this is the only action available).</li>
+                    <li><b>Polygon</b> - you move, rotate or manage the control points (you can't reshape it).</li>
+                    <li><b>MultiPolygon</b> - all the actions are available.</li>
+                    <li><b>Polyline</b> - all the actions are available.</li>
+                    <li><b>Rectangle</b> - you can move it (resize and rotate are not allowed).</li>
+                    <li><b>Sector</b> -  all the actions are available.</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
