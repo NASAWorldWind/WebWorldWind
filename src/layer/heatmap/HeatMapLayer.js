@@ -51,12 +51,16 @@ define([
      * @classdesc A HeatMap layer for visualising an array of measured locations.
      * @param {String} displayName This layer's display name.
      * @param {MeasuredLocation[]} measuredLocations An array of locations with measures to visualise.
+     * @param {Number} amountOfLevels Optional. If provided it specifies the amount of levels that will be generated for
+     *  this layer. If you have only one, it behaves in a similar way to the Analytical surface from the World Wind Java.
+     *  If you have multiple levels then whenever the user zooms over certain threshold, the new version of the layer
+     *  will be generated.
      */
-    var HeatMapLayer = function (displayName, measuredLocations) {
+    var HeatMapLayer = function (displayName, measuredLocations, amountOfLevels) {
         this.tileWidth = 256;
         this.tileHeight = 256;
 
-        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
+        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), amountOfLevels || 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
 
         this.displayName = displayName;
 
