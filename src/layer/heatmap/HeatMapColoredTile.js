@@ -33,6 +33,8 @@ define([
      *  color strings.
      *  @param options.extendedWidth {Number} Optional. Minimal width that needs to be retrieved for colorization.
      *  @param options.extendedHeight {Number} Optional. Minimal height that needs to be retrieved for colorization.
+     *  @param options.opacity {Number} Optional. The opacity applied to the calculated colors. The opacity is between 0 and 1. If this value isn't
+     *      provided, the default generated from the black white are used.
      */
     var HeatMapColoredTile = function(data, options) {
         HeatMapTile.call(this, data, options);
@@ -40,6 +42,7 @@ define([
         this._extendedWidth = options.extendedWidth;
         this._extendedHeight = options.extendedHeight;
         this._gradient = this.gradient(options.intensityGradient);
+        this._opacity = (typeof options.opacity !== "undefined") ? options.opacity * 255: false;
     };
 
     HeatMapColoredTile.prototype = Object.create(HeatMapTile.prototype);
@@ -112,6 +115,9 @@ define([
                 pixels[i] = gradient[j];
                 pixels[i + 1] = gradient[j + 1];
                 pixels[i + 2] = gradient[j + 2];
+                if(this._opacity !== false){
+                    pixels[i + 3] = this._opacity;
+                }
             }
         }
 
