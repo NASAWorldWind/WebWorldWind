@@ -42,7 +42,7 @@ define([
         this._extendedWidth = options.extendedWidth;
         this._extendedHeight = options.extendedHeight;
         this._gradient = this.gradient(options.intensityGradient);
-        this._opacity = (typeof options.opacity !== "undefined") ? options.opacity * 255: false;
+        this._opacity = options.opacity * 255;
     };
 
     HeatMapColoredTile.prototype = Object.create(HeatMapTile.prototype);
@@ -115,9 +115,7 @@ define([
                 pixels[i] = gradient[j];
                 pixels[i + 1] = gradient[j + 1];
                 pixels[i + 2] = gradient[j + 2];
-                if(this._opacity !== false){
-                    pixels[i + 3] = this._opacity;
-                }
+                pixels[i + 3] = this._opacity;
             }
         }
 
