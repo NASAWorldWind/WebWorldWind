@@ -23,6 +23,7 @@ define([
         './gesture/ClickRecognizer',
         './gesture/DragRecognizer',
         './gesture/GestureRecognizer',
+        './geom/Location',
         './util/Logger',
         './geom/Matrix',
         './gesture/PanRecognizer',
@@ -41,6 +42,7 @@ define([
               ClickRecognizer,
               DragRecognizer,
               GestureRecognizer,
+              Location,
               Logger,
               Matrix,
               PanRecognizer,
@@ -66,6 +68,18 @@ define([
         var BasicWorldWindowController = function (worldWindow) {
             WorldWindowController.call(this, worldWindow); // base class checks for a valid worldWindow
 
+            /**
+             * Enables/disables the zoom to mouse effect.
+             * When used on a touch device the location of the mouse is the center between the touch points.
+             *
+             * When zooming in, the location of the mouse will move towards the center of the screen.
+             * When zooming out, the location of the mouse will away from the center of the screen.
+             *
+             * @type {Boolean}
+             * @default true
+             */
+            this.zoomToMouseEnabled = true;
+
             // Intentionally not documented.
             this.primaryDragRecognizer = new DragRecognizer(this.wwd, null);
             this.primaryDragRecognizer.addListener(this);
@@ -90,6 +104,11 @@ define([
             // Intentionally not documented.
             this.tiltRecognizer = new TiltRecognizer(this.wwd, null);
             this.tiltRecognizer.addListener(this);
+
+            var self = this;
+            this.wwd.addEventListener('mousemove', function (event) {
+                self.pointerLocation = null;
+            }, false);
 
             // Establish the dependencies between gesture recognizers. The pan, pinch and rotate gesture may recognize
             // simultaneously with each other.
@@ -119,6 +138,7 @@ define([
             this.beginTilt = 0;
             this.beginRange = 0;
             this.lastRotation = 0;
+            this.pointerLocation = null;
         };
 
         BasicWorldWindowController.prototype = Object.create(WorldWindowController.prototype);
@@ -321,11 +341,16 @@ define([
 
             if (state === WorldWind.BEGAN) {
                 this.beginRange = navigator.range;
+                this.pointerLocation = null;
             } else if (state === WorldWind.CHANGED) {
                 if (scale !== 0) {
+                    var newRange = this.beginRange / scale;
+                    var amount =  newRange / navigator.range;
+                    this.moveZoom(recognizer.clientX, recognizer.clientY, amount);
+
                     // Apply the change in pinch scale to this navigator's range, relative to the range when the gesture
                     // began.
-                    navigator.range = this.beginRange / scale;
+                    navigator.range = newRange;
                     this.applyLimits();
                     this.wwd.redraw();
                 }
@@ -389,10 +414,77 @@ define([
             // positive or negative, respectfully.
             var scale = 1 + (normalizedDelta / 1000);
 
+            this.moveZoom(event.clientX, event.clientY, scale);
+
             // Apply the scale to this navigator's properties.
             navigator.range *= scale;
             this.applyLimits();
             this.wwd.redraw();
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.locationAtPickPoint = function (x, y) {
+            var coordinates = this.wwd.canvasCoordinates(x, y);
+            var pickList = this.wwd.pickTerrain(coordinates);
+
+            for (var i = 0; i < pickList.objects.length; i++) {
+                var pickedObject = pickList.objects[i];
+                if (pickedObject.isTerrain) {
+                    var pickedPosition = pickedObject.position;
+                    if (pickedPosition) {
+                        return new Location(pickedPosition.latitude, pickedPosition.longitude);
+                    }
+                }
+            }
+        };
+
+        // Intentionally not documented.
+        BasicWorldWindowController.prototype.moveZoom = function (x, y, amount) {
+            if (!this.zoomToMouseEnabled) {
+                return;
+            }
+
+            if (amount === 1) {
+                return;
+            }
+
+            if (!this.pointerLocation) {
+                this.pointerLocation = this.locationAtPickPoint(x, y);
+            }
+
+            if (!this.pointerLocation) {
+                return;
+            }
+
+            var lookAtLocation = this.wwd.navigator.lookAtLocation;
+            var location;
+
+            if (amount < 1) {
+                var distanceRemaining = Location.greatCircleDistance(lookAtLocation,
+                    this.pointerLocation) * this.wwd.globe.equatorialRadius;
+
+                if (distanceRemaining <= 50000) {
+                    location = this.pointerLocation;
+                }
+                else {
+                    location = Location.interpolateGreatCircle(amount, this.pointerLocation,
+                        lookAtLocation, new Location(0, 0));
+                }
+            }
+            else {
+                var intermediateLocation = Location.interpolateGreatCircle(1 / amount, this.pointerLocation,
+                    lookAtLocation, new Location(0, 0));
+
+                var distanceRadians = Location.greatCircleDistance(lookAtLocation, intermediateLocation);
+
+                var greatCircleAzimuthDegrees = Location.greatCircleAzimuth(lookAtLocation, intermediateLocation);
+
+                location = Location.greatCircleLocation(lookAtLocation, greatCircleAzimuthDegrees - 180,
+                    distanceRadians, new Location(0, 0));
+            }
+
+            lookAtLocation.latitude = location.latitude;
+            lookAtLocation.longitude = location.longitude;
         };
 
         // Documented in super-class.
