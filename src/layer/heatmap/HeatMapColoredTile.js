@@ -33,8 +33,8 @@ define([
      *  color strings.
      *  @param options.extendedWidth {Number} Optional. Minimal width that needs to be retrieved for colorization.
      *  @param options.extendedHeight {Number} Optional. Minimal height that needs to be retrieved for colorization.
-     *  @param options.opacity {Number} Optional. The opacity applied to the calculated colors. The opacity is between 0 and 1. If this value isn't
-     *      provided, the default generated from the black white are used.
+     *  @param options.opacity {Number} Optional. The opacity applied to the calculated colors. The opacity is between 
+     *      0 (fully transparent) and 1 (fully opaque). The default value is 1.
      */
     var HeatMapColoredTile = function(data, options) {
         HeatMapTile.call(this, data, options);
