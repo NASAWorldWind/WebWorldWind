@@ -45,7 +45,7 @@ define([
         this._opacity = 1;
         
         if(typeof options.opacity !== "undefined" && options.opacity !== null) {
-            this._opacity = options.opacity * 255;
+            this._opacity = options.opacity;
         }
     };
 
@@ -119,7 +119,7 @@ define([
                 pixels[i] = gradient[j];
                 pixels[i + 1] = gradient[j + 1];
                 pixels[i + 2] = gradient[j + 2];
-                pixels[i + 3] = this._opacity;
+                pixels[i + 3] = this._opacity * 255;
             }
         }
 

@@ -90,7 +90,7 @@ define([
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
         this._radius = 12.5;
         this._incrementPerIntensity = 1 / max;
-        this._opacity = 1;
+        this._tileOpacity = 1;
 
         this.setGradient(measuredLocations);
     };
@@ -171,12 +171,12 @@ define([
          * @memberof HeatMapLayer.prototype
          * @type {Number}
          */
-        opacity: {
+        tileOpacity: {
             get: function() {
-                return this._opacity;
+                return this._tileOpacity;
             },
-            set: function(opacity) {
-                this._opacity = opacity;
+            set: function(tileOpacity) {
+                this._tileOpacity = tileOpacity;
             }
         }
     });
@@ -354,7 +354,7 @@ define([
                 extendedWidth: extendedWidth,
                 extendedHeight: extendedHeight,
 
-                opacity: this.opacity
+                opacity: this.tileOpacity
             }).canvas();
 
             var result = document.createElement('canvas');
