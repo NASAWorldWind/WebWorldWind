@@ -42,7 +42,11 @@ define([
         this._extendedWidth = options.extendedWidth;
         this._extendedHeight = options.extendedHeight;
         this._gradient = this.gradient(options.intensityGradient);
-        this._opacity = options.opacity * 255 || 1;
+        this._opacity = 1;
+        
+        if(typeof options.opacity !== "undefined" && options.opacity !== null) {
+            this._opacity = options.opacity * 255;
+        }
     };
 
     HeatMapColoredTile.prototype = Object.create(HeatMapTile.prototype);
