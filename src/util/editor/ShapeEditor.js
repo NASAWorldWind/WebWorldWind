@@ -332,21 +332,23 @@ define([
         /**
          * Edits the specified shape. Currently, only surface shapes are supported.
          * @param {SurfaceShape} shape The shape to edit.
-         * @param {Boolean} move true to enable move action on shape, false to disable move action on shape.
-         * @param {Boolean} reshape true to enable reshape action on shape, false to disable reshape action on shape.
-         * @param {Boolean} rotate true to enable rotate action on shape, false to disable rotate action on shape.
-         * @param {Boolean} manageControlPoint true to enable the action to manage the control points of the shape,
-         * false to disable it.
+         * @param {{}} config Configuration properties for the ShapeEditor:
+         * <ul>
+         *     <li>move: {Boolean} move true to enable move action on shape, false to disable move action on shape.</li>
+         *     <li>reshape: {Boolean} reshape true to enable reshape action on shape, false to disable reshape action on shape.</li>
+         *     <li>rotate: {Boolean} rotate true to enable rotate action on shape, false to disable rotate action on shape.</li>
+         *     <li>manageControlPoint: {Boolean} manageControlPoint true to enable the action to manage the control points of the shape, false to disable it.</li>
+         * <ul>
          * @return {Boolean} <code>true</code> if the editor could start the edition of the specified shape; otherwise
          * <code>false</code>.
          */
-        ShapeEditor.prototype.edit = function (shape, move, reshape, rotate, manageControlPoint) {
+        ShapeEditor.prototype.edit = function (shape, config) {
             this.stop();
 
-            this._allowMove = move;
-            this._allowReshape = reshape;
-            this._allowRotate = rotate;
-            this._allowManageControlPoint = manageControlPoint;
+            this._allowMove = Object.prototype.hasOwnProperty.call(config, 'move') ? config.move : this._allowMove;
+            this._allowReshape = Object.prototype.hasOwnProperty.call(config, 'reshape') ? config.reshape : this._allowReshape;
+            this._allowRotate = Object.prototype.hasOwnProperty.call(config, 'rotate') ?  config.rotate : this._allowRotate;
+            this._allowManageControlPoint = Object.prototype.hasOwnProperty.call(config, 'manageControlPoint') ?  config.manageControlPoint : this._allowManageControlPoint;
 
             // Look for a fragment that can handle the specified shape
             for (var i = 0, len = this.editorFragments.length; i < len; i++) {
