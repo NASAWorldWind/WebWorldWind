@@ -152,59 +152,66 @@ requirejs(['./WorldWindShim',
 
         var shapeEditor = new WorldWind.ShapeEditor(wwd);
 
+        var config = {
+            move: true,
+            reshape: true,
+            rotate: true,
+            manageControlPoint: true
+        };
+
         document.getElementById("editCircleBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== circleShape) {
-                shapeEditor.edit(circleShape, true, true, true, true);
+                shapeEditor.edit(circleShape, config);
             }
         });
 
         document.getElementById("editEllipseBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== ellipseShape) {
-                shapeEditor.edit(ellipseShape, false, true, false, true);
+                shapeEditor.edit(ellipseShape, config);
             }
         });
 
         document.getElementById("editPlacemarkBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== placemark) {
-                shapeEditor.edit(placemark, true, true, true, true);
+                shapeEditor.edit(placemark, config);
             }
         });
 
         document.getElementById("editPolygonBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== polygonShape) {
-                shapeEditor.edit(polygonShape, true, false, true, true);
+                shapeEditor.edit(polygonShape, config);
             }
         });
 
         document.getElementById("editMultiPolygonBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== multiPolygonShape) {
-                shapeEditor.edit(multiPolygonShape, true, true, true, true);
+                shapeEditor.edit(multiPolygonShape, config);
             }
         });
 
         document.getElementById("editPolylineBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== polylineShape) {
-                shapeEditor.edit(polylineShape, true, true, true, true);
+                shapeEditor.edit(polylineShape, config);
             }
         });
 
         document.getElementById("editRectangleBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== rectangleShape) {
-                shapeEditor.edit(rectangleShape, true, false, false, true);
+                shapeEditor.edit(rectangleShape, config);
             }
         });
 
         document.getElementById("editSectorBtn").addEventListener("click", function(){
             var shape = shapeEditor.stop();
             if (shape !== sectorShape) {
-                shapeEditor.edit(sectorShape, true, true, true, true);
+                shapeEditor.edit(sectorShape, config);
             }
         });
     }
