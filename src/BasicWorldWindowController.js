@@ -105,11 +105,6 @@ define([
             this.tiltRecognizer = new TiltRecognizer(this.wwd, null);
             this.tiltRecognizer.addListener(this);
 
-            var self = this;
-            this.wwd.addEventListener('mousemove', function (event) {
-                self.pointerLocation = null;
-            }, false);
-
             // Establish the dependencies between gesture recognizers. The pan, pinch and rotate gesture may recognize
             // simultaneously with each other.
             this.panRecognizer.recognizeSimultaneouslyWith(this.pinchRecognizer);
@@ -146,6 +141,10 @@ define([
         // Intentionally not documented.
         BasicWorldWindowController.prototype.onGestureEvent = function (e) {
             var handled = WorldWindowController.prototype.onGestureEvent.call(this, e);
+
+            if (e.type === 'mousemove' || (e.pointerType === 'mouse' && e.type === 'pointermove')) {
+                this.pointerLocation = null;
+            }
 
             if (!handled) {
                 if (e.type === "wheel") {
