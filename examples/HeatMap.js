@@ -55,8 +55,10 @@ requirejs(['./WorldWindShim',
             );
         }
 
+        var heatMapLayer = new WorldWind.HeatMapLayer("HeatMap", locations)
+        heatMapLayer.opacity = 0.5;
         // Add new HeatMap Layer with the points as the data source.
-        wwd.addLayer(new WorldWind.HeatMapLayer("HeatMap", locations));
+        wwd.addLayer(heatMapLayer);
 
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);

@@ -90,7 +90,6 @@ define([
         this._scale = ['blue', 'cyan', 'lime', 'yellow', 'red'];
         this._radius = 12.5;
         this._incrementPerIntensity = 1 / max;
-        this._tileOpacity = 1;
 
         this.setGradient(measuredLocations);
     };
@@ -161,22 +160,6 @@ define([
             },
             set: function (radius) {
                 this._radius = radius;
-            }
-        },
-
-        /**
-         * The final opacity of this layer. Number between 0 (Fully transparent)
-         * and 1 (Fully opaque). If the opacity isn't provided the final opacity 
-         * will be 1.
-         * @memberof HeatMapLayer.prototype
-         * @type {Number}
-         */
-        tileOpacity: {
-            get: function() {
-                return this._tileOpacity;
-            },
-            set: function(tileOpacity) {
-                this._tileOpacity = tileOpacity;
             }
         }
     });
@@ -352,9 +335,7 @@ define([
                 incrementPerIntensity: this._incrementPerIntensity,
 
                 extendedWidth: extendedWidth,
-                extendedHeight: extendedHeight,
-
-                opacity: this.tileOpacity
+                extendedHeight: extendedHeight
             }).canvas();
 
             var result = document.createElement('canvas');
