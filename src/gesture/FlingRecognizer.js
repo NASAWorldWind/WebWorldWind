@@ -41,34 +41,90 @@ define(['../gesture/GestureRecognizer'],
              * @type {Number}
              */
             this.minVelocity = 100;
+
+            this._stackLimit = 5;
+            this._positionStack = [];
         };
 
         FlingRecognizer.prototype = Object.create(GestureRecognizer.prototype);
 
+        FlingRecognizer.prototype._pushEvent = function (event) {
+            if (this._positionStack.length >= this._stackLimit) {
+                this._positionStack.shift();
+            }
+            this._positionStack.push({
+                time: new Date(),
+                x: event.clientX,
+                y: event.clientY}
+            );
+        };
+
+        FlingRecognizer.prototype._getVelocity = function () {
+            var stackLength = this._positionStack.length;
+
+            if (stackLength === 0) {
+                return {x: 0, y: 0};
+            }
+
+            var startLocation = this._positionStack[0];
+            var endLocation = this._positionStack[stackLength - 1];
+            this._positionStack.length = 0;
+
+            var elapsedTime = (endLocation.time - startLocation.time) / 1000;
+            var translationX = endLocation.x - startLocation.x;
+            var translationY = endLocation.y - startLocation.y;
+
+            return {
+                x: translationX / elapsedTime,
+                y: translationY / elapsedTime,
+            };
+        };
+
+        // Documented in superclass.
+        FlingRecognizer.prototype.mouseMove = function (event) {
+            this._pushEvent(event);
+        };
+
         // Documented in superclass.
         FlingRecognizer.prototype.mouseUp = function (event) {
-            this.checkForFling();
+            this._checkForFling();
+        };
+
+        // Documented in superclass.
+        FlingRecognizer.prototype.touchMove = function (event) {
+            if (this.touchCount === 1) {
+                this._pushEvent(event);
+            }
+        };
+
+        // Documented in superclass.
+        FlingRecognizer.prototype.touchCancel = function (touch) {
+            this._positionStack.length = 0;
         };
 
         // Documented in superclass.
         FlingRecognizer.prototype.touchEnd = function (touch) {
             // Check for a fling only when the last touch ends
-            if (this.touchCount == 0) {
-                this.checkForFling();
+            if (this.touchCount === 0) {
+                this._checkForFling();
+            } else {
+                this._positionStack.length = 0;
             }
         };
 
-        FlingRecognizer.prototype.checkForFling = function() {
-            if (this.state != WorldWind.POSSIBLE) {
+        FlingRecognizer.prototype._checkForFling = function() {
+            var velocity = this._getVelocity();
+
+            if (this.state !== WorldWind.POSSIBLE) {
                 return;
             }
 
-            if (Math.abs(this.velocityX) > this.minVelocity
-                || Math.abs(this.velocityY) > this.minVelocity) {
+            if (Math.abs(velocity.x) > this.minVelocity
+                || Math.abs(velocity.y) > this.minVelocity) {
 
                 this.state = WorldWind.RECOGNIZED;
             }
-        }
+        };
 
         return FlingRecognizer;
     });

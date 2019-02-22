@@ -121,6 +121,8 @@ define([
             this.flingRecognizer.addListener(this);
             this.flingRecognizer.recognizeSimultaneouslyWith(this.primaryDragRecognizer);
             this.flingRecognizer.recognizeSimultaneouslyWith(this.panRecognizer);
+            this.flingRecognizer.recognizeSimultaneouslyWith(this.pinchRecognizer);
+            this.flingRecognizer.recognizeSimultaneouslyWith(this.rotationRecognizer);
 
             // Intentionally not documented.
             this.beginPoint = new Vec2(0, 0);

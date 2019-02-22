@@ -71,9 +71,6 @@ define([
                 // Intentionally not documented.
                 this._nextState = null;
 
-                // Intentionally not documented.
-                this._lastPositionEventTime = -1;
-
                 // Documented with its property accessor below.
                 this._clientX = 0;
 
@@ -91,12 +88,6 @@ define([
 
                 // Documented with its property accessor below.
                 this._translationY = 0;
-
-                // Documented with its property accessor below.
-                this._velocityX = 0;
-
-                // Documented with its property accessor below.
-                this._velocityY = 0;
 
                 // Intentionally not documented.
                 this._translationWeight = 0.4;
@@ -214,34 +205,6 @@ define([
                     this._translationY = value;
                     this._clientStartY = this._clientY;
                     this._touchCentroidShiftY = 0;
-                }
-            },
-
-            /**
-             * Indicates this gesture's current velocity along the X axis in pixels per second.
-             * @type {Number}
-             * @memberof GestureRecognizer.prototype
-             */
-            velocityX: {
-                get: function () {
-                    return this._velocityX;
-                },
-                set: function (value) {
-                    this._velocityX = value;
-                }
-            },
-
-            /**
-             * Indicates this gesture's current velocity long the Y axis in pixels per second.
-             * @type {Number}
-             * @memberof GestureRecognizer.prototype
-             */
-            velocityY: {
-                get: function () {
-                    return this._velocityY;
-                },
-                set: function (value) {
-                    this._velocityY = value;
                 }
             },
 
@@ -379,9 +342,6 @@ define([
             this._clientStartY = 0;
             this._translationX = 0;
             this._translationY = 0;
-            this._velocityX = 0;
-            this._velocityY = 0;
-            this._lastPositionEventTime = -1;
             this._mouseButtonMask = 0;
             this._touches = [];
             this._touchCentroidShiftX = 0;
@@ -674,9 +634,6 @@ define([
                 this._clientStartY = event.clientY;
                 this._translationX = 0;
                 this._translationY = 0;
-                this._velocityX = 0;
-                this._velocityY = 0;
-                this._lastPositionEventTime = new Date();
             }
 
             this._mouseButtonMask |= buttonBit;
@@ -693,12 +650,6 @@ define([
                 return; // ignore redundant mouse move events
             }
 
-            var now = new Date();
-            var elapsedTime = (now - this._lastPositionEventTime) / 1000;
-            this._velocityX = (event.clientX - this._clientX) / elapsedTime;
-            this._velocityY = (event.clientY - this._clientY) / elapsedTime;
-            this._lastPositionEventTime = now;
-
             var dx = event.clientX - this._clientStartX,
                 dy = event.clientY - this._clientStartY,
                 w = this._translationWeight;
@@ -706,7 +657,6 @@ define([
             this._clientY = event.clientY;
             this._translationX = this._translationX * (1 - w) + dx * w;
             this._translationY = this._translationY * (1 - w) + dy * w;
-
             this.mouseMove(event);
         };
 
@@ -737,9 +687,6 @@ define([
                 this._clientStartY = event.clientY;
                 this._translationX = 0;
                 this._translationY = 0;
-                this._velocityX = 0;
-                this._velocityY = 0;
-                this._lastPositionEventTime = new Date();
                 this._touchCentroidShiftX = 0;
                 this._touchCentroidShiftY = 0;
             } else {
@@ -764,15 +711,8 @@ define([
             touch.clientX = event.clientX;
             touch.clientY = event.clientY;
 
-            var centroid = this.touchCentroid();
-
-            var now = new Date();
-            var elapsedTime = (now - this._lastPositionEventTime) / 1000;
-            this._velocityX = (centroid.clientX - this._clientX) / elapsedTime;
-            this._velocityY = (centroid.clientY - this._clientY) / elapsedTime;
-            this._lastPositionEventTime = now;
-
-            var dx = centroid.clientX - this._clientStartX + this._touchCentroidShiftX,
+            var centroid = this.touchCentroid(),
+                dx = centroid.clientX - this._clientStartX + this._touchCentroidShiftX,
                 dy = centroid.clientY - this._clientStartY + this._touchCentroidShiftY,
                 w = this._translationWeight;
             this._clientX = centroid.clientX;
