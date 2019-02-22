@@ -52,9 +52,7 @@ define([
      * @param {String} displayName This layer's display name.
      * @param {MeasuredLocation[]} measuredLocations An array of locations with measures to visualise.
      * @param {Number} numLevels Optional. If provided it specifies the amount of levels that will be generated for
-     *  this layer. If you have only one, it behaves in a similar way to the Analytical surface from the World Wind Java.
-     *  If you have multiple levels then whenever the user zooms over certain threshold, the new version of the layer
-     *  will be generated.
+     *  this layer.
      */
     var HeatMapLayer = function (displayName, measuredLocations, numLevels) {
         this.tileWidth = 256;
