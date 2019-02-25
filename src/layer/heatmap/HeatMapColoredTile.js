@@ -31,8 +31,8 @@ define([
      * @classdesc Tile for the HeatMap layer visualising data on a canvas using colour scale.
      * @param options.intensityGradient {Object} Keys represent the opacity between 0 and 1 and the values represent
      *  color strings.
-     *  @param options.extendedWidth {Number} Optional. Minimal width that needs to be retrieved for colorization.
-     *  @param options.extendedHeight {Number} Optional. Minimal height that needs to be retrieved for colorization.
+     * @param options.extendedWidth {Number} Optional. Minimal width that needs to be retrieved for colorization.
+     * @param options.extendedHeight {Number} Optional. Minimal height that needs to be retrieved for colorization.
      */
     var HeatMapColoredTile = function(data, options) {
         HeatMapTile.call(this, data, options);
@@ -112,6 +112,7 @@ define([
                 pixels[i] = gradient[j];
                 pixels[i + 1] = gradient[j + 1];
                 pixels[i + 2] = gradient[j + 2];
+                pixels[i + 3] = 255;
             }
         }
 
