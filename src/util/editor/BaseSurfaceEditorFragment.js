@@ -24,8 +24,10 @@ define([
         '../Logger',
         '../../shapes/Path',
         '../../shapes/Placemark',
+        '../../shapes/PlacemarkAttributes',
         '../../geom/Position',
         '../../shapes/ShapeAttributes',
+        './ShapeEditorConstants',
         '../../error/UnsupportedOperationError',
         '../../geom/Vec3'
     ],
@@ -35,8 +37,10 @@ define([
               Logger,
               Path,
               Placemark,
+              PlacemarkAttributes,
               Position,
               ShapeAttributes,
+              ShapeEditorConstants,
               UnsupportedOperationError,
               Vec3) {
         "use strict";
@@ -191,10 +195,44 @@ define([
         // Creates a control point and adds it to the array of control points.
         BaseSurfaceEditorFragment.prototype.createControlPoint = function(controlPoints, attributes, purpose, index) {
             var controlPoint = new Placemark(new Location(0, 0), false, attributes);
+            var highlightedControlPointAttributes = new PlacemarkAttributes(null);
+            highlightedControlPointAttributes.imageScale = 0.15;
 
             controlPoint.altitudeMode = WorldWind.CLAMP_TO_GROUND
 
             controlPoint.userProperties.purpose = purpose;
+            
+            switch (controlPoint.userProperties.purpose) {
+
+                case ShapeEditorConstants.ROTATION:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-green-dot.png";
+                    break;
+                case ShapeEditorConstants.LOCATION:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-blue-dot.png";
+                    break;
+                case ShapeEditorConstants.SHADOW:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-gray-dot.png";
+                    break;
+                case ShapeEditorConstants.WIDTH:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-yellow-dot.png";
+                    break;
+                case ShapeEditorConstants.HEIGHT:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-yellow-dot.png";
+                    break;
+                case ShapeEditorConstants.RADIUS:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-yellow-dot.png";
+                    break;
+                case ShapeEditorConstants.MIN_CORNER:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-yellow-dot.png";
+                    break;
+                case ShapeEditorConstants.MAX_CORNER:
+                    highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-yellow-dot.png";
+                    break;
+                default:
+                    break;
+            }
+
+            controlPoint.highlightAttributes = highlightedControlPointAttributes;
 
             if (typeof index !== "undefined") {
                 controlPoint.userProperties.index = index;

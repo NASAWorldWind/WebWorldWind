@@ -55,7 +55,7 @@ requirejs(['./WorldWindShim',
         // object. Real apps typically create new attributes objects for each shape unless they know the attributes
         // can be shared among shapes.
         var attributes = new WorldWind.ShapeAttributes(null);
-        attributes.outlineColor = WorldWind.Color.BLACK;
+        attributes.outlineColor = WorldWind.Color.RED;
         attributes.interiorColor = new WorldWind.Color(0.8, 0.9, 0.9, 1.0);
 
         var highlightAttributes = new WorldWind.ShapeAttributes(attributes);

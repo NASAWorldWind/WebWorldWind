@@ -102,6 +102,9 @@ define([
             // Documented in defineProperties below.
             this._worldWindow = worldWindow;
 
+            // Now set up to handle highlighting.
+            this._highlightController = new WorldWind.HighlightController(worldWindow);
+
             // Documented in defineProperties below.
             this._shape = null;
 
@@ -132,9 +135,6 @@ define([
             this._rotateControlPointAttributes.imageColor = WorldWind.Color.GREEN;
             this._rotateControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/green-dot.png";
             this._rotateControlPointAttributes.imageScale = 0.15;
-
-            this._highlightedControlPointAttributes = new PlacemarkAttributes(null);
-            this._highlightedControlPointAttributes.imageScale = 0.15;
 
             // Documented in defineProperties below.
             this._annotationAttributes = new AnnotationAttributes(null);
@@ -313,20 +313,6 @@ define([
                 },
                 set: function (value) {
                     this._rotateControlPointAttributes = value;
-                }
-            },
-
-            /**
-             * Attributes used for the control points highlighted on the shape.
-             * @memberof ShapeEditor.prototype
-             * @type {PlacemarkAttributes}
-             */
-            highlightedControlPointAttributes: {
-                get: function () {
-                    return this._highlightedControlPointAttributes;
-                },
-                set: function (value) {
-                    this._highlightedControlPointAttributes = value;
                 }
             },
 
@@ -663,15 +649,6 @@ define([
             // Define the active transformation
             if (controlPoint) {
                 this.actionType = controlPoint.userProperties.purpose;
-                if (this.actionType == 'rotation') {
-                    this._highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-green-dot.png";
-                } else if (this.actionType == 'location') {
-                    this._highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-blue-dot.png";
-                } if (this.actionType == 'shadow') {
-                    this._highlightedControlPointAttributes.imageSource = WorldWind.configuration.baseUrl + "images/light-gray-dot.png";
-                }
-
-                controlPoint.highlightAttributes = this._highlightedControlPointAttributes;
                 controlPoint.highlighted = true;
             } else {
                 this.actionType = ShapeEditorConstants.DRAG;
