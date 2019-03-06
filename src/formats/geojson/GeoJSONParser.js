@@ -428,6 +428,7 @@ define(['../../error/ArgumentError',
                 case GeoJSONConstants.TYPE_FEATURE_COLLECTION:
                     var featureCollection = new GeoJSONFeatureCollection(
                         this.geoJSONObject[GeoJSONConstants.FIELD_FEATURES],
+                        this.geoJSONObject[GeoJSONConstants.FIELD_PROPERTIES],
                         this.geoJSONObject[GeoJSONConstants.FIELD_BBOX]
                     );
                     this.addRenderablesForFeatureCollection(

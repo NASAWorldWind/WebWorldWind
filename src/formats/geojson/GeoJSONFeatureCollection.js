@@ -39,10 +39,11 @@ define(['../../error/ArgumentError',
          * named "bbox".
          * @param {Object} features An object containing the data associated with the GeoJSON FeatureCollection
          * features.
+         * @param {Object} properties An object containing the value of GeoJSON Collection properties member.
          * @param {Object} bbox An object containing the value of GeoJSON FeatureCollection bbox member.
          * @throws {ArgumentError} If the specified mandatory features parameter is null or undefined.
          */
-        var GeoJSONFeatureCollection = function (features,  bbox) {
+        var GeoJSONFeatureCollection = function (features,  properties, bbox) {
 
             if (!features) {
                 throw new ArgumentError(
@@ -55,6 +56,9 @@ define(['../../error/ArgumentError',
                     Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSONFeatureCollection", "constructor",
                         "invalidFeatures"));
             }
+
+            // Documented in defineProperties below.
+            this._properties = properties;
 
             // Documented in defineProperties below.
             this._features = features;
@@ -73,6 +77,17 @@ define(['../../error/ArgumentError',
             features: {
                 get: function () {
                     return this._features;
+                }
+            },
+            /**
+             * The GeoJSON Collection properties as specified to this GeoJSONFeatureCollection's constructor.
+             * @memberof GeoJSONFeatureCollection.prototype
+             * @type {Object}
+             * @readonly
+             */
+            properties: {
+                get: function () {
+                    return this._properties;
                 }
             },
             /**
