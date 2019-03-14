@@ -2,6 +2,15 @@
 
 # Web WorldWind
 
+```
+WorldWind team would like to inform you that starting April 5, 2019, NASA WorldWind project will be
+suspended. All the WorldWind servers providing elevation and imagery will be unavailable. While you
+can still download the SDKs from GitHub, there will be no technical support. If you have questions
+and/or concerns, please feel free to email at:
+
+worldwind-info@lists.nasa.gov
+```
+
 [![Build Status](https://travis-ci.org/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.org/NASAWorldWind/WebWorldWind)
 
 3D virtual globe API in JavaScript for the web, developed by NASA. The European Space Agency has provided valuable
