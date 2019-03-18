@@ -44,8 +44,11 @@ define([
                 return new Promise(function(resolve, reject){
                     try {
                         var parser = new GeoJSONParser(geoJsonString);
-                        parser.load(function () {
-                            resolve(parser.geoJSONObject);
+                        parser.load(function (layer) {
+                            var geoJsonObject = parser.geoJSONObject;
+                            geoJsonObject._layer = layer;
+
+                            resolve(geoJsonObject);
                         }, null, null);
                     } catch(e) {
                         reject(e);
