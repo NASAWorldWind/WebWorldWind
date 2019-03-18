@@ -102,9 +102,6 @@ define([
             // Documented in defineProperties below.
             this._worldWindow = worldWindow;
 
-            // Now set up to handle highlighting.
-            this._highlightController = new WorldWind.HighlightController(worldWindow);
-
             // Documented in defineProperties below.
             this._shape = null;
 
@@ -114,6 +111,10 @@ define([
             this._allowReshape = true;
             this._allowRotate = true;
             this._allowManageControlPoint = true;
+
+            // Internal use only
+            // List of highlighted control points - on mouse over
+            this._highlightedItems = [];
 
             // Documented in defineProperties below.
             this._moveControlPointAttributes = new PlacemarkAttributes(null);
@@ -575,6 +576,38 @@ define([
                 this._click1Time = 0;
             }
 
+            var redrawRequired = this._highlightedItems.length > 0; // must redraw if we de-highlight previous shapes
+
+            // De-highlight any previously highlighted shapes.
+            for (var h = 0; h < this._highlightedItems.length; h++) {
+                this._highlightedItems[h].highlighted = false;
+            }
+            this._highlightedItems = [];
+
+            // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
+            // relative to the upper left corner of the canvas rather than the upper left corner of the page.
+            var pickList = this._worldWindow.pick(this._worldWindow.canvasCoordinates(event.clientX, event.clientY));
+            if (pickList.objects.length > 0) {
+                redrawRequired = true;
+            }
+
+            // Highlight the items picked by simply setting their highlight flag to true.
+            if (pickList.objects.length > 0) {
+                for (var p = 0; p < pickList.objects.length; p++) {
+                    if (!pickList.objects[p].isTerrain && pickList.objects[p].userObject.userProperties.purpose) {
+                        pickList.objects[p].userObject.highlighted = true;
+
+                        // Keep track of highlighted items in order to de-highlight them later.
+                        this._highlightedItems.push(pickList.objects[p].userObject);
+                    }
+                }
+            }
+
+            // Update the window if we changed anything.
+            if (redrawRequired) {
+                this._worldWindow.redraw(); // redraw to make the highlighting changes take effect on the screen
+            }
+
             if (this.actionType) {
 
                 var mousePoint = this._worldWindow.canvasCoordinates(event.clientX, event.clientY);
@@ -649,7 +682,6 @@ define([
             // Define the active transformation
             if (controlPoint) {
                 this.actionType = controlPoint.userProperties.purpose;
-                controlPoint.highlighted = true;
             } else {
                 this.actionType = ShapeEditorConstants.DRAG;
             }
