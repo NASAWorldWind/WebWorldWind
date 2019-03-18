@@ -20,10 +20,12 @@
 
 define([
         '../../OpenSearchConstants',
-        './OpenSearchGeoRssParser'
+        './OpenSearchGeoRssParser',
+        '../../../../util/Promise'
     ],
     function (OpenSearchConstants,
-              OpenSearchGeoRssParser) {
+              OpenSearchGeoRssParser,
+              Promise) {
         'use strict';
 
         /**
@@ -39,7 +41,7 @@ define([
              * @param {String} xmlString The Atom response as a string.
              * @param {String} searchType The relation type.
              *
-             * @return {Object} The resulting GeoJSON feature collection.
+             * @return {Promise<Object>} The promise of resulting GeoJSON feature collection.
              */
             parse: function (xmlString, searchType) {
                 var root = new DOMParser().parseFromString(xmlString, 'text/xml').documentElement;
@@ -96,7 +98,9 @@ define([
                     }
                 }
 
-                return featureCollection;
+                return new Promise(function(resolve, reject){
+                    resolve(featureCollection);
+                });
             },
 
             /**

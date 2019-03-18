@@ -54,7 +54,7 @@ requirejs([
                     return feature.properties.identifier == 'urn:eop:VITO:CGS_S2_LAI';
                 })[0];
 
-                var productSearchUrl = feature.links.search[0].href;
+                var productSearchUrl = feature.properties.links.search[0].href;
 
                 return WorldWind.OpenSearchService.create({url: productSearchUrl});
             })
