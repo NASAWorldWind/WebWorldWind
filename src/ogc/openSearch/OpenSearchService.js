@@ -24,7 +24,6 @@ define([
         './responseFormats/atomParser/OpenSearchAtomParser',
         './OpenSearchConstants',
         './descriptionDocument/OpenSearchDescriptionDocument',
-        './responseFormats/geoJsonParser/OpenSearchGeoJSONParser',
         './responseFormats/OpenSearchParserRegistry',
         './OpenSearchRequest',
         './OpenSearchUtils',
@@ -35,7 +34,6 @@ define([
               OpenSearchAtomParser,
               OpenSearchConstants,
               OpenSearchDescriptionDocument,
-              OpenSearchGeoJSONParser,
               OpenSearchParserRegistry,
               OpenSearchRequest,
               OpenSearchUtils,
@@ -270,14 +268,14 @@ define([
             this.registerParser('application/atom+xml', OpenSearchConstants.COLLECTION, OpenSearchAtomParser);
 
             /** There are 3 accepted mime types for GeoJSON **/
-            this.registerParser('application/vnd.geo+json', OpenSearchConstants.RESULTS, OpenSearchGeoJSONParser);
-            this.registerParser('application/vnd.geo+json', OpenSearchConstants.COLLECTION, OpenSearchGeoJSONParser);
+            this.registerParser('application/vnd.geo+json', OpenSearchConstants.RESULTS, window.JSON);
+            this.registerParser('application/vnd.geo+json', OpenSearchConstants.COLLECTION, window.JSON);
 
-            this.registerParser('application/geo+json', OpenSearchConstants.RESULTS, OpenSearchGeoJSONParser);
-            this.registerParser('application/geo+json', OpenSearchConstants.COLLECTION, OpenSearchGeoJSONParser);
+            this.registerParser('application/geo+json', OpenSearchConstants.RESULTS, window.JSON);
+            this.registerParser('application/geo+json', OpenSearchConstants.COLLECTION, window.JSON);
 
-            this.registerParser('application/json', OpenSearchConstants.RESULTS, OpenSearchGeoJSONParser);
-            this.registerParser('application/json', OpenSearchConstants.COLLECTION, OpenSearchGeoJSONParser);
+            this.registerParser('application/json', OpenSearchConstants.RESULTS, window.JSON);
+            this.registerParser('application/json', OpenSearchConstants.COLLECTION, window.JSON);
         };
 
         return OpenSearchService;
