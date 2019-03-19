@@ -342,9 +342,11 @@ define([
                 );
             });
 
-            Logger.logMessage(Logger.LEVEL_WARNING, 'OpenSearchUrl', 'isCompatible', 'Missing required params: ', missingRequiredParams.map(function(param){
-                return param.name + ': ' + param.value;
-            }).join(','));
+            if(missingRequiredParams.length > 0) {
+                Logger.logMessage(Logger.LEVEL_WARNING, 'OpenSearchUrl', 'isCompatible', 'Missing required params: ', missingRequiredParams.map(function (param) {
+                    return param.name + ': ' + param.value;
+                }).join(','));
+            }
 
             return missingRequiredParams.length === 0;
         };
