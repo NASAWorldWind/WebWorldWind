@@ -11,7 +11,7 @@ and/or concerns, please feel free to email at:
 worldwind-info@lists.nasa.gov
 ```
 
-[![Build Status](https://travis-ci.org/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.org/NASAWorldWind/WebWorldWind)
+[![Build Status](https://travis-ci.com/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.com/NASAWorldWind/WebWorldWind)
 
 3D virtual globe API in JavaScript for the web, developed by NASA. The European Space Agency has provided valuable
 contributions to this platform since 2015. Web WorldWind provides a geographic context, complete with terrain, and a
