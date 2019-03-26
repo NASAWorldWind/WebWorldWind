@@ -51,12 +51,14 @@ define([
      * @classdesc A HeatMap layer for visualising an array of measured locations.
      * @param {String} displayName This layer's display name.
      * @param {MeasuredLocation[]} measuredLocations An array of locations with measures to visualise.
+     * @param {Number} numLevels Optional. If provided it specifies the amount of levels that will be generated for
+     *  this layer.
      */
-    var HeatMapLayer = function (displayName, measuredLocations) {
+    var HeatMapLayer = function (displayName, measuredLocations, numLevels) {
         this.tileWidth = 256;
         this.tileHeight = 256;
 
-        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
+        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), numLevels || 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
 
         this.displayName = displayName;
 

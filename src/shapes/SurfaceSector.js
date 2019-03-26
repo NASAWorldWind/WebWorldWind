@@ -37,7 +37,8 @@ define([
          * @constructor
          * @augments SurfaceShape
          * @classdesc Represents a sector draped over the terrain surface. The sector is specified as a rectangular
-         * region in geographic coordinates.
+         * region in geographic coordinates. By default, a surface sector is drawn with a linear path, see
+         * {@link SurfaceShape#pathType}.
          * <p>
          * SurfaceSector uses the following attributes from its associated shape attributes bundle:
          * <ul>
@@ -67,6 +68,9 @@ define([
              * @type {Sector}
              */
             this._sector = sector;
+
+            // The default path type for a surface sector is linear so that it represents a bounding box by default.
+            this._pathType = WorldWind.LINEAR;
         };
 
         SurfaceSector.prototype = Object.create(SurfaceShape.prototype);
