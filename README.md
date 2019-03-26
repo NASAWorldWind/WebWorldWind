@@ -31,7 +31,7 @@ Web WorldWind release provides many simple examples showing how to use all of We
 
 ## Building
 
-[Install NodeJS](https://nodejs.org). The build is known to work with Node.js v10.15.3 (LTS).
+[Install NodeJS](https://nodejs.org). The build is known to work with Node.js 10.15.3 LTS and 11.12.0.
 
 - `npm install` downloads WorldWind's dependencies
 
