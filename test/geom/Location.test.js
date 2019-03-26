@@ -49,7 +49,7 @@ define([
         describe("Copies this location to the latitude and longitude of a specified location", function () {
 
             it("Copies the location successfully", function () {
-                var location = Location.ZERO;
+                var location = new Location(0, 0);
                 var locationTarget = new Location(37.52, 15.08);
 
                 location.copy(locationTarget);
@@ -59,14 +59,14 @@ define([
 
             it("Should throw an exception on missing location input", function () {
                 expect(function () {
-                    var location = Location.ZERO;
+                    var location = new Location(0, 0);
                     location.copy(null);
                 }).toThrow();
             });
         });
 
         it('Sets latitude and longitude of a location', function () {
-            var location = Location.ZERO;
+            var location = new Location(0, 0);
             location.set(37.52, 15.08);
             expect(location.latitude).toEqual(37.52);
             expect(location.longitude).toEqual(15.08);
@@ -98,7 +98,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.537, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.227, 2);
             });
@@ -109,7 +109,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.135, 2);
             });
@@ -120,7 +120,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.044, 2);
             });
@@ -131,7 +131,7 @@ define([
                     4.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(45.48, 2);
                 expect(resultLocation.longitude).toBeCloseTo(9.089, 2);
             });
@@ -142,13 +142,13 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.044, 2);
             });
 
             it('Store result in the provided variable', function () {
-                var resultLocation = Location.ZERO;
+                var resultLocation = new Location(0, 0);
                 Location.interpolateAlongPath(
                     WorldWind.LINEAR,
                     0.5,
@@ -168,7 +168,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -179,7 +179,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -206,7 +206,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.537, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.227, 2);
             });
@@ -216,7 +216,7 @@ define([
                     0.5,
                     locationA,
                     locationA,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation).toEqual(locationA);
             });
 
@@ -228,7 +228,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -238,7 +238,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -264,7 +264,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.135, 2);
             });
@@ -274,7 +274,7 @@ define([
                     0.5,
                     locationA,
                     locationA,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation).toEqual(locationA);
             });
 
@@ -286,7 +286,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -296,7 +296,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -322,7 +322,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.044, 2);
             });
@@ -332,7 +332,7 @@ define([
                     0.5,
                     locationA,
                     locationA,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation).toEqual(locationA);
             });
 
@@ -344,7 +344,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -354,7 +354,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 

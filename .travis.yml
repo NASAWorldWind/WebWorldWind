@@ -4,9 +4,9 @@
 # Set up to run the JavaScript build script per the Travis CI documentation
 language: node_js
 
-# Configure the build to use the latest Node.js 6.x release
+# Configure the build to use the latest Node.js 10.x release
 node_js:
-  - "6"
+  - "10"
 
 # Build the project. Travis CI automatically runs npm install before the build
 script:
