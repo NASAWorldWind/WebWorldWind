@@ -17,29 +17,14 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="alert alert-info">
-                Dragging the body of the shape moves the whole shape. Dragging a control point performs the action associated
+                <p>Dragging the body of the shape moves the whole shape. Dragging a control point performs the action associated
                 with that control point. The editor provides vertex insertion and removal for SurfacePolygon and
                 SurfacePolyline. Single click when the cursor is over a shadow control point of a shape inserts a control point at
-                that position. Double click when the cursor is over a control point removes that particular control point.
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="alert alert-warning">
+                    that position. Double click when the cursor is over a control point removes that particular control point.</p>
                 <p>You can also manage the actions available for a particular shape by calling the edit method of ShapeEditor with the desired options.
                     You can manage the move, reshape and rotate actions and you can also chose if you can add/remove control points on a shape (default values - all action are allowed).
-                    In our example we used the edit method in various ways:</p>
-                <ul>
-                    <li><b>Circle</b> - you can do all the available actions (move, resize).</li>
-                    <li><b>Ellipse</b> - you can do resize (move and rotate are not allowed).</li>
-                    <li><b>Placemark</b> - you move it (this is the only action available).</li>
-                    <li><b>Polygon</b> - you move, rotate or manage the control points (you can't reshape it).</li>
-                    <li><b>MultiPolygon</b> - all the actions are available.</li>
-                    <li><b>Polyline</b> - all the actions are available.</li>
-                    <li><b>Rectangle</b> - you can move it (resize and rotate are not allowed).</li>
-                    <li><b>Sector</b> -  all the actions are available.</li>
-                </ul>
+                    <span class="glyphicon glyphicon-info-sign" data-toggle="modal" data-target="#helpModal"></span>
+                </p>
             </div>
         </div>
     </div>
@@ -54,18 +39,6 @@
             </div>
             <br>
 
-            <h4>Shape Editor</h4>
-            <div class="list-group">
-                <button type="button" class="list-group-item btn btn-block active" id="editCircleBtn">Edit circle</button>
-                <button type="button" class="list-group-item btn btn-block active" id="editEllipseBtn">Edit ellipse</button>
-                <button type="button" class="list-group-item btn btn-block active" id="editPlacemarkBtn">Edit placemark</button>
-                <button type="button" class="list-group-item btn btn-block active" id="editPolygonBtn">Edit polygon</button>
-                <button type="button" class="list-group-item btn btn-block active" id="editMultiPolygonBtn">Edit multi polygon</button>
-                <button type="button" class="list-group-item btn btn-block active" id="editPolylineBtn">Edit polyline</button>
-                <button type="button" class="list-group-item btn btn-block active" id="editRectangleBtn">Edit rectangle</button>
-                <button type="button" class="list-group-item btn btn-block active" id="editSectorBtn">Edit sector</button>
-            </div>
-            <br>
             <h4>Destination</h4>
             <div class="input-group" id="searchBox">
                 <input type="text" class="form-control" placeholder="GoTo" id="searchText"/>
@@ -80,6 +53,36 @@
             <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto">
                 Your browser does not support HTML5 Canvas.
             </canvas>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="helpModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Application information</h4>
+                </div>
+                <div class="modal-body">
+                    <p>In our application we used the edit method in various ways:</p>
+                    <ul>
+                        <li><b>Circle</b> - you can do all the available actions (move, resize).</li>
+                        <li><b>Ellipse</b> - you can do resize (move and rotate are not allowed).</li>
+                        <li><b>Placemark</b> - you move it (this is the only action available).</li>
+                        <li><b>Polygon</b> - you move, rotate or manage the control points (you can't reshape it).</li>
+                        <li><b>MultiPolygon</b> - all the actions are available.</li>
+                        <li><b>Polyline</b> - all the actions are available.</li>
+                        <li><b>Rectangle</b> - you can move it (resize and rotate are not allowed).</li>
+                        <li><b>Sector</b> -  all the actions are available.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
