@@ -159,60 +159,58 @@ requirejs(['../../src/WorldWind',
             manageControlPoint: true
         };
 
-        document.getElementById("editCircleBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== circleShape) {
-                shapeEditor.edit(circleShape, config);
-            }
-        });
+        var selectedShape = null;
 
-        document.getElementById("editEllipseBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== ellipseShape) {
-                shapeEditor.edit(ellipseShape, config);
-            }
-        });
+        // The common pick-handling function.
+        var handlePick = function (o) {
+            // The input argument is either an Event or a TapRecognizer. Both have the same properties for determining
+            // the mouse or tap location.
+            var x = o.clientX,
+                y = o.clientY;
 
-        document.getElementById("editPlacemarkBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== placemark) {
-                shapeEditor.edit(placemark, config);
-            }
-        });
+            // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
+            // relative to the upper left corner of the canvas rather than the upper left corner of the page.
+            var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
 
-        document.getElementById("editPolygonBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== polygonShape) {
-                shapeEditor.edit(polygonShape, config);
-            }
-        });
+            if (pickList.objects.length > 0) {
+                for (var p = 0; p < pickList.objects.length; p++) {
+                    // Enable editor if a shape is picked.
+                    if (!pickList.objects[p].isTerrain) {
+                        var pickedShape = pickList.objects[p].userObject;
+                        console.dir(selectedShape !== pickedShape && !pickedShape.userProperties.purpose)
+                        if (selectedShape !== pickedShape && !pickedShape.userProperties.purpose) {
+                            if (pickedShape instanceof WorldWind.SurfaceCircle) {
+                                selectedShape = circleShape;
+                            } else if (pickedShape instanceof WorldWind.SurfaceEllipse) {
+                                selectedShape = ellipseShape;
+                            } else if (pickedShape instanceof WorldWind.Placemark) {
+                                console.dir(pickList.objects[p])
+                                selectedShape = placemark;
+                            } else if (pickedShape instanceof WorldWind.SurfacePolygon) {
+                                if (Array.isArray(pickedShape.boundaries[0])) {
+                                    selectedShape = multiPolygonShape;
+                                } else {
+                                    selectedShape = polygonShape;
+                                }
+                            } else if (pickedShape instanceof WorldWind.SurfacePolyline) {
+                                selectedShape = polylineShape;
+                            } else if (pickedShape instanceof WorldWind.SurfaceRectangle) {
+                                selectedShape = rectangleShape;
+                            } else if (pickedShape instanceof WorldWind.SurfaceSector) {
+                                selectedShape = sectorShape;
+                            }
 
-        document.getElementById("editMultiPolygonBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== multiPolygonShape) {
-                shapeEditor.edit(multiPolygonShape, config);
+                            shapeEditor.stop();
+                            shapeEditor.edit(selectedShape, config);
+                        }
+                    } else if (pickList.objects[p].isTerrain && pickList.objects[p].isOnTop) {
+                        selectedShape = shapeEditor.stop();
+                    }
+                }
             }
-        });
+        };
 
-        document.getElementById("editPolylineBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== polylineShape) {
-                shapeEditor.edit(polylineShape, config);
-            }
-        });
+        wwd.addEventListener("click", handlePick);
 
-        document.getElementById("editRectangleBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== rectangleShape) {
-                shapeEditor.edit(rectangleShape, config);
-            }
-        });
-
-        document.getElementById("editSectorBtn").addEventListener("click", function(){
-            var shape = shapeEditor.stop();
-            if (shape !== sectorShape) {
-                shapeEditor.edit(sectorShape, config);
-            }
-        });
     }
 );
