@@ -57,6 +57,11 @@ requirejs(['../../src/WorldWind',
         attributes.outlineColor = WorldWind.Color.BLACK;
         attributes.interiorColor = new WorldWind.Color(0.8, 0.9, 0.9, 1.0);
 
+        var polylineAttributes = new WorldWind.ShapeAttributes(null);
+        polylineAttributes.outlineColor = WorldWind.Color.BLACK;
+        polylineAttributes.outlineWidth = 5;
+        polylineAttributes.interiorColor = new WorldWind.Color(0.8, 0.9, 0.9, 1.0);
+
         var highlightAttributes = new WorldWind.ShapeAttributes(attributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
         highlightAttributes.outlineWidth = 5;
@@ -106,7 +111,7 @@ requirejs(['../../src/WorldWind',
         polylineBoundaries.push(new WorldWind.Location(40, -115));
         polylineBoundaries.push(new WorldWind.Location(43, -110));
         polylineBoundaries.push(new WorldWind.Location(50, -120));
-        var polylineShape = new WorldWind.SurfacePolyline(polylineBoundaries, attributes);
+        var polylineShape = new WorldWind.SurfacePolyline(polylineBoundaries, polylineAttributes);
         polylineShape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(polylineShape);
 
