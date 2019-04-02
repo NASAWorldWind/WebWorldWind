@@ -1,6 +1,6 @@
 **Important notice:** Official NASA WorldWind development is suspended, beginning April 5th, 2019. This suspension 
 also applies to the WorldWind geospatial data web services that operated at NASA Ames Research Center (ARC), and which 
-are configured as the default services for geospatial data consumption in the WorldWind 3D globe (imagery, elevations
+are configured by default for geospatial data consumption in the WorldWind 3D globe (imagery, elevations
 and place names). 
 
 If your WorldWind-based application is not retrieving imagery or elevations, it may be that it's attempting to access
@@ -8,17 +8,18 @@ services at *.worldwind.arc.nasa.gov (you can use a network traffic monitoring t
 that's the case).
 
 A WorldWind-based application can be modified to retrieve from other geospatial web services in order to continue
-operating without relying on NASA ARC geospatial data services. 
+operating without relying on NASA ARC geospatial data services. Throughout the source files you can look for references
+to URLs in the form of `https://worldwind\d\d.arc.nasa.gov` (in regex notation) in order to find which features of 
+WorldWind make use of NASA ARC services. For instance, any elevations layer points towards 
+`https://worldwind26.arc.nasa.gov`.
 
-Web WorldWind's `-Layer` classes
-
-More information about the suspension and general guidance into alternative geospatial data services that may be usesd
+More information about the suspension and general guidance into alternative geospatial data services that may be used
 by WorldWind at the following link:
  
 https://worldwind.arc.nasa.gov/news/2019-03-21-suspension-faq/
 
-Issues will not be attended by the maintainers in the foreseaable future, but users are welcome to raise them for 
-consideration in the case that the suspension is lifted at a later point. 
+Issues will not be attended by the maintainers in the foreseeable future, but users are welcome to raise them for 
+consideration in the case that the project suspension is lifted at a later point. 
 
 ---
 
