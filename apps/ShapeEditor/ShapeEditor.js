@@ -177,14 +177,13 @@ requirejs(['../../src/WorldWind',
                     // Enable editor if a shape is picked.
                     if (!pickList.objects[p].isTerrain) {
                         var pickedShape = pickList.objects[p].userObject;
-                        console.dir(selectedShape !== pickedShape && !pickedShape.userProperties.purpose)
+
                         if (selectedShape !== pickedShape && !pickedShape.userProperties.purpose) {
                             if (pickedShape instanceof WorldWind.SurfaceCircle) {
                                 selectedShape = circleShape;
                             } else if (pickedShape instanceof WorldWind.SurfaceEllipse) {
                                 selectedShape = ellipseShape;
                             } else if (pickedShape instanceof WorldWind.Placemark) {
-                                console.dir(pickList.objects[p])
                                 selectedShape = placemark;
                             } else if (pickedShape instanceof WorldWind.SurfacePolygon) {
                                 if (Array.isArray(pickedShape.boundaries[0])) {
