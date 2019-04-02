@@ -1,3 +1,8 @@
+**Important notice:** Official NASA WorldWind development is suspended, beginning April 5th, 2019. Issues can be
+raised for preservation purposes in case the suspension is lifted. More information in the following link:
+ 
+https://worldwind.arc.nasa.gov/news/2019-03-21-suspension-faq/
+
 # Contributing to Web WorldWind
 
 #### Table of Contents
