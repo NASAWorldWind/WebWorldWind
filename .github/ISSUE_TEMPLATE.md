@@ -19,7 +19,7 @@ by WorldWind at the following link:
 https://worldwind.arc.nasa.gov/news/2019-03-21-suspension-faq/
 
 Issues will not be attended by the maintainers in the foreseeable future, but users are welcome to raise them for 
-consideration in the case that the project suspension is lifted at a later point. 
+consideration in case that the project suspension is lifted at a later point in time. 
 
 ---
 
