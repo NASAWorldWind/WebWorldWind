@@ -10,8 +10,8 @@ that's the case).
 A WorldWind-based application can be modified to retrieve from other geospatial web services in order to continue
 operating without relying on NASA ARC geospatial data services. Throughout the source files you can look for references
 to URLs in the form of `https://worldwind\d\d.arc.nasa.gov` (in regex notation) in order to find which features of 
-WorldWind make use of NASA ARC services. For instance, any elevations layer points towards 
-`https://worldwind26.arc.nasa.gov`.
+WorldWind make use of NASA ARC services. For instance, ny elevations layer points either towards 
+`https://worldwind26.arc.nasa.gov` or `https://data.worldwind.arc.nasa.gov/elev`.
 
 More information about the suspension and general guidance into alternative geospatial data services that may be used
 by WorldWind at the following link:
