@@ -3,7 +3,7 @@
 # Web WorldWind
 
 ```
-WorldWind team would like to inform you that starting April 5, 2019, NASA WorldWind project will be
+WorldWind team would like to inform you that starting May 3, 2019, NASA WorldWind project will be
 suspended. All the WorldWind servers providing elevation and imagery will be unavailable. While you
 can still download the SDKs from GitHub, there will be no technical support. If you have questions
 and/or concerns, please feel free to email at:
