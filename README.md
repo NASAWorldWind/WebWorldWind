@@ -3,10 +3,10 @@
 # Web WorldWind
 
 ```
-WorldWind team would like to inform you that starting May 3, 2019, NASA WorldWind project will be
-suspended. All the WorldWind servers providing elevation and imagery will be unavailable. While you
-can still download the SDKs from GitHub, there will be no technical support. If you have questions
-and/or concerns, please feel free to email at:
+Currently WorldWind is undergoing system evaluation. We will not be able to accept any software 
+update requests. WorldWind users can continue to access the NASA servers and SDKs, available on 
+Github. More information will be provided in the near future. If you have questions and/or 
+concerns, please feel free to email at:
 
 worldwind-info@lists.nasa.gov
 ```
