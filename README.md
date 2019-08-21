@@ -2,14 +2,12 @@
 
 # Web WorldWind
 
-```
-Currently WorldWind is undergoing system evaluation. We will not be able to accept any software 
-update requests. WorldWind users can continue to access the NASA servers and SDKs, available on 
-Github. More information will be provided in the near future. If you have questions and/or 
-concerns, please feel free to email at:
+## NASA Renews Commitment to WorldWind
+WorldWind has received renewed commitment from NASA for continued development and support.  NASA will continue to release updates to the WorldWind SDKs, and will continue to make the WorldWind Servers accessible for all Users.  We plan to make an announcement soon regarding a path forward for improved support of the WorldWind User & Developer communities.
+
+If you have questions and/or concerns, please feel free to email at:
 
 worldwind-info@lists.nasa.gov
-```
 
 [![Build Status](https://travis-ci.com/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.com/NASAWorldWind/WebWorldWind)
 
