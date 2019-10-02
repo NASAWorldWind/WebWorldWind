@@ -3,12 +3,18 @@
 Invokes Web WorldWind without using the Internet. Refers to data stored only on a local environment.
 
 To deploy:
-- Download https://worldwind32.arc.nasa.gov/WebWorldWind-StandaloneData.tar.gz and unzip it into the top-level
-  directory so that the "standalonedata" directory is a peer of the Apps folder. The worldwind.min.js file location
-  is assumed to be where the library is compiled given the repository build process.
+
+- Download https://files.worldwind.arc.nasa.gov/artifactory/web/WebWorldWind-StandaloneData.tar.gz and unzip it
+  so that the "standalonedata" directory is a peer of the 'apps' folder. It contains the Blue Marble imagery,
+  the Landsat imagery and the DTED0 elevations in its Earth directory.
+
+- The worldwind.min.js file location in this file is assumed to be where the library is compiled given the repository
+  build process, and it can be modified as needed.
+
 - Ensure that your web server is configured to send an HTTP content type of application/octet-stream
   or application/bil16 for files with a .bil suffix. You can do this for Apache servers by adding bil
   to the list of application-octet-stream suffixes in the mime.types file and then restarting the server.
+
 - Use your browser to invoke this HTML file, the one you're now reading, via the web server. Do not attempt
   to open it using the browser's File->Open menu. Use an http or https URL with the server address.
 
@@ -18,8 +24,6 @@ should have Blue Marble imagery all over it and greenish Landsat imagery over mo
 If you zoom into a mountainous region you should see the raised mountains. There are no elevations
 included for the oceans, so they are all flat.
 
-Be sure that the "../standalonedata" directory exists (relative to this file) and that it contains the Blue Marble
-imagery, the Landsat imagery and the DTED0 elevations in its Earth directory.
 -->
 <html>
 <head lang="en">
