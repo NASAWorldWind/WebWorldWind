@@ -43,6 +43,9 @@ define([
             this._extraSamples = null;
 
             // Documented in defineProperties below.
+            this._imageDescription = null;
+
+            // Documented in defineProperties below.
             this._imageLength = null;
 
             // Documented in defineProperties below.
@@ -122,6 +125,9 @@ define([
 
             // Documented in defineProperties below.
             this._noData = null;
+
+            // Documented in defineProperties below.
+            this._metaData = null;
 
             // Documented in defineProperties below.
             this._bbox = null;
@@ -220,6 +226,21 @@ define([
 
                 set: function(value){
                     this._extraSamples = value;
+                }
+            },
+
+            /**
+             * Contains the image description.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {String}
+             */
+            imageDescription: {
+                get: function () {
+                    return this._imageDescription;
+                },
+
+                set: function(value){
+                    this._imageDescription = value;
                 }
             },
 
@@ -592,6 +613,21 @@ define([
 
                 set: function(value){
                     this._noData = value;
+                }
+            },
+
+            /**
+             * Contains the METADATA value.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {String}
+             */
+            metaData: {
+                get: function () {
+                    return this._metaData;
+                },
+
+                set: function(value){
+                    this._metaData = value;
                 }
             },
 

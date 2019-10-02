@@ -37,7 +37,8 @@ define([
          * @constructor
          * @augments SurfaceShape
          * @classdesc Represents a sector draped over the terrain surface. The sector is specified as a rectangular
-         * region in geographic coordinates.
+         * region in geographic coordinates. By default, a surface sector is drawn with a linear path, see
+         * {@link SurfaceShape#pathType}.
          * <p>
          * SurfaceSector uses the following attributes from its associated shape attributes bundle:
          * <ul>
@@ -67,6 +68,9 @@ define([
              * @type {Sector}
              */
             this._sector = sector;
+
+            // The default path type for a surface sector is linear so that it represents a bounding box by default.
+            this._pathType = WorldWind.LINEAR;
         };
 
         SurfaceSector.prototype = Object.create(SurfaceShape.prototype);
@@ -111,6 +115,31 @@ define([
             this._boundaries[1] = new Location(sector.maxLatitude, sector.minLongitude);
             this._boundaries[2] = new Location(sector.maxLatitude, sector.maxLongitude);
             this._boundaries[3] = new Location(sector.minLatitude, sector.maxLongitude);
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.getReferencePosition = function () {
+            return new Location(this.sector.centroidLatitude(), this.sector.centroidLongitude());
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.moveTo = function (globe, position) {
+            var sector = this._sector;
+
+            var locations = new Array(3);
+
+            locations[0] = new Location(sector.minLatitude, sector.minLongitude);
+            locations[1] = new Location(sector.maxLatitude, sector.minLongitude);
+            locations[2] = new Location(sector.maxLatitude, sector.maxLongitude);
+
+            locations = this.computeShiftedLocations(globe, this.getReferencePosition(), position, locations);
+
+            this.sector = new WorldWind.Sector(
+                locations[0].latitude,
+                locations[1].latitude,
+                locations[1].longitude,
+                locations[2].longitude
+            );
         };
 
         return SurfaceSector;

@@ -794,5 +794,15 @@ define([
                 && (!dc.pickingMode || this.enableLeaderLinePicking);
         };
 
+        // Internal use only. Intentionally not documented.
+        Placemark.prototype.getReferencePosition = function () {
+            return this.position;
+        };
+
+        // Internal use only. Intentionally not documented.
+        Placemark.prototype.moveTo = function (globe, position) {
+            this.position = position;
+        };
+
         return Placemark;
     });

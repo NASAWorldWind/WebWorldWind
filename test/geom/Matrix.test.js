@@ -36,13 +36,6 @@ define([
             }
         });
 
-        it("Matrix prototype", function () {
-            var matrix = Matrix.prototype;
-            for (var i = 0; i < 16; i++) {
-                expect(matrix[i]).toEqual(0);
-            }
-        });
-
         it("Should create an identity Matrix", function () {
             var identity = Matrix.fromIdentity();
 
@@ -273,7 +266,7 @@ define([
         describe("Sets this matrix to the matrix product of two specified matrices", function () {
 
             it("Sets the matrix correctly", function () {
-                var targetMatrix = Matrix.prototype;
+                var targetMatrix = new Matrix();
                 var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                 var matrixB = new Matrix(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
@@ -301,7 +294,7 @@ define([
 
                 it("Missing matrix A", function () {
                     expect(function () {
-                        var targetMatrix = Matrix.prototype;
+                        var targetMatrix = new Matrix();
                         var matrixB = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         targetMatrix.setToMultiply(null, matrixB);
                     }).toThrow();
@@ -309,7 +302,7 @@ define([
 
                 it("Missing matrix B", function () {
                     expect(function () {
-                        var targetMatrix = Matrix.prototype;
+                        var targetMatrix = new Matrix();
                         var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         targetMatrix.setToMultiply(matrixA, null);
                     }).toThrow();
@@ -320,7 +313,7 @@ define([
         describe("Sets this matrix to the symmetric covariance Matrix computed from a point array", function () {
 
             it("Sets the matrix correctly", function () {
-                var targetMatrix = Matrix.prototype;
+                var targetMatrix = new Matrix();
                 targetMatrix.setToCovarianceOfPoints([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
 
                 expect(targetMatrix[0]).toEqual(26.25);
@@ -343,7 +336,7 @@ define([
 
             it("Should throw an exception on missing points", function () {
                 expect(function () {
-                    var targetMatrix = Matrix.prototype;
+                    var targetMatrix = new Matrix();
                     targetMatrix.setToCovarianceOfPoints(null);
                 }).toThrow();
             });
@@ -417,7 +410,7 @@ define([
         });
 
         it("Sets this matrix to one that flips and shifts the y-axis", function () {
-            var matrix = Matrix.prototype;
+            var matrix = new Matrix();
 
             matrix.setToUnitYFlip();
             expect(matrix[0]).toEqual(1);
