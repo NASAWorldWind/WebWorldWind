@@ -20,7 +20,7 @@
 define(['../../error/ArgumentError',
         './GeoJSONConstants',
         '../../util/Logger',
-        '../../util/proj4-src'
+        'proj4' // External dependency
     ],
     function (ArgumentError,
               GeoJSONConstants,

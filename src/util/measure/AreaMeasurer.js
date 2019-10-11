@@ -26,7 +26,7 @@ define([
         './MeasurerUtils',
         '../../geom/Sector',
         '../../geom/Vec3',
-        '../libtess'
+        'libtess' // External dependency
     ],
     function (Angle,
               ArgumentError,

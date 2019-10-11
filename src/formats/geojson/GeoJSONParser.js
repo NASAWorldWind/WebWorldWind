@@ -37,7 +37,7 @@ define(['../../error/ArgumentError',
         '../../shapes/PlacemarkAttributes',
         '../../shapes/Polygon',
         '../../geom/Position',
-        '../../util/proj4-src',
+        'proj4', // External dependency
         '../../layer/RenderableLayer',
         '../../shapes/ShapeAttributes',
         '../../shapes/SurfacePolygon',

@@ -18,7 +18,7 @@
     "url": "https://github.com/NASAWorldWind/WebWorldWind.git"
   },
   "scripts": {
-    "build": "grunt",
+    "build": "webpack --config webpack.dev.js",
     "clean": "grunt clean",
     "doc": "grunt jsdoc",
     "test": "grunt karma",
@@ -45,7 +45,9 @@
     "karma-junit-reporter": "^1.2.0",
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-requirejs": "^1.1.0",
-    "recursive-readdir": "^2.2.2"
+    "recursive-readdir": "^2.2.2",
+    "webpack": "^4.41.1",
+    "webpack-cli": "^3.3.9"
   },
   "keywords": [
     "sdk",
@@ -65,5 +67,11 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "es6-promise": "^4.2.8",
+    "jszip": "^3.2.2",
+    "libtess": "^1.2.2",
+    "proj4": "^2.5.0"
   }
 }

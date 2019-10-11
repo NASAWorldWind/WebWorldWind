@@ -33,7 +33,7 @@ define([
         '../shapes/SurfacePolygon',
         '../geom/Vec2',
         '../geom/Vec3',
-        '../util/libtess'
+        'libtess' // External dependency
     ],
     function (AbstractShape,
               ArgumentError,

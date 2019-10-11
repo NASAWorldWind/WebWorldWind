@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-define(['./es6-promise'],
+define(['es6-promise'], // External dependency
     function (LegacyPromise) {
         "use strict";
         if (window.Promise) {

@@ -18,7 +18,7 @@
  * @exports KmzFile
  */
 define([
-    '../../util/jszip',
+    'jszip', // External dependency
     '../../util/Promise',
     '../../util/WWUtil'
 ], function (JsZip,
