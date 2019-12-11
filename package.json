@@ -10,8 +10,7 @@
   "license": "Apache-2.0",
   "author": "NASA",
   "contributors": [
-    "NASA Project Manager <patrick.hogan@nasa.gov>",
-    "ESA Consortium Contact <yann.voumard@solenix.ch>"
+    "NASA Project Management contact <worldwind-info@lists.nasa.gov>"
   ],
   "repository": {
     "type": "git",
@@ -35,10 +34,10 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-requirejs": "^1.0.0",
     "grunt-jsdoc": "^2.4.0",
-    "grunt-karma": "^3.0.1",
+    "grunt-karma": "^3.0.2",
     "grunt-zip": "^0.18.2",
-    "jasmine-core": "^3.3.0",
-    "karma": "^4.0.1",
+    "jasmine-core": "^3.5.0",
+    "karma": "^4.4.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-htmlfile-reporter": "^0.3.8",
     "karma-jasmine": "^1.1.2",
@@ -46,8 +45,8 @@
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-requirejs": "^1.1.0",
     "recursive-readdir": "^2.2.2",
-    "webpack": "^4.41.1",
-    "webpack-cli": "^3.3.9"
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   },
   "keywords": [
     "sdk",
@@ -72,6 +71,6 @@
     "es6-promise": "^4.2.8",
     "jszip": "^3.2.2",
     "libtess": "^1.2.2",
-    "proj4": "^2.5.0"
+    "proj4": "^2.6.0"
   }
 }
