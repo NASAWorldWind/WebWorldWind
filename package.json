@@ -1,6 +1,6 @@
 {
   "name": "@nasaworldwind/worldwind",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Web WorldWind",
   "main": "build/dist/worldwind.min.js",
   "homepage": "https://worldwind.arc.nasa.gov",
