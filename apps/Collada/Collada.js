@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
-require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, ProjectionMenu) {
+define(['../WorldWindShim',
+        '../util/ProjectionMenu'],
+    function (ww,
+              ProjectionMenu) {
     "use strict";
 
     var modelsCombo = document.getElementById('model-list');

@@ -17,8 +17,8 @@
 /**
  * Exemplifies how to display and analyze NDVI data.
  */
-requirejs(['../../src/WorldWind',
-        '../util/LayerManager'],
+requirejs(['../WorldWindShim',
+           '../util/LayerManager'],
     function (WorldWind,
               LayerManager) {
 

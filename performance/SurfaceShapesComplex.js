@@ -17,7 +17,7 @@
 /**
  * Illustrates how to display SurfaceShapes.
  */
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         '../examples/LayerManager'],
     function (ww,
               LayerManager) {

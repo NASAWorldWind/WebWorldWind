@@ -17,7 +17,7 @@
 /**
  * Illustrates how to display and pick Paths.
  */
-requirejs(['../src/WorldWind',
+requirejs(['./WorldWindShim',
         '../examples/LayerManager'],
     function (ww,
               LayerManager) {

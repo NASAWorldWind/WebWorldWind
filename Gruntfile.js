@@ -30,34 +30,6 @@ module.exports = function (grunt) {
             }
         },
 
-        requirejs: {
-            compile: {
-                options: {
-                    baseUrl: 'src',
-                    name: '../tools/almond',
-                    include: ['WorldWind'],
-                    out: 'build/dist/worldwind.min.js',
-                    wrap: {
-                        startFile: 'tools/wrap.start',
-                        endFile: 'tools/wrap.end'
-                    }
-                }
-            },
-            compileDebug: {
-                options: {
-                    baseUrl: 'src',
-                    name: '../tools/almond',
-                    include: ['WorldWind'],
-                    optimize: 'none',
-                    out: 'build/dist/worldwind.js',
-                    wrap: {
-                        startFile: 'tools/wrap.start',
-                        endFile: 'tools/wrap.end'
-                    }
-                }
-            },
-        },
-
         karma: {
             unit: {
                 configFile: 'karma.conf.js',
@@ -72,10 +44,6 @@ module.exports = function (grunt) {
                 },
             }
         },
-
-        clean: [
-            'build/'
-        ],
 
         copy: {
             main: {
@@ -122,5 +90,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-zip');
 
-    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'copy', 'zip']);
+    grunt.registerTask('default', ['karma', 'jsdoc', 'copy', 'zip']);
 };

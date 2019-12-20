@@ -5,8 +5,8 @@
  * and hosted examples to use the faster to download minified library. A shim is not required for the use of WorldWind.
  * The minified library (worldwind.min.js) is recommended for use in deployed applications.
  */
-define(['../worldwind'], function (WorldWind) {
-    "use strict";
+define(['../build/dist/worldwind'], function (WorldWind) {           // Webpack bundling (unminified)
+   "use strict";
 
-    return WorldWind;
+   return WorldWind;
 });

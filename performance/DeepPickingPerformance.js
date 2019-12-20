@@ -18,8 +18,8 @@
  * Illustrates the performance of deep picking with many surface shapes.
  */
 
-requirejs(['../src/WorldWind',
-        '../examples/LayerManager'],
+requirejs(['./WorldWindShim',
+           '../examples/LayerManager'],
     function (ww,
               LayerManager) {
         "use strict";

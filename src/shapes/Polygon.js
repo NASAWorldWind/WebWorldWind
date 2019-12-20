@@ -50,7 +50,7 @@ define([
               SurfacePolygon,
               Vec2,
               Vec3,
-              libtessDummy) {
+              libtessDummy) { // Dummy object. See: https://github.com/brendankenny/libtess.js/issues/15
         "use strict";
 
         /**
