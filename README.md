@@ -2,7 +2,14 @@
 
 # Web WorldWind
 
-[![Build Status](https://travis-ci.org/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.org/NASAWorldWind/WebWorldWind)
+## NASA Renews Commitment to WorldWind
+WorldWind has received renewed commitment from NASA for continued development and support.  NASA will continue to release updates to the WorldWind SDKs, and will continue to make the WorldWind Servers accessible for all Users.  We plan to make an announcement soon regarding a path forward for improved support of the WorldWind User & Developer communities.
+
+If you have questions and/or concerns, please feel free to email at:
+
+worldwind-info@lists.nasa.gov
+
+[![Build Status](https://travis-ci.com/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.com/NASAWorldWind/WebWorldWind)
 
 3D virtual globe API in JavaScript for the web, developed by NASA. The European Space Agency has provided valuable
 contributions to this platform since 2015. Web WorldWind provides a geographic context, complete with terrain, and a
@@ -22,7 +29,7 @@ Web WorldWind release provides many simple examples showing how to use all of We
 
 ## Building
 
-[Install NodeJS](https://nodejs.org). The build is known to work with v6.9.2 (LTS).
+[Install NodeJS](https://nodejs.org). The build is known to work with Node.js 10.15.3 LTS and 11.12.0.
 
 - `npm install` downloads WorldWind's dependencies
 

@@ -30,13 +30,6 @@ define([
             }
         });
 
-        it("Matrix prototype", function () {
-            var matrix = Matrix3.prototype;
-            for (var i = 0; i < 9; i++) {
-                expect(matrix[i]).toEqual(0);
-            }
-        });
-
         it("Should create an identity Matrix", function () {
             var identity = Matrix3.fromIdentity();
 
@@ -52,7 +45,7 @@ define([
         });
 
         it("Sets this matrix to one that flips and shifts the y-axis", function () {
-            var matrix = Matrix3.prototype;
+            var matrix = new Matrix3();
 
             matrix.setToUnitYFlip();
             expect(matrix[0]).toEqual(1);
