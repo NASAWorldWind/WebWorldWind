@@ -6,11 +6,8 @@
  * @version   v4.2.8+1e68dce6
  */
 
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-        typeof define === 'function' && define.amd ? define(factory) :
-            (global.ES6Promise = factory());
-}(this, (function () { 'use strict';
+define([], function () {
+    'use strict';
 
     function objectOrFunction(x) {
         var type = typeof x;
@@ -1167,7 +1164,7 @@
 
     return Promise$1;
 
-})));
+});
 
 
 
