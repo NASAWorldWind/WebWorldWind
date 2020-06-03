@@ -81,7 +81,12 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
             switch (child.nodeName) {
 
                 case 'node':
-                    this.children.push((new ColladaNode()).parse(child, iNodes, this.worldMatrix));
+                    var childNodes = (new ColladaNode()).parse(child, iNodes, this.worldMatrix)
+                    if (childNodes) {
+                        for (var j = 0, len = childNodes.length; j < len; j++) {
+                            this.children.push(childNodes[j]);
+                        }
+                    }
                     break;
 
                 case 'instance_geometry':
@@ -111,7 +116,12 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
                     var iNode = this.getLibraryNode(iNodes, iNodeId);
 
                     if (iNode) {
-                        this.children.push((new ColladaNode()).parse(iNode, iNodes, this.worldMatrix));
+                        var childNodes = (new ColladaNode()).parse(iNode, iNodes, this.worldMatrix);
+                        if (childNodes) {
+                            for (var j = 0, len = childNodes.length; j < len; j++) {
+                                this.children.push(childNodes[j]);
+                            }
+                        }
                     }
                     break;
 

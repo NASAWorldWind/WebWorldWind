@@ -175,8 +175,8 @@ define([
                     case 'node':
                         var nodes = (new ColladaNode()).parse(libNode, extraNodes);
                         if (nodes) {
-                            for (var i = 0, len = nodes.length; i < len; i++) {
-                                this.scene.root.children.push(nodes[i]);
+                            for (var j = 0, len = nodes.length; j < len; j++) {
+                                this.scene.root.children.push(nodes[j]);
                             }
                         }
                         break;
