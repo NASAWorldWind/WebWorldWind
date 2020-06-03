@@ -107,13 +107,11 @@ define([
 
                 if (!data) {
                     var colladaScene = null;
-                }
-                else {
+                } else {
 
                     try {
                         colladaScene = this.parse(data);
-                    }
-                    catch (e) {
+                    } catch (e) {
                         colladaScene = null;
                         Logger.log(Logger.LEVEL_SEVERE, "error parsing collada file: " + e);
                     }
@@ -139,7 +137,7 @@ define([
             var iNodes = this.xmlDoc.querySelectorAll('library_nodes node');
             var eNodes = this.xmlDoc.querySelectorAll("library_effects effect");
 
-            this.scene.metadata = ( new ColladaAsset(this.xmlDoc) ).parse();
+            this.scene.metadata = (new ColladaAsset(this.xmlDoc)).parse();
             this.parseLib('visual_scene', iNodes);
             this.parseLib('library_geometries');
             this.parseLib('library_materials', eNodes);
@@ -175,16 +173,18 @@ define([
                 switch (libNode.nodeName) {
 
                     case 'node':
-                        var node = ( new ColladaNode() ).parse(libNode, extraNodes);
-                        if (node) {
-                            this.scene.root.children.push(node);
+                        var nodes = (new ColladaNode()).parse(libNode, extraNodes);
+                        if (nodes) {
+                            for (var i = 0, len = nodes.length; i < len; i++) {
+                                this.scene.root.children.push(nodes[i]);
+                            }
                         }
                         break;
 
                     case 'geometry':
                         var geometryId = libNode.getAttribute("id");
                         var xmlMesh = libNode.querySelector("mesh");
-                        var mesh = ( new ColladaMesh(geometryId) ).parse(xmlMesh);
+                        var mesh = (new ColladaMesh(geometryId)).parse(xmlMesh);
                         if (mesh) {
                             this.scene.meshes[geometryId] = mesh;
                         }
@@ -195,7 +195,7 @@ define([
                         var iEffect = libNode.querySelector("instance_effect");
                         var effectId = iEffect.getAttribute("url").substr(1);
                         var effect = ColladaUtils.querySelectorById(extraNodes, effectId);
-                        var material = ( new ColladaMaterial(materialId) ).parse(effect);
+                        var material = (new ColladaMaterial(materialId)).parse(effect);
                         if (material) {
                             this.scene.materials[materialId] = material;
                         }
@@ -204,7 +204,7 @@ define([
                     case 'image':
                         var imageId = libNode.getAttribute("id");
                         var imageName = libNode.getAttribute("name");
-                        var image = ( new ColladaImage(imageId, imageName) ).parse(libNode);
+                        var image = (new ColladaImage(imageId, imageName)).parse(libNode);
                         if (image) {
                             this.scene.images[imageId] = image;
                         }

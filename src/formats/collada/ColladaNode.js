@@ -27,15 +27,23 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
      * @constructor
      * @classdesc Represents a collada node tag.
      */
-    var ColladaNode = function () {
-        this.id = "";
-        this.name = "";
-        this.sid = "";
+    var ColladaNode = function (that) {
         this.children = [];
         this.materials = [];
         this.mesh = "";
-        this.localMatrix = Matrix.fromIdentity();
-        this.worldMatrix = Matrix.fromIdentity();
+        if (that) {
+            this.id = that.id;
+            this.name = that.name;
+            this.sid = that.sid;
+            this.localMatrix = that.localMatrix.clone();
+            this.worldMatrix = that.worldMatrix.clone();
+        } else {
+            this.id = "";
+            this.name = "";
+            this.sid = "";
+            this.localMatrix = Matrix.fromIdentity();
+            this.worldMatrix = Matrix.fromIdentity();
+        }
     };
 
     /**
@@ -46,7 +54,10 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
      * @param {Matrix} parentWorldMatrix The transformation matrix of it's parent.
      */
     ColladaNode.prototype.parse = function (element, iNodes, parentWorldMatrix) {
-
+        // TODO: The current implementation only allows one mesh per node, multiple meshes are possible. As a workaround
+        // TODO: a new node is created for each mesh if the node.mesh has already been populated.
+        var meshNodes = [this];
+        var currentNode = this;
         this.id = element.getAttribute('id');
         this.sid = element.getAttribute('sid');
         this.name = element.getAttribute('name');
@@ -70,12 +81,16 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
             switch (child.nodeName) {
 
                 case 'node':
-                    this.children.push(( new ColladaNode() ).parse(child, iNodes, this.worldMatrix));
+                    this.children.push((new ColladaNode()).parse(child, iNodes, this.worldMatrix));
                     break;
 
                 case 'instance_geometry':
 
-                    this.mesh = child.getAttribute("url").substr(1);
+                    if (currentNode.mesh !== "") {
+                        currentNode = new ColladaNode(currentNode);
+                        meshNodes.push(currentNode);
+                    }
+                    currentNode.mesh = child.getAttribute("url").substr(1);
 
                     var materials = child.querySelectorAll("instance_material");
 
@@ -83,7 +98,7 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
 
                         var material = materials.item(j);
 
-                        this.materials.push({
+                        currentNode.materials.push({
                             id: material.getAttribute("target").substr(1),
                             symbol: material.getAttribute("symbol")
                         });
@@ -96,7 +111,7 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
                     var iNode = this.getLibraryNode(iNodes, iNodeId);
 
                     if (iNode) {
-                        this.children.push(( new ColladaNode() ).parse(iNode, iNodes, this.worldMatrix));
+                        this.children.push((new ColladaNode()).parse(iNode, iNodes, this.worldMatrix));
                     }
                     break;
 
@@ -107,7 +122,7 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
 
         }
 
-        return this;
+        return meshNodes;
 
     };
 
@@ -178,7 +193,7 @@ define(['./ColladaUtils', '../../geom/Matrix', '../../geom/Vec3'], function (Col
 
         this.normalMatrix = Matrix.fromIdentity();
 
-        var rotationAngles = new Vec3(0,0,0);
+        var rotationAngles = new Vec3(0, 0, 0);
         this.worldMatrix.extractRotationAngles(rotationAngles);
 
         this.normalMatrix.multiplyByRotation(-1, 0, 0, rotationAngles[0]);
