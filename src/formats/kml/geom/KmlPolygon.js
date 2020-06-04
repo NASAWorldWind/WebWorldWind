@@ -140,7 +140,8 @@ define([
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
     KmlPolygon.prototype.createPolygon = function(styles, fileCache) {
-        if(this.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND ||
+        if(!this.isValidAltitudeMode(this.kmlAltitudeMode) ||
+            this.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND ||
             (this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND) ||
             (this.kmlOuterBoundary && this.kmlOuterBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND)) {
             this._renderable = new SurfacePolygon(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
@@ -204,6 +205,16 @@ define([
             locations = this.kmlOuterBoundary.kmlPositions;
         }
         return locations;
+    };
+
+    /**
+     * @inheritDoc
+     */
+    KmlPolygon.prototype.isValidAltitudeMode = function (altMode) {
+        return "clampToGround" === altMode
+            || "relativeToGround" === altMode
+            || "absolute" === altMode;
+
     };
 
     /**
