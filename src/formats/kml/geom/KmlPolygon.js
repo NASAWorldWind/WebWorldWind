@@ -144,7 +144,7 @@ define([
         if(
             !this.isValidAltitudeMode(this.kmlAltitudeMode) ||
             this.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND ||
-        //    (this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND) ||
+            (this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND) ||
             (this.kmlOuterBoundary && this.kmlOuterBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND)
         ) {
             this._renderable = new SurfacePolygon(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
