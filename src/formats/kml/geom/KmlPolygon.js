@@ -140,7 +140,8 @@ define([
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
     KmlPolygon.prototype.createPolygon = function(styles, fileCache) {
-        if(!this.isValidAltitudeMode(this.kmlAltitudeMode) ||
+        if(
+            !this.isValidAltitudeMode(this.kmlAltitudeMode) ||
             this.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND ||
             (this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND) ||
             (this.kmlOuterBoundary && this.kmlOuterBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND)) {

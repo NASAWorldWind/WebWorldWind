@@ -46,7 +46,7 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
-        var kmlFilePromise = new WorldWind.KmlFile('data/KML_Samples.kml', [new WorldWind.KmlTreeVisibility('treeControls', wwd)]);
+        var kmlFilePromise = new WorldWind.KmlFile('data/Hayward_General_Plan_Land_Use.kml', [new WorldWind.KmlTreeVisibility('treeControls', wwd)]);
         kmlFilePromise.then(function (kmlFile) {
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
             renderableLayer.currentTimeInterval = [
