@@ -141,7 +141,8 @@ define([
      */
     KmlPolygon.prototype.createPolygon = function(styles, fileCache) {
         console.log(this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND);
-        if(
+        // TODO: KML boundaries are displaying graphic glitches when the camera is zoomed out
+        if(            
             !this.isValidAltitudeMode(this.kmlAltitudeMode) ||
             this.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND ||
             (this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND) ||
