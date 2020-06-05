@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+	<asset>
+		<created>2020-05-21T08:37:06Z</created>
+		<modified>2020-05-21T08:37:06Z</modified>
+		<up_axis>Z_UP</up_axis>
+	</asset>
+	<library_geometries>
+		<geometry id="ID_201700003257.dae3">
+			<mesh>
+				<source id="ID_201700003257.dae3-positions">
+					<float_array id="ID_201700003257.dae3-positions-array" count="24">25.8881 2.22867 13.4721 25.8881 2.22867 0.5465 11.6699 -23.2139 13.4721 11.6699 -23.2139 1.2027 -25.8881 -2.2244 13.4721 -25.8881 -2.2244 0.6561 -11.6621 23.2139 13.4721 -11.6621 23.2139 0</float_array>
+					<technique_common>
+						<accessor count="8" source="#ID_201700003257.dae3-positions-array" stride="3">
+							<param name="X" type="float"/>
+							<param name="Y" type="float"/>
+							<param name="Z" type="float"/>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="ID_201700003257.dae3-normals">
+					<float_array id="ID_201700003257.dae3-normals-array" count="3">0 0 1</float_array>
+					<technique_common>
+						<accessor count="1" source="#ID_201700003257.dae3-normals-array" stride="3">
+							<param name="X" type="float"/>
+							<param name="Y" type="float"/>
+							<param name="Z" type="float"/>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="ID_201700003257.dae3-vertices">
+					<input semantic="POSITION" source="#ID_201700003257.dae3-positions"/>
+				</vertices>
+				<triangles count="8" material="ID_201700003257.dae3material">
+					<input offset="0" semantic="VERTEX" source="#ID_201700003257.dae3-vertices"/>
+					<input offset="1" semantic="NORMAL" source="#ID_201700003257.dae3-normals"/>
+					<p>1 0 0 0 2 0 1 0 2 0 3 0 3 0 2 0 4 0 3 0 4 0 5 0 5 0 4 0 6 0 5 0 6 0 7 0 7 0 6 0 0 0 7 0 0 0 1 0</p>
+				</triangles>
+			</mesh>
+		</geometry>
+		<geometry id="ID_201700003257.dae4">
+			<mesh>
+				<source id="ID_201700003257.dae4-positions">
+					<float_array id="ID_201700003257.dae4-positions-array" count="12">11.6699 -23.2139 1.2027 -11.6621 23.2139 0 -25.8881 -2.2244 0.6561 25.8881 2.22867 0.5465</float_array>
+					<technique_common>
+						<accessor count="4" source="#ID_201700003257.dae4-positions-array" stride="3">
+							<param name="X" type="float"/>
+							<param name="Y" type="float"/>
+							<param name="Z" type="float"/>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="ID_201700003257.dae4-normals">
+					<float_array id="ID_201700003257.dae4-normals-array" count="3">0 0 1</float_array>
+					<technique_common>
+						<accessor count="1" source="#ID_201700003257.dae4-normals-array" stride="3">
+							<param name="X" type="float"/>
+							<param name="Y" type="float"/>
+							<param name="Z" type="float"/>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="ID_201700003257.dae4-vertices">
+					<input semantic="POSITION" source="#ID_201700003257.dae4-positions"/>
+				</vertices>
+				<triangles count="2" material="ID_201700003257.dae4material">
+					<input offset="0" semantic="VERTEX" source="#ID_201700003257.dae4-vertices"/>
+					<input offset="1" semantic="NORMAL" source="#ID_201700003257.dae4-normals"/>
+					<p>1 0 0 0 2 0 0 0 1 0 3 0</p>
+				</triangles>
+			</mesh>
+		</geometry>
+		<geometry id="ID_201700003257.dae5">
+			<mesh>
+				<source id="ID_201700003257.dae5-positions">
+					<float_array id="ID_201700003257.dae5-positions-array" count="12">-11.6621 23.2139 13.4721 11.6699 -23.2139 13.4721 -25.8881 -2.2244 13.4721 25.8881 2.22867 13.4721</float_array>
+					<technique_common>
+						<accessor count="4" source="#ID_201700003257.dae5-positions-array" stride="3">
+							<param name="X" type="float"/>
+							<param name="Y" type="float"/>
+							<param name="Z" type="float"/>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="ID_201700003257.dae5-normals">
+					<float_array id="ID_201700003257.dae5-normals-array" count="3">0 0 1</float_array>
+					<technique_common>
+						<accessor count="1" source="#ID_201700003257.dae5-normals-array" stride="3">
+							<param name="X" type="float"/>
+							<param name="Y" type="float"/>
+							<param name="Z" type="float"/>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="ID_201700003257.dae5-vertices">
+					<input semantic="POSITION" source="#ID_201700003257.dae5-positions"/>
+				</vertices>
+				<triangles count="2" material="ID_201700003257.dae5material">
+					<input offset="0" semantic="VERTEX" source="#ID_201700003257.dae5-vertices"/>
+					<input offset="1" semantic="NORMAL" source="#ID_201700003257.dae5-normals"/>
+					<p>1 0 0 0 2 0 0 0 1 0 3 0</p>
+				</triangles>
+			</mesh>
+		</geometry>
+	</library_geometries>
+	<library_effects>
+		<effect id="ID_201700003257.dae0effect">
+			<profile_COMMON>
+				<technique sid="common">
+					<phong>
+						<diffuse>
+							<color>0.929412 0.760784 0.611765 1</color>
+						</diffuse>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_materials>
+		<material id="ID_201700003257.dae0material">
+			<instance_effect url="#ID_201700003257.dae0effect"/>
+		</material>
+	</library_materials>
+	<library_effects>
+		<effect id="ID_201700003257.dae1effect">
+			<profile_COMMON>
+				<technique sid="common">
+					<phong>
+						<diffuse>
+							<color>0.929412 0.760784 0.611765 1</color>
+						</diffuse>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_materials>
+		<material id="ID_201700003257.dae1material">
+			<instance_effect url="#ID_201700003257.dae1effect"/>
+		</material>
+	</library_materials>
+	<library_effects>
+		<effect id="ID_201700003257.dae2effect">
+			<profile_COMMON>
+				<technique sid="common">
+					<phong>
+						<diffuse>
+							<color>0.929412 0.760784 0.611765 1</color>
+						</diffuse>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_materials>
+		<material id="ID_201700003257.dae2material">
+			<instance_effect url="#ID_201700003257.dae2effect"/>
+		</material>
+	</library_materials>
+	<library_effects>
+		<effect id="ID_201700003257.dae3effect">
+			<profile_COMMON>
+				<technique sid="common">
+					<phong>
+						<diffuse>
+							<color>0.929412 0.760784 0.611765 1</color>
+						</diffuse>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_materials>
+		<material id="ID_201700003257.dae3material">
+			<instance_effect url="#ID_201700003257.dae3effect"/>
+		</material>
+	</library_materials>
+	<library_effects>
+		<effect id="ID_201700003257.dae4effect">
+			<profile_COMMON>
+				<technique sid="common">
+					<phong>
+						<diffuse>
+							<color>0.929412 0.760784 0.611765 1</color>
+						</diffuse>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_materials>
+		<material id="ID_201700003257.dae4material">
+			<instance_effect url="#ID_201700003257.dae4effect"/>
+		</material>
+	</library_materials>
+	<library_effects>
+		<effect id="ID_201700003257.dae5effect">
+			<profile_COMMON>
+				<technique sid="common">
+					<phong>
+						<diffuse>
+							<color>0.929412 0.760784 0.611765 1</color>
+						</diffuse>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_materials>
+		<material id="ID_201700003257.dae5material">
+			<instance_effect url="#ID_201700003257.dae5effect"/>
+		</material>
+	</library_materials>
+	<library_visual_scenes>
+		<visual_scene id="Multipatch-Converted-Scene">
+			<node id="ID_201700003257.dae">
+				<translate>0 0 0</translate>
+				<instance_geometry url="#ID_201700003257.dae3">
+					<bind_material>
+						<technique_common>
+							<instance_material symbol="ID_201700003257.dae3material" target="#ID_201700003257.dae3material"/>
+						</technique_common>
+					</bind_material>
+				</instance_geometry>
+				<instance_geometry url="#ID_201700003257.dae4">
+					<bind_material>
+						<technique_common>
+							<instance_material symbol="ID_201700003257.dae4material" target="#ID_201700003257.dae4material"/>
+						</technique_common>
+					</bind_material>
+				</instance_geometry>
+				<instance_geometry url="#ID_201700003257.dae5">
+					<bind_material>
+						<technique_common>
+							<instance_material symbol="ID_201700003257.dae5material" target="#ID_201700003257.dae5material"/>
+						</technique_common>
+					</bind_material>
+				</instance_geometry>
+			</node>
+		</visual_scene>
+	</library_visual_scenes>
+	<scene>
+		<instance_visual_scene url="#Multipatch-Converted-Scene"/>
+	</scene>
+</COLLADA>
