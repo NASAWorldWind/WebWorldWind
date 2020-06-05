@@ -120,6 +120,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'box',
             initialScale: 500000,
             maxScale: 1000000,
+            doubleSided: false,
             useTexturePaths: true
         },
         {
@@ -128,6 +129,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'duck',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
             useTexturePaths: true
         },
         {
@@ -136,6 +138,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: '2_cylinder_engine',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
             useTexturePaths: true
         },
         {
@@ -144,6 +147,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'Reciprocating_Saw',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
             useTexturePaths: true
         },
         {
@@ -152,6 +156,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'gearbox_assy',
             initialScale: 10000,
             maxScale: 20000,
+            doubleSided: false,
             useTexturePaths: true
         },
         {
@@ -160,6 +165,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'buggy',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
             useTexturePaths: true
         },
         {
@@ -168,6 +174,16 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'kmlBuilding',
             initialScale: 500,
             maxScale: 1000,
+            doubleSided: false,
+            useTexturePaths: false
+        },
+        {
+            displayName: 'bad normals',
+            fileName: 'bad_normals.dae',
+            path: 'bad_normals',
+            initialScale: 20000,
+            maxScale: 40000,
+            doubleSided: true,
             useTexturePaths: false
         },
     ];
@@ -204,7 +220,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
                 scene.scale = model.initialScale;
                 scene.altitudeMode = WorldWind.ABSOLUTE;
                 scene.useTexturePaths = model.useTexturePaths;
-
+                scene.doubleSided = model.doubleSided;
                 modelLayer.removeAllRenderables();
                 modelLayer.addRenderable(scene);
 
