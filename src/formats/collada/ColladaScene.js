@@ -120,6 +120,8 @@ define([
             //Internal. Intentionally not documented.
             this._vboCacheKey = '';
             this._iboCacheKey = '';
+            // TODO: Process the double sided flag if set in sub-geometries.
+            this._doubleSided = false;
 
             this.setSceneData(sceneData);
         };
@@ -447,6 +449,21 @@ define([
                 set: function (value) {
                     this._hideNodes = value;
                 }
+            },
+
+            /**
+             * Set to true to skip back face culling for this scene. Helpful when the model contains incorrect normal data.
+             * @memberof ColladaScene.prototype
+             * @default false
+             * @type {Boolean}
+             */
+            doubleSided: {
+                get: function () {
+                    return this._doubleSided;
+                },
+                set: function (value) {
+                    this._doubleSided = value;
+                }
             }
 
         });
@@ -500,8 +517,7 @@ define([
                     if (hasTexture) {
                         if (material.textures.diffuse) {
                             imageKey = material.textures.diffuse.mapId;
-                        }
-                        else if (material.textures.reflective) {
+                        } else if (material.textures.reflective) {
                             imageKey = material.textures.reflective.mapId;
                         }
                     }
@@ -572,8 +588,7 @@ define([
         ColladaScene.prototype.drawOrderedScene = function (dc) {
             try {
                 this.beginDrawing(dc);
-            }
-            finally {
+            } finally {
                 this.endDrawing(dc);
             }
         };
@@ -599,6 +614,9 @@ define([
 
             dc.findAndBindProgram(BasicTextureProgram);
             gl.enableVertexAttribArray(0);
+            if (this._doubleSided) {
+                gl.disable(gl.CULL_FACE);
+            }
 
             if (dc.pickingMode) {
                 this.pickColor = dc.uniquePickColor();
@@ -683,8 +701,7 @@ define([
                         'Your browser does not support the "OES_element_index_uint" extension, ' +
                         'required to render large models.'
                     );
-                }
-                else {
+                } else {
                     indexSize = sizeOfUint32;
                     indexBufferSize = numIndices * indexSize;
                 }
@@ -732,7 +749,13 @@ define([
             var nodeWorldMatrix = entity.node.worldMatrix;
             var nodeNormalMatrix = entity.node.normalMatrix;
 
-            var hasLighting = buffers.normals && buffers.normals.length;
+            var hasLighting;
+            if (this._doubleSided) {
+                hasLighting=false;
+            }
+            else {
+                hasLighting = buffers.normals && buffers.normals.length;
+            }
 
             var imageKey = entity.imageKey;
 
@@ -752,13 +775,11 @@ define([
                     gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 8, entity.uvOffset * 4);
                     gl.enableVertexAttribArray(2);
                     program.loadModulateColor(gl, dc.pickingMode);
-                }
-                else {
+                } else {
                     program.loadTextureEnabled(gl, false);
                     gl.disableVertexAttribArray(2);
                 }
-            }
-            else {
+            } else {
                 program.loadTextureEnabled(gl, false);
                 gl.disableVertexAttribArray(2);
             }
@@ -767,8 +788,7 @@ define([
                 program.loadApplyLighting(gl, 1);
                 gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 12, entity.normalOffset * 4);
                 gl.enableVertexAttribArray(1);
-            }
-            else {
+            } else {
                 program.loadApplyLighting(gl, 0);
                 gl.disableVertexAttribArray(1);
             }
@@ -781,12 +801,10 @@ define([
                 var indexOffsetBytes = entity.indexOffset * entity.indexSize;
                 if (buffers.indices instanceof Uint32Array && dc.getExtension('OES_element_index_uint')) {
                     gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_INT, indexOffsetBytes);
-                }
-                else {
+                } else {
                     gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_SHORT, indexOffsetBytes);
                 }
-            }
-            else {
+            } else {
                 gl.drawArrays(gl.TRIANGLES, 0, Math.floor(buffers.vertices.length / 3));
             }
         };
@@ -799,8 +817,7 @@ define([
             if (material) {
                 if (material.techniqueType === 'constant') {
                     var diffuse = material.reflective;
-                }
-                else {
+                } else {
                     diffuse = material.diffuse;
                 }
             }
@@ -853,6 +870,10 @@ define([
         ColladaScene.prototype.endDrawing = function (dc) {
             var gl = dc.currentGlContext;
             var program = dc.currentProgram;
+
+            if (this._doubleSided) {
+                gl.enable(gl.CULL_FACE);
+            }
 
             gl.disableVertexAttribArray(1);
             gl.disableVertexAttribArray(2);
