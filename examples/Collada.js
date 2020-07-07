@@ -21,49 +21,53 @@
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind, LayerManager) {
-    "use strict";
+        "use strict";
 
         // Tell WorldWind to log only warnings and errors.
-    WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
+        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-    // Create the WorldWindow.
-    var wwd = new WorldWind.WorldWindow("canvasOne");
+        // Create the WorldWindow.
+        var wwd = new WorldWind.WorldWindow("canvasOne");
 
-    // Create and add layers to the WorldWindow.
-    var layers = [
-        // Imagery layers.
-        {layer: new WorldWind.BMNGLayer(), enabled: true},
-        {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-        {layer: new WorldWind.BingAerialLayer(null), enabled: false},
-        {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
-        {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
-        // Add atmosphere layer on top of all base layers.
-        {layer: new WorldWind.AtmosphereLayer(), enabled: true},
-        // WorldWindow UI layers.
-        {layer: new WorldWind.CompassLayer(), enabled: true},
-        {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-        {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
-    ];
+        // Create and add layers to the WorldWindow.
+        var layers = [
+            // Imagery layers.
+            {layer: new WorldWind.BMNGLayer(), enabled: false},
+            {layer: new WorldWind.BMNGLandsatLayer(), enabled: true},
+            {layer: new WorldWind.BingAerialLayer(null), enabled: false},
+            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
+            {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
+            {layer: new WorldWind.CompassLayer(), enabled: true},
+            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+        ];
 
-    for (var l = 0; l < layers.length; l++) {
-        layers[l].layer.enabled = layers[l].enabled;
-        wwd.addLayer(layers[l].layer);
-    }
+        for (var l = 0; l < layers.length; l++) {
+            layers[l].layer.enabled = layers[l].enabled;
+            wwd.addLayer(layers[l].layer);
+        }
 
         // Create renderable layer to hold the Collada model.
-    var modelLayer = new WorldWind.RenderableLayer("Duck");
-    wwd.addLayer(modelLayer);
+        var modelLayer = new WorldWind.RenderableLayer("Duck");
+        wwd.addLayer(modelLayer);
 
         // Define a position for locating the model.
-    var position = new WorldWind.Position(45, -100, 1000e3);
+        var position = new WorldWind.Position(45, -100, 20000);
         // Create a Collada loader and direct it to the desired directory and .dae file.
-    var colladaLoader = new WorldWind.ColladaLoader(position);
-    colladaLoader.init({dirPath: './collada_models/duck/'});
-    colladaLoader.load('duck.dae', function (scene) {
-        scene.scale = 5000;
-        modelLayer.addRenderable(scene); // Add the Collada model to the renderable layer within a callback.
-    });
+        var colladaLoader = new WorldWind.ColladaLoader(position);
+        colladaLoader.init({dirPath: './collada_models/bad_normals/'});
+        colladaLoader.load('bad_normals.dae', function (scene) {
+        // colladaLoader.init({dirPath: './collada_models/box/'});
+        // colladaLoader.load('box.dae', function (scene) {
+            scene.scale = 100;
+            scene.computedNormals = true;
+            modelLayer.addRenderable(scene); // Add the Collada model to the renderable layer within a callback.
+        });
+        wwd.goTo(new WorldWind.Position(position.latitude, position.longitude, 25000));
 
-    // Create a layer manager for controlling layer visibility.
-    var layerManager = new LayerManager(wwd);
-});
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
+    });

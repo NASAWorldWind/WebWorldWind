@@ -27,7 +27,8 @@ define([
         '../../geom/Position',
         '../../pick/PickedObject',
         '../../render/Renderable',
-        '../../geom/Vec3'
+        '../../geom/Vec3',
+        '../../util/WWMath'
     ],
     function (ArgumentError,
               BasicTextureProgram,
@@ -37,7 +38,8 @@ define([
               Position,
               PickedObject,
               Renderable,
-              Vec3) {
+              Vec3,
+              WWMath) {
         "use strict";
 
         /**
@@ -122,6 +124,7 @@ define([
             this._iboCacheKey = '';
             // TODO: Process the double sided flag if set in sub-geometries.
             this._doubleSided = false;
+            this._computedNormals = false;
 
             this.setSceneData(sceneData);
         };
@@ -464,6 +467,21 @@ define([
                 set: function (value) {
                     this._doubleSided = value;
                 }
+            },
+
+            /**
+             * Set to true to compute vertex normals from vertices. Helpful when the model contains incorrect or missing normal data.
+             * @memberof ColladaScene.prototype
+             * @default false
+             * @type {Boolean}
+             */
+            computedNormals: {
+                get: function () {
+                    return this._computedNormals;
+                },
+                set: function (value) {
+                    this._computedNormals = value;
+                }
             }
 
         });
@@ -632,6 +650,34 @@ define([
             }
         };
 
+        // Internal. Recalculates normals, converts buffers to non-indexed.
+        ColladaScene.prototype.rewriteBufferNormals=function(mesh) {
+            mesh._normalsComputed = true;
+            if (mesh.indexedRendering) {
+                var vtxs = mesh.vertices;
+                var idxs = mesh.indices;
+                var newVtxs=[];
+                var newNormals=[];
+                for (var i = 0, len = idxs.length; i < len; i += 3) {
+                    var triangle = [];
+                    for (var j = 0; j < 3; j++) {
+                        var vtxOfs = idxs[i + j] * 3;
+                        var vtx = new Vec3(vtxs[vtxOfs], vtxs[vtxOfs + 1], vtxs[vtxOfs + 2]);
+                        triangle.push(vtx);
+                        newVtxs.push(vtxs[vtxOfs], vtxs[vtxOfs + 1], vtxs[vtxOfs + 2]);
+                    }
+                    var normal = WWMath.computeTriangleNormal(triangle[0], triangle[1], triangle[2]);
+                    for (var j =  0; j < 3; j++) {
+                        newNormals.push(normal[0],normal[1],normal[2]);
+                    }
+                }
+                mesh.indexedRendering=false;
+                mesh.vertices=Float32Array.from(newVtxs);
+                mesh.normals=Float32Array.from(newNormals);
+            }
+            return mesh;
+        }
+
         // Internal. Intentionally not documented.
         ColladaScene.prototype.setupBuffers = function (dc) {
             var gl = dc.currentGlContext;
@@ -643,6 +689,9 @@ define([
             var numVertices = 0;
 
             for (var i = 0, len = this._entities.length; i < len; i++) {
+                if (this._computedNormals && !this._entities[i].mesh._normalsComputed) {
+                    this._entities[i].mesh=this.rewriteBufferNormals(this._entities[i].mesh);
+                }
                 var mesh = this._entities[i].mesh;
                 if (mesh.indexedRendering) {
                     numIndices += mesh.indices.length;
@@ -751,9 +800,8 @@ define([
 
             var hasLighting;
             if (this._doubleSided) {
-                hasLighting=false;
-            }
-            else {
+                hasLighting = false;
+            } else {
                 hasLighting = buffers.normals && buffers.normals.length;
             }
 
