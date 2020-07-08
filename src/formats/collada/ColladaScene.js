@@ -651,32 +651,55 @@ define([
         };
 
         // Internal. Recalculates normals, converts buffers to non-indexed.
-        ColladaScene.prototype.rewriteBufferNormals=function(mesh) {
+        ColladaScene.prototype.rewriteBufferNormals = function (mesh) {
             mesh._normalsComputed = true;
             if (mesh.indexedRendering) {
                 var vtxs = mesh.vertices;
                 var idxs = mesh.indices;
-                var newVtxs=[];
-                var newNormals=[];
+                var uvs = mesh.uvs;
+                var hasUvs = mesh.uvs && mesh.uvs.length > 0;
+                var newLen = idxs.length * 3;
+                var newVtxs = new Float32Array(newLen);
+                var newNormals = new Float32Array(newLen);
+                var newUvs = null;
+                if (hasUvs) {
+                    newUvs = new Float32Array(idxs.length * 2);
+                }
                 for (var i = 0, len = idxs.length; i < len; i += 3) {
                     var triangle = [];
                     for (var j = 0; j < 3; j++) {
                         var vtxOfs = idxs[i + j] * 3;
                         var vtx = new Vec3(vtxs[vtxOfs], vtxs[vtxOfs + 1], vtxs[vtxOfs + 2]);
                         triangle.push(vtx);
-                        newVtxs.push(vtxs[vtxOfs], vtxs[vtxOfs + 1], vtxs[vtxOfs + 2]);
+                        var newIdx = (i + j) * 3;
+                        newVtxs[newIdx] = vtxs[vtxOfs];
+                        newVtxs[newIdx + 1] = vtxs[vtxOfs + 1];
+                        newVtxs[newIdx + 2] = vtxs[vtxOfs + 2];
+                        if (hasUvs) {
+                            var uvOfs = idxs[i + j] * 2;
+                            var newUvIdx = (i + j) * 2;
+                            newUvs[newUvIdx] = uvs[uvOfs];
+                            newUvs[newUvIdx + 1] = uvs[uvOfs + 1];
+                        }
                     }
                     var normal = WWMath.computeTriangleNormal(triangle[0], triangle[1], triangle[2]);
-                    for (var j =  0; j < 3; j++) {
-                        newNormals.push(normal[0],normal[1],normal[2]);
+                    for (var j = 0; j < 3; j++) {
+                        var newIdx = (i + j) * 3;
+                        newNormals[newIdx] = normal[0];
+                        newNormals[newIdx + 1] = normal[1];
+                        newNormals[newIdx + 2] = normal[2];
                     }
                 }
-                mesh.indexedRendering=false;
-                mesh.vertices=Float32Array.from(newVtxs);
-                mesh.normals=Float32Array.from(newNormals);
+                mesh.indexedRendering = false;
+                mesh.vertices = newVtxs;
+                mesh.normals = newNormals;
+                mesh.indices = null;
+                if (hasUvs) {
+                    mesh.uvs = newUvs;
+                }
             }
             return mesh;
-        }
+        };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.setupBuffers = function (dc) {
@@ -690,7 +713,7 @@ define([
 
             for (var i = 0, len = this._entities.length; i < len; i++) {
                 if (this._computedNormals && !this._entities[i].mesh._normalsComputed) {
-                    this._entities[i].mesh=this.rewriteBufferNormals(this._entities[i].mesh);
+                    this._entities[i].mesh = this.rewriteBufferNormals(this._entities[i].mesh);
                 }
                 var mesh = this._entities[i].mesh;
                 if (mesh.indexedRendering) {
