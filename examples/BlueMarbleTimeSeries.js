@@ -43,7 +43,7 @@ requirejs(['./WorldWindShim',
         // Create the Blue Marble time series layer using REST tiles hosted at worldwind32.arc.nasa.gov.
         // Disable it until its images are cached, which is initiated below.
         var timeSeriesLayer = new WorldWind.BMNGRestLayer(
-           "https://worldwind.arc.nasa.gov/standalonedata/Earth/BlueMarble256");
+            "https://worldwind.arc.nasa.gov/standalonedata/Earth/BlueMarble256");
         timeSeriesLayer.enabled = false;
         timeSeriesLayer.showSpinner = true;
         wwd.addLayer(timeSeriesLayer);
