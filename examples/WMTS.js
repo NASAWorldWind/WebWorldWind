@@ -53,9 +53,9 @@ requirejs([
         }
 
         // Web Map Tiling Service information from
-        var serviceAddress = "https://tiles.geoservice.dlr.de/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0";
-        // Layer displaying Global Hillshade based on GMTED2010
-        var layerIdentifier = "hillshade";
+        var serviceAddress = "https://map1.vis.earthdata.nasa.gov/wmts-webmerc/wmts.cgi?&request=GetCapabilities";
+        // Layer displaying Gridded Population of the World density forecast
+        var layerIdentifier = "GPW_Population_Density_2020";
 
         // Called asynchronously to parse and create the WMTS layer
         var createLayer = function (xmlDom) {
