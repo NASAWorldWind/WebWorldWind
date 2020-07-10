@@ -16,9 +16,10 @@
  */
 
 define([
+        'src/geom/Vec3',
         'src/util/WWMath'
     ],
-    function (WWMath) {
+    function (Vec3, WWMath) {
         'use strict';
 
         describe('WWMath test', function () {
@@ -38,5 +39,27 @@ define([
 
             });
 
+            describe('computeTriangleNormal test', function () {
+
+                it('Computes a triangle normals', function () {
+                    var v1 = new Vec3(26, 2, 1);
+                    var v2 = new Vec3(26, 2, 13);
+                    var v3 = new Vec3(12, -23, 13);
+                    var expectedNormal = new Vec3(0.8725060159497201, -0.48860336893184325, 0.0);
+                    var normal = WWMath.computeTriangleNormal(v1, v2, v3);
+                    expect(expectedNormal[0]).toBeCloseTo(normal[0]);
+                    expect(expectedNormal[1]).toBeCloseTo(normal[1]);
+                    expect(expectedNormal[2]).toBeCloseTo(normal[2]);
+
+                    v1 = new Vec3(-12, 12, 26);
+                    v2 = new Vec3(23, -23, 2);
+                    v3 = new Vec3(13, 13, 13);
+                    expectedNormal = new Vec3(0.4612242682795252, -0.1396190373706287, 0.8762298207398077);
+                    normal = WWMath.computeTriangleNormal(v1, v2, v3);
+                    expect(expectedNormal[0]).toBeCloseTo(normal[0]);
+                    expect(expectedNormal[1]).toBeCloseTo(normal[1]);
+                    expect(expectedNormal[2]).toBeCloseTo(normal[2]);
+                });
+            });
         });
     });
