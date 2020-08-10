@@ -116,14 +116,43 @@ define([
 
                 if (d < 0) {
                     return false;
-                }
-                else {
+                } else {
                     t = (-b - Math.sqrt(d)) / (2 * a);
                     result[0] = sx + vx * t;
                     result[1] = sy + vy * t;
                     result[2] = sz + vz * t;
                     return true;
                 }
+            },
+
+            /**
+             * Returns the normal vector corresponding to the triangle defined by three vertices (a, b, c).
+             *
+             * @param {Vec3} a The triangle's first vertex.
+             * @param {Vec3} b The triangle's second vertex.
+             * @param {Vec3} c The triangle's third vertex.
+             *
+             * @return {Vec3} the triangle's unit-length normal vector.
+             *
+             * @throws {ArgumentError} If the specified vertices are null or undefined.
+             */
+            computeTriangleNormal: function (a, b, c) {
+                if (!a || !b || !c) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeTriangleNormal", "missingVertex"));
+                }
+
+                var x = ((b[1] - a[1]) * (c[2] - a[2])) - ((b[2] - a[2]) * (c[1] - a[1]));
+                var y = ((b[2] - a[2]) * (c[0] - a[0])) - ((b[0] - a[0]) * (c[2] - a[2]));
+                var z = ((b[0] - a[0]) * (c[1] - a[1])) - ((b[1] - a[1]) * (c[0] - a[0]));
+
+                var length = (x * x) + (y * y) + (z * z);
+                if (length == 0) {
+                    return new Vec3(x, y, z);
+                }
+
+                length = Math.sqrt(length);
+                return new Vec3(x / length, y / length, z / length);
             },
 
             /**
@@ -722,16 +751,16 @@ define([
                 }
 
                 var m = transformMatrix,
-                // transform of (0, 0)
+                    // transform of (0, 0)
                     x1 = m[3],
                     y1 = m[7],
-                // transform of (1, 0)
+                    // transform of (1, 0)
                     x2 = m[0] + m[3],
                     y2 = m[4] + m[7],
-                // transform of (0, 1)
+                    // transform of (0, 1)
                     x3 = m[1] + m[3],
                     y3 = m[5] + m[7],
-                // transform of (1, 1)
+                    // transform of (1, 1)
                     x4 = m[0] + m[1] + m[3],
                     y4 = m[4] + m[5] + m[7],
                     minX = Math.min(Math.min(x1, x2), Math.min(x3, x4)),
@@ -800,7 +829,7 @@ define([
              *
              * @return {Number} the specified angle wrapped to [0, 360] degrees
              */
-            normalizeAngle360: function(degrees) {
+            normalizeAngle360: function (degrees) {
                 var angle = degrees % 360;
                 return angle >= 0 ? angle : (angle < 0 ? 360 + angle : 360 - angle);
             }

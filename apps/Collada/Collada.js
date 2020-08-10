@@ -121,6 +121,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             initialScale: 500000,
             maxScale: 1000000,
             doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -130,6 +131,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             initialScale: 5000,
             maxScale: 10000,
             doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -139,6 +141,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             initialScale: 5000,
             maxScale: 10000,
             doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -148,6 +151,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             initialScale: 5000,
             maxScale: 10000,
             doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -157,6 +161,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             initialScale: 10000,
             maxScale: 20000,
             doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -166,6 +171,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             initialScale: 5000,
             maxScale: 10000,
             doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -175,17 +181,29 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             initialScale: 500,
             maxScale: 1000,
             doubleSided: false,
+            computedNormals: false,
             useTexturePaths: false
         },
         {
-            displayName: 'bad normals',
+            displayName: 'bad normals double sided',
             fileName: 'bad_normals.dae',
             path: 'bad_normals',
             initialScale: 20000,
             maxScale: 40000,
             doubleSided: true,
+            computedNormals: false,
             useTexturePaths: false
         },
+        {
+            displayName: 'bad normals computed normals',
+            fileName: 'bad_normals.dae',
+            path: 'bad_normals',
+            initialScale: 20000,
+            maxScale: 40000,
+            doubleSided: false,
+            computedNormals: true,
+            useTexturePaths: false
+        }
     ];
 
     createCombo();
@@ -221,6 +239,7 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
                 scene.altitudeMode = WorldWind.ABSOLUTE;
                 scene.useTexturePaths = model.useTexturePaths;
                 scene.doubleSided = model.doubleSided;
+                scene.computedNormals = model.computedNormals;
                 modelLayer.removeAllRenderables();
                 modelLayer.addRenderable(scene);
 
