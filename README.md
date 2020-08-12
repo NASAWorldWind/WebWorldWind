@@ -18,7 +18,7 @@ collection for shapes for displaying and interacting with geographic or geo-loca
 modern web browser. High-resolution terrain and imagery is retrieved from remote servers automatically as needed, while
 enabling developers to include their own custom terrain and imagery.
 
-- [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has setup instructions, developers guides, API documentation and more.
+[worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has setup instructions, developers guides, API documentation and more.
 
 ## Get Started
 
