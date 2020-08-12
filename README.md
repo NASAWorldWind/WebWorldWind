@@ -3,7 +3,8 @@
 # Web WorldWind
 
 ## NASA Renews Commitment to WorldWind
-WorldWind has received renewed commitment from NASA for continued development and support.  NASA will continue to release updates to the WorldWind SDKs, and will continue to make the WorldWind Servers accessible for all Users.  We plan to make an announcement soon regarding a path forward for improved support of the WorldWind User & Developer communities.
+WorldWind has received renewed commitment from NASA for continued development and support.  NASA will continue to release updates
+ to the WorldWind SDKs, and will continue to make the WorldWind Servers accessible for all Users.
 
 If you have questions and/or concerns, please feel free to email at:
 
@@ -17,19 +18,19 @@ collection for shapes for displaying and interacting with geographic or geo-loca
 modern web browser. High-resolution terrain and imagery is retrieved from remote servers automatically as needed, while
 enabling developers to include their own custom terrain and imagery.
 
-- [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has setup instructions, developers guides, API documentation and more
-- [Forum](https://forum.worldwindcentral.com) provides help from the WorldWind community
-- [WebStorm](https://www.jetbrains.com/webstorm) is used by the NASA WorldWind development team
+- [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has setup instructions, developers guides, API documentation and more.
 
 ## Get Started
 
 The Web WorldWind [Developer's Guide](https://worldwind.arc.nasa.gov/web) has a complete description of Web WorldWind's
-functionality. You'll also find there links to many Web WorldWind resources, including a user guide. The latest
-Web WorldWind release provides many simple examples showing how to use all of Web WorldWind's functionality.
+functionality. You'll also find there links to many Web WorldWind resources, including a user guide. For novices on WorldWind, 
+A [Get Started](https://worldwind.arc.nasa.gov/web/get-started/) tutorial is the place to go. The latest Web WorldWind release 
+provides many simple [examples](https://github.com/NASAWorldWind/WebWorldWind/tree/develop/examples) showing how to use all of
+ Web WorldWind's functionality.
 
 ## Building
 
-[Install NodeJS](https://nodejs.org). The build is known to work with Node.js 10.15.3 LTS and 11.12.0.
+[Install NodeJS](https://nodejs.org). The build is known to work with Node.js 12.18.0 LTS.
 
 - `npm install` downloads WorldWind's dependencies
 

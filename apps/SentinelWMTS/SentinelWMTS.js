@@ -42,7 +42,7 @@ define(['../../src/WorldWind',
 
             $.get(wmtsServer + '?REQUEST=GetCapabilities&SERVICE=WMTS', function (response) {
                 wmtsCapabilities = new WorldWind.WmtsCapabilities(response);
-                console.log(wmtsCapabilities);
+                // console.log(wmtsCapabilities);
             }).done(function () {
                 // Internal layers
                 var layers = [
