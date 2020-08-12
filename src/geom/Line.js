@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Line
@@ -94,6 +106,50 @@ define([
             result[2] = this.origin[2] + this.direction[2] * distance;
 
             return result;
+        };
+
+        /**
+         * Indicates whether the components of this line are equal to those of a specified line.
+         * @param {Line} otherLine The line to test equality with. May be null or undefined, in which case this
+         * function returns false.
+         * @returns {boolean} true if all components of this line are equal to the corresponding
+         * components of the specified line, otherwise false.
+         */
+        Line.prototype.equals = function (otherLine) {
+            if (otherLine) {
+                return this.origin.equals(otherLine.origin) && this.direction.equals(otherLine.direction);
+            }
+
+            return false;
+        };
+
+        /**
+         * Creates a new line that is a copy of this line.
+         * @returns {Line} The new line.
+         */
+        Line.prototype.clone = function () {
+            var clone = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+            clone.copy(this);
+
+            return clone;
+        };
+
+        /**
+         * Copies the components of a specified line to this line.
+         * @param {Line} copyLine The line to copy.
+         * @returns {Line} A copy of this line equal to otherLine.
+         * @throws {ArgumentError} If the specified line is null or undefined.
+         */
+        Line.prototype.copy = function (copyLine) {
+            if (!copyLine) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Line", "copy", "missingLine"));
+            }
+
+            this.origin.copy(copyLine.origin);
+            this.direction.copy(copyLine.direction);
+
+            return this;
         };
 
         return Line;

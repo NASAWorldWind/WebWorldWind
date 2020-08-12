@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Location
@@ -54,7 +66,7 @@ define([
         };
 
         /**
-         * A Location with latitude and longitude both 0.
+         * A location with latitude and longitude both 0.
          * @constant
          * @type {Location}
          */
@@ -63,7 +75,7 @@ define([
         /**
          * Creates a location from angles specified in radians.
          * @param {Number} latitudeRadians The latitude in radians.
-         * @param {Number} longitudeRadians The longitude in radians
+         * @param {Number} longitudeRadians The longitude in radians.
          * @returns {Location} The new location with latitude and longitude in degrees.
          */
         Location.fromRadians = function (latitudeRadians, longitudeRadians) {
@@ -90,10 +102,9 @@ define([
 
         /**
          * Sets this location to the latitude and longitude.
-         * @param {number} latitude The latitude to set.
-         * @param {number} longitude The longitude to set.
-         * @returns {Location} This location, set to the values of the specified location.
-         * @throws {ArgumentError} If the specified location is null or undefined.
+         * @param {Number} latitude The latitude to set.
+         * @param {Number} longitude The longitude to set.
+         * @returns {Location} This location, set to the values of the specified latitude and longitude.
          */
         Location.prototype.set = function (latitude, longitude) {
             this.latitude = latitude;
@@ -105,7 +116,7 @@ define([
         /**
          * Indicates whether this location is equal to a specified location.
          * @param {Location} location The location to compare this one to.
-         * @returns {boolean} <code>true</code> if this location is equal to the specified location, otherwise
+         * @returns {Boolean} <code>true</code> if this location is equal to the specified location, otherwise
          * <code>false</code>.
          */
         Location.prototype.equals = function (location) {

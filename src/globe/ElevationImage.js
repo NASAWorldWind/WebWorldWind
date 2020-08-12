@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports ElevationImage
@@ -32,21 +44,12 @@ define([
          * @constructor
          * @classdesc Holds elevation values for an elevation tile.
          * This class is typically not used directly by applications.
-         * @param {String} imagePath A string uniquely identifying this elevation image relative to other elevation
-         * images.
          * @param {Sector} sector The sector spanned by this elevation image.
          * @param {Number} imageWidth The number of longitudinal sample points in this elevation image.
          * @param {Number} imageHeight The number of latitudinal sample points in this elevation image.
-         * @throws {ArgumentError} If the specified image path is null, undefined or empty, or the specified
-         * sector is null or undefined.
+         * @throws {ArgumentError} If the sector is null or undefined
          */
-        var ElevationImage = function (imagePath, sector, imageWidth, imageHeight) {
-            if (!imagePath || (imagePath.length < 1)) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "constructor",
-                        "The specified image path is null, undefined or zero length."));
-            }
-
+        var ElevationImage = function (sector, imageWidth, imageHeight) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ElevationImage", "constructor", "missingSector"));
@@ -58,13 +61,6 @@ define([
              * @readonly
              */
             this.sector = sector;
-
-            /**
-             * A string uniquely identifying this elevation image.
-             * @type {String}
-             * @readonly
-             */
-            this.imagePath = imagePath;
 
             /**
              * The number of longitudinal sample points in this elevation image.
@@ -86,6 +82,42 @@ define([
              * @readonly
              */
             this.size = this.imageWidth * this.imageHeight;
+
+            /**
+             * Internal use only
+             * false if the entire image consists of NO_DATA values, true otherwise.
+             * @ignore
+             */
+            this.hasData = true;
+
+            /**
+             * Internal use only
+             * true if any pixel in the image has a NO_DATA value, false otherwise.
+             * @ignore
+             */
+            this.hasMissingData = false;
+        };
+
+        /**
+         * Internal use only
+         * The value that indicates a pixel contains no data.
+         * TODO: This will eventually need to become an instance property
+         * @ignore
+         */
+        ElevationImage.NO_DATA = 0;
+
+        /**
+         * Internal use only
+         * Returns true if a set of elevation pixels represents the NO_DATA value.
+         * @ignore
+         */
+        ElevationImage.isNoData = function (x0y0, x1y0, x0y1, x1y1) {
+            // TODO: Change this logic once proper NO_DATA value handling is in place.
+            var v = ElevationImage.NO_DATA;
+            return x0y0 === v &&
+                x1y0 === v &&
+                x0y1 === v &&
+                x1y1 === v;
         };
 
         /**
@@ -135,6 +167,10 @@ define([
                 x1y1 = pixels[x1 + y1 * this.imageWidth],
                 xf = x - x0,
                 yf = y - y0;
+
+            if (ElevationImage.isNoData(x0y0, x1y0, x0y1, x1y1)) {
+                return NaN;
+            }
 
             return (1 - xf) * (1 - yf) * x0y0 +
                 xf * (1 - yf) * x1y0 +
@@ -201,7 +237,7 @@ define([
                             lon = maxLon; // explicitly set the last lon to the max longitude to ensure alignment
                         }
 
-                        if (lon >= minLonSelf && lon <= maxLonSelf) {
+                        if (lon >= minLonSelf && lon <= maxLonSelf && isNaN(result[index])) {
                             // Image x-coordinate of the specified location, given an image origin in the top-left corner.
                             var x = (this.imageWidth - 1) * (lon - minLonSelf) / deltaLonSelf,
                                 x0 = Math.floor(WWMath.clamp(x, 0, this.imageWidth - 1)),
@@ -213,10 +249,15 @@ define([
                                 x0y1 = pixels[x0 + y1 * this.imageWidth],
                                 x1y1 = pixels[x1 + y1 * this.imageWidth];
 
-                            result[index] = (1 - xf) * (1 - yf) * x0y0 +
-                            xf * (1 - yf) * x1y0 +
-                            (1 - xf) * yf * x0y1 +
-                            xf * yf * x1y1;
+                            if (ElevationImage.isNoData(x0y0, x1y0, x0y1, x1y1)) {
+                                result[index] = NaN;
+                            }
+                            else {
+                                result[index] = (1 - xf) * (1 - yf) * x0y0 +
+                                    xf * (1 - yf) * x1y0 +
+                                    (1 - xf) * yf * x0y1 +
+                                    xf * yf * x1y1;
+                            }
                         }
 
                         index++;
@@ -232,11 +273,15 @@ define([
          * @param {Sector} sector The sector of interest. If null or undefined, the minimum and maximum elevations
          * for the sector associated with this tile are returned.
          * @returns {Number[]} An array containing the minimum and maximum elevations within the specified sector,
-         * or null if the specified sector does not include this elevation image's coverage sector.
+         * or null if the specified sector does not include this elevation image's coverage sector or the image is filled with
+         * NO_DATA values.
          */
         ElevationImage.prototype.minAndMaxElevationsForSector = function (sector) {
-            var result = [];
+            if (!this.hasData) {
+                return null;
+            }
 
+            var result = [];
             if (!sector) { // the sector is this sector
                 result[0] = this.minElevation;
                 result[1] = this.maxElevation;
@@ -305,25 +350,34 @@ define([
          * this object. See [minAndMaxElevationsForSector]{@link ElevationImage#minAndMaxElevationsForSector}
          */
         ElevationImage.prototype.findMinAndMaxElevation = function () {
+            this.hasData = false;
+            this.hasMissingData = false;
+
             if (this.imageData && (this.imageData.length > 0)) {
                 this.minElevation = Number.MAX_VALUE;
-                this.maxElevation = -this.minElevation;
+                this.maxElevation = -Number.MAX_VALUE;
 
                 var pixels = this.imageData,
                     pixelCount = this.imageWidth * this.imageHeight;
 
                 for (var i = 0; i < pixelCount; i++) {
                     var p = pixels[i];
+                    if (p !== ElevationImage.NO_DATA) {
+                        this.hasData = true;
+                        if (this.minElevation > p) {
+                            this.minElevation = p;
+                        }
 
-                    if (this.minElevation > p) {
-                        this.minElevation = p;
-                    }
-
-                    if (this.maxElevation < p) {
-                        this.maxElevation = p;
+                        if (this.maxElevation < p) {
+                            this.maxElevation = p;
+                        }
+                    } else {
+                        this.hasMissingData = true;
                     }
                 }
-            } else {
+            }
+
+            if (!this.hasData) {
                 this.minElevation = 0;
                 this.maxElevation = 0;
             }

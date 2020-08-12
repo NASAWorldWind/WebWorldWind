@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Placemark
@@ -175,7 +187,7 @@ define([
             this.updateImage = true;
 
             /**
-             * Indicates the group ID of the declutter group to include this Text shape. If non-zero, this shape
+             * Indicates the group ID of the declutter group to include this placemark. If non-zero, this placemark
              * is decluttered relative to all other shapes within its group.
              * @type {Number}
              * @default 2
@@ -183,21 +195,22 @@ define([
             this.declutterGroup = 2;
 
             /**
-             * This shape's target visibility, a value between 0 and 1. During ordered rendering this shape modifies its
-             * [current visibility]{@link Text#currentVisibility} towards its target visibility at the rate
-             * specified by the draw context's [fade time]{@link DrawContext#fadeTime} property. The target
-             * visibility and current visibility are used to control the fading in and out of this shape.
+             * This placemark's target label visibility, a value between 0 and 1. During ordered rendering this
+             * placemark modifies its [current visibility]{@link Placemark#currentVisibility} towards its target
+             * visibility at the rate specified by the draw context's [fade time]{@link DrawContext#fadeTime} property.
+             * The target visibility and current visibility are used to control the fading in and out of this
+             * placemark's label.
              * @type {Number}
              * @default 1
              */
             this.targetVisibility = 1;
 
             /**
-             * This shape's current visibility, a value between 0 and 1. This property scales the shape's effective
-             * opacity. It is incremented or decremented each frame according to the draw context's
-             * [fade time]{@link DrawContext#fadeTime} property in order to achieve this shape's current
-             * [target visibility]{@link Text#targetVisibility}. This current visibility and target visibility are
-             * used to control the fading in and out of this shape.
+             * This placemark's current label visibility, a value between 0 and 1. This property scales the placemark's
+             * effective label opacity. It is incremented or decremented each frame according to the draw context's
+             * [fade time]{@link DrawContext#fadeTime} property in order to achieve this placemark's
+             * [target visibility]{@link Placemark#targetVisibility}. This current visibility and target visibility are
+             * used to control the fading in and out of this placemark's label.
              * @type {Number}
              * @default 1
              * @readonly
@@ -395,7 +408,7 @@ define([
 
                 if (dc.pickPoint && this.mustDrawLabel()) {
                     if (this.labelBounds.containsPoint(
-                            dc.navigatorState.convertPointToViewport(dc.pickPoint, Placemark.scratchPoint))) {
+                            dc.convertPointToViewport(dc.pickPoint, Placemark.scratchPoint))) {
                         po.labelPicked = true;
                     }
                 }
@@ -427,7 +440,7 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
-            this.eyeDistance = this.alwaysOnTop ? 0 : dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = this.alwaysOnTop ? 0 : dc.eyePoint.distanceTo(this.placePoint);
 
             if (this.mustDrawLeaderLine(dc)) {
                 dc.surfacePointForMode(this.position.latitude, this.position.longitude, 0,
@@ -439,7 +452,7 @@ define([
             // terrain. When a placemark is displayed near the terrain portions of its geometry are often behind the terrain,
             // yet as a screen element the placemark is expected to be visible. We adjust its depth values rather than moving
             // the placemark itself to avoid obscuring its actual position.
-            if (!dc.navigatorState.projectWithDepth(this.placePoint, this.depthOffset, Placemark.screenPoint)) {
+            if (!dc.projectWithDepth(this.placePoint, this.depthOffset, Placemark.screenPoint)) {
                 return null;
             }
 
@@ -476,18 +489,11 @@ define([
 
             this.imageBounds = WWMath.boundingRectForUnitQuad(this.imageTransform);
 
-            // If there's a label, perform these same operations for the label texture, creating that texture if it
-            // doesn't already exist.
+            // If there's a label, perform these same operations for the label texture.
 
             if (this.mustDrawLabel()) {
-                var labelFont = this.activeAttributes.labelAttributes.font,
-                    labelKey = this.label + labelFont.toString();
 
-                this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-                if (!this.labelTexture) {
-                    this.labelTexture = dc.textSupport.createTexture(dc, this.label, labelFont, true);
-                    dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-                }
+                this.labelTexture = dc.createTextTexture(this.label, this.activeAttributes.labelAttributes);
 
                 w = this.labelTexture.imageWidth;
                 h = this.labelTexture.imageHeight;
@@ -532,12 +538,12 @@ define([
                 return dc.pickRectangle && (this.imageBounds.intersects(dc.pickRectangle)
                     || (this.mustDrawLabel() && this.labelBounds.intersects(dc.pickRectangle))
                     || (this.mustDrawLeaderLine(dc)
-                    && dc.pickFrustum.intersectsSegment(this.groundPoint, this.placePoint)));
+                        && dc.pickFrustum.intersectsSegment(this.groundPoint, this.placePoint)));
             } else {
-                return this.imageBounds.intersects(dc.navigatorState.viewport)
-                    || (this.mustDrawLabel() && this.labelBounds.intersects(dc.navigatorState.viewport))
+                return this.imageBounds.intersects(dc.viewport)
+                    || (this.mustDrawLabel() && this.labelBounds.intersects(dc.viewport))
                     || (this.mustDrawLeaderLine(dc)
-                    && dc.navigatorState.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
+                        && dc.frustumInModelCoordinates.intersectsSegment(this.groundPoint, this.placePoint));
             }
         };
 
@@ -671,7 +677,7 @@ define([
                 program.loadColor(gl, dc.pickingMode ? this.pickColor :
                     this.activeAttributes.leaderLineAttributes.outlineColor);
 
-                Placemark.matrix.copy(dc.navigatorState.modelviewProjection);
+                Placemark.matrix.copy(dc.modelviewProjection);
                 program.loadModelviewProjection(gl, Placemark.matrix);
 
                 if (!this.activeAttributes.leaderLineAttributes.depthTest) {
@@ -706,7 +712,7 @@ define([
             Placemark.matrix.multiplyMatrix(this.imageTransform);
 
             var actualRotation = this.imageRotationReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigatorState.heading - this.imageRotation : -this.imageRotation;
+                dc.navigator.heading - this.imageRotation : -this.imageRotation;
             Placemark.matrix.multiplyByTranslation(0.5, 0.5, 0);
             Placemark.matrix.multiplyByRotation(0, 0, 1, actualRotation);
             Placemark.matrix.multiplyByTranslation(-0.5, -0.5, 0);
@@ -714,7 +720,7 @@ define([
             // Perform the tilt before applying the rotation so that the image tilts back from its base into
             // the view volume.
             var actualTilt = this.imageTiltReference === WorldWind.RELATIVE_TO_GLOBE ?
-            dc.navigatorState.tilt + this.imageTilt : this.imageTilt;
+                dc.navigator.tilt + this.imageTilt : this.imageTilt;
             Placemark.matrix.multiplyByRotation(-1, 0, 0, actualTilt);
 
             program.loadModelviewProjection(gl, Placemark.matrix);
@@ -758,7 +764,7 @@ define([
                     this.texCoordMatrix.multiplyByTextureTransform(this.labelTexture);
 
                     program.loadTextureMatrix(gl, this.texCoordMatrix);
-                    program.loadColor(gl, this.activeAttributes.labelAttributes.color);
+                    program.loadColor(gl, Color.WHITE);
 
                     textureBound = this.labelTexture.bind(dc);
                     program.loadTextureEnabled(gl, textureBound);
@@ -797,6 +803,16 @@ define([
         Placemark.prototype.mustDrawLeaderLine = function (dc) {
             return this.activeAttributes.drawLeaderLine && this.activeAttributes.leaderLineAttributes
                 && (!dc.pickingMode || this.enableLeaderLinePicking);
+        };
+
+        // Internal use only. Intentionally not documented.
+        Placemark.prototype.getReferencePosition = function () {
+            return this.position;
+        };
+
+        // Internal use only. Intentionally not documented.
+        Placemark.prototype.moveTo = function (globe, position) {
+            this.position = position;
         };
 
         return Placemark;

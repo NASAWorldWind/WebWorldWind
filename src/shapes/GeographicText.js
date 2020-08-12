@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports GeographicText
@@ -103,18 +115,18 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, GeographicText.placePoint);
 
-            if (!dc.navigatorState.frustumInModelCoordinates.containsPoint(GeographicText.placePoint)) {
+            if (!dc.frustumInModelCoordinates.containsPoint(GeographicText.placePoint)) {
                 return false;
             }
 
-            this.eyeDistance = this.alwaysOnTop ? 0 : dc.navigatorState.eyePoint.distanceTo(GeographicText.placePoint);
+            this.eyeDistance = this.alwaysOnTop ? 0 : dc.eyePoint.distanceTo(GeographicText.placePoint);
 
             // Compute the text's screen point in the OpenGL coordinate system of the WorldWindow by projecting its model
             // coordinate point onto the viewport. Apply a depth offset in order to cause the text to appear above nearby
             // terrain. When text is displayed near the terrain portions of its geometry are often behind the terrain,
             // yet as a screen element the text is expected to be visible. We adjust its depth values rather than moving
             // the text itself to avoid obscuring its actual position.
-            if (!dc.navigatorState.projectWithDepth(GeographicText.placePoint, this.depthOffset, this.screenPoint)) {
+            if (!dc.projectWithDepth(GeographicText.placePoint, this.depthOffset, this.screenPoint)) {
                 return false;
             }
 

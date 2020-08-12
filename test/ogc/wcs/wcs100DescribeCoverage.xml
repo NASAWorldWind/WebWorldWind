@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wcs:CoverageDescription xmlns:wcs="http://www.opengis.net/wcs" xmlns:gml="http://www.opengis.net/gml" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://localhost:8080/geoserver/schemas/wcs/1.0.0/describeCoverage.xsd" version="1.0.0">
+    <wcs:CoverageOffering>
+        <wcs:description>Generated from GeoTIFF</wcs:description>
+        <wcs:name>testing:gebco</wcs:name>
+        <wcs:label>gebco</wcs:label>
+        <wcs:lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+            <gml:pos>-180.0 -90.0</gml:pos>
+            <gml:pos>180.0 90.0</gml:pos>
+        </wcs:lonLatEnvelope>
+        <wcs:keywords><wcs:keyword>gebco</wcs:keyword><wcs:keyword>WCS</wcs:keyword><wcs:keyword>GeoTIFF</wcs:keyword></wcs:keywords>
+        <wcs:domainSet>
+            <wcs:spatialDomain>
+                <gml:Envelope srsName="EPSG:4326">
+                    <gml:pos>-180.0 -90.0</gml:pos>
+                    <gml:pos>180.0 90.0</gml:pos>
+                </gml:Envelope>
+                <gml:RectifiedGrid dimension="2" srsName="EPSG:4326">
+                    <gml:limits>
+                        <gml:GridEnvelope>
+                            <gml:low>0 0</gml:low>
+                            <gml:high>43199 21599</gml:high>
+                        </gml:GridEnvelope>
+                    </gml:limits>
+                    <gml:axisName>x</gml:axisName>
+                    <gml:axisName>y</gml:axisName>
+                    <gml:origin>
+                        <gml:pos>-179.99583333333334 89.99583333333334</gml:pos>
+                    </gml:origin>
+                    <gml:offsetVector>0.008333333333333333 0.0</gml:offsetVector>
+                    <gml:offsetVector>0.0 -0.008333333333333333</gml:offsetVector>
+                </gml:RectifiedGrid>
+            </wcs:spatialDomain>
+        </wcs:domainSet>
+        <wcs:rangeSet>
+            <wcs:RangeSet>
+                <wcs:name>gebco</wcs:name>
+                <wcs:label>gebco</wcs:label>
+                <wcs:axisDescription>
+                    <wcs:AxisDescription>
+                        <wcs:name>Band</wcs:name>
+                        <wcs:label>Band</wcs:label>
+                        <wcs:values>
+                            <wcs:singleValue>1</wcs:singleValue>
+                        </wcs:values>
+                    </wcs:AxisDescription>
+                </wcs:axisDescription>
+            </wcs:RangeSet>
+        </wcs:rangeSet>
+        <wcs:supportedCRSs>
+            <wcs:requestResponseCRSs>EPSG:4326</wcs:requestResponseCRSs>
+        </wcs:supportedCRSs>
+        <wcs:supportedFormats nativeFormat="GeoTIFF">
+            <wcs:formats>ArcGrid</wcs:formats>
+            <wcs:formats>GeoTIFF</wcs:formats>
+            <wcs:formats>GIF</wcs:formats>
+            <wcs:formats>GeoPackage (tiles)</wcs:formats>
+            <wcs:formats>Gtopo30</wcs:formats>
+            <wcs:formats>ImageMosaic</wcs:formats>
+            <wcs:formats>ImagePyramid</wcs:formats>
+            <wcs:formats>JP2K (Direct)</wcs:formats>
+            <wcs:formats>JPEG</wcs:formats>
+            <wcs:formats>MBTiles</wcs:formats>
+            <wcs:formats>PNG</wcs:formats>
+            <wcs:formats>TIFF</wcs:formats>
+        </wcs:supportedFormats>
+        <wcs:supportedInterpolations default="nearest neighbor">
+            <wcs:interpolationMethod>nearest neighbor</wcs:interpolationMethod>
+            <wcs:interpolationMethod>bilinear</wcs:interpolationMethod>
+            <wcs:interpolationMethod>bicubic</wcs:interpolationMethod>
+        </wcs:supportedInterpolations>
+    </wcs:CoverageOffering>
+    <wcs:CoverageOffering>
+        <wcs:description>Generated from GeoTIFF</wcs:description>
+        <wcs:name>testing:pacificnw_usgs_ned_10m</wcs:name>
+        <wcs:label>pacificnw_usgs_ned_10m</wcs:label>
+        <wcs:lonLatEnvelope srsName="urn:ogc:def:crs:OGC:1.3:CRS84">
+            <gml:pos>-123.0005555556 43.9994444441653</gml:pos>
+            <gml:pos>-117.99944444420979 49.000555555555515</gml:pos>
+        </wcs:lonLatEnvelope>
+        <wcs:keywords>
+            <wcs:keyword>pacificnw_usgs_ned_10m</wcs:keyword>
+            <wcs:keyword>WCS</wcs:keyword>
+            <wcs:keyword>GeoTIFF</wcs:keyword>
+        </wcs:keywords>
+        <wcs:domainSet>
+            <wcs:spatialDomain>
+                <gml:Envelope srsName="EPSG:4326">
+                    <gml:pos>-123.0005555556 43.9994444441653</gml:pos>
+                    <gml:pos>-117.99944444420979 49.000555555555515</gml:pos>
+                </gml:Envelope>
+                <gml:RectifiedGrid dimension="2" srsName="EPSG:4326">
+                    <gml:limits>
+                        <gml:GridEnvelope>
+                            <gml:low>0 0</gml:low>
+                            <gml:high>54011 54011</gml:high>
+                        </gml:GridEnvelope>
+                    </gml:limits>
+                    <gml:axisName>x</gml:axisName>
+                    <gml:axisName>y</gml:axisName>
+                    <gml:origin>
+                        <gml:pos>-123.0005092593037 49.00050925925922</gml:pos>
+                    </gml:origin>
+                    <gml:offsetVector>9.259259259776E-5 0.0</gml:offsetVector>
+                    <gml:offsetVector>0.0 -9.259259259776E-5</gml:offsetVector>
+                </gml:RectifiedGrid>
+            </wcs:spatialDomain>
+        </wcs:domainSet>
+        <wcs:rangeSet>
+            <wcs:RangeSet>
+                <wcs:name>pacificnw_usgs_ned_10m</wcs:name>
+                <wcs:label>pacificnw_usgs_ned_10m</wcs:label>
+                <wcs:axisDescription>
+                    <wcs:AxisDescription>
+                        <wcs:name>Band</wcs:name>
+                        <wcs:label>Band</wcs:label>
+                        <wcs:values>
+                            <wcs:singleValue>1</wcs:singleValue>
+                        </wcs:values>
+                    </wcs:AxisDescription>
+                </wcs:axisDescription>
+            </wcs:RangeSet>
+        </wcs:rangeSet>
+        <wcs:supportedCRSs>
+            <wcs:requestResponseCRSs>EPSG:4326</wcs:requestResponseCRSs>
+        </wcs:supportedCRSs>
+        <wcs:supportedFormats nativeFormat="GeoTIFF">
+            <wcs:formats>ArcGrid</wcs:formats>
+            <wcs:formats>GeoTIFF</wcs:formats>
+            <wcs:formats>GIF</wcs:formats>
+            <wcs:formats>GeoPackage (tiles)</wcs:formats>
+            <wcs:formats>Gtopo30</wcs:formats>
+            <wcs:formats>ImageMosaic</wcs:formats>
+            <wcs:formats>ImagePyramid</wcs:formats>
+            <wcs:formats>JP2K (Direct)</wcs:formats>
+            <wcs:formats>JPEG</wcs:formats>
+            <wcs:formats>MBTiles</wcs:formats>
+            <wcs:formats>PNG</wcs:formats>
+            <wcs:formats>TIFF</wcs:formats>
+        </wcs:supportedFormats>
+        <wcs:supportedInterpolations default="nearest neighbor">
+            <wcs:interpolationMethod>nearest neighbor</wcs:interpolationMethod>
+            <wcs:interpolationMethod>bilinear</wcs:interpolationMethod>
+            <wcs:interpolationMethod>bicubic</wcs:interpolationMethod>
+        </wcs:supportedInterpolations>
+    </wcs:CoverageOffering>
+</wcs:CoverageDescription>

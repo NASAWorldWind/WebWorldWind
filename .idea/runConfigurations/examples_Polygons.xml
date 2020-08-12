@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="examples/Polygons" type="JavascriptDebugType" factoryName="JavaScript Debug" uri="http://localhost:63342/WebWorldWind/examples/Polygons.html">
+    <RunnerSettings RunnerId="JavascriptDebugRunner" />
+    <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
+    <method />
+  </configuration>
+</component>

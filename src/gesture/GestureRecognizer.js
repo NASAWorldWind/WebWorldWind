@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports GestureRecognizer
@@ -42,108 +54,90 @@ define([
          * e.g., <code>gestureCallback(recognizer)</code>.
          * @throws {ArgumentError} If the specified target is null or undefined.
          */
+            // TODO: evaluate target usage
         var GestureRecognizer = function (target, callback) {
-            if (!target) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "constructor", "missingTarget"));
-            }
+                if (!target) {
+                    throw new ArgumentError(
+                        Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "constructor", "missingTarget"));
+                }
 
-            /**
-             * Indicates the document element this gesture recognizer observes for UI events.
-             * @type {EventTarget}
-             * @readonly
-             */
-            this.target = target;
+                /**
+                 * Indicates the document element this gesture recognizer observes for UI events.
+                 * @type {EventTarget}
+                 * @readonly
+                 */
+                this.target = target;
 
-            /**
-             * Indicates whether or not this gesture recognizer is enabled. When false, this gesture recognizer will
-             * ignore any events dispatched by its target.
-             * @type {Boolean}
-             * @default true
-             */
-            this.enabled = true;
+                /**
+                 * Indicates whether or not this gesture recognizer is enabled. When false, this gesture recognizer will
+                 * ignore any events dispatched by its target.
+                 * @type {Boolean}
+                 * @default true
+                 */
+                this.enabled = true;
 
-            // Documented with its property accessor below.
-            this._state = WorldWind.POSSIBLE;
+                // Documented with its property accessor below.
+                this._state = WorldWind.POSSIBLE;
 
-            // Intentionally not documented.
-            this._nextState = null;
+                // Intentionally not documented.
+                this._nextState = null;
 
-            // Documented with its property accessor below.
-            this._clientX = 0;
+                // Documented with its property accessor below.
+                this._clientX = 0;
 
-            // Documented with its property accessor below.
-            this._clientY = 0;
+                // Documented with its property accessor below.
+                this._clientY = 0;
 
-            // Intentionally not documented.
-            this._clientStartX = 0;
+                // Intentionally not documented.
+                this._clientStartX = 0;
 
-            // Intentionally not documented.
-            this._clientStartY = 0;
+                // Intentionally not documented.
+                this._clientStartY = 0;
 
-            // Documented with its property accessor below.
-            this._translationX = 0;
+                // Documented with its property accessor below.
+                this._translationX = 0;
 
-            // Documented with its property accessor below.
-            this._translationY = 0;
+                // Documented with its property accessor below.
+                this._translationY = 0;
 
-            // Intentionally not documented.
-            this._translationWeight = 0.4;
+                // Intentionally not documented.
+                this._translationWeight = 0.4;
 
-            // Documented with its property accessor below.
-            this._mouseButtonMask = 0;
+                // Documented with its property accessor below.
+                this._mouseButtonMask = 0;
 
-            // Intentionally not documented.
-            this._touches = [];
+                // Intentionally not documented.
+                this._touches = [];
 
-            // Intentionally not documented.
-            this._touchCentroidShiftX = 0;
+                // Intentionally not documented.
+                this._touchCentroidShiftX = 0;
 
-            // Intentionally not documented.
-            this._touchCentroidShiftY = 0;
+                // Intentionally not documented.
+                this._touchCentroidShiftY = 0;
 
-            // Documented with its property accessor below.
-            this._gestureCallbacks = [];
+                // Documented with its property accessor below.
+                this._gestureCallbacks = [];
 
-            // Intentionally not documented.
-            this._canRecognizeWith = [];
+                // Intentionally not documented.
+                this._canRecognizeWith = [];
 
-            // Intentionally not documented.
-            this._requiresFailureOf = [];
+                // Intentionally not documented.
+                this._requiresFailureOf = [];
 
-            // Intentionally not documented.
-            this._requiredToFailBy = [];
+                // Intentionally not documented.
+                this._requiredToFailBy = [];
 
-            // Add the optional gesture callback.
-            if (callback) {
-                this._gestureCallbacks.push(callback);
-            }
+                // Add the optional gesture callback.
+                if (callback) {
+                    this._gestureCallbacks.push(callback);
+                }
 
-            // Add this recognizer to the list of all recognizers.
-            GestureRecognizer.allRecognizers.push(this);
+                // Intentionally not documented.
+                this.listenerList = [];
 
-            // Register listeners on the event target.
-            var thisRecognizer = this;
-
-            function eventListener(event) {
-                thisRecognizer.handleEvent(event);
-            }
-
-            if (window.PointerEvent) {
-                target.addEventListener("pointerdown", eventListener, false);
-                window.addEventListener("pointermove", eventListener, false); // get pointermove events outside event target
-                window.addEventListener("pointercancel", eventListener, false); // get pointercancel events outside event target
-                window.addEventListener("pointerup", eventListener, false); // get pointerup events outside event target
-            } else {
-                target.addEventListener("mousedown", eventListener, false);
-                window.addEventListener("mousemove", eventListener, false); // get mousemove events outside event target
-                window.addEventListener("mouseup", eventListener, false); // get mouseup events outside event target
-                target.addEventListener("touchstart", eventListener, false);
-                target.addEventListener("touchmove", eventListener, false);
-                target.addEventListener("touchend", eventListener, false);
-                target.addEventListener("touchcancel", eventListener, false);
-            }
-        };
+                // Add this recognizer to the list of all recognizers.
+                GestureRecognizer.allRecognizers.push(this);
+            };
 
         // Intentionally not documented.
         GestureRecognizer.allRecognizers = [];
@@ -431,32 +425,37 @@ define([
         GestureRecognizer.prototype.transitionToState = function (newState) {
             this._nextState = null; // clear any pending state transition
 
-            if (newState == WorldWind.FAILED) {
+            if (newState === WorldWind.FAILED) {
                 this._state = newState;
                 this.updateRecognizersWaitingForFailure();
                 this.resetIfEventsEnded();
-            } else if (newState == WorldWind.RECOGNIZED) {
+            } else if (newState === WorldWind.RECOGNIZED) {
                 this.tryToRecognize(newState); // may prevent the transition to Recognized
-                if (this._state == newState) {
+                if (this._state === newState) {
                     this.prepareToRecognize();
+                    this.notifyListeners();
                     this.callGestureCallbacks();
                     this.resetIfEventsEnded();
                 }
-            } else if (newState == WorldWind.BEGAN) {
+            } else if (newState === WorldWind.BEGAN) {
                 this.tryToRecognize(newState); // may prevent the transition to Began
-                if (this._state == newState) {
+                if (this._state === newState) {
                     this.prepareToRecognize();
+                    this.notifyListeners();
                     this.callGestureCallbacks();
                 }
-            } else if (newState == WorldWind.CHANGED) {
+            } else if (newState === WorldWind.CHANGED) {
                 this._state = newState;
+                this.notifyListeners();
                 this.callGestureCallbacks();
-            } else if (newState == WorldWind.CANCELLED) {
+            } else if (newState === WorldWind.CANCELLED) {
                 this._state = newState;
+                this.notifyListeners();
                 this.callGestureCallbacks();
                 this.resetIfEventsEnded();
-            } else if (newState == WorldWind.ENDED) {
+            } else if (newState === WorldWind.ENDED) {
                 this._state = newState;
+                this.notifyListeners();
                 this.callGestureCallbacks();
                 this.resetIfEventsEnded();
             }
@@ -514,6 +513,51 @@ define([
                 this.requiresRecognizerToFail(that);
         };
 
+        /**
+         * Registers a gesture state listener on this GestureRecognizer. Registering state listeners using this function
+         * enables applications to receive notifications of gesture recognition.
+         *
+         * Listeners must implement a gestureStateChanged method to receive notifications. The gestureStateChanged method will
+         * receive one parameter containing a reference to the recognizer that changed state.
+         *
+         * @param listener The function to call when the event occurs.
+         * @throws {ArgumentError} If any argument is null or undefined.
+         */
+        GestureRecognizer.prototype.addListener = function (listener) {
+            if (!listener) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "addListener", "missingListener"));
+            }
+            this.listenerList.push(listener);
+        };
+
+        /**
+         * Removes a gesture state listener from this GestureRecognizer. The listener must be the same object passed to
+         * addListener. Calling removeListener with arguments that do not identify a currently registered
+         * listener has no effect.
+         *
+         * @param listener The listener to remove. Must be the same object passed to addListener.
+         * @throws {ArgumentError} If any argument is null or undefined.
+         */
+        GestureRecognizer.prototype.removeListener = function (listener) {
+            if (!listener) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GestureRecognizer", "removeListener", "missingListener"));
+            }
+
+            var index = this.listenerList.indexOf(listener);
+            if (index !== -1) {
+                this.listenerList.splice(index, 1); // remove the listener from the list
+            }
+        };
+
+        // Intentionally not documented.
+        GestureRecognizer.prototype.notifyListeners = function () {
+            for (var i = 0; i < this.listenerList.length; i++) {
+                this.listenerList[i].gestureStateChanged(this);
+            }
+        };
+
         // Intentionally not documented.
         GestureRecognizer.prototype.callGestureCallbacks = function () {
             for (var i = 0, len = this._gestureCallbacks.length; i < len; i++) {
@@ -522,56 +566,56 @@ define([
         };
 
         // Intentionally not documented.
-        GestureRecognizer.prototype.handleEvent = function (event) {
+        GestureRecognizer.prototype.onGestureEvent = function (event) {
             if (!this.enabled) {
                 return;
             }
 
-            if (event.defaultPrevented && this.state == WorldWind.POSSIBLE) {
+            if (event.defaultPrevented && this.state === WorldWind.POSSIBLE) {
                 return; // ignore cancelled events while in the Possible state
             }
 
             var i, len;
 
             try {
-                if (event.type == "mousedown") {
+                if (event.type === "mousedown") {
                     this.handleMouseDown(event);
-                } else if (event.type == "mousemove") {
+                } else if (event.type === "mousemove") {
                     this.handleMouseMove(event);
-                } else if (event.type == "mouseup") {
+                } else if (event.type === "mouseup") {
                     this.handleMouseUp(event);
-                } else if (event.type == "touchstart") {
+                } else if (event.type === "touchstart") {
                     for (i = 0, len = event.changedTouches.length; i < len; i++) {
                         this.handleTouchStart(event.changedTouches.item(i));
                     }
-                } else if (event.type == "touchmove") {
+                } else if (event.type === "touchmove") {
                     for (i = 0, len = event.changedTouches.length; i < len; i++) {
                         this.handleTouchMove(event.changedTouches.item(i));
                     }
-                } else if (event.type == "touchcancel") {
+                } else if (event.type === "touchcancel") {
                     for (i = 0, len = event.changedTouches.length; i < len; i++) {
                         this.handleTouchCancel(event.changedTouches.item(i));
                     }
-                } else if (event.type == "touchend") {
+                } else if (event.type === "touchend") {
                     for (i = 0, len = event.changedTouches.length; i < len; i++) {
                         this.handleTouchEnd(event.changedTouches.item(i));
                     }
-                } else if (event.type == "pointerdown" && event.pointerType == "mouse") {
+                } else if (event.type === "pointerdown" && event.pointerType === "mouse") {
                     this.handleMouseDown(event);
-                } else if (event.type == "pointermove" && event.pointerType == "mouse") {
+                } else if (event.type === "pointermove" && event.pointerType === "mouse") {
                     this.handleMouseMove(event);
-                } else if (event.type == "pointercancel" && event.pointerType == "mouse") {
+                } else if (event.type === "pointercancel" && event.pointerType === "mouse") {
                     // Intentionally left blank. The W3C Pointer Events specification is ambiguous on what cancel means
                     // for mouse input, and there is no evidence that this event is actually generated (6/19/2015).
-                } else if (event.type == "pointerup" && event.pointerType == "mouse") {
+                } else if (event.type === "pointerup" && event.pointerType === "mouse") {
                     this.handleMouseUp(event);
-                } else if (event.type == "pointerdown" && event.pointerType == "touch") {
+                } else if (event.type === "pointerdown" && event.pointerType === "touch") {
                     this.handleTouchStart(event);
-                } else if (event.type == "pointermove" && event.pointerType == "touch") {
+                } else if (event.type === "pointermove" && event.pointerType === "touch") {
                     this.handleTouchMove(event);
-                } else if (event.type == "pointercancel" && event.pointerType == "touch") {
+                } else if (event.type === "pointercancel" && event.pointerType === "touch") {
                     this.handleTouchCancel(event);
-                } else if (event.type == "pointerup" && event.pointerType == "touch") {
+                } else if (event.type === "pointerup" && event.pointerType === "touch") {
                     this.handleTouchEnd(event);
                 } else {
                     Logger.logMessage(Logger.LEVEL_INFO, "GestureRecognizer", "handleEvent",

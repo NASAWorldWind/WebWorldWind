@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports GoToAnimator
@@ -27,7 +39,6 @@ define([
               Position,
               Vec3) {
         "use strict";
-
         /**
          * Constructs a GoTo animator.
          * @alias GoToAnimator
@@ -119,7 +130,7 @@ define([
             // Determine how high we need to go to give the user context. The max altitude computed is approximately
             // that needed to fit the start and end positions in the same viewport assuming a 45 degree field of view.
             var pA = this.wwd.globe.computePointFromLocation(
-                    this.startPosition.latitude, this.startPosition.longitude, new Vec3(0, 0, 0)),
+                this.startPosition.latitude, this.startPosition.longitude, new Vec3(0, 0, 0)),
                 pB = this.wwd.globe.computePointFromLocation(
                     this.targetPosition.latitude, this.targetPosition.longitude, new Vec3(0, 0, 0));
             this.maxAltitude = pA.distanceTo(pB);
@@ -127,7 +138,7 @@ define([
             // Determine an approximate viewport size in radians in order to determine whether we actually change
             // the range as we pan to the new location. We don't want to change the range if the distance between
             // the start and target positions is small relative to the current viewport.
-            var viewportSize = this.wwd.navigator.currentState().pixelSizeAtDistance(this.startPosition.altitude)
+            var viewportSize = this.wwd.pixelSizeAtDistance(this.startPosition.altitude)
                 * this.wwd.canvas.clientWidth / this.wwd.globe.equatorialRadius;
 
             if (panDistance <= 2 * viewportSize) {

@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports TiledImageLayer
@@ -23,6 +35,7 @@ define([
         '../layer/Layer',
         '../util/LevelSet',
         '../util/Logger',
+        '../geom/Matrix',
         '../cache/MemoryCache',
         '../render/Texture',
         '../util/Tile',
@@ -34,6 +47,7 @@ define([
               Layer,
               LevelSet,
               Logger,
+              Matrix,
               MemoryCache,
               Texture,
               Tile,
@@ -114,6 +128,13 @@ define([
             this.retrievalImageFormat = imageFormat;
             this.cachePath = cachePath;
 
+            /**
+             * Controls how many concurrent tile requests are allowed for this layer.
+             * @type {Number}
+             * @default WorldWind.configuration.layerRetrievalQueueSize
+             */
+            this.retrievalQueueSize = WorldWind.configuration.layerRetrievalQueueSize;
+            
             this.levels = new LevelSet(sector, levelZeroDelta, numLevels, tileWidth, tileHeight);
 
             /**
@@ -150,6 +171,9 @@ define([
             this.absentResourceList = new AbsentResourceList(3, 50e3);
 
             this.pickEnabled = false;
+
+            // Internal. Intentionally not documented.
+            this.lasTtMVP = Matrix.fromIdentity();
         };
 
         TiledImageLayer.prototype = Object.create(Layer.prototype);
@@ -251,8 +275,8 @@ define([
                 return;
 
             if (this.currentTilesInvalid
-                || !this.lasTtMVP || !dc.navigatorState.modelviewProjection.equals(this.lasTtMVP)
-                || dc.globeStateKey != this.lastGlobeStateKey) {
+                || !dc.modelviewProjection.equals(this.lasTtMVP)
+                || dc.globeStateKey !== this.lastGlobeStateKey) {
                 this.currentTilesInvalid = false;
 
                 // Tile fading works visually only when the surface tiles are opaque, otherwise the surface flashes
@@ -275,7 +299,7 @@ define([
 
             }
 
-            this.lasTtMVP = dc.navigatorState.modelviewProjection;
+            this.lasTtMVP.copy(dc.modelviewProjection);
             this.lastGlobeStateKey = dc.globeStateKey;
 
             if (this.currentTiles.length > 0) {
@@ -393,7 +417,8 @@ define([
 
             var texture = dc.gpuResourceCache.resourceForKey(tile.imagePath);
             if (texture) {
-                tile.opacity = 1;;
+                tile.opacity = 1;
+                ;
                 this.currentTiles.push(tile);
 
                 // If the tile's texture has expired, cause it to be re-retrieved. Note that the current,
@@ -423,7 +448,7 @@ define([
                 return false;
             }
 
-            return tile.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+            return tile.extent.intersectsFrustum(dc.frustumInModelCoordinates);
         };
 
         // Intentionally not documented.
@@ -456,6 +481,10 @@ define([
          */
         TiledImageLayer.prototype.retrieveTileImage = function (dc, tile, suppressRedraw) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+                if (this.currentRetrievals.length > this.retrievalQueueSize) {
+                    return;
+                }
+                
                 if (this.absentResourceList.isResourceAbsent(tile.imagePath)) {
                     return;
                 }

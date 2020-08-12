@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Globe
@@ -77,25 +89,27 @@ define([
             this.elevationModel = elevationModel;
 
             /**
-             * This globe's equatorial radius.
+             * This globe's equatorial radius in meters.
+             *
              * @type {Number}
-             * @default 6378137.0 meters
+             * @default WGS 84 semi-major axis (6378137.0 meters)
              */
-            this.equatorialRadius = 6378137.0;
+            this.equatorialRadius = WorldWind.WGS84_SEMI_MAJOR_AXIS;
+            var f = 1 / WorldWind.WGS84_INVERSE_FLATTENING;
 
             /**
-             * This globe's polar radius.
+             * This globe's polar radius in meters.
              * @type {Number}
-             * @default 6356752.3 meters
+             * @default WGS 84 semi-minor axis (6356752.3142 meters). Taken from NGA.STND.0036_1.0.0_WGS84, section 3.2.
              */
-            this.polarRadius = 6356752.3;
+            this.polarRadius = this.equatorialRadius * (1 - f);
 
             /**
              * This globe's eccentricity squared.
              * @type {Number}
-             * @default 0.00669437999013
+             * @default WGS 84 first eccentricity squared (6.694379990141e-3). Taken from NGA.STND.0036_1.0.0_WGS84, section 3.3.
              */
-            this.eccentricitySquared = 0.00669437999013;
+            this.eccentricitySquared = (2 * f) - (f * f);
 
             /**
              * The tessellator used to create this globe's terrain.
@@ -360,6 +374,12 @@ define([
                     "missingResult"));
             }
 
+            // For backwards compatibility, check whether the projection defines a surfaceNormalAtLocation function
+            // before calling it. If it's not available, use the old code to compute the normal.
+            if (this.projection.surfaceNormalAtLocation) {
+                return this.projection.surfaceNormalAtLocation(this, latitude, longitude, result);
+            }
+
             if (this.is2D()) {
                 result[0] = 0;
                 result[1] = 0;
@@ -371,13 +391,11 @@ define([
             var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
                 cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
                 sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
-                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS),
-                eqSquared = this.equatorialRadius * this.equatorialRadius,
-                polSquared = this.polarRadius * this.polarRadius;
+                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS);
 
-            result[0] = cosLat * sinLon / eqSquared;
-            result[1] = (1 - this.eccentricitySquared) * sinLat / polSquared;
-            result[2] = cosLat * cosLon / eqSquared;
+            result[0] = cosLat * sinLon;
+            result[1] = sinLat;
+            result[2] = cosLat * cosLon;
 
             return result.normalize();
         };
@@ -632,8 +650,8 @@ define([
          * @param {Sector} sector The sector for which to determine the elevations.
          * @param {Number} numLat The number of latitudinal sample locations within the sector.
          * @param {Number} numLon The number of longitudinal sample locations within the sector.
-         * @param {Number} targetResolution The desired elevation resolution, in radians. (To compute radians from
-         * meters, divide the number of meters by the globe's radius.)
+         * @param {Number} targetResolution The desired elevation resolution, in degrees. (To compute degrees from
+         * meters, divide the number of meters by the globe's radius to obtain radians and convert the result to degrees.)
          * @param {Number[]} result An array in which to return the requested elevations.
          * @returns {Number} The resolution actually achieved, which may be greater than that requested if the
          * elevation data for the requested resolution is not currently available.
@@ -660,6 +678,4 @@ define([
         };
 
         return Globe;
-    }
-)
-;
+    });

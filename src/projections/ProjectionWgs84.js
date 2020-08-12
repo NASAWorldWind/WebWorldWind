@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports ProjectionWgs84
@@ -274,7 +286,7 @@ define([
             result[1] = cosLat;
             result[2] = -sinLat * cosLon;
 
-            return result;
+            return result.normalize();
         };
 
         ProjectionWgs84.prototype.northTangentAtPoint = function (globe, x, y, z, offset, result) {
@@ -283,18 +295,31 @@ define([
             return this.northTangentAtLocation(globe, this.scratchPosition.latitude, this.scratchPosition.longitude, result);
         };
 
+        ProjectionWgs84.prototype.surfaceNormalAtLocation = function (globe, latitude, longitude, result) {
+            var cosLat = Math.cos(latitude * Angle.DEGREES_TO_RADIANS),
+                cosLon = Math.cos(longitude * Angle.DEGREES_TO_RADIANS),
+                sinLat = Math.sin(latitude * Angle.DEGREES_TO_RADIANS),
+                sinLon = Math.sin(longitude * Angle.DEGREES_TO_RADIANS);
+
+            result[0] = cosLat * sinLon;
+            result[1] = sinLat;
+            result[2] = cosLat * cosLon;
+
+            return result.normalize();
+        };
+
         ProjectionWgs84.prototype.surfaceNormalAtPoint = function (globe, x, y, z, result) {
             if (!globe) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ProjectionWgs84",
                     "surfaceNormalAtPoint", "missingGlobe"));
             }
 
-            var eSquared = globe.equatorialRadius * globe.equatorialRadius,
-                polSquared = globe.polarRadius * globe.polarRadius;
+            var a2 = globe.equatorialRadius * globe.equatorialRadius,
+                b2 = globe.polarRadius * globe.polarRadius;
 
-            result[0] = x / eSquared;
-            result[1] = y / polSquared;
-            result[2] = z / eSquared;
+            result[0] = x / a2;
+            result[1] = y / b2;
+            result[2] = z / a2;
 
             return result.normalize();
         };

@@ -1,24 +1,37 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 define([
     'src/geom/Location',
     'src/geom/Angle',
-    'src/globe/Globe',
-    'src/globe/EarthElevationModel'
-], function (Location, Angle, Globe, EarthElevationModel) {
+    'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
+    'src/globe/Globe'
+], function (Location, Angle, EarthElevationModel, ElevationModel, Globe) {
     "use strict";
 
     describe("Location Tests", function () {
@@ -47,7 +60,7 @@ define([
         describe("Copies this location to the latitude and longitude of a specified location", function () {
 
             it("Copies the location successfully", function () {
-                var location = Location.ZERO;
+                var location = new Location(0, 0);
                 var locationTarget = new Location(37.52, 15.08);
 
                 location.copy(locationTarget);
@@ -57,14 +70,14 @@ define([
 
             it("Should throw an exception on missing location input", function () {
                 expect(function () {
-                    var location = Location.ZERO;
+                    var location = new Location(0, 0);
                     location.copy(null);
                 }).toThrow();
             });
         });
 
         it('Sets latitude and longitude of a location', function () {
-            var location = Location.ZERO;
+            var location = new Location(0, 0);
             location.set(37.52, 15.08);
             expect(location.latitude).toEqual(37.52);
             expect(location.longitude).toEqual(15.08);
@@ -96,7 +109,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.537, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.227, 2);
             });
@@ -107,7 +120,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.135, 2);
             });
@@ -118,7 +131,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.044, 2);
             });
@@ -129,7 +142,7 @@ define([
                     4.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(45.48, 2);
                 expect(resultLocation.longitude).toBeCloseTo(9.089, 2);
             });
@@ -140,13 +153,13 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.044, 2);
             });
 
             it('Store result in the provided variable', function () {
-                var resultLocation = Location.ZERO;
+                var resultLocation = new Location(0, 0);
                 Location.interpolateAlongPath(
                     WorldWind.LINEAR,
                     0.5,
@@ -166,7 +179,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -177,7 +190,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -204,7 +217,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.537, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.227, 2);
             });
@@ -214,7 +227,7 @@ define([
                     0.5,
                     locationA,
                     locationA,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation).toEqual(locationA);
             });
 
@@ -226,7 +239,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -236,7 +249,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -262,7 +275,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.135, 2);
             });
@@ -272,7 +285,7 @@ define([
                     0.5,
                     locationA,
                     locationA,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation).toEqual(locationA);
             });
 
@@ -284,7 +297,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -294,7 +307,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -320,7 +333,7 @@ define([
                     0.5,
                     locationA,
                     locationB,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation.latitude).toBeCloseTo(41.5, 2);
                 expect(resultLocation.longitude).toBeCloseTo(12.044, 2);
             });
@@ -330,7 +343,7 @@ define([
                     0.5,
                     locationA,
                     locationA,
-                    Location.ZERO);
+                    new Location());
                 expect(resultLocation).toEqual(locationA);
             });
 
@@ -342,7 +355,7 @@ define([
                             0.5,
                             null,
                             locationB,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 
@@ -352,7 +365,7 @@ define([
                             0.5,
                             locationA,
                             null,
-                            Location.ZERO);
+                            new Location());
                     }).toThrow();
                 });
 

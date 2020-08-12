@@ -1,51 +1,59 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports EarthElevationModel
  */
 define([
-        '../geom/Location',
-        '../geom/Sector',
+        '../globe/AsterV2ElevationCoverage',
         '../globe/ElevationModel',
-        '../util/WmsUrlBuilder'
+        '../globe/GebcoElevationCoverage',
+        '../globe/UsgsNedElevationCoverage',
+        '../globe/UsgsNedHiElevationCoverage'
     ],
-    function (Location,
-              Sector,
+    function (AsterV2ElevationCoverage,
               ElevationModel,
-              WmsUrlBuilder) {
+              GebcoElevationCoverage,
+              UsgsNedElevationCoverage,
+              UsgsNedHiElevationCoverage) {
         "use strict";
 
         /**
-         * Constructs an Earth elevation model.
+         * Constructs an EarthElevationModel consisting of three elevation coverages GEBCO, Aster V2, and USGS NED.
          * @alias EarthElevationModel
          * @constructor
-         * @augments ElevationModel
-         * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
         var EarthElevationModel = function () {
-            ElevationModel.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "application/bil16", "EarthElevations256", 256, 256);
+            ElevationModel.call(this);
 
-            this.displayName = "Earth Elevation Model";
-            this.minElevation = -11000; // Depth of Marianas Trench, in meters
-            this.maxElevation = 8850; // Height of Mt. Everest
-            this.pixelIsPoint = false; // WorldWind WMS elevation layers return pixel-as-area images
-
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind26.arc.nasa.gov/elev",
-                "GEBCO,aster_v2,USGS-NED", "", "1.3.0");
+            this.addCoverage(new GebcoElevationCoverage());
+            this.addCoverage(new AsterV2ElevationCoverage());
+            this.addCoverage(new UsgsNedElevationCoverage());
+            this.addCoverage(new UsgsNedHiElevationCoverage());
         };
 
         EarthElevationModel.prototype = Object.create(ElevationModel.prototype);

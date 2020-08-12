@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 define([
     '../../../util/Color',
@@ -20,7 +32,7 @@ define([
     './KmlLinearRing',
     '../styles/KmlStyle',
     '../../../geom/Location',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../shapes/Polygon',
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon'
@@ -103,7 +115,10 @@ define([
          */
         kmlOuterBoundary: {
             get: function () {
-                return this._factory.specific(this, {name: 'outerBoundaryIs', transformer: NodeTransformers.linearRing});
+                return this._factory.specific(this, {
+                    name: 'outerBoundaryIs',
+                    transformer: NodeTransformers.linearRing
+                });
             }
         },
 
@@ -115,7 +130,10 @@ define([
          */
         kmlInnerBoundary: {
             get: function () {
-                return this._factory.specific(this, {name: 'innerBoundaryIs', transformer: NodeTransformers.linearRing});
+                return this._factory.specific(this, {
+                    name: 'innerBoundaryIs',
+                    transformer: NodeTransformers.linearRing
+                });
             }
         },
 
@@ -138,30 +156,37 @@ define([
      * @param styles.normal {KmlStyle} Style to apply when not highlighted
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
-    KmlPolygon.prototype.createPolygon = function(styles) {
-        if(this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
-            this._renderable = new SurfacePolygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+    KmlPolygon.prototype.createPolygon = function (styles, fileCache) {
+        console.log(this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND);
+        // TODO: KML boundaries are displaying graphic glitches when the camera is zoomed out
+        if (
+            !this.isValidAltitudeMode(this.kmlAltitudeMode) ||
+            this.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND ||
+            (this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND) ||
+            (this.kmlOuterBoundary && this.kmlOuterBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND)
+        ) {
+            this._renderable = new SurfacePolygon(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         } else {
-            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal));
+            this._renderable = new Polygon(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         }
-        if(styles.highlight) {
-            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight);
+        if (styles.highlight) {
+            this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight, fileCache);
         }
         this.moveValidProperties();
     };
 
-	/**
+    /**
      * @inheritDoc
      */
-    KmlPolygon.prototype.render = function(dc, kmlOptions) {
+    KmlPolygon.prototype.render = function (dc, kmlOptions) {
         KmlGeometry.prototype.render.call(this, dc, kmlOptions);
 
-        if(kmlOptions.lastStyle && !this._renderable) {
-            this.createPolygon(kmlOptions.lastStyle);
+        if (kmlOptions.lastStyle && !this._renderable) {
+            this.createPolygon(kmlOptions.lastStyle, kmlOptions.fileCache);
             dc.redrawRequested = true;
         }
 
-        if(this._renderable) {
+        if (this._renderable) {
             this._renderable.enabled = this.enabled;
             this._renderable.render(dc);
         }
@@ -176,8 +201,8 @@ define([
     /**
      * @inheritDoc
      */
-    KmlPolygon.prototype.prepareAttributes = function (style) {
-        var shapeOptions = style && style.generate() || {};
+    KmlPolygon.prototype.prepareAttributes = function (style, fileCache) {
+        var shapeOptions = style && style.generate(fileCache) || {};
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
         shapeOptions._applyLighting = true;
@@ -201,6 +226,16 @@ define([
             locations = this.kmlOuterBoundary.kmlPositions;
         }
         return locations;
+    };
+
+    /**
+     * @inheritDoc
+     */
+    KmlPolygon.prototype.isValidAltitudeMode = function (altMode) {
+        return WorldWind.CLAMP_TO_GROUND === altMode
+            || WorldWind.RELATIVE_TO_GROUND === altMode
+            || WorldWind.ABSOLUTE === altMode;
+
     };
 
     /**

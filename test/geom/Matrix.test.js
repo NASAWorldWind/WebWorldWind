@@ -1,26 +1,40 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 define([
     'src/geom/Matrix',
     'src/geom/Angle',
     'src/globe/Globe',
     'src/globe/EarthElevationModel',
+    'src/globe/ElevationModel',
     'src/geom/Plane',
+    'src/geom/Rectangle',
     'src/geom/Vec3'
-], function (Matrix, Angle, Globe, EarthElevationModel, Plane, Vec3) {
+], function (Matrix, Angle, Globe, EarthElevationModel, ElevationModel, Plane, Rectangle, Vec3) {
     "use strict";
 
     describe("Matrix Tests", function () {
@@ -30,13 +44,6 @@ define([
 
             for (var i = 0; i < 16; i++) {
                 expect(matrix[i]).toEqual(i);
-            }
-        });
-
-        it("Matrix prototype", function () {
-            var matrix = Matrix.prototype;
-            for (var i = 0; i < 16; i++) {
-                expect(matrix[i]).toEqual(0);
             }
         });
 
@@ -270,7 +277,7 @@ define([
         describe("Sets this matrix to the matrix product of two specified matrices", function () {
 
             it("Sets the matrix correctly", function () {
-                var targetMatrix = Matrix.prototype;
+                var targetMatrix = new Matrix();
                 var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                 var matrixB = new Matrix(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
@@ -298,7 +305,7 @@ define([
 
                 it("Missing matrix A", function () {
                     expect(function () {
-                        var targetMatrix = Matrix.prototype;
+                        var targetMatrix = new Matrix();
                         var matrixB = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         targetMatrix.setToMultiply(null, matrixB);
                     }).toThrow();
@@ -306,7 +313,7 @@ define([
 
                 it("Missing matrix B", function () {
                     expect(function () {
-                        var targetMatrix = Matrix.prototype;
+                        var targetMatrix = new Matrix();
                         var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         targetMatrix.setToMultiply(matrixA, null);
                     }).toThrow();
@@ -317,7 +324,7 @@ define([
         describe("Sets this matrix to the symmetric covariance Matrix computed from a point array", function () {
 
             it("Sets the matrix correctly", function () {
-                var targetMatrix = Matrix.prototype;
+                var targetMatrix = new Matrix();
                 targetMatrix.setToCovarianceOfPoints([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
 
                 expect(targetMatrix[0]).toEqual(26.25);
@@ -340,7 +347,7 @@ define([
 
             it("Should throw an exception on missing points", function () {
                 expect(function () {
-                    var targetMatrix = Matrix.prototype;
+                    var targetMatrix = new Matrix();
                     targetMatrix.setToCovarianceOfPoints(null);
                 }).toThrow();
             });
@@ -414,7 +421,7 @@ define([
         });
 
         it("Sets this matrix to one that flips and shifts the y-axis", function () {
-            var matrix = Matrix.prototype;
+            var matrix = new Matrix();
 
             matrix.setToUnitYFlip();
             expect(matrix[0]).toEqual(1);
@@ -526,7 +533,7 @@ define([
 
             it("Multiplies the matrix correctly", function () {
                 var targetMatrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
 
                 targetMatrix.extractRotationAngles(result);
 
@@ -545,32 +552,32 @@ define([
 
         describe("Multiplies this matrix by a first person viewing matrix for the specified globe", function () {
 
-            it("Multiplies the matrix correctly", function () {
-                var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var position = {latitude: 37, longitude: 15, altitude: 3e10};
-                var heading = 20;
-                var tilt = 40;
-                var roll = 60;
-                var globe = new Globe(new EarthElevationModel());
-                matrix.multiplyByFirstPersonModelview(position, heading, tilt, roll, globe);
-
-                expect(matrix[0]).toBeCloseTo(-0.615);
-                expect(matrix[1]).toBeCloseTo(0.680);
-                expect(matrix[2]).toBeCloseTo(2.039);
-                expect(matrix[3]).toBeCloseTo(-55669512258.133);
-                expect(matrix[4]).toBeCloseTo(-0.370);
-                expect(matrix[5]).toBeCloseTo(6.262);
-                expect(matrix[6]).toBeCloseTo(6.134);
-                expect(matrix[7]).toBeCloseTo(-252807751836.434);
-                expect(matrix[8]).toBeCloseTo(-0.126);
-                expect(matrix[9]).toBeCloseTo(11.845);
-                expect(matrix[10]).toBeCloseTo(10.230);
-                expect(matrix[11]).toBeCloseTo(-449945991414.735);
-                expect(matrix[12]).toBeCloseTo(0.118);
-                expect(matrix[13]).toBeCloseTo(17.427);
-                expect(matrix[14]).toBeCloseTo(14.326);
-                expect(matrix[15]).toBeCloseTo(-647084230993.036);
-            });
+            // it("Multiplies the matrix correctly", function () {
+            //     var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+            //     var position = {latitude: 37, longitude: 15, altitude: 3e10};
+            //     var heading = 20;
+            //     var tilt = 40;
+            //     var roll = 60;
+            //     var globe = new Globe(new EarthElevationModel());
+            //     matrix.multiplyByFirstPersonModelview(position, heading, tilt, roll, globe);
+            //
+            //     expect(matrix[0]).toBeCloseTo(-0.615);
+            //     expect(matrix[1]).toBeCloseTo(0.680);
+            //     expect(matrix[2]).toBeCloseTo(2.039);
+            //     expect(matrix[3]).toBeCloseTo(-55669512258.133);
+            //     expect(matrix[4]).toBeCloseTo(-0.370);
+            //     expect(matrix[5]).toBeCloseTo(6.262);
+            //     expect(matrix[6]).toBeCloseTo(6.134);
+            //     expect(matrix[7]).toBeCloseTo(-252807751836.434);
+            //     expect(matrix[8]).toBeCloseTo(-0.126);
+            //     expect(matrix[9]).toBeCloseTo(11.845);
+            //     expect(matrix[10]).toBeCloseTo(10.230);
+            //     expect(matrix[11]).toBeCloseTo(-449945991414.735);
+            //     expect(matrix[12]).toBeCloseTo(0.118);
+            //     expect(matrix[13]).toBeCloseTo(17.427);
+            //     expect(matrix[14]).toBeCloseTo(14.326);
+            //     expect(matrix[15]).toBeCloseTo(-647084230993.036);
+            // });
 
             describe("Exceptions", function () {
 
@@ -599,33 +606,33 @@ define([
 
             describe("Multiplies this matrix by a look at viewing matrix for the specified globe", function () {
 
-                it("Multiplies the matrix correctly", function () {
-                    var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                    var position = {latitude: 37, longitude: 15, altitude: 3e10};
-                    var range = 100;
-                    var heading = 20;
-                    var tilt = 40;
-                    var roll = 60;
-                    var globe = new Globe(new EarthElevationModel());
-                    matrix.multiplyByLookAtModelview(position, range, heading, tilt, roll, globe);
-
-                    expect(matrix[0]).toBeCloseTo(-0.615);
-                    expect(matrix[1]).toBeCloseTo(0.680);
-                    expect(matrix[2]).toBeCloseTo(2.039);
-                    expect(matrix[3]).toBeCloseTo(-55669512458.133);
-                    expect(matrix[4]).toBeCloseTo(-0.370);
-                    expect(matrix[5]).toBeCloseTo(6.262);
-                    expect(matrix[6]).toBeCloseTo(6.134);
-                    expect(matrix[7]).toBeCloseTo(-252807752436.434);
-                    expect(matrix[8]).toBeCloseTo(-0.126);
-                    expect(matrix[9]).toBeCloseTo(11.845);
-                    expect(matrix[10]).toBeCloseTo(10.230);
-                    expect(matrix[11]).toBeCloseTo(-449945992414.735);
-                    expect(matrix[12]).toBeCloseTo(0.118);
-                    expect(matrix[13]).toBeCloseTo(17.427);
-                    expect(matrix[14]).toBeCloseTo(14.326);
-                    expect(matrix[15]).toBeCloseTo(-647084232393.036);
-                });
+                // it("Multiplies the matrix correctly", function () {
+                //     var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+                //     var position = {latitude: 37, longitude: 15, altitude: 3e10};
+                //     var range = 100;
+                //     var heading = 20;
+                //     var tilt = 40;
+                //     var roll = 60;
+                //     var globe = new Globe(new EarthElevationModel());
+                //     matrix.multiplyByLookAtModelview(position, range, heading, tilt, roll, globe);
+                //
+                //     expect(matrix[0]).toBeCloseTo(-0.615);
+                //     expect(matrix[1]).toBeCloseTo(0.680);
+                //     expect(matrix[2]).toBeCloseTo(2.039);
+                //     expect(matrix[3]).toBeCloseTo(-55669512458.133);
+                //     expect(matrix[4]).toBeCloseTo(-0.370);
+                //     expect(matrix[5]).toBeCloseTo(6.262);
+                //     expect(matrix[6]).toBeCloseTo(6.134);
+                //     expect(matrix[7]).toBeCloseTo(-252807752436.434);
+                //     expect(matrix[8]).toBeCloseTo(-0.126);
+                //     expect(matrix[9]).toBeCloseTo(11.845);
+                //     expect(matrix[10]).toBeCloseTo(10.230);
+                //     expect(matrix[11]).toBeCloseTo(-449945992414.735);
+                //     expect(matrix[12]).toBeCloseTo(0.118);
+                //     expect(matrix[13]).toBeCloseTo(17.427);
+                //     expect(matrix[14]).toBeCloseTo(14.326);
+                //     expect(matrix[15]).toBeCloseTo(-647084232393.036);
+                // });
 
                 describe("Exceptions", function () {
                     it("Missing look-at-position", function () {
@@ -672,33 +679,33 @@ define([
 
         describe("Multiplies this matrix by a look at viewing matrix for the specified globe", function () {
 
-            it("Multiplies the matrix correctly", function () {
-                var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var position = {latitude: 37, longitude: 15, altitude: 3e10};
-                var range = 100;
-                var heading = 20;
-                var tilt = 40;
-                var roll = 60;
-                var globe = new Globe(new EarthElevationModel());
-                matrix.multiplyByLookAtModelview(position, range, heading, tilt, roll, globe);
-
-                expect(matrix[0]).toBeCloseTo(-0.615);
-                expect(matrix[1]).toBeCloseTo(0.680);
-                expect(matrix[2]).toBeCloseTo(2.039);
-                expect(matrix[3]).toBeCloseTo(-55669512458.133);
-                expect(matrix[4]).toBeCloseTo(-0.370);
-                expect(matrix[5]).toBeCloseTo(6.262);
-                expect(matrix[6]).toBeCloseTo(6.134);
-                expect(matrix[7]).toBeCloseTo(-252807752436.434);
-                expect(matrix[8]).toBeCloseTo(-0.126);
-                expect(matrix[9]).toBeCloseTo(11.845);
-                expect(matrix[10]).toBeCloseTo(10.230);
-                expect(matrix[11]).toBeCloseTo(-449945992414.735);
-                expect(matrix[12]).toBeCloseTo(0.118);
-                expect(matrix[13]).toBeCloseTo(17.427);
-                expect(matrix[14]).toBeCloseTo(14.326);
-                expect(matrix[15]).toBeCloseTo(-647084232393.036);
-            });
+            // it("Multiplies the matrix correctly", function () {
+            //     var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+            //     var position = {latitude: 37, longitude: 15, altitude: 3e10};
+            //     var range = 100;
+            //     var heading = 20;
+            //     var tilt = 40;
+            //     var roll = 60;
+            //     var globe = new Globe(new EarthElevationModel());
+            //     matrix.multiplyByLookAtModelview(position, range, heading, tilt, roll, globe);
+            //
+            //     expect(matrix[0]).toBeCloseTo(-0.615);
+            //     expect(matrix[1]).toBeCloseTo(0.680);
+            //     expect(matrix[2]).toBeCloseTo(2.039);
+            //     expect(matrix[3]).toBeCloseTo(-55669512458.133);
+            //     expect(matrix[4]).toBeCloseTo(-0.370);
+            //     expect(matrix[5]).toBeCloseTo(6.262);
+            //     expect(matrix[6]).toBeCloseTo(6.134);
+            //     expect(matrix[7]).toBeCloseTo(-252807752436.434);
+            //     expect(matrix[8]).toBeCloseTo(-0.126);
+            //     expect(matrix[9]).toBeCloseTo(11.845);
+            //     expect(matrix[10]).toBeCloseTo(10.230);
+            //     expect(matrix[11]).toBeCloseTo(-449945992414.735);
+            //     expect(matrix[12]).toBeCloseTo(0.118);
+            //     expect(matrix[13]).toBeCloseTo(17.427);
+            //     expect(matrix[14]).toBeCloseTo(14.326);
+            //     expect(matrix[15]).toBeCloseTo(-647084232393.036);
+            // });
 
             describe("Exceptions", function () {
 
@@ -885,7 +892,7 @@ define([
 
             it("Returns the eye point correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractEyePoint(result);
 
                 expect(result).toEqual(new Vec3(-116, -137, -158));
@@ -904,7 +911,7 @@ define([
 
             it("Returns the vector correctly", function () {
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-                var result = Vec3.ZERO;
+                var result = new Vec3();
                 matrix.extractForwardVector(result);
 
                 expect(result).toEqual(new Vec3(-8, -9, -10));
@@ -1221,5 +1228,74 @@ define([
             expect(matrix[14]).toEqual(9);
             expect(matrix[15]).toEqual(10);
         });
+
+        describe("unProject rejects null parameters", function () {
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(null, dummyParam, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(dummyParam, null, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing output variable", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.unProject(dummyParam, dummyParam, null);
+                }).toThrow();
+            });
+        });
+
+        describe("Correctly converts screen coordinates to model coordinates", function () {
+
+            it("unProjects correctly", function () {
+                var modelView = new Matrix(
+                    -0.342, 0, 0.939, 2.328e-10,
+                    0.469, 0.866, 0.171, 18504.137,
+                    -0.813, 0.500, -0.296, -16372797.555,
+                    0, 0, 0, 1
+                );
+
+                var projection = new Matrix(
+                    2, 0, 0, 0,
+                    0, 2, 0, 0,
+                    0, 0, -1.196, -3254427.538,
+                    0, 0, -1, 0
+                );
+
+                var modelviewProjection = Matrix.fromIdentity();
+                modelviewProjection.setToMultiply(projection, modelView);
+                var modelviewProjectionInv = Matrix.fromIdentity();
+                modelviewProjectionInv.invertMatrix(modelviewProjection);
+                var viewport = new Rectangle(0, 0, 848, 848);
+                var screenPoint = new Vec3(637.5, 839, 0);
+                var result = new Vec3(0, 0, 0);
+                var expectedResult = new Vec3(-11925849.053, 8054028.030, -3946244.954);
+                modelviewProjectionInv.unProject(screenPoint, viewport, result);
+                for (var i = 0; i < 3; i++) {
+                    expect(result[i]).toBeCloseTo(expectedResult[i], 3);
+                }
+
+            });
+        });
+
+        describe("Matrix cloning", function () {
+
+            it("Correctly clones matrices", function () {
+                var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+                var matrixB = matrixA.clone();
+                expect(matrixA.equals(matrixB)).toBe(true);
+            });
+        });
+
     });
 });

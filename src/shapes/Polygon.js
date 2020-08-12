@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Polygon
@@ -242,7 +254,7 @@ define([
             if (Array.isArray(this.activeAttributes.imageSource)
                 && this.activeAttributes.imageSource[0]
                 && (typeof this.activeAttributes.imageSource[0] === "string"
-                || this.activeAttributes.imageSource instanceof ImageSource)) {
+                    || this.activeAttributes.imageSource instanceof ImageSource)) {
                 return this.activeAttributes.imageSource[0];
             }
 
@@ -347,7 +359,7 @@ define([
         // Private. Intentionally not documented.
         Polygon.prototype.computeBoundaryPoints = function (dc, boundaries) {
             var eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 boundaryPoints = [],
                 stride = this._extrude ? 6 : 3,
                 pt = new Vec3(0, 0, 0),
@@ -391,7 +403,8 @@ define([
                 }
             }
 
-            this.currentData.eyeDistance = 0;/*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
+            this.currentData.eyeDistance = 0;
+            /*DO NOT COMMITMath.sqrt(eyeDistSquared);*/
 
             return boundaryPoints;
         };
@@ -518,7 +531,7 @@ define([
 
             if (dc.pickingMode) {
                 var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, null,
-                    dc.currentLayer, false);
+                    this.layer, false);
                 dc.resolvePick(po);
             }
         };
@@ -531,7 +544,7 @@ define([
                 hasCapTexture = !!this.hasCapTexture(),
                 applyLighting = this.activeAttributes.applyLighting,
                 numCapVertices = currentData.capTriangles.length / (hasCapTexture ? 5 : 3),
-                vboId, opacity, color, stride, textureBound, capBuffer;
+                vboId, color, stride, textureBound, capBuffer;
 
             // Assume no cap texture.
             program.loadTextureEnabled(gl, false);
@@ -557,11 +570,10 @@ define([
             }
 
             color = this.activeAttributes.interiorColor;
-            opacity = color.alpha * dc.currentLayer.opacity;
             // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-            gl.depthMask(opacity >= 1 || dc.pickingMode);
+            gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? pickColor : color);
-            program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
             stride = 12 + (hasCapTexture ? 8 : 0) + (applyLighting ? 12 : 0);
 
@@ -658,19 +670,12 @@ define([
             }
 
             color = this.activeAttributes.interiorColor;
-            opacity = color.alpha * dc.currentLayer.opacity;
             // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-            gl.depthMask(opacity >= 1 || dc.pickingMode);
+            gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
             program.loadColor(gl, dc.pickingMode ? pickColor : color);
-            program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
             if (hasSideTextures && !dc.pickingMode) {
-                this.activeTexture = dc.gpuResourceCache.resourceForKey(this.capImageSource());
-                if (!this.activeTexture) {
-                    this.activeTexture =
-                        dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.capImageSource());
-                }
-
                 if (applyLighting) {
                     program.loadApplyLighting(gl, true);
                     gl.enableVertexAttribArray(program.normalVectorLocation);
@@ -695,7 +700,7 @@ define([
                             coordByteOffset + 12);
 
                         this.scratchMatrix.setToIdentity();
-                        this.scratchMatrix.multiplyByTextureTransform(this.activeTexture);
+                        this.scratchMatrix.multiplyByTextureTransform(sideTexture);
 
                         program.loadTextureEnabled(gl, true);
                         program.loadTextureUnit(gl, gl.TEXTURE0);
@@ -870,12 +875,10 @@ define([
                 }
 
                 color = this.activeAttributes.outlineColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
-                // Disable writing the shape's fragments to the depth buffer when the outline is
-                // semi-transparent.
-                gl.depthMask(opacity >= 1 || dc.pickingMode);
+                // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 
@@ -910,7 +913,7 @@ define([
 
             var applyLighting = !dc.pickMode && this.activeAttributes.applyLighting;
             if (applyLighting) {
-                dc.currentProgram.loadModelviewInverse(gl, dc.navigatorState.modelviewNormalTransform);
+                dc.currentProgram.loadModelviewInverse(gl, dc.modelviewNormalTransform);
             }
         };
 

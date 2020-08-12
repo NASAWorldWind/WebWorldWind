@@ -1,22 +1,33 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
- * Illustrates how to display TriangleMesh shapes.
+ * Illustrates how to display shapes built with triangles.
  */
-
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
@@ -29,12 +40,14 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        /**
-         * Add imagery layers.
-         */
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -45,6 +58,8 @@ requirejs(['./WorldWindShim',
             wwd.addLayer(layers[l].layer);
         }
 
+        // Create a mesh that displays a texture image from an image file.
+
         var altitude = 100e3,
             numRadialPositions = 40,
             meshPositions = [],
@@ -54,7 +69,6 @@ requirejs(['./WorldWindShim',
             meshRadius = 5; // degrees
 
         // Create the mesh's positions, which are the center point of a circle followed by points on the circle.
-
         meshPositions.push(new WorldWind.Position(35, -115, altitude)); // the mesh center
         texCoords.push(new WorldWind.Vec2(0.5, 0.5));
 
@@ -90,14 +104,14 @@ requirejs(['./WorldWindShim',
         // Create the mesh's attributes. Light this mesh.
         var meshAttributes = new WorldWind.ShapeAttributes(null);
         meshAttributes.outlineColor = WorldWind.Color.BLUE;
-        meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.7);
+        meshAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
         meshAttributes.imageSource = "data/400x230-splash-nww.png";
         meshAttributes.applyLighting = true;
 
         // Create the mesh's highlight attributes.
         var highlightAttributes = new WorldWind.ShapeAttributes(meshAttributes);
         highlightAttributes.outlineColor = WorldWind.Color.RED;
-        highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 1);
+        highlightAttributes.interiorColor = new WorldWind.Color(1, 1, 1, 0.5);
         highlightAttributes.applyLighting = false;
 
         // Create the mesh.
@@ -112,7 +126,7 @@ requirejs(['./WorldWindShim',
         meshLayer.addRenderable(mesh);
         wwd.addLayer(meshLayer);
 
-        // Create a mesh that displays a custom image.
+        // Create a mesh that displays a custom image created with a 2D canvas.
 
         var canvas = document.createElement("canvas"),
             ctx2d = canvas.getContext("2d"),
@@ -143,9 +157,11 @@ requirejs(['./WorldWindShim',
             meshPositions.push(new WorldWind.Position(lat, lon, altitude));
         }
 
+        // Use the same attributes as before, except for the image source, which is now the custom image.
         meshAttributes = new WorldWind.ShapeAttributes(meshAttributes);
         meshAttributes.imageSource = new WorldWind.ImageSource(canvas);
 
+        // Use the same highlight attributes as the previous shape. Point the image source to the custom image.
         highlightAttributes = new WorldWind.ShapeAttributes(highlightAttributes);
         highlightAttributes.imageSource = new WorldWind.ImageSource(canvas);
 
@@ -158,9 +174,9 @@ requirejs(['./WorldWindShim',
         // Add the mesh to the layer.
         meshLayer.addRenderable(mesh);
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
-
         // Now set up to handle highlighting.
         var highlightController = new WorldWind.HighlightController(wwd);
+
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

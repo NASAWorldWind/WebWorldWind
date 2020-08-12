@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Tile
@@ -115,7 +127,7 @@ define([
              * @type {String}
              * @readonly
              */
-            this.tileKey = level.levelNumber.toString() + "." + row.toString() + "." + column.toString();
+            this.tileKey = Tile.computeTileKey(level.levelNumber, row, column);
 
             /**
              * The Cartesian bounding box of this tile.
@@ -322,8 +334,8 @@ define([
             // window-size dependent and results in selecting an excessive number of tiles when the window is large.
 
             var cellSize = dc.globe.equatorialRadius * this.texelSize,
-                distance = this.distanceTo(dc.navigatorState.eyePoint),
-                pixelSize = dc.navigatorState.pixelSizeAtDistance(distance);
+                distance = this.distanceTo(dc.eyePoint),
+                pixelSize = dc.pixelSizeAtDistance(distance);
 
             return cellSize > Math.max(detailFactor * pixelSize, 0.5);
         };
@@ -372,9 +384,10 @@ define([
             var globe = dc.globe,
                 verticalExaggeration = dc.verticalExaggeration,
                 extremes = globe.minAndMaxElevationsForSector(this.sector),
-                minHeight = extremes ? (extremes[0] * verticalExaggeration) : 0,
-                maxHeight = extremes ? (extremes[1] * verticalExaggeration) : 0;
-            if (minHeight == maxHeight) {
+                minHeight = extremes[0] * verticalExaggeration,
+                maxHeight = extremes[1] * verticalExaggeration;
+
+            if (minHeight === maxHeight) {
                 minHeight = maxHeight + 10; // TODO: Determine if this is necessary.
             }
 
@@ -400,6 +413,18 @@ define([
 
             globe.computePointFromPosition(this.sector.centroidLatitude(), this.sector.centroidLongitude(), 0,
                 this.referencePoint);
+        };
+
+        /**
+         * Computes a key that uniquely identifies a tile within its level set.
+         *
+         * @param {Number} levelNumber The tile's level number in a tile pyramid.
+         * @param {Number} row The tile's row in the specified level in a tile pyramid.
+         * @param {Number} column The tile's column in the specified level in a tile pyramid.
+         * @returns {String} A string key uniquely identifying a tile with the specified level, row, and column.
+         */
+        Tile.computeTileKey = function (levelNumber, row, column) {
+            return levelNumber + "." + row + "." + column;
         };
 
         /**

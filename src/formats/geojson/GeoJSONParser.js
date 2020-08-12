@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports GeoJSONParser
@@ -83,7 +95,8 @@ define(['../../error/ArgumentError',
          * This function enables the application to assign independent attributes to each
          * shape. An argument to this function provides any attributes specified in a properties member of GeoJSON
          * feature.
-         * @param {String} dataSource The data source of the GeoJSON. Can be a string or an URL to a GeoJSON.
+         * @param {String|Object} dataSource The data source of the GeoJSON. Can be a URL to an external resource,
+         * or a JSON string, or a JavaScript object representing a parsed GeoJSON string.
          * @throws {ArgumentError} If the specified data source is null or undefined.
          */
         var GeoJSONParser = function (dataSource) {
@@ -125,7 +138,7 @@ define(['../../error/ArgumentError',
             /**
              * The GeoJSON data source as specified to this GeoJSON's constructor.
              * @memberof GeoJSONParser.prototype
-             * @type {String}
+             * @type {String|Object}
              * @readonly
              */
             dataSource: {
@@ -260,11 +273,19 @@ define(['../../error/ArgumentError',
 
             this._layer = layer || new RenderableLayer();
 
-            if (this.isDataSourceJson()){
-                this.parse(this.dataSource);
-            }
-            else {
-                this.requestUrl(this.dataSource);
+            var dataSourceType = (typeof this.dataSource);
+            if (dataSourceType === 'string') {
+                var obj = GeoJSONParser.tryParseJSONString(this.dataSource);
+                if (obj !== null) {
+                    this.handle(obj);
+                } else {
+                    this.requestUrl(this.dataSource);
+                }
+            } else if (dataSourceType === 'object') {
+                this.handle(this.dataSource);
+            } else {
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "load",
+                    "Unsupported data source type: " + dataSourceType);
             }
         };
 
@@ -313,7 +334,7 @@ define(['../../error/ArgumentError',
             xhr.onreadystatechange = (function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        this.parse(xhr.response);
+                        this.handle(GeoJSONParser.tryParseJSONString(xhr.response));
                     }
                     else {
                         Logger.log(Logger.LEVEL_WARNING,
@@ -333,37 +354,31 @@ define(['../../error/ArgumentError',
             xhr.send(null);
         };
 
-        // Parse GeoJSON string using built in method JSON.parse(). Internal use only.
-        GeoJSONParser.prototype.parse = function (geoJSONString) {
-            try {
-                this._geoJSONObject = JSON.parse(geoJSONString);
+        // Handles the object created from the GeoJSON data source. Internal use only.
+        GeoJSONParser.prototype.handle = function (obj) {
+            if (!obj) {
+                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "handle", "Invalid GeoJSON object");
             }
-            catch (e) {
-                Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
-                    "invalidGeoJSONObject")
+
+            this._geoJSONObject = obj;
+
+            if (Object.prototype.toString.call(this.geoJSONObject) === '[object Array]') {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "handle",
+                        "invalidGeoJSONObjectLength"));
             }
-            finally {
-                if (this.geoJSONObject){
-                    if (Object.prototype.toString.call(this.geoJSONObject) === '[object Array]') {
-                        throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
-                                "invalidGeoJSONObjectLength"));
-                    }
 
-                    if (this.geoJSONObject.hasOwnProperty(GeoJSONConstants.FIELD_TYPE)) {
-                        this.setGeoJSONType();
-                        this.setGeoJSONCRS();
-                    }
-                    else{
-                        throw new ArgumentError(
-                            Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "parse",
-                                "missingGeoJSONType"));
-                    }
+            if (this.geoJSONObject.hasOwnProperty(GeoJSONConstants.FIELD_TYPE)) {
+                this.setGeoJSONType();
+                this.setGeoJSONCRS();
+            } else {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoJSON", "handle",
+                        "missingGeoJSONType"));
+            }
 
-                    if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
-                        this._parserCompletionCallback(this.layer);
-                    }
-                }
+            if (!!this._parserCompletionCallback && typeof this._parserCompletionCallback === "function") {
+                this._parserCompletionCallback(this.layer);
             }
         };
 
@@ -813,6 +828,7 @@ define(['../../error/ArgumentError',
             var configuration = this.shapeConfigurationCallback(geometry, properties);
 
             if (!this.crs || this.crs.isCRSSupported()) {
+                var pBoundaries = [];
                 for (var boundariesIndex = 0, boundaries = geometry.coordinates;
                      boundariesIndex < boundaries.length; boundariesIndex++) {
                     var positions = [];
@@ -829,10 +845,12 @@ define(['../../error/ArgumentError',
                         var position = new Location(reprojectedCoordinate[1], reprojectedCoordinate[0]);
                         positions.push(position);
                     }
+                    pBoundaries.push(positions);
+                }
 
                     var shape;
                     shape = new SurfacePolygon(
-                        positions,
+                        pBoundaries,
                         configuration && configuration.attributes ? configuration.attributes : null);
                     if (configuration.highlightAttributes) {
                         shape.highlightAttributes = configuration.highlightAttributes;
@@ -843,7 +861,6 @@ define(['../../error/ArgumentError',
                     if (configuration && configuration.userProperties) {
                         shape.userProperties = configuration.userProperties;
                     }                    layer.addRenderable(shape);
-                }
             }
         };
 
@@ -1094,29 +1111,32 @@ define(['../../error/ArgumentError',
         GeoJSONParser.prototype.setProj4jsAliases = function () {
             Proj4.defs([
                 [
+                    "urn:ogc:def:crs:EPSG::4326",
+                    Proj4.defs('EPSG:4326')
+                ],
+                [
                     'urn:ogc:def:crs:OGC:1.3:CRS84',
                     Proj4.defs('EPSG:4326')
                 ],
                 [
                     'urn:ogc:def:crs:EPSG::3857',
                     Proj4.defs('EPSG:3857')
-
                 ]
             ]);
         };
 
         /**
-        * Indicate whether the data source is of a JSON type.
-        * @returns {Boolean} True if the data source is of JSON type.
-        */
-        GeoJSONParser.prototype.isDataSourceJson = function() {
+         * Tries to parse a JSON string into a JavaScript object.
+         * @param {String} str the string to try to parse.
+         * @returns {Object} the object if the string is valid JSON; otherwise null.
+         */
+        GeoJSONParser.tryParseJSONString = function (str) {
             try {
-                JSON.parse(this.dataSource);
+                return JSON.parse(str);
             } catch (e) {
-                return false;
+                return null;
             }
-            return true;
-        }
+        };
 
         return GeoJSONParser;
     }

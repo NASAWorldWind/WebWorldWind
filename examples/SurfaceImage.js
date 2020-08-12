@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * Illustrates how to display and pick SurfaceImages.
@@ -28,13 +40,15 @@ requirejs(['./WorldWindShim',
         // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        /**
-         * Added imagery layers.
-         */
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -47,13 +61,18 @@ requirejs(['./WorldWindShim',
 
         // Create a surface image using a static image.
         var surfaceImage1 = new WorldWind.SurfaceImage(new WorldWind.Sector(40, 50, -120, -100),
-        "data/400x230-splash-nww.png");
+            "data/400x230-splash-nww.png");
 
-        // Create a surface image using a dynamically created image.
+        // Create a surface image using a static image and apply filtering to it.
+        var surfaceImage2 = new WorldWind.SurfaceImage(new WorldWind.Sector(50, 60, -80, -60),
+            "data/surface-image-nearest.png");
+        surfaceImage2.resamplingMode = WorldWind.FILTER_NEAREST; // or FILTER_LINEAR by default
+
+        // Create a surface image using a dynamically created image with a 2D canvas.
 
         var canvas = document.createElement("canvas"),
             ctx2d = canvas.getContext("2d"),
-            size = 64, c = size / 2  - 0.5, innerRadius = 5, outerRadius = 20;
+            size = 64, c = size / 2 - 0.5, innerRadius = 5, outerRadius = 20;
 
         canvas.width = size;
         canvas.height = size;
@@ -67,7 +86,7 @@ requirejs(['./WorldWindShim',
         ctx2d.arc(c, c, outerRadius, 0, 2 * Math.PI, false);
         ctx2d.fill();
 
-        var surfaceImage2 = new WorldWind.SurfaceImage(new WorldWind.Sector(30, 40, -100, -80),
+        var surfaceImage3 = new WorldWind.SurfaceImage(new WorldWind.Sector(30, 40, -100, -80),
             new WorldWind.ImageSource(canvas));
 
         // Add the surface images to a layer and the layer to the WorldWindow's layer list.
@@ -75,36 +94,9 @@ requirejs(['./WorldWindShim',
         surfaceImageLayer.displayName = "Surface Images";
         surfaceImageLayer.addRenderable(surfaceImage1);
         surfaceImageLayer.addRenderable(surfaceImage2);
+        surfaceImageLayer.addRenderable(surfaceImage3);
         wwd.addLayer(surfaceImageLayer);
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
-
-        // Now set up to handle picking.
-
-        // The common pick-handling function.
-        var handlePick = function (o) {
-            // The input argument is either an Event or a TapRecognizer. Both have the same properties for determining
-            // the mouse or tap location.
-            var x = o.clientX,
-                y = o.clientY;
-
-            // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
-            // relative to the upper left corner of the canvas rather than the upper left corner of the page.
-            var pickList = wwd.pick(wwd.canvasCoordinates(x, y));
-
-            if (pickList.objects.length > 0) {
-                for (var p = 0; p < pickList.objects.length; p++) {
-                    if (pickList.objects[p].userObject instanceof WorldWind.SurfaceImage) {
-                        console.log("Surface image picked");
-                    }
-                }
-            }
-        };
-
-        // Listen for mouse moves and highlight the placemarks that the cursor rolls over.
-        wwd.addEventListener("mousemove", handlePick);
-
-        // Listen for taps on mobile devices and highlight the placemarks that the user taps.
-        var tapRecognizer = new WorldWind.TapRecognizer(wwd, handlePick);
+        var layerManager = new LayerManager(wwd);
     });

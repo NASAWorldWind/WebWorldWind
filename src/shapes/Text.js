@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Text
@@ -184,9 +196,6 @@ define([
             this.imageTransform = Matrix.fromIdentity();
 
             // Internal use only. Intentionally not documented.
-            this.texCoordMatrix = Matrix.fromIdentity();
-
-            // Internal use only. Intentionally not documented.
             this.imageBounds = null;
 
             // Internal use only. Intentionally not documented.
@@ -258,7 +267,7 @@ define([
             // Create an ordered renderable for this text. If one has already been created this frame then we're
             // in 2D-continuous mode and another needs to be created for one of the alternate globe offsets.
             var orderedText;
-            if (this.lastFrameTime != dc.timestamp) {
+            if (this.lastFrameTime !== dc.timestamp) {
                 orderedText = this.makeOrderedRenderable(dc);
             } else {
                 var textCopy = this.clone();
@@ -315,14 +324,7 @@ define([
                 return null;
             }
 
-            var labelFont = this.activeAttributes.font,
-                textureKey = this.text + labelFont.toString();
-
-            this.activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
-            if (!this.activeTexture) {
-                this.activeTexture = dc.textSupport.createTexture(dc, this.text, labelFont, true);
-                dc.gpuResourceCache.putResource(textureKey, this.activeTexture, this.activeTexture.size);
-            }
+            this.activeTexture = dc.createTextTexture(this.text, this.activeAttributes);
 
             w = this.activeTexture.imageWidth;
             h = this.activeTexture.imageHeight;
@@ -366,7 +368,7 @@ define([
             if (dc.pickingMode) {
                 return dc.pickRectangle && this.imageBounds.intersects(dc.pickRectangle);
             } else {
-                return this.imageBounds.intersects(dc.navigatorState.viewport);
+                return this.imageBounds.intersects(dc.viewport);
             }
         };
 
@@ -431,9 +433,6 @@ define([
 
             // Suppress depth-buffer writes.
             gl.depthMask(false);
-
-            // The currentTexture field is used to avoid re-specifying textures unnecessarily. Clear it to start.
-            Text.currentTexture = null;
         };
 
         // Internal. Intentionally not documented.
@@ -441,25 +440,22 @@ define([
             var gl = dc.currentGlContext,
                 program = dc.currentProgram;
 
-            // Clear the vertex attribute state.
+            // Restore the default GL vertex attribute state.
             gl.disableVertexAttribArray(program.vertexPointLocation);
             gl.disableVertexAttribArray(program.vertexTexCoordLocation);
 
-            // Clear GL bindings.
+            // Restore the default GL buffer and texture bindings.
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
             gl.bindTexture(gl.TEXTURE_2D, null);
 
+            // Restore the default GL depth mask state.
             gl.depthMask(true);
-
-            // Avoid keeping a dangling reference to the current texture.
-            Text.currentTexture = null;
         };
 
         // Internal. Intentionally not documented.
         Text.prototype.doDrawOrderedText = function (dc) {
             var gl = dc.currentGlContext,
-                program = dc.currentProgram,
-                textureBound;
+                program = dc.currentProgram;
 
             // Compute the text's current visibility, potentially requesting additional frames.
             if (!dc.pickingMode && this.currentVisibility !== this.targetVisibility) {
@@ -472,9 +468,15 @@ define([
                 dc.redrawRequested = true;
             }
 
-            // Use the text color and opacity. When picking, use the pick color, 100% opacity and no texture.
+            // Turn off depth testing for the text unless it's been requested.
+            if (!this.activeAttributes.depthTest) {
+                gl.disable(gl.DEPTH_TEST);
+            }
+
+            // Use the text color and opacity. Modulation is done to white to avoid the program's shader from
+            // modifying the text color. When picking, use the pick color, 100% opacity and no texture.
             if (!dc.pickingMode) {
-                program.loadColor(gl, this.activeAttributes.color);
+                program.loadColor(gl, Color.WHITE);
                 program.loadOpacity(gl, this.layer.opacity * this.currentVisibility);
             } else {
                 this.pickColor = dc.uniquePickColor();
@@ -485,84 +487,78 @@ define([
 
             // When the text is visible, draw the text label.
             if (this.currentVisibility > 0) {
-                // Compute and specify the MVP matrix.
-                Text.matrix.copy(dc.screenProjection);
-                Text.matrix.multiplyMatrix(this.imageTransform);
-                program.loadModelviewProjection(gl, Text.matrix);
-
-                if (!dc.pickingMode) {
-                    this.texCoordMatrix.setToIdentity();
-                    if (this.activeTexture) {
-                        this.texCoordMatrix.multiplyByTextureTransform(this.activeTexture);
-                    }
-                    program.loadTextureMatrix(gl, this.texCoordMatrix);
-
-                    // Avoid unnecessary texture state changes
-                    if (this.activeTexture && this.activeTexture != Text.currentTexture) {
-                        textureBound = this.activeTexture.bind(dc); // returns false if texture is null or cannot be bound
-                        program.loadTextureEnabled(gl, textureBound);
-                        Text.currentTexture = this.activeTexture;
-                    }
-                }
-
-                // Turn off depth testing for the label unless it's been requested.
-                if (!this.activeAttributes.depthTest) {
-                    gl.disable(gl.DEPTH_TEST, false);
-                }
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-                if (!this.activeAttributes.depthTest) {
-                    // Turn depth testing back on.
-                    gl.disable(gl.DEPTH_TEST, true);
-                }
+                this.drawLabel(dc);
             }
 
             // When the text is not visible, draw a marker to indicate that something is there.
             if (this.currentVisibility < 1 && this.markerImageSource) {
-                var markerTexture = dc.gpuResourceCache.resourceForKey(this.markerImageSource);
-                if (!markerTexture) {
-                    dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.markerImageSource);
-                    return;
-                }
-
-                var s = this.markerImageScale;
-                var markerTransform = Matrix.fromIdentity();
-                markerTransform.setTranslation(
-                    this.screenPoint[0] - s * markerTexture.imageWidth / 2,
-                    this.screenPoint[1] - s * markerTexture.imageWidth / 2,
-                    this.screenPoint[2]);
-
-                markerTransform.setScale(markerTexture.imageWidth * s, markerTexture.imageHeight * s, 1);
-
-                Text.matrix.copy(dc.screenProjection);
-                Text.matrix.multiplyMatrix(markerTransform);
-                program.loadModelviewProjection(gl, Text.matrix);
-
-                // Use the marker opacity and texture when not picking.
-                if (!dc.pickingMode) {
-                    program.loadOpacity(gl, this.layer.opacity * ( 1 - this.currentVisibility));
-
-                    var tcMatrix = Matrix.fromIdentity();
-                    tcMatrix.multiplyByTextureTransform(markerTexture);
-                    program.loadTextureMatrix(gl, tcMatrix);
-
-                    // Avoid unnecessary texture state changes
-                    if (markerTexture != Text.currentTexture) {
-                        textureBound = markerTexture.bind(dc); // returns false if texture is null or cannot be bound
-                        program.loadTextureEnabled(gl, textureBound);
-                        Text.currentTexture = markerTexture;
-                    }
-                }
-
-                // Turn off depth testing unless it's been requested.
-                if (!this.activeAttributes.depthTest) {
-                    gl.disable(gl.DEPTH_TEST, false);
-                }
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-                if (!this.activeAttributes.depthTest) {
-                    // Turn depth testing back on.
-                    gl.enable(gl.DEPTH_TEST, true);
-                }
+                this.drawMarker(dc);
             }
+
+            // Restore the default GL depth test state.
+            if (!this.activeAttributes.depthTest) {
+                gl.enable(gl.DEPTH_TEST);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.drawLabel = function (dc) {
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram,
+                textureBound;
+
+            // Use the label texture when not picking.
+            if (!dc.pickingMode && this.activeTexture) {
+                Text.matrix.setToIdentity();
+                Text.matrix.multiplyByTextureTransform(this.activeTexture);
+                textureBound = this.activeTexture.bind(dc); // returns false if texture is null or cannot be bound
+                program.loadTextureEnabled(gl, textureBound);
+                program.loadTextureMatrix(gl, Text.matrix);
+            }
+
+            // Compute and specify the text label's modelview-projection matrix.
+            Text.matrix.copy(dc.screenProjection);
+            Text.matrix.multiplyMatrix(this.imageTransform);
+            program.loadModelviewProjection(gl, Text.matrix);
+
+            // Draw the text as a two-triangle square.
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+
+        // Internal. Intentionally not documented.
+        Text.prototype.drawMarker = function (dc) {
+            var gl = dc.currentGlContext,
+                program = dc.currentProgram,
+                textureBound;
+
+            var markerTexture = dc.gpuResourceCache.resourceForKey(this.markerImageSource);
+            if (!markerTexture) {
+                dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.markerImageSource);
+                return;
+            }
+
+            // Use the marker opacity and texture when not picking.
+            if (!dc.pickingMode) {
+                Text.matrix.setToIdentity();
+                Text.matrix.multiplyByTextureTransform(markerTexture);
+                textureBound = markerTexture.bind(dc); // returns false if texture is null or cannot be bound
+                program.loadTextureEnabled(gl, textureBound);
+                program.loadTextureMatrix(gl, Text.matrix);
+                program.loadOpacity(gl, this.layer.opacity * (1 - this.currentVisibility));
+            }
+
+            // Compute and specify the marker's modelview-projection matrix.
+            var s = this.markerImageScale;
+            Text.matrix.copy(dc.screenProjection);
+            Text.matrix.multiplyByTranslation(
+                this.screenPoint[0] - s * markerTexture.imageWidth / 2,
+                this.screenPoint[1] - s * markerTexture.imageWidth / 2,
+                this.screenPoint[2]);
+            Text.matrix.multiplyByScale(markerTexture.imageWidth * s, markerTexture.imageHeight * s, 1);
+            program.loadModelviewProjection(gl, Text.matrix);
+
+            // Draw the marker as a two-triangle square.
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
         };
 
         return Text;

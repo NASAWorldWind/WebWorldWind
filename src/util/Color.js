@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Color
@@ -222,7 +234,7 @@ define([
             return new Color(redByte / 255, greenByte / 255, blueByte / 255, alphaByte / 255);
         };
 
-        Color.colorFromHex = function(color) {
+        Color.colorFromHex = function (color) {
             var red = parseInt(color.substring(0, 2), 16);
             var green = parseInt(color.substring(2, 4), 16);
             var blue = parseInt(color.substring(4, 6), 16);
@@ -230,7 +242,7 @@ define([
             return Color.colorFromBytes(red, green, blue, alpha);
         };
 
-        Color.colorFromKmlHex = function(color) {
+        Color.colorFromKmlHex = function (color) {
             var alpha = parseInt(color.substring(0, 2), 16);
             var blue = parseInt(color.substring(2, 4), 16);
             var green = parseInt(color.substring(4, 6), 16);
@@ -318,8 +330,9 @@ define([
          * because some uses reject a four-component color specification.
          * @param {Boolean} isUsingAlpha Enable the use of an alpha component.
          * @returns {string} A color string suitable for CSS.
+         * @deprecated since version 0.10.0, use toCssColorString for valid CSS color strings
          */
-        Color.prototype.toHexString = function(isUsingAlpha) {
+        Color.prototype.toHexString = function (isUsingAlpha) {
             // Use Math.ceil() to get 0.75 to map to 0xc0. This is important if the display is dithering.
             var redHex = Math.ceil(this.red * 255).toString(16),
                 greenHex = Math.ceil(this.green * 255).toString(16),
@@ -338,15 +351,16 @@ define([
         };
 
         /**
-         * Create a rgba color string that CSS can use.
+         * Create a rgba color string that conforms to CSS Color Module Level 3 specification.
          * @returns {string} A color string suitable for CSS.
          */
-        Color.prototype.toRGBAString = function () {
-            var red = Math.floor(this.red * 255),
-                green = Math.floor(this.green * 255),
-                blue = Math.floor(this.blue * 255);
+        Color.prototype.toCssColorString = function () {
+            var red = Math.round(this.red * 255),
+                green = Math.round(this.green * 255),
+                blue = Math.round(this.blue * 255);
 
-            return 'rgba(' + red + ' ,' + green + ' ,' + blue + ' ,' + this.alpha + ')';
+            // Per the CSS Color Module Level 3 specification, alpha is expressed as floating point value between 0 - 1
+            return 'rgba(' + red + ', ' + green + ', ' + blue + ', ' + this.alpha + ')';
         };
 
         return Color;

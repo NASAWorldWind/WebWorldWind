@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports SurfaceSector
@@ -36,7 +48,8 @@ define([
          * @constructor
          * @augments SurfaceShape
          * @classdesc Represents a sector draped over the terrain surface. The sector is specified as a rectangular
-         * region in geographic coordinates.
+         * region in geographic coordinates. By default, a surface sector is drawn with a linear path, see
+         * {@link SurfaceShape#pathType}.
          * <p>
          * SurfaceSector uses the following attributes from its associated shape attributes bundle:
          * <ul>
@@ -66,6 +79,9 @@ define([
              * @type {Sector}
              */
             this._sector = sector;
+
+            // The default path type for a surface sector is linear so that it represents a bounding box by default.
+            this._pathType = WorldWind.LINEAR;
         };
 
         SurfaceSector.prototype = Object.create(SurfaceShape.prototype);
@@ -110,6 +126,31 @@ define([
             this._boundaries[1] = new Location(sector.maxLatitude, sector.minLongitude);
             this._boundaries[2] = new Location(sector.maxLatitude, sector.maxLongitude);
             this._boundaries[3] = new Location(sector.minLatitude, sector.maxLongitude);
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.getReferencePosition = function () {
+            return new Location(this.sector.centroidLatitude(), this.sector.centroidLongitude());
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.moveTo = function (globe, position) {
+            var sector = this._sector;
+
+            var locations = new Array(3);
+
+            locations[0] = new Location(sector.minLatitude, sector.minLongitude);
+            locations[1] = new Location(sector.maxLatitude, sector.minLongitude);
+            locations[2] = new Location(sector.maxLatitude, sector.maxLongitude);
+
+            locations = this.computeShiftedLocations(globe, this.getReferencePosition(), position, locations);
+
+            this.sector = new WorldWind.Sector(
+                locations[0].latitude,
+                locations[1].latitude,
+                locations[1].longitude,
+                locations[2].longitude
+            );
         };
 
         return SurfaceSector;

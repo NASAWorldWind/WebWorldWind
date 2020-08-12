@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports ColladaMesh
@@ -166,6 +178,7 @@ define(['./ColladaUtils'], function (ColladaUtils) {
         var indicesArray = [];
         var pos = 0;
         var indexedRendering = false;
+        var is32BitIndices = false;
 
         for (var i = 0; i < count; i++) {
 
@@ -215,11 +228,17 @@ define(['./ColladaUtils'], function (ColladaUtils) {
                         firstIndex = currentIndex;
                     }
                     if (k > 2 * maxOffset) {
+                        if (firstIndex > 65535 || prevIndex > 65535) {
+                            is32BitIndices = true;
+                        }
                         indicesArray.push(firstIndex);
                         indicesArray.push(prevIndex);
                     }
                 }
 
+                if (currentIndex > 65535) {
+                    is32BitIndices = true;
+                }
                 indicesArray.push(currentIndex);
                 pos += maxOffset;
 
@@ -232,7 +251,11 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             material: material
         };
 
-        this.transformMeshInfo(mesh, inputs, indicesArray);
+        if (mesh.indexedRendering) {
+            mesh.indices = is32BitIndices ? new Uint32Array(indicesArray) : new Uint16Array(indicesArray);
+        }
+
+        this.transformMeshInfo(mesh, inputs);
 
         return mesh;
 
@@ -294,9 +317,8 @@ define(['./ColladaUtils'], function (ColladaUtils) {
      * Internal. Applications should not call this function.
      * @param {Object} mesh The mesh that will be returned.
      * @param {Array} inputs The array containing the inputs of the mesh.
-     * @param {Number[]} indicesArray An array containing the indices.
      */
-    ColladaMesh.prototype.transformMeshInfo = function (mesh, inputs, indicesArray) {
+    ColladaMesh.prototype.transformMeshInfo = function (mesh, inputs) {
         var translator = {
             "normal": "normals",
             "texcoord": "uvs"
@@ -324,10 +346,6 @@ define(['./ColladaUtils'], function (ColladaUtils) {
             if (name === 'uvs') {
                 mesh.isClamp = ColladaUtils.getTextureType(data);
             }
-        }
-
-        if (mesh.indexedRendering) {
-            mesh.indices = new Uint16Array(indicesArray);
         }
 
         return mesh;

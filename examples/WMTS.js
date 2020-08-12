@@ -1,19 +1,33 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
-
+/**
+ * Illustrates how to consume imagery from a Web Map Tile Service (WMTS).
+ */
 requirejs([
         './WorldWindShim',
         '../examples/LayerManager'
@@ -22,17 +36,23 @@ requirejs([
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
+        // Create the WorldWindow.
         var wwd = new WorldWind.WorldWindow("canvasOne");
 
-        // Standard WorldWind layers
+        // Create and add layers to the WorldWindow.
         var layers = [
+            // Imagery layers.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
             {layer: new WorldWind.BingAerialLayer(null), enabled: false},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: false},
             {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
@@ -43,13 +63,10 @@ requirejs([
             wwd.addLayer(layers[l].layer);
         }
 
-        // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
-
         // Web Map Tiling Service information from
-        var serviceAddress = "https://tiles.geoservice.dlr.de/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities&VERSION=1.0.0";
-        // Layer displaying Global Hillshade based on GMTED2010
-        var layerIdentifier = "hillshade";
+        var serviceAddress = "https://map1.vis.earthdata.nasa.gov/wmts-webmerc/wmts.cgi?&request=GetCapabilities";
+        // Layer displaying Gridded Population of the World density forecast
+        var layerIdentifier = "GPW_Population_Density_2020";
 
         // Called asynchronously to parse and create the WMTS layer
         var createLayer = function (xmlDom) {
@@ -64,8 +81,8 @@ requirejs([
 
             // Add the layers to WorldWind and update the layer manager
             wwd.addLayer(wmtsLayer);
-            layerManger.synchronizeLayerList();
-        }
+            layerManager.synchronizeLayerList();
+        };
 
         // Called if an error occurs during WMTS Capabilities document retrieval
         var logError = function (jqXhr, text, exception) {
@@ -74,4 +91,6 @@ requirejs([
 
         $.get(serviceAddress).done(createLayer).fail(logError);
 
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

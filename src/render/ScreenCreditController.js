@@ -1,302 +1,148 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports ScreenCreditController
  */
 define([
         '../error/ArgumentError',
-        '../shaders/BasicTextureProgram',
         '../util/Color',
         '../util/Font',
+        '../layer/Layer',
         '../util/Logger',
-        '../geom/Matrix',
         '../util/Offset',
-        '../pick/PickedObject',
-        '../render/Renderable',
-        '../geom/Vec3',
-        '../util/WWMath'
+        '../shapes/ScreenText'
     ],
     function (ArgumentError,
-              BasicTextureProgram,
               Color,
               Font,
+              Layer,
               Logger,
-              Matrix,
               Offset,
-              PickedObject,
-              Renderable,
-              Vec3,
-              WWMath) {
+              ScreenText) {
         "use strict";
 
         /**
          * Constructs a screen credit controller.
          * @alias ScreenCreditController
          * @constructor
+         * @augments Layer
          * @classdesc Collects and displays screen credits.
          */
         var ScreenCreditController = function () {
-            // Internal. Intentionally not documented.
-            this.imageUrls = [];
+            Layer.call(this, "ScreenCreditController");
 
-            // Internal. Intentionally not documented.
-            this.stringCredits = [];
+            /**
+             * An {@link Offset} indicating where to place the attributions on the screen.
+             * @type {Offset}
+             * @default The lower left corner of the window with an 11px left margin and a 2px bottom margin.
+             */
+            this.creditPlacement = new Offset(WorldWind.OFFSET_PIXELS, 11, WorldWind.OFFSET_PIXELS, 2);
 
-            // Internal. Intentionally not documented.
-            this.imageCreditSize = 64;
+            /**
+             * The amount of horizontal spacing between adjacent attributions.
+             * @type {number}
+             * @default An 11px margin between attributions.
+             */
+            this.creditMargin = 11;
 
-            // Internal. Intentionally not documented.
-            this.margin = 5;
-
-            // Internal. Intentionally not documented.
+            // Apply 50% opacity to all shapes rendered by this layer.
             this.opacity = 0.5;
 
             // Internal. Intentionally not documented.
-            this.creditFont = new Font(14);
+            this.credits = [];
         };
 
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.scratchMatrix = Matrix.fromIdentity(); // scratch variable
-        ScreenCreditController.imageTransform = Matrix.fromIdentity(); // scratch variable
-        ScreenCreditController.texCoordMatrix = Matrix.fromIdentity(); // scratch variable
+        ScreenCreditController.prototype = Object.create(Layer.prototype);
 
         /**
          * Clears all credits from this controller.
          */
         ScreenCreditController.prototype.clear = function () {
-            this.imageUrls = [];
-            this.stringCredits = [];
+            this.credits = [];
         };
 
         /**
-         * Adds an image credit to this controller.
-         * @param {String} imageUrl The URL of the image to display in the credits area.
-         * @throws {ArgumentError} If the specified URL is null or undefined.
-         */
-        ScreenCreditController.prototype.addImageCredit = function (imageUrl) {
-            if (!imageUrl) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addImageCredit", "missingUrl"));
-            }
-
-            if (this.imageUrls.indexOf(imageUrl) === -1) {
-                this.imageUrls.push(imageUrl);
-            }
-        };
-
-        /**
-         * Adds a string credit to this controller.
-         * @param {String} stringCredit The string to display in the credits area.
-         * @param (Color} color The color with which to draw the string.
+         * Adds a credit to this controller.
+         * @param {String} creditString The text to display in the credits area.
+         * @param {Color} color The color with which to draw the string.
+         * @param {String} hyperlinkUrl Optional argument if screen credit is intended to work as a hyperlink.
          * @throws {ArgumentError} If either the specified string or color is null or undefined.
          */
-        ScreenCreditController.prototype.addStringCredit = function (stringCredit, color) {
-            if (!stringCredit) {
+        ScreenCreditController.prototype.addCredit = function (creditString, color, hyperlinkUrl) {
+            if (!creditString) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingText"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addCredit", "missingText"));
             }
 
             if (!color) {
                 throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addStringCredit", "missingColor"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ScreenCreditController", "addCredit", "missingColor"));
             }
 
-            if (this.stringCredits.indexOf(stringCredit) === -1) {
-                this.stringCredits.push({
-                    text: stringCredit,
-                    color: color || Color.WHITE
-                });
-            }
-        };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawCredits = function (dc) {
-            // Check to see if there's anything to draw.
-            if ((this.imageUrls.length === 0 && this.stringCredits.length === 0)) {
-                return;
-            }
-
-            // Picking not provided.
-            if (dc.pickingMode) {
-                return;
-            }
-
-            // Want to draw only once per frame.
-            if (dc.timestamp == this.lastFrameTimestamp) {
-                return;
-            }
-            this.lastFrameTimestamp = dc.timestamp;
-
-            this.beginDrawingCredits(dc);
-
-            // Draw the image credits in a row along the bottom of the window from right to left.
-            var imageX = dc.navigatorState.viewport.width - (this.margin + this.imageCreditSize),
-                imageHeight, maxImageHeight = 0;
-
-            for (var i = 0; i < this.imageUrls.length; i++) {
-                imageHeight = this.drawImageCredit(dc, this.imageUrls[i], imageX, this.margin);
-                if (imageHeight > 0) {
-                    imageX -= (this.margin + this.imageCreditSize);
-                    maxImageHeight = WWMath.max(imageHeight, maxImageHeight);
+            // Verify if text credit is not already in controller, if it is, don't add it.
+            for (var i = 0, len = this.credits.length; i < len; i++) {
+                if (this.credits[i].text === creditString) {
+                    return;
                 }
             }
 
-            // Draw the string credits above the image credits and progressing from bottom to top.
-            var stringY = maxImageHeight + this.margin;
-            for (var j = 0; j < this.stringCredits.length; j++) {
-                this.drawStringCredit(dc, this.stringCredits[j], stringY);
-                stringY += this.margin + 15; // margin + string height
+            var credit = new ScreenText(new Offset(WorldWind.OFFSET_PIXELS, 0, WorldWind.OFFSET_PIXELS, 0), creditString);
+            credit.attributes.font = new Font(10);
+            credit.attributes.color = color;
+            credit.attributes.enableOutline = false;
+            credit.attributes.offset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 0);
+
+            // Append new user property to store URL for hyperlinking.
+            // (See BasicWorldWindowController.handleClickOrTap).
+            if (hyperlinkUrl) {
+                credit.userProperties.url = hyperlinkUrl;
             }
 
-            this.endDrawingCredits(dc);
+            this.credits.push(credit);
         };
 
         // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.beginDrawingCredits = function (dc) {
-            var gl = dc.currentGlContext,
-                program;
+        ScreenCreditController.prototype.doRender = function (dc) {
+            var point = this.creditPlacement.offsetForSize(dc.viewport.width, dc.viewport.height);
 
-            dc.findAndBindProgram(BasicTextureProgram);
+            for (var i = 0, len = this.credits.length; i < len; i++) {
+                // Place the credit text on screen and render it.
+                this.credits[i].screenOffset.x = point[0];
+                this.credits[i].screenOffset.y = point[1];
+                this.credits[i].render(dc);
 
-            // Configure GL to use the draw context's unit quad VBOs for both model coordinates and texture coordinates.
-            // Most browsers can share the same buffer for vertex and texture coordinates, but Internet Explorer requires
-            // that they be in separate buffers, so the code below uses the 3D buffer for vertex coords and the 2D
-            // buffer for texture coords.
-            program = dc.currentProgram;
-            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer3());
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
-            gl.bindBuffer(gl.ARRAY_BUFFER, dc.unitQuadBuffer());
-            gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(program.vertexPointLocation);
-            gl.enableVertexAttribArray(program.vertexTexCoordLocation);
-
-            // Tell the program which texture unit to use.
-            program.loadTextureUnit(gl, gl.TEXTURE0);
-            program.loadModulateColor(gl, false);
-
-            // Turn off depth testing.
-            // tag, 6/17/15: It's not clear why this call was here. It was carried over from WWJ.
-            //gl.disable(WebGLRenderingContext.DEPTH_TEST);
-        };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.endDrawingCredits = function (dc) {
-            var gl = dc.currentGlContext,
-                program = dc.currentProgram;
-
-            // Clear the vertex attribute state.
-            gl.disableVertexAttribArray(program.vertexPointLocation);
-            gl.disableVertexAttribArray(program.vertexTexCoordLocation);
-
-            // Clear GL bindings.
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
-            gl.bindTexture(gl.TEXTURE_2D, null);
-
-            // Re-enable depth testing.
-            gl.enable(gl.DEPTH_TEST);
-        };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawImageCredit = function (dc, creditUrl, x, y) {
-            var imageWidth, imageHeight, scale, activeTexture, gl, program;
-
-            activeTexture = dc.gpuResourceCache.resourceForKey(creditUrl);
-            if (!activeTexture) {
-                dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, creditUrl);
-                return 0;
+                // Advance the screen position for the next credit.
+                dc.textRenderer.typeFace = this.credits[i].attributes.font;
+                dc.textRenderer.outlineWidth = this.credits[i].attributes.outlineWidth;
+                dc.textRenderer.enableOutline = this.credits[i].attributes.enableOutline;
+                point[0] += dc.textRenderer.textSize(this.credits[i].text)[0];
+                point[0] += this.creditMargin;
             }
-
-            // Scale the image to fit within a constrained size.
-            imageWidth = activeTexture.imageWidth;
-            imageHeight = activeTexture.imageHeight;
-            if (imageWidth <= this.imageCreditSize && this.imageHeight <= this.imageCreditSize) {
-                scale = 1;
-            } else if (imageWidth >= imageHeight) {
-                scale = this.imageCreditSize / imageWidth;
-            } else {
-                scale = this.imageCreditSize / imageHeight;
-            }
-
-            ScreenCreditController.imageTransform.setTranslation(x, y, 0);
-            ScreenCreditController.imageTransform.setScale(scale * imageWidth, scale * imageHeight, 1);
-
-            gl = dc.currentGlContext;
-            program = dc.currentProgram;
-
-            // Compute and specify the MVP matrix.
-            ScreenCreditController.scratchMatrix.copy(dc.screenProjection);
-            ScreenCreditController.scratchMatrix.multiplyMatrix(ScreenCreditController.imageTransform);
-            program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
-
-            program.loadTextureEnabled(gl, true);
-            program.loadColor(gl, Color.WHITE);
-            program.loadOpacity(gl, this.opacity);
-
-            ScreenCreditController.texCoordMatrix.setToIdentity();
-            ScreenCreditController.texCoordMatrix.multiplyByTextureTransform(activeTexture);
-            program.loadTextureMatrix(gl, ScreenCreditController.texCoordMatrix);
-
-            if (activeTexture.bind(dc)) { // returns false if active texture cannot be bound
-                // Draw the image quad.
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            }
-
-            return imageHeight;
-        };
-
-        // Internal use only. Intentionally not documented.
-        ScreenCreditController.prototype.drawStringCredit = function (dc, credit, y) {
-            var imageWidth, imageHeight, activeTexture, textureKey, gl, program, x;
-
-            textureKey = credit.text + this.creditFont.toString();
-            activeTexture = dc.gpuResourceCache.resourceForKey(textureKey);
-            if (!activeTexture) {
-                activeTexture = dc.textSupport.createTexture(dc, credit.text, this.creditFont, false);
-                dc.gpuResourceCache.putResource(textureKey, activeTexture, activeTexture.size);
-            }
-
-            imageWidth = activeTexture.imageWidth;
-            imageHeight = activeTexture.imageHeight;
-
-            x = dc.navigatorState.viewport.width - (imageWidth + this.margin);
-            ScreenCreditController.imageTransform.setTranslation(x, y, 0);
-            ScreenCreditController.imageTransform.setScale(imageWidth, imageHeight, 1);
-
-            gl = dc.currentGlContext;
-            program = dc.currentProgram;
-
-            // Compute and specify the MVP matrix.
-            ScreenCreditController.scratchMatrix.copy(dc.screenProjection);
-            ScreenCreditController.scratchMatrix.multiplyMatrix(ScreenCreditController.imageTransform);
-            program.loadModelviewProjection(gl, ScreenCreditController.scratchMatrix);
-
-            program.loadTextureEnabled(gl, true);
-            program.loadColor(gl, credit.color);
-            program.loadOpacity(gl, this.opacity);
-
-            ScreenCreditController.texCoordMatrix.setToIdentity();
-            ScreenCreditController.texCoordMatrix.multiplyByTextureTransform(activeTexture);
-            program.loadTextureMatrix(gl, ScreenCreditController.texCoordMatrix);
-
-            if (activeTexture.bind(dc)) { // returns false if active texture cannot be bound
-                // Draw the image quad.
-                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            }
-
-            return true;
         };
 
         return ScreenCreditController;

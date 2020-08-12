@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports GeographicProjection
@@ -205,6 +217,30 @@ define([
             result[0] = 0;
             result[1] = 1;
             result[2] = 0;
+
+            return result;
+        };
+
+        /**
+         * Computes the Cartesian surface normal vector at a specified geographic location.
+         *
+         * @param {Globe} globe The globe this projection is applied to.
+         * @param {number} latitude The latitude of the location, in degrees.
+         * @param {number} longitude The longitude of the location, in degrees.
+         * @param {Vec3} result A variable in which to return the computed vector.
+         *
+         * @returns{Vec3} The specified result argument containing the computed vector.
+         * @throws {ArgumentError} If either the specified globe or result argument is null or undefined.
+         */
+        GeographicProjection.prototype.surfaceNormalAtLocation = function (globe, latitude, longitude, result) {
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "GeographicProjection", "surfaceNormalAtLocation",
+                    "missingResult"));
+            }
+
+            result[0] = 0;
+            result[1] = 0;
+            result[2] = 1;
 
             return result;
         };

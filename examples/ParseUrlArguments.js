@@ -1,17 +1,32 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
+ */
+/**
+ * Illustrates how to retrieve arguments in the browser's URL in order to interact with the globe.
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],
@@ -19,6 +34,34 @@ requirejs(['./WorldWindShim',
               LayerManager) {
         "use strict";
 
+        // Tell WorldWind to log only warnings and errors.
+        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
+
+        // Create the WorldWindow.
+        var wwd = new WorldWind.WorldWindow("canvasOne");
+
+        // Create and add layers to the WorldWindow.
+        var layers = [
+            // Imagery layers.
+            {layer: new WorldWind.BMNGLayer(), enabled: true},
+            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
+            {layer: new WorldWind.BingAerialLayer(null), enabled: false},
+            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
+            {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
+            // Add atmosphere layer on top of all base layers.
+            {layer: new WorldWind.AtmosphereLayer(), enabled: true},
+            // WorldWindow UI layers.
+            {layer: new WorldWind.CompassLayer(), enabled: true},
+            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
+            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
+        ];
+
+        for (var l = 0; l < layers.length; l++) {
+            layers[l].layer.enabled = layers[l].enabled;
+            wwd.addLayer(layers[l].layer);
+        }
+
+        // Function to obtain arguments from query string.
         var parseArgs = function () {
             var result = {};
 
@@ -29,6 +72,7 @@ requirejs(['./WorldWindShim',
                 for (var a = 0; a < args.length; a++) {
                     var arg = args[a].split("=");
 
+                    // Obtain geographic position to redirect WorldWindow camera view.
                     if (arg[0] === "pos") {
                         // arg format is "pos=lat,lon,alt"
                         var position = arg[1].split(","),
@@ -45,31 +89,11 @@ requirejs(['./WorldWindShim',
 
         var args = parseArgs();
 
-        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
-
-        var wwd = new WorldWind.WorldWindow("canvasOne");
-
-        var layers = [
-            {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BMNGLandsatLayer(), enabled: false},
-            {layer: new WorldWind.BingAerialLayer(null), enabled: false},
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            {layer: new WorldWind.BingRoadsLayer(null), enabled: false},
-            {layer: new WorldWind.CompassLayer(), enabled: true},
-            {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
-            {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true}
-        ];
-
-        for (var l = 0; l < layers.length; l++) {
-            layers[l].layer.enabled = layers[l].enabled;
-            wwd.addLayer(layers[l].layer);
+        // Now move the view to the requested position.
+        if (args.position) {
+            wwd.goTo(args.position);
         }
 
         // Create a layer manager for controlling layer visibility.
-        var layerManger = new LayerManager(wwd);
-
-        // Now move the view to the requested position.
-        if  (args.position) {
-            wwd.goTo(args.position);
-        }
+        var layerManager = new LayerManager(wwd);
     });

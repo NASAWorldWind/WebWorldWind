@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 define([
         '../util/Color',
@@ -38,7 +50,7 @@ define([
             // These are all documented with their property accessors below.
             this._cornerRadius = attributes ? attributes._cornerRadius : 0;
             this._insets = attributes ? attributes._insets : new Insets(0, 0, 0, 0);
-            this._backgroundColor = attributes ? attributes._backgroundColor : Color.WHITE;
+            this._backgroundColor = attributes ? attributes._backgroundColor.clone() : Color.WHITE.clone();
             this._leaderGapWidth = attributes ? attributes._leaderGapWidth : 40;
             this._leaderGapHeight = attributes ? attributes._leaderGapHeight : 30;
             this._opacity = attributes ? attributes._opacity : 1;
@@ -46,7 +58,7 @@ define([
             this._drawLeader = attributes ? attributes._drawLeader : true;
             this._width = attributes ? attributes._width : 200;
             this._height = attributes ? attributes._height : 100;
-            this._textAttributes = attributes ? attributes._textAttributes : new TextAttributes(null);
+            this._textAttributes = attributes ? attributes._textAttributes : this.createDefaultTextAttributes();
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their
@@ -77,6 +89,13 @@ define([
                 + " op " + this.opacity
                 + " ta " + this._textAttributes.stateKey
                 + " sc " + this.scale;
+        };
+
+        // Internal use only. Intentionally not documented.
+        AnnotationAttributes.prototype.createDefaultTextAttributes = function() {
+            var attributes = new TextAttributes(null);
+            attributes.enableOutline = false; // Annotations display text without an outline by default
+            return attributes;
         };
 
         Object.defineProperties(AnnotationAttributes.prototype, {

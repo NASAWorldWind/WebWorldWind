@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--
+Invokes Web WorldWind without using the Internet. Refers to data stored only on a local environment.
+
+To deploy:
+
+- Download https://files.worldwind.arc.nasa.gov/artifactory/web/WebWorldWind-StandaloneData.tar.gz and unzip it
+  so that the "standalonedata" directory is a peer of the 'apps' folder. It contains the Blue Marble imagery,
+  the Landsat imagery and the DTED0 elevations in its Earth directory.
+
+- The worldwind.min.js file location in this file is assumed to be where the library is compiled given the repository
+  build process, and it can be modified as needed.
+
+- Ensure that your web server is configured to send an HTTP content type of application/octet-stream
+  or application/bil16 for files with a .bil suffix. You can do this for Apache servers by adding bil
+  to the list of application-octet-stream suffixes in the mime.types file and then restarting the server.
+
+- Use your browser to invoke this HTML file, the one you're now reading, via the web server. Do not attempt
+  to open it using the browser's File->Open menu. Use an http or https URL with the server address.
+
+If deployment was successful then you should see a Web WorldWind globe in the browser. The globe
+should have Blue Marble imagery all over it and greenish Landsat imagery over most of North America.
+
+If you zoom into a mountainous region you should see the raised mountains. There are no elevations
+included for the oceans, so they are all flat.
+
+-->
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>WorldWind Offline Example</title>
+    <!-- Include the locally hosted Web WorldWind library. Modify the address to your local setup as needed. -->
+    <script src="../build/dist/worldwind.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div style="position: absolute; top: 50px; left: 50px;">
+    <!-- Create a canvas for Web WorldWind. -->
+    <canvas id="canvasOne" width="1024" height="768">
+        Your browser does not support HTML5 Canvas.
+    </canvas>
+</div>
+<script>
+    // Register an event listener to be called when the page is loaded.
+    window.addEventListener("load", eventWindowLoaded, false);
+
+    // Define the event listener to initialize Web WorldWind.
+    function eventWindowLoaded() {
+
+        // Tell WorldWind to log only warnings and errors.
+        WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
+
+        // Create a WorldWindow for the canvas.
+        var wwd = new WorldWind.WorldWindow("canvasOne");
+
+        // Use a REST elevation coverage rather than the defaults.
+        var dted0 = new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0");
+        wwd.globe.elevationModel.removeAllCoverages();
+        wwd.globe.elevationModel.addCoverage(dted0);
+
+        // Add the REST Blue Marble layer that retrieves imagery from local standalone data.
+        var blueMarble = new WorldWind.BMNGRestLayer(null, "../standalonedata/Earth/BlueMarble256/");
+        wwd.addLayer(blueMarble);
+
+        // Add the REST Landsat layer (this offline data covers only a sector of the globe in North America)
+        var landSat = new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat");
+        wwd.addLayer(landSat);
+
+        // Add a compass, a coordinates display and some view controls to the WorldWindow.
+        wwd.addLayer(new WorldWind.CompassLayer());
+        wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
+        wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
+    }
+</script>
+</body>
+</html>

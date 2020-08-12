@@ -1,27 +1,52 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
+ *
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 define([
     'src/geom/BoundingBox',
-    'src/geom/Vec3',
-    'src/geom/Plane',
-    'src/globe/Globe',
     'src/globe/EarthElevationModel',
-    'src/geom/Sector'
-], function (BoundingBox, Vec3, Plane, Globe, EarthElevationModel, Sector) {
+    'src/globe/ElevationModel',
+    'src/globe/Globe',
+    'src/geom/Plane',
+    'src/geom/Sector',
+    'src/geom/Vec3',
+    'test/CustomMatchers.test'
+], function (BoundingBox,
+             EarthElevationModel,
+             ElevationModel,
+             Globe,
+             Plane,
+             Sector,
+             Vec3,
+             CustomMatchers) {
     "use strict";
+
+    beforeEach(function () {
+        jasmine.addMatchers(CustomMatchers);
+    });
 
     describe("BoundingBox Tests", function () {
 
@@ -102,7 +127,7 @@ define([
                 var resultCount = 0;
                 for (var i = 0; i < corners.length; i++) {
                     var vec = corners[i];
-                    for (var j = 0; j < vec.length; j++) {
+                    for (var j = 0; j < 3; j++) {
                         expect(vec[j]).toBeCloseTo(results[resultCount], 3);
                         resultCount++;
                     }
@@ -112,11 +137,21 @@ define([
 
         describe("Set to sector method", function () {
 
-            it("Sets this bounding box to contain a specified sector with min and max elevation", function () {
-                var boundingBox = new BoundingBox();
-                var globe = new Globe(new EarthElevationModel());
+            it("Sets this bounding box to contain an entire globe", function () {
                 var sector = new Sector(-90, 90, -180, 180);
-                expect(boundingBox.setToSector(sector, globe, 10, 1000).radius).toBeCloseTo(9006353.499282671, 3);
+                var globe = new Globe(new EarthElevationModel());
+                var minElevation = -11000; // Approximately the depth of the Marianas Trench, in meters
+                var maxElevation = 8850; // Approximately the height of the Mt. Everest, in meters
+                var boundingBox = new BoundingBox().setToSector(sector, globe, minElevation, maxElevation);
+
+                var equatorialExtreme = globe.equatorialRadius + maxElevation;
+                var polarExtreme = globe.polarRadius + maxElevation;
+                expect(boundingBox.center).toEqualVec3(new Vec3(0, 0, 0), 1.0e-9);
+                expect(boundingBox.bottomCenter).toEqualVec3(new Vec3(-equatorialExtreme, 0, 0), 1.0e-9);
+                expect(boundingBox.topCenter).toEqualVec3(new Vec3(equatorialExtreme, 0, 0), 1.0e-9);
+                expect(boundingBox.r).toEqualVec3(new Vec3(equatorialExtreme * 2, 0, 0), 1.0e-9);
+                expect(boundingBox.s).toEqualVec3(new Vec3(0, 0, equatorialExtreme * 2), 1.0e-6);
+                expect(boundingBox.t).toEqualVec3(new Vec3(0, polarExtreme * 2, 0), 1.0e-1);
             });
 
             it("Should throw an exception because no globe is provided", function () {

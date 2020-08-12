@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports GeoTiffUtil
@@ -28,7 +40,7 @@ define([
 
         var GeoTiffUtil = {
 
-            // Get bytes from an arraybuffer depending on the size.
+            // Get bytes from an arraybuffer depending on the size. Internal use only.
             getBytes: function (geoTiffData, byteOffset, numOfBytes, isLittleEndian, isSigned) {
                 if (numOfBytes <= 0) {
                     throw new ArgumentError(
@@ -69,7 +81,7 @@ define([
                 }
             },
 
-            // Get sample value from an arraybuffer depending on the sample format.
+            // Get sample value from an arraybuffer depending on the sample format. Internal use only.
             getSampleBytes: function (geoTiffData, byteOffset, numOfBytes, sampleFormat, isLittleEndian) {
                 var res;
 
@@ -102,14 +114,7 @@ define([
                 return res;
             },
 
-            // Converts canvas to an image.
-            canvasToTiffImage: function (canvas) {
-                var image = new Image();
-                image.src = canvas.toDataURL();
-                return image;
-            },
-
-            // Get RGBA fill style for a canvas context as a string.
+            // Get RGBA fill style for a canvas context as a string. Internal use only.
             getRGBAFillValue: function (r, g, b, a) {
                 if (typeof a === 'undefined') {
                     a = 1.0;
@@ -117,49 +122,10 @@ define([
                 return "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
             },
 
-            // Get the tag value as a string.
-            getTagValueAsString: function (tagName, tagValue) {
-                for (var property in tagName) {
-                    if (tagName[property] === tagValue) {
-                        return property;
-                    }
-                }
-                return undefined;
-            },
-
-            // Clamp color sample from color sample value and number of bits per sample.
+            // Clamp color sample from color sample value and number of bits per sample. Internal use only.
             clampColorSample: function (colorSample, bitsPerSample) {
                 var multiplier = Math.pow(2, 8 - bitsPerSample);
                 return Math.floor((colorSample * multiplier) + (multiplier - 1));
-            },
-
-            // Clamp color sample for elevation data from elevation sample values.
-            clampColorSampleForElevation: function (elevationSample, minElevation, maxElevation) {
-                var slope = 255 / (maxElevation - minElevation);
-                return Math.round(slope * (elevationSample - minElevation))
-            },
-
-            // Get min and max geotiff sample values.
-            getMinMaxGeotiffSamples: function (geotiffSampleArray, noDataValue) {
-                var min = Infinity;
-                var max = -Infinity;
-                for (var i = 0; i < geotiffSampleArray.length; i++) {
-                    for (var j = 0; j < geotiffSampleArray[i].length; j++) {
-                        for (var k = 0; k < geotiffSampleArray[i][j].length; k++) {
-                            if (geotiffSampleArray[i][j][k] == noDataValue)
-                                continue;
-
-                            if (geotiffSampleArray[i][j][k] > max) {
-                                max = geotiffSampleArray[i][j][k];
-                            }
-                            if (geotiffSampleArray[i][j][k] < min) {
-                                min = geotiffSampleArray[i][j][k];
-                            }
-                        }
-                    }
-                }
-
-                return {max: max, min: min};
             }
         };
 

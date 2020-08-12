@@ -1,17 +1,29 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports ColladaScene
@@ -26,7 +38,8 @@ define([
         '../../geom/Position',
         '../../pick/PickedObject',
         '../../render/Renderable',
-        '../../geom/Vec3'
+        '../../geom/Vec3',
+        '../../util/WWMath'
     ],
     function (ArgumentError,
               BasicTextureProgram,
@@ -36,7 +49,8 @@ define([
               Position,
               PickedObject,
               Renderable,
-              Vec3) {
+              Vec3,
+              WWMath) {
         "use strict";
 
         /**
@@ -50,7 +64,6 @@ define([
          * info needed to render the scene.
          */
         var ColladaScene = function (position, sceneData) {
-
             if (!position) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "ColladaScene", "constructor", "missingPosition"));
@@ -95,21 +108,36 @@ define([
             this._nodesToHide = [];
             this._hideNodes = false;
 
-            this.setSceneData(sceneData);
-
             // Documented in defineProperties below.
             this._placePoint = new Vec3(0, 0, 0);
 
             // Documented in defineProperties below.
             this._transformationMatrix = Matrix.fromIdentity();
+            this._mvpMatrix = Matrix.fromIdentity();
 
             // Documented in defineProperties below.
+            this._normalTransformMatrix = Matrix.fromIdentity();
             this._normalMatrix = Matrix.fromIdentity();
-
             this._texCoordMatrix = Matrix.fromIdentity().setToUnitYFlip();
 
+            //Internal. Intentionally not documented.
+            this._entities = [];
+
+            //Internal. Intentionally not documented.
             this._activeTexture = null;
 
+            //Internal. Intentionally not documented.
+            this._tmpVector = new Vec3(0, 0, 0);
+            this._tmpColor = new Color(1, 1, 1, 1);
+
+            //Internal. Intentionally not documented.
+            this._vboCacheKey = '';
+            this._iboCacheKey = '';
+            // TODO: Process the double sided flag if set in sub-geometries.
+            this._doubleSided = false;
+            this._computedNormals = false;
+
+            this.setSceneData(sceneData);
         };
 
         ColladaScene.prototype = Object.create(Renderable.prototype);
@@ -435,6 +463,36 @@ define([
                 set: function (value) {
                     this._hideNodes = value;
                 }
+            },
+
+            /**
+             * Set to true to skip back face culling for this scene. Helpful when the model contains incorrect normal data.
+             * @memberof ColladaScene.prototype
+             * @default false
+             * @type {Boolean}
+             */
+            doubleSided: {
+                get: function () {
+                    return this._doubleSided;
+                },
+                set: function (value) {
+                    this._doubleSided = value;
+                }
+            },
+
+            /**
+             * Set to true to compute vertex normals from vertices. Helpful when the model contains incorrect or missing normal data.
+             * @memberof ColladaScene.prototype
+             * @default false
+             * @type {Boolean}
+             */
+            computedNormals: {
+                get: function () {
+                    return this._computedNormals;
+                },
+                set: function (value) {
+                    this._computedNormals = value;
+                }
             }
 
         });
@@ -442,19 +500,75 @@ define([
         // Internal. Intentionally not documented.
         ColladaScene.prototype.setSceneData = function (sceneData) {
             if (sceneData) {
-                this.nodes = sceneData.root.children;
-                this.meshes = sceneData.meshes;
-                this.materials = sceneData.materials;
-                this.images = sceneData.images;
-                this.upAxis = sceneData.metadata.up_axis;
-                this.dirPath = sceneData.dirPath;
+                this._nodes = sceneData.root.children;
+                this._meshes = sceneData.meshes;
+                this._materials = sceneData.materials;
+                this._images = sceneData.images;
+                this._upAxis = sceneData.metadata.up_axis;
+                this._dirPath = sceneData.dirPath;
+
+                this.flattenModel();
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        ColladaScene.prototype.flattenModel = function () {
+            for (var i = 0, nodesLen = this._nodes.length; i < nodesLen; i++) {
+                this.flattenNode(this._nodes[i]);
+            }
+
+            this._entities.sort(function (a, b) {
+                var va = (a.imageKey === null) ? "" : "" + a,
+                    vb = (b.imageKey === null) ? "" : "" + b;
+                return va > vb ? 1 : (va === vb ? 0 : -1);
+            });
+        };
+
+        // Internal. Intentionally not documented.
+        ColladaScene.prototype.flattenNode = function (node) {
+            if (node.mesh) {
+                var meshKey = node.mesh;
+                var buffers = this._meshes[meshKey].buffers;
+
+                for (var i = 0, bufLen = buffers.length; i < bufLen; i++) {
+                    var materialBuf = buffers[i].material;
+
+                    for (var j = 0; j < node.materials.length; j++) {
+                        if (materialBuf === node.materials[j].symbol) {
+                            var materialKey = node.materials[j].id;
+                            break;
+                        }
+                    }
+
+                    var material = this._materials[materialKey];
+                    var imageKey = null;
+                    var hasTexture = material && material.textures && buffers[i].uvs && buffers[i].uvs.length > 0;
+                    if (hasTexture) {
+                        if (material.textures.diffuse) {
+                            imageKey = material.textures.diffuse.mapId;
+                        } else if (material.textures.reflective) {
+                            imageKey = material.textures.reflective.mapId;
+                        }
+                    }
+
+                    this._entities.push({
+                        mesh: buffers[i],
+                        material: material,
+                        node: node,
+                        imageKey: imageKey
+                    });
+                }
+            }
+
+            for (var k = 0; k < node.children.length; k++) {
+                this.flattenNode(node.children[k]);
             }
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.render = function (dc) {
-
             var orderedScene;
+            var frustum = dc.frustumInModelCoordinates;
 
             if (!this.enabled) {
                 return;
@@ -468,6 +582,10 @@ define([
                 return;
             }
 
+            if (!frustum.containsPoint(this._placePoint)) {
+                return;
+            }
+
             orderedScene.layer = dc.currentLayer;
 
             this.lastFrameTime = dc.timestamp;
@@ -477,56 +595,57 @@ define([
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.makeOrderedRenderable = function (dc) {
+            dc.surfacePointForMode(this._position.latitude, this._position.longitude, this._position.altitude,
+                this._altitudeMode, this._placePoint);
 
-            dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
-                this.altitudeMode, this.placePoint);
-
-            this.eyeDistance = dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = dc.eyePoint.distanceTo(this._placePoint);
 
             return this;
-
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.renderOrdered = function (dc) {
-
             this.drawOrderedScene(dc);
 
             if (dc.pickingMode) {
-                var po = new PickedObject(this.pickColor.clone(), this,
-                    this.position, this.layer, false);
-
+                var po = new PickedObject(this.pickColor.clone(), this, this._position, this.layer, false);
                 dc.resolvePick(po);
             }
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.drawOrderedScene = function (dc) {
-
-            this.beginDrawing(dc);
-
             try {
-                this.doDrawOrderedScene(dc);
-            }
-            finally {
+                this.beginDrawing(dc);
+            } finally {
                 this.endDrawing(dc);
             }
-
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.beginDrawing = function (dc) {
-
             var gl = dc.currentGlContext;
+            var gpuResourceCache = dc.gpuResourceCache;
+
+            var vboId = gpuResourceCache.resourceForKey(this._vboCacheKey);
+            var iboId = gpuResourceCache.resourceForKey(this._iboCacheKey);
+
+            if (!vboId) {
+                this.setupBuffers(dc);
+                vboId = gpuResourceCache.resourceForKey(this._vboCacheKey);
+                iboId = gpuResourceCache.resourceForKey(this._iboCacheKey);
+            }
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
+            if (iboId) {
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboId);
+            }
 
             dc.findAndBindProgram(BasicTextureProgram);
-
-            gl.enable(gl.CULL_FACE);
-            gl.enable(gl.DEPTH_TEST);
-        };
-
-        // Internal. Intentionally not documented.
-        ColladaScene.prototype.doDrawOrderedScene = function (dc) {
+            gl.enableVertexAttribArray(0);
+            if (this._doubleSided) {
+                gl.disable(gl.CULL_FACE);
+            }
 
             if (dc.pickingMode) {
                 this.pickColor = dc.uniquePickColor();
@@ -534,125 +653,253 @@ define([
 
             this.computeTransformationMatrix(dc.globe);
 
-            for (var i = 0, nodesLen = this.nodes.length; i < nodesLen; i++) {
-                this.traverseNodeTree(dc, this.nodes[i]);
+            for (var i = 0, len = this._entities.length; i < len; i++) {
+                var mustRenderNode = this.mustRenderNode(this._entities[i].node.id);
+                if (mustRenderNode) {
+                    this.draw(dc, this._entities[i]);
+                }
             }
         };
 
-        // Internal. Intentionally not documented.
-        ColladaScene.prototype.traverseNodeTree = function (dc, node) {
-
-            var renderNode = this.mustRenderNode(node.id);
-
-            if (renderNode) {
-
-                if (node.mesh) {
-                    var meshKey = node.mesh;
-                    var buffers = this.meshes[meshKey].buffers;
-
-                    for (var i = 0, bufLen = buffers.length; i < bufLen; i++) {
-
-                        var materialBuf = buffers[i].material;
-
-                        for (var j = 0; j < node.materials.length; j++) {
-                            if (materialBuf === node.materials[j].symbol) {
-                                var materialKey = node.materials[j].id;
-                                break;
-                            }
+        // Internal. Recalculates normals, converts buffers to non-indexed.
+        ColladaScene.prototype.rewriteBufferNormals = function (mesh) {
+            mesh._normalsComputed = true;
+            if (mesh.indexedRendering) {
+                var vtxs = mesh.vertices;
+                var idxs = mesh.indices;
+                var uvs = mesh.uvs;
+                var hasUvs = mesh.uvs && mesh.uvs.length > 0;
+                var newLen = idxs.length * 3;
+                var newVtxs = new Float32Array(newLen);
+                var newNormals = new Float32Array(newLen);
+                var newUvs = null;
+                if (hasUvs) {
+                    newUvs = new Float32Array(idxs.length * 2);
+                }
+                for (var i = 0, len = idxs.length; i < len; i += 3) {
+                    var triangle = [];
+                    for (var j = 0; j < 3; j++) {
+                        var vtxOfs = idxs[i + j] * 3;
+                        var vtx = new Vec3(vtxs[vtxOfs], vtxs[vtxOfs + 1], vtxs[vtxOfs + 2]);
+                        triangle.push(vtx);
+                        var newIdx = (i + j) * 3;
+                        newVtxs[newIdx] = vtxs[vtxOfs];
+                        newVtxs[newIdx + 1] = vtxs[vtxOfs + 1];
+                        newVtxs[newIdx + 2] = vtxs[vtxOfs + 2];
+                        if (hasUvs) {
+                            var uvOfs = idxs[i + j] * 2;
+                            var newUvIdx = (i + j) * 2;
+                            newUvs[newUvIdx] = uvs[uvOfs];
+                            newUvs[newUvIdx + 1] = uvs[uvOfs + 1];
                         }
-
-                        var material = this.materials[materialKey];
-
-                        this.draw(dc, buffers[i], material, node.worldMatrix, node.normalMatrix);
+                    }
+                    var normal = WWMath.computeTriangleNormal(triangle[0], triangle[1], triangle[2]);
+                    for (var j = 0; j < 3; j++) {
+                        var newIdx = (i + j) * 3;
+                        newNormals[newIdx] = normal[0];
+                        newNormals[newIdx + 1] = normal[1];
+                        newNormals[newIdx + 2] = normal[2];
                     }
                 }
-
-                for (var k = 0; k < node.children.length; k++) {
-                    this.traverseNodeTree(dc, node.children[k]);
+                mesh.indexedRendering = false;
+                mesh.vertices = newVtxs;
+                mesh.normals = newNormals;
+                mesh.indices = null;
+                if (hasUvs) {
+                    mesh.uvs = newUvs;
                 }
             }
-
+            return mesh;
         };
 
         // Internal. Intentionally not documented.
-        ColladaScene.prototype.draw = function (dc, buffers, material, nodeWorldMatrix, nodeNormalMatrix) {
+        ColladaScene.prototype.setupBuffers = function (dc) {
+            var gl = dc.currentGlContext;
+            var sizeOfFloat32 = Float32Array.BYTES_PER_ELEMENT || 4;
+            var sizeOfUint16 = Uint16Array.BYTES_PER_ELEMENT || 2;
+            var sizeOfUint32 = Uint32Array.BYTES_PER_ELEMENT || 4;
+            var is32BitIndices = false;
+            var numIndices = 0;
+            var numVertices = 0;
 
-            var gl = dc.currentGlContext,
-                program = dc.currentProgram,
-                vboId;
+            for (var i = 0, len = this._entities.length; i < len; i++) {
+                if (this._computedNormals && !this._entities[i].mesh._normalsComputed) {
+                    this._entities[i].mesh = this.rewriteBufferNormals(this._entities[i].mesh);
+                }
+                var mesh = this._entities[i].mesh;
+                if (mesh.indexedRendering) {
+                    numIndices += mesh.indices.length;
+                    if (mesh.indices instanceof Uint32Array) {
+                        is32BitIndices = true;
+                    }
+                }
+                numVertices += mesh.vertices.length;
+                if (this._entities[i].imageKey) {
+                    numVertices += mesh.uvs.length;
+                }
+                if (mesh.normals && mesh.normals.length) {
+                    numVertices += mesh.normals.length;
+                }
+            }
 
-            this.applyVertices(dc, buffers);
+            var vbo = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+            gl.bufferData(gl.ARRAY_BUFFER, numVertices * sizeOfFloat32, gl.STATIC_DRAW);
 
-            program.loadTextureEnabled(gl, false);
+            var offset = 0;
+            for (i = 0, len = this._entities.length; i < len; i++) {
+                var data = this._entities[i].mesh.vertices;
+                this._entities[i].vertexOffset = offset;
+                gl.bufferSubData(gl.ARRAY_BUFFER, offset * sizeOfFloat32, data);
+                offset += data.length;
+            }
+
+            for (i = 0, len = this._entities.length; i < len; i++) {
+                if (this._entities[i].imageKey) {
+                    data = this._entities[i].mesh.uvs;
+                    this._entities[i].uvOffset = offset;
+                    gl.bufferSubData(gl.ARRAY_BUFFER, offset * sizeOfFloat32, data);
+                    offset += data.length;
+                }
+            }
+
+            for (i = 0, len = this._entities.length; i < len; i++) {
+                data = data = this._entities[i].mesh.normals;
+                if (data && data.length) {
+                    this._entities[i].normalOffset = offset;
+                    gl.bufferSubData(gl.ARRAY_BUFFER, offset * sizeOfFloat32, data);
+                    offset += data.length;
+                }
+            }
+
+            var indexSize = sizeOfUint16;
+            var indexBufferSize = numIndices * indexSize;
+            var uIntExt;
+            if (is32BitIndices) {
+                uIntExt = dc.getExtension('OES_element_index_uint');
+
+                if (!uIntExt) {
+                    Logger.log(Logger.LEVEL_SEVERE,
+                        'The 3D model is too big and might not render properly. \n' +
+                        'Your browser does not support the "OES_element_index_uint" extension, ' +
+                        'required to render large models.'
+                    );
+                } else {
+                    indexSize = sizeOfUint32;
+                    indexBufferSize = numIndices * indexSize;
+                }
+            }
+
+            if (numIndices) {
+                var ibo = gl.createBuffer();
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexBufferSize, gl.STATIC_DRAW);
+
+                offset = 0;
+                for (i = 0, len = this._entities.length; i < len; i++) {
+                    mesh = this._entities[i].mesh;
+                    if (mesh.indexedRendering) {
+                        data = mesh.indices;
+                        if (data instanceof Uint32Array && !uIntExt) {
+                            data = new Uint16Array(data);
+                        }
+                        this._entities[i].indexOffset = offset;
+                        this._entities[i].indexSize = indexSize;
+                        gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, offset * indexSize, data);
+                        offset += data.length;
+                    }
+                }
+            }
+
+            this._vboCacheKey = dc.gpuResourceCache.generateCacheKey();
+            dc.gpuResourceCache.putResource(this._vboCacheKey, vbo, numVertices * sizeOfFloat32);
+
+            if (numIndices) {
+                this._iboCacheKey = dc.gpuResourceCache.generateCacheKey();
+                dc.gpuResourceCache.putResource(this._iboCacheKey, ibo, indexBufferSize);
+            }
+        };
+
+        // Internal. Intentionally not documented.
+        ColladaScene.prototype.draw = function (dc, entity) {
+            var gl = dc.currentGlContext;
+            var program = dc.currentProgram;
+            var gpuResourceCache = dc.gpuResourceCache;
+
+            var buffers = entity.mesh;
+            var material = entity.material;
+
+            var nodeWorldMatrix = entity.node.worldMatrix;
+            var nodeNormalMatrix = entity.node.normalMatrix;
+
+            var hasLighting;
+            if (this._doubleSided) {
+                hasLighting = false;
+            } else {
+                hasLighting = buffers.normals && buffers.normals.length;
+            }
+
+            var imageKey = entity.imageKey;
 
             this.applyColor(dc, material);
 
-            var hasTexture = (material && material.textures != null && buffers.uvs && buffers.uvs.length > 0);
-            if (hasTexture) {
-                this.applyTexture(dc, buffers, material);
+            if (imageKey) {
+                var imagePath = this._useTexturePaths ? this._images[imageKey].path : this._images[imageKey].filename;
+                var textureCacheKey = this._dirPath + imagePath;
+                this._activeTexture = gpuResourceCache.resourceForKey(textureCacheKey);
+                if (!this._activeTexture) {
+                    var wrapMode = buffers.isClamp ? gl.CLAMP_TO_EDGE : gl.REPEAT;
+                    this._activeTexture = gpuResourceCache.retrieveTexture(gl, textureCacheKey, wrapMode);
+                }
+                var textureBound = this._activeTexture && this._activeTexture.bind(dc);
+                if (textureBound) {
+                    program.loadTextureEnabled(gl, true);
+                    gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 8, entity.uvOffset * 4);
+                    gl.enableVertexAttribArray(2);
+                    program.loadModulateColor(gl, dc.pickingMode);
+                } else {
+                    program.loadTextureEnabled(gl, false);
+                    gl.disableVertexAttribArray(2);
+                }
+            } else {
+                program.loadTextureEnabled(gl, false);
+                gl.disableVertexAttribArray(2);
             }
 
-            var hasLighting = (buffers.normals != null && buffers.normals.length > 0);
             if (hasLighting && !dc.pickingMode) {
-                this.applyLighting(dc, buffers);
+                program.loadApplyLighting(gl, 1);
+                gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 12, entity.normalOffset * 4);
+                gl.enableVertexAttribArray(1);
+            } else {
+                program.loadApplyLighting(gl, 0);
+                gl.disableVertexAttribArray(1);
             }
 
-            this.applyMatrix(dc, hasLighting, hasTexture , nodeWorldMatrix, nodeNormalMatrix);
+            this.applyMatrix(dc, hasLighting, textureCacheKey, nodeWorldMatrix, nodeNormalMatrix);
+
+            gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 12, entity.vertexOffset * 4);
 
             if (buffers.indexedRendering) {
-                this.applyIndices(dc, buffers);
-                gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_SHORT, 0);
-            }
-            else {
+                var indexOffsetBytes = entity.indexOffset * entity.indexSize;
+                if (buffers.indices instanceof Uint32Array && dc.getExtension('OES_element_index_uint')) {
+                    gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_INT, indexOffsetBytes);
+                } else {
+                    gl.drawElements(gl.TRIANGLES, buffers.indices.length, gl.UNSIGNED_SHORT, indexOffsetBytes);
+                }
+            } else {
                 gl.drawArrays(gl.TRIANGLES, 0, Math.floor(buffers.vertices.length / 3));
             }
-
-            this.resetDraw(dc, hasLighting, hasTexture);
-
-        };
-
-        // Internal. Intentionally not documented.
-        ColladaScene.prototype.applyVertices = function (dc, buffers) {
-
-            var gl = dc.currentGlContext,
-                program = dc.currentProgram,
-                vboId;
-
-            if (!buffers.verticesVboCacheKey) {
-                buffers.verticesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
-            }
-
-            vboId = dc.gpuResourceCache.resourceForKey(buffers.verticesVboCacheKey);
-            if (!vboId) {
-                vboId = gl.createBuffer();
-                dc.gpuResourceCache.putResource(buffers.verticesVboCacheKey, vboId,
-                    buffers.vertices.length);
-                buffers.refreshVertexBuffer = true;
-            }
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-            if (buffers.refreshVertexBuffer) {
-                gl.bufferData(gl.ARRAY_BUFFER, buffers.vertices, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                buffers.refreshVertexBuffer = false;
-            }
-
-            gl.enableVertexAttribArray(program.vertexPointLocation);
-            gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
-
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.applyColor = function (dc, material) {
-
             var gl = dc.currentGlContext,
                 program = dc.currentProgram;
 
             if (material) {
                 if (material.techniqueType === 'constant') {
                     var diffuse = material.reflective;
-                }
-                else {
+                } else {
                     diffuse = material.diffuse;
                 }
             }
@@ -667,218 +914,86 @@ define([
                 a = diffuse[3] != null ? diffuse[3] : 1;
             }
 
-            var color = new Color(r, g, b, a);
-            opacity = a * dc.currentLayer.opacity;
+            this._tmpColor.set(r, g, b, a);
+            opacity = a * this.layer.opacity;
             gl.depthMask(opacity >= 1 || dc.pickingMode);
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : color);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : this._tmpColor);
             program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
         };
 
         // Internal. Intentionally not documented.
-        ColladaScene.prototype.applyTexture = function (dc, buffers, material) {
-
-            var textureBound, vboId,
-                gl = dc.currentGlContext,
-                program = dc.currentProgram,
-                wrapMode;
-
-            if (material.textures.diffuse) {
-                var imageKey = material.textures.diffuse.mapId;
-            }
-            else {
-                imageKey = material.textures.reflective.mapId;
-            }
-
-            var image = this.useTexturePaths ? this.images[imageKey].path : this.images[imageKey].filename;
-
-            this._activeTexture = dc.gpuResourceCache.resourceForKey(this.dirPath + image + "");
-            if (!this._activeTexture) {
-                wrapMode = buffers.isClamp ? gl.CLAMP_TO_EDGE : gl.REPEAT;
-                this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.dirPath + image + "", wrapMode);
-            }
-            textureBound = this._activeTexture && this._activeTexture.bind(dc);
-
-            if (textureBound) {
-                if (!buffers.texCoordsVboCacheKey) {
-                    buffers.texCoordsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
-                }
-
-                vboId = dc.gpuResourceCache.resourceForKey(buffers.texCoordsVboCacheKey);
-                if (!vboId) {
-                    vboId = gl.createBuffer();
-                    dc.gpuResourceCache.putResource(buffers.texCoordsVboCacheKey, vboId, buffers.uvs.length);
-                    buffers.refreshTexCoordBuffer = true;
-                }
-
-                gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-                if (buffers.refreshTexCoordBuffer) {
-                    gl.bufferData(gl.ARRAY_BUFFER, buffers.uvs, gl.STATIC_DRAW);
-                    dc.frameStatistics.incrementVboLoadCount(1);
-                    buffers.refreshTexCoordBuffer = false;
-                }
-
-                program.loadTextureEnabled(gl, true);
-                gl.enableVertexAttribArray(program.vertexTexCoordLocation);
-                gl.vertexAttribPointer(program.vertexTexCoordLocation, 2, gl.FLOAT, false, 0, 0);
-                program.loadTextureUnit(gl, gl.TEXTURE0);
-                program.loadModulateColor(gl, dc.pickingMode);
-            }
-        };
-
-        // Internal. Intentionally not documented.
-        ColladaScene.prototype.applyLighting = function (dc, buffers) {
-
-            var vboId,
-                gl = dc.currentGlContext,
-                program = dc.currentProgram;
-
-            program.loadApplyLighting(gl, true);
-            if (!buffers.normalsVboCacheKey) {
-                buffers.normalsVboCacheKey = dc.gpuResourceCache.generateCacheKey();
-            }
-
-            vboId = dc.gpuResourceCache.resourceForKey(buffers.normalsVboCacheKey);
-            if (!vboId) {
-                vboId = gl.createBuffer();
-                dc.gpuResourceCache.putResource(buffers.normalsVboCacheKey, vboId, buffers.normals.length);
-                buffers.refreshNormalBuffer = true;
-            }
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
-            if (buffers.refreshNormalBuffer) {
-                gl.bufferData(gl.ARRAY_BUFFER, buffers.normals, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                buffers.refreshNormalBuffer = false;
-            }
-
-            gl.enableVertexAttribArray(program.normalVectorLocation);
-            gl.vertexAttribPointer(program.normalVectorLocation, 3, gl.FLOAT, false, 0, 0);
-        };
-
-        // Internal. Intentionally not documented.
         ColladaScene.prototype.applyMatrix = function (dc, hasLighting, hasTexture, nodeWorldMatrix, nodeNormalMatrix) {
+            this._mvpMatrix.copy(dc.modelviewProjection);
+            this._mvpMatrix.multiplyMatrix(this._transformationMatrix);
 
-            var mvpMatrix = Matrix.fromIdentity();
-
-            mvpMatrix.copy(dc.navigatorState.modelviewProjection);
-
-            mvpMatrix.multiplyMatrix(this.transformationMatrix);
-
-            if (nodeWorldMatrix && this.localTransforms) {
-                mvpMatrix.multiplyMatrix(nodeWorldMatrix);
+            if (nodeWorldMatrix && this._localTransforms) {
+                this._mvpMatrix.multiplyMatrix(nodeWorldMatrix);
             }
 
             if (hasLighting && !dc.pickingMode) {
-
-                var normalMatrix = Matrix.fromIdentity();
-
-                normalMatrix.copy(dc.navigatorState.modelviewNormalTransform);
-
-                normalMatrix.multiplyMatrix(this.normalMatrix);
-
-                if (nodeNormalMatrix && this.localTransforms) {
-                    normalMatrix.multiplyMatrix(nodeNormalMatrix);
+                this._normalMatrix.copy(dc.modelviewNormalTransform);
+                this._normalMatrix.multiplyMatrix(this._normalTransformMatrix);
+                if (nodeNormalMatrix && this._localTransforms) {
+                    this._normalMatrix.multiplyMatrix(nodeNormalMatrix);
                 }
 
-                dc.currentProgram.loadModelviewInverse(dc.currentGlContext, normalMatrix);
+                dc.currentProgram.loadModelviewInverse(dc.currentGlContext, this._normalMatrix);
             }
 
-            if (hasTexture && this._activeTexture){
+            if (hasTexture && this._activeTexture) {
                 dc.currentProgram.loadTextureMatrix(dc.currentGlContext, this._texCoordMatrix);
                 this._activeTexture = null;
             }
 
-            dc.currentProgram.loadModelviewProjection(dc.currentGlContext, mvpMatrix);
-
-        };
-
-        // Internal. Intentionally not documented.
-        ColladaScene.prototype.applyIndices = function (dc, buffers) {
-
-            var gl = dc.currentGlContext,
-                vboId;
-
-            if (!buffers.indicesVboCacheKey) {
-                buffers.indicesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
-            }
-
-            vboId = dc.gpuResourceCache.resourceForKey(buffers.indicesVboCacheKey);
-            if (!vboId) {
-                vboId = gl.createBuffer();
-                dc.gpuResourceCache.putResource(buffers.indicesVboCacheKey, vboId, buffers.indices.length);
-                buffers.refreshIndicesBuffer = true;
-            }
-
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
-            if (buffers.refreshIndicesBuffer) {
-                gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, buffers.indices, gl.STATIC_DRAW);
-                dc.frameStatistics.incrementVboLoadCount(1);
-                buffers.refreshIndicesBuffer = false;
-            }
-
-        };
-
-        // Internal. Intentionally not documented.
-        ColladaScene.prototype.resetDraw = function (dc, hasLighting, hasTexture) {
-
-            var gl = dc.currentGlContext,
-                program = dc.currentProgram;
-
-            if (hasLighting && !dc.pickingMode) {
-                program.loadApplyLighting(gl, false);
-                gl.disableVertexAttribArray(program.normalVectorLocation);
-            }
-
-            if (hasTexture) {
-                gl.disableVertexAttribArray(program.vertexTexCoordLocation);
-            }
-
-            gl.disableVertexAttribArray(program.vertexPointLocation);
+            dc.currentProgram.loadModelviewProjection(dc.currentGlContext, this._mvpMatrix);
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.endDrawing = function (dc) {
-            dc.bindProgram(null);
+            var gl = dc.currentGlContext;
+            var program = dc.currentProgram;
+
+            if (this._doubleSided) {
+                gl.enable(gl.CULL_FACE);
+            }
+
+            gl.disableVertexAttribArray(1);
+            gl.disableVertexAttribArray(2);
+            program.loadApplyLighting(gl, 0);
+            program.loadTextureEnabled(gl, false);
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.computeTransformationMatrix = function (globe) {
+            this._transformationMatrix.setToIdentity();
 
-            this.transformationMatrix = Matrix.fromIdentity();
+            this._transformationMatrix.multiplyByLocalCoordinateTransform(this._placePoint, globe);
 
-            this.transformationMatrix.multiplyByLocalCoordinateTransform(this.placePoint, globe);
+            this._transformationMatrix.multiplyByRotation(1, 0, 0, this._xRotation);
+            this._transformationMatrix.multiplyByRotation(0, 1, 0, this._yRotation);
+            this._transformationMatrix.multiplyByRotation(0, 0, 1, this._zRotation);
 
-            this.transformationMatrix.multiplyByRotation(1, 0, 0, this.xRotation);
-            this.transformationMatrix.multiplyByRotation(0, 1, 0, this.yRotation);
-            this.transformationMatrix.multiplyByRotation(0, 0, 1, this.zRotation);
+            this._transformationMatrix.multiplyByScale(this._scale, this._scale, this._scale);
 
-            this.transformationMatrix.multiplyByScale(this.scale, this.scale, this.scale);
-
-            this.transformationMatrix.multiplyByTranslation(this.xTranslation, this.yTranslation, this.zTranslation);
+            this._transformationMatrix.multiplyByTranslation(this._xTranslation, this._yTranslation, this._zTranslation);
 
             this.computeNormalMatrix();
-
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.computeNormalMatrix = function () {
-
-            var rotAngles = new Vec3(0, 0, 0);
-
-            this.transformationMatrix.extractRotationAngles(rotAngles);
-
-            this.normalMatrix = Matrix.fromIdentity();
-
-            this.normalMatrix.multiplyByRotation(-1, 0, 0, rotAngles[0]);
-            this.normalMatrix.multiplyByRotation(0, -1, 0, rotAngles[1]);
-            this.normalMatrix.multiplyByRotation(0, 0, -1, rotAngles[2]);
+            this._transformationMatrix.extractRotationAngles(this._tmpVector);
+            this._normalTransformMatrix.setToIdentity();
+            this._normalTransformMatrix.multiplyByRotation(-1, 0, 0, this._tmpVector[0]);
+            this._normalTransformMatrix.multiplyByRotation(0, -1, 0, this._tmpVector[1]);
+            this._normalTransformMatrix.multiplyByRotation(0, 0, -1, this._tmpVector[2]);
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.mustRenderNode = function (nodeId) {
             var draw = true;
-            if (this.hideNodes) {
-                var pos = this.nodesToHide.indexOf(nodeId);
+            if (this._hideNodes) {
+                var pos = this._nodesToHide.indexOf(nodeId);
                 draw = (pos === -1);
             }
             return draw;
