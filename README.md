@@ -2,13 +2,13 @@
 
 # Web WorldWind
 
-## NASA Renews Commitment to WorldWind
-WorldWind has received renewed commitment from NASA for continued development and support.  NASA will continue to release updates
- to the WorldWind SDKs, and will continue to make the WorldWind Servers accessible for all Users.
+## New versions of WorldWind released
+ 
+Web WorldWind 0.10.0 and WorldWind Java 2.2.0 are now available on GitHub. The new version of Web WorldWind addresses potential vulnerabilities in the code and underlying packages. The new version of WorldWind Java focuses on upgrading to Java 11 and JOGL 2.4 as well as a switch to Apache 2.0 license. WorldWind's API remains largely unchanged in this release and we are committed to maintaining a consistent API in future releases.
+More information on the release can be found at these links: [Web WorldWind 0.10.0](https://github.com/NASAWorldWind/WebWorldWind/releases) and [WorldWind Java 2.2.0](https://github.com/NASAWorldWind/WorldWindJava/releases).
+Please direct questions to our new email address: 
 
-If you have questions and/or concerns, please feel free to email at:
-
-worldwind-info@lists.nasa.gov
+arc-worldwind@mail.nasa.gov
 
 [![Build Status](https://travis-ci.com/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.com/NASAWorldWind/WebWorldWind)
 
