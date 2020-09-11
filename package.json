@@ -10,8 +10,7 @@
   "license": "Apache-2.0",
   "author": "NASA",
   "contributors": [
-    "NASA Project Manager <patrick.hogan@nasa.gov>",
-    "ESA Consortium Contact <yann.voumard@solenix.ch>"
+    "NASA Project Manager <confesor.santiago@nasa.gov>"
   ],
   "repository": {
     "type": "git",
@@ -52,12 +51,17 @@
     "worldwind",
     "3d",
     "globe",
+    "cartography",
+    "maps",
     "earth",
     "terrain",
+    "elevations",
+    "satellite",
     "imagery",
     "nasa",
     "esa",
     "geospatial",
+    "gis",
     "html5",
     "javascript",
     "webgl",
