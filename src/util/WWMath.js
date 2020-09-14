@@ -258,6 +258,32 @@ define([
                 }
             },
 
+            computeTriangleListIntersection: function (line, points, results) {
+                if (!line) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingLine"));
+                }
+
+                if (!points) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingPoints"));
+                }
+
+                if (!results) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingResults"));
+                }
+                var iPoint = new Vec3(0, 0, 0);
+                for (var i = 0, len = points.length; i < len; i += 3) {
+                    if (WWMath.computeTriangleIntersection(line, points[i], points[i + 1], points[i + 2], iPoint)) {
+                        results.push(iPoint);
+                        iPoint = new Vec3(0, 0, 0);
+                    }
+                }
+
+                return results.length > 0;
+            },
+
             computeIndexedTrianglesIntersection: function (line, points, indices, results) {
                 if (!line) {
                     throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",

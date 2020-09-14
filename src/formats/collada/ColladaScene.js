@@ -33,6 +33,8 @@ define([
         '../../error/ArgumentError',
         '../../shaders/BasicTextureProgram',
         '../../util/Color',
+        '../../globe/Globe',
+        '../../geom/Line',
         '../../util/Logger',
         '../../geom/Matrix',
         '../../geom/Position',
@@ -44,6 +46,8 @@ define([
     function (ArgumentError,
               BasicTextureProgram,
               Color,
+              Globe,
+              Line,
               Logger,
               Matrix,
               Position,
@@ -71,6 +75,10 @@ define([
 
             Renderable.call(this);
 
+            this._currentData = {
+                expired: true,
+                transformedPoints: []
+            };
             // Documented in defineProperties below.
             this._position = position;
 
@@ -155,6 +163,7 @@ define([
                     return this._position;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._position = value;
                 }
             },
@@ -183,6 +192,7 @@ define([
                     return this._meshes;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._meshes = value;
                 }
             },
@@ -253,6 +263,7 @@ define([
                     return this._xRotation;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._xRotation = value;
                 }
             },
@@ -267,6 +278,7 @@ define([
                     return this._yRotation;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._yRotation = value;
                 }
             },
@@ -281,6 +293,7 @@ define([
                     return this._zRotation;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._zRotation = value;
                 }
             },
@@ -295,6 +308,7 @@ define([
                     return this._xTranslation;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._xTranslation = value;
                 }
             },
@@ -309,6 +323,7 @@ define([
                     return this._yTranslation;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._yTranslation = value;
                 }
             },
@@ -323,6 +338,7 @@ define([
                     return this._zTranslation;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._zTranslation = value;
                 }
             },
@@ -337,6 +353,7 @@ define([
                     return this._scale;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._scale = value;
                 }
             },
@@ -351,6 +368,7 @@ define([
                     return this._placePoint;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._placePoint = value;
                 }
             },
@@ -491,6 +509,7 @@ define([
                     return this._computedNormals;
                 },
                 set: function (value) {
+                    this._currentData.expired = true;
                     this._computedNormals = value;
                 }
             }
@@ -603,6 +622,70 @@ define([
             return this;
         };
 
+        ColladaScene.prototype.computeTransformedPoints = function (mesh) {
+            var vtxs = mesh.vertices;
+            var points = [];
+            if (mesh.indexedRendering) {
+                var idxs = mesh.indices;
+                for (var i = 0, len = idxs.length; i < len; i += 3) {
+                    for (var j = 0; j < 3; j++) {
+                        var vtxOfs = idxs[i + j] * 3;
+                        var vtx = new Vec3(vtxs[vtxOfs], vtxs[vtxOfs + 1], vtxs[vtxOfs + 2]);
+                        vtx.multiplyByMatrix(this._transformationMatrix);
+                        points.push(vtx);
+                    }
+                }
+            } else {
+                for (var i = 0, len = vtxs.length; i < len; i += 3) {
+                    var vtx = new Vec3(vtxs[i], vtxs[i + 1], vtxs[i + 2]);
+                    vtx.multiplyByMatrix(this._transformationMatrix);
+                    points.push(vtx);
+                }
+            }
+
+            return points;
+        };
+
+        ColladaScene.prototype.computePointIntersections = function (globe, pointRay, results) {
+            if (!globe) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ColladaScene",
+                    "computePointIntersections", "missingGlobe"));
+            }
+
+            if (!pointRay) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "ColladaScene",
+                        "computePointIntersections", "missingRay"));
+            }
+
+            if (!results) {
+                throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ColladaScene",
+                    "computePointIntersections", "missingResults"));
+            }
+
+            var computeTransforms = this._currentData.transformedPoints.length <= this._entities.length;
+            if (computeTransforms) {
+                this._currentData.transformedPoints = [];
+            }
+            for (var i = 0, len = this._entities.length; i < len; i++) {
+                var mesh = this._entities[i].mesh;
+                if (computeTransforms) {
+                    this._currentData.transformedPoints.push(this.computeTransformedPoints(mesh));
+                }
+                var intersectionPoints = [];
+                if (WWMath.computeTriangleListIntersection(pointRay,
+                    this._currentData.transformedPoints[i], intersectionPoints)) {
+                    for (var j = 0, iLen = intersectionPoints.length; j < iLen; j++) {
+                        var position = new Position(0, 0, 0);
+                        globe.computePositionFromPoint(intersectionPoints[j][0],
+                            intersectionPoints[j][1], intersectionPoints[j][2], position);
+                        results.push(position);
+                    }
+                }
+            }
+            return results.length > 0;
+        };
+
         // Internal. Intentionally not documented.
         ColladaScene.prototype.renderOrdered = function (dc) {
             this.drawOrderedScene(dc);
@@ -624,6 +707,9 @@ define([
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.beginDrawing = function (dc) {
+            if (this._currentData.expired) {
+                this._currentData.transformedPoints = [];
+            }
             var gl = dc.currentGlContext;
             var gpuResourceCache = dc.gpuResourceCache;
 
@@ -693,6 +779,7 @@ define([
                             newUvs[newUvIdx + 1] = uvs[uvOfs + 1];
                         }
                     }
+
                     var normal = WWMath.computeTriangleNormal(triangle[0], triangle[1], triangle[2]);
                     for (var j = 0; j < 3; j++) {
                         var newIdx = (i + j) * 3;
@@ -961,10 +1048,15 @@ define([
             gl.disableVertexAttribArray(2);
             program.loadApplyLighting(gl, 0);
             program.loadTextureEnabled(gl, false);
+            this._currentData.expired = false;
         };
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.computeTransformationMatrix = function (globe) {
+            if (!this._currentData.expired) {
+                return;
+            }
+
             this._transformationMatrix.setToIdentity();
 
             this._transformationMatrix.multiplyByLocalCoordinateTransform(this._placePoint, globe);
@@ -982,6 +1074,9 @@ define([
 
         // Internal. Intentionally not documented.
         ColladaScene.prototype.computeNormalMatrix = function () {
+            if (!this._currentData.expired) {
+                return;
+            }
             this._transformationMatrix.extractRotationAngles(this._tmpVector);
             this._normalTransformMatrix.setToIdentity();
             this._normalTransformMatrix.multiplyByRotation(-1, 0, 0, this._tmpVector[0]);
