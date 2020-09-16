@@ -26,7 +26,8 @@
  * PDF found in code  directory.
  */
 /**
- * Illustrates how to load and display a Collada 3D model onto the globe.
+ * Illustrates how to load and display a Collada 3D model onto the globe. Also shows how to calculate
+ * intersection points when you click on the model.
  */
 
 requirejs(['./WorldWindShim',
@@ -79,6 +80,8 @@ requirejs(['./WorldWindShim',
             duckScene = scene;
         });
 
+        // Add place marks to intersection points with the ray extending from the eye point when the
+        // model is clicked.
         var placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
         placemarkAttributes.imageScale = 1;
         placemarkAttributes.imageColor = WorldWind.Color.RED;
@@ -86,6 +89,9 @@ requirejs(['./WorldWindShim',
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.RED;
         placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/crosshair.png";
+        var closestPlacemarkAttributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
+        closestPlacemarkAttributes.imageColor = WorldWind.Color.GREEN;
+        closestPlacemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.GREEN;
         var handleClick = function (o) {
             if (duckScene == null) {
                 return;
@@ -98,7 +104,11 @@ requirejs(['./WorldWindShim',
                 for (var i = 0, len = intersections.length; i < len; i++) {
                     var placemark = new WorldWind.Placemark(intersections[i], true, null);
                     placemark.altitudeMode = WorldWind.ABSOLUTE;
-                    placemark.attributes = placemarkAttributes;
+                    if (i == 0) {
+                        placemark.attributes = closestPlacemarkAttributes;
+                    } else {
+                        placemark.attributes = placemarkAttributes;
+                    }
                     placemarkLayer.addRenderable(placemark);
                 }
             }

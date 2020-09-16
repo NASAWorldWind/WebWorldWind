@@ -74,11 +74,7 @@ define([
             }
 
             Renderable.call(this);
-
-            this._currentData = {
-                expired: true,
-                transformedPoints: []
-            };
+            this.resetCurrentData();
             // Documented in defineProperties below.
             this._position = position;
 
@@ -516,6 +512,14 @@ define([
 
         });
 
+        // Internal. Resets the cache of calculated data that doesn't need to be recomputed each time.
+        ColladaScene.prototype.resetCurrentData = function () {
+            this._currentData = {
+                expired: true,
+                transformedPoints: []
+            };
+        };
+
         // Internal. Intentionally not documented.
         ColladaScene.prototype.setSceneData = function (sceneData) {
             if (sceneData) {
@@ -622,6 +626,7 @@ define([
             return this;
         };
 
+        // Internal. Calculates the transformed cartesian coordinates of a mesh.
         ColladaScene.prototype.computeTransformedPoints = function (mesh) {
             var vtxs = mesh.vertices;
             var points = [];
@@ -646,6 +651,15 @@ define([
             return points;
         };
 
+        /**
+         * Calculates the intersection positions of a given ray with this scene.
+         * @param {Globe} globe The globe to use for translating points to positions.
+         * @param {Line} pointRay The ray to test for intersections.
+         * @param {Position[]} results An array to hold the results if any. This list is sorted in ascending order by
+         * distance from the eyepoint. The closest intersection will be the 0th element of the list.
+         * @returns {Boolean} true if any intersections are found.
+         * @throws {ArgumentError} if any of the arguments are not supplied.
+         */
         ColladaScene.prototype.computePointIntersections = function (globe, pointRay, results) {
             if (!globe) {
                 throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "ColladaScene",
@@ -663,10 +677,12 @@ define([
                     "computePointIntersections", "missingResults"));
             }
 
+            var eyePoint = pointRay.origin;
             var computeTransforms = this._currentData.transformedPoints.length <= this._entities.length;
             if (computeTransforms) {
                 this._currentData.transformedPoints = [];
             }
+            var eyeDists = [];
             for (var i = 0, len = this._entities.length; i < len; i++) {
                 var mesh = this._entities[i].mesh;
                 if (computeTransforms) {
@@ -679,7 +695,20 @@ define([
                         var position = new Position(0, 0, 0);
                         globe.computePositionFromPoint(intersectionPoints[j][0],
                             intersectionPoints[j][1], intersectionPoints[j][2], position);
-                        results.push(position);
+                        // sorted insert
+                        var jEyeDist = intersectionPoints[j].distanceTo(eyePoint);
+                        var inserted = false;
+                        for (var k = 0, eLen = eyeDists.length; k < eLen && !inserted; k++) {
+                            if (jEyeDist < eyeDists[k]) {
+                                results.splice(k, 0, position);
+                                eyeDists.splice(k, 0, jEyeDist);
+                                inserted = true;
+                            }
+                        }
+                        if (!inserted) {
+                            results.push(position);
+                            eyeDists.push(jEyeDist);
+                        }
                     }
                 }
             }
@@ -708,7 +737,7 @@ define([
         // Internal. Intentionally not documented.
         ColladaScene.prototype.beginDrawing = function (dc) {
             if (this._currentData.expired) {
-                this._currentData.transformedPoints = [];
+                this.resetCurrentData();
             }
             var gl = dc.currentGlContext;
             var gpuResourceCache = dc.gpuResourceCache;

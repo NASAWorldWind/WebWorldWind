@@ -258,6 +258,16 @@ define([
                 }
             },
 
+            /**
+             * Computes the Cartesian intersection point(s) of a specified line with a non-indexed list of
+             * triangle vertices.
+             * @param {Line} line The line for which to compute the intersection(s).
+             * @param {Vec3[]} points The list of triangle vertices arranged such that each
+             * 3-tuple, (i,i+1,i+2), specifies a triangle.
+             * @param {Vec3[]} results The Cartesian intersection point(s) if any.
+             * @returns {boolean} true if the line intersects any triangle, otherwise false
+             * @throws {ArgumentError} If any of the arguments is not supplied.
+             */
             computeTriangleListIntersection: function (line, points, results) {
                 if (!line) {
                     throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
