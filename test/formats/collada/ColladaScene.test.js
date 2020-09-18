@@ -27,7 +27,6 @@
  */
 define([
     'src/formats/collada/ColladaScene',
-    'test/CustomMatchers.test',
     'src/globe/ElevationModel',
     'src/globe/Globe',
     'src/geom/Line',
@@ -35,7 +34,7 @@ define([
     'src/geom/Position',
     'src/projections/ProjectionWgs84',
     'src/geom/Vec3'
-], function (ColladaScene, CustomMatchers, ElevationModel, Globe, Line, Matrix, Position, ProjectionWgs84, Vec3) {
+], function (ColladaScene, ElevationModel, Globe, Line, Matrix, Position, ProjectionWgs84, Vec3) {
     "use strict";
 
     describe("ColladaScene calculation and data manipulation testing", function () {
@@ -100,6 +99,7 @@ define([
                 expect(mesh.uvs[i]).toBe(expectedUvs[i]);
             }
         });
+
         it("Should properly compute intersection points with a ray", function () {
             var colladaLoader = new WorldWind.ColladaLoader(new Position(44, -96, 10000));
             colladaLoader.init({dirPath: '../base/test/formats/collada/'});
@@ -124,10 +124,17 @@ define([
                 intersectionsFound = scene.computePointIntersections(globe, pointRay, intersections);
                 expect(intersectionsFound).toBe(true);
                 expect(intersections.length).toBe(2);
-                var i1 = new Position(43.088776730634535, -95.18631436743668, 29685.22045946613);
-                var i2 = new Position(43.30646919618773, -95.39472743244926, 15659.079434582456);
-                expect(intersections[0]).toBeCloseToPosition(i1, 7, 7, 7);
-                expect(intersections[1]).toBeCloseToPosition(i2, 7, 7, 7);
+                var i0 = new Position(43.088776730634535, -95.18631436743668, 29685.22045946613);
+                var i1 = new Position(43.30646919618773, -95.39472743244926, 15659.079434582456);
+                // Using toBeCloseToPosition may be causing weird unreliability
+                // expect(intersections[0]).toBeCloseToPosition(i1, 7, 7, 7);
+                // expect(intersections[1]).toBeCloseToPosition(i2, 7, 7, 7);
+                expect(intersections[0].latitude).toBeCloseTo(i0.latitude, 7);
+                expect(intersections[0].longitude).toBeCloseTo(i0.longitude, 7);
+                expect(intersections[0].altitude).toBeCloseTo(i0.altitude, 7);
+                expect(intersections[1].latitude).toBeCloseTo(i1.latitude, 7);
+                expect(intersections[1].longitude).toBeCloseTo(i1.longitude, 7);
+                expect(intersections[1].altitude).toBeCloseTo(i1.altitude, 7);
                 expect(function () {
                     scene.computePointIntersections(null, pointRay, intersections);
                 }).toThrow();
