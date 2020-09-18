@@ -32,7 +32,7 @@ provides many simple [examples](https://github.com/NASAWorldWind/WebWorldWind/tr
 
 [Install NodeJS](https://nodejs.org). The build is known to work with Node.js 12.18.0 LTS.
 
-- `npm install` downloads WorldWind's dependencies
+- `npm install` downloads WorldWind's dependencies and builds everything
 
 - `npm run build` builds everything
 
