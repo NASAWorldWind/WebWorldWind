@@ -1500,8 +1500,7 @@ define([
                     for (j = ii; j <= i - 1; j += 1) {
                         sum -= A[i][j] * b[j];
                     }
-                }
-                else if (sum != 0.0) {
+                } else if (sum != 0.0) {
                     ii = i;
                 }
 
@@ -1548,8 +1547,7 @@ define([
 
                 if (big == 0.0) {
                     return 0.0; // Matrix is singular if the entire row contains zero.
-                }
-                else {
+                } else {
                     vv[i] = 1.0 / big;
                 }
             }
@@ -1926,6 +1924,17 @@ define([
             result[2] = z / w;
 
             return true;
+        };
+
+        /**
+         * Returns a string representation of this matrix.
+         * @returns {String} A string representation of this matrix.
+         */
+        Matrix.prototype.toString = function () {
+            return "(" + this[0] + ", " + this[1] + ", " + this[2] + ", " + this[3] + ")\n" +
+                "(" + this[4] + ", " + this[5] + ", " + this[6] + ", " + this[7] + ")\n" +
+                "(" + this[8] + ", " + this[9] + ", " + this[10] + ", " + this[11] + ")\n" +
+                "(" + this[12] + ", " + this[13] + ", " + this[14] + ", " + this[15] + ")";
         };
 
         return Matrix;

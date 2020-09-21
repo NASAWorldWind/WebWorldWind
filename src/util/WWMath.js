@@ -258,6 +258,42 @@ define([
                 }
             },
 
+            /**
+             * Computes the Cartesian intersection point(s) of a specified line with a non-indexed list of
+             * triangle vertices.
+             * @param {Line} line The line for which to compute the intersection(s).
+             * @param {Vec3[]} points The list of triangle vertices arranged such that each
+             * 3-tuple, (i,i+1,i+2), specifies a triangle.
+             * @param {Vec3[]} results The Cartesian intersection point(s) if any.
+             * @returns {boolean} true if the line intersects any triangle, otherwise false
+             * @throws {ArgumentError} If any of the arguments is not supplied.
+             */
+            computeTriangleListIntersection: function (line, points, results) {
+                if (!line) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingLine"));
+                }
+
+                if (!points) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingPoints"));
+                }
+
+                if (!results) {
+                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
+                        "computeIndexedTrianglesIntersection", "missingResults"));
+                }
+                var iPoint = new Vec3(0, 0, 0);
+                for (var i = 0, len = points.length; i < len; i += 3) {
+                    if (WWMath.computeTriangleIntersection(line, points[i], points[i + 1], points[i + 2], iPoint)) {
+                        results.push(iPoint);
+                        iPoint = new Vec3(0, 0, 0);
+                    }
+                }
+
+                return results.length > 0;
+            },
+
             computeIndexedTrianglesIntersection: function (line, points, indices, results) {
                 if (!line) {
                     throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
