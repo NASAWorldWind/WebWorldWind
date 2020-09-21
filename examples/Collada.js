@@ -93,12 +93,12 @@ requirejs(['./WorldWindShim',
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.RED;
         placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/crosshair.png";
-        
+
         // The next placemark will portray the closest intersection point to the camera, marked in a different color.
         var closestPlacemarkAttributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
         closestPlacemarkAttributes.imageColor = WorldWind.Color.GREEN;
         closestPlacemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.GREEN;
-        
+
         // Add click event to trigger the generation of the ray and the computation of its intersctions with the COLLADA model.
         var handleClick = function (o) {
             if (duckScene == null) {
