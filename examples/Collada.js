@@ -80,8 +80,12 @@ requirejs(['./WorldWindShim',
             duckScene = scene;
         });
 
-        // Add place marks to intersection points with the ray extending from the eye point when the
-        // model is clicked.
+        // The following is an example of 3D ray intersaction with a COLLADA model.
+        // A ray will be generated extending from the camera "eye" point towards a point in the 
+        // COLLADA model where the user has clicked, then the intersections between this ray and the model
+        // will be computed and displayed.
+
+        // Add placemarks to visualize intersection points.
         var placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
         placemarkAttributes.imageScale = 1;
         placemarkAttributes.imageColor = WorldWind.Color.RED;
@@ -89,16 +93,25 @@ requirejs(['./WorldWindShim',
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.RED;
         placemarkAttributes.imageSource = WorldWind.configuration.baseUrl + "images/crosshair.png";
+        
+        // The next placemark will portray the closest intersection point to the camera, marked in a different color.
         var closestPlacemarkAttributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
         closestPlacemarkAttributes.imageColor = WorldWind.Color.GREEN;
         closestPlacemarkAttributes.leaderLineAttributes.outlineColor = WorldWind.Color.GREEN;
+        
+        // Add click event to trigger the generation of the ray and the computation of its intersctions with the COLLADA model.
         var handleClick = function (o) {
             if (duckScene == null) {
                 return;
             }
             placemarkLayer.removeAllRenderables();
+
+            // Obtain 3D ray that extends from the camera "eye" point towards the point where the user clicked on the COLLADA model.
             var clickPoint = wwd.canvasCoordinates(o.clientX, o.clientY);
             var clickRay = wwd.rayThroughScreenPoint(clickPoint);
+
+            // Compute intersection points between the model and the ray extending from the camera "eye" point.
+            // Note that this takes into account possible concavities in the model.
             var intersections = [];
             if (duckScene.computePointIntersections(wwd.globe, clickRay, intersections)) {
                 for (var i = 0, len = intersections.length; i < len; i++) {
@@ -112,8 +125,12 @@ requirejs(['./WorldWindShim',
                     placemarkLayer.addRenderable(placemark);
                 }
             }
+
+            // Redraw scene with the computed results.
             wwd.redraw();
         };
+
+        // Listen for mouse clicks to trigger the related event.
         wwd.addEventListener("click", handleClick);
 
         // Create a layer manager for controlling layer visibility.
