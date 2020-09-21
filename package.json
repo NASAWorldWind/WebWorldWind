@@ -20,6 +20,7 @@
     "build": "grunt",
     "clean": "grunt clean",
     "doc": "grunt jsdoc",
+    "prepare": "npm run build",
     "test": "grunt karma",
     "test:watch": "karma start karma.conf.js"
   },
