@@ -1,11 +1,15 @@
 // Karma configuration
 // Generated on Thu Feb 04 2016 14:07:41 GMT+0100 (CET)
 
+const puppeteer = require('puppeteer');
+process.env.CHROME_BIN = puppeteer.executablePath();
+
 module.exports = function (config) {
     config.set({
 
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
+
 
 
         // frameworks to use
@@ -60,7 +64,7 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['PhantomJS'],
+        browsers: ['ChromeHeadless'],
 
 
         // Continuous Integration mode

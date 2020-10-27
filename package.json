@@ -43,8 +43,8 @@
     "karma-htmlfile-reporter": "^0.3.8",
     "karma-jasmine": "^1.1.2",
     "karma-junit-reporter": "^1.2.0",
-    "karma-phantomjs-launcher": "^1.0.4",
     "karma-requirejs": "^1.1.0",
+    "puppeteer": "^5.4.1",
     "recursive-readdir": "^2.2.2"
   },
   "keywords": [
@@ -70,5 +70,6 @@
   ],
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "dependencies": {}
 }
