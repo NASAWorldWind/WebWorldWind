@@ -158,6 +158,19 @@ define([
                 }
             },
 
+            arrayIncludes: function (array, value) {
+                if (!array) {
+                    return;
+                }
+
+                for (var i = 0, len = array.length; i < len; i++) {
+                    if (array[i]==value) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+
             /**
              * Multiplies each element of an array by a specified value and assigns each element to the result. This
              * function is intentionally generic, and works with any data structure with a length property whose
