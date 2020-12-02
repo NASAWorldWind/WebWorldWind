@@ -26,12 +26,13 @@
  * PDF found in code  directory.
  */
 /**
- * Illustrates how to load and display a KML file.
+ * Illustrates how to refresh KML files
  */
 requirejs(['./WorldWindShim',
         './LayerManager'],
     function (WorldWind,
               LayerManager) {
+        "use strict";
 
         // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
@@ -41,10 +42,9 @@ requirejs(['./WorldWindShim',
 
         // Create and add layers to the WorldWindow.
         var layers = [
-            // Imagery layers.
+            // Imagery layer.
             {layer: new WorldWind.BMNGLayer(), enabled: true},
-            {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
-            // Add atmosphere layer on top of all base layers.
+            // Add atmosphere layer on top of base layer.
             {layer: new WorldWind.AtmosphereLayer(), enabled: true},
             // WorldWindow UI layers.
             {layer: new WorldWind.CompassLayer(), enabled: true},
@@ -56,19 +56,30 @@ requirejs(['./WorldWindShim',
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
-        var kmlFilePromise = new WorldWind.KmlFile('data/IconExpiration.kml', [new WorldWind.KmlTreeVisibility('treeControls', wwd)]);
-        kmlFilePromise.then(function (kmlFile) {
-            var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
-            // renderableLayer.currentTimeInterval = [
-            //     new Date("Mon Aug 09 2015 12:10:10 GMT+0200 (Střední Evropa (letní čas))").valueOf(),
-            //     new Date("Mon Aug 11 2015 12:10:10 GMT+0200 (Střední Evropa (letní čas))").valueOf()
-            // ];
-            renderableLayer.addRenderable(kmlFile);
 
-            wwd.addLayer(renderableLayer);
+        var kmlLayer = new WorldWind.RenderableLayer("KML");
+        wwd.addLayer(kmlLayer);
+        let displayedKML;
+        let redraw = function (refreshKML) {
+            kmlLayer.addRenderable(refreshKML);
+            let shapes=refreshKML.shapes;
+            let kmlShapes=shapes[0].kmlShapes;
+            for (let shape of kmlShapes) {
+                shape.volatile=true;
+            }
+            if (displayedKML) {
+                kmlLayer.removeRenderable(displayedKML);
+            }
+            displayedKML = refreshKML;
             wwd.redraw();
-        });
+        }
+        let refresh = function () {
+            new WorldWind.KmlFile('data/IconExpiration.kml').then(redraw);
+        }
+        refresh();
+        // Set up to refresh the imagery periodically.
+        setInterval(refresh, 2000); // Refresh every 2 seconds.
 
-        // Now set up to handle highlighting.
-        var highlightController = new WorldWind.HighlightController(wwd);
+        // Create a layer manager for controlling layer visibility.
+        var layerManager = new LayerManager(wwd);
     });

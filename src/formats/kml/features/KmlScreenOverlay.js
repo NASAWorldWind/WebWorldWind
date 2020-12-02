@@ -317,6 +317,7 @@ define([
                     this.kmlOverlayXYyunits,
                     this.kmlOverlayXYy
                 );
+                this._renderable.volatile=this.volatile;
                 dc.redrawRequested = true;
             }
         }

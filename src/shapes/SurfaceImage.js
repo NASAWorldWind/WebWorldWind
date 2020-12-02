@@ -104,6 +104,8 @@ define([
 
             // Internal. Indicates whether the image needs to be updated in the GPU resource cache.
             this.imageSourceWasUpdated = true;
+            // If true, the assets of this shape should not be cached.
+            this._volatile=false;
         };
 
         SurfaceImage.prototype = Object.create(SurfaceTile.prototype);
@@ -129,6 +131,22 @@ define([
 
                     this._imageSource = imageSource;
                     this.imageSourceWasUpdated = true;
+                }
+            },
+            /**
+             * If true the assets used by this shape should not be cached.
+             * @memberof KmlFeature.prototype
+             * @type {Boolean}
+             */
+            volatile: {
+                get: function () {
+                    return this._volatile;
+                },
+                set: function(value) {
+                    if (this._renderable && this._volatile!=value) {
+                        this._renderable.volatile=value;
+                    }
+                    this._volatile=value;
                 }
             }
         });

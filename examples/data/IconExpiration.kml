@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $Id: GroundOverlay.kml 15607 2011-06-14 04:28:40Z pabercrombie $ -->
+<kml xmlns="http://www.opengis.net/kml/2.2">
+    <Document>
+
+        <Placemark>
+            <name>Point placemark</name>
+            <Style>
+                <IconStyle>
+                    <Icon>
+                        <href>http://localhost/random_image.php</href>
+                        <refreshMode>onExpire</refreshMode>
+                    </Icon>
+                </IconStyle>
+            </Style>
+            <Point>
+                <coordinates>-122.0822035425683,37.42228990140251,0</coordinates>
+            </Point>
+        </Placemark>
+
+        <GroundOverlay>
+            <name>Ground Overlay</name>
+            <visibility>1</visibility>
+            <Icon>
+                <href>http://localhost/random_image.php</href>
+                <refreshMode>onExpire</refreshMode>
+            </Icon>
+            <LatLonBox>
+                <north>50</north>
+                <south>38</south>
+                <east>-63</east>
+                <west>-83</west>
+            </LatLonBox>
+        </GroundOverlay>
+
+        <ScreenOverlay>
+            <name>Screen Overlay</name>
+            <visibility>1</visibility>
+            <Icon>
+                <href>http://localhost/random_image.php</href>
+                <refreshMode>onExpire</refreshMode>
+            </Icon>
+            <overlayXY x="0" y="1" xunits="fraction" yunits="fraction"/>
+            <screenXY x="0" y="1" xunits="fraction" yunits="fraction"/>
+            <rotationXY x="0" y="0" xunits="fraction" yunits="fraction"/>
+            <size x="0" y="0" xunits="fraction" yunits="fraction"/>
+        </ScreenOverlay>
+    </Document>
+</kml>

@@ -120,6 +120,9 @@ define([
             this.useSurfaceShapeFor2D = false;
 
             this.scratchMatrix = Matrix.fromIdentity(); // scratch variable
+
+            // If true, the assets of this shape should not be cached.
+            this._volatile=false;
         };
 
         AbstractShape.prototype = Object.create(Renderable.prototype);
@@ -186,6 +189,22 @@ define([
 
                     this._altitudeMode = altitudeMode;
                     this.reset();
+                }
+            },
+            /**
+             * If true the assets used by this shape should not be cached.
+             * @memberof KmlFeature.prototype
+             * @type {Boolean}
+             */
+            volatile: {
+                get: function () {
+                    return this._volatile;
+                },
+                set: function(value) {
+                    if (this._renderable && this._volatile!=value) {
+                        this._renderable.volatile=value;
+                    }
+                    this._volatile=value;
                 }
             }
         });

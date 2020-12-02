@@ -581,7 +581,7 @@ define([
                 this.activeTexture = dc.gpuResourceCache.resourceForKey(this.capImageSource());
                 if (!this.activeTexture) {
                     this.activeTexture =
-                        dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.capImageSource());
+                        dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.capImageSource(),this.volatile);
                 }
 
                 textureBound = this.activeTexture && this.activeTexture.bind(dc);
@@ -690,7 +690,7 @@ define([
                         coordByteOffset = side * 6 * numBytesPerVertex; // 6 vertices (2 triangles) per side
 
                     if (sideImageSource && !sideTexture) {
-                        sideTexture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, sideImageSource);
+                        sideTexture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, sideImageSource,this.volatile);
                     }
 
                     textureBound = sideTexture && sideTexture.bind(dc);

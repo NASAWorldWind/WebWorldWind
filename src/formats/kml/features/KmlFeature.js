@@ -65,6 +65,8 @@ define([
 
         this._pStyle = null;
         this.controlledVisibility = null;
+        // If true, the content of this feature should not be cached.
+        this._volatile=false;
     };
 
     KmlFeature.prototype = Object.create(KmlObject.prototype);
@@ -238,7 +240,24 @@ define([
                     name: KmlRegion.prototype.getTagNames()
                 });
             }
+        },
+        /**
+         * If true the assets used by this feature should not be cached.
+         * @memberof KmlFeature.prototype
+         * @type {Boolean}
+         */
+        volatile: {
+            get: function () {
+                return this._volatile;
+            },
+            set: function(value) {
+                if (this._renderable && this._volatile!=value) {
+                    this._renderable.volatile=value;
+                }
+                this._volatile=value;
+            }
         }
+
     });
 
 	/**

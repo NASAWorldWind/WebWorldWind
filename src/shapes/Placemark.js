@@ -289,6 +289,8 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.depthOffset = -0.003;
+            // If true, the assets of this shape should not be cached.
+            this._volatile=false;
         };
 
         // Internal use only. Intentionally not documented.
@@ -308,6 +310,22 @@ define([
             screenBounds: {
                 get: function () {
                     return this.labelBounds;
+                }
+            },
+            /**
+             * If true the assets used by this shape should not be cached.
+             * @memberof KmlFeature.prototype
+             * @type {Boolean}
+             */
+            volatile: {
+                get: function () {
+                    return this._volatile;
+                },
+                set: function(value) {
+                    if (this._renderable && this._volatile!=value) {
+                        this._renderable.volatile=value;
+                    }
+                    this._volatile=value;
                 }
             }
         });
@@ -526,7 +544,7 @@ define([
 
                 if (!this.activeTexture || this.updateImage) {
                     this.activeTexture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext,
-                        this.activeAttributes.imageSource);
+                        this.activeAttributes.imageSource, this._volatile);
                     this.updateImage = false;
                 }
             }

@@ -965,7 +965,7 @@ define([
                 this._activeTexture = gpuResourceCache.resourceForKey(textureCacheKey);
                 if (!this._activeTexture) {
                     var wrapMode = buffers.isClamp ? gl.CLAMP_TO_EDGE : gl.REPEAT;
-                    this._activeTexture = gpuResourceCache.retrieveTexture(gl, textureCacheKey, wrapMode);
+                    this._activeTexture = gpuResourceCache.retrieveTexture(gl, textureCacheKey, false, wrapMode);
                 }
                 var textureBound = this._activeTexture && this._activeTexture.bind(dc);
                 if (textureBound) {

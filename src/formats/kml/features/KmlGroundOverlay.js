@@ -139,6 +139,7 @@ define([
                     ),
                     this.kmlIcon.kmlHref(kmlOptions.fileCache)
                 );
+                this._renderable.volatile=this.volatile;
                 dc.redrawRequested = true;
             }
         }

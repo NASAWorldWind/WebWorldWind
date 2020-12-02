@@ -374,7 +374,7 @@ define([
                     this.activeTexture = dc.gpuResourceCache.resourceForKey(this.activeAttributes.imageSource);
                     if (!this.activeTexture) {
                         this.activeTexture =
-                            dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.activeAttributes.imageSource);
+                            dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.activeAttributes.imageSource,this.volatile);
                     }
 
                     textureBound = this.activeTexture && this.activeTexture.bind(dc);

@@ -103,6 +103,7 @@ define([
                     false,
                     this.prepareAttributes(kmlOptions.lastStyle.normal, kmlOptions.fileCache)
                 );
+                this._renderable.volatile=this.volatile;
                 if(kmlOptions.lastStyle.highlight) {
                     this._renderable.highlightAttributes = this.prepareAttributes(kmlOptions.lastStyle.highlight, kmlOptions.fileCache);
                 }

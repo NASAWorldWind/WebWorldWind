@@ -184,7 +184,6 @@ define([
                 ? this.entries.entryForKey(key.key) : this.entries.entryForKey(key);
 
             var resource = entry ? entry.resource : null;
-
             // This is faster than checking if the resource is a texture using instanceof.
             if (resource !== null && typeof resource.clearTexParameters === "function") {
                 resource.clearTexParameters();
@@ -237,11 +236,12 @@ define([
          * @param {WebGLRenderingContext} gl The current WebGL context.
          * @param {String|ImageSource} imageSource The image source, either a {@link ImageSource} or a String
          * giving the URL of the image.
+         * @param {Boolean} volatile Volatile objects should be forced to reload.
          * @param {GLenum} wrapMode Optional. Specifies the wrap mode of the texture. Defaults to gl.CLAMP_TO_EDGE
          * @returns {Texture} The {@link Texture} created for the image if the specified image source is an
          * {@link ImageSource}, otherwise null.
          */
-        GpuResourceCache.prototype.retrieveTexture = function (gl, imageSource, wrapMode) {
+        GpuResourceCache.prototype.retrieveTexture = function (gl, imageSource, volatile, wrapMode) {
             if (!imageSource) {
                 return null;
             }
@@ -251,7 +251,9 @@ define([
                 this.putResource(imageSource.key, t, t.size);
                 return t;
             }
-
+            if (volatile) {
+                imageSource=imageSource+"?t="+new Date().getTime();
+            }
             if (this.currentRetrievals[imageSource] || this.absentResourceList.isResourceAbsent(imageSource)) {
                 return null;
             }
@@ -264,7 +266,9 @@ define([
 
                 var texture = new Texture(gl, image, wrapMode);
 
-                cache.putResource(imageSource, texture, texture.size);
+                if (!volatile) {
+                    cache.putResource(imageSource, texture, texture.size);
+                }
 
                 delete cache.currentRetrievals[imageSource];
                 cache.absentResourceList.unmarkResourceAbsent(imageSource);

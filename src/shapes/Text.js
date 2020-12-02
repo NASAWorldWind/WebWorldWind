@@ -206,6 +206,8 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.screenPoint = new Vec3(0, 0, 0);
+            // If true, the assets of this shape should not be cached.
+            this._volatile=false;
         };
 
         // Internal use only. Intentionally not documented.
@@ -245,6 +247,22 @@ define([
             screenBounds: {
                 get: function () {
                     return this.imageBounds;
+                }
+            },
+            /**
+             * If true the assets used by this shape should not be cached.
+             * @memberof KmlFeature.prototype
+             * @type {Boolean}
+             */
+            volatile: {
+                get: function () {
+                    return this._volatile;
+                },
+                set: function(value) {
+                    if (this._renderable && this._volatile!=value) {
+                        this._renderable.volatile=value;
+                    }
+                    this._volatile=value;
                 }
             }
         });
@@ -533,7 +551,7 @@ define([
 
             var markerTexture = dc.gpuResourceCache.resourceForKey(this.markerImageSource);
             if (!markerTexture) {
-                dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.markerImageSource);
+                dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this.markerImageSource, this.volatile);
                 return;
             }
 

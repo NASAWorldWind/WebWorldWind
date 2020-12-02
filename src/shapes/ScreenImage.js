@@ -166,6 +166,8 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.layer = null;
+            // If true, the assets of this shape should not be cached.
+            this._volatile=false;
         };
 
         // Internal use only. Intentionally not documented.
@@ -194,6 +196,22 @@ define([
 
                     this._imageSource = imageSource;
                     this.imageSourceWasUpdated = true;
+                }
+            },
+            /**
+             * If true the assets used by this shape should not be cached.
+             * @memberof KmlFeature.prototype
+             * @type {Boolean}
+             */
+            volatile: {
+                get: function () {
+                    return this._volatile;
+                },
+                set: function(value) {
+                    if (this._renderable && this._volatile!=value) {
+                        this._renderable.volatile=value;
+                    }
+                    this._volatile=value;
                 }
             }
         });
@@ -255,7 +273,7 @@ define([
 
             this.activeTexture = this.getActiveTexture(dc);
             if (!this.activeTexture || this.imageSourceWasUpdated) {
-                this.activeTexture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this._imageSource);
+                this.activeTexture = dc.gpuResourceCache.retrieveTexture(dc.currentGlContext, this._imageSource,this.volatile);
                 if (!this.activeTexture) {
                     return null;
                 }
