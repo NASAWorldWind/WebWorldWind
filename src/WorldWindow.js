@@ -414,9 +414,9 @@ define([
             if (!entry) {
                 entry = {
                     listeners: [],
-                    callback: function (event) { // calls listeners in reverse registration order
+                    callback: function (event) { // calls listeners in registration order
                         event.worldWindow = thisWorldWindow;
-                        for (var i = 0, len = entry.listeners.length; i < len; i++) {
+                        for (var i = entry.listeners.length - 1; i >= 0; i--) {
                             entry.listeners[i](event);
                         }
                     }
