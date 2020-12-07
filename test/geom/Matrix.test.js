@@ -755,16 +755,18 @@ define([
                 var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                 var viewportWidth = 500;
                 var viewportHeight = 400;
+                var fieldOfView = 45;
                 var nearDistance = 120;
                 var farDistance = 600;
-                matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, nearDistance, farDistance);
+                matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, fieldOfView, nearDistance, farDistance);
 
-                expect(matrix[0]).toEqual(2);
+                // FOV based approach gives another test result then old perspectiveFrustumRectangle based calculation
+                expect(matrix[0]).toEqual(1.931370849898476);
                 expect(matrix[1]).toEqual(0);
                 expect(matrix[2]).toEqual(0);
                 expect(matrix[3]).toEqual(0);
                 expect(matrix[4]).toEqual(0);
-                expect(matrix[5]).toEqual(2.5);
+                expect(matrix[5]).toEqual(2.414213562373095);
                 expect(matrix[6]).toEqual(0);
                 expect(matrix[7]).toEqual(0);
                 expect(matrix[8]).toEqual(0);
@@ -784,9 +786,10 @@ define([
                         var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         var viewportWidth = -500;
                         var viewportHeight = 400;
+                        var fieldOfView = 45;
                         var nearDistance = 120;
                         var farDistance = 600;
-                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, nearDistance, farDistance);
+                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, fieldOfView, nearDistance, farDistance);
                     }).toThrow();
                 });
 
@@ -795,9 +798,10 @@ define([
                         var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         var viewportWidth = 500;
                         var viewportHeight = -400;
+                        var fieldOfView = 45;
                         var nearDistance = 120;
                         var farDistance = 600;
-                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, nearDistance, farDistance);
+                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, fieldOfView, nearDistance, farDistance);
                     }).toThrow();
                 });
 
@@ -806,9 +810,10 @@ define([
                         var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         var viewportWidth = 500;
                         var viewportHeight = 400;
+                        var fieldOfView = 45;
                         var nearDistance = 120;
                         var farDistance = nearDistance;
-                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, nearDistance, farDistance);
+                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, fieldOfView, nearDistance, farDistance);
                     }).toThrow();
                 });
 
@@ -817,9 +822,10 @@ define([
                         var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         var viewportWidth = 500;
                         var viewportHeight = 400;
+                        var fieldOfView = 45;
                         var nearDistance = -120;
                         var farDistance = 600;
-                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, nearDistance, farDistance);
+                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, fieldOfView, nearDistance, farDistance);
                     }).toThrow();
                 });
 
@@ -828,9 +834,10 @@ define([
                         var matrix = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         var viewportWidth = 500;
                         var viewportHeight = 400;
+                        var fieldOfView = 45;
                         var nearDistance = 120;
                         var farDistance = -600;
-                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, nearDistance, farDistance);
+                        matrix.setToPerspectiveProjection(viewportWidth, viewportHeight, fieldOfView, nearDistance, farDistance);
                     }).toThrow();
                 });
             });

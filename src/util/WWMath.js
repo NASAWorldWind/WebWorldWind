@@ -664,23 +664,17 @@ define([
              * Matrix.setToPerspectiveProjection. The given distance should specify the smallest distance between the
              * eye and the object being viewed, but may be an approximation if an exact distance is not required.
              *
-             * @param {Number} viewportWidth The viewport width, in screen coordinates.
-             * @param {Number} viewportHeight The viewport height, in screen coordinates.
+             * @param {Number} fovyDegrees The camera vertical field of view.
              * @param {Number} distanceToSurface The distance from the perspective eye point to the nearest object, in
              * meters.
              * @returns {Number} The maximum near clip distance, in meters.
              * @throws {ArgumentError} If the specified width or height is less than or equal to zero, or if the
              * specified distance is negative.
              */
-            perspectiveNearDistance: function (viewportWidth, viewportHeight, distanceToSurface) {
-                if (viewportWidth <= 0) {
+            perspectiveNearDistance: function (fovyDegrees, distanceToSurface) {
+                if (fovyDegrees <= 0 || fovyDegrees >= 180) {
                     throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath", "perspectiveNearDistance",
-                        "invalidWidth"));
-                }
-
-                if (viewportHeight <= 0) {
-                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath", "perspectiveNearDistance",
-                        "invalidHeight"));
+                        "invalidFieldOfView"));
                 }
 
                 if (distanceToSurface < 0) {
@@ -688,29 +682,8 @@ define([
                         "The specified distance is negative."));
                 }
 
-                // Compute the maximum near clip distance that avoids clipping an object at the specified distance from
-                // the eye. Since the furthest points on the near clip rectangle are the four corners, we compute a near
-                // distance that puts any one of these corners exactly at the given distance. The distance to one of the
-                // four corners can be expressed in terms of the near clip distance, given distance to a corner 'd',
-                // near distance 'n', and aspect ratio 'a':
-                //
-                // d*d = x*x + y*y + z*z
-                // d*d = (n*n/4 * a*a) + (n*n/4) + (n*n)
-                //
-                // Extracting 'n*n/4' from the right hand side gives:
-                //
-                // d*d = (n*n/4) * (a*a + 1 + 4)
-                // d*d = (n*n/4) * (a*a + 5)
-                //
-                // Finally, solving for 'n' gives:
-                //
-                // n*n = 4 * d*d / (a*a + 5)
-                // n = 2 * d / sqrt(a*a + 5)
-
-                // Assumes a 45 degree horizontal field of view.
-                var aspectRatio = viewportHeight / viewportWidth;
-
-                return 2 * distanceToSurface / Math.sqrt(aspectRatio * aspectRatio + 5);
+                var tanHalfFov = Math.tan(0.5 * fovyDegrees / 180 * Math.PI);
+                return distanceToSurface / (2 * Math.sqrt(2 * tanHalfFov * tanHalfFov + 1));
             },
 
             /**

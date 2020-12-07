@@ -712,7 +712,7 @@ define([
             Placemark.matrix.multiplyMatrix(this.imageTransform);
 
             var actualRotation = this.imageRotationReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigator.heading - this.imageRotation : -this.imageRotation;
+                dc.camera.heading - this.imageRotation : -this.imageRotation;
             Placemark.matrix.multiplyByTranslation(0.5, 0.5, 0);
             Placemark.matrix.multiplyByRotation(0, 0, 1, actualRotation);
             Placemark.matrix.multiplyByTranslation(-0.5, -0.5, 0);
@@ -720,7 +720,7 @@ define([
             // Perform the tilt before applying the rotation so that the image tilts back from its base into
             // the view volume.
             var actualTilt = this.imageTiltReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigator.tilt + this.imageTilt : this.imageTilt;
+                dc.camera.tilt + this.imageTilt : this.imageTilt;
             Placemark.matrix.multiplyByRotation(-1, 0, 0, actualTilt);
 
             program.loadModelviewProjection(gl, Placemark.matrix);

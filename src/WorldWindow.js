@@ -31,6 +31,7 @@
 define([
         './error/ArgumentError',
         './BasicWorldWindowController',
+        './geom/Camera',
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
@@ -57,6 +58,7 @@ define([
     ],
     function (ArgumentError,
               BasicWorldWindowController,
+              Camera,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
@@ -125,7 +127,7 @@ define([
             // Internal. Intentionally not documented.
             this.drawContext = new DrawContext(gl);
 
-            // Internal. Intentionally not documented. Must be initialized before the navigator is created.
+            // Internal. Intentionally not documented.
             this.eventListeners = {};
 
             // Internal. Intentionally not documented. Initially true in order to redraw at least once.
@@ -181,11 +183,20 @@ define([
             this.layers = [];
 
             /**
-             * The navigator used to manipulate the globe.
+             * The deprecated navigator that can be used to manipulate the globe. See the {@link Camera} and {@link LookAt}
+             * classes for replacement functionality.
+             * @deprecated
              * @type {LookAtNavigator}
              * @default [LookAtNavigator]{@link LookAtNavigator}
              */
-            this.navigator = new LookAtNavigator();
+            this.navigator = new LookAtNavigator(this);
+
+            /**
+             * The camera used to view the globe.
+             * @type {Camera}
+             * @default [Camera]{@link Camera}
+             */
+            this.camera = new Camera(this);
 
             /**
              * The controller used to manipulate the globe.
@@ -394,13 +405,7 @@ define([
          * arguments, see the W3C [EventTarget]{@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget}
          * documentation.
          *
-         * Registering event listeners using this function enables applications to prevent the WorldWindow's default
-         * navigation behavior. To prevent default navigation behavior, call the [Event]{@link https://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-Event}'s
-         * preventDefault method from within an event listener for any events the navigator should not respond to.
-         *
-         * When an event occurs, this calls the registered event listeners in order of reverse registration. Since the
-         * WorldWindow registers its navigator event listeners first, application event listeners are called before
-         * navigator event listeners.
+         * When an event occurs, this calls the registered event listeners in order of reverse registration.
          *
          * @param type The event type to listen for.
          * @param listener The function to call when the event occurs.
@@ -699,24 +704,18 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
             }
 
-            modelview.setToIdentity();
-            this.worldWindowController.applyLimits();
-            var globe = this.globe;
-            var navigator = this.navigator;
-            var lookAtPosition = new Position(navigator.lookAtLocation.latitude, navigator.lookAtLocation.longitude, 0);
-            modelview.multiplyByLookAtModelview(lookAtPosition, navigator.range, navigator.heading, navigator.tilt, navigator.roll, globe);
+            this.camera.computeViewingTransform(modelview);
 
             if (projection) {
-                projection.setToIdentity();
-                var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius),
-                    eyePoint = modelview.extractEyePoint(new Vec3(0, 0, 0)),
-                    eyePos = globe.computePositionFromPoint(eyePoint[0], eyePoint[1], eyePoint[2], new Position(0, 0, 0)),
+                var globeRadius = WWMath.max(this.globe.equatorialRadius, this.globe.polarRadius),
+                    eyePos = this.camera.position,
+                    fieldOfView = this.camera.fieldOfView,
                     eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
                     atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
                     viewport = this.viewport;
 
                 // Set the far clip distance to the smallest value that does not clip the atmosphere.
-                // TODO adjust the clip plane distances based on the navigator's orientation - shorter distances when the
+                // TODO adjust the clip plane distances based on the camera's orientation - shorter distances when the
                 // TODO horizon is not in view
                 // TODO parameterize the object altitude for horizon distance
                 var farDistance = eyeHorizon + atmosphereHorizon;
@@ -730,9 +729,9 @@ define([
                 var nearDistance = WWMath.perspectiveNearDistanceForFarDistance(farDistance, 10, this.depthBits);
 
                 // Prevent the near clip plane from intersecting the terrain.
-                var distanceToSurface = eyePos.altitude - globe.elevationAtLocation(eyePos.latitude, eyePos.longitude);
+                var distanceToSurface = eyePos.altitude - this.globe.elevationAtLocation(eyePos.latitude, eyePos.longitude) * this.verticalExaggeration;
                 if (distanceToSurface > 0) {
-                    var maxNearDistance = WWMath.perspectiveNearDistance(viewport.width, viewport.height, distanceToSurface);
+                    var maxNearDistance = WWMath.perspectiveNearDistance(fieldOfView, distanceToSurface);
                     if (nearDistance > maxNearDistance) {
                         nearDistance = maxNearDistance;
                     }
@@ -742,47 +741,11 @@ define([
                     nearDistance = 1;
                 }
 
-                // Compute the current projection matrix based on this navigator's perspective properties and the current
+                // Compute the current projection matrix based on this camera's perspective properties and the current
                 // WebGL viewport.
-                projection.setToPerspectiveProjection(viewport.width, viewport.height, nearDistance, farDistance);
+                projection.setToIdentity();
+                projection.setToPerspectiveProjection(viewport.width, viewport.height, fieldOfView, nearDistance, farDistance);
             }
-        };
-
-        // Internal. Intentionally not documented.
-        WorldWindow.prototype.computePixelMetrics = function (projection) {
-            var projectionInv = Matrix.fromIdentity();
-            projectionInv.invertMatrix(projection);
-
-            // Compute the eye coordinate rectangles carved out of the frustum by the near and far clipping planes, and
-            // the distance between those planes and the eye point along the -Z axis. The rectangles are determined by
-            // transforming the bottom-left and top-right points of the frustum from clip coordinates to eye
-            // coordinates.
-            var nbl = new Vec3(-1, -1, -1),
-                ntr = new Vec3(+1, +1, -1),
-                fbl = new Vec3(-1, -1, +1),
-                ftr = new Vec3(+1, +1, +1);
-            // Convert each frustum corner from clip coordinates to eye coordinates by multiplying by the inverse
-            // projection matrix.
-            nbl.multiplyByMatrix(projectionInv);
-            ntr.multiplyByMatrix(projectionInv);
-            fbl.multiplyByMatrix(projectionInv);
-            ftr.multiplyByMatrix(projectionInv);
-
-            var nrRectWidth = WWMath.fabs(ntr[0] - nbl[0]),
-                frRectWidth = WWMath.fabs(ftr[0] - fbl[0]),
-                nrDistance = -nbl[2],
-                frDistance = -fbl[2];
-
-            // Compute the scale and offset used to determine the width of a pixel on a rectangle carved out of the
-            // frustum at a distance along the -Z axis in eye coordinates. These values are found by computing the scale
-            // and offset of a frustum rectangle at a given distance, then dividing each by the viewport width.
-            var frustumWidthScale = (frRectWidth - nrRectWidth) / (frDistance - nrDistance),
-                frustumWidthOffset = nrRectWidth - frustumWidthScale * nrDistance;
-
-            return {
-                pixelSizeFactor: frustumWidthScale / this.viewport.width,
-                pixelSizeOffset: frustumWidthOffset / this.viewport.height
-            };
         };
 
         /**
@@ -799,9 +762,9 @@ define([
          * coordinates per pixel.
          */
         WorldWindow.prototype.pixelSizeAtDistance = function (distance) {
-            this.computeViewingTransform(this.scratchProjection, this.scratchModelview);
-            var pixelMetrics = this.computePixelMetrics(this.scratchProjection);
-            return pixelMetrics.pixelSizeFactor * distance + pixelMetrics.pixelSizeOffset;
+            var tanfovy_2 = Math.tan(this.camera.fieldOfView * 0.5 / 180.0 * Math.PI);
+            var frustumHeight = 2 * distance * tanfovy_2;
+            return frustumHeight / this.viewport.height;
         };
 
         // Internal. Intentionally not documented.
@@ -815,12 +778,7 @@ define([
             dc.modelviewProjection.setToIdentity();
             dc.modelviewProjection.setToMultiply(dc.projection, dc.modelview);
 
-            var pixelMetrics = this.computePixelMetrics(dc.projection);
-            dc.pixelSizeFactor = pixelMetrics.pixelSizeFactor;
-            dc.pixelSizeOffset = pixelMetrics.pixelSizeOffset;
-
-            // Compute the inverse of the modelview, projection, and modelview-projection matrices. The inverse matrices
-            // are used to support operations on navigator state.
+            // Compute the inverse of the modelview, projection, and modelview-projection matrices.
             var modelviewInv = Matrix.fromIdentity();
             modelviewInv.invertOrthonormalMatrix(dc.modelview);
 
@@ -846,6 +804,7 @@ define([
             dc.reset();
             dc.globe = this.globe;
             dc.navigator = this.navigator;
+            dc.camera = this.camera;
             dc.layers = this.layers.slice();
             dc.layers.push(dc.screenCreditController);
             this.computeDrawContext();
@@ -1452,10 +1411,10 @@ define([
         };
 
         /**
-         * Moves this WorldWindow's navigator to a specified location or position.
-         * @param {Location | Position} position The location or position to move the navigator to. If this
+         * Moves this WorldWindow's camera to a specified look at location or position.
+         * @param {Location | Position} position The location or position to move the look at to. If this
          * argument contains an "altitude" property, as {@link Position} does, the end point of the navigation is
-         * at the specified altitude. Otherwise the end point is at the current altitude of the navigator.
+         * at the specified altitude. Otherwise the end point is at the current altitude of the camera.
          *
          * This function uses this WorldWindow's {@link GoToAnimator} property to perform the move. That object's
          * properties can be specified by the application to modify its behavior during calls to this function.

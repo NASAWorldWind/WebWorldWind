@@ -374,8 +374,21 @@ define([
             // Intentionally not documented.
             this.pixelScale = 1;
 
-            // TODO: replace with camera in the next phase of navigator refactoring
+            /**
+             * The deprecated navigator that can be used to manipulate the globe. See the {@link Camera} and {@link LookAt}
+             * classes for replacement functionality.
+             * @deprecated
+             * @type {LookAtNavigator}
+             * @default [LookAtNavigator]{@link LookAtNavigator}
+             */
             this.navigator = null;
+
+            /**
+             * The viewing point as a camera.
+             * @type {Camera}
+             * @readonly
+             */
+            this.camera = null;
 
             /**
              * The model-view matrix. The model-view matrix transforms points from model coordinates to eye
@@ -429,9 +442,6 @@ define([
             this.pixelSizeFactor = 0;
 
             // Intentionally not documented.
-            this.pixelSizeOffset = 0;
-
-            // Intentionally not documented.
             this.glExtensionsCache = {};
         };
 
@@ -469,6 +479,7 @@ define([
             this.verticalExaggeration = 1;
             this.frameStatistics = null;
             this.accumulateOrderedRenderables = true;
+            this.pixelSizeFactor = 0;
 
             // Reset picking properties that may be set by the WorldWindow.
             this.pickingMode = false;
@@ -1520,18 +1531,13 @@ define([
          * coordinates per pixel.
          */
         DrawContext.prototype.pixelSizeAtDistance = function (distance) {
-            // Compute the pixel size from the width of a rectangle carved out of the frustum in model coordinates at
-            // the specified distance along the -Z axis and the viewport width in screen coordinates. The pixel size is
-            // expressed in model coordinates per screen coordinate (e.g. meters per pixel).
-            //
-            // The frustum width is determined by noticing that the frustum size is a linear function of distance from
-            // the eye point. The linear equation constants are determined during initialization, then solved for
-            // distance here.
-            //
-            // This considers only the frustum width by assuming that the frustum and viewport share the same aspect
-            // ratio, so that using either the frustum width or height results in the same pixel size.
+            if (this.pixelSizeFactor === 0) { // cache the scaling factor used to convert distances to pixel sizes
+                var fovyDegrees = this.camera.fieldOfView;
+                var tanfovy_2 = Math.tan(fovyDegrees * 0.5 / 180.0 * Math.PI);
+                this.pixelSizeFactor = 2 * tanfovy_2 / this.viewport.height;
+            }
 
-            return this.pixelSizeFactor * distance + this.pixelSizeOffset;
+            return distance * this.pixelSizeFactor;
         };
 
         /**

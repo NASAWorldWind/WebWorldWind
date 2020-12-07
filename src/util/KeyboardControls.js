@@ -14,13 +14,14 @@
  * @@author Bruce Schubert
  */
 define([
-    '../geom/Location'],
+    '../geom/Location',
+    '../geom/LookAt'],
     function (
-        Location) {
+        Location, LookAt) {
         "use strict";
         /**
          * Creates a KeyboardController that dispatches keystrokes from the 
-         * WorldWindow to the Navigator. Note: the WorldWindow's canvas must be focusable; 
+         * WorldWindow to the Camera. Note: the WorldWindow's canvas must be focusable;
          * this can be accomplished by establishing the "tabindex" on the canvas element.
          * @param {WorldWindow} wwd The keyboard event generator.
          * @returns {KeyboardControls}
@@ -60,6 +61,13 @@ define([
              * @type {Number}
              */
             this.panIncrement = 0.0000000005;
+
+            /**
+             * Internal use only.
+             * The current state of the viewing parameters during an operation as a look at view.
+             * @ignore
+             */
+            this.lookAt = new LookAt();
 
         };
 
@@ -112,7 +120,9 @@ define([
          * Reset the view to North up.
          */
         KeyboardControls.prototype.resetHeading = function () {
-            this.wwd.navigator.heading = Number(0);
+            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.lookAt.heading = Number(0);
+            this.wwd.camera.setFromLookAt(this.lookAt);
             this.wwd.redraw();
         };
 
@@ -120,17 +130,11 @@ define([
          * Reset the view to North up and nadir.
          */
         KeyboardControls.prototype.resetHeadingAndTilt = function () {
-            this.wwd.navigator.heading = 0;
-            this.wwd.navigator.tilt = 0;
-            this.wwd.redraw(); // calls applyLimits which may change the location
-
-//            // Tilting the view will change the location due to a deficiency in
-//            // the early release of WW.  So we set the location to the center of the
-//            // current crosshairs position (viewpoint) to resolve this issue
-//            var viewpoint = this.getViewpoint(),
-//                    lat = viewpoint.target.latitude,
-//                    lon = viewpoint.target.longitude;
-//            this.lookAt(lat, lon);   
+            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.lookAt.heading = 0;
+            this.lookAt.tilt = 0;
+            this.wwd.camera.setFromLookAt(this.lookAt);
+            this.wwd.redraw();
         };
 
         /**
@@ -150,16 +154,18 @@ define([
          */
         KeyboardControls.prototype.handleZoom = function (operation) {
             this.activeOperation = this.handleZoom;
+            this.wwd.camera.getAsLookAt(this.lookAt);
 
             // This function is called by the timer to perform the operation.
             var self = this, // capture 'this' for use in the function
                 setRange = function () {
                     if (self.activeOperation) {
                         if (operation === "zoomIn") {
-                            self.wwd.navigator.range *= (1 - self.zoomIncrement);
+                            self.lookAt.range *= (1 - self.zoomIncrement);
                         } else if (operation === "zoomOut") {
-                            self.wwd.navigator.range *= (1 + self.zoomIncrement);
+                            self.lookAt.range *= (1 + self.zoomIncrement);
                         }
+                        self.wwd.camera.setFromLookAt(self.lookAt);
                         self.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
@@ -173,13 +179,14 @@ define([
          */
         KeyboardControls.prototype.handlePan = function (operation) {
             this.activeOperation = this.handlePan;
+            this.wwd.camera.getAsLookAt(this.lookAt);
 
             // This function is called by the timer to perform the operation.
             var self = this, // capture 'this' for use in the function
                 setLookAtLocation = function () {
                     if (self.activeOperation) {
-                        var heading = self.wwd.navigator.heading,
-                            distance = self.panIncrement * self.wwd.navigator.range;
+                        var heading = self.lookAt.heading,
+                            distance = self.panIncrement * self.lookAt.range;
 
                         switch (operation) {
                             case 'panUp' :
@@ -194,12 +201,13 @@ define([
                                 heading += 90;
                                 break;
                         }
-                        // Update the navigator's lookAtLocation
+                        // Update the cameras's lookAt Position
                         Location.greatCircleLocation(
-                            self.wwd.navigator.lookAtLocation,
+                            self.lookAt.position,
                             heading,
                             distance,
-                            self.wwd.navigator.lookAtLocation);
+                            self.lookAt.position);
+                        self.wwd.camera.setFromLookAt(self.lookAt);
                         self.wwd.redraw();
                         setTimeout(setLookAtLocation, 50);
                     }
