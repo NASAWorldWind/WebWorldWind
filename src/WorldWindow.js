@@ -39,6 +39,7 @@ define([
         './globe/Globe2D',
         './util/GoToAnimator',
         './cache/GpuResourceCache',
+        './util/KeyboardControls',
         './geom/Line',
         './util/Logger',
         './navigate/LookAtNavigator',
@@ -64,6 +65,7 @@ define([
               Globe2D,
               GoToAnimator,
               GpuResourceCache,
+              KeyboardControls,
               Line,
               Logger,
               LookAtNavigator,
@@ -191,6 +193,12 @@ define([
              * @default [BasicWorldWindowController]{@link BasicWorldWindowController}
              */
             this.worldWindowController = new BasicWorldWindowController(this);
+
+            /**
+             * The controller used to manipulate the globe with the keyboard.
+             * @type {KeyboardController}
+             */
+            this.keyboardControls = new KeyboardControls(this);
 
             /**
              * The vertical exaggeration to apply to the terrain.
