@@ -93,7 +93,7 @@ define([
 
         return this.requestRemote(url).then(function (options) {
             var loadedDocument = options.text;
-            self._headers = options.headers;
+            self._headers = self.parseHeaders(options.headers);
 
             if (!self.hasExtension("kmz", url)) {
                 return loadedDocument;
@@ -127,6 +127,23 @@ define([
             }
         }
     });
+
+    KmlFile.prototype.parseHeaders = function (headers) {
+        let parsedHeaders = new Map();
+        let tokens = headers.split(/[\r\n]/);
+        for (let token of tokens) {
+            if (token) {
+                let colonIdx = token.indexOf(":");
+                if (colonIdx > 0) {
+                    let headerName = token.substring(0, colonIdx).trim().toLowerCase();
+                    let value = token.substring(colonIdx + 1).trim().toLowerCase();
+                    parsedHeaders.set(headerName, value);
+                }
+            }
+
+        }
+        return parsedHeaders;
+    };
 
     /**
      * @inheritDoc
@@ -210,12 +227,34 @@ define([
 
     /**
      * This function returns expire time of this file in miliseconds.
-     * @returns {Number} miliseconds for this file to expire.
+     * @returns {Number} milliseconds for this file to expire.
      */
     KmlFile.prototype.getExpired = function () {
-        var expireDate = new Date(this._headers.getRequestHeader("Expires"));
-        var currentDate = new Date();
-        return currentDate.getTime - expireDate.getTime();
+        let expireDate, expireTime = Number.MAX_SAFE_INTEGER, maxAgeTime = Number.MAX_SAFE_INTEGER;
+        if (this._headers.has("expires")) {
+            expireDate = new Date(this._headers.get("expires"));
+            let currentDate = new Date()
+            expireTime = expireDate.getTime() - currentDate.getTime();
+        }
+        if (this._headers.has("cache-control")) {
+            let cacheControls = this._headers.get("cache-control").split(",");
+            for (let cacheControl of cacheControls) {
+                let directive = cacheControl.trim();
+                if (directive.startsWith("max-age")) {
+                    let maxAgeTokens = directive.split("=");
+                    let foundValue = false;
+                    for (let i = maxAgeTokens.length - 1; i > 0 && !foundValue; i--) {
+                        let maxAgeToken = maxAgeTokens[i].trim();
+                        if (maxAgeToken && maxAgeToken !== "") {
+                            maxAgeTime = parseInt(maxAgeToken) * 1000;
+                            foundValue=true;
+                        }
+                    }
+                }
+            }
+
+        }
+        return Math.min(expireTime, maxAgeTime);
     };
 
     return KmlFile;

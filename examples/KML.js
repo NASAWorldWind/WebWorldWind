@@ -56,7 +56,8 @@ requirejs(['./WorldWindShim',
             layers[l].layer.enabled = layers[l].enabled;
             wwd.addLayer(layers[l].layer);
         }
-        var kmlFilePromise = new WorldWind.KmlFile('data/IconExpiration.kml', [new WorldWind.KmlTreeVisibility('treeControls', wwd)]);
+        // var kmlFilePromise = new WorldWind.KmlFile('data/IconExpiration.kml', [new WorldWind.KmlTreeVisibility('treeControls', wwd)]);
+        var kmlFilePromise = new WorldWind.KmlFile('http://localhost:8000/jump-around.kml', [new WorldWind.KmlTreeVisibility('treeControls', wwd)]);
         kmlFilePromise.then(function (kmlFile) {
             var renderableLayer = new WorldWind.RenderableLayer("Surface Shapes");
             // renderableLayer.currentTimeInterval = [
