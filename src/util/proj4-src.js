@@ -25,7 +25,10 @@ define([], function () {
     var RA4 = 0.04722222222222222222;
     /* 17/360 */
     var RA6 = 0.02215608465608465608;
-    var EPSLN = (typeof Number.EPSILON === 'undefined') ? 1.0e-10 : Number.EPSILON;
+    var EPSLN = 1.0e-10;
+    // you'd think you could use Number.EPSILON above but that makes
+    // Mollweide get into an infinate loop.
+
     var D2R = 0.01745329251994329577;
     var R2D = 57.29577951308232088;
     var FORTPI = Math.PI/4;
@@ -518,7 +521,7 @@ define([], function () {
                         wkt.to_meter = wkt.UNIT.convert*wkt.DATUM.SPHEROID.a;
                     }
                 } else {
-                    wkt.to_meter = wkt.UNIT.convert, 10;
+                    wkt.to_meter = wkt.UNIT.convert;
                 }
             }
         }
@@ -565,8 +568,25 @@ define([], function () {
                 wkt.a = geogcs.DATUM.SPHEROID.a;
                 wkt.rf = parseFloat(geogcs.DATUM.SPHEROID.rf, 10);
             }
+
+            if (geogcs.DATUM && geogcs.DATUM.TOWGS84) {
+                wkt.datum_params = geogcs.DATUM.TOWGS84;
+            }
             if (~wkt.datumCode.indexOf('osgb_1936')) {
                 wkt.datumCode = 'osgb36';
+            }
+            if (~wkt.datumCode.indexOf('osni_1952')) {
+                wkt.datumCode = 'osni52';
+            }
+            if (~wkt.datumCode.indexOf('tm65')
+                || ~wkt.datumCode.indexOf('geodetic_datum_of_1965')) {
+                wkt.datumCode = 'ire65';
+            }
+            if (wkt.datumCode === 'ch1903+') {
+                wkt.datumCode = 'ch1903';
+            }
+            if (~wkt.datumCode.indexOf('israel')) {
+                wkt.datumCode = 'isr93';
             }
         }
         if (wkt.b && !isFinite(wkt.b)) {
@@ -590,9 +610,11 @@ define([], function () {
             ['latitude_of_origin', 'Central_Parallel'],
             ['scale_factor', 'Scale_Factor'],
             ['k0', 'scale_factor'],
+            ['latitude_of_center', 'Latitude_Of_Center'],
             ['latitude_of_center', 'Latitude_of_center'],
             ['lat0', 'latitude_of_center', d2r],
             ['longitude_of_center', 'Longitude_Of_Center'],
+            ['longitude_of_center', 'Longitude_of_center'],
             ['longc', 'longitude_of_center', d2r],
             ['x0', 'false_easting', toMeter],
             ['y0', 'false_northing', toMeter],
@@ -601,6 +623,7 @@ define([], function () {
             ['lat0', 'standard_parallel_1', d2r],
             ['lat1', 'standard_parallel_1', d2r],
             ['lat2', 'standard_parallel_2', d2r],
+            ['azimuth', 'Azimuth'],
             ['alpha', 'azimuth', d2r],
             ['srsCode', 'name']
         ];
@@ -688,6 +711,22 @@ define([], function () {
             return code.indexOf(word) > -1;
         });
     }
+    var codes = ['3857', '900913', '3785', '102113'];
+    function checkMercator(item) {
+        var auth = match(item, 'authority');
+        if (!auth) {
+            return;
+        }
+        var code = match(auth, 'epsg');
+        return code && codes.indexOf(code) > -1;
+    }
+    function checkProjStr(item) {
+        var ext = match(item, 'extension');
+        if (!ext) {
+            return;
+        }
+        return match(ext, 'proj4');
+    }
     function testProj(code){
         return code[0] === '+';
     }
@@ -698,7 +737,16 @@ define([], function () {
                 return defs[code];
             }
             if (testWKT(code)) {
-                return wkt(code);
+                var out = wkt(code);
+                // test of spetial case, due to this being a very common and often malformed
+                if (checkMercator(out)) {
+                    return defs['EPSG:3857'];
+                }
+                var maybeProjStr = checkProjStr(out);
+                if (maybeProjStr) {
+                    return parseProj(maybeProjStr);
+                }
+                return out;
             }
             if (testProj(code)) {
                 return parseProj(code);
@@ -790,7 +838,7 @@ define([], function () {
     }
 
     /* Mercator forward equations--mapping lat,long to x,y
-     --------------------------------------------------*/
+      --------------------------------------------------*/
 
     function forward(p) {
         var lon = p.x;
@@ -822,7 +870,7 @@ define([], function () {
     }
 
     /* Mercator inverse equations--mapping x,y to lat/long
-     --------------------------------------------------*/
+      --------------------------------------------------*/
     function inverse(p) {
 
         var x = p.x - this.x0;
@@ -870,7 +918,7 @@ define([], function () {
     };
 
     var projs = [merc, longlat];
-    var names$$1 = {};
+    var names = {};
     var projStore = [];
 
     function add(proj, i) {
@@ -881,7 +929,7 @@ define([], function () {
         }
         projStore[len] = proj;
         proj.names.forEach(function(n) {
-            names$$1[n.toLowerCase()] = len;
+            names[n.toLowerCase()] = len;
         });
         return this;
     }
@@ -891,8 +939,8 @@ define([], function () {
             return false;
         }
         var n = name.toLowerCase();
-        if (typeof names$$1[n] !== 'undefined' && projStore[names$$1[n]]) {
-            return projStore[names$$1[n]];
+        if (typeof names[n] !== 'undefined' && projStore[names[n]]) {
+            return projStore[names[n]];
         }
     }
 
@@ -1258,6 +1306,12 @@ define([], function () {
         datumName: "Hermannskogel"
     };
 
+    exports$3.osni52 = {
+        towgs84: "482.530,-130.596,564.557,-1.042,-0.214,-0.631,8.15",
+        ellipse: "airy",
+        datumName: "Irish National"
+    };
+
     exports$3.ire65 = {
         towgs84: "482.530,-130.596,564.557,-1.042,-0.214,-0.631,8.15",
         ellipse: "mod_airy",
@@ -1338,21 +1392,21 @@ define([], function () {
         return out;
     }
 
-    function Projection$1(srsCode,callback) {
-        if (!(this instanceof Projection$1)) {
-            return new Projection$1(srsCode);
+    function Projection(srsCode,callback) {
+        if (!(this instanceof Projection)) {
+            return new Projection(srsCode);
         }
         callback = callback || function(error){
-                if(error){
-                    throw error;
-                }
-            };
+            if(error){
+                throw error;
+            }
+        };
         var json = parse(srsCode);
         if(typeof json !== 'object'){
             callback(srsCode);
             return;
         }
-        var ourProj = Projection$1.projections.get(json.projName);
+        var ourProj = Projection.projections.get(json.projName);
         if(!ourProj){
             callback(srsCode);
             return;
@@ -1396,9 +1450,10 @@ define([], function () {
         callback(null, this);
 
     }
-    Projection$1.projections = projections;
-    Projection$1.projections.start();
+    Projection.projections = projections;
+    Projection.projections.start();
 
+    'use strict';
     function compareDatums(source, dest) {
         if (source.datum_type !== dest.datum_type) {
             return false; // false, datums are not equal
@@ -1439,18 +1494,21 @@ define([], function () {
         var Cos_Lat; /*  Math.cos(Latitude)  */
 
         /*
-         ** Don't blow up if Latitude is just a little out of the value
-         ** range as it may just be a rounding issue.  Also removed longitude
-         ** test, it should be wrapped by Math.cos() and Math.sin().  NFW for PROJ.4, Sep/2001.
-         */
+       ** Don't blow up if Latitude is just a little out of the value
+       ** range as it may just be a rounding issue.  Also removed longitude
+       ** test, it should be wrapped by Math.cos() and Math.sin().  NFW for PROJ.4, Sep/2001.
+       */
         if (Latitude < -HALF_PI && Latitude > -1.001 * HALF_PI) {
             Latitude = -HALF_PI;
         } else if (Latitude > HALF_PI && Latitude < 1.001 * HALF_PI) {
             Latitude = HALF_PI;
-        } else if ((Latitude < -HALF_PI) || (Latitude > HALF_PI)) {
+        } else if (Latitude < -HALF_PI) {
             /* Latitude out of range */
             //..reportError('geocent:lat out of range:' + Latitude);
-            return null;
+            return { x: -Infinity, y: -Infinity, z: p.z };
+        } else if (Latitude > HALF_PI) {
+            /* Latitude out of range */
+            return { x: Infinity, y: Infinity, z: p.z };
         }
 
         if (Longitude > Math.PI) {
@@ -1505,7 +1563,7 @@ define([], function () {
             Longitude = 0.0;
 
             /*  if (X,Y,Z)=(0.,0.,0.) then Height becomes semi-minor axis
-             *  of ellipsoid (=center of mass), Latitude becomes PI/2 */
+         *  of ellipsoid (=center of mass), Latitude becomes PI/2 */
             if (RR / a < genau) {
                 Latitude = HALF_PI;
                 Height = -b;
@@ -1517,19 +1575,19 @@ define([], function () {
             }
         } else {
             /*  ellipsoidal (geodetic) longitude
-             *  interval: -PI < Longitude <= +PI */
+         *  interval: -PI < Longitude <= +PI */
             Longitude = Math.atan2(Y, X);
         }
 
         /* --------------------------------------------------------------
-         * Following iterative algorithm was developped by
-         * "Institut for Erdmessung", University of Hannover, July 1988.
-         * Internet: www.ife.uni-hannover.de
-         * Iterative computation of CPHI,SPHI and Height.
-         * Iteration of CPHI and SPHI to 10**-12 radian resp.
-         * 2*10**-7 arcsec.
-         * --------------------------------------------------------------
-         */
+       * Following iterative algorithm was developped by
+       * "Institut for Erdmessung", University of Hannover, July 1988.
+       * Internet: www.ife.uni-hannover.de
+       * Iterative computation of CPHI,SPHI and Height.
+       * Iteration of CPHI and SPHI to 10**-12 radian resp.
+       * 2*10**-7 arcsec.
+       * --------------------------------------------------------------
+       */
         CT = Z / RR;
         ST = P / RR;
         RX = 1.0 / Math.sqrt(1.0 - es * (2.0 - es) * ST * ST);
@@ -1538,7 +1596,7 @@ define([], function () {
         iter = 0;
 
         /* loop to find sin(Latitude) resp. Latitude
-         * until |sin(Latitude(iter)-Latitude(iter-1))| < genau */
+       * until |sin(Latitude(iter)-Latitude(iter-1))| < genau */
         do {
             iter++;
             RN = a / Math.sqrt(1.0 - es * SPHI0 * SPHI0);
@@ -1744,6 +1802,22 @@ define([], function () {
         return out;
     };
 
+    var checkSanity = function (point) {
+        checkCoord(point.x);
+        checkCoord(point.y);
+    };
+    function checkCoord(num) {
+        if (typeof Number.isFinite === 'function') {
+            if (Number.isFinite(num)) {
+                return;
+            }
+            throw new TypeError('coordinates must be finite numbers');
+        }
+        if (typeof num !== 'number' || num !== num || !isFinite(num)) {
+            throw new TypeError('coordinates must be finite numbers');
+        }
+    }
+
     function checkNotWGS(source, dest) {
         return ((source.datum.datum_type === PJD_3PARAM || source.datum.datum_type === PJD_7PARAM) && dest.datumCode !== 'WGS84') || ((dest.datum.datum_type === PJD_3PARAM || dest.datum.datum_type === PJD_7PARAM) && source.datumCode !== 'WGS84');
     }
@@ -1753,10 +1827,10 @@ define([], function () {
         if (Array.isArray(point)) {
             point = toPoint(point);
         }
-
+        checkSanity(point);
         // Workaround for datum shifts towgs84, if either source or destination projection is not wgs84
         if (source.datum && dest.datum && checkNotWGS(source, dest)) {
-            wgs84 = new Projection$1('WGS84');
+            wgs84 = new Projection('WGS84');
             point = transform(source, wgs84, point);
             source = wgs84;
         }
@@ -1768,14 +1842,15 @@ define([], function () {
         if (source.projName === 'longlat') {
             point = {
                 x: point.x * D2R,
-                y: point.y * D2R
+                y: point.y * D2R,
+                z: point.z || 0
             };
-        }
-        else {
+        } else {
             if (source.to_meter) {
                 point = {
                     x: point.x * source.to_meter,
-                    y: point.y * source.to_meter
+                    y: point.y * source.to_meter,
+                    z: point.z || 0
                 };
             }
             point = source.inverse(point); // Convert Cartesian to longlat
@@ -1792,7 +1867,8 @@ define([], function () {
         if (dest.from_greenwich) {
             point = {
                 x: point.x - dest.from_greenwich,
-                y: point.y
+                y: point.y,
+                z: point.z || 0
             };
         }
 
@@ -1800,14 +1876,16 @@ define([], function () {
             // convert radians to decimal degrees
             point = {
                 x: point.x * R2D,
-                y: point.y * R2D
+                y: point.y * R2D,
+                z: point.z || 0
             };
         } else { // else project
             point = dest.forward(point);
             if (dest.to_meter) {
                 point = {
                     x: point.x / dest.to_meter,
-                    y: point.y / dest.to_meter
+                    y: point.y / dest.to_meter,
+                    z: point.z || 0
                 };
             }
         }
@@ -1820,33 +1898,57 @@ define([], function () {
         return point;
     }
 
-    var wgs84 = Projection$1('WGS84');
+    var wgs84 = Projection('WGS84');
 
     function transformer(from, to, coords) {
-        var transformedArray;
+        var transformedArray, out, keys;
         if (Array.isArray(coords)) {
-            transformedArray = transform(from, to, coords);
-            if (coords.length === 3) {
-                return [transformedArray.x, transformedArray.y, transformedArray.z];
-            }
-            else {
+            transformedArray = transform(from, to, coords) || {x: NaN, y: NaN};
+            if (coords.length > 2) {
+                if ((typeof from.name !== 'undefined' && from.name === 'geocent') || (typeof to.name !== 'undefined' && to.name === 'geocent')) {
+                    if (typeof transformedArray.z === 'number') {
+                        return [transformedArray.x, transformedArray.y, transformedArray.z].concat(coords.splice(3));
+                    } else {
+                        return [transformedArray.x, transformedArray.y, coords[2]].concat(coords.splice(3));
+                    }
+                } else {
+                    return [transformedArray.x, transformedArray.y].concat(coords.splice(2));
+                }
+            } else {
                 return [transformedArray.x, transformedArray.y];
             }
-        }
-        else {
-            return transform(from, to, coords);
+        } else {
+            out = transform(from, to, coords);
+            keys = Object.keys(coords);
+            if (keys.length === 2) {
+                return out;
+            }
+            keys.forEach(function (key) {
+                if ((typeof from.name !== 'undefined' && from.name === 'geocent') || (typeof to.name !== 'undefined' && to.name === 'geocent')) {
+                    if (key === 'x' || key === 'y' || key === 'z') {
+                        return;
+                    }
+                } else {
+                    if (key === 'x' || key === 'y') {
+                        return;
+                    }
+                }
+                out[key] = coords[key];
+            });
+            return out;
         }
     }
 
     function checkProj(item) {
-        if (item instanceof Projection$1) {
+        if (item instanceof Projection) {
             return item;
         }
         if (item.oProj) {
             return item.oProj;
         }
-        return Projection$1(item);
+        return Projection(item);
     }
+
     function proj4$1(fromProj, toProj, coord) {
         fromProj = checkProj(fromProj);
         var single = false;
@@ -1855,8 +1957,7 @@ define([], function () {
             toProj = fromProj;
             fromProj = wgs84;
             single = true;
-        }
-        else if (typeof toProj.x !== 'undefined' || Array.isArray(toProj)) {
+        } else if (typeof toProj.x !== 'undefined' || Array.isArray(toProj)) {
             coord = toProj;
             toProj = fromProj;
             fromProj = wgs84;
@@ -1865,13 +1966,12 @@ define([], function () {
         toProj = checkProj(toProj);
         if (coord) {
             return transformer(fromProj, toProj, coord);
-        }
-        else {
+        } else {
             obj = {
-                forward: function(coords) {
+                forward: function (coords) {
                     return transformer(fromProj, toProj, coords);
                 },
-                inverse: function(coords) {
+                inverse: function (coords) {
                     return transformer(toProj, fromProj, coords);
                 }
             };
@@ -2658,8 +2758,6 @@ define([], function () {
         return forward$1([this.x, this.y], accuracy);
     };
 
-    var version = "2.4.3";
-
     var C00 = 1;
     var C02 = 0.25;
     var C04 = 0.046875;
@@ -2784,15 +2882,15 @@ define([], function () {
 
             x = this.a * (this.k0 * al * (1 +
                 als / 6 * (1 - t + c +
-                als / 20 * (5 - 18 * t + ts + 14 * c - 58 * t * c +
-                als / 42 * (61 + 179 * ts - ts * t - 479 * t))))) +
+                    als / 20 * (5 - 18 * t + ts + 14 * c - 58 * t * c +
+                        als / 42 * (61 + 179 * ts - ts * t - 479 * t))))) +
                 this.x0;
 
             y = this.a * (this.k0 * (ml - this.ml0 +
                 sin_phi * delta_lon * al / 2 * (1 +
-                als / 12 * (5 - t + 9 * c + 4 * cs +
-                als / 30 * (61 + ts - 58 * t + 270 * c - 330 * t * c +
-                als / 56 * (1385 + 543 * ts - ts * t - 3111 * t)))))) +
+                    als / 12 * (5 - t + 9 * c + 4 * cs +
+                        als / 30 * (61 + ts - 58 * t + 270 * c - 330 * t * c +
+                            als / 56 * (1385 + 543 * ts - ts * t - 3111 * t)))))) +
                 this.y0;
         }
 
@@ -2849,13 +2947,13 @@ define([], function () {
 
                 lat = phi - (con * ds / (1 - this.es)) * 0.5 * (1 -
                     ds / 12 * (5 + 3 * t - 9 * c * t + c - 4 * cs -
-                    ds / 30 * (61 + 90 * t - 252 * c * t + 45 * ts + 46 * c -
-                    ds / 56 * (1385 + 3633 * t + 4095 * ts + 1574 * ts * t))));
+                        ds / 30 * (61 + 90 * t - 252 * c * t + 45 * ts + 46 * c -
+                            ds / 56 * (1385 + 3633 * t + 4095 * ts + 1574 * ts * t))));
 
                 lon = adjust_lon(this.long0 + (d * (1 -
                     ds / 6 * (1 + 2 * t + c -
-                    ds / 20 * (5 + 28 * t + 24 * ts + 8 * c * t + 6 * c -
-                    ds / 42 * (61 + 662 * t + 1320 * ts + 720 * ts * t)))) / cos_phi));
+                        ds / 20 * (5 + 28 * t + 24 * ts + 8 * c * t + 6 * c -
+                            ds / 42 * (61 + 662 * t + 1320 * ts + 720 * ts * t)))) / cos_phi));
             }
             else {
                 lat = HALF_PI * sign(y);
@@ -3277,7 +3375,7 @@ define([], function () {
         return p;
     }
 
-    var names$6 = ["Stereographic_North_Pole", "Oblique_Stereographic", "Polar_Stereographic", "sterea","Oblique Stereographic Alternative"];
+    var names$6 = ["Stereographic_North_Pole", "Oblique_Stereographic", "Polar_Stereographic", "sterea","Oblique Stereographic Alternative","Double_Stereographic"];
     var sterea = {
         init: init$5,
         forward: forward$4,
@@ -3382,7 +3480,7 @@ define([], function () {
         var lon, lat, ts, ce, Chi;
         var rh = Math.sqrt(p.x * p.x + p.y * p.y);
         if (this.sphere) {
-            var c = 2 * Math.atan(rh / (0.5 * this.a * this.k0));
+            var c = 2 * Math.atan(rh / (2 * this.a * this.k0));
             lon = this.long0;
             lat = this.lat0;
             if (rh <= EPSLN) {
@@ -3453,12 +3551,12 @@ define([], function () {
     };
 
     /*
-     references:
-     Formules et constantes pour le Calcul pour la
-     projection cylindrique conforme à axe oblique et pour la transformation entre
-     des systèmes de référence.
-     http://www.swisstopo.admin.ch/internet/swisstopo/fr/home/topics/survey/sys/refsys/switzerland.parsysrelated1.31216.downloadList.77004.DownloadFile.tmp/swissprojectionfr.pdf
-     */
+      references:
+        Formules et constantes pour le Calcul pour la
+        projection cylindrique conforme à axe oblique et pour la transformation entre
+        des systèmes de référence.
+        http://www.swisstopo.admin.ch/internet/swisstopo/fr/home/topics/survey/sys/refsys/switzerland.parsysrelated1.31216.downloadList.77004.DownloadFile.tmp/swissprojectionfr.pdf
+      */
 
     function init$8() {
         var phy0 = this.lat0;
@@ -3540,7 +3638,7 @@ define([], function () {
     };
 
     /* Initialize the Oblique Mercator  projection
-     ------------------------------------------*/
+        ------------------------------------------*/
     function init$9() {
         this.no_off = this.no_off || false;
         this.no_rot = this.no_rot || false;
@@ -3615,7 +3713,7 @@ define([], function () {
     }
 
     /* Oblique Mercator forward equations--mapping lat,long to x,y
-     ----------------------------------------------------------*/
+        ----------------------------------------------------------*/
     function forward$8(p) {
         var lon = p.x;
         var lat = p.y;
@@ -4002,11 +4100,11 @@ define([], function () {
     }
 
     /* Cassini forward equations--mapping lat,long to x,y
-     -----------------------------------------------------------------------*/
+      -----------------------------------------------------------------------*/
     function forward$11(p) {
 
         /* Forward equations
-         -----------------*/
+          -----------------*/
         var x, y;
         var lam = p.x;
         var phi = p.y;
@@ -4039,7 +4137,7 @@ define([], function () {
     }
 
     /* Inverse equations
-     -----------------*/
+      -----------------*/
     function inverse$11(p) {
         p.x -= this.x0;
         p.y -= this.y0;
@@ -4101,10 +4199,10 @@ define([], function () {
     };
 
     /*
-     reference
-     "New Equal-Area Map Projections for Noncircular Regions", John P. Snyder,
-     The American Cartographer, Vol 15, No. 4, October 1988, pp. 341-355.
-     */
+      reference
+        "New Equal-Area Map Projections for Noncircular Regions", John P. Snyder,
+        The American Cartographer, Vol 15, No. 4, October 1988, pp. 341-355.
+      */
 
     var S_POLE = 1;
 
@@ -4113,7 +4211,7 @@ define([], function () {
     var OBLIQ = 4;
 
     /* Initialize the Lambert Azimuthal Equal Area projection
-     ------------------------------------------------------*/
+      ------------------------------------------------------*/
     function init$13() {
         var t = Math.abs(this.lat0);
         if (Math.abs(t - HALF_PI) < EPSLN) {
@@ -4164,11 +4262,11 @@ define([], function () {
     }
 
     /* Lambert Azimuthal Equal Area forward equations--mapping lat,long to x,y
-     -----------------------------------------------------------------------*/
+      -----------------------------------------------------------------------*/
     function forward$12(p) {
 
         /* Forward equations
-         -----------------*/
+          -----------------*/
         var x, y, coslam, sinlam, sinphi, q, sinb, cosb, b, cosphi;
         var lam = p.x;
         var phi = p.y;
@@ -4262,7 +4360,7 @@ define([], function () {
     }
 
     /* Inverse equations
-     -----------------*/
+      -----------------*/
     function inverse$12(p) {
         p.x -= this.x0;
         p.y -= this.y0;
@@ -4438,7 +4536,7 @@ define([], function () {
     }
 
     /* Albers Conical Equal Area forward equations--mapping lat,long to x,y
-     -------------------------------------------------------------------*/
+      -------------------------------------------------------------------*/
     function forward$13(p) {
 
         var lon = p.x;
@@ -4491,8 +4589,8 @@ define([], function () {
     }
 
     /* Function to compute phi1, the latitude for the inverse of the
-     Albers Conical Equal-Area projection.
-     -------------------------------------------*/
+       Albers Conical Equal-Area projection.
+    -------------------------------------------*/
     function phi1z(eccent, qs) {
         var sinphi, cosphi, con, com, dphi;
         var phi = asinz(0.5 * qs);
@@ -4525,15 +4623,15 @@ define([], function () {
     };
 
     /*
-     reference:
-     Wolfram Mathworld "Gnomonic Projection"
-     http://mathworld.wolfram.com/GnomonicProjection.html
-     Accessed: 12th November 2009
-     */
+      reference:
+        Wolfram Mathworld "Gnomonic Projection"
+        http://mathworld.wolfram.com/GnomonicProjection.html
+        Accessed: 12th November 2009
+      */
     function init$15() {
 
         /* Place parameters in static storage for common use
-         -------------------------------------------------*/
+          -------------------------------------------------*/
         this.sin_p14 = Math.sin(this.lat0);
         this.cos_p14 = Math.cos(this.lat0);
         // Approximation for projecting points to the horizon (infinity)
@@ -4542,7 +4640,7 @@ define([], function () {
     }
 
     /* Gnomonic forward equations--mapping lat,long to x,y
-     ---------------------------------------------------*/
+        ---------------------------------------------------*/
     function forward$14(p) {
         var sinphi, cosphi; /* sin and cos value        */
         var dlon; /* delta longitude value      */
@@ -4553,7 +4651,7 @@ define([], function () {
         var lon = p.x;
         var lat = p.y;
         /* Forward equations
-         -----------------*/
+          -----------------*/
         dlon = adjust_lon(lon - this.long0);
 
         sinphi = Math.sin(lat);
@@ -4591,7 +4689,7 @@ define([], function () {
         var lon, lat;
 
         /* Inverse equations
-         -----------------*/
+          -----------------*/
         p.x = (p.x - this.x0) / this.a;
         p.y = (p.y - this.y0) / this.a;
 
@@ -4657,11 +4755,11 @@ define([], function () {
     };
 
     /*
-     reference:
-     "Cartographic Projection Procedures for the UNIX Environment-
-     A User's Manual" by Gerald I. Evenden,
-     USGS Open File Report 90-284and Release 4 Interim Reports (2003)
-     */
+      reference:
+        "Cartographic Projection Procedures for the UNIX Environment-
+        A User's Manual" by Gerald I. Evenden,
+        USGS Open File Report 90-284and Release 4 Interim Reports (2003)
+    */
     function init$16() {
         //no-op
         if (!this.sphere) {
@@ -4670,13 +4768,13 @@ define([], function () {
     }
 
     /* Cylindrical Equal Area forward equations--mapping lat,long to x,y
-     ------------------------------------------------------------*/
+        ------------------------------------------------------------*/
     function forward$15(p) {
         var lon = p.x;
         var lat = p.y;
         var x, y;
         /* Forward equations
-         -----------------*/
+          -----------------*/
         var dlon = adjust_lon(lon - this.long0);
         if (this.sphere) {
             x = this.x0 + this.a * dlon * Math.cos(this.lat_ts);
@@ -4694,7 +4792,7 @@ define([], function () {
     }
 
     /* Cylindrical Equal Area inverse equations--mapping x,y to lat/long
-     ------------------------------------------------------------*/
+        ------------------------------------------------------------*/
     function inverse$15(p) {
         p.x -= this.x0;
         p.y -= this.y0;
@@ -4772,7 +4870,7 @@ define([], function () {
 
     function init$18() {
         /* Place parameters in static storage for common use
-         -------------------------------------------------*/
+          -------------------------------------------------*/
         this.temp = this.b / this.a;
         this.es = 1 - Math.pow(this.temp, 2); // devait etre dans tmerc.js mais n y est pas donc je commente sinon retour de valeurs nulles
         this.e = Math.sqrt(this.es);
@@ -4784,7 +4882,7 @@ define([], function () {
     }
 
     /* Polyconic forward equations--mapping lat,long to x,y
-     ---------------------------------------------------*/
+        ---------------------------------------------------*/
     function forward$17(p) {
         var lon = p.x;
         var lat = p.y;
@@ -4819,7 +4917,7 @@ define([], function () {
     }
 
     /* Inverse equations
-     -----------------*/
+      -----------------*/
     function inverse$17(p) {
         var lon, lat, x, y, i;
         var al, bl;
@@ -4895,12 +4993,12 @@ define([], function () {
     };
 
     /*
-     reference
-     Department of Land and Survey Technical Circular 1973/32
-     http://www.linz.govt.nz/docs/miscellaneous/nz-map-definition.pdf
-     OSG Technical Report 4.1
-     http://www.linz.govt.nz/docs/miscellaneous/nzmg.pdf
-     */
+      reference
+        Department of Land and Survey Technical Circular 1973/32
+          http://www.linz.govt.nz/docs/miscellaneous/nz-map-definition.pdf
+        OSG Technical Report 4.1
+          http://www.linz.govt.nz/docs/miscellaneous/nzmg.pdf
+      */
 
     /**
      * iterations: Number of iterations to refine inverse transform.
@@ -5120,25 +5218,25 @@ define([], function () {
     };
 
     /*
-     reference
-     "New Equal-Area Map Projections for Noncircular Regions", John P. Snyder,
-     The American Cartographer, Vol 15, No. 4, October 1988, pp. 341-355.
-     */
+      reference
+        "New Equal-Area Map Projections for Noncircular Regions", John P. Snyder,
+        The American Cartographer, Vol 15, No. 4, October 1988, pp. 341-355.
+      */
 
 
     /* Initialize the Miller Cylindrical projection
-     -------------------------------------------*/
+      -------------------------------------------*/
     function init$20() {
         //no-op
     }
 
     /* Miller Cylindrical forward equations--mapping lat,long to x,y
-     ------------------------------------------------------------*/
+        ------------------------------------------------------------*/
     function forward$19(p) {
         var lon = p.x;
         var lat = p.y;
         /* Forward equations
-         -----------------*/
+          -----------------*/
         var dlon = adjust_lon(lon - this.long0);
         var x = this.x0 + this.a * dlon;
         var y = this.y0 + this.a * Math.log(Math.tan((Math.PI / 4) + (lat / 2.5))) * 1.25;
@@ -5149,7 +5247,7 @@ define([], function () {
     }
 
     /* Miller Cylindrical inverse equations--mapping x,y to lat/long
-     ------------------------------------------------------------*/
+        ------------------------------------------------------------*/
     function inverse$19(p) {
         p.x -= this.x0;
         p.y -= this.y0;
@@ -5173,7 +5271,7 @@ define([], function () {
     var MAX_ITER$3 = 20;
     function init$21() {
         /* Place parameters in static storage for common use
-         -------------------------------------------------*/
+        -------------------------------------------------*/
 
 
         if (!this.sphere) {
@@ -5190,13 +5288,13 @@ define([], function () {
     }
 
     /* Sinusoidal forward equations--mapping lat,long to x,y
-     -----------------------------------------------------*/
+      -----------------------------------------------------*/
     function forward$20(p) {
         var x, y;
         var lon = p.x;
         var lat = p.y;
         /* Forward equations
-         -----------------*/
+        -----------------*/
         lon = adjust_lon(lon - this.long0);
 
         if (this.sphere) {
@@ -5278,11 +5376,11 @@ define([], function () {
 
     function init$22() {}
     /* Mollweide forward equations--mapping lat,long to x,y
-     ----------------------------------------------------*/
+        ----------------------------------------------------*/
     function forward$21(p) {
 
         /* Forward equations
-         -----------------*/
+          -----------------*/
         var lon = p.x;
         var lat = p.y;
 
@@ -5291,8 +5389,8 @@ define([], function () {
         var con = Math.PI * Math.sin(lat);
 
         /* Iterate using the Newton-Raphson method to find theta
-         -----------------------------------------------------*/
-        for (var i = 0; true; i++) {
+          -----------------------------------------------------*/
+        while (true) {
             var delta_theta = -(theta + Math.sin(theta) - con) / (1 + Math.cos(theta));
             theta += delta_theta;
             if (Math.abs(delta_theta) < EPSLN) {
@@ -5302,8 +5400,8 @@ define([], function () {
         theta /= 2;
 
         /* If the latitude is 90 deg, force the x coordinate to be "0 + false easting"
-         this is done here because of precision problems with "cos(theta)"
-         --------------------------------------------------------------------------*/
+           this is done here because of precision problems with "cos(theta)"
+           --------------------------------------------------------------------------*/
         if (Math.PI / 2 - Math.abs(lat) < EPSLN) {
             delta_lon = 0;
         }
@@ -5320,14 +5418,14 @@ define([], function () {
         var arg;
 
         /* Inverse equations
-         -----------------*/
+          -----------------*/
         p.x -= this.x0;
         p.y -= this.y0;
         arg = p.y / (1.4142135623731 * this.a);
 
         /* Because of division by zero problems, 'arg' can not be 1.  Therefore
-         a number very close to one is used instead.
-         -------------------------------------------------------------------*/
+           a number very close to one is used instead.
+           -------------------------------------------------------------------*/
         if (Math.abs(arg) > 0.999999999999) {
             arg = 0.999999999999;
         }
@@ -5361,7 +5459,7 @@ define([], function () {
     function init$23() {
 
         /* Place parameters in static storage for common use
-         -------------------------------------------------*/
+          -------------------------------------------------*/
         // Standard Parallels cannot be equal and on opposite sides of the equator
         if (Math.abs(this.lat1 + this.lat2) < EPSLN) {
             return;
@@ -5397,14 +5495,14 @@ define([], function () {
     }
 
     /* Equidistant Conic forward equations--mapping lat,long to x,y
-     -----------------------------------------------------------*/
+      -----------------------------------------------------------*/
     function forward$22(p) {
         var lon = p.x;
         var lat = p.y;
         var rh1;
 
         /* Forward equations
-         -----------------*/
+          -----------------*/
         if (this.sphere) {
             rh1 = this.a * (this.g - lat);
         }
@@ -5421,7 +5519,7 @@ define([], function () {
     }
 
     /* Inverse equations
-     -----------------*/
+      -----------------*/
     function inverse$22(p) {
         p.x -= this.x0;
         p.y = this.rh - p.y + this.y0;
@@ -5466,7 +5564,7 @@ define([], function () {
     };
 
     /* Initialize the Van Der Grinten projection
-     ----------------------------------------*/
+      ----------------------------------------*/
     function init$24() {
         //this.R = 6370997; //Radius of earth
         this.R = this.a;
@@ -5478,7 +5576,7 @@ define([], function () {
         var lat = p.y;
 
         /* Forward equations
-         -----------------*/
+        -----------------*/
         var dlon = adjust_lon(lon - this.long0);
         var x, y;
 
@@ -5528,7 +5626,7 @@ define([], function () {
     }
 
     /* Van Der Grinten inverse equations--mapping x,y to lat/long
-     ---------------------------------------------------------*/
+      ---------------------------------------------------------*/
     function inverse$23(p) {
         var lon, lat;
         var xx, yy, xys, c1, c2, c3;
@@ -5539,7 +5637,7 @@ define([], function () {
         var d;
 
         /* inverse equations
-         -----------------*/
+        -----------------*/
         p.x -= this.x0;
         p.y -= this.y0;
         con = Math.PI * this.R;
@@ -5710,12 +5808,12 @@ define([], function () {
                 }
                 else {
                     /*con = cosz - this.sin_p12 * Math.sin(lat);
-                     if ((Math.abs(con) < EPSLN) && (Math.abs(p.x) < EPSLN)) {
-                     //no-op, just keep the lon value as is
-                     } else {
-                     var temp = Math.atan2((p.x * sinz * this.cos_p12), (con * rh));
-                     lon = adjust_lon(this.long0 + Math.atan2((p.x * sinz * this.cos_p12), (con * rh)));
-                     }*/
+            if ((Math.abs(con) < EPSLN) && (Math.abs(p.x) < EPSLN)) {
+              //no-op, just keep the lon value as is
+            } else {
+              var temp = Math.atan2((p.x * sinz * this.cos_p12), (con * rh));
+              lon = adjust_lon(this.long0 + Math.atan2((p.x * sinz * this.cos_p12), (con * rh)));
+            }*/
                     lon = adjust_lon(this.long0 + Math.atan2(p.x * sinz, rh * this.cos_p12 * cosz - p.y * this.sin_p12 * sinz));
                 }
             }
@@ -5787,13 +5885,13 @@ define([], function () {
         //double temp;      /* temporary variable    */
 
         /* Place parameters in static storage for common use
-         -------------------------------------------------*/
+          -------------------------------------------------*/
         this.sin_p14 = Math.sin(this.lat0);
         this.cos_p14 = Math.cos(this.lat0);
     }
 
     /* Orthographic forward equations--mapping lat,long to x,y
-     ---------------------------------------------------*/
+        ---------------------------------------------------*/
     function forward$25(p) {
         var sinphi, cosphi; /* sin and cos value        */
         var dlon; /* delta longitude value      */
@@ -5803,7 +5901,7 @@ define([], function () {
         var lon = p.x;
         var lat = p.y;
         /* Forward equations
-         -----------------*/
+          -----------------*/
         dlon = adjust_lon(lon - this.long0);
 
         sinphi = Math.sin(lat);
@@ -5828,7 +5926,7 @@ define([], function () {
         var con;
         var lon, lat;
         /* Inverse equations
-         -----------------*/
+          -----------------*/
         p.x -= this.x0;
         p.y -= this.y0;
         rh = Math.sqrt(p.x * p.x + p.y * p.y);
@@ -5871,6 +5969,554 @@ define([], function () {
         names: names$27
     };
 
+    // QSC projection rewritten from the original PROJ4
+    // https://github.com/OSGeo/proj.4/blob/master/src/PJ_qsc.c
+
+    /* constants */
+    var FACE_ENUM = {
+        FRONT: 1,
+        RIGHT: 2,
+        BACK: 3,
+        LEFT: 4,
+        TOP: 5,
+        BOTTOM: 6
+    };
+
+    var AREA_ENUM = {
+        AREA_0: 1,
+        AREA_1: 2,
+        AREA_2: 3,
+        AREA_3: 4
+    };
+
+    function init$27() {
+
+        this.x0 = this.x0 || 0;
+        this.y0 = this.y0 || 0;
+        this.lat0 = this.lat0 || 0;
+        this.long0 = this.long0 || 0;
+        this.lat_ts = this.lat_ts || 0;
+        this.title = this.title || "Quadrilateralized Spherical Cube";
+
+        /* Determine the cube face from the center of projection. */
+        if (this.lat0 >= HALF_PI - FORTPI / 2.0) {
+            this.face = FACE_ENUM.TOP;
+        } else if (this.lat0 <= -(HALF_PI - FORTPI / 2.0)) {
+            this.face = FACE_ENUM.BOTTOM;
+        } else if (Math.abs(this.long0) <= FORTPI) {
+            this.face = FACE_ENUM.FRONT;
+        } else if (Math.abs(this.long0) <= HALF_PI + FORTPI) {
+            this.face = this.long0 > 0.0 ? FACE_ENUM.RIGHT : FACE_ENUM.LEFT;
+        } else {
+            this.face = FACE_ENUM.BACK;
+        }
+
+        /* Fill in useful values for the ellipsoid <-> sphere shift
+       * described in [LK12]. */
+        if (this.es !== 0) {
+            this.one_minus_f = 1 - (this.a - this.b) / this.a;
+            this.one_minus_f_squared = this.one_minus_f * this.one_minus_f;
+        }
+    }
+
+    // QSC forward equations--mapping lat,long to x,y
+    // -----------------------------------------------------------------
+    function forward$26(p) {
+        var xy = {x: 0, y: 0};
+        var lat, lon;
+        var theta, phi;
+        var t, mu;
+        /* nu; */
+        var area = {value: 0};
+
+        // move lon according to projection's lon
+        p.x -= this.long0;
+
+        /* Convert the geodetic latitude to a geocentric latitude.
+       * This corresponds to the shift from the ellipsoid to the sphere
+       * described in [LK12]. */
+        if (this.es !== 0) {//if (P->es != 0) {
+            lat = Math.atan(this.one_minus_f_squared * Math.tan(p.y));
+        } else {
+            lat = p.y;
+        }
+
+        /* Convert the input lat, lon into theta, phi as used by QSC.
+       * This depends on the cube face and the area on it.
+       * For the top and bottom face, we can compute theta and phi
+       * directly from phi, lam. For the other faces, we must use
+       * unit sphere cartesian coordinates as an intermediate step. */
+        lon = p.x; //lon = lp.lam;
+        if (this.face === FACE_ENUM.TOP) {
+            phi = HALF_PI - lat;
+            if (lon >= FORTPI && lon <= HALF_PI + FORTPI) {
+                area.value = AREA_ENUM.AREA_0;
+                theta = lon - HALF_PI;
+            } else if (lon > HALF_PI + FORTPI || lon <= -(HALF_PI + FORTPI)) {
+                area.value = AREA_ENUM.AREA_1;
+                theta = (lon > 0.0 ? lon - SPI : lon + SPI);
+            } else if (lon > -(HALF_PI + FORTPI) && lon <= -FORTPI) {
+                area.value = AREA_ENUM.AREA_2;
+                theta = lon + HALF_PI;
+            } else {
+                area.value = AREA_ENUM.AREA_3;
+                theta = lon;
+            }
+        } else if (this.face === FACE_ENUM.BOTTOM) {
+            phi = HALF_PI + lat;
+            if (lon >= FORTPI && lon <= HALF_PI + FORTPI) {
+                area.value = AREA_ENUM.AREA_0;
+                theta = -lon + HALF_PI;
+            } else if (lon < FORTPI && lon >= -FORTPI) {
+                area.value = AREA_ENUM.AREA_1;
+                theta = -lon;
+            } else if (lon < -FORTPI && lon >= -(HALF_PI + FORTPI)) {
+                area.value = AREA_ENUM.AREA_2;
+                theta = -lon - HALF_PI;
+            } else {
+                area.value = AREA_ENUM.AREA_3;
+                theta = (lon > 0.0 ? -lon + SPI : -lon - SPI);
+            }
+        } else {
+            var q, r, s;
+            var sinlat, coslat;
+            var sinlon, coslon;
+
+            if (this.face === FACE_ENUM.RIGHT) {
+                lon = qsc_shift_lon_origin(lon, +HALF_PI);
+            } else if (this.face === FACE_ENUM.BACK) {
+                lon = qsc_shift_lon_origin(lon, +SPI);
+            } else if (this.face === FACE_ENUM.LEFT) {
+                lon = qsc_shift_lon_origin(lon, -HALF_PI);
+            }
+            sinlat = Math.sin(lat);
+            coslat = Math.cos(lat);
+            sinlon = Math.sin(lon);
+            coslon = Math.cos(lon);
+            q = coslat * coslon;
+            r = coslat * sinlon;
+            s = sinlat;
+
+            if (this.face === FACE_ENUM.FRONT) {
+                phi = Math.acos(q);
+                theta = qsc_fwd_equat_face_theta(phi, s, r, area);
+            } else if (this.face === FACE_ENUM.RIGHT) {
+                phi = Math.acos(r);
+                theta = qsc_fwd_equat_face_theta(phi, s, -q, area);
+            } else if (this.face === FACE_ENUM.BACK) {
+                phi = Math.acos(-q);
+                theta = qsc_fwd_equat_face_theta(phi, s, -r, area);
+            } else if (this.face === FACE_ENUM.LEFT) {
+                phi = Math.acos(-r);
+                theta = qsc_fwd_equat_face_theta(phi, s, q, area);
+            } else {
+                /* Impossible */
+                phi = theta = 0;
+                area.value = AREA_ENUM.AREA_0;
+            }
+        }
+
+        /* Compute mu and nu for the area of definition.
+       * For mu, see Eq. (3-21) in [OL76], but note the typos:
+       * compare with Eq. (3-14). For nu, see Eq. (3-38). */
+        mu = Math.atan((12 / SPI) * (theta + Math.acos(Math.sin(theta) * Math.cos(FORTPI)) - HALF_PI));
+        t = Math.sqrt((1 - Math.cos(phi)) / (Math.cos(mu) * Math.cos(mu)) / (1 - Math.cos(Math.atan(1 / Math.cos(theta)))));
+
+        /* Apply the result to the real area. */
+        if (area.value === AREA_ENUM.AREA_1) {
+            mu += HALF_PI;
+        } else if (area.value === AREA_ENUM.AREA_2) {
+            mu += SPI;
+        } else if (area.value === AREA_ENUM.AREA_3) {
+            mu += 1.5 * SPI;
+        }
+
+        /* Now compute x, y from mu and nu */
+        xy.x = t * Math.cos(mu);
+        xy.y = t * Math.sin(mu);
+        xy.x = xy.x * this.a + this.x0;
+        xy.y = xy.y * this.a + this.y0;
+
+        p.x = xy.x;
+        p.y = xy.y;
+        return p;
+    }
+
+    // QSC inverse equations--mapping x,y to lat/long
+    // -----------------------------------------------------------------
+    function inverse$26(p) {
+        var lp = {lam: 0, phi: 0};
+        var mu, nu, cosmu, tannu;
+        var tantheta, theta, cosphi, phi;
+        var t;
+        var area = {value: 0};
+
+        /* de-offset */
+        p.x = (p.x - this.x0) / this.a;
+        p.y = (p.y - this.y0) / this.a;
+
+        /* Convert the input x, y to the mu and nu angles as used by QSC.
+       * This depends on the area of the cube face. */
+        nu = Math.atan(Math.sqrt(p.x * p.x + p.y * p.y));
+        mu = Math.atan2(p.y, p.x);
+        if (p.x >= 0.0 && p.x >= Math.abs(p.y)) {
+            area.value = AREA_ENUM.AREA_0;
+        } else if (p.y >= 0.0 && p.y >= Math.abs(p.x)) {
+            area.value = AREA_ENUM.AREA_1;
+            mu -= HALF_PI;
+        } else if (p.x < 0.0 && -p.x >= Math.abs(p.y)) {
+            area.value = AREA_ENUM.AREA_2;
+            mu = (mu < 0.0 ? mu + SPI : mu - SPI);
+        } else {
+            area.value = AREA_ENUM.AREA_3;
+            mu += HALF_PI;
+        }
+
+        /* Compute phi and theta for the area of definition.
+       * The inverse projection is not described in the original paper, but some
+       * good hints can be found here (as of 2011-12-14):
+       * http://fits.gsfc.nasa.gov/fitsbits/saf.93/saf.9302
+       * (search for "Message-Id: <9302181759.AA25477 at fits.cv.nrao.edu>") */
+        t = (SPI / 12) * Math.tan(mu);
+        tantheta = Math.sin(t) / (Math.cos(t) - (1 / Math.sqrt(2)));
+        theta = Math.atan(tantheta);
+        cosmu = Math.cos(mu);
+        tannu = Math.tan(nu);
+        cosphi = 1 - cosmu * cosmu * tannu * tannu * (1 - Math.cos(Math.atan(1 / Math.cos(theta))));
+        if (cosphi < -1) {
+            cosphi = -1;
+        } else if (cosphi > +1) {
+            cosphi = +1;
+        }
+
+        /* Apply the result to the real area on the cube face.
+       * For the top and bottom face, we can compute phi and lam directly.
+       * For the other faces, we must use unit sphere cartesian coordinates
+       * as an intermediate step. */
+        if (this.face === FACE_ENUM.TOP) {
+            phi = Math.acos(cosphi);
+            lp.phi = HALF_PI - phi;
+            if (area.value === AREA_ENUM.AREA_0) {
+                lp.lam = theta + HALF_PI;
+            } else if (area.value === AREA_ENUM.AREA_1) {
+                lp.lam = (theta < 0.0 ? theta + SPI : theta - SPI);
+            } else if (area.value === AREA_ENUM.AREA_2) {
+                lp.lam = theta - HALF_PI;
+            } else /* area.value == AREA_ENUM.AREA_3 */ {
+                lp.lam = theta;
+            }
+        } else if (this.face === FACE_ENUM.BOTTOM) {
+            phi = Math.acos(cosphi);
+            lp.phi = phi - HALF_PI;
+            if (area.value === AREA_ENUM.AREA_0) {
+                lp.lam = -theta + HALF_PI;
+            } else if (area.value === AREA_ENUM.AREA_1) {
+                lp.lam = -theta;
+            } else if (area.value === AREA_ENUM.AREA_2) {
+                lp.lam = -theta - HALF_PI;
+            } else /* area.value == AREA_ENUM.AREA_3 */ {
+                lp.lam = (theta < 0.0 ? -theta - SPI : -theta + SPI);
+            }
+        } else {
+            /* Compute phi and lam via cartesian unit sphere coordinates. */
+            var q, r, s;
+            q = cosphi;
+            t = q * q;
+            if (t >= 1) {
+                s = 0;
+            } else {
+                s = Math.sqrt(1 - t) * Math.sin(theta);
+            }
+            t += s * s;
+            if (t >= 1) {
+                r = 0;
+            } else {
+                r = Math.sqrt(1 - t);
+            }
+            /* Rotate q,r,s into the correct area. */
+            if (area.value === AREA_ENUM.AREA_1) {
+                t = r;
+                r = -s;
+                s = t;
+            } else if (area.value === AREA_ENUM.AREA_2) {
+                r = -r;
+                s = -s;
+            } else if (area.value === AREA_ENUM.AREA_3) {
+                t = r;
+                r = s;
+                s = -t;
+            }
+            /* Rotate q,r,s into the correct cube face. */
+            if (this.face === FACE_ENUM.RIGHT) {
+                t = q;
+                q = -r;
+                r = t;
+            } else if (this.face === FACE_ENUM.BACK) {
+                q = -q;
+                r = -r;
+            } else if (this.face === FACE_ENUM.LEFT) {
+                t = q;
+                q = r;
+                r = -t;
+            }
+            /* Now compute phi and lam from the unit sphere coordinates. */
+            lp.phi = Math.acos(-s) - HALF_PI;
+            lp.lam = Math.atan2(r, q);
+            if (this.face === FACE_ENUM.RIGHT) {
+                lp.lam = qsc_shift_lon_origin(lp.lam, -HALF_PI);
+            } else if (this.face === FACE_ENUM.BACK) {
+                lp.lam = qsc_shift_lon_origin(lp.lam, -SPI);
+            } else if (this.face === FACE_ENUM.LEFT) {
+                lp.lam = qsc_shift_lon_origin(lp.lam, +HALF_PI);
+            }
+        }
+
+        /* Apply the shift from the sphere to the ellipsoid as described
+       * in [LK12]. */
+        if (this.es !== 0) {
+            var invert_sign;
+            var tanphi, xa;
+            invert_sign = (lp.phi < 0 ? 1 : 0);
+            tanphi = Math.tan(lp.phi);
+            xa = this.b / Math.sqrt(tanphi * tanphi + this.one_minus_f_squared);
+            lp.phi = Math.atan(Math.sqrt(this.a * this.a - xa * xa) / (this.one_minus_f * xa));
+            if (invert_sign) {
+                lp.phi = -lp.phi;
+            }
+        }
+
+        lp.lam += this.long0;
+        p.x = lp.lam;
+        p.y = lp.phi;
+        return p;
+    }
+
+    /* Helper function for forward projection: compute the theta angle
+     * and determine the area number. */
+    function qsc_fwd_equat_face_theta(phi, y, x, area) {
+        var theta;
+        if (phi < EPSLN) {
+            area.value = AREA_ENUM.AREA_0;
+            theta = 0.0;
+        } else {
+            theta = Math.atan2(y, x);
+            if (Math.abs(theta) <= FORTPI) {
+                area.value = AREA_ENUM.AREA_0;
+            } else if (theta > FORTPI && theta <= HALF_PI + FORTPI) {
+                area.value = AREA_ENUM.AREA_1;
+                theta -= HALF_PI;
+            } else if (theta > HALF_PI + FORTPI || theta <= -(HALF_PI + FORTPI)) {
+                area.value = AREA_ENUM.AREA_2;
+                theta = (theta >= 0.0 ? theta - SPI : theta + SPI);
+            } else {
+                area.value = AREA_ENUM.AREA_3;
+                theta += HALF_PI;
+            }
+        }
+        return theta;
+    }
+
+    /* Helper function: shift the longitude. */
+    function qsc_shift_lon_origin(lon, offset) {
+        var slon = lon + offset;
+        if (slon < -SPI) {
+            slon += TWO_PI;
+        } else if (slon > +SPI) {
+            slon -= TWO_PI;
+        }
+        return slon;
+    }
+
+    var names$28 = ["Quadrilateralized Spherical Cube", "Quadrilateralized_Spherical_Cube", "qsc"];
+    var qsc = {
+        init: init$27,
+        forward: forward$26,
+        inverse: inverse$26,
+        names: names$28
+    };
+
+    // Robinson projection
+    // Based on https://github.com/OSGeo/proj.4/blob/master/src/PJ_robin.c
+    // Polynomial coeficients from http://article.gmane.org/gmane.comp.gis.proj-4.devel/6039
+
+    var COEFS_X = [
+        [1.0000, 2.2199e-17, -7.15515e-05, 3.1103e-06],
+        [0.9986, -0.000482243, -2.4897e-05, -1.3309e-06],
+        [0.9954, -0.00083103, -4.48605e-05, -9.86701e-07],
+        [0.9900, -0.00135364, -5.9661e-05, 3.6777e-06],
+        [0.9822, -0.00167442, -4.49547e-06, -5.72411e-06],
+        [0.9730, -0.00214868, -9.03571e-05, 1.8736e-08],
+        [0.9600, -0.00305085, -9.00761e-05, 1.64917e-06],
+        [0.9427, -0.00382792, -6.53386e-05, -2.6154e-06],
+        [0.9216, -0.00467746, -0.00010457, 4.81243e-06],
+        [0.8962, -0.00536223, -3.23831e-05, -5.43432e-06],
+        [0.8679, -0.00609363, -0.000113898, 3.32484e-06],
+        [0.8350, -0.00698325, -6.40253e-05, 9.34959e-07],
+        [0.7986, -0.00755338, -5.00009e-05, 9.35324e-07],
+        [0.7597, -0.00798324, -3.5971e-05, -2.27626e-06],
+        [0.7186, -0.00851367, -7.01149e-05, -8.6303e-06],
+        [0.6732, -0.00986209, -0.000199569, 1.91974e-05],
+        [0.6213, -0.010418, 8.83923e-05, 6.24051e-06],
+        [0.5722, -0.00906601, 0.000182, 6.24051e-06],
+        [0.5322, -0.00677797, 0.000275608, 6.24051e-06]
+    ];
+
+    var COEFS_Y = [
+        [-5.20417e-18, 0.0124, 1.21431e-18, -8.45284e-11],
+        [0.0620, 0.0124, -1.26793e-09, 4.22642e-10],
+        [0.1240, 0.0124, 5.07171e-09, -1.60604e-09],
+        [0.1860, 0.0123999, -1.90189e-08, 6.00152e-09],
+        [0.2480, 0.0124002, 7.10039e-08, -2.24e-08],
+        [0.3100, 0.0123992, -2.64997e-07, 8.35986e-08],
+        [0.3720, 0.0124029, 9.88983e-07, -3.11994e-07],
+        [0.4340, 0.0123893, -3.69093e-06, -4.35621e-07],
+        [0.4958, 0.0123198, -1.02252e-05, -3.45523e-07],
+        [0.5571, 0.0121916, -1.54081e-05, -5.82288e-07],
+        [0.6176, 0.0119938, -2.41424e-05, -5.25327e-07],
+        [0.6769, 0.011713, -3.20223e-05, -5.16405e-07],
+        [0.7346, 0.0113541, -3.97684e-05, -6.09052e-07],
+        [0.7903, 0.0109107, -4.89042e-05, -1.04739e-06],
+        [0.8435, 0.0103431, -6.4615e-05, -1.40374e-09],
+        [0.8936, 0.00969686, -6.4636e-05, -8.547e-06],
+        [0.9394, 0.00840947, -0.000192841, -4.2106e-06],
+        [0.9761, 0.00616527, -0.000256, -4.2106e-06],
+        [1.0000, 0.00328947, -0.000319159, -4.2106e-06]
+    ];
+
+    var FXC = 0.8487;
+    var FYC = 1.3523;
+    var C1 = R2D/5; // rad to 5-degree interval
+    var RC1 = 1/C1;
+    var NODES = 18;
+
+    var poly3_val = function(coefs, x) {
+        return coefs[0] + x * (coefs[1] + x * (coefs[2] + x * coefs[3]));
+    };
+
+    var poly3_der = function(coefs, x) {
+        return coefs[1] + x * (2 * coefs[2] + x * 3 * coefs[3]);
+    };
+
+    function newton_rapshon(f_df, start, max_err, iters) {
+        var x = start;
+        for (; iters; --iters) {
+            var upd = f_df(x);
+            x -= upd;
+            if (Math.abs(upd) < max_err) {
+                break;
+            }
+        }
+        return x;
+    }
+
+    function init$28() {
+        this.x0 = this.x0 || 0;
+        this.y0 = this.y0 || 0;
+        this.long0 = this.long0 || 0;
+        this.es = 0;
+        this.title = this.title || "Robinson";
+    }
+
+    function forward$27(ll) {
+        var lon = adjust_lon(ll.x - this.long0);
+
+        var dphi = Math.abs(ll.y);
+        var i = Math.floor(dphi * C1);
+        if (i < 0) {
+            i = 0;
+        } else if (i >= NODES) {
+            i = NODES - 1;
+        }
+        dphi = R2D * (dphi - RC1 * i);
+        var xy = {
+            x: poly3_val(COEFS_X[i], dphi) * lon,
+            y: poly3_val(COEFS_Y[i], dphi)
+        };
+        if (ll.y < 0) {
+            xy.y = -xy.y;
+        }
+
+        xy.x = xy.x * this.a * FXC + this.x0;
+        xy.y = xy.y * this.a * FYC + this.y0;
+        return xy;
+    }
+
+    function inverse$27(xy) {
+        var ll = {
+            x: (xy.x - this.x0) / (this.a * FXC),
+            y: Math.abs(xy.y - this.y0) / (this.a * FYC)
+        };
+
+        if (ll.y >= 1) { // pathologic case
+            ll.x /= COEFS_X[NODES][0];
+            ll.y = xy.y < 0 ? -HALF_PI : HALF_PI;
+        } else {
+            // find table interval
+            var i = Math.floor(ll.y * NODES);
+            if (i < 0) {
+                i = 0;
+            } else if (i >= NODES) {
+                i = NODES - 1;
+            }
+            for (;;) {
+                if (COEFS_Y[i][0] > ll.y) {
+                    --i;
+                } else if (COEFS_Y[i+1][0] <= ll.y) {
+                    ++i;
+                } else {
+                    break;
+                }
+            }
+            // linear interpolation in 5 degree interval
+            var coefs = COEFS_Y[i];
+            var t = 5 * (ll.y - coefs[0]) / (COEFS_Y[i+1][0] - coefs[0]);
+            // find t so that poly3_val(coefs, t) = ll.y
+            t = newton_rapshon(function(x) {
+                return (poly3_val(coefs, x) - ll.y) / poly3_der(coefs, x);
+            }, t, EPSLN, 100);
+
+            ll.x /= poly3_val(COEFS_X[i], t);
+            ll.y = (5 * i + t) * D2R;
+            if (xy.y < 0) {
+                ll.y = -ll.y;
+            }
+        }
+
+        ll.x = adjust_lon(ll.x + this.long0);
+        return ll;
+    }
+
+    var names$29 = ["Robinson", "robin"];
+    var robin = {
+        init: init$28,
+        forward: forward$27,
+        inverse: inverse$27,
+        names: names$29
+    };
+
+    function init$29() {
+        this.name = 'geocent';
+
+    }
+
+    function forward$28(p) {
+        var point = geodeticToGeocentric(p, this.es, this.a);
+        return point;
+    }
+
+    function inverse$28(p) {
+        var point = geocentricToGeodetic(p, this.es, this.a, this.b);
+        return point;
+    }
+
+    var names$30 = ["Geocentric", 'geocentric', "geocent", "Geocent"];
+    var geocent = {
+        init: init$29,
+        forward: forward$28,
+        inverse: inverse$28,
+        names: names$30
+    };
+
     var includedProjections = function(proj4){
         proj4.Proj.projections.add(tmerc);
         proj4.Proj.projections.add(etmerc);
@@ -5896,18 +6542,22 @@ define([], function () {
         proj4.Proj.projections.add(vandg);
         proj4.Proj.projections.add(aeqd);
         proj4.Proj.projections.add(ortho);
+        proj4.Proj.projections.add(qsc);
+        proj4.Proj.projections.add(robin);
+        proj4.Proj.projections.add(geocent);
     };
 
     proj4$1.defaultDatum = 'WGS84'; //default datum
-    proj4$1.Proj = Projection$1;
+    proj4$1.Proj = Projection;
     proj4$1.WGS84 = new proj4$1.Proj('WGS84');
     proj4$1.Point = Point;
     proj4$1.toPoint = toPoint;
     proj4$1.defs = defs;
     proj4$1.transform = transform;
     proj4$1.mgrs = mgrs;
-    proj4$1.version = version;
+    proj4$1.version = '2.6.0';
     includedProjections(proj4$1);
 
     return proj4$1;
+
 });
