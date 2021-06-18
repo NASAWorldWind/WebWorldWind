@@ -1229,6 +1229,56 @@ define([
             expect(matrix[15]).toEqual(10);
         });
 
+        describe("project rejects null parameters", function () {
+            it("Should throw an exception on missing input parameter", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.project(0, 0, 0, null, dummyParam);
+                }).toThrow();
+            });
+
+            it("Should throw an exception on missing output variable", function () {
+                expect(function () {
+                    var m = Matrix.fromIdentity();
+                    var dummyParam = "dummy";
+                    m.project(0, 0, 0, dummyParam, null);
+                }).toThrow();
+            });
+        });
+
+        describe("Correctly converts model coordinates to screen coordinates", function () {
+
+            it("projects correctly", function () {
+                var modelView = new Matrix(
+                    -0.342, 0, 0.939, 2.328e-10,
+                    0.469, 0.866, 0.171, 18504.137,
+                    -0.813, 0.500, -0.296, -16372797.555,
+                    0, 0, 0, 1
+                );
+
+                var projection = new Matrix(
+                    2, 0, 0, 0,
+                    0, 2, 0, 0,
+                    0, 0, -1.196, -3254427.538,
+                    0, 0, -1, 0
+                );
+
+                var modelviewProjection = Matrix.fromIdentity();
+                modelviewProjection.setToMultiply(projection, modelView);
+                var viewport = new Rectangle(0, 0, 848, 848);
+                var modelPoint = new Vec3(-11925849.053, 8054028.030, -3946244.954);
+                var result = new Vec3(0, 0, 0);
+                var expectedResult = new Vec3(637.5, 839, 0);
+                modelviewProjection.project(modelPoint[0], modelPoint[1], modelPoint[2], viewport, result);
+                for (var i = 0; i < 3; i++) {
+                    expect(result[i]).toBeCloseTo(expectedResult[i], 3);
+                }
+
+            });
+        });
+
+
         describe("unProject rejects null parameters", function () {
             it("Should throw an exception on missing input parameter", function () {
                 expect(function () {
