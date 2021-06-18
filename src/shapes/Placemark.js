@@ -424,13 +424,7 @@ define([
          * cannot be created or should not be created at the time this method is called.
          */
         Placemark.prototype.makeOrderedRenderable = function (dc) {
-            var w, h, s,
-                offset;
-
-            this.determineActiveAttributes(dc);
-            if (!this.activeAttributes) {
-                return null;
-            }
+            var w, h, s, offset;
 
             // Compute the placemark's model point and corresponding distance to the eye point. If the placemark's
             // position is terrain-dependent but off the terrain, then compute it ABSOLUTE so that we have a point for
@@ -441,6 +435,14 @@ define([
                 this.altitudeMode, this.placePoint);
 
             this.eyeDistance = this.alwaysOnTop ? 0 : dc.eyePoint.distanceTo(this.placePoint);
+
+            // Extension point to override placemark attributes depending on camera distance
+            this.selectLevelOfDetail(dc, this, this.eyeDistance);
+
+            this.determineActiveAttributes(dc);
+            if (!this.activeAttributes) {
+                return null;
+            }
 
             if (this.mustDrawLeaderLine(dc)) {
                 dc.surfacePointForMode(this.position.latitude, this.position.longitude, 0,
@@ -511,6 +513,17 @@ define([
             }
 
             return this;
+        };
+
+        /**
+         * Set the placemark attributes for the current distance to the camera and highlighted state.
+         *
+         * @param {DrawContext} dc The current render context
+         * @param {Placemark} placemark The placemark needing a level of detail selection
+         * @param {Number} cameraDistance The distance from the placemark to the camera (meters)
+         */
+        Placemark.prototype.selectLevelOfDetail = function (dc, placemark, cameraDistance) {
+            // Intentionally empty. Can be override in application if required.
         };
 
         // Internal. Intentionally not documented.
