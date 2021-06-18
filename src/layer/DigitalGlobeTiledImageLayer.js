@@ -29,20 +29,14 @@
  * @exports DigitalGlobeTiledImageLayer
  */
 define([
-        '../geom/Angle',
         '../error/ArgumentError',
         '../util/Color',
-        '../geom/Location',
         '../util/Logger',
-        '../geom/Sector',
         '../layer/MercatorTiledImageLayer'
     ],
-    function (Angle,
-              ArgumentError,
+    function (ArgumentError,
               Color,
-              Location,
               Logger,
-              Sector,
               MercatorTiledImageLayer) {
         "use strict";
 
@@ -73,12 +67,7 @@ define([
                         "The access token is null or undefined."));
             }
 
-            this.imageSize = 256;
-            displayName = displayName || "Digital Globe";
-
-            MercatorTiledImageLayer.call(this,
-                new Sector(-85.05, 85.05, -180, 180), new Location(85.05, 180), 19, "image/jpeg", displayName,
-                this.imageSize, this.imageSize);
+            MercatorTiledImageLayer.call(this, displayName || "Digital Globe", 19, "image/jpeg", displayName, 256, 1);
 
             /**
              * The map ID identifying the dataset displayed by this layer.
@@ -94,7 +83,6 @@ define([
             this.accessToken = accessToken;
             //"pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6IjljZjQwNmEyMTNhOWUyMWM5NWUzYWIwOGNhYTY2ZDViIn0.Ju3tOUUUc0C_gcCSAVpFIA";
 
-            this.displayName = displayName;
             // TODO: Picking is enabled as a temporary measure for screen credit hyperlinks to work (see Layer.render)
             this.pickEnabled = true;
 
@@ -154,21 +142,6 @@ define([
             if (this.inCurrentFrame) {
                 dc.screenCreditController.addCredit("\u00A9 Digital Globe", Color.DARK_GRAY);
             }
-        };
-
-        // Overridden from TiledImageLayer.
-        DigitalGlobeTiledImageLayer.prototype.createTopLevelTiles = function (dc) {
-            this.topLevelTiles = [];
-
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 0, 0));
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 0, 1));
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 1, 0));
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 1, 1));
-        };
-
-        // Determines the Bing map size for a specified level number.
-        DigitalGlobeTiledImageLayer.prototype.mapSizeForLevel = function (levelNumber) {
-            return 256 << (levelNumber + 1);
         };
 
         return DigitalGlobeTiledImageLayer;

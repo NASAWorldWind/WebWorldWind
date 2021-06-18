@@ -49,11 +49,8 @@ define([
          */
         var BMNGLandsatLayer = function () {
             // This LevelSet configuration captures the Landsat resolution of 1.38889E-04 degrees/pixel
-            TiledImageLayer.call(this,
+            TiledImageLayer.call(this, "Blue Marble & Landsat",
                 Sector.FULL_SPHERE, new Location(45, 45), 12, "image/jpeg", "BMNGLandsat256", 256, 256);
-
-            this.displayName = "Blue Marble & Landsat";
-            this.pickEnabled = false;
 
             this.urlBuilder = new WmsUrlBuilder("https://worldwind25.arc.nasa.gov/wms",
                 "BlueMarble-200405,esat", "", "1.3.0");
