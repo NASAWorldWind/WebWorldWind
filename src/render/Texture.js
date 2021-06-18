@@ -80,11 +80,6 @@ define([
             this.size = image.width * image.height * 4;
 
             gl.bindTexture(gl.TEXTURE_2D, textureId);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,
-                isPowerOfTwo ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
-
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapMode);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapMode);
 
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
             gl.texImage2D(gl.TEXTURE_2D, 0,
@@ -105,6 +100,9 @@ define([
 
             // Internal use only. Intentionally not documented.
             this.texParameters = {};
+            this.texParameters[gl.TEXTURE_MIN_FILTER] = isPowerOfTwo ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR;
+            this.texParameters[gl.TEXTURE_WRAP_S] = wrapMode;
+            this.texParameters[gl.TEXTURE_WRAP_T] = wrapMode;
 
             // Internal use only. Intentionally not documented.
             // https://www.khronos.org/registry/webgl/extensions/EXT_texture_filter_anisotrop
@@ -171,9 +169,16 @@ define([
         Texture.prototype.applyTexParameters = function (dc) {
             var gl = dc.currentGlContext;
 
-            // Configure the OpenGL texture magnification function. Use linear by default.
-            var textureMagFilter = this.texParameters[gl.TEXTURE_MAG_FILTER] || gl.LINEAR;
+            // Configure the OpenGL texture minification function. Use nearest in pickingMode or linear by default.
+            var textureMinFilter = dc.pickingMode ? gl.NEAREST : this.texParameters[gl.TEXTURE_MIN_FILTER] || gl.LINEAR;
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, textureMinFilter);
+
+            // Configure the OpenGL texture magnification function. Use nearest in pickingMode or linear by default.
+            var textureMagFilter = dc.pickingMode ? gl.NEAREST : this.texParameters[gl.TEXTURE_MAG_FILTER] || gl.LINEAR;
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, textureMagFilter);
+
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this.texParameters[gl.TEXTURE_WRAP_S] || gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this.texParameters[gl.TEXTURE_WRAP_T] || gl.CLAMP_TO_EDGE);
 
             // Try to enable the anisotropic texture filtering only if we have a linear magnification filter.
             // This can't be enabled all the time because Windows seems to ignore the TEXTURE_MAG_FILTER parameter when

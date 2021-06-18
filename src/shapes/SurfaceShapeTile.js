@@ -223,6 +223,21 @@ define([
                 shape.renderToTexture(dc, ctx2D, xScale, yScale, xOffset, yOffset);
             }
 
+            // Remove semi-transparent pixels, which may contain wrong pick color due to anti-aliasing
+            // TODO Disable anti-aliasing of canvas stroke in renderToTexture instead of this hack, when it will be supported by browsers
+            if (dc.pickingMode) {
+                var imageData = ctx2D.getImageData(0, 0, canvas.width, canvas.height);
+                for (var i = 3, n = canvas.width * canvas.height * 4; i < n; i += 4) {
+                    if (imageData.data[i] < 255) {
+                        imageData.data[i - 3] = 0;
+                        imageData.data[i - 2] = 0;
+                        imageData.data[i - 1] = 0;
+                        imageData.data[i] = 0;
+                    }
+                }
+                ctx2D.putImageData(imageData, 0, 0);
+            }
+
             this.gpuCacheKey = this.getCacheKey();
 
             var gpuResourceCache = dc.gpuResourceCache;
