@@ -75,8 +75,10 @@ define(['../../src/WorldWind',
             this.wwd.surfaceOpacity = 0.7;
 
             // Start the view pointing to a longitude within the current time zone.
-            this.wwd.navigator.lookAtLocation.latitude = 30;
-            this.wwd.navigator.lookAtLocation.longitude = -(180 / 12) * ((new Date()).getTimezoneOffset() / 60);
+            var lookAt = new WorldWind.LookAt();
+            lookAt.position.latitude = 30;
+            lookAt.position.longitude = -(180 / 12) * ((new Date()).getTimezoneOffset() / 60);
+            this.wwd.camera.setFromLookAt(lookAt);
 
             // Establish the shapes and the controllers to handle picking.
             this.setupPicking();

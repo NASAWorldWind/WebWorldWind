@@ -85,11 +85,13 @@ define(['../../src/WorldWind',
             this.wwd.surfaceOpacity = 0.5;
 
             // Start the view pointing to a location near the well data.
-            this.wwd.navigator.lookAtLocation.latitude = 33.0977;
-            this.wwd.navigator.lookAtLocation.longitude = -117.0119;
-            this.wwd.navigator.range = 1400;
-            this.wwd.navigator.heading = 90;
-            this.wwd.navigator.tilt = 60;
+            var lookAt = new WorldWind.LookAt();
+            lookAt.position.latitude = 33.0977;
+            lookAt.position.longitude = -117.0119;
+            lookAt.range = 1400;
+            lookAt.heading = 90;
+            lookAt.tilt = 60;
+            this.wwd.camera.setFromLookAt(lookAt);
 
             // Establish the shapes and the controllers to handle picking.
             this.setupPicking();
