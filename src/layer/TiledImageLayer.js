@@ -87,7 +87,7 @@ define([
          * null or undefined, or if the specified number of levels, tile width or tile height is less than 1.
          *
          */
-        var TiledImageLayer = function (sector, levelZeroDelta, numLevels, imageFormat, cachePath, tileWidth, tileHeight) {
+        var TiledImageLayer = function (sector, levelZeroDelta, numLevels, imageFormat, cachePath, tileWidth, tileHeight, tileOrigin) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledImageLayer", "constructor", "missingSector"));
@@ -135,7 +135,7 @@ define([
              */
             this.retrievalQueueSize = WorldWind.configuration.layerRetrievalQueueSize;
             
-            this.levels = new LevelSet(sector, levelZeroDelta, numLevels, tileWidth, tileHeight);
+            this.levels = new LevelSet(sector, levelZeroDelta, numLevels, tileWidth, tileHeight, tileOrigin);
 
             /**
              * Controls the level of detail switching for this layer. The next highest resolution level is
@@ -353,7 +353,7 @@ define([
         // Documented in superclass.
         TiledImageLayer.prototype.createTopLevelTiles = function (dc) {
             this.topLevelTiles = [];
-            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles);
+            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles, this.levels.tileOrigin);
         };
 
         // Intentionally not documented.

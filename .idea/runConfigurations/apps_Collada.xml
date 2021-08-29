@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="apps/Collada" type="JavascriptDebugType" factoryName="JavaScript Debug" uri="http://localhost:63342/WebWorldWind/apps/Collada.html">
-    <method />
+  <configuration default="false" name="apps/Collada" type="JavascriptDebugType" uri="http://localhost:63342/WebWorldWind/apps/Collada.html" useBuiltInWebServerPort="true">
+    <method v="2" />
   </configuration>
 </component>

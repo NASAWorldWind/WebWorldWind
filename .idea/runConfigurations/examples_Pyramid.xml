@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="examples/Pyramid" type="JavascriptDebugType" uri="http://localhost:63342/WebWorldWind/examples/Pyramid.html" useBuiltInWebServerPort="true">
+    <RunnerSettings RunnerId="JavascriptDebugRunner" />
+    <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
+    <method v="2" />
+  </configuration>
+</component>

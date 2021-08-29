@@ -675,7 +675,7 @@ define(['../geom/Angle',
 
         Tessellator.prototype.createTopLevelTiles = function (dc) {
             this.topLevelTiles[dc.globeStateKey] = [];
-            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles[dc.globeStateKey]);
+            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles[dc.globeStateKey], this.levels.tileOrigin);
         };
 
         Tessellator.prototype.addTileOrDescendants = function (dc, tile) {

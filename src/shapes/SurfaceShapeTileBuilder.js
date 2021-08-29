@@ -497,7 +497,7 @@ define([
         };
 
         SurfaceShapeTileBuilder.prototype.createTopLevelTiles = function () {
-            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles);
+            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles, this.levels.tileOrigin);
         };
 
         /**

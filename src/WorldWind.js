@@ -215,6 +215,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './projections/ProjectionPolarEquidistant',
         './projections/ProjectionUPS',
         './projections/ProjectionWgs84',
+        './layer/PyramidLayer',
+        './layer/PyramidMetaData',
         './geom/Rectangle',
         './render/Renderable',
         './layer/RenderableLayer',
@@ -493,6 +495,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ProjectionPolarEquidistant,
               ProjectionUPS,
               ProjectionWgs84,
+              PyramidLayer,
+              PyramidMetaData,
               Rectangle,
               Renderable,
               RenderableLayer,
@@ -1008,6 +1012,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ProjectionPolarEquidistant'] = ProjectionPolarEquidistant;
         WorldWind['ProjectionUPS'] = ProjectionUPS;
         WorldWind['ProjectionWgs84'] = ProjectionWgs84;
+        WorldWind['PyramidLayer'] = PyramidLayer;
+        WorldWind['PyramidMetaData'] = PyramidMetaData;
         WorldWind['Rectangle'] = Rectangle;
         WorldWind['Renderable'] = Renderable;
         WorldWind['RenderableLayer'] = RenderableLayer;

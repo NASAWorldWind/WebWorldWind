@@ -289,8 +289,11 @@ define(['../util/AbsentResourceList',
             var level = this.levels.lastLevel(),
                 deltaLat = level.tileDelta.latitude,
                 deltaLon = level.tileDelta.longitude,
-                r = Tile.computeRow(deltaLat, latitude),
-                c = Tile.computeColumn(deltaLon, longitude),
+                origin = this.levels.tileOrigin,
+                latOrigin = origin.latitude,
+                lonOrigin = origin.longitude,
+                r = Tile.computeRow(deltaLat, latitude, latOrigin),
+                c = Tile.computeColumn(deltaLon, longitude, lonOrigin),
                 tileKey,
                 image = null;
 
@@ -478,10 +481,13 @@ define(['../util/AbsentResourceList',
 
             var deltaLat = level.tileDelta.latitude,
                 deltaLon = level.tileDelta.longitude,
-                firstRow = Tile.computeRow(deltaLat, this.currentSector.minLatitude),
-                lastRow = Tile.computeLastRow(deltaLat, this.currentSector.maxLatitude),
-                firstCol = Tile.computeColumn(deltaLon, this.currentSector.minLongitude),
-                lastCol = Tile.computeLastColumn(deltaLon, this.currentSector.maxLongitude);
+                origin = this.levels.tileOrigin,
+                latOrigin = origin.latitude,
+                lonOrigin = origin.longitude,
+                firstRow = Tile.computeRow(deltaLat, this.currentSector.minLatitude, latOrigin),
+                lastRow = Tile.computeRow(deltaLat, this.currentSector.maxLatitude, latOrigin),
+                firstCol = Tile.computeColumn(deltaLon, this.currentSector.minLongitude, lonOrigin),
+                lastCol = Tile.computeColumn(deltaLon, this.currentSector.maxLongitude, lonOrigin);
 
             for (var row = firstRow; row <= lastRow; row++) {
                 for (var col = firstCol; col <= lastCol; col++) {

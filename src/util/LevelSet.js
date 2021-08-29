@@ -57,7 +57,7 @@ define([
          * delta values are less than or equal to zero, or any of the number-of-levels, tile-width or tile-height
          * arguments are less than 1.
          */
-        var LevelSet = function (sector, levelZeroDelta, numLevels, tileWidth, tileHeight) {
+        var LevelSet = function (sector, levelZeroDelta, numLevels, tileWidth, tileHeight, tileOrigin) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "LevelSet", "constructor", "missingSector"));
@@ -100,6 +100,13 @@ define([
              * @readonly
              */
             this.levelZeroDelta = levelZeroDelta;
+
+            if (tileOrigin) {
+                this.tileOrigin = tileOrigin;
+            }
+            else {
+                this.tileOrigin = new Location(-90, -180);
+            }
 
             /**
              * The number of levels in this level set.

@@ -220,7 +220,7 @@ define([
 
         // Internal. Intentionally not documented.
         FramebufferTileController.prototype.createTopLevelTiles = function () {
-            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles);
+            Tile.createTilesForLevel(this.levels.firstLevel(), this, this.topLevelTiles, this.levels.tileOrigin);
         };
 
         // Internal. Intentionally not documented.

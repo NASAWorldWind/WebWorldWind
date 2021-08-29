@@ -433,14 +433,19 @@ define([
          * @param {Number} latitude The tile's minimum latitude.
          * @returns {Number} The computed row number.
          */
-        Tile.computeRow = function (delta, latitude) {
-            var row = Math.floor((latitude + 90) / delta);
-
-            // If latitude is at the end of the grid, subtract 1 from the computed row to return the last row.
-            if (latitude == 90) {
-                row -= 1;
+        Tile.computeRow = function (delta, latitude, origin) {
+            // var row = Math.floor((latitude + 90) / delta);
+            //
+            // // If latitude is at the end of the grid, subtract 1 from the computed row to return the last row.
+            // if (latitude == 90) {
+            //     row -= 1;
+            // }
+            //
+            // return row;
+            let row = Math.floor((latitude - origin) / delta);
+            if ((latitude - origin) === 180) {
+                row = row - 1;
             }
-
             return row;
         };
 
@@ -450,14 +455,23 @@ define([
          * @param {Number} longitude The tile's minimum longitude.
          * @returns {Number} The computed column number.
          */
-        Tile.computeColumn = function (delta, longitude) {
-            var col = Math.floor((longitude + 180) / delta);
-
-            // If longitude is at the end of the grid, subtract 1 from the computed column to return the last column.
-            if (longitude == 180) {
-                col -= 1;
+        Tile.computeColumn = function (delta, longitude, origin) {
+            // var col = Math.floor((longitude + 180) / delta);
+            //
+            // // If longitude is at the end of the grid, subtract 1 from the computed column to return the last column.
+            // if (longitude == 180) {
+            //     col -= 1;
+            // }
+            //
+            // return col;
+            let gridLongitude = longitude - origin;
+            if (gridLongitude < 0) {
+                gridLongitude = 360 + gridLongitude;
             }
-
+            let col = Math.floor(gridLongitude / delta);
+            if ((longitude - origin) === 360) {
+                col = col - 1;
+            }
             return col;
         };
 
@@ -467,16 +481,16 @@ define([
          * @param {Number} maxLatitude The tile's maximum latitude in degrees.
          * @returns {Number} The computed row number.
          */
-        Tile.computeLastRow = function (delta, maxLatitude) {
-            var row = Math.ceil((maxLatitude + 90) / delta - 1);
-
-            // If max latitude is in the first row, set the max row to 0.
-            if (maxLatitude + 90 < delta) {
-                row = 0;
-            }
-
-            return row;
-        };
+        // Tile.computeLastRow = function (delta, maxLatitude) {
+        //     var row = Math.ceil((maxLatitude + 90) / delta - 1);
+        //
+        //     // If max latitude is in the first row, set the max row to 0.
+        //     if (maxLatitude + 90 < delta) {
+        //         row = 0;
+        //     }
+        //
+        //     return row;
+        // };
 
         /**
          * Computes the last column number for a tile within a level given the tile's maximum longitude.
@@ -484,16 +498,16 @@ define([
          * @param {Number} maxLongitude The tile's maximum longitude in degrees.
          * @returns {Number} The computed column number.
          */
-        Tile.computeLastColumn = function (delta, maxLongitude) {
-            var col = Math.ceil((maxLongitude + 180) / delta - 1);
-
-            // If max longitude is in the first column, set the max column to 0.
-            if (maxLongitude + 180 < delta) {
-                col = 0;
-            }
-
-            return col;
-        };
+        // Tile.computeLastColumn = function (delta, maxLongitude) {
+        //     var col = Math.ceil((maxLongitude + 180) / delta - 1);
+        //
+        //     // If max longitude is in the first column, set the max column to 0.
+        //     if (maxLongitude + 180 < delta) {
+        //         col = 0;
+        //     }
+        //
+        //     return col;
+        // };
 
         /**
          * Computes a sector spanned by a tile with the specified level number, row and column.
@@ -533,7 +547,7 @@ define([
          * @param {Tile[]} result An array in which to return the results.
          * @throws {ArgumentError} If any argument is null or undefined.
          */
-        Tile.createTilesForLevel = function (level, tileFactory, result) {
+        Tile.createTilesForLevel = function (level, tileFactory, result,origin) {
             if (!level) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Tile", "createTilesForLevel", "missingLevel"));
@@ -554,14 +568,16 @@ define([
                 deltaLon = level.tileDelta.longitude,
 
                 sector = level.sector,
-                firstRow = Tile.computeRow(deltaLat, sector.minLatitude),
-                lastRow = Tile.computeRow(deltaLat, sector.maxLatitude),
+                latOrigin = origin.latitude,
+                lonOrigin = origin.longitude,
+                firstRow = Tile.computeRow(deltaLat, sector.minLatitude, latOrigin),
+                lastRow = Tile.computeRow(deltaLat, sector.maxLatitude, latOrigin),
 
-                firstCol = Tile.computeColumn(deltaLon, sector.minLongitude),
-                lastCol = Tile.computeColumn(deltaLon, sector.maxLongitude),
+                firstCol = Tile.computeColumn(deltaLon, sector.minLongitude, lonOrigin),
+                lastCol = Tile.computeColumn(deltaLon, sector.maxLongitude, lonOrigin),
 
-                firstRowLat = -90 + firstRow * deltaLat,
-                firstRowLon = -180 + firstCol * deltaLon,
+                firstRowLat = latOrigin + firstRow * deltaLat,
+                firstRowLon = lonOrigin + firstCol * deltaLon,
 
                 minLat = firstRowLat,
                 minLon,
