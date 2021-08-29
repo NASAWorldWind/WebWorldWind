@@ -64,7 +64,7 @@ requirejs(['./WorldWindShim',
         };
         pyramidMetaData.load(xmlLoaded);
 
-        wwd.navigator.lookAtLocation = new Location(34.3, -103.8);
+        wwd.navigator.lookAtLocation = new WorldWind.Location(34.3, -103.8);
         wwd.navigator.range = 3000;
 
         // Create a layer manager for controlling layer visibility.
