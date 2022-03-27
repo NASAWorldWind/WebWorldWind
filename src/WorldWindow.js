@@ -218,6 +218,12 @@ define([
             this.verticalExaggeration = 1;
 
             /**
+             * Distance from camera point to horizon.
+             * @type {Number}
+             */
+            this.horizonDistance = 0;
+
+            /**
              * Indicates that picking will return all objects at the pick point, if any. The top-most object will have
              * its isOnTop flag set to true.
              * If deep picking is false, the default, only the top-most object is returned, plus
@@ -707,11 +713,10 @@ define([
             this.camera.computeViewingTransform(modelview);
 
             if (projection) {
-                var globeRadius = WWMath.max(this.globe.equatorialRadius, this.globe.polarRadius),
-                    eyePos = this.camera.position,
+                var eyePos = this.camera.position,
                     fieldOfView = this.camera.fieldOfView,
-                    eyeHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, eyePos.altitude),
-                    atmosphereHorizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, 160000),
+                    eyeHorizon = this.globe.horizonDistance(eyePos.altitude),
+                    atmosphereHorizon = this.globe.horizonDistance(160000),
                     viewport = this.viewport;
 
                 // Set the far clip distance to the smallest value that does not clip the atmosphere.
@@ -805,6 +810,7 @@ define([
             dc.globe = this.globe;
             dc.navigator = this.navigator;
             dc.camera = this.camera;
+            dc.horizonDistance = this.globe.horizonDistance(this.camera.position.altitude);
             dc.layers = this.layers.slice();
             dc.layers.push(dc.screenCreditController);
             this.computeDrawContext();

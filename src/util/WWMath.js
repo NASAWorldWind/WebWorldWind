@@ -601,26 +601,6 @@ define([
             },
 
             /**
-             * Computes the distance to a globe's horizon from a viewer at a given altitude.
-             *
-             * Only the globe's ellipsoid is considered; terrain height is not incorporated. This returns zero if the radius is zero
-             * or if the altitude is less than or equal to zero.
-             *
-             * @param {Number} radius The globe's radius, in meters.
-             * @param {Number} altitude The viewer's altitude above the globe, in meters.
-             * @returns {Number} The distance to the horizon, in model coordinates.
-             * @throws {ArgumentError} If the specified globe radius is negative.
-             */
-            horizonDistanceForGlobeRadius: function (radius, altitude) {
-                if (radius < 0) {
-                    throw new ArgumentError(Logger.logMessage(Logger.LEVEL_SEVERE, "WWMath",
-                        "horizontalDistanceForGlobeRadius", "The specified globe radius is negative."));
-                }
-
-                return (radius > 0 && altitude > 0) ? Math.sqrt(altitude * (2 * radius + altitude)) : 0;
-            },
-
-            /**
              * Computes the near clip distance that corresponds to a specified far clip distance and resolution at the far clip
              * plane.
              *

@@ -278,8 +278,7 @@ define([
                 modelview.extractEyePoint(forwardRay.origin);
                 modelview.extractForwardVector(forwardRay.direction);
 
-                var globeRadius = WWMath.max(globe.equatorialRadius, globe.polarRadius);
-                var horizon = WWMath.horizonDistanceForGlobeRadius(globeRadius, this.position.altitude);
+                var horizon = globe.horizonDistance(this.position.altitude);
                 forwardRay.pointAt(horizon, originPoint);
 
                 globe.computePositionFromPoint(originPoint[0], originPoint[1], originPoint[2], originPos);

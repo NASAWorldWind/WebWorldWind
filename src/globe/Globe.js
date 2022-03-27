@@ -677,5 +677,18 @@ define([
             return this.elevationModel.elevationsForGrid(sector, numLat, numLon, targetResolution, result);
         };
 
+        /**
+         * Computes the distance to a globe's horizon from a viewer at a given altitude.
+         *
+         * Only the globe's ellipsoid is considered; terrain height is not incorporated.
+         * This returns zero if the altitude is less than or equal to zero.
+         *
+         * @param {Number} altitude The viewer's altitude above the globe, in meters.
+         * @returns {Number} The distance to the horizon, in model coordinates.
+         */
+        Globe.prototype.horizonDistance = function (altitude) {
+            return (altitude > 0) ? Math.sqrt(altitude * (2 * this.equatorialRadius + altitude)) : 0;
+        };
+
         return Globe;
     });
