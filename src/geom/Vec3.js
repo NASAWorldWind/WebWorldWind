@@ -258,9 +258,7 @@ define([
             return new Vec3(0, 0, 0);
         };
 
-
-    
-            /**
+        /**
          * Assigns the components of this vector.
          * @param {Number} x The X component of the vector.
          * @param {Number} y The Y component of the vector.
