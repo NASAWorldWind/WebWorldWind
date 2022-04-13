@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                     baseUrl: 'src',
                     name: '../tools/almond',
                     include: ['WorldWind'],
-                    out: 'build/worldwind.min.js',
+                    out: 'build/dist/worldwind.min.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
@@ -60,7 +60,7 @@ module.exports = function (grunt) {
                     name: '../tools/almond',
                     include: ['WorldWind'],
                     optimize: 'none',
-                    out: 'build/worldwind.js',
+                    out: 'build/dist/worldwind.js',
                     wrap: {
                         startFile: 'tools/wrap.start',
                         endFile: 'tools/wrap.end'
