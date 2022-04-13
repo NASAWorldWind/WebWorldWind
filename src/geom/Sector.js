@@ -590,8 +590,8 @@ define([
             }
 
             if (this.centerPoint == null) {
-                const lat = 0.5 * (this.minLatitude + this.maxLatitude);
-                const lon = 0.5 * (this.minLongitude + this.maxLongitude);
+                var lat = 0.5 * (this.minLatitude + this.maxLatitude);
+                var lon = 0.5 * (this.minLongitude + this.maxLongitude);
                 this.centerPoint = globe.computePointFromPosition(lat, lon, exaggeration * globe.elevationAtLocation(lat, lon), Vec3.zero());
             }
 
@@ -613,25 +613,25 @@ define([
                 throw new ArgumentError(
                     Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "computeCornerPoints", "missingGlobe"));
             }
-            const corners = new Array(4);
+            var corners = new Array(4);
 
             if (this.cornerPoints == null) {
-                const minLat = this.minLatitude;
-                const maxLat = this.maxLatitude;
-                const minLon = this.minLongitude;
-                const maxLon = this.maxLongitude;
+                var minLat = this.minLatitude;
+                var maxLat = this.maxLatitude;
+                var minLon = this.minLongitude;
+                var maxLon = this.maxLongitude;
 
                 corners[0] = globe.computePointFromPosition(minLat, minLon, exaggeration * globe.elevationAtLocation(minLat, minLon), Vec3.zero());
                 corners[1] = globe.computePointFromPosition(minLat, maxLon, exaggeration * globe.elevationAtLocation(minLat, maxLon), Vec3.zero());
                 corners[2] = globe.computePointFromPosition(maxLat, maxLon, exaggeration * globe.elevationAtLocation(maxLat, maxLon), Vec3.zero());
                 corners[3] = globe.computePointFromPosition(maxLat, minLon, exaggeration * globe.elevationAtLocation(maxLat, minLon), Vec3.zero());
                 this.cornerPoints = new Array(corners.length);
-                for (let i = 0, len = corners.length; i < len; i++) {
+                for (var i = 0, len = corners.length; i < len; i++) {
                     this.cornerPoints[i] = Vec3.fromVec3(corners[i]);
                 }
             }
             else {
-                for (let i = 0, len = this.cornerPoints.length; i < len; i++) {
+                for (var i = 0, len = this.cornerPoints.length; i < len; i++) {
                     corners[i] = Vec3.fromVec3(this.cornerPoints[i]);
                 }
             }
@@ -665,18 +665,18 @@ define([
                     Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "distanceTo", "missingPoint"));
             }
 
-            const corners = this.computeCornerPoints(dc.globe, dc.verticalExaggeration);
-            const centerPoint = this.computeCenterPoint(dc.globe, dc.verticalExaggeration);
+            var corners = this.computeCornerPoints(dc.globe, dc.verticalExaggeration);
+            var centerPoint = this.computeCenterPoint(dc.globe, dc.verticalExaggeration);
 
             // Get the distance for each of the sector's corners and its center.
-            const d1 = point.distanceTo(corners[0]);
-            const d2 = point.distanceTo(corners[1]);
-            const d3 = point.distanceTo(corners[2]);
-            const d4 = point.distanceTo(corners[3]);
-            const d5 = point.distanceTo(centerPoint);
+            var d1 = point.distanceTo(corners[0]);
+            var d2 = point.distanceTo(corners[1]);
+            var d3 = point.distanceTo(corners[2]);
+            var d4 = point.distanceTo(corners[3]);
+            var d5 = point.distanceTo(centerPoint);
 
             // Find the minimum distance.
-            let minDistance = d1;
+            var minDistance = d1;
             if (minDistance > d2) {
                 minDistance = d2;
             }
