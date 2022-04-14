@@ -247,6 +247,18 @@ define([
         };
 
         /**
+         * Creates a new Vec3 vector from a Vec3 src.
+         * @param {Vec3} src The Vec3 src vector top copy values from.
+         */
+        Vec3.fromVec3 = function(src) {
+            return new Vec3(src[0], src[1], src[2]);
+        };
+
+        Vec3.zero = function() {
+            return new Vec3(0, 0, 0);
+        };
+
+        /**
          * Assigns the components of this vector.
          * @param {Number} x The X component of the vector.
          * @param {Number} y The Y component of the vector.

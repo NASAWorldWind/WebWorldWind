@@ -32,8 +32,9 @@ define([
     'src/globe/ElevationModel',
     'src/geom/BoundingBox',
     'src/geom/Vec3',
+    'src/render/DrawContext',
     'src/globe/Globe'
-], function (Sector, Location, EarthElevationModel, ElevationModel, BoundingBox, Vec3, Globe) {
+], function (Sector, Location, EarthElevationModel, ElevationModel, BoundingBox, Vec3, DrawContext, Globe) {
     "use strict";
 
     describe("Sector Tests", function () {
@@ -523,5 +524,52 @@ define([
             });
         });
 
+        describe("Computes points and distances", function () {
+
+            it("Computes a center point", function () {
+                const sector = new Sector(-90, -45, -180, -135);
+                expect(function () {
+                    sector.computeCenterPoint(null, 1);
+                }).toThrow();
+                var mockGlobe = new Globe(new EarthElevationModel());
+                const center = sector.computeCenterPoint(mockGlobe, 1);
+                const result = new Vec3(-936736.6335818054, -5869977.306109176, -2261482.2851649104);
+                expect(center).toEqual(result);
+            });
+
+            it("Computes corner points", function () {
+                const sector = new Sector(-90, -45, -180, -135);
+                expect(function () {
+                    sector.computeCornerPoints(null, 1);
+                }).toThrow();
+                const corners = [new Vec3(-4.798926572645884e-26, -6356752.314245179, -3.9186209248144716e-10),
+                new Vec3(-2.770883428835813e-10, -6356752.314245179, -2.7708834288358126e-10),
+                new Vec3(-3194419.1450605746, -4487348.408865919, -3194419.145060574),
+                new Vec3(-5.532453209639622e-10, -4487348.408865919, -4517590.878848932)];
+                var mockGlobe = new Globe(new EarthElevationModel());
+                const result = sector.computeCornerPoints(mockGlobe, 1);
+                for (let i = 0, len = result.length; i < len; i++) {
+                    for (let j=0; j<3; j++) {
+                        expect(corners[i][j]).toBeCloseTo(result[i][j],6);
+                    }
+                }
+            });
+
+            it("Computes distance from a point.", function () {
+                var MockGlContext = function () { };
+                var dc = new DrawContext(new MockGlContext());
+                dc.globe = new Globe(new EarthElevationModel());
+                const sector = new Sector(-90, -45, -180, -135);
+                const point = new Vec3(-13332838.783247922, 8170373.735383635, -4852756.455372253);
+                expect(function () {
+                    sector.distanceTo(null, point);
+                }).toThrow();
+                expect(function () {
+                    sector.distanceTo(dc, null);
+                }).toThrow();
+                const distance = sector.distanceTo(dc, point);
+                expect(distance).toBeCloseTo(16302011.080715783, 7);
+            });
+        });
     });
 });

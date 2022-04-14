@@ -75,6 +75,13 @@ define([
              * @type {Number}
              */
             this.maxLongitude = maxLongitude;
+
+            // Cached center point
+            this.centerPoint = null;
+
+            // Cached corner points
+            this.cornerPoints = null;
+
         };
 
         /**
@@ -92,6 +99,14 @@ define([
         Sector.FULL_SPHERE = new Sector(-90, 90, -180, 180);
 
         /**
+         * Resets cached values from calculations.
+         */
+        Sector.prototype.resetCachedValues = function() {
+            this.centerPoint = null;
+            this.cornerPoints = null;
+        };
+
+        /**
          * Sets this sector's latitudes and longitudes to those of a specified sector.
          * @param {Sector} sector The sector to copy.
          * @returns {Sector} This sector, set to the values of the specified sector.
@@ -106,6 +121,8 @@ define([
             this.maxLatitude = sector.maxLatitude;
             this.minLongitude = sector.minLongitude;
             this.maxLongitude = sector.maxLongitude;
+
+            this.resetCachedValues();
 
             return this;
         };
@@ -236,6 +253,8 @@ define([
             this.maxLatitude = maxLatitude;
             this.minLongitude = minLongitude;
             this.maxLongitude = maxLongitude;
+
+            this.resetCachedValues();
 
             return this;
         };
@@ -549,7 +568,129 @@ define([
             if (this.maxLongitude < sector.maxLongitude)
                 this.maxLongitude = sector.maxLongitude;
 
+            this.resetCachedValues();
+
             return this;
+        };
+
+        /**
+         * Computes the Cartesian coordinates of a Sector's center.
+         *
+         * @param globe The globe associated with the sector.
+         * @param exaggeration The vertical exaggeration to apply.
+         *
+         * @return the Cartesian coordinates of the sector's center.
+         *
+         * @throws IllegalArgumentException if <code>globe</code> is null.
+         */
+        Sector.prototype.computeCenterPoint = function(globe, exaggeration) {
+            if (globe == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "computeCornerPoints", "missingGlobe"));
+            }
+
+            if (this.centerPoint == null) {
+                var lat = 0.5 * (this.minLatitude + this.maxLatitude);
+                var lon = 0.5 * (this.minLongitude + this.maxLongitude);
+                this.centerPoint = globe.computePointFromPosition(lat, lon, exaggeration * globe.elevationAtLocation(lat, lon), Vec3.zero());
+            }
+
+            return Vec3.fromVec3(this.centerPoint);
+        };
+
+        /**
+         * Computes the Cartesian coordinates of a Sector's corners.
+         *
+         * @param globe The globe associated with the sector.
+         * @param exaggeration The vertical exaggeration to apply.
+         *
+         * @return an array of four Cartesian points.
+         *
+         * @throws IllegalArgumentException if <code>globe</code> is null.
+         */
+        Sector.prototype.computeCornerPoints = function(globe, exaggeration) {
+            if (!globe) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "computeCornerPoints", "missingGlobe"));
+            }
+            var corners = new Array(4);
+
+            if (this.cornerPoints == null) {
+                var minLat = this.minLatitude;
+                var maxLat = this.maxLatitude;
+                var minLon = this.minLongitude;
+                var maxLon = this.maxLongitude;
+
+                corners[0] = globe.computePointFromPosition(minLat, minLon, exaggeration * globe.elevationAtLocation(minLat, minLon), Vec3.zero());
+                corners[1] = globe.computePointFromPosition(minLat, maxLon, exaggeration * globe.elevationAtLocation(minLat, maxLon), Vec3.zero());
+                corners[2] = globe.computePointFromPosition(maxLat, maxLon, exaggeration * globe.elevationAtLocation(maxLat, maxLon), Vec3.zero());
+                corners[3] = globe.computePointFromPosition(maxLat, minLon, exaggeration * globe.elevationAtLocation(maxLat, minLon), Vec3.zero());
+                this.cornerPoints = new Array(corners.length);
+                for (var i = 0, len = corners.length; i < len; i++) {
+                    this.cornerPoints[i] = Vec3.fromVec3(corners[i]);
+                }
+            }
+            else {
+                for (var i = 0, len = this.cornerPoints.length; i < len; i++) {
+                    corners[i] = Vec3.fromVec3(this.cornerPoints[i]);
+                }
+            }
+            return corners;
+        };
+
+        /**
+         * Returns an approximation of the distance in model coordinates between the
+         * surface geometry defined by this sector and the specified model
+         * coordinate point. The returned value represents the shortest distance
+         * between the specified point and this sector's corner points or its center
+         * point. The draw context defines the globe and the elevations that are
+         * used to compute the corner points and the center point.
+         *
+         * @param dc The draw context defining the surface geometry.
+         * @param point The model coordinate point to compute a distance to.
+         *
+         * @return The distance between this sector's surface geometry and the
+         * specified point, in model coordinates.
+         *
+         * @throws IllegalArgumentException if any argument is null.
+         */
+        Sector.prototype.distanceTo = function(dc, point) {
+            if (!dc) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "distanceTo", "missingDc"));
+            }
+
+            if (!point) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "distanceTo", "missingPoint"));
+            }
+
+            var corners = this.computeCornerPoints(dc.globe, dc.verticalExaggeration);
+            var centerPoint = this.computeCenterPoint(dc.globe, dc.verticalExaggeration);
+
+            // Get the distance for each of the sector's corners and its center.
+            var d1 = point.distanceTo(corners[0]);
+            var d2 = point.distanceTo(corners[1]);
+            var d3 = point.distanceTo(corners[2]);
+            var d4 = point.distanceTo(corners[3]);
+            var d5 = point.distanceTo(centerPoint);
+
+            // Find the minimum distance.
+            var minDistance = d1;
+            if (minDistance > d2) {
+                minDistance = d2;
+            }
+            if (minDistance > d3) {
+                minDistance = d3;
+            }
+            if (minDistance > d4) {
+                minDistance = d4;
+            }
+            if (minDistance > d5) {
+                minDistance = d5;
+            }
+
+            return minDistance;
         };
 
         return Sector;

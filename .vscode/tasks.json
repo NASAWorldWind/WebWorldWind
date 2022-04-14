@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "grunt",
+            "task": "default",
+			"problemMatcher": [],
+            "label": "grunt: default",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}

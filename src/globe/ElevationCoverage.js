@@ -107,7 +107,9 @@ define(['../error/ArgumentError',
         });
 
         /**
-         * Returns the minimum and maximum elevations within a specified sector.
+         * Returns the minimum and maximum elevations for the elevation tile(s) enclosing a specified sector. Note that the elevations 
+         * returned may not accurately portray the elevation extremes solely within the specified sector. 
+         * 
          * @param {Sector} sector The sector for which to determine extreme elevations.
          * @param {Number[]} result An array in which to return the requested minimum and maximum elevations.
          * @returns {Boolean} true if the coverage completely fills the sector with data, false otherwise.
