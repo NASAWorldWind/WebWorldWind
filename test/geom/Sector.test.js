@@ -549,7 +549,9 @@ define([
                 var mockGlobe = new Globe(new EarthElevationModel());
                 const result = sector.computeCornerPoints(mockGlobe, 1);
                 for (let i = 0, len = result.length; i < len; i++) {
-                    expect(corners[i]).toEqual(result[i]);
+                    for (let j=0; j<3; j++) {
+                        expect(corners[i][j]).toBeCloseTo(result[i][j],6);
+                    }
                 }
             });
 
