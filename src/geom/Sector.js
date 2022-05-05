@@ -29,19 +29,19 @@
  * @exports Sector
  */
 define([
-        '../geom/Angle',
-        '../error/ArgumentError',
-        '../geom/Location',
-        '../util/Logger',
-        '../geom/Vec3',
-        '../util/WWMath'
-    ],
+    '../geom/Angle',
+    '../error/ArgumentError',
+    '../geom/Location',
+    '../util/Logger',
+    '../geom/Vec3',
+    '../util/WWMath'
+],
     function (Angle,
-              ArgumentError,
-              Location,
-              Logger,
-              Vec3,
-              WWMath) {
+        ArgumentError,
+        Location,
+        Logger,
+        Vec3,
+        WWMath) {
         "use strict";
 
         /**
@@ -75,13 +75,6 @@ define([
              * @type {Number}
              */
             this.maxLongitude = maxLongitude;
-
-            // Cached center point
-            this.centerPoint = null;
-
-            // Cached corner points
-            this.cornerPoints = null;
-
         };
 
         /**
@@ -99,14 +92,6 @@ define([
         Sector.FULL_SPHERE = new Sector(-90, 90, -180, 180);
 
         /**
-         * Resets cached values from calculations.
-         */
-        Sector.prototype.resetCachedValues = function() {
-            this.centerPoint = null;
-            this.cornerPoints = null;
-        };
-
-        /**
          * Sets this sector's latitudes and longitudes to those of a specified sector.
          * @param {Sector} sector The sector to copy.
          * @returns {Sector} This sector, set to the values of the specified sector.
@@ -121,8 +106,6 @@ define([
             this.maxLatitude = sector.maxLatitude;
             this.minLongitude = sector.minLongitude;
             this.maxLongitude = sector.maxLongitude;
-
-            this.resetCachedValues();
 
             return this;
         };
@@ -253,8 +236,6 @@ define([
             this.maxLatitude = maxLatitude;
             this.minLongitude = minLongitude;
             this.maxLongitude = maxLongitude;
-
-            this.resetCachedValues();
 
             return this;
         };
@@ -568,8 +549,6 @@ define([
             if (this.maxLongitude < sector.maxLongitude)
                 this.maxLongitude = sector.maxLongitude;
 
-            this.resetCachedValues();
-
             return this;
         };
 
@@ -583,19 +562,15 @@ define([
          *
          * @throws IllegalArgumentException if <code>globe</code> is null.
          */
-        Sector.prototype.computeCenterPoint = function(globe, exaggeration) {
+        Sector.prototype.computeCenterPoint = function (globe, exaggeration) {
             if (globe == null) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "computeCornerPoints", "missingGlobe"));
             }
 
-            if (this.centerPoint == null) {
-                var lat = 0.5 * (this.minLatitude + this.maxLatitude);
-                var lon = 0.5 * (this.minLongitude + this.maxLongitude);
-                this.centerPoint = globe.computePointFromPosition(lat, lon, exaggeration * globe.elevationAtLocation(lat, lon), Vec3.zero());
-            }
-
-            return Vec3.fromVec3(this.centerPoint);
+            var lat = 0.5 * (this.minLatitude + this.maxLatitude);
+            var lon = 0.5 * (this.minLongitude + this.maxLongitude);
+            return globe.computePointFromPosition(lat, lon, exaggeration * globe.elevationAtLocation(lat, lon), Vec3.zero());
         };
 
         /**
@@ -608,33 +583,27 @@ define([
          *
          * @throws IllegalArgumentException if <code>globe</code> is null.
          */
-        Sector.prototype.computeCornerPoints = function(globe, exaggeration) {
+        Sector.prototype.computeCornerPoints = function (globe, exaggeration) {
             if (!globe) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "computeCornerPoints", "missingGlobe"));
             }
             var corners = new Array(4);
 
-            if (this.cornerPoints == null) {
-                var minLat = this.minLatitude;
-                var maxLat = this.maxLatitude;
-                var minLon = this.minLongitude;
-                var maxLon = this.maxLongitude;
+            var minLat = this.minLatitude;
+            var maxLat = this.maxLatitude;
+            var minLon = this.minLongitude;
+            var maxLon = this.maxLongitude;
 
-                corners[0] = globe.computePointFromPosition(minLat, minLon, exaggeration * globe.elevationAtLocation(minLat, minLon), Vec3.zero());
-                corners[1] = globe.computePointFromPosition(minLat, maxLon, exaggeration * globe.elevationAtLocation(minLat, maxLon), Vec3.zero());
-                corners[2] = globe.computePointFromPosition(maxLat, maxLon, exaggeration * globe.elevationAtLocation(maxLat, maxLon), Vec3.zero());
-                corners[3] = globe.computePointFromPosition(maxLat, minLon, exaggeration * globe.elevationAtLocation(maxLat, minLon), Vec3.zero());
-                this.cornerPoints = new Array(corners.length);
-                for (var i = 0, len = corners.length; i < len; i++) {
-                    this.cornerPoints[i] = Vec3.fromVec3(corners[i]);
-                }
+            corners[0] = globe.computePointFromPosition(minLat, minLon, exaggeration * globe.elevationAtLocation(minLat, minLon), Vec3.zero());
+            corners[1] = globe.computePointFromPosition(minLat, maxLon, exaggeration * globe.elevationAtLocation(minLat, maxLon), Vec3.zero());
+            corners[2] = globe.computePointFromPosition(maxLat, maxLon, exaggeration * globe.elevationAtLocation(maxLat, maxLon), Vec3.zero());
+            corners[3] = globe.computePointFromPosition(maxLat, minLon, exaggeration * globe.elevationAtLocation(maxLat, minLon), Vec3.zero());
+            this.cornerPoints = new Array(corners.length);
+            for (var i = 0, len = corners.length; i < len; i++) {
+                this.cornerPoints[i] = Vec3.fromVec3(corners[i]);
             }
-            else {
-                for (var i = 0, len = this.cornerPoints.length; i < len; i++) {
-                    corners[i] = Vec3.fromVec3(this.cornerPoints[i]);
-                }
-            }
+
             return corners;
         };
 
@@ -654,7 +623,7 @@ define([
          *
          * @throws IllegalArgumentException if any argument is null.
          */
-        Sector.prototype.distanceTo = function(dc, point) {
+        Sector.prototype.distanceTo = function (dc, point) {
             if (!dc) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "distanceTo", "missingDc"));

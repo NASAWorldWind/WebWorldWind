@@ -9,6 +9,9 @@
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:5500/examples/Annotations.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -16,6 +19,9 @@
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:5500/examples/BasicExample.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}"
         },
         {
@@ -23,90 +29,139 @@
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:5500/examples/BlueMarbleTimeSeries.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "name": "Collada Example",
             "request": "launch",
             "type": "pwa-chrome",
             "url": "http://localhost:5500/examples/Collada.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Configuration Example",
             "url": "http://localhost:5500/examples/Configuration.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Custom Placemark Example",
             "url": "http://localhost:5500/examples/CustomPlacemark.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Deep Picking Example",
             "url": "http://localhost:5500/examples/DeepPicking.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Geographic Meshes Example",
             "url": "http://localhost:5500/examples/GeographicMeshes.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Geographic Text Example",
             "url": "http://localhost:5500/examples/GeographicText.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "GeoJSON Example",
             "url": "http://localhost:5500/examples/GeoJSON.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "GeoJSON Exporter Example",
             "url": "http://localhost:5500/examples/GeoJSONExporter.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "GeoTIFF Example",
             "url": "http://localhost:5500/examples/GeoTiff.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
-        {
-            "type": "pwa-chrome",
-            "request": "launch",
-            "name": "GLTF Example",
-            "url": "http://localhost:5500/examples/GLTF.html",
-            "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Go to Location Example",
             "url": "http://localhost:5500/examples/GoToLocation.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "HeatMap Example",
             "url": "http://localhost:5500/examples/HeatMap.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "KML Example",
             "url": "http://localhost:5500/examples/KML.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
+        },
         {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Measurements Example",
             "url": "http://localhost:5500/examples/Measurements.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -114,6 +169,9 @@
             "request": "launch",
             "name": "MultiWindow Example",
             "url": "http://localhost:5500/examples/MultiWindow.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -121,6 +179,9 @@
             "request": "launch",
             "name": "Night Sky Animation Example",
             "url": "http://localhost:5500/examples/NightSkyAnimation.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -128,6 +189,9 @@
             "request": "launch",
             "name": "Parse URL Arguments Example",
             "url": "http://localhost:5500/examples/ParseUrlArguments.html?pos=38.8831,-77.0163,500",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -135,6 +199,9 @@
             "request": "launch",
             "name": "Paths Example",
             "url": "http://localhost:5500/examples/Paths.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -142,6 +209,9 @@
             "request": "launch",
             "name": "Pick All Shapes in Region Example",
             "url": "http://localhost:5500/examples/PickAllShapesInRegion.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -149,6 +219,9 @@
             "request": "launch",
             "name": "Placemarks And Picking Example",
             "url": "http://localhost:5500/examples/PlacemarksAndPicking.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -156,6 +229,9 @@
             "request": "launch",
             "name": "Polygons Example",
             "url": "http://localhost:5500/examples/Polygons.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -163,6 +239,9 @@
             "request": "launch",
             "name": "Pyramid Example",
             "url": "http://localhost:5500/examples/Pyramid.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -170,6 +249,9 @@
             "request": "launch",
             "name": "Refresh Imagery Example",
             "url": "http://localhost:5500/examples/RefreshImagery.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -177,6 +259,9 @@
             "request": "launch",
             "name": "Screen Image Example",
             "url": "http://localhost:5500/examples/ScreenImage.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -184,6 +269,9 @@
             "request": "launch",
             "name": "Screen Text Example",
             "url": "http://localhost:5500/examples/ScreenText.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -191,6 +279,9 @@
             "request": "launch",
             "name": "Shapefiles Example",
             "url": "http://localhost:5500/examples/Shapefiles.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -198,6 +289,9 @@
             "request": "launch",
             "name": "Surface Image Example",
             "url": "http://localhost:5500/examples/SurfaceImage.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -205,6 +299,9 @@
             "request": "launch",
             "name": "Surface Shapes Example",
             "url": "http://localhost:5500/examples/SurfaceShapes.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -212,6 +309,9 @@
             "request": "launch",
             "name": "Test Moving Surface Shapes Example",
             "url": "http://localhost:5500/examples/TestMovingSurfaceShapes.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -219,6 +319,9 @@
             "request": "launch",
             "name": "Triangle Meshes Example",
             "url": "http://localhost:5500/examples/TriangleMeshes.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -226,6 +329,9 @@
             "request": "launch",
             "name": "WKT Example",
             "url": "http://localhost:5500/examples/WKT.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -233,6 +339,9 @@
             "request": "launch",
             "name": "WKT Exporter Example",
             "url": "http://localhost:5500/examples/WKTExporter.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -240,6 +349,9 @@
             "request": "launch",
             "name": "WMS Example",
             "url": "http://localhost:5500/examples/WMS.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -247,6 +359,9 @@
             "request": "launch",
             "name": "WMTS Example",
             "url": "http://localhost:5500/examples/WMTS.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         },
         {
@@ -254,6 +369,9 @@
             "request": "launch",
             "name": "Collada App",
             "url": "http://localhost:5500/build/app/Collada.html",
+            "runtimeArgs": [
+                "--window-size=1200,768"
+            ],
             "webRoot": "${workspaceFolder}",
         }
     ]
