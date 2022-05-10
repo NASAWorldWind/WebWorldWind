@@ -105,9 +105,9 @@ define([
      */
     WktObject.prototype.addCoordinates = function (coordinates) {
         if (this._is3d) {
-            this.coordinates.push(new Position(coordinates[1], coordinates[0], coordinates[2] || 0));
+            this.coordinates.push(new Position(coordinates[0], coordinates[1], coordinates[2] || 0));
         } else {
-            this.coordinates.push(new Location(coordinates[1], coordinates[0]));
+            this.coordinates.push(new Location(coordinates[0], coordinates[1]));
         }
     };
 
