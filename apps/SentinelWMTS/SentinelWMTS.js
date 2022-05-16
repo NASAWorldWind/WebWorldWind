@@ -45,11 +45,14 @@ define(['../../src/WorldWind',
             var wmtsCapabilities;
 
             /*
-            * This example is functional if a valid API key is provided.
+            * This example should be functional if a valid API key is provided.
             * Your own key to access Copernicus Sentinel data hosted on www.sentinel-hub.com must be
             * obtained by creating an account at https://www.sentinel-hub.com/create_account/
             * Trial keys as well as ESA-sponsored keys are available at https://www.sentinel-hub.com/Network-of-Resources/
             */
+
+            // TO DO: Verify proper functioning with up to date API key
+
             var wmtsServer = 'https://services.sentinel-hub.com/v1/wmts/';
             var apiKey = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'; // Substitute with Sentinel Hub API key
 
