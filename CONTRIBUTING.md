@@ -18,7 +18,7 @@
 **Please do not file an issue to ask a question.** You will get faster results by using the following resources:
 
 - Check out the [WorldWind Forum](https://forum.worldwindcentral.com/)
-- Email the [Administrative Contact](arc-worldwind@mail.nasa.gov)
+- Email the [Administrative Contact](mailto:arc-worldwind@mail.nasa.gov)
 
 ## Design and Coding Guidelines
 
@@ -159,5 +159,5 @@ For Web WorldWind tutorials and examples, please check out our website: https://
 
 For community support and FAQs, check out the WorldWind Forum: https://forum.worldwindcentral.com/.
 
-To reach our Administrative Contact, please email: [patrick.hogan@nasa.gov](arc-worldwind@mail.nasa.gov).
+To reach our Administrative Contact, please email: [arc-worldwind@mail.nasa.gov](mailto:arc-worldwind@mail.nasa.gov).
 
