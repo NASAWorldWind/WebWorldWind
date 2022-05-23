@@ -4,29 +4,44 @@
 
 ## New versions of WorldWind released
  
-Web WorldWind 0.10.0 and WorldWind Java 2.2.0 are now available on GitHub. The new version of Web WorldWind addresses potential vulnerabilities in the code and underlying packages. The new version of WorldWind Java focuses on upgrading to Java 11 and JOGL 2.4 as well as a switch to Apache 2.0 license. WorldWind's API remains largely unchanged in this release and we are committed to maintaining a consistent API in future releases.
-More information on the release can be found at these links: [Web WorldWind 0.10.0](https://github.com/NASAWorldWind/WebWorldWind/releases) and [WorldWind Java 2.2.0](https://github.com/NASAWorldWind/WorldWindJava/releases).
+Web WorldWind 0.11.0 is now available on GitHub. The summary of changes is as follows:
+- Improvements to COLLADA 3D model support.
+  - Added ability to obtain locations of a click in a 3D model
+  - Added visualization support to COLLADA models with wrongly formatted normals.
+- Transparent placemark picking has been fixed.
+- Improvements to Well-Known Text format support.
+- Various fixes to example code files.
+ 
+Development environment changes:
+- Added Chrome and Firefox headless browsers and removed PhantomJS
+- Switched IDEs from WebStorm to Visual Studio Code
+- Updated development dependencies to latest versions
+
+WorldWind's API remains largely unchanged in this release and we are committed to maintaining a consistent API in future releases.
+
+More information on the release can be found at these links: [Web WorldWind 0.11.0](https://github.com/NASAWorldWind/WebWorldWind/releases).
 Please direct questions to our new email address: 
 
 arc-worldwind@mail.nasa.gov
 
 [![Build Status](https://travis-ci.com/NASAWorldWind/WebWorldWind.svg?branch=develop)](https://travis-ci.com/NASAWorldWind/WebWorldWind)
 
-3D virtual globe API in JavaScript for the web, developed by NASA. The European Space Agency has provided valuable
-contributions to this platform since 2015. Web WorldWind provides a geographic context, complete with terrain, and a
+3D planetary globe engine in JavaScript for the web, developed by NASA. The European Space Agency has provided valuable
+contributions to this platform since 2015. Web WorldWind provides a geographic context complete with terrain, and a
 collection for shapes for displaying and interacting with geographic or geo-located information in 3D and 2D in any
 modern web browser. High-resolution terrain and imagery is retrieved from remote servers automatically as needed, while
-enabling developers to include their own custom terrain and imagery.
+enabling developers to include their own custom terrain, imagery, 3D shapes, and position markings.
 
 [worldwind.arc.nasa.gov](https://worldwind.arc.nasa.gov) has setup instructions, developers guides, API documentation and more.
 
 ## Get Started
 
 The Web WorldWind [Developer's Guide](https://worldwind.arc.nasa.gov/web) has a complete description of Web WorldWind's
-functionality. You'll also find there links to many Web WorldWind resources, including a user guide. For novices on WorldWind, 
-A [Get Started](https://worldwind.arc.nasa.gov/web/get-started/) tutorial is the place to go. The latest Web WorldWind release 
-provides many simple [examples](https://github.com/NASAWorldWind/WebWorldWind/tree/develop/examples) showing how to use all of
- Web WorldWind's functionality.
+functionality. You'll also find there links to many Web WorldWind resources, including a user guide and documentation for every module file. 
+For complete beginners on WorldWind, the [Get Started](https://worldwind.arc.nasa.gov/web/get-started/) tutorial is the place to go.
+The latest Web WorldWind release provides many simple [examples](https://github.com/NASAWorldWind/WebWorldWind/tree/develop/examples) showing
+how to use most of Web WorldWind's functionality, as well as more involved small [applications](https://github.com/NASAWorldWind/WebWorldWind/tree/develop/apps)
+for reference on how to use Web WorldWind in domain-focused GIS development. 
 
 ## Building
 
@@ -44,7 +59,7 @@ provides many simple [examples](https://github.com/NASAWorldWind/WebWorldWind/tr
 
 ## License
 
-Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+Copyright 2003-2006, 2009, 2017, 2020, 2022 United States Government, as represented
 by the Administrator of the National Aeronautics and Space Administration.
 All rights reserved.
 

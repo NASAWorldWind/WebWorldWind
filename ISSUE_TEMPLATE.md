@@ -25,7 +25,7 @@ Please fulfill the following requirements before submitting an issue to this rep
 
 **Reproduces how often:** [What percentage of the time does it reproduce?]
 
-### Operating System and Version
+### Browser, Operating System and their versions
 
 [What operating system and version are you using?]
 
