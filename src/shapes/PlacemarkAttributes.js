@@ -61,9 +61,9 @@ define([
             this._imageScale = attributes ? attributes._imageScale : 1;
             this._imageSource = attributes ? attributes._imageSource : null;
             this._depthTest = attributes ? attributes._depthTest : true;
-            this._labelAttributes = attributes ? attributes._labelAttributes : new TextAttributes(null);
+            this._labelAttributes = attributes ? new TextAttributes(attributes._labelAttributes) : new TextAttributes(null);
             this._drawLeaderLine = attributes ? attributes._drawLeaderLine : false;
-            this._leaderLineAttributes = attributes ? attributes._leaderLineAttributes : new ShapeAttributes(null);
+            this._leaderLineAttributes = attributes ? new ShapeAttributes(attributes._leaderLineAttributes) : new ShapeAttributes(null);
 
             /**
              * Indicates whether this object's state key is invalid. Subclasses must set this value to true when their

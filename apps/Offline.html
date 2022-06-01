@@ -4,7 +4,7 @@ Invokes Web WorldWind without using the Internet. Refers to data stored only on 
 
 To deploy:
 
-- Download https://files.worldwind.arc.nasa.gov/artifactory/web/WebWorldWind-StandaloneData.tar.gz and unzip it
+- Download https://files.worldwind.arc.nasa.gov/artifactory/standalone-data/WebWorldWind-StandaloneData.tar.gz and unzip it
   so that the "standalonedata" directory is a peer of the 'apps' folder. It contains the Blue Marble imagery,
   the Landsat imagery and the DTED0 elevations in its Earth directory.
 
@@ -49,19 +49,19 @@ included for the oceans, so they are all flat.
         // Tell WorldWind to log only warnings and errors.
         WorldWind.Logger.setLoggingLevel(WorldWind.Logger.LEVEL_WARNING);
 
-        // Create a WorldWindow for the canvas.
-        var wwd = new WorldWind.WorldWindow("canvasOne");
+        // Use a local elevation coverage rather than the defaults.
+        var elevationCoverage = new WorldWind.EarthRestElevationCoverage("../standalonedata/Earth/DTED0");
+        var elevationModel = new WorldWind.ElevationModel();
+        elevationModel.addCoverage(elevationCoverage);
 
-        // Use a REST elevation coverage rather than the defaults.
-        var dted0 = new WorldWind.EarthRestElevationCoverage(null, "../standalonedata/Earth/DTED0");
-        wwd.globe.elevationModel.removeAllCoverages();
-        wwd.globe.elevationModel.addCoverage(dted0);
+        // Create a WorldWindow for the canvas using the local elevations data.        
+        var wwd = new WorldWind.WorldWindow("canvasOne", elevationModel);
 
-        // Add the REST Blue Marble layer that retrieves imagery from local standalone data.
+        // Add the local Blue Marble layer that retrieves imagery from local standalone data.
         var blueMarble = new WorldWind.BMNGRestLayer(null, "../standalonedata/Earth/BlueMarble256/");
         wwd.addLayer(blueMarble);
 
-        // Add the REST Landsat layer (this offline data covers only a sector of the globe in North America)
+        // Add the local Landsat layer (this offline data covers only a sector of the globe in North America)
         var landSat = new WorldWind.LandsatRestLayer(null, "../standalonedata/Earth/Landsat");
         wwd.addLayer(landSat);
 

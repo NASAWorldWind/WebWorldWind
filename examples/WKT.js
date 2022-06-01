@@ -93,7 +93,7 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(customCallbackLayer);
 
         // Allow for parsing of Well-Known Text from the app's text box (entered by the user).
-        var wktLayer = new WorldWind.RenderableLayer('WKT Custom');
+        var wktLayer = new WorldWind.RenderableLayer('Custom WKT');
         $('#showWkt').click(function () {
             new WorldWind.Wkt($('#wkt').val()).load(null, null, wktLayer);
         });

@@ -45,13 +45,18 @@ define(['../../src/WorldWind',
             var wmtsCapabilities;
 
             /*
-            * The key to access Copernicus Sentinel data hosted on www.sentinel-hub.com is provided free-of-charge by
-            * Sinergise for demonstration purposes only. You must obtain your own key at www.sentinel-hub.com before
-            * using this layer in your application.
+            * This example should be functional if a valid API key is provided.
+            * Your own key to access Copernicus Sentinel data hosted on www.sentinel-hub.com must be
+            * obtained by creating an account at https://www.sentinel-hub.com/create_account/
+            * Trial keys as well as ESA-sponsored keys are available at https://www.sentinel-hub.com/Network-of-Resources/
             */
-            var wmtsServer = 'https://services.sentinel-hub.com/v1/wmts/56748ba2-4a88-4854-beea-86f9afc63e35';
 
-            $.get(wmtsServer + '?REQUEST=GetCapabilities&SERVICE=WMTS', function (response) {
+            // TO DO: Verify proper functioning with up to date API key
+
+            var wmtsServer = 'https://services.sentinel-hub.com/v1/wmts/';
+            var apiKey = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'; // Substitute with Sentinel Hub API key
+
+            $.get(wmtsServer + apiKey + '?REQUEST=GetCapabilities&SERVICE=WMTS', function (response) {
                 wmtsCapabilities = new WorldWind.WmtsCapabilities(response);
                 // console.log(wmtsCapabilities);
             }).done(function () {
