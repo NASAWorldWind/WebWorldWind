@@ -200,7 +200,7 @@ define([
                 return;
             }
 
-            this.getEndianness();
+            this.initEndiannessFromFile();
 
             if (!this.isTiffFileType()) {
                 throw new AbstractError(
@@ -216,7 +216,7 @@ define([
         };
 
         // Get byte order of the geotiff file. Internal use only.
-        GeoTiffReader.prototype.getEndianness = function () {
+        GeoTiffReader.prototype.initEndiannessFromFile = function () {
             var byteOrderValue = GeoTiffUtil.getBytes(this.geoTiffData, 0, 2, this.isLittleEndian);
             if (byteOrderValue === 0x4949) {
                 this._isLittleEndian = true;
@@ -226,7 +226,7 @@ define([
             }
             else {
                 throw new AbstractError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "getEndianness", "invalidByteOrderValue"));
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "GeoTiffReader", "initEndiannessFromFile", "invalidByteOrderValue"));
             }
         };
 
