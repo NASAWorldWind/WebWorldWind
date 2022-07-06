@@ -1,6 +1,6 @@
 {
   "name": "@nasaworldwind/worldwind",
-  "version": "0.9.0",
+  "version": "0.11.0",
   "description": "Web WorldWind",
   "main": "build/dist/worldwind.min.js",
   "homepage": "https://worldwind.arc.nasa.gov",
@@ -10,8 +10,7 @@
   "license": "Apache-2.0",
   "author": "NASA",
   "contributors": [
-    "NASA Project Manager <patrick.hogan@nasa.gov>",
-    "ESA Consortium Contact <yann.voumard@solenix.ch>"
+    "NASA Project Manager <confesor.santiago@nasa.gov>"
   ],
   "repository": {
     "type": "git",
@@ -21,6 +20,7 @@
     "build": "grunt",
     "clean": "grunt clean",
     "doc": "grunt jsdoc",
+    "prepare": "npm run build",
     "test": "grunt karma",
     "test:watch": "karma start karma.conf.js"
   },
@@ -30,34 +30,39 @@
     "build/dist/worldwind.min.js"
   ],
   "devDependencies": {
-    "grunt": "^1.0.1",
-    "grunt-contrib-clean": "^1.1.0",
-    "grunt-contrib-compress": "^1.4.3",
+    "grunt": "^1.3.0",
+    "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-requirejs": "^1.0.0",
-    "grunt-jsdoc": "^2.2.0",
-    "grunt-karma": "^2.0.0",
-    "jasmine-core": "^2.8.0",
-    "karma": "^1.7.1",
-    "karma-chrome-launcher": "^2.0.0",
-    "karma-htmlfile-reporter": "^0.3.4",
-    "karma-jasmine": "^1.1.0",
-    "karma-junit-reporter": "^1.2.0",
-    "karma-phantomjs-launcher": "^1.0.2",
+    "grunt-jsdoc": "^2.4.1",
+    "grunt-karma": "^4.0.0",
+    "grunt-zip": "^0.14.0",
+    "jasmine-core": "^3.6.0",
+    "karma": "^6.3.2",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-firefox-launcher": "^2.1.0",
+    "karma-htmlfile-reporter": "^0.3.8",
+    "karma-jasmine": "^4.0.1",
+    "karma-junit-reporter": "^2.0.1",
     "karma-requirejs": "^1.1.0",
-    "recursive-readdir": "^2.2.1"
+    "recursive-readdir": "^2.2.2"
   },
   "keywords": [
     "sdk",
     "worldwind",
     "3d",
     "globe",
+    "cartography",
+    "maps",
     "earth",
     "terrain",
+    "elevations",
+    "satellite",
     "imagery",
     "nasa",
     "esa",
     "geospatial",
+    "gis",
     "html5",
     "javascript",
     "webgl",

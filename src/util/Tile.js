@@ -1,18 +1,29 @@
 /*
- * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
- * National Aeronautics and Space Administration. All rights reserved.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Tile
@@ -139,12 +150,6 @@ define([
             this.opacity = 1;
 
             // Internal use only. Intentionally not documented.
-            this.samplePoints = null;
-
-            // Internal use only. Intentionally not documented.
-            this.sampleElevations = null;
-
-            // Internal use only. Intentionally not documented.
             this.updateTimestamp = null;
 
             // Internal use only. Intentionally not documented.
@@ -185,33 +190,6 @@ define([
                 + 8 // min and max height
                 + (4 + 32) // nearest point
                 + 8; // extent timestamp and vertical exaggeration
-        };
-
-        /**
-         * Computes an approximate distance from this tile to a specified vector.
-         * @param {Vec3} vector The vector to compute the distance to.
-         * @returns {number} The distance between this tile and the vector.
-         * @throws {ArgumentError} If the specified vector is null or undefined.
-         */
-        Tile.prototype.distanceTo = function (vector) {
-            if (!vector) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "Tile", "distanceTo", "missingVector"));
-            }
-
-            var px = vector[0], py = vector[1], pz = vector[2],
-                dx, dy, dz,
-                points = this.samplePoints,
-                distance = Number.POSITIVE_INFINITY;
-
-            for (var i = 0, len = points.length; i < len; i += 3) {
-                dx = px - points[i];
-                dy = py - points[i + 1];
-                dz = pz - points[i + 2];
-                distance = Math.min(distance, dx * dx + dy * dy + dz * dz); // minimum squared distance
-            }
-
-            return Math.sqrt(distance);
         };
 
         /**
@@ -323,7 +301,7 @@ define([
             // window-size dependent and results in selecting an excessive number of tiles when the window is large.
 
             var cellSize = dc.globe.equatorialRadius * this.texelSize,
-                distance = this.distanceTo(dc.eyePoint),
+                distance = this.sector.distanceTo(dc, dc.eyePoint),
                 pixelSize = dc.pixelSizeAtDistance(distance);
 
             return cellSize > Math.max(detailFactor * pixelSize, 0.5);
@@ -385,15 +363,6 @@ define([
                 this.extent = new BoundingBox();
             }
             this.extent.setToSector(this.sector, globe, minHeight, maxHeight);
-
-            // Compute the cartesian points for a 3x3 geographic grid. This grid captures sufficiently close sample
-            // points in order to estimate the distance from the viewer to this tile.
-            if (!this.samplePoints) {
-                this.sampleElevations = new Float64Array(9);
-                this.samplePoints = new Float64Array(3 * this.sampleElevations.length);
-            }
-            WWUtil.fillArray(this.sampleElevations, 0.5 * (minHeight + maxHeight));
-            globe.computePointsForGrid(this.sector, 3, 3, this.sampleElevations, Vec3.ZERO, this.samplePoints);
 
             // Compute the reference point used as a local coordinate origin for the tile.
             if (!this.referencePoint) {

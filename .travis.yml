@@ -4,58 +4,58 @@
 # Set up to run the JavaScript build script per the Travis CI documentation
 language: node_js
 
-# Configure the build to use the latest Node.js 6.x release
+# Configure the build to use the latest Node.js 10.x release
 node_js:
-  - "6"
+  - "10"
 
 # Build the project. Travis CI automatically runs npm install before the build
 script:
   - npm run build
 
-# Deploy build artifacts. Travis does not invoke this step for pull request builds
-deploy:
-  # Publish develop branch distributions to the Artifactory apps repository
-  #- provider: script
-  #  script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/apps/web
-  #  skip_cleanup: true
-  #  on:
-  #    branch: develop
-  # Publish API documentation to GitHub Pages
-  #- provider: pages
-  #  github_token: $GITHUB_API_KEY
-  #  local_dir: build/dist/api-doc
-  #  skip_cleanup: true
-  #  on:
-  #    branch: develop
-  # Publish release artifacts to the npm repository
-  - provider: npm
-    email: $NPM_EMAIL
-    api_key: $NPM_API_KEY
-    skip_cleanup: true
-    on:
-      tags: true
-  # Publish release distributions to the Artifactory repository
-  - provider: script
-    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/${TRAVIS_TAG:1}
-    skip_cleanup: true
-    on:
-      tags: true
-  # Create CHANGELOG.md in the current directory
-  - provider: script
-    script: ./travis/changelog.sh >> CHANGELOG.md
-    skip_cleanup: true
-    on:
-      tags: true
-  # Create a GitHub release and publish CHANGELOG.md and WebWorldWind.zip to the release assets
-  - provider: releases
-    api_key: $GITHUB_API_KEY
-    file_glob: true
-    file:
-      - CHANGELOG.md
-      - build/WebWorldWind-Distribution-*.zip
-    skip_cleanup: true
-    on:
-      tags: true
+# Deployment has been disabled in preparation for the WorldWind project suspension on April 5, 2019
+# deploy:
+#   # Publish develop branch distributions to the Artifactory apps repository
+#   - provider: script
+#    script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/apps/web
+#    skip_cleanup: true
+#    on:
+#      branch: develop
+#   # Publish API documentation to GitHub Pages
+#   - provider: pages
+#    github_token: $GITHUB_API_KEY
+#    local_dir: build/dist/api-doc
+#    skip_cleanup: true
+#    on:
+#      branch: develop
+#   # Publish release artifacts to the npm repository
+#   - provider: npm
+#     email: $NPM_EMAIL
+#     api_key: $NPM_API_KEY
+#     skip_cleanup: true
+#     on:
+#       tags: true
+#   # Publish release distributions to the Artifactory repository
+#   - provider: script
+#     script: node ./travis/publishFolderToArtifactory $ARTIFACTORY_API_KEY ./build/dist /artifactory/web/${TRAVIS_TAG:1}
+#     skip_cleanup: true
+#     on:
+#       tags: true
+#   # Create CHANGELOG.md in the current directory
+#   - provider: script
+#     script: ./travis/changelog.sh >> CHANGELOG.md
+#     skip_cleanup: true
+#     on:
+#       tags: true
+#   # Create a GitHub release and publish CHANGELOG.md and WebWorldWind.zip to the release assets
+#   - provider: releases
+#     api_key: $GITHUB_API_KEY
+#     file_glob: true
+#     file:
+#       - CHANGELOG.md
+#       - build/WebWorldWind-Distribution-*.zip
+#     skip_cleanup: true
+#     on:
+#       tags: true
 
 # Node.js build cache configuration. See the Travis CI documentation: https://docs.travis-ci.com/user/languages/javascript-with-nodejs/#Caching-with-npm
 cache:

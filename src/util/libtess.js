@@ -1,7 +1,7 @@
-/*
+/**
  * @license
  * Copyright 2000, Silicon Graphics, Inc. All Rights Reserved.
- * Copyright 2014, Google Inc. All Rights Reserved.
+ * Copyright 2015, Google Inc. All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
@@ -27,12 +27,12 @@
  * Copyright in any portions created by third parties is as indicated
  * elsewhere herein. All Rights Reserved.
  */
-/*
+/**
  * @author ericv@cs.stanford.edu (Eric Veach)
  * @author bckenny@google.com (Brendan Kenny)
  */
 
-/*
+/**
  * Base namespace.
  * @const
  */
@@ -84,13 +84,6 @@ libtess.GLU_TESS_MAX_COORD = 1e150;
  * @const {boolean}
  */
 libtess.TRUE_PROJECT = false;
-
-/**
- * We cache vertex data for single-contour polygons so that we can try a
- * quick-and-dirty decomposition first.
- * @const {number}
- */
-libtess.TESS_MAX_CACHE = 100;
 
 /**
  * The default tolerance for merging features, 0, meaning vertices are only
@@ -192,11 +185,6 @@ libtess.gluEnum = {
 
 /** @typedef {number} */
 libtess.PQHandle;
-
-// TODO(bckenny): better typing on key?
-/** @typedef {Object} */
-libtess.PQKey;
-
 
 /* global libtess */
 
@@ -527,8 +515,6 @@ libtess.geom.edgeIntersect = function(o1, d1, o2, d2, v) {
     v.t = libtess.geom.interpolate_(z1, o2.t, z2, d2.t);
   }
 };
-
-
 
 /* global libtess */
 
@@ -1127,7 +1113,6 @@ libtess.mesh.killFace_ = function(fDel, newLFace) {
   // TODO(bckenny): need to null at callsites?
 };
 
-
 /* global libtess */
 
 /** @const */
@@ -1150,39 +1135,43 @@ libtess.normal = {};
 
 /**
  * X coordinate of local basis for polygon projection.
- * @private
+ * @private {number}
  * @const
  */
 libtess.normal.S_UNIT_X_ = 1.0;
 
 /**
  * Y coordinate of local basis for polygon projection.
- * @private
+ * @private {number}
  * @const
  */
 libtess.normal.S_UNIT_Y_ = 0.0;
 
 /**
  * Determines a polygon normal and projects vertices onto the plane of the
- * polygon.
+ * polygon. A pre-computed normal for the data may be provided, or set to the
+ * zero vector if one should be computed from it.
  * @param {!libtess.GluTesselator} tess
+ * @param {number} normalX
+ * @param {number} normalY
+ * @param {number} normalZ
  */
-libtess.normal.projectPolygon = function(tess) {
+libtess.normal.projectPolygon = function(tess, normalX, normalY, normalZ) {
   var computedNormal = false;
 
   var norm = [
-    tess.normal[0],
-    tess.normal[1],
-    tess.normal[2]
+    normalX,
+    normalY,
+    normalZ
   ];
-  if (norm[0] === 0 && norm[1] === 0 && norm[2] === 0) {
+  if (normalX === 0 && normalY === 0 && normalZ === 0) {
     libtess.normal.computeNormal_(tess, norm);
     computedNormal = true;
   }
 
-  var sUnit = tess.sUnit;
-  var tUnit = tess.tUnit;
   var i = libtess.normal.longAxis_(norm);
+  var vHead = tess.mesh.vHead;
+  var v;
 
   // NOTE(bckenny): This branch is never taken. See comment on
   // libtess.TRUE_PROJECT.
@@ -1191,6 +1180,9 @@ libtess.normal.projectPolygon = function(tess) {
     // Choose the initial sUnit vector to be approximately perpendicular
     // to the normal.
     libtess.normal.normalize_(norm);
+
+    var sUnit = [0, 0, 0];
+    var tUnit = [0, 0, 0];
 
     sUnit[i] = 0;
     sUnit[(i + 1) % 3] = libtess.normal.S_UNIT_X_;
@@ -1209,24 +1201,23 @@ libtess.normal.projectPolygon = function(tess) {
     tUnit[2] = norm[0] * sUnit[1] - norm[1] * sUnit[0];
     libtess.normal.normalize_(tUnit);
 
+    // Project the vertices onto the sweep plane
+    for (v = vHead.next; v !== vHead; v = v.next) {
+      v.s = libtess.normal.dot_(v.coords, sUnit);
+      v.t = libtess.normal.dot_(v.coords, tUnit);
+    }
+
   } else {
     // Project perpendicular to a coordinate axis -- better numerically
-    sUnit[i] = 0;
-    sUnit[(i + 1) % 3] = libtess.normal.S_UNIT_X_;
-    sUnit[(i + 2) % 3] = libtess.normal.S_UNIT_Y_;
+    var sAxis = (i + 1) % 3;
+    var tAxis = (i + 2) % 3;
+    var tNegate = norm[i] > 0 ? 1 : -1;
 
-    tUnit[i] = 0;
-    tUnit[(i + 1) % 3] = (norm[i] > 0) ?
-        -libtess.normal.S_UNIT_Y_ : libtess.normal.S_UNIT_Y_;
-    tUnit[(i + 2) % 3] = (norm[i] > 0) ?
-        libtess.normal.S_UNIT_X_ : -libtess.normal.S_UNIT_X_;
-  }
-
-  // Project the vertices onto the sweep plane
-  var vHead = tess.mesh.vHead;
-  for (var v = vHead.next; v !== vHead; v = v.next) {
-    v.s = libtess.normal.dot_(v.coords, sUnit);
-    v.t = libtess.normal.dot_(v.coords, tUnit);
+    // Project the vertices onto the sweep plane
+    for (v = vHead.next; v !== vHead; v = v.next) {
+      v.s = v.coords[sAxis];
+      v.t = tNegate * v.coords[tAxis];
+    }
   }
 
   if (computedNormal) {
@@ -1234,11 +1225,14 @@ libtess.normal.projectPolygon = function(tess) {
   }
 };
 
+// NOTE(bckenny): libtess.normal.dot_ is no longer called in code without
+// libtess.TRUE_PROJECT defined.
+/* istanbul ignore next */
 /**
  * Computes the dot product of vectors u and v.
  * @private
- * @param {!Array.<number>} u
- * @param {!Array.<number>} v
+ * @param {!Array<number>} u
+ * @param {!Array<number>} v
  * @return {number}
  */
 libtess.normal.dot_ = function(u, v) {
@@ -1251,7 +1245,7 @@ libtess.normal.dot_ = function(u, v) {
 /**
  * Normalize vector v.
  * @private
- * @param {!Array.<number>} v
+ * @param {!Array<number>} v
  */
 libtess.normal.normalize_ = function(v) {
   var len = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
@@ -1265,7 +1259,7 @@ libtess.normal.normalize_ = function(v) {
 /**
  * Returns the index of the longest component of vector v.
  * @private
- * @param {!Array.<number>} v
+ * @param {!Array<number>} v
  * @return {number}
  */
 libtess.normal.longAxis_ = function(v) {
@@ -1286,7 +1280,7 @@ libtess.normal.longAxis_ = function(v) {
  * Result returned in norm.
  * @private
  * @param {!libtess.GluTesselator} tess
- * @param {!Array.<number>} norm
+ * @param {!Array<number>} norm
  */
 libtess.normal.computeNormal_ = function(tess, norm) {
   var maxVal = [
@@ -1383,12 +1377,8 @@ libtess.normal.checkOrientation_ = function(tess) {
     for (var v = vHead.next; v !== vHead; v = v.next) {
       v.t = -v.t;
     }
-    tess.tUnit[0] = -tess.tUnit[0];
-    tess.tUnit[1] = -tess.tUnit[1];
-    tess.tUnit[2] = -tess.tUnit[2];
   }
 };
-
 
 /* global libtess */
 
@@ -1404,7 +1394,7 @@ libtess.render = {};
  * @param {boolean} flagEdges
  */
 libtess.render.renderMesh = function(tess, mesh, flagEdges) {
-  var beginOrBeginDataCalled = false;
+  var beginCallbackCalled = false;
 
   // TODO(bckenny): edgeState needs to be boolean, but !== on first call
   // force edge state output for first vertex
@@ -1417,9 +1407,9 @@ libtess.render.renderMesh = function(tess, mesh, flagEdges) {
   for (var f = mesh.fHead.prev; f !== mesh.fHead; f = f.prev) {
     if (f.inside) {
       // We're going to emit a triangle, so call begin callback once
-      if (!beginOrBeginDataCalled) {
-        tess.callBeginOrBeginData(libtess.primitiveType.GL_TRIANGLES);
-        beginOrBeginDataCalled = true;
+      if (!beginCallbackCalled) {
+        tess.callBeginCallback(libtess.primitiveType.GL_TRIANGLES);
+        beginCallbackCalled = true;
       }
 
       // check that face has only three edges
@@ -1433,12 +1423,12 @@ libtess.render.renderMesh = function(tess, mesh, flagEdges) {
           if (edgeState !== newState) {
             edgeState = newState;
             // TODO(bckenny): edgeState should be boolean now
-            tess.callEdgeFlagOrEdgeFlagData(!!edgeState);
+            tess.callEdgeFlagCallback(!!edgeState);
           }
         }
 
         // emit vertex
-        tess.callVertexOrVertexData(e.org.data);
+        tess.callVertexCallback(e.org.data);
 
         e = e.lNext;
       } while (e !== f.anEdge);
@@ -1446,8 +1436,8 @@ libtess.render.renderMesh = function(tess, mesh, flagEdges) {
   }
 
   // only call end callback if begin was called
-  if (beginOrBeginDataCalled) {
-    tess.callEndOrEndData();
+  if (beginCallbackCalled) {
+    tess.callEndCallback();
   }
 };
 
@@ -1460,19 +1450,18 @@ libtess.render.renderMesh = function(tess, mesh, flagEdges) {
 libtess.render.renderBoundary = function(tess, mesh) {
   for (var f = mesh.fHead.next; f !== mesh.fHead; f = f.next) {
     if (f.inside) {
-      tess.callBeginOrBeginData(libtess.primitiveType.GL_LINE_LOOP);
+      tess.callBeginCallback(libtess.primitiveType.GL_LINE_LOOP);
 
       var e = f.anEdge;
       do {
-        tess.callVertexOrVertexData(e.org.data);
+        tess.callVertexCallback(e.org.data);
         e = e.lNext;
       } while (e !== f.anEdge);
 
-      tess.callEndOrEndData();
+      tess.callEndCallback();
     }
   }
 };
-
 
 /* global libtess */
 
@@ -1558,11 +1547,10 @@ libtess.sweep.computeInterior = function(tess) {
   libtess.sweep.initPriorityQ_(tess);
   libtess.sweep.initEdgeDict_(tess);
 
-  // TODO(bckenny): don't need the cast if pq's key is better typed
   var v;
-  while ((v = /** @type {libtess.GluVertex} */(tess.pq.extractMin())) !== null) {
+  while ((v = tess.pq.extractMin()) !== null) {
     for (;;) {
-      var vNext = /** @type {libtess.GluVertex} */(tess.pq.minimum());
+      var vNext = tess.pq.minimum();
       if (vNext === null || !libtess.geom.vertEq(vNext, v)) {
         break;
       }
@@ -1581,7 +1569,7 @@ libtess.sweep.computeInterior = function(tess) {
        * gap between them.  This kind of error is especially obvious
        * when using boundary extraction (GLU_TESS_BOUNDARY_ONLY).
        */
-      vNext = /** @type {libtess.GluVertex} */(tess.pq.extractMin());
+      vNext = tess.pq.extractMin();
       libtess.sweep.spliceMergeVertices_(tess, v.anEdge, vNext.anEdge);
     }
     libtess.sweep.sweepEvent_(tess, v);
@@ -1904,7 +1892,7 @@ libtess.sweep.finishLeftRegions_ = function(tess, regFirst, regLast) {
  * @param {boolean} cleanUp [description].
  */
 libtess.sweep.addRightEdges_ = function(tess, regUp, eFirst, eLast, eTopLeft,
-    cleanUp) {
+                                        cleanUp) {
 
   var firstTime = true;
 
@@ -1963,13 +1951,13 @@ libtess.sweep.addRightEdges_ = function(tess, regUp, eFirst, eLast, eTopLeft,
 
 
 /**
- * [callCombine_ description]
+ * Set up data for and call GLU_TESS_COMBINE callback on GluTesselator.
  * @private
- * @param {libtess.GluTesselator} tess [description].
- * @param {libtess.GluVertex} isect [description].
- * @param {Array.<Object>} data [description].
- * @param {Array.<number>} weights [description].
- * @param {boolean} needed [description].
+ * @param {!libtess.GluTesselator} tess
+ * @param {!libtess.GluVertex} isect A raw vertex at the intersection.
+ * @param {!Array<Object>} data The vertices of the intersecting edges.
+ * @param {!Array<number>} weights The linear combination coefficients for this intersection.
+ * @param {boolean} needed Whether a returned vertex is necessary in this case.
  */
 libtess.sweep.callCombine_ = function(tess, isect, data, weights, needed) {
   // Copy coord data in case the callback changes it.
@@ -1980,7 +1968,7 @@ libtess.sweep.callCombine_ = function(tess, isect, data, weights, needed) {
   ];
 
   isect.data = null;
-  isect.data = tess.callCombineOrCombineData(coords, data, weights);
+  isect.data = tess.callCombineCallback(coords, data, weights);
   if (isect.data === null) {
     if (!needed) {
       // not needed, so just use data from first vertex
@@ -1990,8 +1978,7 @@ libtess.sweep.callCombine_ = function(tess, isect, data, weights, needed) {
       // The only way fatal error is when two edges are found to intersect,
       // but the user has not provided the callback necessary to handle
       // generated intersection points.
-      tess.callErrorOrErrorData(
-          libtess.errorType.GLU_TESS_NEED_COMBINE_CALLBACK);
+      tess.callErrorCallback(libtess.errorType.GLU_TESS_NEED_COMBINE_CALLBACK);
       tess.fatalError = true;
     }
   }
@@ -2002,7 +1989,7 @@ libtess.sweep.callCombine_ = function(tess, isect, data, weights, needed) {
  * Two vertices with idential coordinates are combined into one.
  * e1.org is kept, while e2.org is discarded.
  * @private
- * @param {libtess.GluTesselator} tess [description].
+ * @param {!libtess.GluTesselator} tess
  * @param {libtess.GluHalfEdge} e1 [description].
  * @param {libtess.GluHalfEdge} e2 [description].
  */
@@ -2055,7 +2042,7 @@ libtess.sweep.vertexWeights_ = function(isect, org, dst, weights, weightIndex) {
  * from the user so that we can refer to this new vertex in the
  * rendering callbacks.
  * @private
- * @param {libtess.GluTesselator} tess [description].
+ * @param {!libtess.GluTesselator} tess
  * @param {libtess.GluVertex} isect [description].
  * @param {libtess.GluVertex} orgUp [description].
  * @param {libtess.GluVertex} dstUp [description].
@@ -2063,7 +2050,7 @@ libtess.sweep.vertexWeights_ = function(isect, org, dst, weights, weightIndex) {
  * @param {libtess.GluVertex} dstLo [description].
  */
 libtess.sweep.getIntersectData_ = function(tess, isect, orgUp, dstUp, orgLo,
-    dstLo) {
+                                           dstLo) {
 
   // TODO(bckenny): called for every intersection event, should these be from a pool?
   // TODO(bckenny): better way to init these?
@@ -2138,8 +2125,7 @@ libtess.sweep.checkForRightSplice_ = function(tess, regUp) {
 
     } else if (eUp.org !== eLo.org) {
       // merge the two vertices, discarding eUp.org
-      // TODO(bckenny): fix pqHandle null situation
-      tess.pq.remove(/** @type {libtess.PQHandle} */(eUp.org.pqHandle));
+      tess.pq.remove(eUp.org.pqHandle);
       libtess.sweep.spliceMergeVertices_(tess, eLo.oPrev(), eUp);
     }
 
@@ -2300,7 +2286,7 @@ libtess.sweep.checkForIntersect_ = function(tess, regUp) {
   if ((!libtess.geom.vertEq(dstUp, tess.event) &&
       libtess.geom.edgeSign(dstUp, tess.event, isect) >= 0) ||
       (!libtess.geom.vertEq(dstLo, tess.event) &&
-      libtess.geom.edgeSign(dstLo, tess.event, isect) <= 0)) {
+          libtess.geom.edgeSign(dstLo, tess.event, isect) <= 0)) {
 
     /* Very unusual -- the new upper or lower edge would pass on the
      * wrong side of the sweep event, or through it. This can happen
@@ -2554,7 +2540,7 @@ libtess.sweep.connectRightVertex_ = function(tess, regUp, eBottomLeft) {
  * Adding the new vertex involves splicing it into the already-processed
  * part of the mesh.
  * @private
- * @param {libtess.GluTesselator} tess [description].
+ * @param {!libtess.GluTesselator} tess
  * @param {libtess.ActiveRegion} regUp [description].
  * @param {libtess.GluVertex} vEvent [description].
  */
@@ -2865,9 +2851,7 @@ libtess.sweep.removeDegenerateEdges_ = function(tess) {
  * @param {libtess.GluTesselator} tess [description].
  */
 libtess.sweep.initPriorityQ_ = function(tess) {
-  // TODO(bckenny): libtess.geom.vertLeq needs cast?
-  var pq = new libtess.PriorityQ(
-      /** @type {function(Object, Object): boolean} */(libtess.geom.vertLeq));
+  var pq = new libtess.PriorityQ();
   tess.pq = pq;
 
   var vHead = tess.mesh.vHead;
@@ -2922,7 +2906,6 @@ libtess.sweep.removeDegenerateFaces_ = function(mesh) {
     }
   }
 };
-
 
 /* global libtess */
 
@@ -3072,7 +3055,6 @@ libtess.tessmono.setWindingNumber = function(mesh, value, keepOnlyBoundary) {
   }
 };
 
-
 /* global libtess */
 
 /**
@@ -3090,13 +3072,13 @@ libtess.Dict = function(frame, leq) {
   /**
    * The head of the doubly-linked DictNode list. At creation time, links back
    * and forward only to itself.
-   * @private
+   * @private {!libtess.DictNode}
    */
   this.head_ = new libtess.DictNode();
 
   /**
    * The GluTesselator used as the frame for edge/event comparisons.
-   * @private
+   * @private {!libtess.GluTesselator}
    */
   this.frame_ = frame;
 
@@ -3202,7 +3184,6 @@ libtess.Dict.prototype.getMax = function() {
   return this.head_.prev;
 };
 
-
 /* global libtess */
 
 /**
@@ -3261,33 +3242,6 @@ libtess.DictNode.prototype.getPredecessor = function() {
   return this.prev;
 };
 
-
-
-/* global libtess */
-
-/**
- * Cached vertex data for single-countour polygons for quick-and-dirty
- * decomposition.
- * @constructor
- * @struct
- */
-libtess.CachedVertex = function() {
-  /**
-   * [coords description]
-   * @type {Array.<number>}
-   */
-  this.coords = [0, 0, 0];
-  // TODO(bckenny): better way to init?
-
-  /**
-   * [data description]
-   * @type {Object}
-   */
-  this.data = null;
-};
-
-
-
 /* global libtess */
 
 // TODO(bckenny): create more javascript-y API, e.g. make gluTessEndPolygon
@@ -3302,21 +3256,17 @@ libtess.GluTesselator = function() {
   // Only initialize fields which can be changed by the api. Other fields
   // are initialized where they are used.
 
-  // TODO(bckenny): many of these can be made private
-  // TODO(bckenny): can we combine call* and call*Data functions?
-
   /*** state needed for collecting the input data ***/
 
   /**
-   * what begin/end calls have we seen?
-   * @type {libtess.GluTesselator.tessState_}
+   * Tesselator state, tracking what begin/end calls have been seen.
+   * @private {libtess.GluTesselator.tessState_}
    */
-  this.state = libtess.GluTesselator.tessState_.T_DORMANT;
+  this.state_ = libtess.GluTesselator.tessState_.T_DORMANT;
 
   /**
    * lastEdge_.org is the most recent vertex
-   * @private
-   * @type {libtess.GluHalfEdge}
+   * @private {libtess.GluHalfEdge}
    */
   this.lastEdge_ = null;
 
@@ -3325,45 +3275,22 @@ libtess.GluTesselator = function() {
    * @type {libtess.GluMesh}
    */
   this.mesh = null;
-  // NOTE(bckenny): initialized in this.emptyCache_
 
   /**
    * Error callback.
-   * @private
-   * @type {?function((libtess.errorType|libtess.gluEnum))}
+   * @private {?function((libtess.errorType|libtess.gluEnum), Object=)}
    */
-  this.callError_ = null;
-
+  this.errorCallback_ = null;
 
   /*** state needed for projecting onto the sweep plane ***/
 
   /**
    * user-specified normal (if provided)
-   * @type {!Array.<number>}
+   * @private {!Array<number>}
    */
-  this.normal = [0, 0, 0];
-  // TODO(bckenny): better way to init these arrays?
-
-  /**
-   * unit vector in s-direction (debugging)
-   * @type {!Array.<number>}
-   */
-  this.sUnit = [0, 0, 0];
-
-  /**
-   * unit vector in t-direction (debugging)
-   * @type {!Array.<number>}
-   */
-  this.tUnit = [0, 0, 0];
+  this.normal_ = [0, 0, 0];
 
   /*** state needed for the line sweep ***/
-  // TODO(bckenny): this could be moved to a sweep state object of some sort
-
-  /**
-   * tolerance for merging features
-   * @type {number}
-   */
-  this.relTolerance = libtess.GLU_TESS_DEFAULT_TOLERANCE;
 
   /**
    * rule for determining polygon interior
@@ -3399,128 +3326,53 @@ libtess.GluTesselator = function() {
 
   /**
    * Combine callback.
-   * @private
-   * @type {?function(Array.<number>, Array.<Object>, Array.<number>): Object}
+   * @private {?function(Array<number>, Array<Object>, Array<number>, Object=): Object}
    */
-  this.callCombine_ = null;
+  this.combineCallback_ = null;
 
   /*** state needed for rendering callbacks (see render.js) ***/
 
   /**
    * Extract contours, not triangles
-   * @type {boolean}
+   * @private {boolean}
    */
-  this.boundaryOnly = false;
+  this.boundaryOnly_ = false;
 
   /**
    * Begin callback.
-   * @private
-   * @type {?function(libtess.primitiveType)}
+   * @private {?function(libtess.primitiveType, Object=)}
    */
-  this.callBegin_ = null;
+  this.beginCallback_ = null;
 
   /**
    * Edge flag callback.
-   * @private
-   * @type {?function(boolean)}
+   * @private {?function(boolean, Object=)}
    */
-  this.callEdgeFlag_ = null;
+  this.edgeFlagCallback_ = null;
 
   /**
    * Vertex callback.
-   * @private
-   * @type {?function(Object)}
+   * @private {?function(Object, Object=)}
    */
-  this.callVertex_ = null;
+  this.vertexCallback_ = null;
 
   /**
    * End callback.
-   * @private
-   * @type {?function()}
+   * @private {?function(Object=)}
    */
-  this.callEnd_ = null;
+  this.endCallback_ = null;
 
   /**
    * Mesh callback.
-   * @private
-   * @type {?function(libtess.GluMesh)}
+   * @private {?function(libtess.GluMesh)}
    */
-  this.callMesh_ = null;
-
-  /*** rendering callbacks that also pass polygon data  ***/
-  /**
-   * BeginData callback.
-   * @private
-   * @type {?function(libtess.primitiveType, Object)}
-   */
-  this.callBeginData_ = null;
-
-  /**
-   * EdgeFlagData callback.
-   * @private
-   * @type {?function(boolean, Object)}
-   */
-  this.callEdgeFlagData_ = null;
-
-  /**
-   * VertexData callback.
-   * @private
-   * @type {?function(Object, Object)}
-   */
-  this.callVertexData_ = null;
-
-  /**
-   * EndData callback.
-   * @private
-   * @type {?function(Object)}
-   */
-  this.callEndData_ = null;
-
-  /**
-   * ErrorData callback.
-   * @private
-   * @type {?function((libtess.errorType|libtess.gluEnum), Object)}
-   */
-  this.callErrorData_ = null;
-
-  /**
-   * CombineData callback.
-   * @private
-   * @type {?function(Array.<number>, Array.<Object>, Array.<number>, Object): Object}
-   */
-  this.callCombineData_ = null;
+  this.meshCallback_ = null;
 
   /**
    * client data for current polygon
-   * @private
-   * @type {Object}
+   * @private {Object}
    */
   this.polygonData_ = null;
-
-  /*** state needed to cache single-contour polygons for renderCache() ***/
-  /**
-   * empty cache on next vertex() call
-   * @type {boolean}
-   */
-  this.emptyCache = false;
-  // TODO(bckenny): possibly rename to be clear it's a boolean
-
-  /**
-   * number of cached vertices
-   * @type {number}
-   */
-  this.cacheCount = 0;
-
-  /**
-   * the vertex data
-   * @type {Array.<libtess.CachedVertex>}
-   */
-  this.cache = new Array(libtess.TESS_MAX_CACHE);
-
-  // TODO(bckenny): fill now? or init on demand
-  for (var i = 0; i < libtess.TESS_MAX_CACHE; i++) {
-    this.cache[i] = new libtess.CachedVertex();
-  }
 };
 
 /**
@@ -3546,7 +3398,6 @@ libtess.GluTesselator.prototype.gluDeleteTess = function() {
   // memFree(tess); TODO(bckenny)
 };
 
-
 /**
  * Set properties for control over tesselation. See README.
  * @param {libtess.gluEnum} which [description].
@@ -3558,12 +3409,7 @@ libtess.GluTesselator.prototype.gluTessProperty = function(which, value) {
 
   switch (which) {
     case libtess.gluEnum.GLU_TESS_TOLERANCE:
-      if (value < 0 || value > 1) {
-        break;
-      }
-      // TODO(bckenny): libtess doesn't support any tolerance but 0. This should
-      // reject any non-zero tolerance accordingly.
-      this.relTolerance = /** @type {number} */(value);
+      // NOTE(bckenny): libtess has never supported any tolerance but 0.
       return;
 
     case libtess.gluEnum.GLU_TESS_WINDING_RULE:
@@ -3582,17 +3428,15 @@ libtess.GluTesselator.prototype.gluTessProperty = function(which, value) {
       break;
 
     case libtess.gluEnum.GLU_TESS_BOUNDARY_ONLY:
-      // TODO(bckenny): added boolean param type. make sure ok.
-      this.boundaryOnly = !!value;
+      this.boundaryOnly_ = !!value;
       return;
 
     default:
-      this.callErrorOrErrorData(libtess.gluEnum.GLU_INVALID_ENUM);
+      this.callErrorCallback(libtess.gluEnum.GLU_INVALID_ENUM);
       return;
   }
-  this.callErrorOrErrorData(libtess.gluEnum.GLU_INVALID_VALUE);
+  this.callErrorCallback(libtess.gluEnum.GLU_INVALID_VALUE);
 };
-
 
 /**
  * Returns tessellator property
@@ -3605,122 +3449,96 @@ libtess.GluTesselator.prototype.gluGetTessProperty = function(which) {
 
   switch (which) {
     case libtess.gluEnum.GLU_TESS_TOLERANCE:
-      // tolerance should be in range [0..1]
-      return this.relTolerance;
+      return 0;
 
     case libtess.gluEnum.GLU_TESS_WINDING_RULE:
       var rule = this.windingRule;
       return rule;
 
     case libtess.gluEnum.GLU_TESS_BOUNDARY_ONLY:
-      return this.boundaryOnly;
+      return this.boundaryOnly_;
 
     default:
-      this.callErrorOrErrorData(libtess.gluEnum.GLU_INVALID_ENUM);
+      this.callErrorCallback(libtess.gluEnum.GLU_INVALID_ENUM);
       break;
   }
   return false;
 };
 
-
 /**
- * Lets the user supply the polygon normal, if known.  All input data
- * is projected into a plane perpendicular to the normal before
- * tesselation. All output triangles are oriented CCW with
- * respect to the normal (CW orientation can be obtained by
- * reversing the sign of the supplied normal). For example, if
- * you know that all polygons lie in the x-y plane, call
- * "tess.gluTessNormal(0.0, 0.0, 1.0)" before rendering any polygons.
- *
- * @param {number} x [description].
- * @param {number} y [description].
- * @param {number} z [description].
+ * Lets the user supply the polygon normal, if known. All input data is
+ * projected into a plane perpendicular to the normal before tesselation. All
+ * output triangles are oriented CCW with respect to the normal (CW orientation
+ * can be obtained by reversing the sign of the supplied normal). For example,
+ * if you know that all polygons lie in the x-y plane, call
+ * `tess.gluTessNormal(0.0, 0.0, 1.0)` before rendering any polygons.
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
  */
 libtess.GluTesselator.prototype.gluTessNormal = function(x, y, z) {
-  this.normal[0] = x;
-  this.normal[1] = y;
-  this.normal[2] = z;
+  this.normal_[0] = x;
+  this.normal_[1] = y;
+  this.normal_[2] = z;
 };
 
-
 /**
- * Specify callbacks. See README. A null or undefined opt_fn removes current callback.
- *
- * @param {libtess.gluEnum} which [description].
- * @param {?Function=} opt_fn [description].
+ * Specify callbacks. See README for callback descriptions. A null or undefined
+ * opt_fn removes current callback.
+ * @param {libtess.gluEnum} which The callback-type gluEnum value.
+ * @param {?Function=} opt_fn
  */
 libtess.GluTesselator.prototype.gluTessCallback = function(which, opt_fn) {
   var fn = !opt_fn ? null : opt_fn;
   // TODO(bckenny): better opt_fn typing?
+  // TODO(bckenny): should add documentation that references in callback are volatile (or make a copy)
 
   switch (which) {
     case libtess.gluEnum.GLU_TESS_BEGIN:
-      this.callBegin_ = /** @type {function(libtess.primitiveType)} */ (fn);
-      return;
-
     case libtess.gluEnum.GLU_TESS_BEGIN_DATA:
-      this.callBeginData_ =
-          /** @type {function(libtess.primitiveType, Object)} */ (fn);
+      this.beginCallback_ = /** @type {?function(libtess.primitiveType, Object=)} */ (fn);
       return;
 
     case libtess.gluEnum.GLU_TESS_EDGE_FLAG:
-      this.callEdgeFlag_ = /** @type {function(boolean)} */ (fn);
-      return;
-
     case libtess.gluEnum.GLU_TESS_EDGE_FLAG_DATA:
-      this.callEdgeFlagData_ = /** @type {function(boolean, Object)} */ (fn);
+      this.edgeFlagCallback_ = /** @type {?function(boolean, Object=)} */ (fn);
       return;
 
     case libtess.gluEnum.GLU_TESS_VERTEX:
-      this.callVertex_ = /** @type {function(Object)} */ (fn);
-      return;
-
     case libtess.gluEnum.GLU_TESS_VERTEX_DATA:
-      this.callVertexData_ = /** @type {function(Object, Object)} */ (fn);
+      this.vertexCallback_ = /** @type {?function(Object, Object=)} */ (fn);
       return;
 
     case libtess.gluEnum.GLU_TESS_END:
-      this.callEnd_ = /** @type {function()} */ (fn);
-      return;
-
     case libtess.gluEnum.GLU_TESS_END_DATA:
-      this.callEndData_ = /** @type {function(Object)} */ (fn);
+      this.endCallback_ = /** @type {?function(Object=)} */ (fn);
       return;
 
     case libtess.gluEnum.GLU_TESS_ERROR:
-      this.callError_ = /** @type {function((libtess.errorType|libtess.gluEnum))} */ (fn);
-      return;
-
     case libtess.gluEnum.GLU_TESS_ERROR_DATA:
-      this.callErrorData_ =
-          /** @type {function((libtess.errorType|libtess.gluEnum), Object)} */ (fn);
+      this.errorCallback_ = /** @type {?function((libtess.errorType|libtess.gluEnum), Object=)} */ (fn);
       return;
 
     case libtess.gluEnum.GLU_TESS_COMBINE:
-      this.callCombine_ = /** @type {function(Array.<number>, Array.<Object>, Array.<number>): Object} */ (fn);
-      return;
-
     case libtess.gluEnum.GLU_TESS_COMBINE_DATA:
-      this.callCombineData_ = /** @type {function(Array.<number>, Array.<Object>, Array.<number>, Object): Object} */ (fn);
+      this.combineCallback_ = /** @type {?function(Array<number>, Array<Object>, Array<number>, Object=): Object} */ (fn);
       return;
 
     case libtess.gluEnum.GLU_TESS_MESH:
-      this.callMesh_ = /** @type {function(libtess.GluMesh)} */ (fn);
+      this.meshCallback_ = /** @type {?function(libtess.GluMesh)} */ (fn);
       return;
 
     default:
-      this.callErrorOrErrorData(libtess.gluEnum.GLU_INVALID_ENUM);
+      this.callErrorCallback(libtess.gluEnum.GLU_INVALID_ENUM);
       return;
   }
 };
 
-
 /**
  * Specify a vertex and associated data. Must be within calls to
  * beginContour/endContour. See README.
- *
- * @param {Array.<number>} coords [description].
- * @param {Object} data [description].
+ * @param {!Array<number>} coords
+ * @param {Object} data
  */
 libtess.GluTesselator.prototype.gluTessVertex = function(coords, data) {
   var tooLarge = false;
@@ -3729,11 +3547,6 @@ libtess.GluTesselator.prototype.gluTessVertex = function(coords, data) {
   var clamped = [0, 0, 0];
 
   this.requireState_(libtess.GluTesselator.tessState_.T_IN_CONTOUR);
-
-  if (this.emptyCache) {
-    this.emptyCache_();
-    this.lastEdge_ = null;
-  }
 
   for (var i = 0; i < 3; ++i) {
     var x = coords[i];
@@ -3749,22 +3562,11 @@ libtess.GluTesselator.prototype.gluTessVertex = function(coords, data) {
   }
 
   if (tooLarge) {
-    this.callErrorOrErrorData(libtess.errorType.GLU_TESS_COORD_TOO_LARGE);
-  }
-
-  if (this.mesh === null) {
-    if (this.cacheCount < libtess.TESS_MAX_CACHE) {
-      this.cacheVertex_(clamped, data);
-      return;
-    }
-
-    // cache is full, create mesh and add cached verts to it
-    this.emptyCache_();
+    this.callErrorCallback(libtess.errorType.GLU_TESS_COORD_TOO_LARGE);
   }
 
   this.addVertex_(clamped, data);
 };
-
 
 /**
  * [gluTessBeginPolygon description]
@@ -3773,14 +3575,12 @@ libtess.GluTesselator.prototype.gluTessVertex = function(coords, data) {
 libtess.GluTesselator.prototype.gluTessBeginPolygon = function(data) {
   this.requireState_(libtess.GluTesselator.tessState_.T_DORMANT);
 
-  this.state = libtess.GluTesselator.tessState_.T_IN_POLYGON;
-  this.cacheCount = 0;
-  this.emptyCache = false;
-  this.mesh = null;
+  this.state_ = libtess.GluTesselator.tessState_.T_IN_POLYGON;
+
+  this.mesh = new libtess.GluMesh();
 
   this.polygonData_ = data;
 };
-
 
 /**
  * [gluTessBeginContour description]
@@ -3788,42 +3588,29 @@ libtess.GluTesselator.prototype.gluTessBeginPolygon = function(data) {
 libtess.GluTesselator.prototype.gluTessBeginContour = function() {
   this.requireState_(libtess.GluTesselator.tessState_.T_IN_POLYGON);
 
-  this.state = libtess.GluTesselator.tessState_.T_IN_CONTOUR;
+  this.state_ = libtess.GluTesselator.tessState_.T_IN_CONTOUR;
   this.lastEdge_ = null;
-  if (this.cacheCount > 0) {
-    // Just set a flag so we don't get confused by empty contours
-    // -- these can be generated accidentally with the obsolete
-    // NextContour() interface.
-    // TODO(bckenny): we aren't implementing NextContour() interface.
-    this.emptyCache = true;
-  }
 };
-
 
 /**
  * [gluTessEndContour description]
  */
 libtess.GluTesselator.prototype.gluTessEndContour = function() {
   this.requireState_(libtess.GluTesselator.tessState_.T_IN_CONTOUR);
-  this.state = libtess.GluTesselator.tessState_.T_IN_POLYGON;
+  this.state_ = libtess.GluTesselator.tessState_.T_IN_POLYGON;
 };
-
 
 /**
  * [gluTessEndPolygon description]
  */
 libtess.GluTesselator.prototype.gluTessEndPolygon = function() {
   this.requireState_(libtess.GluTesselator.tessState_.T_IN_POLYGON);
-  this.state = libtess.GluTesselator.tessState_.T_DORMANT;
-
-  if (this.mesh === null) {
-    // TODO(bckenny): can we eliminate more cache functionality?
-    this.emptyCache_();
-  }
+  this.state_ = libtess.GluTesselator.tessState_.T_DORMANT;
 
   // Determine the polygon normal and project vertices onto the plane
   // of the polygon.
-  libtess.normal.projectPolygon(this);
+  libtess.normal.projectPolygon(this, this.normal_[0], this.normal_[1],
+      this.normal_[2]);
 
   // computeInterior(tess) computes the planar arrangement specified
   // by the given contours, and further subdivides this arrangement
@@ -3838,7 +3625,7 @@ libtess.GluTesselator.prototype.gluTessEndPolygon = function() {
     // Otherwise we tessellate all the regions marked "inside".
     // NOTE(bckenny): we know this.mesh has been initialized, so help closure out.
     var mesh = /** @type {!libtess.GluMesh} */(this.mesh);
-    if (this.boundaryOnly) {
+    if (this.boundaryOnly_) {
       libtess.tessmono.setWindingNumber(mesh, 1, true);
     } else {
       libtess.tessmono.tessellateInterior(mesh);
@@ -3846,22 +3633,21 @@ libtess.GluTesselator.prototype.gluTessEndPolygon = function() {
 
     this.mesh.checkMesh();
 
-    if (this.callBegin_ || this.callEnd_ || this.callVertex_ ||
-        this.callEdgeFlag_ || this.callBeginData_ || this.callEndData_ ||
-        this.callVertexData_ || this.callEdgeFlagData_) {
+    if (this.beginCallback_ || this.endCallback_ || this.vertexCallback_ ||
+        this.edgeFlagCallback_) {
 
-      if (this.boundaryOnly) {
+      if (this.boundaryOnly_) {
         // output boundary contours
         libtess.render.renderBoundary(this, this.mesh);
 
       } else {
         // output triangles (with edge callback if one is set)
-        var flagEdges = !!(this.callEdgeFlag_ || this.callEdgeFlagData_);
+        var flagEdges = !!this.edgeFlagCallback_;
         libtess.render.renderMesh(this, this.mesh, flagEdges);
       }
     }
 
-    if (this.callMesh_) {
+    if (this.meshCallback_) {
       // Throw away the exterior faces, so that all faces are interior.
       // This way the user doesn't have to check the "inside" flag,
       // and we don't need to even reveal its existence. It also leaves
@@ -3869,7 +3655,7 @@ libtess.GluTesselator.prototype.gluTessEndPolygon = function() {
       // faces in the first place.
       libtess.tessmono.discardExterior(this.mesh);
       // user wants the mesh itself
-      this.callMesh_(this.mesh);
+      this.meshCallback_(this.mesh);
 
       this.mesh = null;
       this.polygonData_ = null;
@@ -3882,81 +3668,68 @@ libtess.GluTesselator.prototype.gluTessEndPolygon = function() {
   this.mesh = null;
 };
 
-
 /**
- * Return the tessellator to its original dormant state.
+ * Change the tesselator state.
  * @private
- */
-libtess.GluTesselator.prototype.makeDormant_ = function() {
-  if (this.mesh) {
-    libtess.mesh.deleteMesh(this.mesh);
-  }
-  this.state = libtess.GluTesselator.tessState_.T_DORMANT;
-  this.lastEdge_ = null;
-  this.mesh = null;
-};
-
-
-/**
- * [requireState_ description]
- * @private
- * @param {libtess.GluTesselator.tessState_} state [description].
+ * @param {libtess.GluTesselator.tessState_} state
  */
 libtess.GluTesselator.prototype.requireState_ = function(state) {
-  if (this.state !== state) {
+  if (this.state_ !== state) {
     this.gotoState_(state);
   }
 };
 
-
 /**
- * [gotoState_ description]
+ * Change the current tesselator state one level at a time to get to the
+ * desired state. Only triggered when the API is not called in the correct order
+ * so an error callback is made, however the tesselator will always attempt to
+ * recover afterwards (see README).
  * @private
- * @param  {libtess.GluTesselator.tessState_} newState [description].
+ * @param {libtess.GluTesselator.tessState_} newState
  */
 libtess.GluTesselator.prototype.gotoState_ = function(newState) {
-  while (this.state !== newState) {
-    // We change the current state one level at a time, to get to the desired
-    // state.
-    if (this.state < newState) {
-      switch (this.state) {
+  while (this.state_ !== newState) {
+    if (this.state_ < newState) {
+      switch (this.state_) {
         case libtess.GluTesselator.tessState_.T_DORMANT:
-          this.callErrorOrErrorData(
+          this.callErrorCallback(
               libtess.errorType.GLU_TESS_MISSING_BEGIN_POLYGON);
           this.gluTessBeginPolygon(null);
           break;
 
         case libtess.GluTesselator.tessState_.T_IN_POLYGON:
-          this.callErrorOrErrorData(
+          this.callErrorCallback(
               libtess.errorType.GLU_TESS_MISSING_BEGIN_CONTOUR);
           this.gluTessBeginContour();
           break;
       }
 
     } else {
-      switch (this.state) {
+      switch (this.state_) {
         case libtess.GluTesselator.tessState_.T_IN_CONTOUR:
-          this.callErrorOrErrorData(
+          this.callErrorCallback(
               libtess.errorType.GLU_TESS_MISSING_END_CONTOUR);
           this.gluTessEndContour();
           break;
 
         case libtess.GluTesselator.tessState_.T_IN_POLYGON:
-          this.callErrorOrErrorData(
+          this.callErrorCallback(
               libtess.errorType.GLU_TESS_MISSING_END_POLYGON);
-          // this.gluTessEndPolygon() is too much work!
-          this.makeDormant_();
+          // NOTE(bckenny): libtess originally reset the tesselator, even though
+          // the README claims it should spit out the tessellated results at
+          // this point.
+          // (see http://cgit.freedesktop.org/mesa/glu/tree/src/libtess/tess.c#n180)
+          this.gluTessEndPolygon();
           break;
       }
     }
   }
 };
 
-
 /**
  * [addVertex_ description]
  * @private
- * @param {Array.<number>} coords [description].
+ * @param {!Array<number>} coords [description].
  * @param {Object} data [description].
  */
 libtess.GluTesselator.prototype.addVertex_ = function(coords, data) {
@@ -3989,142 +3762,75 @@ libtess.GluTesselator.prototype.addVertex_ = function(coords, data) {
   this.lastEdge_ = e;
 };
 
-
 /**
- * [cacheVertex_ description]
- * @private
- * @param {Array.<number>} coords [description].
- * @param {Object} data [description].
+ * Call callback to indicate the start of a primitive, to be followed by emitted
+ * vertices, if any. In libtess.js, `type` will always be `GL_TRIANGLES`.
+ * @param {libtess.primitiveType} type
  */
-libtess.GluTesselator.prototype.cacheVertex_ = function(coords, data) {
-  var v = this.cache[this.cacheCount];
-
-  v.data = data;
-  v.coords[0] = coords[0];
-  v.coords[1] = coords[1];
-  v.coords[2] = coords[2];
-  ++this.cacheCount;
-};
-
-
-/**
- * [emptyCache_ description]
- * @private
- */
-libtess.GluTesselator.prototype.emptyCache_ = function() {
-  // NOTE(bckenny): surprise!
-  this.mesh = new libtess.GluMesh();
-
-  for (var i = 0; i < this.cacheCount; i++) {
-    var v = this.cache[i];
-    this.addVertex_(v.coords, v.data);
-  }
-
-  this.cacheCount = 0;
-  this.emptyCache = false;
-};
-
-
-// TODO(bckenny): all following conditional callbacks could be simplified
-// TODO(bckenny): using null for now, but may rework
-// TODO(bckenny): should add documentation that references in callback are volatile (or make a copy)
-// see README callback descriptions
-/**
- * [callBeginOrBeginData description]
- * @param {libtess.primitiveType} type [description].
- */
-libtess.GluTesselator.prototype.callBeginOrBeginData = function(type) {
-  if (this.callBeginData_) {
-    this.callBeginData_(type, this.polygonData_);
-
-  } else if (this.callBegin_) {
-    this.callBegin_(type);
+libtess.GluTesselator.prototype.callBeginCallback = function(type) {
+  if (this.beginCallback_) {
+    this.beginCallback_(type, this.polygonData_);
   }
 };
 
-
 /**
- * [callVertexOrVertexData description]
- * @param {Object} data [description].
+ * Call callback to emit a vertex of the tessellated polygon.
+ * @param {Object} data
  */
-libtess.GluTesselator.prototype.callVertexOrVertexData = function(data) {
-  if (this.callVertexData_) {
-    this.callVertexData_(data, this.polygonData_);
-
-  } else if (this.callVertex_) {
-    this.callVertex_(data);
+libtess.GluTesselator.prototype.callVertexCallback = function(data) {
+  if (this.vertexCallback_) {
+    this.vertexCallback_(data, this.polygonData_);
   }
 };
 
-
 /**
- * [callEdgeFlagOrEdgeFlagData description]
- * @param {boolean} flag [description].
+ * Call callback to indicate whether the vertices to follow begin edges which
+ * lie on a polygon boundary.
+ * @param {boolean} flag
  */
-libtess.GluTesselator.prototype.callEdgeFlagOrEdgeFlagData = function(flag) {
-  if (this.callEdgeFlagData_) {
-    this.callEdgeFlagData_(flag, this.polygonData_);
-
-  } else if (this.callEdgeFlag_) {
-    this.callEdgeFlag_(flag);
+libtess.GluTesselator.prototype.callEdgeFlagCallback = function(flag) {
+  if (this.edgeFlagCallback_) {
+    this.edgeFlagCallback_(flag, this.polygonData_);
   }
 };
 
-
 /**
- * [callEndOrEndData description]
+ * Call callback to indicate the end of tessellation.
  */
-libtess.GluTesselator.prototype.callEndOrEndData = function() {
-  if (this.callEndData_) {
-    this.callEndData_(this.polygonData_);
-
-  } else if (this.callEnd_) {
-    this.callEnd_();
+libtess.GluTesselator.prototype.callEndCallback = function() {
+  if (this.endCallback_) {
+    this.endCallback_(this.polygonData_);
   }
 };
 
+/* jscs:disable maximumLineLength */
+/**
+ * Call callback for combining vertices at edge intersection requiring the
+ * creation of a new vertex.
+ * @param {!Array<number>} coords Intersection coordinates.
+ * @param {!Array<Object>} data Array of vertex data, one per edge vertices.
+ * @param {!Array<number>} weight Coefficients used for the linear combination of vertex coordinates that gives coords.
+ * @return {?Object} Interpolated vertex.
+ */
+libtess.GluTesselator.prototype.callCombineCallback = function(coords, data, weight) {
+  if (this.combineCallback_) {
+    return this.combineCallback_(coords, data, weight, this.polygonData_) ||
+        null;
+  }
+
+  return null;
+};
+/* jscs:enable maximumLineLength */
 
 /**
- * [callCombineOrCombineData description]
- * @param {Array.<number>} coords [description].
- * @param {Array.<Object>} data [description].
- * @param {Array.<number>} weight [description].
- * @return {Object} Interpolated vertex.
+ * Call error callback, if specified, with errno.
+ * @param {(libtess.errorType|libtess.gluEnum)} errno
  */
-libtess.GluTesselator.prototype.callCombineOrCombineData =
-    function(coords, data, weight) {
-
-  var interpData;
-  if (this.callCombineData_) {
-    interpData = this.callCombineData_(coords, data, weight, this.polygonData_);
-
-  } else if (this.callCombine_) {
-    interpData = this.callCombine_(coords, data, weight);
-  }
-
-  // TODO(bckenny): can't be undefined
-  if (interpData === undefined) {
-    interpData = null;
-  }
-  return interpData;
-};
-
-
-// TODO(bckenny): combine the enums in libtess
-/**
- * [callErrorOrErrorData description]
- * @param {(libtess.errorType|libtess.gluEnum)} errno [description].
- */
-libtess.GluTesselator.prototype.callErrorOrErrorData = function(errno) {
-  if (this.callErrorData_) {
-    this.callErrorData_(errno, this.polygonData_);
-
-  } else if (this.callError_) {
-    this.callError_(errno);
+libtess.GluTesselator.prototype.callErrorCallback = function(errno) {
+  if (this.errorCallback_) {
+    this.errorCallback_(errno, this.polygonData_);
   }
 };
-
-
 
 /* global libtess */
 
@@ -4172,8 +3878,6 @@ libtess.GluFace = function(opt_nextFace, opt_prevFace) {
    */
   this.inside = false;
 };
-
-
 
 /* global libtess */
 
@@ -4345,8 +4049,6 @@ libtess.GluHalfEdge.prototype.rNext = function() {
   return this.oPrev().sym;
 };
 
-
-
 /* global libtess */
 
 /**
@@ -4428,8 +4130,6 @@ libtess.GluMesh.prototype.checkMesh = function() {
   }
 };
 
-
-
 /* global libtess */
 
 /**
@@ -4437,15 +4137,12 @@ libtess.GluMesh.prototype.checkMesh = function() {
  * circular list, and a pointer to a half-edge with this vertex as
  * the origin (null if this is the dummy header). There is also a
  * field "data" for client data.
- *
- * @param {libtess.GluVertex=} opt_nextVertex [description].
- * @param {libtess.GluVertex=} opt_prevVertex [description].
+ * @param {libtess.GluVertex=} opt_nextVertex Optional reference to next vertex in the vertex list.
+ * @param {libtess.GluVertex=} opt_prevVertex Optional reference to previous vertex in the vertex list.
  * @constructor
  * @struct
  */
 libtess.GluVertex = function(opt_nextVertex, opt_prevVertex) {
-  // TODO(bckenny): reverse order of params?
-
   /**
    * Next vertex (never null).
    * @type {!libtess.GluVertex}
@@ -4491,381 +4188,173 @@ libtess.GluVertex = function(opt_nextVertex, opt_prevVertex) {
   this.t = 0;
 
   /**
-   * To allow deletion from priority queue.
-   * @type {?libtess.PQHandle}
-   */
-  this.pqHandle = null;
-  // NOTE(bckenny): pqHandle inited in sweep
-  // TODO(bckenny): can we have a numeric default value? null may do bad things
-};
-
-
-
-/* global libtess */
-
-// TODO(bckenny): more specific typing on key
-
-/**
- * [PQHandleElem description]
- * @constructor
- * @struct
- */
-libtess.PQHandleElem = function() {
-  // TODO(bckenny): if key could instead be an indexed into another store, makes heap storage a lot easier
-
-  /**
-   * [key description]
-   * @type {libtess.PQKey}
-   */
-  this.key = null;
-
-  /**
-   * [node description]
+   * Handle to allow deletion from priority queue, or 0 if not yet inserted into
+   * queue.
    * @type {libtess.PQHandle}
    */
-  this.node = 0;
+  this.pqHandle = 0;
 };
-
-
-/**
- * Allocate a PQHandleElem array of size size. If oldArray is not null, its
- * contents are copied to the beginning of the new array. The rest of the array
- * is filled with new PQHandleElems.
- *
- * @param {?Array.<libtess.PQHandleElem>} oldArray [description].
- * @param {number} size [description].
- * @return {Array.<libtess.PQHandleElem>} [description].
- */
-libtess.PQHandleElem.realloc = function(oldArray, size) {
-  var newArray = new Array(size);
-
-  // TODO(bckenny): better to reallocate array? or grow array?
-  var index = 0;
-  if (oldArray !== null) {
-    for (; index < oldArray.length; index++) {
-      newArray[index] = oldArray[index];
-    }
-  }
-
-  for (; index < size; index++) {
-    newArray[index] = new libtess.PQHandleElem();
-  }
-
-  return newArray;
-};
-
-
 
 /* global libtess */
 
-// TODO(bckenny): maybe just have these created inline as literals
-// (or unboxed directly - PQHandle is just an array index number)
-
 /**
- * [PQNode description]
+ * A priority queue of vertices, ordered by libtess.geom.vertLeq, implemented
+ * with a sorted array. Used for initial insertion of vertices (see
+ * libtess.sweep.initPriorityQ_), sorted once, then it uses an internal
+ * libtess.PriorityQHeap for any subsequently created vertices from
+ * intersections.
  * @constructor
  * @struct
  */
-libtess.PQNode = function() {
+libtess.PriorityQ = function() {
   /**
-   * [handle description]
-   * @type {libtess.PQHandle}
+   * An unordered list of vertices that have been inserted in the queue, with
+   * null in empty slots.
+   * @private {Array<libtess.GluVertex>}
    */
-  this.handle = 0;
-};
-
-
-/**
- * Allocate a PQNode array of size size. If oldArray is not null, its contents
- * are copied to the beginning of the new array. The rest of the array is
- * filled with new PQNodes.
- *
- * @param {?Array.<libtess.PQNode>} oldArray [description].
- * @param {number} size [description].
- * @return {Array.<libtess.PQNode>} [description].
- */
-libtess.PQNode.realloc = function(oldArray, size) {
-  var newArray = new Array(size);
-
-  // TODO(bckenny): better to reallocate array? or grow array?
-  var index = 0;
-  if (oldArray !== null) {
-    for (; index < oldArray.length; index++) {
-      newArray[index] = oldArray[index];
-    }
-  }
-
-  for (; index < size; index++) {
-    newArray[index] = new libtess.PQNode();
-  }
-
-  return newArray;
-};
-
-
-
-/* global libtess */
-
-// TODO(bckenny): preallocating arrays may actually be hurting us in sort
-// performance (esp if theres some undefs in there)
-
-/**
- * [PriorityQ description]
- * @constructor
- * @struct
- * @param {function(Object, Object): boolean} leq [description].
- */
-libtess.PriorityQ = function(leq) {
-  /**
-   * [keys description]
-   * @private
-   * @type {Array.<libtess.PQKey>}
-   */
-  this.keys_ = libtess.PriorityQ.prototype.PQKeyRealloc_(null,
-      libtess.PriorityQ.INIT_SIZE_);
+  this.verts_ = [];
 
   /**
-   * Array of indexes into this.keys_
-   * @private
-   * @type {Array.<number>}
+   * Array of indices into this.verts_, sorted by vertLeq over the addressed
+   * vertices.
+   * @private {Array<number>}
    */
   this.order_ = null;
 
   /**
-   * [size description]
-   * @private
-   * @type {number}
+   * The size of this queue, not counting any vertices stored in heap_.
+   * @private {number}
    */
   this.size_ = 0;
 
   /**
-   * [max_ description]
-   * @private
-   * @type {number}
-   */
-  this.max_ = libtess.PriorityQ.INIT_SIZE_;
-
-  /**
-   * [initialized description]
-   * @private
-   * @type {boolean}
+   * Indicates that the queue has been initialized via init. If false, inserts
+   * are fast insertions at the end of the verts_ array. If true, the verts_
+   * array is sorted and subsequent inserts are done in the heap.
+   * @private {boolean}
    */
   this.initialized_ = false;
 
-  // TODO(bckenny): leq was inlined by define in original, but appears to just
-  // be vertLeq, as passed. keep an eye on this as to why its not used.
   /**
-   * [leq description]
-   * @private
-   * @type {function(libtess.PQKey, libtess.PQKey): boolean}
+   * A priority queue heap, used for faster insertions of vertices after verts_
+   * has been sorted.
+   * @private {libtess.PriorityQHeap}
    */
-  this.leq_ =
-      /** @type {function(libtess.PQKey, libtess.PQKey): boolean} */(leq);
-
-  /**
-   * [heap_ description]
-   * @private
-   * @type {libtess.PriorityQHeap}
-   */
-  this.heap_ = new libtess.PriorityQHeap(this.leq_);
+  this.heap_ = new libtess.PriorityQHeap();
 };
 
-
 /**
- * [INIT_SIZE_ description]
- * @private
- * @const
- * @type {number}
- */
-libtess.PriorityQ.INIT_SIZE_ = 32;
-
-
-/**
- * [deleteQ description]
+ * Release major storage memory used by priority queue.
  */
 libtess.PriorityQ.prototype.deleteQ = function() {
-  // TODO(bckenny): unnecessary, I think.
-  this.heap_.deleteHeap();
+  // TODO(bckenny): could instead clear most of these.
   this.heap_ = null;
   this.order_ = null;
-  this.keys_ = null;
+  this.verts_ = null;
   // NOTE(bckenny): nulled at callsite (sweep.donePriorityQ_)
 };
 
-
 /**
- * [init description]
+ * Sort vertices by libtess.geom.vertLeq. Must be called before any method other
+ * than insert is called to ensure correctness when removing or querying.
  */
 libtess.PriorityQ.prototype.init = function() {
   // TODO(bckenny): reuse. in theory, we don't have to empty this, as access is
   // dictated by this.size_, but array.sort doesn't know that
   this.order_ = [];
 
-  // Create an array of indirect pointers to the keys, so that
+  // Create an array of indirect pointers to the verts, so that
   // the handles we have returned are still valid.
   // TODO(bckenny): valid for when? it appears we can just store indexes into
-  // keys_, but what did this mean?
+  // verts_, but what did this mean?
   for (var i = 0; i < this.size_; i++) {
     this.order_[i] = i;
   }
 
-  // sort the indirect pointers in descending order of the keys themselves
-  // TODO(bckenny): make sure it's ok that keys[a] === keys[b] returns 1
+  // sort the indirect pointers in descending order of the verts themselves
+  // TODO(bckenny): make sure it's ok that verts[a] === verts[b] returns 1
   // TODO(bckenny): unstable sort means we may get slightly different polys in
   // different browsers, but only when passing in equal points
   // TODO(bckenny): make less awkward closure?
-  var comparator = (function(keys, leq) {
+  var comparator = (function(verts) {
     return function(a, b) {
-      return leq(keys[a], keys[b]) ? 1 : -1;
+      return libtess.geom.vertLeq(verts[a], verts[b]) ? 1 : -1;
     };
-  })(this.keys_, this.leq_);
+  })(this.verts_);
   this.order_.sort(comparator);
 
-  this.max_ = this.size_;
   this.initialized_ = true;
   this.heap_.init();
 
-  // TODO(bckenny):
-  // #ifndef NDEBUG
+  // NOTE(bckenny): debug assert of ordering of the verts_ array.
   if (libtess.DEBUG) {
     var p = 0;
     var r = p + this.size_ - 1;
     for (i = p; i < r; ++i) {
     }
   }
-  // #endif
 };
 
-
 /**
- * [insert description]
- * @param {libtess.PQKey} keyNew [description].
- * @return {libtess.PQHandle} [description].
+ * Insert a vertex into the priority queue. Returns a PQHandle to refer to it,
+ * which will never be 0.
+ * @param {libtess.GluVertex} vert
+ * @return {libtess.PQHandle}
  */
-libtess.PriorityQ.prototype.insert = function(keyNew) {
+libtess.PriorityQ.prototype.insert = function(vert) {
   // NOTE(bckenny): originally returned LONG_MAX as alloc failure signal. no
   // longer does.
   if (this.initialized_) {
-    return this.heap_.insert(keyNew);
+    return this.heap_.insert(vert);
   }
 
-  var curr = this.size_;
-  if (++this.size_ >= this.max_) {
-    // If the heap overflows, double its size.
-    this.max_ *= 2;
-    this.keys_ =
-        libtess.PriorityQ.prototype.PQKeyRealloc_(this.keys_, this.max_);
-  }
+  var curr = this.size_++;
 
-  this.keys_[curr] = keyNew;
+  this.verts_[curr] = vert;
 
   // Negative handles index the sorted array.
   return -(curr + 1);
 };
 
-
 /**
- * Allocate a PQKey array of size size. If oldArray is not null, its
- * contents are copied to the beginning of the new array. The rest of the array
- * is filled with nulls.
- *
- * @private
- * @param {?Array.<libtess.PQKey>} oldArray [description].
- * @param {number} size [description].
- * @return {Array.<(?libtess.PQKey)>} [description].
- */
-libtess.PriorityQ.prototype.PQKeyRealloc_ = function(oldArray, size) {
-  // TODO(bckenny): double check return type. can we have ? there?
-  var newArray = new Array(size);
-
-  // TODO(bckenny): better to reallocate array? or grow array?
-  var index = 0;
-  if (oldArray !== null) {
-    for (; index < oldArray.length; index++) {
-      newArray[index] = oldArray[index];
-    }
-  }
-
-  for (; index < size; index++) {
-    newArray[index] = null;
-  }
-
-  return newArray;
-};
-
-// NOTE(bckenny): libtess.PriorityQ.keyLessThan_ is called nowhere in libtess
-// and isn't part of the public API.
-/* istanbul ignore next */
-/**
- * Whether x is less than y according to this.leq_.
- * @private
- * @param {number} x
- * @param {number} y
- * @return {boolean}
- */
-libtess.PriorityQ.prototype.keyLessThan_ = function(x, y) {
-  // NOTE(bckenny): was macro LT
-  var keyX = this.keys_[x];
-  var keyY = this.keys_[y];
-  return !this.leq_(keyY, keyX);
-};
-
-// NOTE(bckenny): libtess.PriorityQ.keyGreaterThan_ is called nowhere in libtess
-// and isn't part of the public API.
-/* istanbul ignore next */
-/**
- * Whether x is greater than y according to this.leq_.
- * @private
- * @param {number} x
- * @param {number} y
- * @return {boolean}
- */
-libtess.PriorityQ.prototype.keyGreaterThan_ = function(x, y) {
-  // NOTE(bckenny): was macro GT
-  var keyX = this.keys_[x];
-  var keyY = this.keys_[y];
-  return !this.leq_(keyX, keyY);
-};
-
-
-/**
- * [extractMin description]
- * @return {libtess.PQKey} [description].
+ * Removes the minimum vertex from the queue and returns it. If the queue is
+ * empty, null will be returned.
+ * @return {libtess.GluVertex}
  */
 libtess.PriorityQ.prototype.extractMin = function() {
   if (this.size_ === 0) {
     return this.heap_.extractMin();
   }
 
-  var sortMin = this.keys_[this.order_[this.size_ - 1]];
+  var sortMin = this.verts_[this.order_[this.size_ - 1]];
   if (!this.heap_.isEmpty()) {
     var heapMin = this.heap_.minimum();
-    if (this.leq_(heapMin, sortMin)) {
+    if (libtess.geom.vertLeq(heapMin, sortMin)) {
       return this.heap_.extractMin();
     }
   }
 
   do {
     --this.size_;
-  } while (this.size_ > 0 && this.keys_[this.order_[this.size_ - 1]] === null);
+  } while (this.size_ > 0 && this.verts_[this.order_[this.size_ - 1]] === null);
 
   return sortMin;
 };
 
-
 /**
- * [minimum description]
- * @return {libtess.PQKey} [description].
+ * Returns the minimum vertex in the queue. If the queue is empty, null will be
+ * returned.
+ * @return {libtess.GluVertex}
  */
 libtess.PriorityQ.prototype.minimum = function() {
   if (this.size_ === 0) {
     return this.heap_.minimum();
   }
 
-  var sortMin = this.keys_[this.order_[this.size_ - 1]];
+  var sortMin = this.verts_[this.order_[this.size_ - 1]];
   if (!this.heap_.isEmpty()) {
     var heapMin = this.heap_.minimum();
-    if (this.leq_(heapMin, sortMin)) {
+    if (libtess.geom.vertLeq(heapMin, sortMin)) {
       return heapMin;
     }
   }
@@ -4873,89 +4362,73 @@ libtess.PriorityQ.prototype.minimum = function() {
   return sortMin;
 };
 
-// NOTE(bckenny): libtess.PriorityQ.isEmpty_ isn't called within libtess and
-// isn't part of the public API. For now, leaving in but ignoring for coverage.
-/* istanbul ignore next */
 /**
- * Returns whether the priority queue is empty.
- * @private
- * @return {boolean}
+ * Remove vertex with handle removeHandle from queue.
+ * @param {libtess.PQHandle} removeHandle
  */
-libtess.PriorityQ.prototype.isEmpty_ = function() {
-  return (this.size_ === 0) && this.heap_.isEmpty();
-};
-
-
-/**
- * [remove description]
- * @param {libtess.PQHandle} curr [description].
- */
-libtess.PriorityQ.prototype.remove = function(curr) {
-  if (curr >= 0) {
-    this.heap_.remove(curr);
+libtess.PriorityQ.prototype.remove = function(removeHandle) {
+  if (removeHandle >= 0) {
+    this.heap_.remove(removeHandle);
     return;
   }
-  curr = -(curr + 1);
+  removeHandle = -(removeHandle + 1);
 
-  this.keys_[curr] = null;
-  while (this.size_ > 0 && this.keys_[this.order_[this.size_ - 1]] === null) {
+  this.verts_[removeHandle] = null;
+  while (this.size_ > 0 && this.verts_[this.order_[this.size_ - 1]] === null) {
     --this.size_;
   }
 };
 
-
-
 /* global libtess */
 
-// TODO(bckenny): keys appear to always be GluVertex in this case?
-
 /**
- * [PriorityQHeap description]
+ * A priority queue of vertices, ordered by libtess.geom.vertLeq, implemented
+ * with a binary heap. Used only within libtess.PriorityQ for prioritizing
+ * vertices created by intersections (see libtess.sweep.checkForIntersect_).
  * @constructor
  * @struct
- * @param {function(libtess.PQKey, libtess.PQKey): boolean} leq [description].
  */
-libtess.PriorityQHeap = function(leq) {
+libtess.PriorityQHeap = function() {
   /**
-   * The heap itself. Active nodes are stored in the range 1..size. Each node
-   * stores only an index into handles.
-   * @private
-   * @type {Array.<libtess.PQNode>}
+   * The heap itself. Active nodes are stored in the range 1..size, with the
+   * minimum at 1. Each node stores only an index into verts_ and handles_.
+   * @private {!Array<number>}
    */
-  this.nodes_ = libtess.PQNode.realloc(null,
+  this.heap_ = libtess.PriorityQHeap.reallocNumeric_([0],
       libtess.PriorityQHeap.INIT_SIZE_ + 1);
 
   /**
-   * Each handle stores a key, plus a pointer back to the node which currently
-   * represents that key (ie. nodes[handles[i].node].handle == i).
-   * @private
-   * @type {Array.<libtess.PQHandleElem>}
+   * An unordered list of vertices in the heap, with null in empty slots.
+   * @private {!Array<libtess.GluVertex>}
    */
-  this.handles_ = libtess.PQHandleElem.realloc(null,
-      libtess.PriorityQHeap.INIT_SIZE_ + 1);
+  this.verts_ = [null, null];
 
-  // TODO(bckenny): size and max should probably be libtess.PQHandle for correct
-  // typing (see PriorityQ.js)
+  /**
+   * An unordered list of indices mapping vertex handles into the heap. An entry
+   * at index i will map the vertex at i in verts_ to its place in the heap
+   * (i.e. heap_[handles_[i]] === i).
+   * Empty slots below size_ are a free list chain starting at freeList_.
+   * @private {!Array<number>}
+   */
+  this.handles_ = [0, 0];
+
   /**
    * The size of the queue.
-   * @private
-   * @type {number}
+   * @private {number}
    */
   this.size_ = 0;
 
   /**
    * The queue's current allocated space.
-   * @private
-   * @type {number}
+   * @private {number}
    */
   this.max_ = libtess.PriorityQHeap.INIT_SIZE_;
 
   /**
-   * The index of the next free hole in the handles array. Handle in that slot
-   * has next item in freeList in its node propert. If there are no holes,
-   * freeList === 0 and one at the end of handles must be use.
-   * @private
-   * @type {libtess.PQHandle}
+   * The index of the next free hole in the verts_ array. That slot in handles_
+   * has the next index in the free list. If there are no holes, freeList_ === 0
+   * and a new vertex must be appended to the list.
+   * @private {libtess.PQHandle}
    */
   this.freeList_ = 0;
 
@@ -4963,45 +4436,46 @@ libtess.PriorityQHeap = function(leq) {
    * Indicates that the heap has been initialized via init. If false, inserts
    * are fast insertions at the end of a list. If true, all inserts will now be
    * correctly ordered in the queue before returning.
-   * @private
-   * @type {boolean}
+   * @private {boolean}
    */
   this.initialized_ = false;
 
-  // TODO(bckenny): leq was inlined by define in original, but appears to
-  // be vertLeq, as passed. Using injected version, but is it better just to
-  // manually inline?
-  /**
-   * [leq description]
-   * @private
-   * @type {function(libtess.PQKey, libtess.PQKey): boolean}
-   */
-  this.leq_ = leq;
-
-  // so that minimum returns null
-  this.nodes_[1].handle = 1;
+  // Point the first index at the first (currently null) vertex.
+  this.heap_[1] = 1;
 };
 
-
 /**
- * [INIT_SIZE_ description]
- * @private
+ * The initial allocated space for the queue.
  * @const
- * @type {number}
+ * @private {number}
  */
 libtess.PriorityQHeap.INIT_SIZE_ = 32;
 
-
 /**
- * [deleteHeap description]
+ * Allocate a numeric index array of size size. oldArray's contents are copied
+ * to the beginning of the new array. The rest of the array is filled with
+ * zeroes.
+ * @private
+ * @param {!Array<number>} oldArray
+ * @param {number} size
+ * @return {!Array<number>}
  */
-libtess.PriorityQHeap.prototype.deleteHeap = function() {
-  // TODO(bckenny): unnecessary, I think.
-  this.handles_ = null;
-  this.nodes_ = null;
-  // NOTE(bckenny): nulled at callsite in PriorityQ.deleteQ
-};
+libtess.PriorityQHeap.reallocNumeric_ = function(oldArray, size) {
+  var newArray = new Array(size);
 
+  // NOTE(bckenny): V8 likes this significantly more than simply growing the
+  // array element-by-element or expanding the existing array all at once, so,
+  // for now, emulating realloc.
+  for (var index = 0; index < oldArray.length; index++) {
+    newArray[index] = oldArray[index];
+  }
+
+  for (; index < size; index++) {
+    newArray[index] = 0;
+  }
+
+  return newArray;
+};
 
 /**
  * Initializing ordering of the heap. Must be called before any method other
@@ -5010,47 +4484,49 @@ libtess.PriorityQHeap.prototype.deleteHeap = function() {
 libtess.PriorityQHeap.prototype.init = function() {
   // This method of building a heap is O(n), rather than O(n lg n).
   for (var i = this.size_; i >= 1; --i) {
+    // TODO(bckenny): since init is called before anything is inserted (see
+    // PriorityQ.init), this will always be empty. Better to lazily init?
     this.floatDown_(i);
   }
 
   this.initialized_ = true;
 };
 
-
 /**
- * Insert a new key into the heap.
- * @param {libtess.PQKey} keyNew The key to insert.
- * @return {libtess.PQHandle} A handle that can be used to remove the key.
+ * Insert a new vertex into the heap.
+ * @param {libtess.GluVertex} vert The vertex to insert.
+ * @return {libtess.PQHandle} A handle that can be used to remove the vertex.
  */
-libtess.PriorityQHeap.prototype.insert = function(keyNew) {
-  var curr = ++this.size_;
+libtess.PriorityQHeap.prototype.insert = function(vert) {
+  var endIndex = ++this.size_;
 
-  // if the heap overflows, double its size.
-  if ((curr * 2) > this.max_) {
+  // If the heap overflows, double its size.
+  if ((endIndex * 2) > this.max_) {
     this.max_ *= 2;
-    this.nodes_ = libtess.PQNode.realloc(this.nodes_, this.max_ + 1);
-    this.handles_ = libtess.PQHandleElem.realloc(this.handles_, this.max_ + 1);
+
+    this.handles_ = libtess.PriorityQHeap.reallocNumeric_(this.handles_,
+        this.max_ + 1);
   }
 
-  var free;
+  var newVertSlot;
   if (this.freeList_ === 0) {
-    free = curr;
+    // No free slots, append vertex.
+    newVertSlot = endIndex;
   } else {
-    free = this.freeList_;
-    this.freeList_ = this.handles_[free].node;
+    // Put vertex in free slot, update freeList_ to next free slot.
+    newVertSlot = this.freeList_;
+    this.freeList_ = this.handles_[this.freeList_];
   }
 
-  this.nodes_[curr].handle = free;
-  this.handles_[free].node = curr;
-  this.handles_[free].key = keyNew;
+  this.verts_[newVertSlot] = vert;
+  this.handles_[newVertSlot] = endIndex;
+  this.heap_[endIndex] = newVertSlot;
 
   if (this.initialized_) {
-    this.floatUp_(curr);
+    this.floatUp_(endIndex);
   }
-
-  return free;
+  return newVertSlot;
 };
-
 
 /**
  * @return {boolean} Whether the heap is empty.
@@ -5059,131 +4535,155 @@ libtess.PriorityQHeap.prototype.isEmpty = function() {
   return this.size_ === 0;
 };
 
-
 /**
- * Returns the minimum key in the heap. If the heap is empty, null will be
+ * Returns the minimum vertex in the heap. If the heap is empty, null will be
  * returned.
- * @return {libtess.PQKey} [description].
+ * @return {libtess.GluVertex}
  */
 libtess.PriorityQHeap.prototype.minimum = function() {
-  return this.handles_[this.nodes_[1].handle].key;
+  return this.verts_[this.heap_[1]];
 };
 
-
 /**
- * Removes the minimum key from the heap and returns it. If the heap is empty,
- * null will be returned.
- * @return {libtess.PQKey} [description].
+ * Removes the minimum vertex from the heap and returns it. If the heap is
+ * empty, null will be returned.
+ * @return {libtess.GluVertex}
  */
 libtess.PriorityQHeap.prototype.extractMin = function() {
-  var n = this.nodes_;
-  var h = this.handles_;
-  var hMin = n[1].handle;
-  var min = h[hMin].key;
+  var heap = this.heap_;
+  var verts = this.verts_;
+  var handles = this.handles_;
+
+  var minHandle = heap[1];
+  var minVertex = verts[minHandle];
 
   if (this.size_ > 0) {
-    n[1].handle = n[this.size_].handle;
-    h[n[1].handle].node = 1;
+    // Replace min with last vertex.
+    heap[1] = heap[this.size_];
+    handles[heap[1]] = 1;
 
-    h[hMin].key = null;
-    h[hMin].node = this.freeList_;
-    this.freeList_ = hMin;
+    // Clear min vertex and put slot at front of freeList_.
+    verts[minHandle] = null;
+    handles[minHandle] = this.freeList_;
+    this.freeList_ = minHandle;
 
+    // Restore heap.
     if (--this.size_ > 0) {
       this.floatDown_(1);
     }
   }
 
-  return min;
+  return minVertex;
 };
 
-
 /**
- * Remove key associated with handle hCurr (returned from insert) from heap.
- * @param {libtess.PQHandle} hCurr [description].
+ * Remove vertex with handle removeHandle from heap.
+ * @param {libtess.PQHandle} removeHandle
  */
-libtess.PriorityQHeap.prototype.remove = function(hCurr) {
-  var n = this.nodes_;
-  var h = this.handles_;
+libtess.PriorityQHeap.prototype.remove = function(removeHandle) {
+  var heap = this.heap_;
+  var verts = this.verts_;
+  var handles = this.handles_;
 
-  var curr = h[hCurr].node;
-  n[curr].handle = n[this.size_].handle;
-  h[n[curr].handle].node = curr;
+  var heapIndex = handles[removeHandle];
 
-  if (curr <= --this.size_) {
-    if (curr <= 1 ||
-        this.leq_(h[n[curr >> 1].handle].key, h[n[curr].handle].key)) {
+  // Replace with last vertex.
+  heap[heapIndex] = heap[this.size_];
+  handles[heap[heapIndex]] = heapIndex;
 
-      this.floatDown_(curr);
+  // Restore heap.
+  if (heapIndex <= --this.size_) {
+    if (heapIndex <= 1) {
+      this.floatDown_(heapIndex);
     } else {
-      this.floatUp_(curr);
+      var vert = verts[heap[heapIndex]];
+      var parentVert = verts[heap[heapIndex >> 1]];
+      if (libtess.geom.vertLeq(parentVert, vert)) {
+        this.floatDown_(heapIndex);
+      } else {
+        this.floatUp_(heapIndex);
+      }
     }
   }
 
-  h[hCurr].key = null;
-  h[hCurr].node = this.freeList_;
-  this.freeList_ = hCurr;
+  // Clear vertex and put slot at front of freeList_.
+  verts[removeHandle] = null;
+  handles[removeHandle] = this.freeList_;
+  this.freeList_ = removeHandle;
 };
 
-
 /**
- * [floatDown_ description]
+ * Restore heap by moving the vertex at index in the heap downwards to a valid
+ * slot.
  * @private
- * @param {libtess.PQHandle} curr [description].
+ * @param {libtess.PQHandle} index
  */
-libtess.PriorityQHeap.prototype.floatDown_ = function(curr) {
-  var n = this.nodes_;
-  var h = this.handles_;
+libtess.PriorityQHeap.prototype.floatDown_ = function(index) {
+  var heap = this.heap_;
+  var verts = this.verts_;
+  var handles = this.handles_;
 
-  var hCurr = n[curr].handle;
+  var currIndex = index;
+  var currHandle = heap[currIndex];
   for (;;) {
     // The children of node i are nodes 2i and 2i+1.
-    // set child to the index of the child with the minimum key
-    var child = curr << 1;
-    if (child < this.size_ &&
-        this.leq_(h[n[child + 1].handle].key, h[n[child].handle].key)) {
-
-      ++child;
+    var childIndex = currIndex << 1;
+    if (childIndex < this.size_) {
+      // Set child to the index of the child with the minimum vertex.
+      if (libtess.geom.vertLeq(verts[heap[childIndex + 1]],
+          verts[heap[childIndex]])) {
+        childIndex = childIndex + 1;
+      }
     }
 
-    var hChild = n[child].handle;
-    if (child > this.size_ || this.leq_(h[hCurr].key, h[hChild].key)) {
-      n[curr].handle = hCurr;
-      h[hCurr].node = curr;
-      break;
+    var childHandle = heap[childIndex];
+    if (childIndex > this.size_ ||
+        libtess.geom.vertLeq(verts[currHandle], verts[childHandle])) {
+      // Heap restored.
+      heap[currIndex] = currHandle;
+      handles[currHandle] = currIndex;
+      return;
     }
-    n[curr].handle = hChild;
-    h[hChild].node = curr;
-    curr = child;
+
+    // Swap current node and child; repeat from childIndex.
+    heap[currIndex] = childHandle;
+    handles[childHandle] = currIndex;
+    currIndex = childIndex;
   }
 };
-
 
 /**
- * [floatUp_ description]
+ * Restore heap by moving the vertex at index in the heap upwards to a valid
+ * slot.
  * @private
- * @param {libtess.PQHandle} curr [description].
+ * @param {libtess.PQHandle} index
  */
-libtess.PriorityQHeap.prototype.floatUp_ = function(curr) {
-  var n = this.nodes_;
-  var h = this.handles_;
+libtess.PriorityQHeap.prototype.floatUp_ = function(index) {
+  var heap = this.heap_;
+  var verts = this.verts_;
+  var handles = this.handles_;
 
-  var hCurr = n[curr].handle;
+  var currIndex = index;
+  var currHandle = heap[currIndex];
   for (;;) {
-    var parent = curr >> 1;
-    var hParent = n[parent].handle;
-    if (parent === 0 || this.leq_(h[hParent].key, h[hCurr].key)) {
-      n[curr].handle = hCurr;
-      h[hCurr].node = curr;
-      break;
+    // The parent of node i is node floor(i/2).
+    var parentIndex = currIndex >> 1;
+    var parentHandle = heap[parentIndex];
+
+    if (parentIndex === 0 ||
+        libtess.geom.vertLeq(verts[parentHandle], verts[currHandle])) {
+      // Heap restored.
+      heap[currIndex] = currHandle;
+      handles[currHandle] = currIndex;
+      return;
     }
 
-    n[curr].handle = hParent;
-    h[hParent].node = curr;
-    curr = parent;
+    // Swap current node and parent; repeat from parentIndex.
+    heap[currIndex] = parentHandle;
+    handles[parentHandle] = currIndex;
+    currIndex = parentIndex;
   }
 };
-
 
 /* global libtess */
 

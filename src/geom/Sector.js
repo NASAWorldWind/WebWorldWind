@@ -1,36 +1,47 @@
 /*
- * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
- * National Aeronautics and Space Administration. All rights reserved.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Sector
  */
 define([
-        '../geom/Angle',
-        '../error/ArgumentError',
-        '../geom/Location',
-        '../util/Logger',
-        '../geom/Vec3',
-        '../util/WWMath'
-    ],
+    '../geom/Angle',
+    '../error/ArgumentError',
+    '../geom/Location',
+    '../util/Logger',
+    '../geom/Vec3',
+    '../util/WWMath'
+],
     function (Angle,
-              ArgumentError,
-              Location,
-              Logger,
-              Vec3,
-              WWMath) {
+        ArgumentError,
+        Location,
+        Logger,
+        Vec3,
+        WWMath) {
         "use strict";
 
         /**
@@ -539,6 +550,116 @@ define([
                 this.maxLongitude = sector.maxLongitude;
 
             return this;
+        };
+
+        /**
+         * Computes the Cartesian coordinates of a Sector's center.
+         *
+         * @param globe The globe associated with the sector.
+         * @param exaggeration The vertical exaggeration to apply.
+         *
+         * @return the Cartesian coordinates of the sector's center.
+         *
+         * @throws IllegalArgumentException if <code>globe</code> is null.
+         */
+        Sector.prototype.computeCenterPoint = function (globe, exaggeration) {
+            if (globe == null) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "computeCornerPoints", "missingGlobe"));
+            }
+
+            var lat = 0.5 * (this.minLatitude + this.maxLatitude);
+            var lon = 0.5 * (this.minLongitude + this.maxLongitude);
+            return globe.computePointFromPosition(lat, lon, exaggeration * globe.elevationAtLocation(lat, lon), Vec3.zero());
+        };
+
+        /**
+         * Computes the Cartesian coordinates of a Sector's corners.
+         *
+         * @param globe The globe associated with the sector.
+         * @param exaggeration The vertical exaggeration to apply.
+         *
+         * @return an array of four Cartesian points.
+         *
+         * @throws IllegalArgumentException if <code>globe</code> is null.
+         */
+        Sector.prototype.computeCornerPoints = function (globe, exaggeration) {
+            if (!globe) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "computeCornerPoints", "missingGlobe"));
+            }
+            var corners = new Array(4);
+
+            var minLat = this.minLatitude;
+            var maxLat = this.maxLatitude;
+            var minLon = this.minLongitude;
+            var maxLon = this.maxLongitude;
+
+            corners[0] = globe.computePointFromPosition(minLat, minLon, exaggeration * globe.elevationAtLocation(minLat, minLon), Vec3.zero());
+            corners[1] = globe.computePointFromPosition(minLat, maxLon, exaggeration * globe.elevationAtLocation(minLat, maxLon), Vec3.zero());
+            corners[2] = globe.computePointFromPosition(maxLat, maxLon, exaggeration * globe.elevationAtLocation(maxLat, maxLon), Vec3.zero());
+            corners[3] = globe.computePointFromPosition(maxLat, minLon, exaggeration * globe.elevationAtLocation(maxLat, minLon), Vec3.zero());
+            this.cornerPoints = new Array(corners.length);
+            for (var i = 0, len = corners.length; i < len; i++) {
+                this.cornerPoints[i] = Vec3.fromVec3(corners[i]);
+            }
+
+            return corners;
+        };
+
+        /**
+         * Returns an approximation of the distance in model coordinates between the
+         * surface geometry defined by this sector and the specified model
+         * coordinate point. The returned value represents the shortest distance
+         * between the specified point and this sector's corner points or its center
+         * point. The draw context defines the globe and the elevations that are
+         * used to compute the corner points and the center point.
+         *
+         * @param dc The draw context defining the surface geometry.
+         * @param point The model coordinate point to compute a distance to.
+         *
+         * @return The distance between this sector's surface geometry and the
+         * specified point, in model coordinates.
+         *
+         * @throws IllegalArgumentException if any argument is null.
+         */
+        Sector.prototype.distanceTo = function (dc, point) {
+            if (!dc) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "distanceTo", "missingDc"));
+            }
+
+            if (!point) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.Level.LEVEL_SEVERE, "Sector", "distanceTo", "missingPoint"));
+            }
+
+            var corners = this.computeCornerPoints(dc.globe, dc.verticalExaggeration);
+            var centerPoint = this.computeCenterPoint(dc.globe, dc.verticalExaggeration);
+
+            // Get the distance for each of the sector's corners and its center.
+            var d1 = point.distanceTo(corners[0]);
+            var d2 = point.distanceTo(corners[1]);
+            var d3 = point.distanceTo(corners[2]);
+            var d4 = point.distanceTo(corners[3]);
+            var d5 = point.distanceTo(centerPoint);
+
+            // Find the minimum distance.
+            var minDistance = d1;
+            if (minDistance > d2) {
+                minDistance = d2;
+            }
+            if (minDistance > d3) {
+                minDistance = d3;
+            }
+            if (minDistance > d4) {
+                minDistance = d4;
+            }
+            if (minDistance > d5) {
+                minDistance = d5;
+            }
+
+            return minDistance;
         };
 
         return Sector;

@@ -1,18 +1,29 @@
 /*
- * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
- * National Aeronautics and Space Administration. All rights reserved.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 define(['../../src/WorldWind',
         '../util/GoToBox',
@@ -34,15 +45,20 @@ define(['../../src/WorldWind',
             var wmtsCapabilities;
 
             /*
-            * The key to access Copernicus Sentinel data hosted on www.sentinel-hub.com is provided free-of-charge by
-            * Sinergise for demonstration purposes only. You must obtain your own key at www.sentinel-hub.com before
-            * using this layer in your application.
+            * This example should be functional if a valid API key is provided.
+            * Your own key to access Copernicus Sentinel data hosted on www.sentinel-hub.com must be
+            * obtained by creating an account at https://www.sentinel-hub.com/create_account/
+            * Trial keys as well as ESA-sponsored keys are available at https://www.sentinel-hub.com/Network-of-Resources/
             */
-            var wmtsServer = 'https://services.sentinel-hub.com/v1/wmts/56748ba2-4a88-4854-beea-86f9afc63e35';
 
-            $.get(wmtsServer + '?REQUEST=GetCapabilities&SERVICE=WMTS', function (response) {
+            // TO DO: Verify proper functioning with up to date API key
+
+            var wmtsServer = 'https://services.sentinel-hub.com/v1/wmts/';
+            var apiKey = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'; // Substitute with Sentinel Hub API key
+
+            $.get(wmtsServer + apiKey + '?REQUEST=GetCapabilities&SERVICE=WMTS', function (response) {
                 wmtsCapabilities = new WorldWind.WmtsCapabilities(response);
-                console.log(wmtsCapabilities);
+                // console.log(wmtsCapabilities);
             }).done(function () {
                 // Internal layers
                 var layers = [

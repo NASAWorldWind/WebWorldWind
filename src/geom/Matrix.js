@@ -1,18 +1,29 @@
 /*
- * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
- * National Aeronautics and Space Administration. All rights reserved.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 /**
  * @exports Matrix
@@ -1489,8 +1500,7 @@ define([
                     for (j = ii; j <= i - 1; j += 1) {
                         sum -= A[i][j] * b[j];
                     }
-                }
-                else if (sum != 0.0) {
+                } else if (sum != 0.0) {
                     ii = i;
                 }
 
@@ -1537,8 +1547,7 @@ define([
 
                 if (big == 0.0) {
                     return 0.0; // Matrix is singular if the entire row contains zero.
-                }
-                else {
+                } else {
                     vv[i] = 1.0 / big;
                 }
             }
@@ -1915,6 +1924,17 @@ define([
             result[2] = z / w;
 
             return true;
+        };
+
+        /**
+         * Returns a string representation of this matrix.
+         * @returns {String} A string representation of this matrix.
+         */
+        Matrix.prototype.toString = function () {
+            return "(" + this[0] + ", " + this[1] + ", " + this[2] + ", " + this[3] + ")\n" +
+                "(" + this[4] + ", " + this[5] + ", " + this[6] + ", " + this[7] + ")\n" +
+                "(" + this[8] + ", " + this[9] + ", " + this[10] + ", " + this[11] + ")\n" +
+                "(" + this[12] + ", " + this[13] + ", " + this[14] + ", " + this[15] + ")";
         };
 
         return Matrix;

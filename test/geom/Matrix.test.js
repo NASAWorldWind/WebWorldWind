@@ -1,18 +1,29 @@
 /*
- * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
- * National Aeronautics and Space Administration. All rights reserved.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *     http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 define([
     'src/geom/Matrix',
@@ -33,13 +44,6 @@ define([
 
             for (var i = 0; i < 16; i++) {
                 expect(matrix[i]).toEqual(i);
-            }
-        });
-
-        it("Matrix prototype", function () {
-            var matrix = Matrix.prototype;
-            for (var i = 0; i < 16; i++) {
-                expect(matrix[i]).toEqual(0);
             }
         });
 
@@ -273,7 +277,7 @@ define([
         describe("Sets this matrix to the matrix product of two specified matrices", function () {
 
             it("Sets the matrix correctly", function () {
-                var targetMatrix = Matrix.prototype;
+                var targetMatrix = new Matrix();
                 var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                 var matrixB = new Matrix(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
@@ -301,7 +305,7 @@ define([
 
                 it("Missing matrix A", function () {
                     expect(function () {
-                        var targetMatrix = Matrix.prototype;
+                        var targetMatrix = new Matrix();
                         var matrixB = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         targetMatrix.setToMultiply(null, matrixB);
                     }).toThrow();
@@ -309,7 +313,7 @@ define([
 
                 it("Missing matrix B", function () {
                     expect(function () {
-                        var targetMatrix = Matrix.prototype;
+                        var targetMatrix = new Matrix();
                         var matrixA = new Matrix(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
                         targetMatrix.setToMultiply(matrixA, null);
                     }).toThrow();
@@ -320,7 +324,7 @@ define([
         describe("Sets this matrix to the symmetric covariance Matrix computed from a point array", function () {
 
             it("Sets the matrix correctly", function () {
-                var targetMatrix = Matrix.prototype;
+                var targetMatrix = new Matrix();
                 targetMatrix.setToCovarianceOfPoints([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]);
 
                 expect(targetMatrix[0]).toEqual(26.25);
@@ -343,7 +347,7 @@ define([
 
             it("Should throw an exception on missing points", function () {
                 expect(function () {
-                    var targetMatrix = Matrix.prototype;
+                    var targetMatrix = new Matrix();
                     targetMatrix.setToCovarianceOfPoints(null);
                 }).toThrow();
             });
@@ -417,7 +421,7 @@ define([
         });
 
         it("Sets this matrix to one that flips and shifts the y-axis", function () {
-            var matrix = Matrix.prototype;
+            var matrix = new Matrix();
 
             matrix.setToUnitYFlip();
             expect(matrix[0]).toEqual(1);

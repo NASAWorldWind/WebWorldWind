@@ -1,18 +1,29 @@
 /*
- * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
- * National Aeronautics and Space Administration. All rights reserved.
+ * Copyright 2003-2006, 2009, 2017, 2020 United States Government, as represented
+ * by the Administrator of the National Aeronautics and Space Administration.
+ * All rights reserved.
  *
- * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License
+ * at http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * NASAWorldWind/WebWorldWind also contains the following 3rd party Open Source
+ * software:
+ *
+ *    ES6-Promise – under MIT License
+ *    libtess.js – SGI Free Software License B
+ *    Proj4 – under MIT License
+ *    JSZip – under MIT License
+ *
+ * A complete listing of 3rd Party software notices and licenses included in
+ * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
+ * PDF found in code  directory.
  */
 
 require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, ProjectionMenu) {
@@ -120,6 +131,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'box',
             initialScale: 500000,
             maxScale: 1000000,
+            doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -128,6 +141,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'duck',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -136,6 +151,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: '2_cylinder_engine',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -144,6 +161,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'Reciprocating_Saw',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -152,6 +171,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'gearbox_assy',
             initialScale: 10000,
             maxScale: 20000,
+            doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -160,6 +181,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'buggy',
             initialScale: 5000,
             maxScale: 10000,
+            doubleSided: false,
+            computedNormals: false,
             useTexturePaths: true
         },
         {
@@ -168,8 +191,30 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
             path: 'kmlBuilding',
             initialScale: 500,
             maxScale: 1000,
+            doubleSided: false,
+            computedNormals: false,
             useTexturePaths: false
         },
+        {
+            displayName: 'bad normals double sided',
+            fileName: 'bad_normals.dae',
+            path: 'bad_normals',
+            initialScale: 20000,
+            maxScale: 40000,
+            doubleSided: true,
+            computedNormals: false,
+            useTexturePaths: false
+        },
+        {
+            displayName: 'bad normals computed normals',
+            fileName: 'bad_normals.dae',
+            path: 'bad_normals',
+            initialScale: 20000,
+            maxScale: 40000,
+            doubleSided: false,
+            computedNormals: true,
+            useTexturePaths: false
+        }
     ];
 
     createCombo();
@@ -204,7 +249,8 @@ require(['../../src/WorldWind', '../util/ProjectionMenu'], function (ww, Project
                 scene.scale = model.initialScale;
                 scene.altitudeMode = WorldWind.ABSOLUTE;
                 scene.useTexturePaths = model.useTexturePaths;
-
+                scene.doubleSided = model.doubleSided;
+                scene.computedNormals = model.computedNormals;
                 modelLayer.removeAllRenderables();
                 modelLayer.addRenderable(scene);
 
