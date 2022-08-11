@@ -38,16 +38,16 @@ define([
     '../../../shapes/SurfacePolyline',
     '../../../util/WWUtil'
 ], function (Color,
-             KmlElements,
-             KmlGeometry,
-             KmlStyle,
-             Location,
-             NodeTransformers,
-             Path,
-             Position,
-             ShapeAttributes,
-             SurfacePolyline,
-             WWUtil) {
+    KmlElements,
+    KmlGeometry,
+    KmlStyle,
+    Location,
+    NodeTransformers,
+    Path,
+    Position,
+    ShapeAttributes,
+    SurfacePolyline,
+    WWUtil) {
     "use strict";
 
     /**
@@ -78,7 +78,7 @@ define([
          */
         kmlExtrude: {
             get: function () {
-                return this._factory.specific(this, {name: 'extrude', transformer: NodeTransformers.boolean}) || false;
+                return this._factory.specific(this, { name: 'extrude', transformer: NodeTransformers.boolean }) || false;
             }
         },
 
@@ -90,7 +90,7 @@ define([
          */
         kmlTessellate: {
             get: function () {
-                return this._factory.specific(this, {name: 'tessellate', transformer: NodeTransformers.boolean}) || false;
+                return this._factory.specific(this, { name: 'tessellate', transformer: NodeTransformers.boolean }) || false;
             }
         },
 
@@ -103,7 +103,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function () {
-                return this._factory.specific(this, {name: 'altitudeMode', transformer: NodeTransformers.string}) || WorldWind.ABSOLUTE;
+                return this._factory.specific(this, { name: 'altitudeMode', transformer: NodeTransformers.string }) || WorldWind.CLAMP_TO_GROUND;
             }
         },
 
@@ -115,7 +115,7 @@ define([
          */
         kmlPositions: {
             get: function () {
-                return this._factory.specific(this, {name: 'coordinates', transformer: NodeTransformers.positions});
+                return this._factory.specific(this, { name: 'coordinates', transformer: NodeTransformers.positions });
             }
         },
 
@@ -153,26 +153,26 @@ define([
      * @param styles.highlight {KmlStyle} Style applied when item is highlighted
      */
     KmlLineString.prototype.createPath = function (styles, fileCache) {
-        if(this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
+        if (this.kmlAltitudeMode == WorldWind.CLAMP_TO_GROUND) {
             this._renderable = new SurfacePolyline(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         } else {
             this._renderable = new Path(this.prepareLocations(), this.prepareAttributes(styles.normal, fileCache));
         }
-        if(styles.highlight) {
+        if (styles.highlight) {
             this._renderable.highlightAttributes = this.prepareAttributes(styles.highlight, fileCache);
         }
         this.moveValidProperties();
     };
 
-    KmlLineString.prototype.render = function(dc, kmlOptions) {
+    KmlLineString.prototype.render = function (dc, kmlOptions) {
         KmlGeometry.prototype.render.call(this, dc, kmlOptions);
 
-        if(kmlOptions.lastStyle && !this._renderable) {
+        if (kmlOptions.lastStyle && !this._renderable) {
             this.createPath(kmlOptions.lastStyle, kmlOptions.fileCache);
             dc.redrawRequested = true;
         }
 
-        if(this._renderable) {
+        if (this._renderable) {
             this._renderable.enabled = this.enabled;
             this._renderable.render(dc);
         }
@@ -182,7 +182,7 @@ define([
      * @inheritDoc
      */
     KmlLineString.prototype.prepareAttributes = function (style, fileCache) {
-        var shapeOptions = style && style.generate(fileCache) || {};
+        var shapeOptions = style && style.generate({}, fileCache) || {};
 
         shapeOptions._applyLighting = true;
         shapeOptions._drawOutline = true;
@@ -208,7 +208,7 @@ define([
      */
     KmlLineString.prototype.moveValidProperties = function () {
         this._renderable.extrude = this.kmlExtrude || false;
-        this._renderable.altitudeMode = this.kmlAltitudeMode || WorldWind.ABSOLUTE;
+        this._renderable.altitudeMode = this.kmlAltitudeMode || WorldWind.CLAMP_TO_GROUND;
         //noinspection JSUnusedGlobalSymbols
         this._renderable.tesselate = this.kmlTesselate || false;
     };
