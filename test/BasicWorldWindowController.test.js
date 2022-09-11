@@ -48,7 +48,7 @@ define([
             //     wwd.worldWindowController.handlePanOrDrag2D(recognizer);
             //
             //     var lookAt = new LookAt();
-            //     wwd.camera.getAsLookAt(lookAt);
+            //     wwd.cameraAsLookAt(lookAt);
             //
             //     expect(lookAt.range).toEqual(10000000);
             //     expect(lookAt.tilt).toEqual(0);

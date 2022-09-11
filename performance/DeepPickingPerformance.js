@@ -69,7 +69,7 @@ requirejs(['../src/WorldWind',
         var lookAt = new WorldWind.LookAt();
         lookAt.position = new WorldWind.Position(44.2, -94.12, 0);
         lookAt.range = 625000;
-        wwd.camera.setFromLookAt(lookAt);
+        wwd.cameraFromLookAt(lookAt);
 
         // Satellite image footprints
         var footprints = [];

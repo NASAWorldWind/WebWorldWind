@@ -19,12 +19,10 @@
 define([
         '../error/ArgumentError',
         '../util/Logger',
-        '../geom/Matrix',
         '../geom/Position'
     ],
     function (ArgumentError,
               Logger,
-              Matrix,
               Position) {
         "use strict";
 
@@ -62,28 +60,6 @@ define([
              * @default 10,000 kilometers
              */
             this.range = 10e6; // TODO: Compute initial range to fit globe in viewport.
-        };
-
-        /**
-         * Internal use only.
-         * Computes the model view matrix for this look at view.
-         * @ignore
-         */
-        LookAt.prototype.computeViewingTransform = function (globe, modelview) {
-            if (!globe) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "computeViewingTransform", "missingGlobe"));
-            }
-
-            if (!modelview) {
-                throw new ArgumentError(
-                    Logger.logMessage(Logger.LEVEL_SEVERE, "LookAt", "computeViewingTransform", "missingModelview"));
-            }
-
-            modelview.setToIdentity();
-            modelview.multiplyByLookAtModelview(this.position, this.range, this.heading, this.tilt, this.roll, globe);
-
-            return modelview;
         };
 
         /**

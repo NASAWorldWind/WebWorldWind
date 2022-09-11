@@ -34,7 +34,7 @@ define([
                 lookAt.position = new Position(30, -90, 0);
                 lookAt.range = 1.131761199603698E7;
                 var result = Matrix.fromIdentity();
-                lookAt.computeViewingTransform(wwd.globe, result);
+                wwd.lookAtToViewingTransform(lookAt, result);
                 var expectedModelview = new Matrix(
                     6.123233995736767E-17, -3.0814879110195774E-33, 1.0, 2.0679515313825692E-25,
                     0.5, 0.8660254037844387, -3.0616169978683836E-17, 18504.125313223805,

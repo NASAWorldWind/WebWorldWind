@@ -36,10 +36,10 @@ define([
             //     var lookAt = new LookAt();
             //     camera.position = new Position(30, -110, 10000000);
             //     for (var a = 0; a < 90; a++) {
-            //         camera.getAsLookAt(lookAt);
+            //         wwd.cameraAsLookAt(lookAt);
             //         console.log(lookAt.toString());
             //         lookAt.heading = a;
-            //         camera.setFromLookAt(lookAt);
+            //         wwd.cameraFromLookAt(lookAt);
             //         console.log(camera.toString());
             //         console.log('===');
             //     }
@@ -48,7 +48,7 @@ define([
             //     var testView = wwd.camera;
             //     testView.position = new Position(30, -110, 10e6);
             //     var result = Matrix.fromIdentity();
-            //     testView.computeViewingTransform(result);
+            //     wwd.cameraToViewingTransform(result);
             //     var expectedModelview = new Matrix(
             //         -0.3420201433256687, 0.0, 0.9396926207859083, 0.0,
             //         0.46984631039295405, 0.8660254037844386, 0.17101007166283433, 18504.157,
@@ -61,7 +61,7 @@ define([
             //     var testView = wwd.camera;
             //     testView.position = new Position(0, 0, 10e6);
             //     var result = Matrix.fromIdentity();
-            //     testView.computeViewingTransform(result);
+            //     wwd.cameraToViewingTransform(result);
             //     var expectedModelview = new Matrix(
             //         1.0, 0.0, 0.0, -0.0,
             //         0.0, 1.0, 0.0, -0.0,
@@ -73,7 +73,7 @@ define([
             //     var testView = wwd.camera;
             //     testView.position = new Position(30, 0, 10e6);
             //     var result = Matrix.fromIdentity();
-            //     testView.computeViewingTransform(result);
+            //     wwd.cameraToViewingTransform(result);
             //     var expectedModelview = new Matrix(
             //         1.0,0.0,0.0,-0.0,
             //         0.0,0.8660254037844387,-0.5,18504.125313225202,
@@ -87,7 +87,7 @@ define([
             //     var lookAt = new LookAt();
             //     lookAt.range = 1.131761199603698E7;
             //     lookAt.position = new Position(30, -90, 0);
-            //     camera.setFromLookAt(lookAt);
+            //     wwd.cameraFromLookAt(lookAt);
             //     expect(camera.position.latitude).toBeCloseTo(30.0, 6);
             //     expect(camera.position.longitude).toBeCloseTo(-90.0, 6);
             //     expect(camera.position.altitude).toBeCloseTo(1.131761199603698E7, 6);
@@ -104,7 +104,7 @@ define([
             //     lookAt.roll = 5;
             //     lookAt.heading = 15;
             //     lookAt.position = new Position(30, -90, 0);
-            //     camera.setFromLookAt(lookAt);
+            //     wwd.cameraFromLookAt(lookAt);
             //     expect(camera.position.latitude).toBeCloseTo(26.90254740059172, 6);
             //     expect(camera.position.longitude).toBeCloseTo(-90.92754733364956, 6);
             //     expect(camera.position.altitude).toBeCloseTo(11302122.347, 3);
@@ -117,14 +117,14 @@ define([
         describe("Indicates whether the components of two cameras are equal", function () {
 
             it("Equal cameras", function () {
-                var c1 = new Camera("test");
-                var c2 = new Camera("test");
+                var c1 = new Camera();
+                var c2 = new Camera();
                 expect(c1.equals(c2)).toBe(true);
             });
 
             it("Not equal cameras", function () {
-                var c1 = new Camera("test");
-                var c2 = new Camera("test");
+                var c1 = new Camera();
+                var c2 = new Camera();
                 c2.heading = c1.heading + 1;
                 expect(c1.equals(c2)).toBe(false);
                 c2.heading = c1.heading;
@@ -144,7 +144,7 @@ define([
             });
 
             it("Null comparison", function () {
-                var c1 = new Camera("test");
+                var c1 = new Camera();
                 expect(c1.equals(null)).toBe(false);
                 expect(c1.equals(undefined)).toBe(false);
             });
@@ -152,8 +152,8 @@ define([
 
         describe("Camera cloning and copying", function () {
             it("Correctly copy cameras", function () {
-                var c1 = new Camera("test");
-                var c2 = new Camera("test");
+                var c1 = new Camera();
+                var c2 = new Camera();
                 c2.heading = c1.heading + 1;
                 c2.tilt = c1.tilt + 1;
                 c2.roll = c1.roll + 1;
@@ -163,7 +163,7 @@ define([
             });
 
             it("Correctly clones cameras", function () {
-                var c1 = new Camera("test");
+                var c1 = new Camera();
                 c1.heading = c1.heading + 1;
                 c1.tilt = c1.tilt + 1;
                 c1.roll = c1.roll + 1;

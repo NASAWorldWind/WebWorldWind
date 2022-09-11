@@ -81,7 +81,7 @@ define([
             var wwd = new MockWorldWindow();
             wwd.globe = mockGlobe;
             wwd.drawContext = dc;
-            wwd.camera = new Camera(wwd);
+            wwd.camera = new Camera();
             wwd.worldWindowController = new BasicWorldWindowController(wwd);
             wwd.viewport = viewport;
             wwd.depthBits = 24;

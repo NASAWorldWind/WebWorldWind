@@ -32,6 +32,7 @@ define([
         './error/ArgumentError',
         './BasicWorldWindowController',
         './geom/Camera',
+        './geom/LookAt',
         './render/DrawContext',
         './globe/EarthElevationModel',
         './util/FrameStatistics',
@@ -59,6 +60,7 @@ define([
     function (ArgumentError,
               BasicWorldWindowController,
               Camera,
+              LookAt,
               DrawContext,
               EarthElevationModel,
               FrameStatistics,
@@ -143,6 +145,15 @@ define([
             this.scratchProjection = Matrix.fromIdentity();
 
             // Internal. Intentionally not documented.
+            this.scratchPoint = new Vec3(0, 0, 0);
+
+            // Internal. Intentionally not documented.
+            this.scratchPosition = new Position(0, 0, 0);
+
+            // Internal. Intentionally not documented.
+            this.scratchRay = new Line(new Vec3(0, 0, 0), new Vec3(0, 0, 0));
+
+            // Internal. Intentionally not documented.
             this.hasStencilBuffer = gl.getContextAttributes().stencil;
 
             /**
@@ -196,7 +207,7 @@ define([
              * @type {Camera}
              * @default [Camera]{@link Camera}
              */
-            this.camera = new Camera(this);
+            this.camera = new Camera();
 
             /**
              * The controller used to manipulate the globe.
@@ -499,6 +510,113 @@ define([
         };
 
         /**
+         * Sets the properties of this Camera such that it mimics the supplied look at view. Note that repeated conversions
+         * between a look at and a camera view may result in view errors due to rounding.
+         * @param {LookAt} lookAt The look at view to mimic.
+         * @returns {Camera} This camera set to mimic the supplied look at view.
+         * @throws {ArgumentError} If the specified look at view is null or undefined.
+         */
+        WorldWindow.prototype.cameraFromLookAt = function (lookAt) {
+            if (!lookAt) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "setFromLookAt", "missingLookAt"));
+            }
+
+            var globe = this.globe,
+                ve = this.verticalExaggeration,
+                position = this.camera.position,
+                ray = this.scratchRay,
+                originPoint = this.scratchPoint,
+                modelview = this.scratchModelview,
+                origin = this.scratchProjection;
+
+            this.lookAtToViewingTransform(lookAt, modelview);
+            modelview.extractEyePoint(originPoint);
+
+            globe.computePositionFromPoint(originPoint[0], originPoint[1], originPoint[2], position);
+            origin.setToIdentity();
+            origin.multiplyByLocalCoordinateTransform(originPoint, globe);
+            modelview.multiplyMatrix(origin);
+
+            this.camera.heading = modelview.extractHeading(lookAt.roll); // disambiguate heading and roll
+            this.camera.tilt = modelview.extractTilt();
+            this.camera.roll = lookAt.roll; // roll passes straight through
+
+            // Check if camera altitude is not under the surface and correct tilt
+            var elevation = globe.elevationAtLocation(position.latitude, position.longitude) * ve + 10.0; // 10m above surface
+            if(elevation > position.altitude) {
+                // Set camera altitude above the surface
+                position.altitude = elevation;
+                // Compute new camera point
+                globe.computePointFromPosition(position.latitude, position.longitude, position.altitude, originPoint);
+                // Compute look at point
+                globe.computePointFromPosition(lookAt.position.latitude, lookAt.position.longitude, lookAt.position.altitude, ray.origin);
+                // Compute normal to globe in look at point
+                globe.surfaceNormalAtLocation(lookAt.position.latitude, lookAt.position.longitude, ray.direction);
+                // Calculate tilt angle between new camera point and look at point
+                originPoint.subtract(ray.origin).normalize();
+                var dot = ray.direction.dot(originPoint);
+                if (dot >= -1 && dot <= 1) {
+                    this.camera.tilt = Math.acos(dot) / Math.PI * 180;
+                }
+            }
+
+            return this;
+        };
+
+        /**
+         * Converts the properties of this Camera to those of a look at view. Note that repeated conversions
+         * between a look at and a camera view may result in view errors due to rounding.
+         * @param {LookAt} result The look at view to hold the converted properties.
+         * @param {Position} terrainPosition Picked terrain position.
+         * @returns {LookAt} A reference to the result parameter.
+         * @throws {ArgumentError} If the specified result object is null or undefined.
+         */
+        WorldWindow.prototype.cameraAsLookAt = function (result, terrainPosition = this.pick([this.viewport.width / 2, this.viewport.height / 2]).terrainObject().position) {
+            if (!result) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "getAsLookAt", "missingResult"));
+            }
+
+            var globe = this.globe,
+                forwardRay = this.scratchRay,
+                modelview = this.scratchModelview,
+                originPoint = this.scratchPoint,
+                originPos = this.scratchPosition,
+                origin = this.scratchProjection;
+
+            this.cameraToViewingTransform(modelview);
+
+            // Pick terrain located behind the viewport center point
+            if (terrainPosition) {
+                // Use picked terrain position including approximate rendered altitude
+                originPos.copy(terrainPosition);
+                globe.computePointFromPosition(originPos.latitude, originPos.longitude, originPos.altitude, originPoint);
+            } else {
+                // Center is outside the globe - use point on horizon
+                modelview.extractEyePoint(forwardRay.origin);
+                modelview.extractForwardVector(forwardRay.direction);
+
+                var horizon = globe.horizonDistance(this.camera.position.altitude);
+                forwardRay.pointAt(horizon, originPoint);
+
+                globe.computePositionFromPoint(originPoint[0], originPoint[1], originPoint[2], originPos);
+            }
+
+            origin.setToIdentity();
+            origin.multiplyByLocalCoordinateTransform(originPoint, globe);
+            modelview.multiplyMatrix(origin);
+
+            result.position.copy(originPos);
+            result.range = -modelview[11];
+            result.heading = modelview.extractHeading(this.camera.roll); // disambiguate heading and roll
+            result.tilt = modelview.extractTilt();
+            result.roll = this.camera.roll; // roll passes straight through
+
+            return result;
+        };
+
+        /**
          * Requests the WorldWind objects displayed at a specified screen-coordinate point.
          *
          * If the point intersects the terrain, the returned list contains an object identifying the associated geographic
@@ -710,7 +828,7 @@ define([
                     Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "computeViewingTransform", "missingModelview"));
             }
 
-            this.camera.computeViewingTransform(modelview);
+            this.cameraToViewingTransform(modelview);
 
             if (projection) {
                 var eyePos = this.camera.position,
@@ -751,6 +869,45 @@ define([
                 projection.setToIdentity();
                 projection.setToPerspectiveProjection(viewport.width, viewport.height, fieldOfView, nearDistance, farDistance);
             }
+        };
+
+        /**
+         * Internal use only.
+         * Computes the model view matrix for this camera.
+         * @ignore
+         */
+        WorldWindow.prototype.cameraToViewingTransform = function (modelview) {
+            if (!modelview) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "cameraToViewingTransform", "missingModelview"));
+            }
+
+            modelview.setToIdentity();
+            modelview.multiplyByFirstPersonModelview(this.camera.position, this.camera.heading, this.camera.tilt, this.camera.roll, this.globe);
+
+            return modelview;
+        };
+
+        /**
+         * Internal use only.
+         * Computes the model view matrix for this look at view.
+         * @ignore
+         */
+        WorldWindow.prototype.lookAtToViewingTransform = function (lookAt, modelview) {
+            if (!lookAt) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "lookAtToViewingTransform", "missingGlobe"));
+            }
+
+            if (!modelview) {
+                throw new ArgumentError(
+                    Logger.logMessage(Logger.LEVEL_SEVERE, "WorldWindow", "lookAtToViewingTransform", "missingModelview"));
+            }
+
+            modelview.setToIdentity();
+            modelview.multiplyByLookAtModelview(lookAt.position, lookAt.range, lookAt.heading, lookAt.tilt, lookAt.roll, this.globe);
+
+            return modelview;
         };
 
         /**

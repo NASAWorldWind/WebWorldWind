@@ -697,7 +697,7 @@ define([
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handlePan;
-                this.wwd.camera.getAsLookAt(this.lookAt);
+                this.wwd.cameraAsLookAt(this.lookAt);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -722,7 +722,7 @@ define([
 
                         Location.greatCircleLocation(lookAt.position, heading, -distance,
                             lookAt.position);
-                        thisLayer.wwd.camera.setFromLookAt(lookAt);
+                        thisLayer.wwd.cameraFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setLookAtLocation, 50);
                     }
@@ -743,7 +743,7 @@ define([
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleZoom;
-                this.wwd.camera.getAsLookAt(this.lookAt);
+                this.wwd.cameraAsLookAt(this.lookAt);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -760,7 +760,7 @@ define([
                         } else if (thisLayer.activeControl === thisLayer.zoomOutControl) {
                             lookAt.range *= (1 + thisLayer.zoomIncrement);
                         }
-                        thisLayer.wwd.camera.setFromLookAt(lookAt);
+                        thisLayer.wwd.cameraFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
@@ -781,7 +781,7 @@ define([
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleHeading;
-                this.wwd.camera.getAsLookAt(this.lookAt);
+                this.wwd.cameraAsLookAt(this.lookAt);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -798,7 +798,7 @@ define([
                         } else if (thisLayer.activeControl === thisLayer.headingRightControl) {
                             lookAt.heading -= thisLayer.headingIncrement;
                         }
-                        thisLayer.wwd.camera.setFromLookAt(lookAt);
+                        thisLayer.wwd.cameraFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setHeading, 50);
                     }
@@ -818,7 +818,7 @@ define([
             if (this.isPointerDown(e) || this.isTouchStart(e)) {
                 this.activeControl = control;
                 this.activeOperation = this.handleTilt;
-                this.wwd.camera.getAsLookAt(this.lookAt);
+                this.wwd.cameraAsLookAt(this.lookAt);
                 e.preventDefault();
 
                 if (this.isTouchStart(e)) {
@@ -837,7 +837,7 @@ define([
                             lookAt.tilt =
                                 Math.min(90, lookAt.tilt + thisLayer.tiltIncrement);
                         }
-                        thisLayer.wwd.camera.setFromLookAt(lookAt);
+                        thisLayer.wwd.cameraFromLookAt(lookAt);
                         thisLayer.wwd.redraw();
                         setTimeout(setTilt, 50);
                     }

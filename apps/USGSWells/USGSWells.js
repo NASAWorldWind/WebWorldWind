@@ -91,7 +91,7 @@ define(['../../src/WorldWind',
             lookAt.range = 1400;
             lookAt.heading = 90;
             lookAt.tilt = 60;
-            this.wwd.camera.setFromLookAt(lookAt);
+            this.wwd.cameraFromLookAt(lookAt);
 
             // Establish the shapes and the controllers to handle picking.
             this.setupPicking();

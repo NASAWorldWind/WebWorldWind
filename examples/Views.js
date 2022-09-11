@@ -24,7 +24,7 @@ requirejs(['./WorldWindShim',
         var wwd = new WorldWind.WorldWindow("canvasOne");
         var camera = wwd.camera;
         var lookAt = new WorldWind.LookAt();
-        camera.getAsLookAt(lookAt);
+        wwd.cameraAsLookAt(lookAt);
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},
@@ -127,7 +127,7 @@ requirejs(['./WorldWindShim',
                     rangeSlider.slider("disable");
                     altitudeSlider.slider("enable");
                 } else {
-                    camera.getAsLookAt(lookAt);
+                    wwd.cameraAsLookAt(lookAt);
                     pos = lookAt.position;
                     view = lookAt;
                     rangeSlider.slider("enable");
@@ -138,7 +138,7 @@ requirejs(['./WorldWindShim',
                     pos = camera.position;
                     view = camera;
                 } else {
-                    camera.getAsLookAt(lookAt);
+                    wwd.cameraAsLookAt(lookAt);
                     pos = lookAt.position;
                     view = lookAt;
                 }
@@ -150,7 +150,7 @@ requirejs(['./WorldWindShim',
                 view.roll = rollSlider.slider("value");
                 if (selectedViewType === "LookAt") {
                     lookAt.range = rangeSlider.slider("value");
-                    camera.setFromLookAt(lookAt);
+                    wwd.cameraFromLookAt(lookAt);
                 }
             }
             updateControls(pos, view);
@@ -159,7 +159,7 @@ requirejs(['./WorldWindShim',
 
         window.setInterval(function () {
             var pos, view;
-            camera.getAsLookAt(lookAt);
+            wwd.cameraAsLookAt(lookAt);
             if (currentViewType === "Camera") {
                 pos = camera.position;
                 view = camera;

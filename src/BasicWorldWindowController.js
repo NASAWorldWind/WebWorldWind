@@ -131,6 +131,8 @@ define([
             this.beginPoint = new Vec2(0, 0);
             this.lastPoint = new Vec2(0, 0);
             this.lastRotation = 0;
+            this.lastWheelEvent = 0;
+            this.activeGestures = 0;
 
             /**
              * Internal use only.
@@ -251,9 +253,9 @@ define([
                 lookAt.position.latitude += forwardDegrees * cosHeading - sideDegrees * sinHeading;
                 lookAt.position.longitude += forwardDegrees * sinHeading + sideDegrees * cosHeading;
                 this.lastPoint.set(tx, ty);
-                this.applyLookAtLimits(lookAt);
-                this.wwd.camera.setFromLookAt(lookAt);
-                this.wwd.redraw();
+                this.applyChanges();
+            } else if (state === WorldWind.ENDED || state === WorldWind.CANCELLED) {
+                this.gestureDidEnd();
             }
         };
 
@@ -295,7 +297,7 @@ define([
 
                 // Transform the original view's modelview matrix to account for the gesture's change.
                 var modelview = Matrix.fromIdentity();
-                lookAt.computeViewingTransform(globe, modelview);
+                this.wwd.lookAtToViewingTransform(lookAt, modelview);
                 modelview.multiplyByTranslation(point2[0] - point1[0], point2[1] - point1[1], point2[2] - point1[2]);
 
                 // Compute the globe point at the screen center from the perspective of the transformed view.
@@ -313,9 +315,9 @@ define([
                 lookAt.heading = params.heading;
                 lookAt.tilt = params.tilt;
                 lookAt.roll = params.roll;
-                this.applyLookAtLimits(lookAt);
-                this.wwd.camera.setFromLookAt(lookAt);
-                this.wwd.redraw();
+                this.applyChanges();
+            } else if (state === WorldWind.ENDED || state === WorldWind.CANCELLED) {
+                this.gestureDidEnd();
             }
         };
 
@@ -337,9 +339,9 @@ define([
                 // Apply the change in heading and tilt to this view's corresponding properties.
                 lookAt.heading = this.beginLookAt.heading + headingDegrees;
                 lookAt.tilt = this.beginLookAt.tilt + tiltDegrees;
-                this.applyLookAtLimits(lookAt);
-                this.wwd.camera.setFromLookAt(lookAt);
-                this.wwd.redraw();
+                this.applyChanges();
+            } else if (state === WorldWind.ENDED || state === WorldWind.CANCELLED) {
+                this.gestureDidEnd();
             }
         };
 
@@ -356,10 +358,10 @@ define([
                     // began.
                     var lookAt = this.lookAt;
                     lookAt.range = this.beginLookAt.range / scale;
-                    this.applyLookAtLimits(lookAt);
-                    this.wwd.camera.setFromLookAt(lookAt);
-                    this.wwd.redraw();
+                    this.applyChanges();
                 }
+            } else if (state === WorldWind.ENDED || state === WorldWind.CANCELLED) {
+                this.gestureDidEnd();
             }
         };
 
@@ -378,9 +380,9 @@ define([
                 var lookAt = this.lookAt;
                 lookAt.heading -= rotation - this.lastRotation;
                 this.lastRotation = rotation;
-                this.applyLookAtLimits(lookAt);
-                this.wwd.camera.setFromLookAt(lookAt);
-                this.wwd.redraw();
+                this.applyChanges();
+            } else if (state === WorldWind.ENDED || state === WorldWind.CANCELLED) {
+                this.gestureDidEnd();
             }
         };
 
@@ -397,16 +399,21 @@ define([
                 var tiltDegrees = -90 * ty / this.wwd.canvas.clientHeight;
                 // Apply the change in heading and tilt to this view's corresponding properties.
                 var lookAt = this.lookAt;
-                lookAt.tilt = this.beginTilt + tiltDegrees;
-                this.applyLookAtLimits(lookAt);
-                this.wwd.camera.setFromLookAt(lookAt);
-                this.wwd.redraw();
+                lookAt.tilt = this.beginLookAt.tilt + tiltDegrees;
+                this.applyChanges();
+            } else if (state === WorldWind.ENDED || state === WorldWind.CANCELLED) {
+                this.gestureDidEnd();
             }
         };
 
         // Intentionally not documented.
         BasicWorldWindowController.prototype.handleWheelEvent = function (event) {
-            var lookAt = this.wwd.camera.getAsLookAt(this.lookAt);
+            var lookAt = this.lookAt;
+            var timeStamp = event.timeStamp;
+            if (timeStamp - this.lastWheelEvent > 500) {
+                this.wwd.cameraAsLookAt(lookAt);
+                this.lastWheelEvent = timeStamp;
+            }
             // Normalize the wheel delta based on the wheel delta mode. This produces a roughly consistent delta across
             // browsers and input devices.
             var normalizedDelta;
@@ -425,17 +432,17 @@ define([
 
             // Apply the scale to this view's properties.
             lookAt.range *= scale;
-            this.applyLookAtLimits(lookAt);
-            this.wwd.camera.setFromLookAt(lookAt);
-            this.wwd.redraw();
+            this.applyChanges();
         };
 
         /**
          * Internal use only.
-         * Limits the properties of a look at view to prevent unwanted navigation behaviour.
+         * Limits the properties of a look at view to prevent unwanted navigation behaviour and update camera view.
          * @ignore
          */
-        BasicWorldWindowController.prototype.applyLookAtLimits = function (lookAt) {
+        BasicWorldWindowController.prototype.applyChanges = function () {
+            var lookAt = this.lookAt;
+
             // Clamp latitude to between -90 and +90, and normalize longitude to between -180 and +180.
             lookAt.position.latitude = WWMath.clamp(lookAt.position.latitude, -90, 90);
             lookAt.position.longitude = Angle.normalizedDegreesLongitude(lookAt.position.longitude);
@@ -463,16 +470,10 @@ define([
                 // Force tilt to 0 when in 2D mode to keep the viewer looking straight down.
                 lookAt.tilt = 0;
             }
-        };
 
-        /**
-         * Documented in super-class.
-         * @ignore
-         */
-        BasicWorldWindowController.prototype.applyLimits = function () {
-            var lookAt = this.wwd.camera.getAsLookAt(this.lookAt);
-            this.applyLookAtLimits(lookAt);
-            this.wwd.camera.setFromLookAt(lookAt);
+            // Update camera view.
+            this.wwd.cameraFromLookAt(lookAt);
+            this.wwd.redraw();
         };
 
         /**
@@ -481,8 +482,17 @@ define([
          * @ignore
          */
         BasicWorldWindowController.prototype.gestureDidBegin = function () {
-            this.wwd.camera.getAsLookAt(this.beginLookAt);
-            this.lookAt.copy(this.beginLookAt);
+            if (this.activeGestures++ === 0) {
+                this.wwd.cameraAsLookAt(this.beginLookAt);
+                this.lookAt.copy(this.beginLookAt);
+            }
+        };
+
+        BasicWorldWindowController.prototype.gestureDidEnd = function () {
+            // this should always be the case, but we check anyway
+            if (this.activeGestures > 0) {
+                this.activeGestures--;
+            }
         };
 
         return BasicWorldWindowController;

@@ -22,7 +22,7 @@ requirejs(['./WorldWindShim'],
         var wwd = new WorldWind.WorldWindow("canvasOne");
         var camera = wwd.camera;
         var lookAt = new WorldWind.LookAt();
-        camera.getAsLookAt(lookAt);
+        wwd.cameraAsLookAt(lookAt);
         var layers = [
             {layer: new WorldWind.BMNGLayer(), enabled: true},
             {layer: new WorldWind.BingAerialWithLabelsLayer(null), enabled: true},

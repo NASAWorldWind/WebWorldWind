@@ -64,7 +64,7 @@ define(['../../src/WorldWind',
             var lookAt = new WorldWind.LookAt();
             lookAt.position.latitude = 30;
             lookAt.position.longitude = -(180 / 12) * ((new Date()).getTimezoneOffset() / 60);
-            this.wwd.camera.setFromLookAt(lookAt);
+            this.wwd.cameraFromLookAt(lookAt);
 
             this.timeSeriesPlayer = new TimeSeriesPlayer(this.wwd);
             this.projectionMenu = new ProjectionMenu(this.wwd);

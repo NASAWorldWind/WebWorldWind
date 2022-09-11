@@ -71,12 +71,12 @@ define([
              */
             lookAtLocation: {
                 get: function () {
-                    this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    this.wwd.cameraAsLookAt(this.scratchLookAt);
                     this.scratchLookAtPositionProxy.position.copy(this.scratchLookAt.position);
                     return this.scratchLookAtPositionProxy;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.cameraAsLookAt(this.scratchLookAt);
                     lookAt.position.latitude = value.latitude;
                     lookAt.position.longitude = value.longitude;
                     if (value.altitude) {
@@ -85,7 +85,7 @@ define([
                     else {
                         lookAt.position.altitude = 0;
                     }
-                    this.wwd.camera.setFromLookAt(lookAt);
+                    this.wwd.cameraFromLookAt(lookAt);
                 }
             },
 
@@ -96,12 +96,12 @@ define([
              */
             range: {
                 get: function () {
-                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).range;
+                    return this.wwd.cameraAsLookAt(this.scratchLookAt).range;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.cameraAsLookAt(this.scratchLookAt);
                     lookAt.range = value;
-                    this.wwd.camera.setFromLookAt(lookAt);
+                    this.wwd.cameraFromLookAt(lookAt);
                 }
             }
         });

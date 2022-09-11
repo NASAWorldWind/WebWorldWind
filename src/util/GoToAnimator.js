@@ -121,7 +121,7 @@ define([
             // Reset the cancellation flag.
             this.cancelled = false;
 
-            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.wwd.cameraAsLookAt(this.lookAt);
             // Capture the target position and determine its altitude.
             this.targetPosition = new Position(position.latitude, position.longitude,
                 position.altitude || this.lookAt.range);
@@ -260,7 +260,7 @@ define([
                 continueAnimation = Math.abs(this.lookAt.range - this.targetPosition.altitude) > 1;
             }
 
-            this.wwd.camera.setFromLookAt(this.lookAt);
+            this.wwd.cameraFromLookAt(this.lookAt);
 
             return continueAnimation;
         };
@@ -280,7 +280,7 @@ define([
 
             this.lookAt.position.latitude = nextLocation.latitude;
             this.lookAt.position.longitude = nextLocation.longitude;
-            this.wwd.camera.setFromLookAt(this.lookAt);
+            this.wwd.cameraFromLookAt(this.lookAt);
 
             // We're done if we're within a meter of the desired location.
             if (nextDistance < 1 / this.wwd.globe.equatorialRadius) {

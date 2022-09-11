@@ -71,12 +71,12 @@ define(['../error/ArgumentError',
              */
             heading: {
                 get: function () {
-                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).heading;
+                    return this.wwd.cameraAsLookAt(this.scratchLookAt).heading;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.cameraAsLookAt(this.scratchLookAt);
                     lookAt.heading = value;
-                    this.wwd.camera.setFromLookAt(lookAt);
+                    this.wwd.cameraFromLookAt(lookAt);
                 }
             },
 
@@ -87,12 +87,12 @@ define(['../error/ArgumentError',
              */
             tilt: {
                 get: function () {
-                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).tilt;
+                    return this.wwd.cameraAsLookAt(this.scratchLookAt).tilt;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.cameraAsLookAt(this.scratchLookAt);
                     lookAt.tilt = value;
-                    this.wwd.camera.setFromLookAt(lookAt);
+                    this.wwd.cameraFromLookAt(lookAt);
                 }
             },
 
@@ -103,12 +103,12 @@ define(['../error/ArgumentError',
              */
             roll: {
                 get: function () {
-                    return this.wwd.camera.getAsLookAt(this.scratchLookAt).roll;
+                    return this.wwd.cameraAsLookAt(this.scratchLookAt).roll;
                 },
                 set: function (value) {
-                    var lookAt = this.wwd.camera.getAsLookAt(this.scratchLookAt);
+                    var lookAt = this.wwd.cameraAsLookAt(this.scratchLookAt);
                     lookAt.roll = value;
-                    this.wwd.camera.setFromLookAt(lookAt);
+                    this.wwd.cameraFromLookAt(lookAt);
                 }
             }
         });

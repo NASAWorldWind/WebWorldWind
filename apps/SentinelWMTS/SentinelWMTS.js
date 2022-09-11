@@ -84,7 +84,7 @@ define(['../../src/WorldWind',
                 lookAt.position.latitude = 48.86;
                 lookAt.position.longitude = 2.37;
                 lookAt.range = 5e4;
-                this.wwd.camera.setFromLookAt(lookAt);
+                this.wwd.cameraFromLookAt(lookAt);
 
                 // Create controllers for the user interface elements.
                 new GoToBox(wwd);

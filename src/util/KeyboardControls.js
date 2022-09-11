@@ -120,9 +120,9 @@ define([
          * Reset the view to North up.
          */
         KeyboardControls.prototype.resetHeading = function () {
-            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.wwd.cameraAsLookAt(this.lookAt);
             this.lookAt.heading = Number(0);
-            this.wwd.camera.setFromLookAt(this.lookAt);
+            this.wwd.cameraFromLookAt(this.lookAt);
             this.wwd.redraw();
         };
 
@@ -130,10 +130,10 @@ define([
          * Reset the view to North up and nadir.
          */
         KeyboardControls.prototype.resetHeadingAndTilt = function () {
-            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.wwd.cameraAsLookAt(this.lookAt);
             this.lookAt.heading = 0;
             this.lookAt.tilt = 0;
-            this.wwd.camera.setFromLookAt(this.lookAt);
+            this.wwd.cameraFromLookAt(this.lookAt);
             this.wwd.redraw();
         };
 
@@ -154,7 +154,7 @@ define([
          */
         KeyboardControls.prototype.handleZoom = function (operation) {
             this.activeOperation = this.handleZoom;
-            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.wwd.cameraAsLookAt(this.lookAt);
 
             // This function is called by the timer to perform the operation.
             var self = this, // capture 'this' for use in the function
@@ -165,7 +165,7 @@ define([
                         } else if (operation === "zoomOut") {
                             self.lookAt.range *= (1 + self.zoomIncrement);
                         }
-                        self.wwd.camera.setFromLookAt(self.lookAt);
+                        self.wwd.cameraFromLookAt(self.lookAt);
                         self.wwd.redraw();
                         setTimeout(setRange, 50);
                     }
@@ -179,7 +179,7 @@ define([
          */
         KeyboardControls.prototype.handlePan = function (operation) {
             this.activeOperation = this.handlePan;
-            this.wwd.camera.getAsLookAt(this.lookAt);
+            this.wwd.cameraAsLookAt(this.lookAt);
 
             // This function is called by the timer to perform the operation.
             var self = this, // capture 'this' for use in the function
@@ -207,7 +207,7 @@ define([
                             heading,
                             distance,
                             self.lookAt.position);
-                        self.wwd.camera.setFromLookAt(self.lookAt);
+                        self.wwd.cameraFromLookAt(self.lookAt);
                         self.wwd.redraw();
                         setTimeout(setLookAtLocation, 50);
                     }
