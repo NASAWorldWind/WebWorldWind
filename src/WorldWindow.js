@@ -572,10 +572,16 @@ define([
          * @returns {LookAt} A reference to the result parameter.
          * @throws {ArgumentError} If the specified result object is null or undefined.
          */
-        WorldWindow.prototype.cameraAsLookAt = function (result, terrainPosition = this.pick([this.viewport.width / 2, this.viewport.height / 2]).terrainObject().position) {
+        WorldWindow.prototype.cameraAsLookAt = function (result, terrainPosition) {
             if (!result) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "getAsLookAt", "missingResult"));
+            }
+            if (!terrainPosition) {
+                var terrainObject = this.pick([this.viewport.width / 2, this.viewport.height / 2]).terrainObject();
+                if (terrainObject) {
+                    terrainPosition = terrainObject.position;
+                }
             }
 
             var globe = this.globe,
