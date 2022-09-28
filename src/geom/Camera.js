@@ -42,6 +42,7 @@ define([
 
             /**
              * Camera tilt, in degrees.
+             * @type {Number}
              * @default 0
              */
             this.tilt = 0;
@@ -53,13 +54,31 @@ define([
              */
             this.roll = 0;
 
+            // Intentionally not documented
+            this._fieldOfView = 45;
+        };
+
+        Object.defineProperties(Camera.prototype, {
             /**
              * Camera vertical field of view, in degrees
              * @type {Number}
              * @default 45
+             * @throws {ArgumentError} If the specified field of view is out of range.
              */
-            this.fieldOfView = 45;
-        };
+            fieldOfView: {
+                get: function () {
+                    return this._fieldOfView;
+                },
+                set: function (value) {
+                    if (value <= 0 || value >= 180) {
+                        throw new ArgumentError(
+                            Logger.logMessage(Logger.LEVEL_SEVERE, "Camera", "setFieldOfView", "Invalid field of view")
+                        );
+                    }
+                    this._fieldOfView = value;
+                }
+            }
+        });
 
         /**
          * Indicates whether the components of this object are equal to those of a specified object.

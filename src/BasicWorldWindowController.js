@@ -457,7 +457,7 @@ define([
             // Clamp tilt to between 0 and +90 to prevent the viewer from going upside down.
             lookAt.tilt = WWMath.clamp(lookAt.tilt, 0, 90);
 
-            // Normalize heading to between -180 and +180.
+            // Normalize roll to between -180 and +180.
             lookAt.roll = Angle.normalizedDegrees(lookAt.roll);
 
             // Apply 2D limits when the globe is 2D.
