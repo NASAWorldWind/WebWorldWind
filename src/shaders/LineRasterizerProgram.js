@@ -189,44 +189,6 @@ function (ArgumentError,
 
         this.loadUniformMatrix(gl, matrix, this.mvpMatrixLocation);
     };
-
-    /**
-     * Loads the specified numbers as the value of this program's 'magnitudeRange' uniform variable.
-     *
-     * @param {WebGLRenderingContext} gl The current WebGL context.
-     * @param {Number} minMag
-     * @param {Number} maxMag
-     * @throws {ArgumentError} If the specified numbers are null or undefined.
-     */
-    LineRasterizerProgram.prototype.loadMagnitudeRange = function (gl, minMag, maxMag) {
-        if (minMag == null) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "LineRasterizerProgram", "loadMagRange", "missingMinMag"));
-        }
-        if (maxMag == null) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "LineRasterizerProgram", "loadMagRange", "missingMaxMag"));
-        }
-        gl.uniform2f(this.magnitudeRangeLocation, minMag, maxMag);
-    };
-
-    /**
-     * Loads the specified number as the value of this program's 'textureSampler' uniform variable.
-     * @param {WebGLRenderingContext} gl The current WebGL context.
-     * @param {Number} unit The texture unit.
-     */
-    LineRasterizerProgram.prototype.loadTextureUnit = function (gl, unit) {
-        gl.uniform1i(this.textureUnitLocation, unit - gl.TEXTURE0);
-    };
-
-    /**
-     * Loads the specified boolean as the value of this program's 'textureEnabledLocation' uniform variable.
-     * @param {WebGLRenderingContext} gl The current WebGL context.
-     * @param {Boolean} value
-     */
-    LineRasterizerProgram.prototype.loadTextureEnabled = function (gl, value) {
-        gl.uniform1i(this.textureEnabledLocation, value ? 1 : 0);
-    };
-
+    
     return LineRasterizerProgram;
 });
