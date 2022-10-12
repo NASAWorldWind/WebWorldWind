@@ -56,69 +56,74 @@ function (ArgumentError,
      */
     var LineRasterizerProgram = function (gl) {
         var vertexShaderSource =
-                //.x = declination
-                //.y = right ascension
-                //.z = point size
-                //.w = magnitude
-                'attribute vec4 vertexPoint;\n' +
-
-                'uniform mat4 mvpMatrix;\n' +
-                //number of days (positive or negative) since Greenwich noon, Terrestrial Time,
-                // on 1 January 2000 (J2000.0)
-                'uniform float numDays;\n' +
-                'uniform vec2 magnitudeRange;\n' +
-
-                'varying float magnitudeWeight;\n' +
-
-                //normalizes an angle between 0.0 and 359.0
-                'float normalizeAngle(float angle) {\n' +
-                '   float angleDivisions = angle / 360.0;\n' +
-                '   return 360.0 * (angleDivisions - floor(angleDivisions));\n' +
-                '}\n' +
-
-                //transforms declination and right ascension in cartesian coordinates
-                'vec3 computePosition(float dec, float ra) {\n' +
-                '   float GMST = normalizeAngle(280.46061837 + 360.98564736629 * numDays);\n' +
-                '   float GHA = normalizeAngle(GMST - ra);\n' +
-                '   float lon = -GHA + 360.0 * step(180.0, GHA);\n' +
-                '   float latRad = radians(dec);\n' +
-                '   float lonRad = radians(lon);\n' +
-                '   float radCosLat = cos(latRad);\n' +
-                '   return vec3(radCosLat * sin(lonRad), sin(latRad), radCosLat * cos(lonRad));\n' +
-                '}\n' +
-
-                //normalizes a value between 0.0 and 1.0
-                'float normalizeScalar(float value, float minValue, float maxValue){\n' +
-                '   return (value - minValue) / (maxValue - minValue);\n' +
-                '}\n' +
-
+                'attribute vec3 position;' +
+                'attribute float direction;' + 
+                'attribute vec3 next;' +
+                'attribute vec3 previous;' +
+                'uniform mat4 projection;' +
+                'uniform mat4 model;' +
+                'uniform mat4 view;' +
+                'uniform float aspect;' +
+                'uniform float thickness;' +
+                'uniform int miter;' +
+                
                 'void main() {\n' +
-                '   vec3 vertexPosition = computePosition(vertexPoint.x, vertexPoint.y);\n' +
-                '   gl_Position = mvpMatrix * vec4(vertexPosition.xyz, 1.0);\n' +
-                '   gl_Position.z = gl_Position.w - 0.00001;\n' +
-                '   gl_PointSize = vertexPoint.z;\n' +
-                '   magnitudeWeight = normalizeScalar(vertexPoint.w, magnitudeRange.x, magnitudeRange.y);\n' +
-                '}',
-            fragmentShaderSource =
-                'precision mediump float;\n' +
-
-                'uniform sampler2D textureSampler;\n' +
-                'uniform int textureEnabled;\n' +
-
-                'varying float magnitudeWeight;\n' +
-
-                'const vec4 white = vec4(1.0, 1.0, 1.0, 1.0);\n' +
-                'const vec4 grey = vec4(0.5, 0.5, 0.5, 1.0);\n' +
-
-                'void main() {\n' +
-                '   if (textureEnabled == 1) {\n' +
-                '       gl_FragColor = texture2D(textureSampler, gl_PointCoord);\n' +
+                '   vec2 aspectVec = vec2(aspect, 1.0);' +
+                '   mat4 projViewModel = projection * view * model;' +
+                '   vec4 previousProjected = projViewModel * vec4(previous, 1.0);' +
+                '   vec4 currentProjected = projViewModel * vec4(position, 1.0);' +
+                '   vec4 nextProjected = projViewModel * vec4(next, 1.0);' +
+                    
+                    //get 2D screen space with W divide and aspect correction
+                '   vec2 currentScreen = currentProjected.xy / currentProjected.w * aspectVec;' +
+                '   vec2 previousScreen = previousProjected.xy / previousProjected.w * aspectVec;' +
+                '   vec2 nextScreen = nextProjected.xy / nextProjected.w * aspectVec;' +
+                    
+                '   float len = thickness;' +
+                '   float orientation = direction;' +
+                    
+                    //starting point uses (next - current)
+                '   vec2 dir = vec2(0.0);' +
+                '   if (currentScreen == previousScreen) {\n' +
+                '       dir = normalize(nextScreen - currentScreen);' +
+                '   }\n' + 
+                    //ending point uses (current - previous)
+                '   else if (currentScreen == nextScreen) {\n' +
+                '   dir = normalize(currentScreen - previousScreen);' +
                 '   }\n' +
+                    //somewhere in middle, needs a join
                 '   else {\n' +
-                //paint the starts in shades of grey, where the brightest star is white and the dimmest star is grey
-                '       gl_FragColor = mix(white, grey, magnitudeWeight);\n' +
+                        //get directions from (C - B) and (B - A)
+                '       vec2 dirA = normalize((currentScreen - previousScreen));' +
+                '       if (miter == 1) {\n' +
+                '          vec2 dirB = normalize((nextScreen - currentScreen));' +
+                           //now compute the miter join normal and length
+                '          vec2 tangent = normalize(dirA + dirB);' +
+                '          vec2 perp = vec2(-dirA.y, dirA.x);' +
+                '          vec2 miter = vec2(-tangent.y, tangent.x);' +
+                '          dir = tangent;' +
+                '          len = thickness / dot(miter, perp);' +
+                '       } else {dir = dirA};' +
                 '   }\n' +
-                '}';
+                '   vec2 normal = vec2(-dir.y, dir.x);' +
+                '   normal *= len/2.0;' +
+                '   normal.x /= aspect;' +
+                    
+                '   vec4 offset = vec4(normal * orientation, 0.0, 1.0);' +
+                '   gl_Position = currentProjected + offset;' +
+                '   gl_PointSize = 1.0;' +
+                '}\n'
+                ,
+            fragmentShaderSource =
+                '#ifdef GL_ES' +
+                'precision mediump float;' +
+                '#endif'+
+                
+                'uniform vec3 color;' +
+                
+                'void main() {\n' +
+                '   gl_FragColor = vec4(color, 1.0);' +
+                '}\n';
 
         // Call to the superclass, which performs shader program compiling and linking.
         GpuProgram.call(this, gl, vertexShaderSource, fragmentShaderSource, ["vertexPoint"]);
@@ -136,13 +141,6 @@ function (ArgumentError,
          * @readonly
          */
         this.mvpMatrixLocation = this.uniformLocation(gl, "mvpMatrix");
-
-        /**
-         * The WebGL location for this program's 'numDays' uniform.
-         * @type {WebGLUniformLocation}
-         * @readonly
-         */
-        this.numDaysLocation = this.uniformLocation(gl, "numDays");
 
         /**
          * The WebGL location for this program's 'magnitudeRangeLocation' uniform.
@@ -190,22 +188,6 @@ function (ArgumentError,
         }
 
         this.loadUniformMatrix(gl, matrix, this.mvpMatrixLocation);
-    };
-
-    /**
-     * Loads the specified number as the value of this program's 'numDays' uniform variable.
-     *
-     * @param {WebGLRenderingContext} gl The current WebGL context.
-     * @param {Number} numDays The number of days (positive or negative) since Greenwich noon, Terrestrial Time,
-     * on 1 January 2000 (J2000.0)
-     * @throws {ArgumentError} If the specified number is null or undefined.
-     */
-    LineRasterizerProgram.prototype.loadNumDays = function (gl, numDays) {
-        if (numDays == null) {
-            throw new ArgumentError(
-                Logger.logMessage(Logger.LEVEL_SEVERE, "LineRasterizerProgram", "loadNumDays", "missingNumDays"));
-        }
-        gl.uniform1f(this.numDaysLocation, numDays);
     };
 
     /**
