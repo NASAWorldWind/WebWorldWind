@@ -105,7 +105,7 @@ define(['../../src/WorldWind',
                 var allWmtsLayers = wmtsCapabilities.getLayers();
                 for (var i = 0; i < allWmtsLayers.length; i++) {
                     var layerItem = $('<li><a data-id="' + allWmtsLayers[i].identifier + '">' + allWmtsLayers[i].titles[0].value + '</a></li>');
-                    ulItem.append(layerItem);
+                    ulItem.append(decodeUri(layerItem));
                 }
 
                 ulItem = $('</ul>');
