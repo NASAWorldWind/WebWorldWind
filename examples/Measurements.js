@@ -51,11 +51,13 @@ requirejs([
         var pathLayer = new WorldWind.RenderableLayer('Path');
         // WorldWindow UI layer.
         var CoordinatesDisplayLayer = new WorldWind.CoordinatesDisplayLayer(wwd);
+        var WorldWindLogoLayer = new WorldWind.WorldWindLogoLayer();
         wwd.addLayer(BNMGLayer);
         // Add atmosphere layer on top of base imagery layer.
         wwd.addLayer(AtmosphereLayer);
         wwd.addLayer(pathLayer);
         wwd.addLayer(CoordinatesDisplayLayer);
+        wwd.addLayer(WorldWindLogoLayer);
 
         // Bind our DOM elements where we will display the results.
         var geoDistSpan = document.getElementById('geo-dist');

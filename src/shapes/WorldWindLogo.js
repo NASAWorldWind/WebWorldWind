@@ -57,7 +57,6 @@ function (ArgumentError,
         var sOffset = screenOffset ? screenOffset
             : new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1),
             iPath = imagePath ? imagePath : WorldWind.configuration.baseUrl + "images/worldwind-logo.png";
-            console.log(WorldWind.configuration.worldWindLogoPlacement);
 
         ScreenImage.call(this, sOffset, iPath);
 

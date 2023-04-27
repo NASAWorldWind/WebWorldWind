@@ -56,15 +56,17 @@ requirejs(['./WorldWindShim'], function () {
         return pathLayer;
     };
 
-    // Create the shared shape layer and imagery layer
+    // Create the shared shape layer and imagery layer, as well as the logo layer.
     var pathLayer = makePathLayer(),
         imageryLayer = new WorldWind.BingAerialWithLabelsLayer(null),
-        atmosphereLayer = new WorldWind.AtmosphereLayer();
+        atmosphereLayer = new WorldWind.AtmosphereLayer(),
+        logoLayer = new WorldWind.WorldWindLogoLayer();
 
     var wwd1 = new WorldWind.WorldWindow("canvasOne");
     wwd1.addLayer(imageryLayer);
     wwd1.addLayer(atmosphereLayer);
     wwd1.addLayer(pathLayer);
+    wwd1.addLayer(logoLayer);
     // Add a compass layer, view controls layer, and coordinates display layer. Each WorldWindow must have its own.
     wwd1.addLayer(new WorldWind.CompassLayer());
     wwd1.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd1));
@@ -74,6 +76,7 @@ requirejs(['./WorldWindShim'], function () {
     wwd2.addLayer(imageryLayer);
     wwd2.addLayer(atmosphereLayer);
     wwd2.addLayer(pathLayer);
+    wwd2.addLayer(logoLayer);
     wwd2.addLayer(new WorldWind.CompassLayer());
     wwd2.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd2));
     wwd2.addLayer(new WorldWind.ViewControlsLayer(wwd2));
@@ -82,6 +85,7 @@ requirejs(['./WorldWindShim'], function () {
     wwd3.addLayer(imageryLayer);
     wwd3.addLayer(atmosphereLayer);
     wwd3.addLayer(pathLayer);
+    wwd3.addLayer(logoLayer);
     wwd3.addLayer(new WorldWind.CompassLayer());
     wwd3.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd3));
     wwd3.addLayer(new WorldWind.ViewControlsLayer(wwd3));

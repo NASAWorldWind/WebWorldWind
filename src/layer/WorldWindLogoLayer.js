@@ -44,7 +44,7 @@ function (WorldWindLogo,
      * @classdesc Displays the WorldWind Logo.
      */
     var WorldWindLogoLayer = function () {
-        RenderableLayer.call(this, "WorldWindLogo");
+        RenderableLayer.call(this, "WorldWind Logo");
 
         this._worldWindLogo = new WorldWindLogo(null, null);
 

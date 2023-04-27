@@ -45,6 +45,7 @@ requirejs(['./WorldWindShim',
         wwd.addLayer(new WorldWind.CompassLayer());
         wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(wwd));
         wwd.addLayer(new WorldWind.ViewControlsLayer(wwd));
+        wwd.addLayer(new WorldWind.WorldWindLogoLayer());
 
         // Create a background layer.
         var backgroundLayer = new WorldWind.BMNGOneImageLayer();
