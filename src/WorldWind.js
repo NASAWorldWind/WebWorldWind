@@ -1116,6 +1116,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
             baseUrl: (WWUtil.worldwindlibLocation()) || (WWUtil.currentUrlSansFilePart() + '/../'),
             layerRetrievalQueueSize: 16,
             coverageRetrievalQueueSize: 16,
+            worldWindLogoPlacement: new Offset(WorldWind.OFFSET_PIXELS, 7, WorldWind.OFFSET_INSET_PIXELS, 7),
+            worldWindLogoAlignment: new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1),
             bingLogoPlacement: new Offset(WorldWind.OFFSET_INSET_PIXELS, 7, WorldWind.OFFSET_PIXELS, 7),
             bingLogoAlignment: new Offset(WorldWind.OFFSET_FRACTION, 1, WorldWind.OFFSET_FRACTION, 0)
         };
