@@ -596,10 +596,10 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         var WorldWind = {
             /**
              * The WorldWind version number.
-             * @default "0.11.0"
+             * @default "0.9.0"
              * @constant
              */
-            VERSION: "0.11.0",
+            VERSION: "0.9.0",
 
             // PLEASE KEEP THE ENTRIES BELOW IN ALPHABETICAL ORDER
             /**
