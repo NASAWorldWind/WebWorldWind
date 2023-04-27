@@ -163,14 +163,14 @@ define([
                 y = 11;
                 yUnitsScreen = WorldWind.OFFSET_PIXELS;
                 yUnitsText = 0;
-            } else if (canvasWidth > 400) { // medium canvas, align the text in the top left
-                x = 60;
-                y = 5;
+            } else if (canvasWidth > 400) { // medium canvas, align the text in the top left, below the logo
+                x = 64;
+                y = 33;
                 yUnitsScreen = WorldWind.OFFSET_INSET_PIXELS;
                 yUnitsText = 1;
-            } else { // small canvas, suppress the eye altitude, align the text in the top left and suppress eye alt
-                x = 60;
-                y = 5;
+            } else { // small canvas, suppress the eye altitude, align the text in the top left, below the logo, and suppress eye alt
+                x = 64;
+                y = 33;
                 yUnitsScreen = WorldWind.OFFSET_INSET_PIXELS;
                 yUnitsText = 1;
                 hideEyeAlt = true;

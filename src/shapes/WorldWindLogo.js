@@ -55,15 +55,16 @@ function (ArgumentError,
     var WorldWindLogo = function (screenOffset, imagePath) {
 
         var sOffset = screenOffset ? screenOffset
-            : new Offset(WorldWind.configuration.worldWindLogoAlignment),
+            : new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1),
             iPath = imagePath ? imagePath : WorldWind.configuration.baseUrl + "images/worldwind-logo.png";
+            console.log(WorldWind.configuration.worldWindLogoPlacement);
 
         ScreenImage.call(this, sOffset, iPath);
 
         // Must set the configured image offset after calling the constructor above.
 
         if (!screenOffset) {
-            this.imageOffset = new Offset(WorldWind.configuration.worldWindLogoAlignment);
+            this.imageOffset = new Offset(WorldWind.OFFSET_PIXELS, -7, WorldWind.OFFSET_INSET_PIXELS, -7);
         }
     };
 
@@ -71,14 +72,14 @@ function (ArgumentError,
 
     WorldWindLogo.prototype.render = function (dc) {
         
-        // // Capture the navigator's heading and tilt and apply it to the compass' screen image.
-        // this.imageRotation = dc.navigator.heading;
-        // this.imageTilt = dc.navigator.tilt;
+        // Capture the navigator's heading and tilt and apply it to the compass' screen image.
+        this.imageRotation = dc.navigator.heading;
+        this.imageTilt = dc.navigator.tilt;
 
-        // var t = this.getActiveTexture(dc);
-        // if (t) {
-        //     this.imageScale = this.size * dc.currentGlContext.drawingBufferWidth / t.imageWidth;
-        // }
+        var t = this.getActiveTexture(dc);
+        if (t) {
+            this.imageScale = 1.0;
+        }
 
         ScreenImage.prototype.render.call(this, dc);
     };
