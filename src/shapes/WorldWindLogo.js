@@ -70,15 +70,6 @@ function (ArgumentError,
     WorldWindLogo.prototype = Object.create(ScreenImage.prototype);
 
     WorldWindLogo.prototype.render = function (dc) {
-        
-        // Capture the navigator's heading and tilt and apply it to the compass' screen image.
-        this.imageRotation = dc.navigator.heading;
-        this.imageTilt = dc.navigator.tilt;
-
-        var t = this.getActiveTexture(dc);
-        if (t) {
-            this.imageScale = 1.0;
-        }
 
         ScreenImage.prototype.render.call(this, dc);
     };
