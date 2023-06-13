@@ -73,19 +73,18 @@ function (ArgumentError,
         }
         
         // Create version number ScreenText to display it to the right of the logo.
-        var versionNumber = WorldWind.VERSION;
 
         this.versionTextScreenOffset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1);
-        this.versionText = new ScreenText(this.versionTextScreenOffset, versionNumber);
+        this.versionText = new ScreenText(this.versionTextScreenOffset, WorldWind.VERSION);
         
+        // Colors and outline width are configured to match the logo appearance.
         this.versionText.attributes = new TextAttributes(null);
         this.versionText.attributes.color = new Color(0, 0, 0, 0.5);
         this.versionText.attributes.outlineColor = new Color(1, 1, 1, 0.5);
         this.versionText.attributes.outlineWidth = 3;
         this.versionText.attributes.scale = 1;
 
-        // TODO Compute version text offset with respect to the logo instead of the hardcoding it,
-        // taking into account possible scale changes of the version text.
+        // TODO Compute version text offset with respect to the logo instead of the hardcoding it.
         this.versionText.attributes.offset = new Offset(WorldWind.OFFSET_PIXELS, -117, WorldWind.OFFSET_INSET_PIXELS, -10);
     };
 
