@@ -30,14 +30,20 @@
  */
 define([
     '../error/ArgumentError',
+    '../util/Color',
     '../util/Logger',
     '../util/Offset',
-    '../shapes/ScreenImage'
+    '../shapes/ScreenImage',
+    '../shapes/ScreenText',
+    '../shapes/TextAttributes'
 ],
 function (ArgumentError,
+          Color,
           Logger,
           Offset,
-          ScreenImage) {
+          ScreenImage,
+          ScreenText,
+          TextAttributes) {
     "use strict";
 
     /**
@@ -46,15 +52,15 @@ function (ArgumentError,
      * @constructor
      * @augments ScreenImage
      * @classdesc Displays the official WorldWind logo in the WorldWindow. Its position is specified in WorldWind's configuration.
-     * @param {Offset} screenOffset The offset indicating the image's placement on the screen. If null or undefined
+     * @param {Offset} logoScreenOffset The offset indicating the image's placement on the screen. If null or undefined
      * the compass is placed at the position stated in WorldWind's configuration.
      * Use [the image offset property]{@link ScreenImage#imageOffset} to position the image relative to the
      * screen point.
      * @param {String} imagePath The URL of the image to display. If null or undefined, a default logo image is used.
      */
-    var WorldWindLogo = function (screenOffset, imagePath) {
+    var WorldWindLogo = function (logoScreenOffset, imagePath) {
 
-        var sOffset = screenOffset ? screenOffset
+        var sOffset = logoScreenOffset ? logoScreenOffset
             : new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1),
             iPath = imagePath ? imagePath : WorldWind.configuration.baseUrl + "images/worldwind-logo.png";
 
@@ -62,9 +68,25 @@ function (ArgumentError,
 
         // Must set the configured image offset after calling the constructor above.
 
-        if (!screenOffset) {
+        if (!logoScreenOffset) {
             this.imageOffset = new Offset(WorldWind.OFFSET_PIXELS, -7, WorldWind.OFFSET_INSET_PIXELS, -7);
         }
+        
+        // Create version number ScreenText to display it to the right of the logo.
+        var versionNumber = WorldWind.VERSION;
+
+        this.versionTextScreenOffset = new Offset(WorldWind.OFFSET_FRACTION, 0, WorldWind.OFFSET_FRACTION, 1);
+        this.versionText = new ScreenText(this.versionTextScreenOffset, versionNumber);
+        
+        this.versionText.attributes = new TextAttributes(null);
+        this.versionText.attributes.color = new Color(0, 0, 0, 0.5);
+        this.versionText.attributes.outlineColor = new Color(1, 1, 1, 0.5);
+        this.versionText.attributes.outlineWidth = 3;
+        this.versionText.attributes.scale = 1;
+
+        // TODO Compute version text offset with respect to the logo instead of the hardcoding it,
+        // taking into account possible scale changes of the version text.
+        this.versionText.attributes.offset = new Offset(WorldWind.OFFSET_PIXELS, -117, WorldWind.OFFSET_INSET_PIXELS, -10);
     };
 
     WorldWindLogo.prototype = Object.create(ScreenImage.prototype);
@@ -72,6 +94,7 @@ function (ArgumentError,
     WorldWindLogo.prototype.render = function (dc) {
 
         ScreenImage.prototype.render.call(this, dc);
+        this.versionText.render(dc);
     };
 
     return WorldWindLogo;
