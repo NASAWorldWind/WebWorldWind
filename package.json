@@ -17,7 +17,8 @@
     "url": "https://github.com/NASAWorldWind/WebWorldWind.git"
   },
   "scripts": {
-    "build": "grunt",
+    "build": "npm run check-version && grunt",
+    "check-version": "node tools/versioncheck.js",
     "clean": "grunt clean",
     "doc": "grunt jsdoc",
     "prepare": "npm run build",
