@@ -52,11 +52,8 @@ define([
          */
         var BMNGLayer = function (layerName) {
             // This LevelSet configuration captures the Blue Marble resolution of 4.166666667E-03 degrees/pixel
-            TiledImageLayer.call(this,
+            TiledImageLayer.call(this, "Blue Marble",
                 Sector.FULL_SPHERE, new Location(45, 45), 7, "image/jpeg", layerName || "BMNG256", 256, 256);
-
-            this.displayName = "Blue Marble";
-            this.pickEnabled = false;
 
             this.urlBuilder = new WmsUrlBuilder("https://worldwind25.arc.nasa.gov/wms",
                 layerName || "BlueMarble-200405", "", "1.3.0");
