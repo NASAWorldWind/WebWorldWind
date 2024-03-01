@@ -298,6 +298,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './ogc/wmts/WmtsCapabilities',
         './layer/WmtsLayer',
         './ogc/wmts/WmtsLayerCapabilities',
+        './shapes/WorldWindLogo',
+        './layer/WorldWindLogoLayer',
         './WorldWindow',
         './WorldWindowController',
         './util/WWMath',
@@ -576,6 +578,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               WmtsCapabilities,
               WmtsLayer,
               WmtsLayerCapabilities,
+              WorldWindLogo,
+              WorldWindLogoLayer,
               WorldWindow,
               WorldWindowController,
               WWMath,
@@ -1093,6 +1097,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['WWMath'] = WWMath;
         WorldWind['WWMessage'] = WWMessage;
         WorldWind['WWUtil'] = WWUtil;
+        WorldWind['WorldWindLogo'] = WorldWindLogo;
+        WorldWind['WorldWindLogoLayer'] = WorldWindLogoLayer;
         WorldWind['WorldWindow'] = WorldWindow;
         WorldWind['WorldWindowController'] = WorldWindowController;
 

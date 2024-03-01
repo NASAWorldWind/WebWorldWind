@@ -52,7 +52,8 @@ requirejs(['./WorldWindShim',
             {layer: new WorldWind.CompassLayer(), enabled: true},
             {layer: new WorldWind.CoordinatesDisplayLayer(wwd), enabled: true},
             {layer: new WorldWind.ViewControlsLayer(wwd), enabled: true},
-            {layer: new WorldWind.FrameStatisticsLayer(wwd), enabled: true}
+            {layer: new WorldWind.FrameStatisticsLayer(wwd), enabled: true},
+            {layer: new WorldWind.WorldWindLogoLayer(), enabled: true}
         ];
 
         for (var l = 0; l < layers.length; l++) {
