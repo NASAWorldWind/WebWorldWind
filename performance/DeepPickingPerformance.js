@@ -66,8 +66,10 @@ requirejs(['../src/WorldWind',
         wwd.deepPicking = true;
 
         // Start out zoomed to the AOI
-        wwd.navigator.lookAtLocation = new WorldWind.Location(44.2, -94.12);
-        wwd.navigator.range = 625000;
+        var lookAt = new WorldWind.LookAt();
+        lookAt.position = new WorldWind.Position(44.2, -94.12, 0);
+        lookAt.range = 625000;
+        wwd.cameraFromLookAt(lookAt);
 
         // Satellite image footprints
         var footprints = [];
