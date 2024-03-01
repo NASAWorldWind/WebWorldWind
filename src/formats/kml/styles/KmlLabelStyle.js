@@ -26,10 +26,12 @@
  * PDF found in code  directory.
  */
 define([
+    '../../../util/Color',
     './KmlColorStyle',
     '../KmlElements',
     '../util/KmlNodeTransformers'
 ], function (
+    Color,
     KmlColorStyle,
     KmlElements,
     NodeTransformers
@@ -61,15 +63,18 @@ define([
          * @type {Number}
          */
         kmlScale: {
-            get: function() {
-                return this._factory.specific(this, {name: 'scale', transformer: NodeTransformers.number});
+            get: function () {
+                return this._factory.specific(this, { name: 'scale', transformer: NodeTransformers.number });
             }
         }
     });
 
 
-    KmlLabelStyle.update = function () {
-
+    KmlLabelStyle.update = function (style, options) {
+        var shapeOptions = options || {};
+        style = style || {};
+        shapeOptions._labelColor = style.kmlColor && Color.colorFromKmlHex(style.kmlColor) || Color.YELLOW;
+        return shapeOptions;
     };
 
     /**

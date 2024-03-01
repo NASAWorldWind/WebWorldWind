@@ -43,18 +43,18 @@ define([
     '../../../util/Offset',
     '../../../util/WWUtil'
 ], function (KmlElements,
-             KmlFeature,
-             KmlGeometry,
-             KmlStyle,
-             KmlTimeSpan,
-             KmlTimeStamp,
-             PlacemarkAttributes,
-             Placemark,
-             Color,
-             ShapeAttributes,
-             TextAttributes,
-             Offset,
-             WWUtil) {
+    KmlFeature,
+    KmlGeometry,
+    KmlStyle,
+    KmlTimeSpan,
+    KmlTimeStamp,
+    PlacemarkAttributes,
+    Placemark,
+    Color,
+    ShapeAttributes,
+    TextAttributes,
+    Offset,
+    WWUtil) {
     "use strict";
     /**
      * Constructs an KmlPlacemark. Applications usually don't call this constructor. It is called by {@link KmlFile} as
@@ -90,12 +90,12 @@ define([
         }
     });
 
-    KmlPlacemark.prototype.render = function(dc, kmlOptions) {
+    KmlPlacemark.prototype.render = function (dc, kmlOptions) {
         KmlFeature.prototype.render.call(this, dc, kmlOptions);
 
         kmlOptions = WWUtil.clone(kmlOptions);
 
-        if(kmlOptions.lastStyle && !this._renderable) {
+        if (kmlOptions.lastStyle && !this._renderable) {
             // TODO: render placemarks without geometry.
             if (this.kmlGeometry) {
                 this._renderable = new Placemark(
@@ -103,15 +103,15 @@ define([
                     false,
                     this.prepareAttributes(kmlOptions.lastStyle.normal, kmlOptions.fileCache)
                 );
-                if(kmlOptions.lastStyle.highlight) {
+                if (kmlOptions.lastStyle.highlight) {
                     this._renderable.highlightAttributes = this.prepareAttributes(kmlOptions.lastStyle.highlight, kmlOptions.fileCache);
                 }
                 this.moveValidProperties();
                 dc.redrawRequested = true;
             }
         }
-        
-        if(this._renderable) {
+
+        if (this._renderable) {
             if (this.kmlGeometry) {
                 this.kmlGeometry.render(dc, kmlOptions);
                 this._renderable.render(dc);
@@ -125,19 +125,9 @@ define([
      * @returns {PlacemarkAttributes} Attributes representing the current Placemark.
      */
     KmlPlacemark.prototype.prepareAttributes = function (style, fileCache) {
-        var options = style && style.generate({}, fileCache) || {normal: {}, highlight:{}};
+        var options = style && style.generate({}, fileCache) || { normal: {}, highlight: {} };
         var placemarkAttributes = new PlacemarkAttributes(KmlStyle.placemarkAttributes(options));
 
-        placemarkAttributes.imageOffset = new Offset(
-            WorldWind.OFFSET_FRACTION, 0.3,
-            WorldWind.OFFSET_FRACTION, 0.0);
-        placemarkAttributes.imageColor = Color.WHITE;
-        placemarkAttributes.labelAttributes = new TextAttributes(KmlStyle.textAttributes({
-            _offset: new Offset(
-                WorldWind.OFFSET_FRACTION, 0.5,
-                WorldWind.OFFSET_FRACTION, 1.0),
-            _color: Color.YELLOW
-        }));
         placemarkAttributes.drawLeaderLine = true;
         placemarkAttributes.leaderLineAttributes = new ShapeAttributes(KmlStyle.shapeAttributes({
             _outlineColor: Color.RED

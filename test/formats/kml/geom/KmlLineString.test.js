@@ -71,7 +71,7 @@ define([
                 kmlPositions: [
                     new Position(37.824787, -122.364167, 0),
                     new Position(37.824423, -122.363917, 0)],
-                kmlAltitudeMode: 'absolute',
+                kmlAltitudeMode: 'clampToGround',
                 kmlExtrude: false,
                 kmlTessellate: false
             })).toBeTruthy();

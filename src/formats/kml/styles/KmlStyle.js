@@ -86,7 +86,7 @@ define([
          * @type {KmlIconStyle|null}
          */
         kmlIconStyle: {
-            get: function() {
+            get: function () {
                 return this._factory.any(this, {
                     name: KmlIconStyle.prototype.getTagNames()
                 });
@@ -100,7 +100,7 @@ define([
          * @type {KmlLabelStyle|null}
          */
         kmlLabelStyle: {
-            get: function() {
+            get: function () {
                 return this._factory.any(this, {
                     name: KmlLabelStyle.prototype.getTagNames()
                 });
@@ -114,7 +114,7 @@ define([
          * @type {KmlLineStyle|null}
          */
         kmlLineStyle: {
-            get: function() {
+            get: function () {
                 return this._factory.any(this, {
                     name: KmlLineStyle.prototype.getTagNames()
                 });
@@ -128,7 +128,7 @@ define([
          * @type {KmlPolyStyle|null}
          */
         kmlPolyStyle: {
-            get: function() {
+            get: function () {
                 return this._factory.any(this, {
                     name: KmlPolyStyle.prototype.getTagNames()
                 });
@@ -142,7 +142,7 @@ define([
          * @type {KmlBalloonStyle|null}
          */
         kmlBalloonStyle: {
-            get: function() {
+            get: function () {
                 return this._factory.any(this, {
                     name: KmlBalloonStyle.prototype.getTagNames()
                 });
@@ -156,7 +156,7 @@ define([
          * @type {KmlListStyle|null}
          */
         kmlListStyle: {
-            get: function() {
+            get: function () {
                 return this._factory.any(this, {
                     name: KmlListStyle.prototype.getTagNames()
                 });
@@ -164,26 +164,26 @@ define([
         }
     });
 
-    KmlStyle.prototype.generate = function(options, fileCache) {
+    KmlStyle.prototype.generate = function (options, fileCache) {
         options = options || {};
         var style = this || {};
 
-        if(style.kmlIconStyle) {
+        if (style.kmlIconStyle) {
             KmlIconStyle.update(style.kmlIconStyle, options, fileCache);
         }
-        if(style.kmlListStyle) {
+        if (style.kmlListStyle) {
             KmlListStyle.update(style.kmlListStyle, options);
         }
-        if(style.kmlBalloonStyle) {
+        if (style.kmlBalloonStyle) {
             KmlBalloonStyle.update(style.kmlBalloonStyle, options);
         }
-        if(style.kmlLabelStyle) {
+        if (style.kmlLabelStyle) {
             KmlLabelStyle.update(style.kmlLabelStyle, options);
         }
-        if(style.kmlPolyStyle) {
+        if (style.kmlPolyStyle) {
             KmlPolyStyle.update(style.kmlPolyStyle, options);
         }
-        if(style.kmlLineStyle) {
+        if (style.kmlLineStyle) {
             KmlLineStyle.update(style.kmlLineStyle, options);
         }
 
@@ -193,10 +193,10 @@ define([
     /**
      * @inheritDoc
      */
-    KmlStyle.prototype.getStyle = function() {
+    KmlStyle.prototype.getStyle = function () {
         var self = this;
-        return new Promise(function(resolve){
-            window.setTimeout(function(){
+        return new Promise(function (resolve) {
+            window.setTimeout(function () {
                 resolve(self);
             }, 0);
         });
@@ -216,16 +216,16 @@ define([
      * @param attributes
      * @returns {Object}
      */
-    KmlStyle.placemarkAttributes = function(attributes) {
+    KmlStyle.placemarkAttributes = function (attributes) {
         attributes = attributes || {};
         // These are all documented with their property accessors below.
         attributes._imageColor = attributes._imageColor || new Color(1, 1, 1, 1);
-        attributes._imageOffset = attributes._imageOffset||
+        attributes._imageOffset = attributes._imageOffset ||
             new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
         attributes._imageScale = attributes._imageScale || 1;
         attributes._imageSource = attributes._imageSource || null;
         attributes._depthTest = attributes._depthTest || true;
-        attributes._labelAttributes = attributes._labelAttributes || new TextAttributes(KmlStyle.textAttributes());
+        attributes._labelAttributes = attributes._labelAttributes || new TextAttributes(KmlStyle.textAttributes(attributes));
         attributes._drawLeaderLine = attributes._drawLeaderLine || false;
         attributes._leaderLineAttributes = attributes._leaderLineAttributes || new ShapeAttributes(KmlStyle.shapeAttributes());
 
@@ -237,14 +237,16 @@ define([
      * @param attributes
      * @returns {Object}
      */
-    KmlStyle.textAttributes = function(attributes) {
+    KmlStyle.textAttributes = function (attributes) {
         attributes = attributes || {};
-        attributes._color = attributes._color || new Color(1, 1, 1, 1);
+        attributes._color = attributes._labelColor || new Color(1, 1, 1, 1);
         attributes._font = attributes._font || new Font(14);
         attributes._offset = attributes._offset || new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.0);
         attributes._scale = attributes._scale || 1;
         attributes._depthTest = attributes._depthTest || false;
-        attributes._outlineColor = attributes._outlineColor || Color.RED;
+        attributes._outlineWidth = 1;
+        attributes._outlineColor = Color.BLACK;
+        attributes._enableOutline = true;
 
         return attributes;
     };
@@ -254,7 +256,7 @@ define([
      * @param attributes
      * @returns {*|{}}
      */
-    KmlStyle.shapeAttributes = function(attributes) {
+    KmlStyle.shapeAttributes = function (attributes) {
         attributes = attributes || {};
         // All these are documented with their property accessors below.
         attributes._drawInterior = attributes._drawInterior || true;
@@ -277,7 +279,7 @@ define([
      * It returns default KmlStyle, which doesn't contain any custom information.
      * @returns {KmlStyle}
      */
-    KmlStyle.default = function() {
+    KmlStyle.default = function () {
         return new KmlStyle({
             objectNode: document.createElement('Style')
         });
