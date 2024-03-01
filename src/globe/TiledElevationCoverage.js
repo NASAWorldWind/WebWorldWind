@@ -571,18 +571,15 @@ define(['../util/AbsentResourceList',
 
         // Intentionally not documented.
         TiledElevationCoverage.prototype.retrieveTileImage = function (tile) {
-            if (this.currentRetrievals.indexOf(tile.tileKey) < 0) {
-
-                if (this.currentRetrievals.length > this.retrievalQueueSize) {
-                    return;
-                }
+            if (this.currentRetrievals.length < this.retrievalQueueSize
+                && this.currentRetrievals.indexOf(tile.tileKey) < 0
+                && !this.absentResourceList.isResourceAbsent(tile.tileKey)) {
 
                 var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
                     xhr = new XMLHttpRequest(),
                     elevationCoverage = this;
 
-                if (!url)
-                    return;
+                if (!url) return;
 
                 xhr.open("GET", url, true);
                 xhr.responseType = 'arraybuffer';
