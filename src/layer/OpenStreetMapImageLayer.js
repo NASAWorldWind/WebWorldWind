@@ -29,17 +29,15 @@
  * @exports OpenStreetMapImageLayer
  */
 define([
-        '../util/Color',
-        '../layer/Layer',
-        '../util/Logger',
-        '../ogc/wmts/WmtsCapabilities',
-        '../layer/WmtsLayer'
-    ],
-    function (Color,
-              Layer,
-              Logger,
-              WmtsCapabilities,
-              WmtsLayer) {
+    '../geom/Location',
+    '../geom/Sector',
+    '../layer/TiledImageLayer',
+    '../util/WmsUrlBuilder'
+],
+    function (Location,
+        Sector,
+        TiledImageLayer,
+        WmsUrlBuilder) {
         "use strict";
 
         /**
@@ -52,79 +50,18 @@ define([
          * @param {String} displayName This layer's display name. "Open Street Map" if this parameter is
          * null or undefined.
          */
-        var OpenStreetMapImageLayer = function (displayName) {
+        var OpenStreetMapImageLayer = function (layerName) {
+            TiledImageLayer.call(this,
+                Sector.FULL_SPHERE, new Location(36, 36), 16, "image/jpeg", "OpenStreetMap-" + layerName, 256, 256);
 
-            Layer.call(this, this.displayName);
+            this.displayName = "OpenStreetMap";
+            this.pickEnabled = false;
 
-            this.displayName = displayName || "Open Street Map";
-
-            this.layer = null;
-
-            this.xhr = null;
-
-            // TODO: Picking is enabled as a temporary measure for screen credit hyperlinks to work (see Layer.render)
-            this.pickEnabled = true;
+            this.urlBuilder = new WmsUrlBuilder("https://worldwind47.arc.nasa.gov/mapcache",
+                layerName, "", "1.3.0");
         };
 
-        OpenStreetMapImageLayer.prototype = Object.create(Layer.prototype);
-
-        OpenStreetMapImageLayer.prototype.doRender = function (dc) {
-
-            this.configureLayer(dc);
-
-            if (this.layer) {
-                this.layer.opacity = this.opacity;
-                this.layer.doRender(dc);
-                this.inCurrentFrame = this.layer.inCurrentFrame;
-
-                // Add a screen credit to attribute the data source to OSM and EOX
-                // The pattern for this attribute is described in the WMTS Capabilities document and demonstrated at EOX
-                // Maps site: http://maps.eox.at/
-                if (this.inCurrentFrame) {
-                    dc.screenCreditController.addCredit("OpenStreetMap ©", Color.DARK_GRAY);
-                    dc.screenCreditController.addCredit("EOX.at ©", Color.DARK_GRAY);
-                }
-            }
-        };
-
-        OpenStreetMapImageLayer.prototype.configureLayer = function (dc) {
-            if (!this.xhr) {
-                var self = this;
-                var canvas = dc.currentGlContext.canvas;
-                this.xhr = new XMLHttpRequest();
-                this.xhr.open("GET", "https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml", true);
-                this.xhr.onreadystatechange = function () {
-                    if (self.xhr.readyState === 4) {
-                        if (self.xhr.status === 200) {
-                            // Create a layer from the WMTS capabilities.
-                            var wmtsCapabilities = new WmtsCapabilities(self.xhr.responseXML);
-                            var wmtsLayerCapabilities = wmtsCapabilities.getLayer("osm");
-                            var wmtsConfig = WmtsLayer.formLayerConfiguration(wmtsLayerCapabilities);
-                            wmtsConfig.title = self.displayName;
-                            self.layer = new WmtsLayer(wmtsConfig);
-                            // Send an event to request a redraw.
-                            var e = document.createEvent('Event');
-                            e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
-                            canvas.dispatchEvent(e);
-                        } else {
-                            Logger.log(Logger.LEVEL_WARNING,
-                                "OSM retrieval failed (" + xhr.statusText + "): " + url);
-                        }
-                    }
-                };
-
-                this.xhr.onerror = function () {
-                    Logger.log(Logger.LEVEL_WARNING, "OSM retrieval failed: " + url);
-                };
-
-                this.xhr.ontimeout = function () {
-                    Logger.log(Logger.LEVEL_WARNING, "OSM retrieval timed out: " + url);
-                };
-
-                this.xhr.send(null);
-            }
-
-        };
+        OpenStreetMapImageLayer.prototype = Object.create(TiledImageLayer.prototype);
 
         return OpenStreetMapImageLayer;
     }
