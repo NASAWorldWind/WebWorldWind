@@ -111,17 +111,33 @@ module.exports = function (grunt) {
             }
         },
 
-        zip: {
+        compress: {
             images: {
-                src: ['images/**'],
-                dest: 'build/dist/images.zip',
-                compression: 'DEFLATE'
+                options: {
+                    archive: 'build/dist/images.zip',
+                    mode: 'zip',
+                    level: 9
+                },
+                files: [
+                    {
+                        expand: true,
+                        src: ['images/**']
+                    }
+                ]
             },
             dist: {
-                cwd: 'build/dist',
-                src: ['build/dist/**'],
-                dest: 'build/WebWorldWind-Distribution-<%= pkg.version %>.zip',
-                compression: 'DEFLATE'
+                options: {
+                    archive: 'build/WebWorldWind-Distribution-<%= pkg.version %>.zip',
+                    mode: 'zip',
+                    level: 9
+                },
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'build/dist',
+                        src: ['**/*']
+                    }
+                ]
             }
         }
     });
@@ -131,7 +147,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-jsdoc');
     grunt.loadNpmTasks('grunt-karma');
-    grunt.loadNpmTasks('grunt-zip');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
-    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'copy', 'zip']);
+    grunt.registerTask('default', ['clean', 'karma', 'jsdoc', 'requirejs', 'copy', 'compress']);
 };
