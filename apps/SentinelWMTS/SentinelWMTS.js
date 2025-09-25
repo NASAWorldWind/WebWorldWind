@@ -25,6 +25,7 @@
  * WebWorldWind can be found in the WebWorldWind 3rd-party notices and licenses
  * PDF found in code  directory.
  */
+var ESAPI = require('node-esapi');
 define(['../../src/WorldWind',
         '../util/GoToBox',
         '../util/LayersPanel',
@@ -105,7 +106,7 @@ define(['../../src/WorldWind',
                 var allWmtsLayers = wmtsCapabilities.getLayers();
                 for (var i = 0; i < allWmtsLayers.length; i++) {
                     var layerItem = $('<li><a data-id="' + allWmtsLayers[i].identifier + '">' + allWmtsLayers[i].titles[0].value + '</a></li>');
-                    ulItem.append(layerItem);
+                    ulItem.append('url(<%=ESAPI.encoder().encodeForJS(ESAPI.encoder().encodeForURL(layerItem))%>)');
                 }
 
                 ulItem = $('</ul>');
