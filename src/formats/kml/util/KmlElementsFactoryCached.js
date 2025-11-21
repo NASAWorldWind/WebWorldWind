@@ -44,7 +44,7 @@ define([
      * @constructor
      * @alias KmlElementsFactoryCached
      */
-    var KmlElementsFactoryCached = function(options) {
+    var KmlElementsFactoryCached = function (options) {
         this.internalFactory = new KmlElementsFactory(options);
         this.cache = TreeKeyValueCache.applicationLevelCache();
     };
@@ -55,13 +55,13 @@ define([
      * @returns {KmlObject[]} All objects among the elements children
      * @see KmlElementsFactory.prototype.all
      */
-    KmlElementsFactoryCached.prototype.all = function(element){
+    KmlElementsFactoryCached.prototype.all = function (element) {
         var parentNode = element.node;
         var children = this.cache.level(this.cacheKey(element.node, "All"));
         if (children) {
             var results = [];
-            for(var key in children) {
-                if(children.hasOwnProperty(key)) {
+            for (var key in children) {
+                if (children.hasOwnProperty(key)) {
                     results.push(children[key]);
                 }
             }
@@ -70,7 +70,7 @@ define([
 
         var elements = this.internalFactory.all(element);
 
-        if(elements && elements.length) {
+        if (elements && elements.length) {
             var self = this;
             elements.forEach(function (pElement) {
                 self.cache.add(self.cacheKey(parentNode, "All"), self.cacheKey(pElement.node), pElement);
@@ -89,10 +89,10 @@ define([
      * @returns Relevant value.
      * @see KmlElementsFactory.prototype.specific
      */
-    KmlElementsFactoryCached.prototype.specific = function(element, options){
+    KmlElementsFactoryCached.prototype.specific = function (element, options) {
         var parentNode = element.node;
         var name = options.name;
-        if(options.attribute) {
+        if (options.attribute) {
             name = options.attribute + name;
         }
         var child = this.cache.value(this.cacheKey(parentNode), name);
@@ -101,9 +101,9 @@ define([
         }
 
         var result = this.internalFactory.specific(element, options);
-        if(result && result.node) {
+        if (result && result.node) {
             this.cache.add(this.cacheKey(parentNode), this.cacheKey(result.node), result);
-        } else if(result) {
+        } else if (result) {
             this.cache.add(this.cacheKey(parentNode), name, result);
         }
         return result;
@@ -117,15 +117,15 @@ define([
      * @returns {KmlObject|null} KmlObject if there is one with the passed in name.
      * @see KmlElementsFactory.prototype.any
      */
-    KmlElementsFactoryCached.prototype.any = function(element, options){
+    KmlElementsFactoryCached.prototype.any = function (element, options) {
         var parentNode = element.node;
 
         var self = this;
         var child = null;
         var potentialChild;
-        options.name.forEach(function(name){
+        options.name.forEach(function (name) {
             potentialChild = self.cache.value(self.cacheKey(parentNode), name);
-            if(potentialChild) {
+            if (potentialChild) {
                 child = potentialChild;
             }
         });
@@ -135,10 +135,18 @@ define([
 
         var result = this.internalFactory.any(element, options);
 
-        if(result) {
+        if (result) {
             this.cache.add(self.cacheKey(parentNode), self.cacheKey(result.node), result);
         }
         return result;
+    };
+
+    KmlElementsFactoryCached.prototype.getOrCreateId = function (node) {
+        var idAttribute = new Attribute(node, "id");
+        if (!idAttribute.exists()) {
+            idAttribute.save(WWUtil.guid());
+        }
+        return idAttribute;
     };
 
     /**
@@ -148,13 +156,27 @@ define([
      * @param prefix {String|undefined} Prefix for the level
      * @returns {String} Value representing the key.
      */
-    KmlElementsFactoryCached.prototype.cacheKey = function(node, prefix) {
-        var idAttribute = new Attribute(node, "id");
-        if (!idAttribute.exists()) {
-            idAttribute.save(WWUtil.guid());
+    KmlElementsFactoryCached.prototype.cacheKey = function (node, prefix) {
+        var idAttribute = this.getOrCreateId(node);
+
+        // KML ids can be duplicated across folders, add any parent folder names to the key to make them unique.
+        let parent = node.parentNode;
+        let parentPrefix = "";
+        while (parent) {
+            if (parent.nodeName === "Folder") {
+                if (parentPrefix !== "") {
+                    parentPrefix += "#";
+                }
+                parentPrefix += this.getOrCreateId(parent).value();
+            }
+            parent = parent.parentNode;
         }
-        var result = node.nodeName + "#" + idAttribute.value();
-        if(prefix) {
+        let result = parentPrefix;
+        if (result !== "") {
+            result += "#";
+        }
+        result += node.nodeName + "#" + idAttribute.value();
+        if (prefix) {
             result = prefix + result;
         }
         return result;
@@ -165,7 +187,7 @@ define([
      * It returns application wide instance of the factory.
      * @returns {KmlElementsFactoryCached} Singleton instance of factory for Application.
      */
-    KmlElementsFactoryCached.applicationWide = function(){
+    KmlElementsFactoryCached.applicationWide = function () {
         return applicationWide;
     };
 

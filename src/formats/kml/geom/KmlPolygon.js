@@ -37,15 +37,15 @@ define([
     '../../../shapes/ShapeAttributes',
     '../../../shapes/SurfacePolygon'
 ], function (Color,
-             KmlElements,
-             KmlGeometry,
-             KmlLinearRing,
-             KmlStyle,
-             Location,
-             NodeTransformers,
-             Polygon,
-             ShapeAttributes,
-             SurfacePolygon) {
+    KmlElements,
+    KmlGeometry,
+    KmlLinearRing,
+    KmlStyle,
+    Location,
+    NodeTransformers,
+    Polygon,
+    ShapeAttributes,
+    SurfacePolygon) {
     "use strict";
     /**
      * Constructs an KmlPolygon. Application usually don't call this constructor. It is called by {@link KmlFile} as
@@ -78,7 +78,7 @@ define([
          */
         kmlExtrude: {
             get: function () {
-                return this._factory.specific(this, {name: 'extrude', transformer: NodeTransformers.boolean});
+                return this._factory.specific(this, { name: 'extrude', transformer: NodeTransformers.boolean });
             }
         },
 
@@ -90,7 +90,7 @@ define([
          */
         kmlTessellate: {
             get: function () {
-                return this._factory.specific(this, {name: 'tessellate', transformer: NodeTransformers.boolean});
+                return this._factory.specific(this, { name: 'tessellate', transformer: NodeTransformers.boolean });
             }
         },
 
@@ -103,7 +103,7 @@ define([
          */
         kmlAltitudeMode: {
             get: function () {
-                return this._factory.specific(this, {name: 'altitudeMode', transformer: NodeTransformers.string});
+                return this._factory.specific(this, { name: 'altitudeMode', transformer: NodeTransformers.string });
             }
         },
 
@@ -157,7 +157,6 @@ define([
      * @param styles.highlight {KmlStyle} Style to apply when item is highlighted. Currently ignored.
      */
     KmlPolygon.prototype.createPolygon = function (styles, fileCache) {
-        console.log(this.kmlInnerBoundary && this.kmlInnerBoundary.kmlAltitudeMode === WorldWind.CLAMP_TO_GROUND);
         // TODO: KML boundaries are displaying graphic glitches when the camera is zoomed out
         if (
             !this.isValidAltitudeMode(this.kmlAltitudeMode) ||
@@ -202,7 +201,7 @@ define([
      * @inheritDoc
      */
     KmlPolygon.prototype.prepareAttributes = function (style, fileCache) {
-        var shapeOptions = style && style.generate(fileCache) || {};
+        var shapeOptions = style && style.generate({}, fileCache) || {};
 
         shapeOptions._drawVerticals = this.kmlExtrude || false;
         shapeOptions._applyLighting = true;
