@@ -73,6 +73,7 @@ define([
          * Layers of this type are by default not pickable. Their pick-enabled flag is initialized to false.
          *
          * @augments Layer
+         * @param {String} displayName This layer's display name.
          * @param {Sector} sector The sector this layer covers.
          * @param {Location} levelZeroDelta The size in latitude and longitude of level zero (lowest resolution) tiles.
          * @param {Number} numLevels The number of levels to define for the layer. Each level is successively one power
@@ -87,7 +88,7 @@ define([
          * null or undefined, or if the specified number of levels, tile width or tile height is less than 1.
          *
          */
-        var TiledImageLayer = function (sector, levelZeroDelta, numLevels, imageFormat, cachePath, tileWidth, tileHeight) {
+        var TiledImageLayer = function (displayName, sector, levelZeroDelta, numLevels, imageFormat, cachePath, tileWidth, tileHeight) {
             if (!sector) {
                 throw new ArgumentError(
                     Logger.logMessage(Logger.LEVEL_SEVERE, "TiledImageLayer", "constructor", "missingSector"));
@@ -123,7 +124,7 @@ define([
                         "The specified tile width or height is less than one."));
             }
 
-            Layer.call(this, "Tiled Image Layer");
+            Layer.call(this, displayName || "Tiled Image Layer");
 
             this.retrievalImageFormat = imageFormat;
             this.cachePath = cachePath;

@@ -29,21 +29,15 @@
  * @exports BingTiledImageLayer
  */
 define([
-        '../geom/Angle',
         '../util/Color',
-        '../geom/Location',
-        '../util/Offset',
         '../shapes/ScreenImage',
-        '../geom/Sector',
-        '../layer/MercatorTiledImageLayer'
+        '../layer/MercatorTiledImageLayer',
+        '../WorldWind'
     ],
-    function (Angle,
-              Color,
-              Location,
-              Offset,
+    function (Color,
               ScreenImage,
-              Sector,
-              MercatorTiledImageLayer) {
+              MercatorTiledImageLayer,
+              WorldWind) {
         "use strict";
 
         /**
@@ -58,18 +52,16 @@ define([
          * @param {String} displayName This layer's display name.
          */
         var BingTiledImageLayer = function (displayName) {
-            this.imageSize = 256;
-
-            MercatorTiledImageLayer.call(this,
-                new Sector(-85.05, 85.05, -180, 180), new Location(85.05, 180), 23, "image/jpeg", displayName,
-                this.imageSize, this.imageSize);
-
-            this.displayName = displayName;
+            MercatorTiledImageLayer.call(this, displayName, 23, "image/jpeg", displayName, 256, 1);
 
             // TODO: Picking is enabled as a temporary measure for screen credit hyperlinks to work (see Layer.render)
             this.pickEnabled = true;
 
             this.detectBlankImages = true;
+
+            // Set the detail control so the resolution is a close match 
+            // to the resolution on the Bing maps website
+            this.detailControl = 1.25;
         };
 
         // Internal use only. Intentionally not documented.
@@ -88,16 +80,6 @@ define([
             }
         };
 
-        // Overridden from TiledImageLayer.
-        BingTiledImageLayer.prototype.createTopLevelTiles = function (dc) {
-            this.topLevelTiles = [];
-
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 0, 0));
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 0, 1));
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 1, 0));
-            this.topLevelTiles.push(this.createTile(null, this.levels.firstLevel(), 1, 1));
-        };
-
         BingTiledImageLayer.prototype.renderLogo = function (dc) {
             if (!BingTiledImageLayer.logoImage) {
                 BingTiledImageLayer.logoImage = new ScreenImage(WorldWind.configuration.bingLogoPlacement,
@@ -111,11 +93,6 @@ define([
                 BingTiledImageLayer.logoImage.render(dc);
                 BingTiledImageLayer.logoLastFrameTime = dc.timestamp;
             }
-        };
-
-        // Determines the Bing map size for a specified level number.
-        BingTiledImageLayer.prototype.mapSizeForLevel = function (levelNumber) {
-            return 256 << (levelNumber + 1);
         };
 
         return BingTiledImageLayer;

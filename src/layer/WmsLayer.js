@@ -82,11 +82,8 @@ define([
                 cachePath = cachePath + timeString;
             }
 
-            TiledImageLayer.call(this, config.sector, config.levelZeroDelta, config.numLevels, config.format,
+            TiledImageLayer.call(this, config.title, config.sector, config.levelZeroDelta, config.numLevels, config.format,
                 cachePath, config.size, config.size);
-
-            this.displayName = config.title;
-            this.pickEnabled = false;
 
             this.urlBuilder = new WmsUrlBuilder(config.service, config.layerNames, config.styleNames, config.version,
                 timeString);

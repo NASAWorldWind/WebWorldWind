@@ -69,9 +69,7 @@ define([
         this.tileWidth = 256;
         this.tileHeight = 256;
 
-        TiledImageLayer.call(this, new Sector(-90, 90, -180, 180), new Location(45, 45), numLevels || 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
-
-        this.displayName = displayName;
+        TiledImageLayer.call(this, displayName, new Sector(-90, 90, -180, 180), new Location(45, 45), numLevels || 18, 'image/png', 'HeatMap' + WWUtil.guid(), this.tileWidth, this.tileHeight);
 
         var data = {};
         for (var lat = -90; lat <= 90; lat++) {

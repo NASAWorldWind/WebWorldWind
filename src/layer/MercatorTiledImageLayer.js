@@ -31,12 +31,14 @@
 define([
         '../util/Color',
         '../geom/Sector',
+        '../geom/Location',
         '../layer/TiledImageLayer',
         '../geom/Vec2',
         '../util/WWMath'
     ],
     function (Color,
               Sector,
+              Location,
               TiledImageLayer,
               Vec2,
               WWMath) {
@@ -49,25 +51,43 @@ define([
          * @augments TiledImageLayer
          * @classdesc Provides an abstract layer to support Mercator layers.
          *
-         * @param {Sector} sector The sector this layer covers.
-         * @param {Location} levelZeroDelta The size in latitude and longitude of level zero (lowest resolution) tiles.
+         * @param {String} displayName This layer's display name.
          * @param {Number} numLevels The number of levels to define for the layer. Each level is successively one power
          * of two higher resolution than the next lower-numbered level. (0 is the lowest resolution level, 1 is twice
          * that resolution, etc.)
          * Each level contains four times as many tiles as the next lower-numbered level, each 1/4 the geographic size.
          * @param {String} imageFormat The mime type of the image format for the layer's tiles, e.g., <em>image/png</em>.
          * @param {String} cachePath A string uniquely identifying this layer relative to other layers.
-         * @param {Number} tileWidth The horizontal size of image tiles in pixels.
-         * @param {Number} tileHeight The vertical size of image tiles in pixels.
-         * @throws {ArgumentError} If any of the specified sector, level-zero delta, cache path or image format arguments are
-         * null or undefined, or if the specified number of levels, tile width or tile height is less than 1.
+         * @param {Number} imageSize The horizontal and vertical size of image tiles in pixels.
+         * @param {Number} firstLevelOffset The level offset to skip applying one tile over whole globe and start from e.g. 8x8 tiles.
+         * @throws {ArgumentError} If any of the specified cache path or image format arguments are
+         * null or undefined, or if the specified number of levels or tile size is less than 1.
          */
-        var MercatorTiledImageLayer = function (sector, levelZeroDelta, numLevels, imageFormat, cachePath,
-                                                tileWidth, tileHeight) {
-            TiledImageLayer.call(this,
-                sector, levelZeroDelta, numLevels, imageFormat, cachePath, tileWidth, tileHeight);
+        var MercatorTiledImageLayer = function (displayName, numLevels, imageFormat, cachePath, imageSize, firstLevelOffset) {
+
+            function gudermannian(percent) {
+                var x = percent * Math.PI;
+                // var sinh = (Math.exp(x) - Math.exp(-x)) / 2;
+                var y = Math.exp(x);
+                var sinh = (y - 1 / y) / 2;
+                return Math.atan(sinh) * 180 / Math.PI;
+            }
+
+            function levelZeroDelta(firstLevelOffset) {
+                var levelZeroDelta = 360 / (1 << firstLevelOffset);
+                return new Location(levelZeroDelta / 2, levelZeroDelta);
+            }
+
+            var sector = new Sector(
+                gudermannian(-1), gudermannian(1), -180, 180
+            );
+
+            TiledImageLayer.call(this, displayName,
+                sector, levelZeroDelta(firstLevelOffset), numLevels - firstLevelOffset, imageFormat, cachePath, imageSize, imageSize);
 
             this.detectBlankImages = false;
+            this.imageSize = imageSize;
+            this.firstLevelOffset = firstLevelOffset;
 
             // These pixels are tested in retrieved images to determine whether the image is blank.
             this.testPixels = [
@@ -187,6 +207,36 @@ define([
             }
 
             return true;
+        };
+
+        /**
+         * Calculates map size in pixels for specified level.
+         *
+         * @param {Number} levelNumber The number of level to calculate map size for.
+         */
+        MercatorTiledImageLayer.prototype.mapSizeForLevel = function(levelNumber) {
+            return this.imageSize << (levelNumber + this.firstLevelOffset);
+        };
+
+        // Overridden from TiledImageLayer to add possibility to create simple child layers with URL builder built-in.
+        MercatorTiledImageLayer.prototype.resourceUrlForTile = function(tile, imageFormat) {
+            if (this.urlBuilder) {
+                return this.urlBuilder.urlForTile(tile, imageFormat);
+            } else {
+                return this.getImageSourceUrl(tile.column, tile.row, tile.level.levelNumber + this.firstLevelOffset);
+            }
+        };
+
+        /**
+         * Simple version of URL builder based on commonly used by online maps input parameters x, y and z.
+         *
+         * @param {Number} x The X coordinate of tile.
+         * @param {Number} y The Y coordinate of tile.
+         * @param {Number} z The zoom level of tile.
+         */
+        MercatorTiledImageLayer.prototype.getImageSourceUrl = function(x, y, z) {
+            // Intentionally empty. Can be override in child layer and return URL for specified tile instead of builder
+            return null;
         };
 
         return MercatorTiledImageLayer;

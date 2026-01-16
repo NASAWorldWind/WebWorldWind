@@ -28,10 +28,7 @@
 /**
  * @exports Layer
  */
-define([
-        '../util/Logger'
-    ],
-    function (Logger) {
+define([], function () {
         "use strict";
 
         /**
@@ -40,6 +37,7 @@ define([
          * @constructor
          * @classdesc Provides an abstract base class for layer implementations. This class is not meant to be instantiated
          * directly.
+         * @param {String} displayName This layer's display name.
          */
         var Layer = function (displayName) {
 
@@ -48,7 +46,7 @@ define([
              * @type {String}
              * @default "Layer"
              */
-            this.displayName = displayName ? displayName : "Layer";
+            this.displayName = displayName || "Layer";
 
             /**
              * Indicates whether to display this layer.

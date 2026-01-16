@@ -63,10 +63,8 @@ define([
         var LandsatRestLayer = function (serverAddress, pathToData, displayName) {
             var cachePath = WWUtil.urlPath(serverAddress + "/" + pathToData);
 
-            TiledImageLayer.call(this, Sector.FULL_SPHERE, new Location(36, 36), 10, "image/png", cachePath, 512, 512);
+            TiledImageLayer.call(this, displayName, Sector.FULL_SPHERE, new Location(36, 36), 10, "image/png", cachePath, 512, 512);
 
-            this.displayName = displayName;
-            this.pickEnabled = false;
             this.urlBuilder = new LevelRowColumnUrlBuilder(serverAddress, pathToData);
         };
 
