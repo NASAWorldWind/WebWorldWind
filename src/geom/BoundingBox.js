@@ -571,7 +571,7 @@ define([
 
             try {
                 // Setup to transform unit cube coordinates to this bounding box's local coordinates, as viewed by the
-                // current navigator state.
+                // current camera state.
                 matrix.copy(dc.modelviewProjection);
                 matrix.multiply(
                     this.r[0], this.s[0], this.t[0], this.center[0],

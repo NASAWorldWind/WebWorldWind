@@ -85,9 +85,11 @@ define(['../../src/WorldWind',
                 }
 
                 // Start the view pointing to Paris
-                wwd.navigator.lookAtLocation.latitude = 48.86;
-                wwd.navigator.lookAtLocation.longitude = 2.37;
-                wwd.navigator.range = 5e4;
+                var lookAt = new WorldWind.LookAt();
+                lookAt.position.latitude = 48.86;
+                lookAt.position.longitude = 2.37;
+                lookAt.range = 5e4;
+                this.wwd.cameraFromLookAt(lookAt);
 
                 // Create controllers for the user interface elements.
                 new GoToBox(wwd);

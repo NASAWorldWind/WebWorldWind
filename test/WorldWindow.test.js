@@ -26,53 +26,19 @@
  * PDF found in code  directory.
  */
 define([
-    'src/BasicWorldWindowController',
-    'src/render/DrawContext',
     'src/globe/ElevationModel',
     'src/globe/Globe',
-    'src/geom/Matrix',
-    'src/navigate/LookAtNavigator',
-    'src/geom/Rectangle',
-    'src/geom/Vec2',
-    'src/geom/Vec3',
-    'src/WorldWind',
-    'src/WorldWindow'
-], function (BasicWorldWindowController, DrawContext, ElevationModel, Globe, Matrix, LookAtNavigator, Rectangle, Vec2, Vec3, WorldWind, WorldWindow) {
+    'test/util/TestUtils.test'
+], function (ElevationModel, Globe, TestUtils) {
     "use strict";
 
-    var MockGlContext = function () {
-        this.drawingBufferWidth = 800;
-        this.drawingBufferHeight = 800;
-    };
-
-    var viewport = new Rectangle(0, 0, 848, 848);
-    var dc = new DrawContext(new MockGlContext());
-    var MockWorldWindow = function () {
-    };
-
-    MockWorldWindow.prototype = Object.create(WorldWindow.prototype);
-
-    // create a globe that returns mock elevations for a given sector so we don't have to rely on
-    // asynchronous tile calls to finish.
-    Globe.prototype.minAndMaxElevationsForSector = function (sector) {
-        return [125.0, 350.0];
-    };
     var mockGlobe = new Globe(new ElevationModel());
-    var wwd = new MockWorldWindow();
-    wwd.globe = mockGlobe;
-    wwd.drawContext = dc;
-    wwd.navigator = new LookAtNavigator();
-    wwd.worldWindowController = new BasicWorldWindowController(wwd);
-    wwd.viewport = viewport;
-    wwd.depthBits = 24;
-    wwd.scratchModelview = Matrix.fromIdentity();
-    wwd.scratchProjection = Matrix.fromIdentity();
-    wwd.layers = [];
+    var wwd = TestUtils.getMockWwd(mockGlobe);
     wwd.resetDrawContext();
 
     describe("WorldWindow Tests", function () {
 
-        describe("Correctly computes a ray originating at the navigator's eyePoint and extending through the specified point in window coordinates", function () {
+        describe("Correctly computes a ray originating at the cameras's point and extending through the specified point in window coordinates", function () {
             it("Should throw an exception on missing input parameter", function () {
                 expect(function () {
                     dc.rayThroughScreenPoint(null);
@@ -91,10 +57,10 @@ define([
             // });
         });
 
-        describe("Correctly computes the approximate size of a pixel at a specified distance from the navigator's eye point", function () {
+        describe("Correctly computes the approximate size of a pixel at a specified distance from the cameras's point", function () {
             it("Calculates pixelSizeAtDistance correctly", function () {
                 var distance = 10097319.189;
-                var expectedSize = 11907.216;
+                var expectedSize = 9864.261; // FOV based approach gives another result then old pixel metrics based on frustum
                 var pixelSize = wwd.pixelSizeAtDistance(distance);
                 expect(pixelSize).toBeCloseTo(expectedSize, 3);
             });
