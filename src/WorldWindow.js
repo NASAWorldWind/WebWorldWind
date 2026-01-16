@@ -139,6 +139,9 @@ define([
             this.scratchProjection = Matrix.fromIdentity();
 
             // Internal. Intentionally not documented.
+            this.scratchPoint = new Vec3(0, 0, 0);
+
+            // Internal. Intentionally not documented.
             this.hasStencilBuffer = gl.getContextAttributes().stencil;
 
             /**
@@ -1502,6 +1505,72 @@ define([
                     }
                 }
             }
+        };
+
+        /**
+         * Transforms a Cartesian coordinate point to coordinates relative to this WorldWindow's canvas.
+         * <p/>
+         * This stores the converted point in the result argument, and returns a boolean value indicating whether or not the
+         * converted is successful. This returns false if the Cartesian point is clipped by either the WorldWindow's near
+         * clipping plane or far clipping plane.
+         *
+         * @param {Number} x      the Cartesian point's x component in meters
+         * @param {Number} y      the Cartesian point's y component in meters
+         * @param {Number} z      the Cartesian point's z component in meters
+         * @param {Vec2}   result a pre-allocated {@link Vec2} in which to return the screen point
+         *
+         * @return {boolean} true if the transformation is successful, otherwise false
+         *
+         * @throws {ArgumentError} If the result is null
+         */
+        WorldWindow.prototype.cartesianToScreenPoint = function (x, y, z, result) {
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.ERROR, "WorldWindow", "cartesianToScreenPoint",
+                    "missingResult"));
+            }
+
+            // Compute the WorldWindow's modelview-projection matrix.
+            this.computeViewingTransform(this.scratchProjection, this.scratchModelview);
+            this.scratchProjection.multiplyMatrix(this.scratchModelview);
+
+            // Transform the Cartesian point to OpenGL screen coordinates. Complete the transformation by converting to
+            // Android screen coordinates and discarding the screen Z component.
+            if (this.scratchProjection.project(x, y, z, this.viewport, this.scratchPoint)) {
+                result[0] = this.scratchPoint[0];
+                result[1] = this.viewport.height - this.scratchPoint[1];
+                return true;
+            }
+
+            return false;
+        };
+
+        /**
+         * Transforms a geographic position to coordinates relative to this WorldWindow's canvas.
+         * <p/>
+         * This stores the converted point in the result argument, and returns a boolean value indicating whether or not the
+         * converted is successful. This returns false if the Cartesian point is clipped by either of the WorldWindow's
+         * near clipping plane or far clipping plane.
+         *
+         * @param {Number} latitude  the position's latitude in degrees
+         * @param {Number} longitude the position's longitude in degrees
+         * @param {Number} altitude  the position's altitude in meters
+         * @param {Vec2}   result    a pre-allocated {@link Vec2} in which to return the screen point
+         *
+         * @return {boolean} true if the transformation is successful, otherwise false
+         *
+         * @throws {ArgumentError} If the result is null
+         */
+        WorldWindow.prototype.geographicToScreenPoint = function (latitude, longitude, altitude, result) {
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.ERROR, "WorldWindow", "geographicToScreenPoint",
+                    "missingResult"));
+            }
+
+            // Convert the position from geographic coordinates to Cartesian coordinates.
+            this.globe.computePointFromPosition(latitude, longitude, altitude, this.scratchPoint);
+
+            // Convert the position from Cartesian coordinates to screen coordinates.
+            return this.cartesianToScreenPoint(this.scratchPoint[0], this.scratchPoint[1], this.scratchPoint[2], result);
         };
 
         /**

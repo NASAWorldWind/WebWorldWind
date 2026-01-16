@@ -1851,6 +1851,77 @@ define([
             return result;
         };
 
+        /**
+         * Projects a Cartesian point to screen coordinates. This method assumes this matrix represents an inverse
+         * modelview-projection matrix. The result of this method is undefined if this matrix is not an inverse
+         * modelview-projection matrix.
+         * <p/>
+         * The resultant screen point is in OpenGL screen coordinates, with the origin in the bottom-left corner and axes
+         * that extend up and to the right from the origin.
+         * <p/>
+         * This stores the projected point in the result argument, and returns a boolean value indicating whether or not the
+         * projection is successful. This returns false if the Cartesian point is clipped by the near clipping plane or the
+         * far clipping plane.
+         *
+         * @param {Number}    x the Cartesian point's X component
+         * @param {Number}    y the Cartesian point's y component
+         * @param {Number}    z the Cartesian point's z component
+         * @param {Rectangle} viewport the viewport defining the screen point's coordinate system
+         * @param {Vec3}    result a pre-allocated {@link Vec3} in which to return the projected point
+         *
+         * @return {boolean} true if the transformation is successful, otherwise false
+         *
+         * @throws {ArgumentError} If any argument is null
+         */
+        Matrix.prototype.project = function (x, y, z, viewport, result) {
+            if (!viewport) {
+                throw new ArgumentError(Logger.logMessage(Logger.ERROR, "Matrix", "project",
+                    "missingViewport"));
+            }
+
+            if (!result) {
+                throw new ArgumentError(Logger.logMessage(Logger.ERROR, "Matrix", "project",
+                    "missingResult"));
+            }
+
+            // Transform the model point from model coordinates to eye coordinates then to clip coordinates. This inverts
+            // the Z axis and stores the negative of the eye coordinate Z value in the W coordinate.
+            var sx = this[0] * x + this[1] * y + this[2] * z + this[3];
+            var sy = this[4] * x + this[5] * y + this[6] * z + this[7];
+            var sz = this[8] * x + this[9] * y + this[10] * z + this[11];
+            var sw = this[12] * x + this[13] * y + this[14] * z + this[15];
+
+            if (sw === 0) {
+                return false;
+            }
+
+            // Complete the conversion from model coordinates to clip coordinates by dividing by W. The resultant X, Y
+            // and Z coordinates are in the range [-1,1].
+            sx /= sw;
+            sy /= sw;
+            sz /= sw;
+
+            // Clip the point against the near and far clip planes.
+            if (sz < -1 || sz > 1) {
+                return false;
+            }
+
+            // Convert the point from clip coordinate to the range [0,1]. This enables the X and Y coordinates to be
+            // converted to screen coordinates, and the Z coordinate to represent a depth value in the range[0,1].
+            sx = sx * 0.5 + 0.5;
+            sy = sy * 0.5 + 0.5;
+            sz = sz * 0.5 + 0.5;
+
+            // Convert the X and Y coordinates from the range [0,1] to screen coordinates.
+            sx = sx * viewport.width + viewport.x;
+            sy = sy * viewport.height + viewport.y;
+
+            result[0] = sx;
+            result[1] = sy;
+            result[2] = sz;
+
+            return true;
+        };
 
         /**
          * Transforms the specified screen point from WebGL screen coordinates to model coordinates. This method assumes
