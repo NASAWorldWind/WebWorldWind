@@ -424,9 +424,6 @@ define([
          * cannot be created or should not be created at the time this method is called.
          */
         Placemark.prototype.makeOrderedRenderable = function (dc) {
-            var w, h, s,
-                offset;
-
             this.determineActiveAttributes(dc);
             if (!this.activeAttributes) {
                 return null;
@@ -459,33 +456,60 @@ define([
             var visibilityScale = this.eyeDistanceScaling ?
                 Math.max(0.0, Math.min(1, this.eyeDistanceScalingThreshold / this.eyeDistance)) : 1;
 
+            // Initialize the unit square transform to the identity matrix.
+            this.imageTransform.setToIdentity();
+
             // Compute the placemark's transform matrix and texture coordinate matrix according to its screen point, image size,
             // image offset and image scale. The image offset is defined with its origin at the image's bottom-left corner and
             // axes that extend up and to the right from the origin point. When the placemark has no active texture the image
             // scale defines the image size and no other scaling is applied.
+            var offset, offsetX, offsetY, scaleX, scaleY;
             if (this.activeTexture) {
-                w = this.activeTexture.originalImageWidth;
-                h = this.activeTexture.originalImageHeight;
-                s = this.activeAttributes.imageScale * visibilityScale;
+                var w = this.activeTexture.originalImageWidth;
+                var h = this.activeTexture.originalImageHeight;
+                var s = this.activeAttributes.imageScale * visibilityScale;
                 offset = this.activeAttributes.imageOffset.offsetForSize(w, h);
-
-                this.imageTransform.setTranslation(
-                    Placemark.screenPoint[0] - offset[0] * s,
-                    Placemark.screenPoint[1] - offset[1] * s,
-                    Placemark.screenPoint[2]);
-
-                this.imageTransform.setScale(w * s, h * s, 1);
+                offsetX = offset[0] * s;
+                offsetY = offset[1] * s;
+                scaleX = w * s;
+                scaleY = h * s;
             } else {
-                s = this.activeAttributes.imageScale * visibilityScale;
+                var size = this.activeAttributes.imageScale * visibilityScale;
                 offset = this.activeAttributes.imageOffset.offsetForSize(s, s);
-
-                this.imageTransform.setTranslation(
-                    Placemark.screenPoint[0] - offset[0],
-                    Placemark.screenPoint[1] - offset[1],
-                    Placemark.screenPoint[2]);
-
-                this.imageTransform.setScale(s, s, 1);
+                offsetX = offset[0];
+                offsetY = offset[1];
+                scaleX = scaleY = size;
             }
+
+            // Position image on screen
+            this.imageTransform.multiplyByTranslation(
+                Placemark.screenPoint[0],
+                Placemark.screenPoint[1],
+                Placemark.screenPoint[2]);
+
+            // Divide Z by 2^24 to prevent texture clipping when tilting (where 24 is depth buffer bit size).
+            // Doing so will limit depth range to (diagonal length)/2^24 and make its value within 0..1 range.
+            this.imageTransform.multiplyByScale(1, 1, 1 / (1 << 24) );
+
+            // Perform the tilt so that the image tilts back from its base into the view volume
+            if (this.imageTilt) {
+                var actualTilt = this.imageTiltReference === WorldWind.RELATIVE_TO_GLOBE ?
+                    dc.camera.tilt + this.imageTilt : this.imageTilt;
+                this.imageTransform.multiplyByRotation(-1, 0, 0, actualTilt);
+            }
+
+            // Perform image rotation
+            if (this.imageRotation) {
+                var actualRotation = this.imageRotationReference === WorldWind.RELATIVE_TO_GLOBE ?
+                    dc.camera.heading - this.imageRotation : -this.imageRotation;
+                this.imageTransform.multiplyByRotation(0, 0, 1, actualRotation);
+            }
+
+            // Apply pivot translation
+            this.imageTransform.multiplyByTranslation(-offsetX, -offsetY, 0);
+
+            // Apply scale
+            this.imageTransform.multiplyByScale(scaleX, scaleY, 1);
 
             this.imageBounds = WWMath.boundingRectForUnitQuad(this.imageTransform);
 
@@ -710,18 +734,6 @@ define([
             // Compute and specify the MVP matrix.
             Placemark.matrix.copy(dc.screenProjection);
             Placemark.matrix.multiplyMatrix(this.imageTransform);
-
-            var actualRotation = this.imageRotationReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigator.heading - this.imageRotation : -this.imageRotation;
-            Placemark.matrix.multiplyByTranslation(0.5, 0.5, 0);
-            Placemark.matrix.multiplyByRotation(0, 0, 1, actualRotation);
-            Placemark.matrix.multiplyByTranslation(-0.5, -0.5, 0);
-
-            // Perform the tilt before applying the rotation so that the image tilts back from its base into
-            // the view volume.
-            var actualTilt = this.imageTiltReference === WorldWind.RELATIVE_TO_GLOBE ?
-                dc.navigator.tilt + this.imageTilt : this.imageTilt;
-            Placemark.matrix.multiplyByRotation(-1, 0, 0, actualTilt);
 
             program.loadModelviewProjection(gl, Placemark.matrix);
 
