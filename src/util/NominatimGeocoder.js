@@ -38,15 +38,15 @@ define([
          * Constructs a Nominatim geocoder.
          * @alias NominatimGeocoder
          * @constructor
-         * @classdesc Provides a gazetteer that uses Open Street Map Nominatim geocoder at Mapquest.
+         * @classdesc Provides a gazetteer that uses the OpenStreetMap Nominatim geocoder.
          */
         var NominatimGeocoder = function () {
             /**
              * The URL of the geocoder service.
              * @type {String}
-             * @default http://open.mapquestapi.com/nominatim/v1/search/
+             * @default https://nominatim.openstreetmap.org/search
              */
-            this.service = "https://open.mapquestapi.com/nominatim/v1/search/";
+            this.service = "https://nominatim.openstreetmap.org/search";
         };
 
         /**
@@ -56,16 +56,16 @@ define([
          * function is passed two arguments: this geocoder and an array containing the query results. See
          * [the OpenStreetMap Nominatim Wiki] {@link http://wiki.openstreetmap.org/wiki/Nominatim} for a description
          * of the results. The result passed to the callback is parsed JSON.
-         * @param {String} accessKey The MapQuest API access key to use for the request. See
-         * https://developer.mapquest.com/plan_purchase/free/business_edition/business_edition_free
-         * to obtain a key.
+         * @param {String} accessKey An optional API access key for geocoder services that require one.
          */
         NominatimGeocoder.prototype.lookup = function (queryString, callback, accessKey) {
-            var url = this.service + queryString.replace(" ", "%20") + "?format=json",
+            var url = this.service + "?format=json&q=" + encodeURIComponent(queryString),
                 xhr = new XMLHttpRequest(),
                 thisGeocoder = this;
 
-            url += "&key=" + (accessKey || "lUvVRchXGGDh5Xwk3oidrXeIDAAevOUS");
+            if (accessKey) {
+                url += "&key=" + encodeURIComponent(accessKey);
+            }
 
             xhr.open("GET", url, true);
 
